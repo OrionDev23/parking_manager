@@ -33,6 +33,7 @@ dependencies:
 
 
   fluent_ui: ^4.7.6
+  supabase_flutter: ^1.10.22
 
 dev_dependencies:
   flutter_test:
