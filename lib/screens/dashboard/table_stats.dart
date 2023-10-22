@@ -35,8 +35,8 @@ class TableStats extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(
-            height: 38,
+          SizedBox(
+            height: 5.h,
           ),
           Table(
             children: [
