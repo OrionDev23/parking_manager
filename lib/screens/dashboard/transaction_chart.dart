@@ -1,7 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
-import 'package:parking_manager/utilities/theme_colors.dart';
-
+import '../../utilities/theme_colors.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 class TransactionChart extends StatefulWidget {
   TransactionChart({super.key});
   final Color leftBarColor = ThemeColors.orange.darkest;
