@@ -1,7 +1,7 @@
 
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
-import 'package:parking_manager/utilities/theme_colors.dart';
+import 'utilities/theme_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_theme/system_theme.dart';
 enum NavigationIndicators { sticky, end }

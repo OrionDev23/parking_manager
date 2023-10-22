@@ -1,6 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parking_manager/theme.dart';
-import 'package:parking_manager/utilities/color_manip.dart';
+import '../theme.dart';
+import '../utilities/color_manip.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 

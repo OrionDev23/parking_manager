@@ -64,13 +64,6 @@ class TransactionChartState extends State<TransactionChart> {
                   'Transactions',
                   style: TextStyle(fontSize: 22),
                 ),
-                const SizedBox(
-                  width: 4,
-                ),
-                const Text(
-                  'state',
-                  style: TextStyle(color: Color(0xff77839a), fontSize: 16),
-                ),
               ],
             ),
             const SizedBox(

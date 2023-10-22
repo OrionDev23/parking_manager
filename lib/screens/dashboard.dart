@@ -20,6 +20,7 @@ class HomePage extends StatelessWidget {
     return ScaffoldPage(
       header: const PageTitle(text: 'home'),
       content: ListView(
+        padding: const EdgeInsets.all(5),
         children: [
           const Padding(
             padding: EdgeInsets.all(8.0),
@@ -62,17 +63,18 @@ class HomePage extends StatelessWidget {
                 const SizedBox(
                   width: 5,
                 ),
-                Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      boxShadow: kElevationToShadow[2],
-                      borderRadius: BorderRadius.circular(5),
-                        color: appTheme.mode==ThemeMode.dark?Colors.grey:appTheme.mode==ThemeMode.light?Colors.white:ThemeMode.system==ThemeMode.light?Colors.white:Colors.grey
+                Expanded(
+                  child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        boxShadow: kElevationToShadow[2],
+                        borderRadius: BorderRadius.circular(5),
+                          color: appTheme.mode==ThemeMode.dark?Colors.grey:appTheme.mode==ThemeMode.light?Colors.white:ThemeMode.system==ThemeMode.light?Colors.white:Colors.grey
 
-                    ),
-                    width: 40.w,
-                    height: 50.h,
-                    child: TransactionChart()),
+                      ),
+                      height: 50.h,
+                      child: TransactionChart()),
+                ),
               ],
             ),
           ),

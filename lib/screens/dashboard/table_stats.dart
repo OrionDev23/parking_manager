@@ -20,8 +20,24 @@ class TableStats extends StatelessWidget {
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              makeTransactionsIcon(),
+              const SizedBox(
+                width: 38,
+              ),
+              const Text(
+                'Alertes',
+                style: TextStyle(fontSize: 22),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 38,
+          ),
           Table(
             children: [
               TableRow(
@@ -118,42 +134,6 @@ class TableStats extends StatelessWidget {
                   child: Text('10000.00 DA'),
                 ),
               ]),
-              const TableRow(children: [
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('5'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Vidange'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('10/10/2019'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('10000.00 DA'),
-                ),
-              ]),
-              const TableRow(children: [
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('5'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Vidange'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('10/10/2019'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('10000.00 DA'),
-                ),
-              ]),
             ],
             border: TableBorder.all(
                 color: Colors.grey[150]
@@ -162,10 +142,37 @@ class TableStats extends StatelessWidget {
           const SizedBox(
             height: 10,
           ),
-          FilledButton(
-              child: const Text('Voir plus'), onPressed: () {}),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              FilledButton(
+                  child: const Text('Voir plus'), onPressed: () {}),
+            ],
+          ),
         ],
       ),
+    );
+  }
+
+  Widget makeTransactionsIcon() {
+    const width = 40.0;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Container(
+          width: width,
+          height: width,
+          decoration: BoxDecoration(
+              color: Colors.transparent,
+              shape: BoxShape.circle,
+              border: Border.all(
+                  color: Colors.orange.withOpacity(0.6),
+                  width: 3,
+              ),
+          ),
+          child: Icon(FluentIcons.note_pinned,color: Colors.orange,),
+        ),
+      ],
     );
   }
 }
