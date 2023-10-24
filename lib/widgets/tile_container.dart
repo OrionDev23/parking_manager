@@ -11,12 +11,12 @@ class TileContainer extends StatefulWidget {
   final int index;
   final int? corner;
   const TileContainer({
-    Key? key,
+    super.key,
     required this.image,
     required this.title,
     required this.index,
     this.corner = 0,
-  }) : super(key: key);
+  });
 
   @override
   State<TileContainer> createState() => _TileContainerState();
