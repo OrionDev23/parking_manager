@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'providers/client_database.dart';
 import 'screens/sidemenu.dart';
 import 'theme.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +14,7 @@ const appTitle="ParcOto";
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initWindow();
+  ClientDatabase();
   launchApp();
 }
 
