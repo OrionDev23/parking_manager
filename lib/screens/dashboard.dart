@@ -22,30 +22,33 @@ class HomePage extends StatelessWidget {
       content: ListView(
         padding: const EdgeInsets.all(5),
         children: [
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ButtonContainer(
-                  icon: FluentIcons.car,
-                  text: 'Vehicules actifs',
-                ),
-                smallSpace,
-                ButtonContainer(
-                    icon: FluentIcons.edit_event, text: 'Reservation'),
-                smallSpace,
-                ButtonContainer(icon: FluentIcons.people, text: 'Clients'),
-                smallSpace,
-                ButtonContainer(
-                  icon: FluentIcons.report_alert,
-                  text: 'Aide',
-                  textList: "Obtenir de l'aide",
-                  showBothLN: false,
-                  showCounter: false,
-                  color: Colors.grey,
-                ),
-              ],
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              width: 90.w,
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ButtonContainer(
+                    icon: FluentIcons.car,
+                    text: 'Vehicules actifs',
+                  ),
+                  smallSpace,
+                  ButtonContainer(
+                      icon: FluentIcons.edit_event, text: 'Reservation'),
+                  smallSpace,
+                  ButtonContainer(icon: FluentIcons.people, text: 'Clients'),
+                  smallSpace,
+                  ButtonContainer(
+                    icon: FluentIcons.report_alert,
+                    text: 'Aide',
+                    textList: "Obtenir de l'aide",
+                    showBothLN: false,
+                    showCounter: false,
+                    color: Colors.grey,
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(
