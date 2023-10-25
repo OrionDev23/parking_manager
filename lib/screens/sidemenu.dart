@@ -1,3 +1,4 @@
+import 'package:parc_oto/screens/login_screen.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'dashboard.dart';
 import 'settings.dart';
@@ -201,7 +202,7 @@ class PanesListState extends State<PanesList> with WindowListener {
     login = PaneItem(
         icon: const Icon(FluentIcons.signin),
         title: const Text('seconnecter').tr(),
-        body: const Placeholder());
+        body: const LoginScreen());
     logout = PaneItem(
         icon: const Icon(FluentIcons.sign_out),
         title: const Text('decon').tr(),
