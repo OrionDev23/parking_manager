@@ -1,5 +1,7 @@
+import 'package:appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:parc_oto/widgets/page_header.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +19,8 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController password = TextEditingController();
 
   bool showPassword=false;
+
+  bool signedIn=false;
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
@@ -100,14 +104,38 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       height: 2.h,
                     ),
-                    FilledButton(onPressed: () {}, child: const Text('Se connecter')),
+                    FilledButton(onPressed: signIn, child: const Text('Se connecter')),
 
                   ],
                 ),
               ),
+              SizedBox(height: 2.h,),
+              Text(
+                signedIn? 'connected to ${session!.userId}'
+                    : 'Not connected',
+                style: TextStyle(color: Colors.red),
+
+              )
             ],
           ),
       ),
     );
   }
+
+  static Session? session;
+  void signIn() async{
+       await ClientDatabase.account!.createEmailSession(
+           email: email.text,
+           password: password.text).then((value) {
+         session=value;
+         setState(() {
+           signedIn=true;
+         });
+       }).catchError((error){
+         print(error);
+         setState(() {
+           signedIn=false;
+         });
+       });
+}
 }
