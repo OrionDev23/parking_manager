@@ -1,7 +1,6 @@
 
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
-
 class ClientDatabase{
   static Client? client;
   static Account? account;

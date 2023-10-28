@@ -1,3 +1,4 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
@@ -172,8 +173,9 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           signedIn=true;
         });
-      }).catchError((error){
+      }).onError<AppwriteException>((e,s){
 
+        error=e.type!.tr();
         setState(() {
           signedIn=false;
         });
@@ -182,7 +184,6 @@ class _LoginScreenState extends State<LoginScreen> {
     else if(password.text.isEmpty){
         setState(() {
           error="emptypassword".tr();
-
           signedIn=false;
         });
     }

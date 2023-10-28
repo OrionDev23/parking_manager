@@ -63,6 +63,8 @@
  "remise": "Remise (%)",
  "delete": "Supprimer",
  "numf": "Numéro de facture",
+ "user_invalid_credentials": "Email et/ou mot de passe incorrecte(s)",
+ "general_argument_invalid": "Le mot de passe doit contenir au moins 8 caractères",
  "num": "N°",
  "year": "Année",
  "numindisp": "Numéro non disponible",
