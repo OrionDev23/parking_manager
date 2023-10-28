@@ -1,8 +1,8 @@
-import 'package:appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/theme.dart';
+import 'package:parc_oto/utilities/form_validators.dart';
 import 'package:parc_oto/widgets/page_header.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -21,6 +21,26 @@ class _LoginScreenState extends State<LoginScreen> {
   bool showPassword=false;
 
   bool signedIn=false;
+
+  bool checking=false;
+
+  bool validEmail=false;
+  bool validPassword=false;
+
+  @override
+  void initState() {
+    checkUser();
+    super.initState();
+  }
+
+  void checkUser() async{
+    checking=true;
+    await ClientDatabase().getUser();
+    setState(() {
+      checking=false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
@@ -38,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.all(10),
                 alignment: Alignment.center,
                 width: 25.w,
-                height: 30.h,
+                height: 35.h,
                 decoration: BoxDecoration(
                   color: appTheme.mode == ThemeMode.dark
                       ? Colors.grey
@@ -56,10 +76,28 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     SizedBox(
                       width: 20.w,
-                      child: TextBox(
-                        controller: email,
-                        placeholder: 'email'.tr(),
-                        keyboardType: TextInputType.emailAddress,
+                      child: InfoLabel(
+
+                        label: validEmail||email.text.isEmpty?'':'entervalidemail'.tr(),
+                        labelStyle: TextStyle(color:Colors.red),
+                        child: TextBox(
+                          controller: email,
+                          placeholder: 'email'.tr(),
+                          keyboardType: TextInputType.emailAddress,
+                          onChanged: (s){
+                           if(!FormValidators.isEmail(s)){
+                             setState(() {
+                               validEmail=false;
+                             });
+                           }
+                           else{
+                             setState(() {
+                               validEmail=true;
+
+                             });
+                           }
+                          },
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -97,24 +135,26 @@ class _LoginScreenState extends State<LoginScreen> {
                                 backgroundColor: ButtonState.all<Color>(Colors.transparent)
 
                             ),
-                            onPressed: (){},
-                            child: Text('Mot de passe oublié ?',style: TextStyle(color: Colors.blue),)),
+                            onPressed: forgotPassword,
+                            child: Text('forgot',style: TextStyle(color: Colors.blue),).tr()),
                       ],
                     ),
                     SizedBox(
                       height: 2.h,
                     ),
-                    FilledButton(onPressed: signIn, child: const Text('Se connecter')),
+                    FilledButton(onPressed:checking?null:signIn,
+                        child:
+                        checking?const ProgressRing(strokeWidth:2.0):
+                        const Text('seconnecter').tr()),
 
                   ],
                 ),
               ),
               SizedBox(height: 2.h,),
+              if(!signedIn && error.isNotEmpty)
               Text(
-                signedIn? 'connected to ${session!.userId}'
-                    : 'Not connected',
+                error,
                 style: TextStyle(color: Colors.red),
-
               )
             ],
           ),
@@ -122,20 +162,48 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  static Session? session;
+  String error="";
   void signIn() async{
-       await ClientDatabase.account!.createEmailSession(
-           email: email.text,
-           password: password.text).then((value) {
-         session=value;
-         setState(() {
-           signedIn=true;
-         });
-       }).catchError((error){
-         print(error);
-         setState(() {
-           signedIn=false;
-         });
-       });
+    if(validEmail && password.text.isNotEmpty){
+      await ClientDatabase.account!.createEmailSession(
+          email: email.text,
+          password: password.text).then((value) async{
+        ClientDatabase.user=await ClientDatabase.account!.get();
+        setState(() {
+          signedIn=true;
+        });
+      }).catchError((error){
+
+        setState(() {
+          signedIn=false;
+        });
+      });
+    }
+    else if(password.text.isEmpty){
+        setState(() {
+          error="emptypassword".tr();
+
+          signedIn=false;
+        });
+    }
+
 }
+
+
+  void forgotPassword(){
+    if(email.text.isEmpty){
+      setState(() {
+        signedIn=false;
+        error="emailempty".tr();
+      });
+    }
+    else if(validEmail){
+      ClientDatabase.account!.createRecovery(email: email.text,
+          url:'https://app.parcoto.com/recoverpassword');
+      setState(() {
+        error="";
+      });
+    }
+
+  }
 }

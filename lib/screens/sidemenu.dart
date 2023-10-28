@@ -45,8 +45,8 @@ class PanesListState extends State<PanesList> with WindowListener {
   bool loading=false;
   @override
   void initState() {
-    initPanes();
     getProfil();
+    initPanes();
     footerItems = [
       PaneItemSeparator(),
       parametres,
