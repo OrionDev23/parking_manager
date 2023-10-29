@@ -1,6 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import '../../utilities/theme_colors.dart';
 import 'package:provider/provider.dart';
 import '../../theme.dart';
 
@@ -25,7 +24,7 @@ class TableStats extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              makeTransactionsIcon(),
+              makeTransactionsIcon(context),
               const SizedBox(
                 width: 38,
               ),
@@ -42,7 +41,7 @@ class TableStats extends StatelessWidget {
             children: [
               TableRow(
                   decoration: BoxDecoration(
-                      color: ThemeColors.orange,
+                      color: appTheme.color,
                       boxShadow: kElevationToShadow[2]),
                   children: const [
                     Padding(
@@ -154,8 +153,9 @@ class TableStats extends StatelessWidget {
     );
   }
 
-  Widget makeTransactionsIcon() {
+  Widget makeTransactionsIcon(BuildContext context) {
     const width = 40.0;
+    var appTheme=context.watch<AppTheme>();
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -166,11 +166,11 @@ class TableStats extends StatelessWidget {
               color: Colors.transparent,
               shape: BoxShape.circle,
               border: Border.all(
-                  color: Colors.orange.withOpacity(0.6),
+                  color: appTheme.color.withOpacity(0.6),
                   width: 3,
               ),
           ),
-          child: Icon(FluentIcons.note_pinned,color: Colors.orange,),
+          child: Icon(FluentIcons.note_pinned,color: appTheme.color,),
         ),
       ],
     );

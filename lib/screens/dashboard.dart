@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import '../theme.dart';
 import 'package:provider/provider.dart';
@@ -26,23 +27,23 @@ class HomePage extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: SizedBox(
               width: 90.w,
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ButtonContainer(
                     icon: FluentIcons.car,
-                    text: 'Vehicules actifs',
+                    text: 'vehicules'.tr(),
                   ),
                   smallSpace,
                   ButtonContainer(
-                      icon: FluentIcons.edit_event, text: 'Reservation'),
+                      icon: FluentIcons.edit_event, text: 'reservation'.tr()),
                   smallSpace,
-                  ButtonContainer(icon: FluentIcons.people, text: 'Clients'),
+                  ButtonContainer(icon: FluentIcons.people, text: 'chauffeurs'.tr()),
                   smallSpace,
                   ButtonContainer(
                     icon: FluentIcons.report_alert,
-                    text: 'Aide',
-                    textList: "Obtenir de l'aide",
+                    text: 'aide'.tr(),
+                    textList: "oaide".tr(),
                     showBothLN: false,
                     showCounter: false,
                     color: Colors.grey,
@@ -76,7 +77,7 @@ class HomePage extends StatelessWidget {
 
                       ),
                       height: 50.h,
-                      child: TransactionChart()),
+                      child: const TransactionChart()),
                 ),
               ],
             ),

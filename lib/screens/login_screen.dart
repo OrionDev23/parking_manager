@@ -2,6 +2,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/screens/sidemenu.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:parc_oto/utilities/form_validators.dart';
 import 'package:parc_oto/widgets/page_header.dart';
@@ -37,6 +38,9 @@ class _LoginScreenState extends State<LoginScreen> {
   void checkUser() async{
     checking=true;
     await ClientDatabase().getUser();
+    if(ClientDatabase.user!=null){
+      PanesListState.signedIn.value=true;
+    }
     setState(() {
       checking=false;
     });
@@ -61,6 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: 25.w,
                 height: 35.h,
                 decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
                   color: appTheme.mode == ThemeMode.dark
                       ? Colors.grey
                       : appTheme.mode == ThemeMode.light
@@ -170,6 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
           email: email.text,
           password: password.text).then((value) async{
         ClientDatabase.user=await ClientDatabase.account!.get();
+        PanesListState.signedIn.value=true;
         setState(() {
           signedIn=true;
         });

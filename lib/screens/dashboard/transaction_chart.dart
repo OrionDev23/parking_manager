@@ -1,33 +1,30 @@
 import 'package:fl_chart/fl_chart.dart';
-import '../../utilities/theme_colors.dart';
+import 'package:parc_oto/theme.dart';
+import 'package:provider/provider.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 class TransactionChart extends StatefulWidget {
-  TransactionChart({super.key});
-  final Color leftBarColor = ThemeColors.orange.darkest;
-  final Color rightBarColor = ThemeColors.orange.lightest;
-  final Color avgColor = ThemeColors.orange;
+  const TransactionChart({super.key});
+
   @override
   State<StatefulWidget> createState() => TransactionChartState();
 }
 
 class TransactionChartState extends State<TransactionChart> {
   final double width = 7;
-
-  late List<BarChartGroupData> rawBarGroups;
+  List<BarChartGroupData>? rawBarGroups;
   late List<BarChartGroupData> showingBarGroups;
 
   int touchedGroupIndex = -1;
 
-  @override
-  void initState() {
-    super.initState();
-    final barGroup1 = makeGroupData(0, 5, 12);
-    final barGroup2 = makeGroupData(1, 16, 12);
-    final barGroup3 = makeGroupData(2, 18, 5);
-    final barGroup4 = makeGroupData(3, 20, 16);
-    final barGroup5 = makeGroupData(4, 17, 6);
-    final barGroup6 = makeGroupData(5, 19, 1.5);
-    final barGroup7 = makeGroupData(6, 10, 1.5);
+
+  void makeGroups(AppTheme appTheme){
+    final barGroup1 = makeGroupData(appTheme,0, 5, 12);
+    final barGroup2 = makeGroupData(appTheme,1, 16, 12);
+    final barGroup3 = makeGroupData(appTheme,2, 18, 5);
+    final barGroup4 = makeGroupData(appTheme,3, 20, 16);
+    final barGroup5 = makeGroupData(appTheme,4, 17, 6);
+    final barGroup6 = makeGroupData(appTheme,5, 19, 1.5);
+    final barGroup7 = makeGroupData(appTheme,6, 10, 1.5);
 
     final items = [
       barGroup1,
@@ -41,11 +38,15 @@ class TransactionChartState extends State<TransactionChart> {
 
     rawBarGroups = items;
 
-    showingBarGroups = rawBarGroups;
+    showingBarGroups = rawBarGroups!;
   }
 
   @override
   Widget build(BuildContext context) {
+    var appTheme=context.watch<AppTheme>();
+    if(rawBarGroups==null){
+      makeGroups(appTheme);
+    }
     return AspectRatio(
       aspectRatio: 1,
       child: Padding(
@@ -56,7 +57,7 @@ class TransactionChartState extends State<TransactionChart> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                makeTransactionsIcon(),
+                makeTransactionsIcon(appTheme),
                 const SizedBox(
                   width: 38,
                 ),
@@ -82,7 +83,7 @@ class TransactionChartState extends State<TransactionChart> {
                       if (response == null || response.spot == null) {
                         setState(() {
                           touchedGroupIndex = -1;
-                          showingBarGroups = List.of(rawBarGroups);
+                          showingBarGroups = List.of(rawBarGroups!);
                         });
                         return;
                       }
@@ -92,10 +93,10 @@ class TransactionChartState extends State<TransactionChart> {
                       setState(() {
                         if (!event.isInterestedForInteractions) {
                           touchedGroupIndex = -1;
-                          showingBarGroups = List.of(rawBarGroups);
+                          showingBarGroups = List.of(rawBarGroups!);
                           return;
                         }
-                        showingBarGroups = List.of(rawBarGroups);
+                        showingBarGroups = List.of(rawBarGroups!);
                         if (touchedGroupIndex != -1) {
                           var sum = 0.0;
                           for (final rod
@@ -113,7 +114,7 @@ class TransactionChartState extends State<TransactionChart> {
                                     .barRods
                                     .map((rod) {
                                   return rod.copyWith(
-                                      toY: avg, color: widget.avgColor);
+                                      toY: avg, color: appTheme.color);
                                 }).toList(),
                               );
                         }
@@ -203,26 +204,26 @@ class TransactionChartState extends State<TransactionChart> {
     );
   }
 
-  BarChartGroupData makeGroupData(int x, double y1, double y2) {
+  BarChartGroupData makeGroupData(AppTheme appTheme,int x, double y1, double y2) {
     return BarChartGroupData(
       barsSpace: 4,
       x: x,
       barRods: [
         BarChartRodData(
           toY: y1,
-          color: widget.leftBarColor,
+          color: appTheme.color.darkest,
           width: width,
         ),
         BarChartRodData(
           toY: y2,
-          color: widget.rightBarColor,
+          color: appTheme.color.lightest,
           width: width,
         ),
       ],
     );
   }
 
-  Widget makeTransactionsIcon() {
+  Widget makeTransactionsIcon(AppTheme appTheme) {
     const width = 4.5;
     const space = 3.5;
     return Row(
@@ -231,7 +232,7 @@ class TransactionChartState extends State<TransactionChart> {
         Container(
           width: width,
           height: 10,
-          color: Colors.orange.withOpacity(0.4),
+          color: appTheme.color.lightest,
         ),
         const SizedBox(
           width: space,
@@ -239,7 +240,7 @@ class TransactionChartState extends State<TransactionChart> {
         Container(
           width: width,
           height: 28,
-          color: Colors.orange.withOpacity(0.8),
+          color: appTheme.color.lighter,
         ),
         const SizedBox(
           width: space,
@@ -247,7 +248,7 @@ class TransactionChartState extends State<TransactionChart> {
         Container(
           width: width,
           height: 42,
-          color: Colors.orange.withOpacity(1),
+          color:appTheme.color,
         ),
         const SizedBox(
           width: space,
@@ -255,7 +256,7 @@ class TransactionChartState extends State<TransactionChart> {
         Container(
           width: width,
           height: 28,
-          color: Colors.orange.withOpacity(0.8),
+          color: appTheme.color.lighter,
         ),
         const SizedBox(
           width: space,
@@ -263,7 +264,7 @@ class TransactionChartState extends State<TransactionChart> {
         Container(
           width: width,
           height: 10,
-          color: Colors.orange.withOpacity(0.4),
+          color:appTheme.color.lightest,
         ),
       ],
     );

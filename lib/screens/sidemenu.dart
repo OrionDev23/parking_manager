@@ -1,3 +1,4 @@
+import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/login_screen.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'dashboard.dart';
@@ -34,53 +35,42 @@ class PanesListState extends State<PanesList> with WindowListener {
   late PaneItem login;
   late PaneItem logout;
   late PaneItem parametres;
+
+  late PaneItem vehicles;
+
+  late PaneItem chauffeurs;
+
+  late PaneItem evenements;
   void listenToSigningChanges() {
 
   }
 
   static List<NavigationPaneItem> originalItems = List.empty(growable: true);
-  late final List<NavigationPaneItem> footerItems;
+  late List<NavigationPaneItem> footerItems;
 
 
   bool loading=false;
   @override
   void initState() {
-    getProfil();
-    initPanes();
-    footerItems = [
-      PaneItemSeparator(),
-      parametres,
-    ];
 
     windowManager.setPreventClose(true);
     windowManager.addListener(this);
-    listenToSigningChanges();
+    getProfil();
+
     super.initState();
   }
 
-  void initPanes() {
-    acceuil = PaneItem(
-        icon: const Icon(FluentIcons.home),
-        body: const HomePage(),
-        title: const Text('home').tr());
-    login = PaneItem(
-        icon: const Icon(FluentIcons.signin),
-        title: const Text('seconnecter').tr(),
-        body: const Placeholder());
-    logout = PaneItem(
-        icon: const Icon(FluentIcons.sign_out),
-        title: const Text('decon').tr(),
-        body: const Placeholder());
-    parametres = PaneItem(
-      icon: const Icon(FluentIcons.settings),
-      title: const Text('parametres').tr(),
-      body: Settings(widget.prefs),
-    );
-    updateOriginalItems();
-  }
 
   void getProfil() async{
+    loading=true;
+    if(mounted){
+      setState(() {
 
+      });
+    }
+    await ClientDatabase().getUser();
+    updateOriginalItems();
+    listenToSigningChanges();
     loading=false;
     if(mounted){
       setState(() {
@@ -89,9 +79,27 @@ class PanesListState extends State<PanesList> with WindowListener {
 
   }
 
+
+  String getFirstLetters(){
+    String result="";
+    if(ClientDatabase.user!=null){
+      var s=ClientDatabase.user!.name.split(' ');
+      if(s.length>1){
+        result=s[0][0]+s[1][0];
+      }
+      else{
+        result=ClientDatabase.user!.email[0]+ClientDatabase.user!.email[1];
+      }
+    }
+    return result;
+  }
   @override
   Widget build(BuildContext context) {
     final appTheme = context.watch<AppTheme>();
+
+    if(loading){
+      return const Center(child: ProgressRing());
+    }
     return ValueListenableBuilder(
         valueListenable: signedIn,
         builder: (BuildContext context, bool value, Widget? child) {
@@ -114,19 +122,25 @@ class PanesListState extends State<PanesList> with WindowListener {
                               height: 80,
                             ),
                             const Spacer(),
-                            if(!loading)
+                            if(!loading && ClientDatabase.user!=null)
                               CircleAvatar(
                                   backgroundColor:Colors.transparent,
-                                  child: Image.network(
-                                    defaultUserPic,
-                                    fit: BoxFit.cover,
-                                    width: 24,
-                                    height: 24,
-                                  )),
-                            if(!loading)
+                                  child:
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: appTheme.color,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    width: 4.w,
+                                    height: 4.w,
+                                    alignment: Alignment.center,
+                                    child: Text(getFirstLetters().toUpperCase(),style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.white),),
+                                  ),
+                              ),
+                            if(!loading && ClientDatabase.user!=null)
                               const SizedBox(width: 10,),
-                            if(!loading)
-                              const Text('example@example.com'),
+                            if(!loading && ClientDatabase.user!=null)
+                              Text(ClientDatabase.user!.email),
                               const SizedBox(width: 150,),
                           ],)
                         ),
@@ -150,11 +164,6 @@ class PanesListState extends State<PanesList> with WindowListener {
                     items: originalItems,
                     footerItems: footerItems,
                   ),
-                  transitionBuilder: (w, a) {
-                    return SuppressPageTransition(
-                      child: w,
-                    );
-                  },
                 );
               });
 
@@ -198,7 +207,18 @@ class PanesListState extends State<PanesList> with WindowListener {
         icon: const Icon(FluentIcons.home),
         body: const HomePage(),
         title: const Text('home').tr());
-
+    vehicles=PaneItemExpander(icon: const Icon(FluentIcons.car),
+        title: const Text('vehicules').tr(),
+        items: [
+          PaneItem(icon: const Icon(FluentIcons.edit),title: const Text('gestionvehicles').tr(), body: const Placeholder()),
+          PaneItem(icon: const Icon(FluentIcons.verified_brand), title:const Text('brands').tr(),body: const Placeholder(),),
+        ], body: const Text(''));
+    chauffeurs=PaneItem(icon: const Icon(FluentIcons.people),title: const Text("chauffeurs").tr(), body: const Placeholder());
+    evenements=PaneItemExpander(items:[
+      PaneItem(icon: const Icon(FluentIcons.edit),title: const Text("gestionevent").tr(), body: const Placeholder()),
+      PaneItem(icon: const Icon(FluentIcons.reservation_orders),title: const Text('planifier').tr(),body: const Placeholder()),
+      PaneItem(icon: const Icon(FluentIcons.parking_solid),title: const Text('parking').tr(),body: const Placeholder()),
+    ],icon: const Icon(FluentIcons.event),title: const Text('journal').tr(), body: const Placeholder());
     login = PaneItem(
         icon: const Icon(FluentIcons.signin),
         title: const Text('seconnecter').tr(),
@@ -213,11 +233,27 @@ class PanesListState extends State<PanesList> with WindowListener {
       body: Settings(widget.prefs),
     );
 
-    originalItems.addAll([
-      acceuil,
-      login,
-    ]);
+    if(ClientDatabase.user!=null){
+      originalItems=[
+        acceuil,
+        vehicles,
+        evenements,
+        chauffeurs,
+      ];
+    }
+    else{
+      originalItems=[
+        login,
+      ];
+    }
 
+
+    footerItems = [
+      PaneItemSeparator(),
+      if(ClientDatabase.user!=null)
+      logout,
+      parametres,
+    ];
   }
 
 }

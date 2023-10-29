@@ -15,10 +15,13 @@ class ClientDatabase{
   }
 
   Future<void> getUser() async{
-    await account?.get().then((value) {
-      user=value;
-    }).catchError((error){
+    if(user==null){
+      await account?.get().then((value) {
+        user=value;
+      }).catchError((error){
+        user=null;
+      });
+    }
 
-    });
   }
 }
