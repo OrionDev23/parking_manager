@@ -118,8 +118,8 @@ class PanesListState extends State<PanesList> with WindowListener {
                           child: Row(children: [
                             Image.asset(
                               'assets/images/logo.webp',
-                              width: 80,
-                              height: 80,
+                              width: 100,
+                              height: 100,
                             ),
                             const Spacer(),
                             if(!loading && ClientDatabase.user!=null)
@@ -131,8 +131,8 @@ class PanesListState extends State<PanesList> with WindowListener {
                                       color: appTheme.color,
                                       shape: BoxShape.circle,
                                     ),
-                                    width: 4.w,
-                                    height: 4.w,
+                                    width: 3.w,
+                                    height: 3.w,
                                     alignment: Alignment.center,
                                     child: Text(getFirstLetters().toUpperCase(),style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.white),),
                                   ),
