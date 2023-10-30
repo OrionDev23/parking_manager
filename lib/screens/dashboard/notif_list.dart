@@ -19,6 +19,7 @@ class _NotifListState extends State<NotifList> {
       children: [
 
         ListTile(
+          onPressed: (){},
           title: Text('Nouveau véhicule ajouté!',style: TextStyle(color: appTheme.color.lightest),),
           trailing: IconButton(icon:Icon(FluentIcons.delete,color: appTheme.color.darkest,),onPressed: (){},),
         ),
