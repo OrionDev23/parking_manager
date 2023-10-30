@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
     return ScaffoldPage(
-      header: const PageTitle(text: 'Connexion',),
+      header: PageTitle(text: 'connexion'.tr(),),
       content: Center(
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -127,6 +127,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 });
                         },),
                         obscureText: !showPassword,
+                        onSubmitted: (s){
+                          signIn();
+                        },
                       ),
                     ),
                     SizedBox(
@@ -139,7 +142,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             style:ButtonStyle(
                               border: ButtonState.all<BorderSide>(BorderSide.none),
                                 backgroundColor: ButtonState.all<Color>(Colors.transparent)
-
                             ),
                             onPressed: forgotPassword,
                             child: Text('forgot',style: TextStyle(color: Colors.blue),).tr()),
