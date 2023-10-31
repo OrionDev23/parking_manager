@@ -1,27 +1,59 @@
-
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
-class ClientDatabase{
+
+import '../serializables/parc_user.dart';
+
+const databaseid = "6531ad112080ae3b14a7";
+const userid = "users";
+const chauffeurid = "6537d87b492c80f255e8";
+const genreid = "6537960246d5b0e1ab77";
+const vehiculeid = "6531ad22153b2a49ca2c";
+
+class ClientDatabase {
   static Client? client;
   static Account? account;
-
   static User? user;
 
-  ClientDatabase(){
+  static Databases? database;
+
+  static ParcUser? me;
+
+  ClientDatabase() {
     client ??= Client()
-        ..setEndpoint('https://cloud.appwrite.io/v1')
-        ..setProject('6531ace99382e496a904');
-    account??=Account(client!);
+      ..setEndpoint('https://cloud.appwrite.io/v1')
+      ..setProject('6531ace99382e496a904');
+    account ??= Account(client!);
+    database ??= Databases(client!);
   }
 
-  Future<void> getUser() async{
-    if(user==null){
-      await account?.get().then((value) {
-        user=value;
-      }).catchError((error){
-        user=null;
+  Future<void> getUser() async {
+    if (user == null) {
+      await account?.get().then((value) async {
+        user = value;
+        database!
+            .getDocument(
+                databaseId: databaseid,
+                collectionId: userid,
+                documentId: user!.$id)
+            .then((result) {
+          me=ParcUser.fromJson(result.data);
+        })
+            .catchError((error) {
+              me=ParcUser(
+                  email: user!.email,
+                  id: user!.$id,
+
+              );
+              uploadUser(me!);
+        });
+      }).catchError((error) {
+        user = null;
       });
     }
+  }
+
+
+  void uploadUser(ParcUser u){
 
   }
 }
