@@ -1,7 +1,9 @@
 import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/screens/login_screen.dart';
+import 'package:parc_oto/screens/login.dart';
+import 'package:parc_oto/screens/logout.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'dashboard.dart';
+import 'dashboard/notif_list.dart';
 import 'settings.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -9,9 +11,11 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 import '../theme.dart';
+import 'package:flutter/material.dart' as m;
 
+const defaultUserPic =
+    "https://upload.wikimedia.org/wikipedia/commons/7/72/Default-welcomer.png";
 
-const defaultUserPic="https://upload.wikimedia.org/wikipedia/commons/7/72/Default-welcomer.png";
 class PanesList extends StatefulWidget {
   final SharedPreferences prefs;
   const PanesList({
@@ -24,7 +28,15 @@ class PanesList extends StatefulWidget {
 }
 
 class PanesListState extends State<PanesList> with WindowListener {
-  static ValueNotifier<int> index = ValueNotifier(0);
+  static ValueNotifier<int> _index = ValueNotifier(0);
+  static ValueNotifier<int> get index => _index;
+
+  static int previousValue = 0;
+
+  static set index(ValueNotifier<int> v) {
+    previousValue = _index.value;
+    _index.value = v.value;
+  }
 
   final viewKey = GlobalKey(debugLabel: 'Navigation View Key');
   static ValueNotifier<bool> signedIn = ValueNotifier(false);
@@ -41,18 +53,14 @@ class PanesListState extends State<PanesList> with WindowListener {
   late PaneItem chauffeurs;
 
   late PaneItem evenements;
-  void listenToSigningChanges() {
-
-  }
+  void listenToSigningChanges() {}
 
   static List<NavigationPaneItem> originalItems = List.empty(growable: true);
   late List<NavigationPaneItem> footerItems;
 
-
-  bool loading=false;
+  bool loading = false;
   @override
   void initState() {
-
     windowManager.setPreventClose(true);
     windowManager.addListener(this);
     getProfil();
@@ -60,44 +68,43 @@ class PanesListState extends State<PanesList> with WindowListener {
     super.initState();
   }
 
-
-  void getProfil() async{
-    loading=true;
-    if(mounted){
-      setState(() {
-
-      });
+  void getProfil() async {
+    loading = true;
+    if (mounted) {
+      setState(() {});
     }
     await ClientDatabase().getUser();
     updateOriginalItems();
     listenToSigningChanges();
-    loading=false;
-    if(mounted){
-      setState(() {
-      });
+    loading = false;
+    if (mounted) {
+      setState(() {});
     }
-
   }
 
-
-  String getFirstLetters(){
-    String result="";
-    if(ClientDatabase.user!=null){
-      var s=ClientDatabase.user!.name.split(' ');
-      if(s.length>1){
-        result=s[0][0]+s[1][0];
-      }
-      else{
-        result=ClientDatabase.user!.email[0]+ClientDatabase.user!.email[1];
+  String getFirstLetters() {
+    String result = "";
+    if (ClientDatabase.user != null) {
+      if (ClientDatabase.user!.name.isNotEmpty) {
+        var s = ClientDatabase.user!.name.split(' ');
+        if (s.length > 1) {
+          result = s[0][0] + s[1][0];
+        } else {
+          result = ClientDatabase.user!.name[0] + ClientDatabase.user!.name[1];
+        }
+      } else {
+        result = ClientDatabase.user!.email[0] + ClientDatabase.user!.email[1];
       }
     }
     return result;
   }
+
+  FlyoutController flyoutController=FlyoutController();
   @override
   Widget build(BuildContext context) {
     final appTheme = context.watch<AppTheme>();
 
-    if(loading){
+    if (loading) {
       return const Center(child: ProgressRing());
     }
     return ValueListenableBuilder(
@@ -114,36 +121,100 @@ class PanesListState extends State<PanesList> with WindowListener {
                     title: () {
                       return DragToMoveArea(
                         child: Align(
-                          alignment: AlignmentDirectional.centerStart,
-                          child: Row(children: [
-                            Image.asset(
-                              'assets/images/logo.webp',
-                              width: 100,
-                              height: 100,
-                            ),
-                            const Spacer(),
-                            if(!loading && ClientDatabase.user!=null)
-                              CircleAvatar(
-                                  backgroundColor:Colors.transparent,
-                                  child:
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: appTheme.color,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    width: 3.w,
-                                    height: 3.w,
-                                    alignment: Alignment.center,
-                                    child: Text(getFirstLetters().toUpperCase(),style: const TextStyle(fontWeight: FontWeight.bold,color: Colors.white),),
-                                  ),
-                              ),
-                            if(!loading && ClientDatabase.user!=null)
-                              const SizedBox(width: 10,),
-                            if(!loading && ClientDatabase.user!=null)
-                              Text(ClientDatabase.user!.email),
-                              const SizedBox(width: 150,),
-                          ],)
-                        ),
+                            alignment: AlignmentDirectional.centerStart,
+                            child: Row(
+                              children: [
+                                Image.asset(
+                                  'assets/images/logo.webp',
+                                  width: 80,
+                                  height: 80,
+                                ),
+                                const Spacer(),
+                                if (!loading && signedIn.value)
+                                  FlyoutTarget(
+                                    controller: flyoutController,
+                                    child: Button(
+                                      style: ButtonStyle(
+                                        shape: ButtonState.all<OutlinedBorder>(
+                                            const RoundedRectangleBorder()),
+                                        padding: ButtonState.all<EdgeInsets>(
+                                            const EdgeInsets.all(15)),
+                                      ),
+                                      child:  Row(
+                                        children: [
+                                          const Icon(FluentIcons.ringer),
+
+                                          const  SizedBox(
+                                            width: 10,
+                                          ),
+
+                                          const  Text('Alertes'),
+                                          const SizedBox(width: 5,),
+
+                                          m.Badge(
+                                            backgroundColor: appTheme.color.darkest,
+                                            alignment: Alignment.topLeft,
+                                            label:const Text('10'),),
+                                        ],
+                                      ),
+                                      onPressed: () {
+                                        flyoutController.showFlyout(
+                                            autoModeConfiguration: FlyoutAutoConfiguration(preferredMode: FlyoutPlacementMode.bottomLeft),
+                                            builder: (context){
+                                              return FlyoutContent(
+                                                child:
+                                                SizedBox(
+                                                  height: 30.h,
+                                                  width: 30.w,
+                                                  child:const NotifList(),
+                                                ),
+
+                                              );
+                                        });
+                                      }),),
+
+                                if (!loading && signedIn.value)
+                                  const SizedBox(width: 10),
+                                  if (!loading && signedIn.value)
+                                  Button(
+                                      style: ButtonStyle(
+                                        shape: ButtonState.all<OutlinedBorder>(
+                                            const RoundedRectangleBorder()),
+                                        padding: ButtonState.all<EdgeInsets>(
+                                            const EdgeInsets.all(4)),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          CircleAvatar(
+                                            backgroundColor: Colors.transparent,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: appTheme.color,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              width: 4.w,
+                                              height: 4.w,
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                getFirstLetters().toUpperCase(),
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(ClientDatabase.user!.email),
+                                        ],
+                                      ),
+                                      onPressed: () {}),
+                                const SizedBox(
+                                  width: 150,
+                                ),
+                              ],
+                            )),
                       );
                     }(),
                     actions: const Row(
@@ -153,8 +224,9 @@ class PanesListState extends State<PanesList> with WindowListener {
                         ]),
                   ),
                   pane: NavigationPane(
-                    selected: index.value,
+                    selected: value,
                     onChanged: (i) {
+                      previousValue = index.value;
                       index.value = i;
                     },
                     size: NavigationPaneSize(
@@ -166,7 +238,6 @@ class PanesListState extends State<PanesList> with WindowListener {
                   ),
                 );
               });
-
         });
   }
 
@@ -201,24 +272,49 @@ class PanesListState extends State<PanesList> with WindowListener {
       }
     });
   }
+
   void updateOriginalItems() {
-    originalItems.clear();
-    acceuil=PaneItem(
+    acceuil = PaneItem(
         icon: const Icon(FluentIcons.home),
         body: const HomePage(),
         title: const Text('home').tr());
-    vehicles=PaneItemExpander(icon: const Icon(FluentIcons.car),
+    vehicles = PaneItemExpander(
+        icon: const Icon(FluentIcons.car),
         title: const Text('vehicules').tr(),
         items: [
-          PaneItem(icon: const Icon(FluentIcons.edit),title: const Text('gestionvehicles').tr(), body: const Placeholder()),
-          PaneItem(icon: const Icon(FluentIcons.verified_brand), title:const Text('brands').tr(),body: const Placeholder(),),
-        ], body: const Text(''));
-    chauffeurs=PaneItem(icon: const Icon(FluentIcons.people),title: const Text("chauffeurs").tr(), body: const Placeholder());
-    evenements=PaneItemExpander(items:[
-      PaneItem(icon: const Icon(FluentIcons.edit),title: const Text("gestionevent").tr(), body: const Placeholder()),
-      PaneItem(icon: const Icon(FluentIcons.reservation_orders),title: const Text('planifier').tr(),body: const Placeholder()),
-      PaneItem(icon: const Icon(FluentIcons.parking_solid),title: const Text('parking').tr(),body: const Placeholder()),
-    ],icon: const Icon(FluentIcons.event),title: const Text('journal').tr(), body: const Placeholder());
+          PaneItem(
+              icon: const Icon(FluentIcons.edit),
+              title: const Text('gestionvehicles').tr(),
+              body: const Placeholder()),
+          PaneItem(
+            icon: const Icon(FluentIcons.verified_brand),
+            title: const Text('brands').tr(),
+            body: const Placeholder(),
+          ),
+        ],
+        body: const Text(''));
+    chauffeurs = PaneItem(
+        icon: const Icon(FluentIcons.people),
+        title: const Text("chauffeurs").tr(),
+        body: const Placeholder());
+    evenements = PaneItemExpander(
+        items: [
+          PaneItem(
+              icon: const Icon(FluentIcons.edit),
+              title: const Text("gestionevent").tr(),
+              body: const Placeholder()),
+          PaneItem(
+              icon: const Icon(FluentIcons.reservation_orders),
+              title: const Text('planifier').tr(),
+              body: const Placeholder()),
+          PaneItem(
+              icon: const Icon(FluentIcons.parking_solid),
+              title: const Text('parking').tr(),
+              body: const Placeholder()),
+        ],
+        icon: const Icon(FluentIcons.event),
+        title: const Text('journal').tr(),
+        body: const Placeholder());
     login = PaneItem(
         icon: const Icon(FluentIcons.signin),
         title: const Text('seconnecter').tr(),
@@ -226,36 +322,32 @@ class PanesListState extends State<PanesList> with WindowListener {
     logout = PaneItem(
         icon: const Icon(FluentIcons.sign_out),
         title: const Text('decon').tr(),
-        body: const Placeholder());
+        body: const LogoutScreen());
     parametres = PaneItem(
       icon: const Icon(FluentIcons.settings),
       title: const Text('parametres').tr(),
       body: Settings(widget.prefs),
     );
 
-    if(ClientDatabase.user!=null){
-      originalItems=[
+    if (signedIn.value) {
+      originalItems = [
         acceuil,
         vehicles,
         evenements,
         chauffeurs,
       ];
-    }
-    else{
-      originalItems=[
+    } else {
+      originalItems = [
         login,
       ];
     }
 
-
     footerItems = [
       PaneItemSeparator(),
-      if(ClientDatabase.user!=null)
-      logout,
+      if (signedIn.value) logout,
       parametres,
     ];
   }
-
 }
 
 class WindowButtons extends StatelessWidget {
