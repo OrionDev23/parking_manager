@@ -3,7 +3,7 @@ import 'package:appwrite/models.dart';
 
 import '../serializables/parc_user.dart';
 
-const databaseid = "6531ad112080ae3b14a7";
+const databaseId = "6531ad112080ae3b14a7";
 const userid = "users";
 const chauffeurid = "6537d87b492c80f255e8";
 const genreid = "6537960246d5b0e1ab77";
@@ -32,19 +32,20 @@ class ClientDatabase {
         user = value;
         database!
             .getDocument(
-                databaseId: databaseid,
+                databaseId: databaseId,
                 collectionId: userid,
                 documentId: user!.$id)
             .then((result) {
-          me=ParcUser.fromJson(result.data);
-        })
-            .catchError((error) {
-              me=ParcUser(
-                  email: user!.email,
-                  id: user!.$id,
+          me = ParcUser.fromJson(result.data);
+        }).catchError((error) {
+          me = ParcUser(
+            email: user!.email,
+            id: user!.$id,
+            name: user!.name,
+            tel: user!.phone,
 
-              );
-              uploadUser(me!);
+          );
+          uploadUser(me!);
         });
       }).catchError((error) {
         user = null;
@@ -52,8 +53,17 @@ class ClientDatabase {
     }
   }
 
-
-  void uploadUser(ParcUser u){
-
+  void uploadUser(ParcUser u) {
+    database!.createDocument(
+        databaseId: databaseId,
+        collectionId: userid,
+        documentId: me!.id,
+        data: me!.toJson(),
+        permissions: [
+          Permission.read(Role.users()),
+          Permission.write(Role.user(me!.id)),
+          Permission.update(Role.user(me!.id)),
+          Permission.delete(Role.user(me!.id)),
+        ]);
   }
 }
