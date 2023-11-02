@@ -266,7 +266,7 @@ class _ProfilFormState extends State<ProfilForm> {
                 ? null
                 : onConfirm,
             child: uploading
-                ? SizedBox(width:2.5.w,height:2.5.w,child: const ProgressRing())
+                ? const ProgressBar()
                 : const Text('confirmer').tr()),
       ],
     );
