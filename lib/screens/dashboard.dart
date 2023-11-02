@@ -16,7 +16,7 @@ class HomePage extends StatelessWidget {
     const smallSpace = SizedBox(
       width: 5,
     );
-    var appTheme=context.watch<AppTheme>();
+    var appTheme = context.watch<AppTheme>();
 
     return ScaffoldPage(
       header: const PageTitle(text: 'home'),
@@ -38,7 +38,8 @@ class HomePage extends StatelessWidget {
                   ButtonContainer(
                       icon: FluentIcons.edit_event, text: 'reservation'.tr()),
                   smallSpace,
-                  ButtonContainer(icon: FluentIcons.people, text: 'chauffeurs'.tr()),
+                  ButtonContainer(
+                      icon: FluentIcons.people, text: 'chauffeurs'.tr()),
                   smallSpace,
                   ButtonContainer(
                     icon: FluentIcons.report_alert,
@@ -71,11 +72,15 @@ class HomePage extends StatelessWidget {
                   child: Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        boxShadow: kElevationToShadow[2],
-                        borderRadius: BorderRadius.circular(5),
-                          color: appTheme.mode==ThemeMode.dark?Colors.grey:appTheme.mode==ThemeMode.light?Colors.white:ThemeMode.system==ThemeMode.light?Colors.white:Colors.grey
-
-                      ),
+                          boxShadow: kElevationToShadow[2],
+                          borderRadius: BorderRadius.circular(5),
+                          color: appTheme.mode == ThemeMode.dark
+                              ? Colors.grey
+                              : appTheme.mode == ThemeMode.light
+                                  ? Colors.white
+                                  : ThemeMode.system == ThemeMode.light
+                                      ? Colors.white
+                                      : Colors.grey),
                       height: 50.h,
                       child: const TransactionChart()),
                 ),

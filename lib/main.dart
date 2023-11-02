@@ -1,3 +1,4 @@
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'providers/client_database.dart';
@@ -58,6 +59,16 @@ class MyApp extends StatelessWidget {
 
   const MyApp({super.key, required this.savedSettings});
 
+
+
+  List<LocalizationsDelegate<dynamic>> getDelegates(BuildContext context){
+    List<LocalizationsDelegate>results=List.from(context.localizationDelegates);
+    results.addAll([
+      CountryLocalizations.delegate,
+      FluentLocalizations.delegate
+    ]);
+    return results;
+  }
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -71,7 +82,7 @@ class MyApp extends StatelessWidget {
               themeMode: appTheme.mode,
               debugShowCheckedModeBanner: false,
               color: appTheme.color,
-              localizationsDelegates: context.localizationDelegates,
+              localizationsDelegates: getDelegates(context),
               localeResolutionCallback: (locale, supportedLocales) {
                 for (var supportedLocale in supportedLocales) {
                   if (supportedLocale.languageCode == locale!.languageCode &&

@@ -1,6 +1,7 @@
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/login.dart';
 import 'package:parc_oto/screens/logout.dart';
+import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'dashboard.dart';
 import 'dashboard/notif_list.dart';
@@ -82,22 +83,7 @@ class PanesListState extends State<PanesList> with WindowListener {
     }
   }
 
-  String getFirstLetters() {
-    String result = "";
-    if (ClientDatabase.user != null) {
-      if (ClientDatabase.user!.name.isNotEmpty) {
-        var s = ClientDatabase.user!.name.split(' ');
-        if (s.length > 1) {
-          result = s[0][0] + s[1][0];
-        } else {
-          result = ClientDatabase.user!.name[0] + ClientDatabase.user!.name[1];
-        }
-      } else {
-        result = ClientDatabase.user!.email[0] + ClientDatabase.user!.email[1];
-      }
-    }
-    return result;
-  }
+
 
   FlyoutController flyoutController=FlyoutController();
   @override
@@ -176,40 +162,7 @@ class PanesListState extends State<PanesList> with WindowListener {
                                 if (!loading && signedIn.value)
                                   const SizedBox(width: 10),
                                   if (!loading && signedIn.value)
-                                  Button(
-                                      style: ButtonStyle(
-                                        shape: ButtonState.all<OutlinedBorder>(
-                                            const RoundedRectangleBorder()),
-                                        padding: ButtonState.all<EdgeInsets>(
-                                            const EdgeInsets.all(4)),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          CircleAvatar(
-                                            backgroundColor: Colors.transparent,
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                color: appTheme.color,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              width: 4.w,
-                                              height: 4.w,
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                getFirstLetters().toUpperCase(),
-                                                style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white),
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            width: 10,
-                                          ),
-                                          Text(ClientDatabase.user!.email),
-                                        ],
-                                      ),
-                                      onPressed: () {}),
+                                  const ProfilNameTopBar(),
                                 const SizedBox(
                                   width: 150,
                                 ),
@@ -272,6 +225,7 @@ class PanesListState extends State<PanesList> with WindowListener {
       }
     });
   }
+
 
   void updateOriginalItems() {
     acceuil = PaneItem(
@@ -348,6 +302,8 @@ class PanesListState extends State<PanesList> with WindowListener {
       parametres,
     ];
   }
+
+
 }
 
 class WindowButtons extends StatelessWidget {

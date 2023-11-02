@@ -1,5 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 
 import '../serializables/parc_user.dart';
 
@@ -13,10 +14,11 @@ class ClientDatabase {
   static Client? client;
   static Account? account;
   static User? user;
+  final DateTime ref=DateTime(2023,11,01,12,13,15);
 
   static Databases? database;
 
-  static ParcUser? me;
+  static ValueNotifier<ParcUser?> me=ValueNotifier(null);
 
   ClientDatabase() {
     client ??= Client()
@@ -36,16 +38,18 @@ class ClientDatabase {
                 collectionId: userid,
                 documentId: user!.$id)
             .then((result) {
-          me = ParcUser.fromJson(result.data);
+          me.value = ParcUser.fromJson(result.data);
         }).catchError((error) {
-          me = ParcUser(
+          me.value = ParcUser(
             email: user!.email,
             id: user!.$id,
             name: user!.name,
             tel: user!.phone,
-
+            datea: DateTime.parse(user!.accessedAt.isEmpty?DateTime.now().toIso8601String():user!.accessedAt).difference(ref).inMilliseconds.abs(),
+            datec: DateTime.parse(user!.$createdAt).difference(ref).inMilliseconds.abs(),
+            datel: DateTime.parse(user!.$updatedAt.isEmpty?DateTime.now().toIso8601String():user!.$updatedAt).difference(ref).inMilliseconds.abs(),
           );
-          uploadUser(me!);
+          uploadUser(me.value!);
         });
       }).catchError((error) {
         user = null;
@@ -57,13 +61,13 @@ class ClientDatabase {
     database!.createDocument(
         databaseId: databaseId,
         collectionId: userid,
-        documentId: me!.id,
-        data: me!.toJson(),
+        documentId: me.value!.id,
+        data: me.value!.toJson(),
         permissions: [
           Permission.read(Role.users()),
-          Permission.write(Role.user(me!.id)),
-          Permission.update(Role.user(me!.id)),
-          Permission.delete(Role.user(me!.id)),
+          Permission.write(Role.user(me.value!.id)),
+          Permission.update(Role.user(me.value!.id)),
+          Permission.delete(Role.user(me.value!.id)),
         ]);
   }
 }

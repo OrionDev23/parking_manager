@@ -176,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
       await ClientDatabase.account!.createEmailSession(
           email: email.text,
           password: password.text).then((value) async{
-        ClientDatabase.user=await ClientDatabase.account!.get();
+        await ClientDatabase().getUser();
         PanesListState.signedIn.value=true;
         setState(() {
           signedIn=true;
