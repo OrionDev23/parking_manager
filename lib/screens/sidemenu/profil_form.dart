@@ -266,7 +266,7 @@ class _ProfilFormState extends State<ProfilForm> {
                 ? null
                 : onConfirm,
             child: uploading
-                ? const ProgressRing()
+                ? SizedBox(width:2.5.w,height:2.5.w,child: const ProgressRing())
                 : const Text('confirmer').tr()),
       ],
     );
@@ -301,6 +301,10 @@ class _ProfilFormState extends State<ProfilForm> {
             documentId: userID,
             data: newme.toJson()).then((value) {
               ClientDatabase.me.value=newme;
+              Navigator.pop(
+                context,
+              );
+
         });
       } else {
         ParcUser newme=ParcUser(
@@ -328,6 +332,9 @@ class _ProfilFormState extends State<ProfilForm> {
               if (url != null) 'avatar': url,
             }).then((value) {
           ClientDatabase.me.value=newme;
+          Navigator.pop(
+            context,
+          );
         });
       }
 
