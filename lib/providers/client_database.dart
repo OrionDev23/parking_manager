@@ -9,23 +9,29 @@ const userid = "users";
 const chauffeurid = "6537d87b492c80f255e8";
 const genreid = "6537960246d5b0e1ab77";
 const vehiculeid = "6531ad22153b2a49ca2c";
+const buckedId="images";
+const endpoint ="https://cloud.appwrite.io/v1";
+const project="6531ace99382e496a904";
 
 class ClientDatabase {
   static Client? client;
   static Account? account;
   static User? user;
-  final DateTime ref=DateTime(2023,11,01,12,13,15);
+  static Storage? storage;
+  static final DateTime ref=DateTime(2023,11,01,12,13,15);
 
   static Databases? database;
 
   static ValueNotifier<ParcUser?> me=ValueNotifier(null);
 
+  static String? jwt;
   ClientDatabase() {
     client ??= Client()
-      ..setEndpoint('https://cloud.appwrite.io/v1')
-      ..setProject('6531ace99382e496a904');
+      ..setEndpoint(endpoint)
+      ..setProject(project);
     account ??= Account(client!);
     database ??= Databases(client!);
+    storage ??=Storage(client!);
   }
 
   Future<void> getUser() async {
@@ -39,7 +45,8 @@ class ClientDatabase {
                 documentId: user!.$id)
             .then((result) {
           me.value = ParcUser.fromJson(result.data);
-        }).catchError((error) {
+        }).catchError((error){
+
           me.value = ParcUser(
             email: user!.email,
             id: user!.$id,
@@ -56,6 +63,8 @@ class ClientDatabase {
       });
     }
   }
+
+
 
   void uploadUser(ParcUser u) {
     database!.createDocument(

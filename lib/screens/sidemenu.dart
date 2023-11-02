@@ -29,7 +29,7 @@ class PanesList extends StatefulWidget {
 }
 
 class PanesListState extends State<PanesList> with WindowListener {
-  static ValueNotifier<int> _index = ValueNotifier(0);
+  static  ValueNotifier<int> _index = ValueNotifier(0);
   static ValueNotifier<int> get index => _index;
 
   static int previousValue = 0;
