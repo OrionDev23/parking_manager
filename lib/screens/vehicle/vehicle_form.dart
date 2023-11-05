@@ -21,7 +21,7 @@ class VehicleForm extends StatefulWidget {
   State<VehicleForm> createState() => _VehicleFormState();
 }
 
-class _VehicleFormState extends State<VehicleForm> {
+class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClientMixin<VehicleForm> {
   final smallSpace = const SizedBox(
     width: 5,
     height: 5,
@@ -36,6 +36,8 @@ class _VehicleFormState extends State<VehicleForm> {
   String pays = 'DZ';
   Dzair dzair = Dzair();
 
+  final tstyle=const TextStyle(fontWeight: FontWeight.bold);
+
   String wilaya = "01";
   String wilayaName = "Adrar";
   String commune = "";
@@ -44,6 +46,7 @@ class _VehicleFormState extends State<VehicleForm> {
   DateTime selectedDate = DateTime.now();
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     var appTheme = context.watch<AppTheme>();
     return ScaffoldPage(
       header: PageTitle(
@@ -54,14 +57,14 @@ class _VehicleFormState extends State<VehicleForm> {
           padding: const EdgeInsets.all(5.0),
           child: Container(
             decoration: BoxDecoration(
-              color: appTheme.mode == ThemeMode.dark
+              color:  appTheme.mode == ThemeMode.dark
                   ? Colors.grey
                   : appTheme.mode == ThemeMode.light
-                      ? Colors.white
-                      : ThemeMode.system == ThemeMode.light
-                          ? Colors.white
-                          : Colors.grey,
-              boxShadow: kElevationToShadow[2],
+                  ? Colors.white
+                  : ThemeMode.system == ThemeMode.light
+                  ? Colors.white
+                  : Colors.grey,
+              boxShadow: kElevationToShadow[4],
             ),
             width: 70.w,
             height: 80.h,
@@ -90,9 +93,9 @@ class _VehicleFormState extends State<VehicleForm> {
                             Expanded(
                                 child: Column(
                               children: [
-                                const Text(
+                                Text(
                                   'pays',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: tstyle,
                                 ).tr(),
                                 smallSpace,
                                 CountryCodePicker(
@@ -120,9 +123,9 @@ class _VehicleFormState extends State<VehicleForm> {
                                   },
                                 ),
                                 smallSpace,
-                                const Text(
+                                Text(
                                   'wilaya',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: tstyle,
                                 ).tr(),
                                 smallSpace,
                                 SizedBox(
@@ -174,10 +177,9 @@ class _VehicleFormState extends State<VehicleForm> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Text(
+                                    Text(
                                       'nummat',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
+                                      style: tstyle,
                                     ).tr(),
                                     smallSpace,
                                     Padding(
@@ -207,7 +209,7 @@ class _VehicleFormState extends State<VehicleForm> {
                                                   ),
                                                 ),
                                                 smallSpace,
-                                                const Text('-'),
+                                                Text('-',style: tstyle,),
                                                 smallSpace,
                                                 Flexible(
                                                   flex: 3,
@@ -223,7 +225,7 @@ class _VehicleFormState extends State<VehicleForm> {
                                                   ),
                                                 ),
                                                 smallSpace,
-                                                const Text('-'),
+                                                Text('-',style: tstyle,),
                                                 smallSpace,
                                                 Flexible(
                                                   flex: 2,
@@ -270,9 +272,9 @@ class _VehicleFormState extends State<VehicleForm> {
                             Expanded(
                                 child: Column(
                               children: [
-                                const Text(
+                                Text(
                                   'daira',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: tstyle,
                                 ).tr(),
                                 smallSpace,
                                 SizedBox(
@@ -302,9 +304,9 @@ class _VehicleFormState extends State<VehicleForm> {
                                   ),
                                 ),
                                 smallSpace,
-                                const Text(
+                                 Text(
                                   'commune',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: tstyle,
                                 ).tr(),
                                 smallSpace,
                                 SizedBox(
@@ -348,9 +350,9 @@ class _VehicleFormState extends State<VehicleForm> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
+                             Text(
                               'date',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                               style: tstyle,
                             ).tr(),
                             smallSpace,
                             SizedBox(
@@ -358,9 +360,9 @@ class _VehicleFormState extends State<VehicleForm> {
                                 child: DatePicker(selected: selectedDate)),
                             smallSpace,
                             smallSpace,
-                            const Text(
+                            Text(
                               'quittance',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: tstyle,
                             ).tr(),
                             smallSpace,
                             SizedBox(
@@ -370,9 +372,9 @@ class _VehicleFormState extends State<VehicleForm> {
                                 )),
                             smallSpace,
                             smallSpace,
-                            const Text(
+                            Text(
                               'num',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: tstyle,
                             ).tr(),
                             smallSpace,
                             SizedBox(
@@ -392,9 +394,9 @@ class _VehicleFormState extends State<VehicleForm> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
+                            Text(
                               'nomf',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: tstyle,
                             ).tr(),
                             smallSpace,
                             SizedBox(
@@ -404,9 +406,9 @@ class _VehicleFormState extends State<VehicleForm> {
                                 )),
                             smallSpace,
                             smallSpace,
-                            const Text(
+                            Text(
                               'prenom',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: tstyle,
                             ).tr(),
                             smallSpace,
                             SizedBox(
@@ -416,9 +418,9 @@ class _VehicleFormState extends State<VehicleForm> {
                                 )),
                             smallSpace,
                             smallSpace,
-                            const Text(
+                            Text(
                               'profession',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: tstyle,
                             ).tr(),
                             smallSpace,
                             SizedBox(
@@ -438,9 +440,9 @@ class _VehicleFormState extends State<VehicleForm> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
+                            Text(
                               'adresse',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: tstyle,
                             ).tr(),
                             smallSpace,
                             SizedBox(
@@ -484,7 +486,7 @@ class _VehicleFormState extends State<VehicleForm> {
                                           horizontal: 5.0),
                                       child: Column(
                                         children: [
-                                          const Text('genre').tr(),
+                                          Text('genre',style: tstyle,).tr(),
                                           smallSpace,
                                           const TextBox(),
                                         ],
@@ -508,7 +510,7 @@ class _VehicleFormState extends State<VehicleForm> {
                                           horizontal: 5.0),
                                       child: Column(
                                         children: [
-                                          const Text('marque').tr(),
+                                          Text('marque',style: tstyle,).tr(),
                                           smallSpace,
                                           const TextBox(),
                                         ],
@@ -531,7 +533,7 @@ class _VehicleFormState extends State<VehicleForm> {
                                           horizontal: 5.0),
                                       child: Column(
                                         children: [
-                                          const Text('type').tr(),
+                                          Text('type',style: tstyle,).tr(),
                                           smallSpace,
                                           const TextBox(),
                                         ],
@@ -554,7 +556,7 @@ class _VehicleFormState extends State<VehicleForm> {
                                           horizontal: 5.0),
                                       child: Column(
                                         children: [
-                                          const Text('numerserie').tr(),
+                                           Text('numerserie',style: tstyle,).tr(),
                                           smallSpace,
                                           const TextBox(),
                                         ],
@@ -581,7 +583,7 @@ class _VehicleFormState extends State<VehicleForm> {
                                           horizontal: 5.0),
                                       child: Column(
                                         children: [
-                                          const Text('caross').tr(),
+                                           Text('caross',style: tstyle,).tr(),
                                           smallSpace,
                                           const TextBox(),
                                         ],
@@ -604,7 +606,7 @@ class _VehicleFormState extends State<VehicleForm> {
                                           horizontal: 5.0),
                                       child: Column(
                                         children: [
-                                          const Text('energie').tr(),
+                                           Text('energie',style: tstyle,).tr(),
                                           smallSpace,
                                           const TextBox(),
                                         ],
@@ -627,7 +629,7 @@ class _VehicleFormState extends State<VehicleForm> {
                                           horizontal: 5.0),
                                       child: Column(
                                         children: [
-                                          const Text('puissance').tr(),
+                                           Text('puissance',style: tstyle,).tr(),
                                           smallSpace,
                                           const TextBox(),
                                         ],
@@ -650,7 +652,7 @@ class _VehicleFormState extends State<VehicleForm> {
                                           horizontal: 5.0),
                                       child: Column(
                                         children: [
-                                          const Text('placeassise').tr(),
+                                           Text('placeassise',style: tstyle,).tr(),
                                           smallSpace,
                                           const TextBox(),
                                         ],
@@ -673,7 +675,7 @@ class _VehicleFormState extends State<VehicleForm> {
                                           horizontal: 5.0),
                                       child: Column(
                                         children: [
-                                          const Text('poidstotal').tr(),
+                                           Text('poidstotal',style: tstyle,).tr(),
                                           smallSpace,
                                           const TextBox(),
                                         ],
@@ -695,7 +697,7 @@ class _VehicleFormState extends State<VehicleForm> {
                                           horizontal: 5.0),
                                       child: Column(
                                         children: [
-                                          const Text('chargeutil').tr(),
+                                           Text('chargeutil',style: tstyle,).tr(),
                                           smallSpace,
                                           const TextBox(),
                                         ],
@@ -723,10 +725,8 @@ class _VehicleFormState extends State<VehicleForm> {
                                             horizontal: 5.0),
                                         child: Row(
                                           children: [
-                                            const Text('precmat',
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold))
+                                            Text('precmat',
+                                              style: tstyle,)
                                                 .tr(),
                                             smallSpace,
                                             const Flexible(child: TextBox()),
@@ -747,10 +747,8 @@ class _VehicleFormState extends State<VehicleForm> {
                                             horizontal: 5.0),
                                         child: Row(
                                           children: [
-                                            const Text('anneeutil',
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold))
+                                             Text('anneeutil',
+                                               style: tstyle,)
                                                 .tr(),
                                             smallSpace,
                                             const Flexible(child: TextBox()),
@@ -797,4 +795,8 @@ class _VehicleFormState extends State<VehicleForm> {
     }
     return result;
   }
+
+  @override
+  bool get wantKeepAlive => true;
+
 }
