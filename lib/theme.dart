@@ -64,7 +64,6 @@ class AppTheme extends ChangeNotifier {
     notifyListeners();
   }
 
-
   AppTheme(SharedPreferences savedSettings) {
     mode = savedSettings.getInt('themeMode') == 0
         ? ThemeMode.system

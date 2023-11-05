@@ -5,6 +5,7 @@ import 'package:dzair_data_usage/dzair.dart';
 import 'package:dzair_data_usage/langs.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart' as m;
 import 'package:flutter/services.dart';
 import 'package:parc_oto/serializables/vehicle.dart';
 import 'package:parc_oto/widgets/page_header.dart';
@@ -37,6 +38,12 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
   Dzair dzair = Dzair();
 
   final tstyle=const TextStyle(fontWeight: FontWeight.bold);
+  final placeStyle=TextStyle(color: Colors.grey[100]);
+  final inputDecoration=m.InputDecoration(
+    fillColor: Colors.grey[100],
+    filled: true,
+    isDense: true,
+  );
 
   String wilaya = "01";
   String wilayaName = "Adrar";
@@ -108,9 +115,10 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                                       ThemeMode.light
                                                   ? Colors.white
                                                   : Colors.grey,
-                                      backgroundBlendMode: BlendMode.difference,
                                       boxShadow: kElevationToShadow[2]),
                                   padding: const EdgeInsets.all(3),
+                                  searchDecoration: inputDecoration,
+                                  dialogSize: Size(40.w,60.h),
                                   initialSelection: pays,
                                   showCountryOnly: true,
                                   showDropDownButton: true,
@@ -132,6 +140,10 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                   width: 13.w,
                                   child: AutoSuggestBox<String>(
                                     placeholder: 'wilaya'.tr(),
+                                    placeholderStyle: placeStyle,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[20],
+                                    ),
                                     items: dzair.getWilayat()!.map((wilaya) {
                                       return AutoSuggestBoxItem<String>(
                                         value: wilaya!.getWilayaCode()!,
@@ -175,13 +187,13 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                   ),
                                 ),
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
                                       'nummat',
                                       style: tstyle,
                                     ).tr(),
-                                    smallSpace,
+                                    const Spacer(),
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 5.0),
@@ -190,6 +202,10 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                               controller: matriculeEtr,
                                               placeholder: 'XXXXXXXXXXXXXX',
                                               textAlign: TextAlign.center,
+                                        placeholderStyle: placeStyle,
+                                        decoration: BoxDecoration(
+                                                    color: Colors.grey[20],
+                                              ),
                                             )
                                           : Row(
                                               mainAxisAlignment:
@@ -200,6 +216,10 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                                   child: TextBox(
                                                     controller: matr1,
                                                     placeholder: '123456',
+                                                    placeholderStyle: placeStyle,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[20],
+                                                    ),
                                                     maxLength: 6,
                                                     textAlign: TextAlign.center,
                                                     inputFormatters: [
@@ -217,6 +237,10 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                                     controller: matr2,
                                                     placeholder: '123',
                                                     maxLength: 3,
+                                                    placeholderStyle: placeStyle,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[20],
+                                                    ),
                                                     textAlign: TextAlign.center,
                                                     inputFormatters: [
                                                       FilteringTextInputFormatter
@@ -233,6 +257,10 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                                     controller: matr3,
                                                     placeholder: '12',
                                                     maxLength: 2,
+                                                    placeholderStyle: placeStyle,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[20],
+                                                    ),
                                                     textAlign: TextAlign.center,
                                                     inputFormatters: [
                                                       FilteringTextInputFormatter
@@ -243,7 +271,7 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                               ],
                                             ),
                                     ),
-                                    smallSpace,
+                                    const Spacer(),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
@@ -264,7 +292,9 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                         ),
                                         smallSpace,
                                       ],
-                                    )
+                                    ),
+                                    smallSpace,
+                                    smallSpace,
                                   ],
                                 ),
                               ),
@@ -281,6 +311,10 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                   width: 13.w,
                                   child: AutoSuggestBox<String>(
                                     placeholder: 'daira'.tr(),
+                                    placeholderStyle: placeStyle,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[20],
+                                    ),
                                     items: getDairas().map((daira) {
                                       return AutoSuggestBoxItem<String>(
                                         value:
@@ -313,6 +347,10 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                   width: 13.w,
                                   child: AutoSuggestBox<String>(
                                     placeholder: 'commune'.tr(),
+                                    placeholderStyle: placeStyle,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[20],
+                                    ),
                                     items: getCommune().map((commune) {
                                       return AutoSuggestBoxItem<String>(
                                         value: commune!
@@ -369,6 +407,10 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                 width: 10.w,
                                 child: TextBox(
                                   placeholder: 'quittance'.tr(),
+                                  placeholderStyle: placeStyle,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[20],
+                                  ),
                                 )),
                             smallSpace,
                             smallSpace,
@@ -381,6 +423,10 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                 width: 20.w,
                                 child: TextBox(
                                   placeholder: 'num'.tr(),
+                                  placeholderStyle: placeStyle,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[20],
+                                  ),
                                 )),
                           ],
                         ),
@@ -403,6 +449,10 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                 width: 15.w,
                                 child: TextBox(
                                   placeholder: 'nomf'.tr(),
+                                  placeholderStyle: placeStyle,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[20],
+                                  ),
                                 )),
                             smallSpace,
                             smallSpace,
@@ -415,6 +465,10 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                 width: 15.w,
                                 child: TextBox(
                                   placeholder: 'prenom'.tr(),
+                                  placeholderStyle: placeStyle,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[20],
+                                  ),
                                 )),
                             smallSpace,
                             smallSpace,
@@ -427,6 +481,10 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                 width: 15.w,
                                 child: TextBox(
                                   placeholder: 'profession'.tr(),
+                                  placeholderStyle: placeStyle,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[20],
+                                  ),
                                 )),
                           ],
                         ),
@@ -449,6 +507,10 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                 width: 30.w,
                                 child: TextBox(
                                   placeholder: 'adresse'.tr(),
+                                  placeholderStyle: placeStyle,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[20],
+                                  ),
                                 )),
                           ],
                         ),
@@ -488,7 +550,13 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                         children: [
                                           Text('genre',style: tstyle,).tr(),
                                           smallSpace,
-                                          const TextBox(),
+                                           TextBox(
+                                            placeholder: 'genre'.tr(),
+                                            placeholderStyle: placeStyle,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[20],
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -512,7 +580,13 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                         children: [
                                           Text('marque',style: tstyle,).tr(),
                                           smallSpace,
-                                          const TextBox(),
+                                          TextBox(
+                                            placeholder: 'marque'.tr(),
+                                            placeholderStyle: placeStyle,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[20],
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -535,7 +609,13 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                         children: [
                                           Text('type',style: tstyle,).tr(),
                                           smallSpace,
-                                          const TextBox(),
+                                           TextBox(
+                                             placeholder: 'type'.tr(),
+                                             placeholderStyle: placeStyle,
+                                             decoration: BoxDecoration(
+                                               color: Colors.grey[20],
+                                             ),
+                                           ),
                                         ],
                                       ),
                                     ),
@@ -558,7 +638,13 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                         children: [
                                            Text('numerserie',style: tstyle,).tr(),
                                           smallSpace,
-                                          const TextBox(),
+                                          TextBox(
+                                            placeholder: 'numerserie'.tr(),
+                                            placeholderStyle: placeStyle,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[20],
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -585,7 +671,13 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                         children: [
                                            Text('caross',style: tstyle,).tr(),
                                           smallSpace,
-                                          const TextBox(),
+                                          TextBox(
+                                            placeholder: 'caross'.tr(),
+                                            placeholderStyle: placeStyle,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[20],
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -608,7 +700,13 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                         children: [
                                            Text('energie',style: tstyle,).tr(),
                                           smallSpace,
-                                          const TextBox(),
+                                          TextBox(
+                                            placeholder: 'energie'.tr(),
+                                            placeholderStyle: placeStyle,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[20],
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -631,7 +729,14 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                         children: [
                                            Text('puissance',style: tstyle,).tr(),
                                           smallSpace,
-                                          const TextBox(),
+                                          TextBox(
+
+                                            placeholder: '000',
+                                            placeholderStyle: placeStyle,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[20],
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -654,7 +759,13 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                         children: [
                                            Text('placeassise',style: tstyle,).tr(),
                                           smallSpace,
-                                          const TextBox(),
+                                          TextBox(
+                                            placeholder:'000',
+                                            placeholderStyle: placeStyle,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[20],
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -677,7 +788,13 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                         children: [
                                            Text('poidstotal',style: tstyle,).tr(),
                                           smallSpace,
-                                          const TextBox(),
+                                          TextBox(
+                                            placeholder:'000000',
+                                            placeholderStyle: placeStyle,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[20],
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -699,7 +816,13 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                         children: [
                                            Text('chargeutil',style: tstyle,).tr(),
                                           smallSpace,
-                                          const TextBox(),
+                                          TextBox(
+                                            placeholder: '000000',
+                                            placeholderStyle: placeStyle,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[20],
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -729,7 +852,14 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                               style: tstyle,)
                                                 .tr(),
                                             smallSpace,
-                                            const Flexible(child: TextBox()),
+                                            Flexible(child: TextBox
+                                              (
+                                              placeholder: 'precmat'.tr(),
+                                              placeholderStyle: placeStyle,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[20],
+                                              ),
+                                            )),
                                           ],
                                         ),
                                       ),
@@ -751,7 +881,13 @@ class _VehicleFormState extends State<VehicleForm> with AutomaticKeepAliveClient
                                                style: tstyle,)
                                                 .tr(),
                                             smallSpace,
-                                            const Flexible(child: TextBox()),
+                                            Flexible(child: TextBox(
+                                              placeholder: 'XXXX',
+                                              placeholderStyle: placeStyle,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[20],
+                                              ),
+                                            )),
                                           ],
                                         ),
                                       ),
