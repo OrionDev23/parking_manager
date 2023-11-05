@@ -2,7 +2,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/screens/sidemenu.dart';
+import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:parc_oto/utilities/form_validators.dart';
 import 'package:parc_oto/widgets/page_header.dart';

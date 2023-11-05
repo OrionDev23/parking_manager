@@ -280,7 +280,7 @@ class _ProfilFormState extends State<ProfilForm> {
       });
       var dateLast =
           DateTime.now().difference(ClientDatabase.ref).inMilliseconds.abs();
-      String? url = await uploadPic();
+      String? url = await uploadPic()??widget.user?.avatar;
       if (widget.user == null) {
 
         ParcUser newme= ParcUser(

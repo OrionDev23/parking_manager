@@ -1,8 +1,11 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart' as m;
 import '../theme.dart';
 import '../utilities/color_manip.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+
+import 'on_tap_scale.dart';
 
 class ButtonContainer extends StatelessWidget {
   final IconData icon;
@@ -11,6 +14,8 @@ class ButtonContainer extends StatelessWidget {
   final String textList;
   final String textNouveau;
 
+
+  final bool showBottom;
   final bool showBothLN;
 
   final bool showCounter;
@@ -30,6 +35,7 @@ class ButtonContainer extends StatelessWidget {
       this.textList = "Liste",
       this.textNouveau = "Nouveau",
       this.showBothLN = true,
+        this.showBottom=true,
       this.showCounter = true});
 
   @override
@@ -37,7 +43,7 @@ class ButtonContainer extends StatelessWidget {
     var appTheme = context.watch<AppTheme>();
     var textStyle = TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold,color: Colors.white);
     var textStyleButton = TextStyle(fontSize: 10.sp, color: Colors.white);
-    return GestureDetector(
+    return OnTapScaleAndFade(
       onTap: action,
       child: Container(
         clipBehavior: Clip.antiAlias,
@@ -78,7 +84,8 @@ class ButtonContainer extends StatelessWidget {
                 const SizedBox(
                   height: 10,
                 ),
-                Row(
+                if(showBottom)
+                  Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     FilledButton(

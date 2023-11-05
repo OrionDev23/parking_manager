@@ -2,7 +2,7 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'providers/client_database.dart';
-import 'screens/sidemenu.dart';
+import 'screens/sidemenu/sidemenu.dart';
 import 'theme.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -54,13 +54,16 @@ Future<void> initWindow() async {
   });
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final SharedPreferences savedSettings;
 
   const MyApp({super.key, required this.savedSettings});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
 
-
+class _MyAppState extends State<MyApp> {
   List<LocalizationsDelegate<dynamic>> getDelegates(BuildContext context){
     List<LocalizationsDelegate>results=List.from(context.localizationDelegates);
     results.addAll([
@@ -69,15 +72,19 @@ class MyApp extends StatelessWidget {
     ]);
     return results;
   }
+
   // This widget is the root of your application.
+  GlobalKey<NavigatorState> navigatorKey=GlobalKey<NavigatorState>();
+
   @override
   Widget build(BuildContext context) {
   return ResponsiveSizer(builder: (context, orientation, deviceType) {
       return ChangeNotifierProvider(
-          create: (_) => AppTheme(savedSettings),
+          create: (_) => AppTheme(widget.savedSettings),
           builder: (context,_){
             final appTheme = context.watch<AppTheme>();
             return FluentApp(
+              navigatorKey: navigatorKey,
               title: appTitle,
               themeMode: appTheme.mode,
               debugShowCheckedModeBanner: false,
@@ -125,7 +132,7 @@ class MyApp extends StatelessWidget {
               initialRoute: '/',
               routes: {
                 '/': (context) => PanesList(
-                  prefs: savedSettings,
+                  prefs: widget.savedSettings,
                 )
               },
 

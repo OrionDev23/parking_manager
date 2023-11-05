@@ -3,6 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  connectivity_plus
+  nb_utils
   screen_retriever
   system_theme
   url_launcher_windows

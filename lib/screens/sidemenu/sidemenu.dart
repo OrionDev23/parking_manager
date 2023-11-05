@@ -2,16 +2,17 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/login.dart';
 import 'package:parc_oto/screens/logout.dart';
 import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
+import 'package:parc_oto/screens/vehicle/vehicle_tabs.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'dashboard.dart';
-import 'dashboard/notif_list.dart';
-import 'settings.dart';
+import '../dashboard/dashboard.dart';
+import '../dashboard/notif_list.dart';
+import '../settings.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
-import '../theme.dart';
+import '../../theme.dart';
 import 'package:flutter/material.dart' as m;
 
 const defaultUserPic =
@@ -239,7 +240,7 @@ class PanesListState extends State<PanesList> with WindowListener {
           PaneItem(
               icon: const Icon(FluentIcons.edit),
               title: const Text('gestionvehicles').tr(),
-              body: const Placeholder()),
+              body: const VehicleTabs()),
           PaneItem(
             icon: const Icon(FluentIcons.verified_brand),
             title: const Text('brands').tr(),

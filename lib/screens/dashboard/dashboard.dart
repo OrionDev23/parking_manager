@@ -1,12 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import '../theme.dart';
+import '../../theme.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import '../widgets/button_container.dart';
-import '../widgets/page_header.dart';
-import 'dashboard/transaction_chart.dart';
-import 'dashboard/table_stats.dart';
+import '../../widgets/button_container.dart';
+import '../../widgets/page_header.dart';
+import 'transaction_chart.dart';
+import 'table_stats.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
