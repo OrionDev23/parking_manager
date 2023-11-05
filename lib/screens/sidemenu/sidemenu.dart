@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/login.dart';
 import 'package:parc_oto/screens/logout.dart';
@@ -63,8 +66,12 @@ class PanesListState extends State<PanesList> with WindowListener {
   bool loading = false;
   @override
   void initState() {
-    windowManager.setPreventClose(true);
+    if(!kIsWeb && (Platform.isMacOS || Platform.isLinux || Platform.isWindows)) {
+      windowManager.setPreventClose(true);
     windowManager.addListener(this);
+    }
+    adjustSize();
+
     getProfil();
 
     super.initState();
@@ -81,6 +88,22 @@ class PanesListState extends State<PanesList> with WindowListener {
     loading = false;
     if (mounted) {
       setState(() {});
+    }
+  }
+
+  double pwidth=20.w;
+
+  void adjustSize(){
+    if(kIsWeb){
+
+    }
+    else{
+      if(Platform.isAndroid || Platform.isIOS){
+        pwidth=60.w;
+      }
+      else{
+        pwidth=20.w;
+      }
     }
   }
 
@@ -184,7 +207,7 @@ class PanesListState extends State<PanesList> with WindowListener {
                       index.value = i;
                     },
                     size: NavigationPaneSize(
-                      openMaxWidth: 20.w,
+                      openMaxWidth: pwidth,
                     ),
                     displayMode: appTheme.displayMode,
                     items: originalItems,
@@ -317,10 +340,14 @@ class WindowButtons extends StatelessWidget {
     return SizedBox(
       width: 138,
       height: 50,
-      child: WindowCaption(
+      child:
+        (!kIsWeb && (Platform.isMacOS || Platform.isLinux || Platform.isWindows))
+    ?
+      WindowCaption(
         brightness: theme.brightness,
         backgroundColor: Colors.transparent,
-      ),
+      )
+          :const SizedBox(),
     );
   }
 }

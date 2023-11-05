@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'providers/client_database.dart';
 import 'screens/sidemenu/sidemenu.dart';
 import 'theme.dart';
@@ -14,7 +18,9 @@ import 'package:window_manager/window_manager.dart';
 const appTitle="ParcOto";
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initWindow();
+  if(!kIsWeb && (Platform.isMacOS || Platform.isLinux || Platform.isWindows)) {
+    await initWindow();
+  }
   ClientDatabase();
   launchApp();
 }

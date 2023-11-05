@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:parc_oto/theme.dart';
@@ -31,6 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
+    adjustSize();
     checkUser();
     super.initState();
   }
@@ -45,6 +49,25 @@ class _LoginScreenState extends State<LoginScreen> {
       checking=false;
     });
   }
+
+  void adjustSize(){
+    if(kIsWeb){
+      pheight=50.h;
+    }
+    else{
+      if(Platform.isAndroid || Platform.isIOS){
+        pwidth=60.w;
+        pheight=50.h;
+      }
+      else{
+        pwidth=20.w;
+        pheight=35.h;
+      }
+    }
+  }
+
+  double pwidth=20.w;
+  double pheight=35.h;
 
   @override
   Widget build(BuildContext context) {
@@ -62,8 +85,8 @@ class _LoginScreenState extends State<LoginScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 alignment: Alignment.center,
-                width: 25.w,
-                height: 35.h,
+                width: pwidth,
+                height: pheight,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   color: appTheme.mode == ThemeMode.dark
@@ -81,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SizedBox(
-                      width: 20.w,
+                      width: pwidth,
                       child: InfoLabel(
 
                         label: validEmail||email.text.isEmpty?'':'entervalidemail'.tr(),
@@ -110,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 2.h,
                     ),
                     SizedBox(
-                      width: 20.w,
+                      width: pwidth,
                       child: TextBox(
                         controller: password,
                         placeholder: 'motdepasse'.tr(),
