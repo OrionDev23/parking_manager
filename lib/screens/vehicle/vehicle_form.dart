@@ -87,8 +87,8 @@ class _VehicleFormState extends State<VehicleForm>
                   width: 70.w,
                   height: 80.h,
                   child: MasonryGridView.count(
-                    crossAxisCount: 3,
-                    itemCount: 4,
+                    crossAxisCount: MediaQuery.of(context).orientation==Orientation.portrait?1:3,
+                    itemCount: 6,
                     padding: const EdgeInsets.symmetric(horizontal: 5.0),
                     crossAxisSpacing: 5,
                     mainAxisSpacing: 5,
@@ -97,7 +97,7 @@ class _VehicleFormState extends State<VehicleForm>
                         case 0:
                           return SizedBox(
                             width: double.infinity,
-                              height: 17.h,
+                              height: 18.h,
                               child: Column(
                                 children: [
                                   Text(
@@ -134,7 +134,6 @@ class _VehicleFormState extends State<VehicleForm>
                                     style: tstyle,
                                   ).tr(),
                                   SizedBox(
-                                    width: 13.w,
                                     height: 5.h,
                                     child: AutoSuggestBox<String>(
                                       placeholder: 'wilaya'.tr(),
@@ -184,7 +183,7 @@ class _VehicleFormState extends State<VehicleForm>
                         case 1:
                           return SizedBox(
                             width: double.infinity,
-                            height: 17.h,
+                            height: 18.h,
                             child: Container(
                               padding: EdgeInsets.zero,
                               decoration: const BoxDecoration(
@@ -316,7 +315,7 @@ class _VehicleFormState extends State<VehicleForm>
                         case 2:
                           return SizedBox(
                               width: double.infinity,
-                              height: 17.h,
+                              height: 18.h,
                               child: Column(
                                 children: [
                                   Text(
@@ -324,7 +323,6 @@ class _VehicleFormState extends State<VehicleForm>
                                     style: tstyle,
                                   ).tr(),
                                   SizedBox(
-                                    width: 13.w,
                                     height: 5.h,
                                     child: AutoSuggestBox<String>(
                                       placeholder: 'daira'.tr(),
@@ -362,9 +360,7 @@ class _VehicleFormState extends State<VehicleForm>
                                     style: tstyle,
                                   ).tr(),
                                   SizedBox(
-                                    width: 13.w,
                                     height: 5.h,
-
                                     child: AutoSuggestBox<String>(
                                       placeholder: 'commune'.tr(),
                                       placeholderStyle: placeStyle,
@@ -406,7 +402,7 @@ class _VehicleFormState extends State<VehicleForm>
 
                         case 3:
                           return SizedBox(
-                              width: 17.w,
+                            width: 15.w,
                               height: 7.h,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -418,16 +414,14 @@ class _VehicleFormState extends State<VehicleForm>
                                   smallSpace,
                                   SizedBox(
                                       width: 15.w,
-                                      child:
-                                          DatePicker(selected: selectedDate)),
-                                  smallSpace,
+                                      child: DatePicker(selected: selectedDate)),
                                 ],
                               ));
-                              /*
+
                         case 4:
                           return SizedBox(
-                              width: 17.w,
-                              height: 15.h,
+                            width: 10.w,
+                              height: 7.h,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -436,21 +430,21 @@ class _VehicleFormState extends State<VehicleForm>
                                     style: tstyle,
                                   ).tr(),
                                   smallSpace,
-                                  SizedBox(
-                                      width: 10.w,
-                                      child: TextBox(
-                                        placeholder: 'quittance'.tr(),
-                                        placeholderStyle: placeStyle,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[20],
-                                        ),
-                                      )),
+                                  Flexible(
+                                    child: TextBox(
+                                      placeholder: 'quittance'.tr(),
+                                      placeholderStyle: placeStyle,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[20],
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ));
                         case 5:
                           return SizedBox(
-                              width: 17.w,
-                              height: 15.h,
+                            width: 20.w,
+                              height: 7.h,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -469,7 +463,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         ),
                                       )),
                                 ],
-                              ));
+                              ));/*
                         case 6:
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.center,
