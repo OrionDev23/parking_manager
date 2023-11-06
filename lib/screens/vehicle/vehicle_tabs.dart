@@ -63,7 +63,7 @@ class _VehicleTabsState extends State<VehicleTabs> {
               final index = tabs.length + 1;
               final tab = generateTab(index);
               tabs.add(tab);
-              currentIndex.value=index;
+              currentIndex.value=index-1;
             });
           },
           onReorder: (oldIndex, newIndex) {

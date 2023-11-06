@@ -58,502 +58,597 @@ class _VehicleFormState extends State<VehicleForm>
     var appTheme = context.watch<AppTheme>();
     return ScaffoldPage(
         content: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: appTheme.mode == ThemeMode.dark
-                    ? Colors.grey
-                    : appTheme.mode == ThemeMode.light
-                        ? Colors.white
-                        : ThemeMode.system == ThemeMode.light
-                            ? Colors.white
-                            : Colors.grey,
-                boxShadow: kElevationToShadow[4],
-              ),
-              width: 80.w,
-              height: 90.h,
-              child: Padding(
+            child: Padding(
                 padding: const EdgeInsets.all(5.0),
                 child: Container(
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      top: BorderSide(),
-                      left: BorderSide(),
-                      right: BorderSide(),
-                      bottom: BorderSide(),
+                    decoration: BoxDecoration(
+                      color: appTheme.mode == ThemeMode.dark
+                          ? Colors.grey
+                          : appTheme.mode == ThemeMode.light
+                              ? Colors.white
+                              : ThemeMode.system == ThemeMode.light
+                                  ? Colors.white
+                                  : Colors.grey,
+                      boxShadow: kElevationToShadow[4],
                     ),
-                  ),
-                  width: 70.w,
-                  height: 80.h,
-                  child: MasonryGridView.count(
-                    crossAxisCount: MediaQuery.of(context).orientation==Orientation.portrait?1:3,
-                    itemCount: 6,
-                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                    crossAxisSpacing: 5,
-                    mainAxisSpacing: 5,
-                    itemBuilder: (c, index) {
-                      switch (index) {
-                        case 0:
-                          return SizedBox(
-                            width: double.infinity,
-                              height: 18.h,
-                              child: Column(
-                                children: [
-                                  Text(
-                                    'pays',
-                                    style: tstyle,
-                                  ).tr(),
-                                  CountryCodePicker(
-                                    boxDecoration: BoxDecoration(
-                                        color: appTheme.mode == ThemeMode.dark
-                                            ? Colors.grey
-                                            : appTheme.mode == ThemeMode.light
-                                                ? Colors.white
-                                                : ThemeMode.system ==
-                                                        ThemeMode.light
-                                                    ? Colors.white
-                                                    : Colors.grey,
-                                        boxShadow: kElevationToShadow[2]),
-                                    padding: const EdgeInsets.all(3),
-                                    searchDecoration: inputDecoration,
-                                    dialogSize: Size(40.w, 60.h),
-                                    initialSelection: pays,
-                                    showCountryOnly: true,
-                                    showDropDownButton: true,
-                                    showFlagDialog: true,
-                                    showOnlyCountryWhenClosed: true,
-                                    onChanged: (c) {
-                                      setState(() {
-                                        pays = c.code ?? 'DZ';
-                                      });
-                                    },
-                                  ),
-                                  Text(
-                                    'wilaya',
-                                    style: tstyle,
-                                  ).tr(),
-                                  SizedBox(
-                                    height: 5.h,
-                                    child: AutoSuggestBox<String>(
-                                      placeholder: 'wilaya'.tr(),
-                                      placeholderStyle: placeStyle,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[20],
-                                      ),
-                                      items: dzair.getWilayat()!.map((wilaya) {
-                                        return AutoSuggestBoxItem<String>(
-                                          value: wilaya!.getWilayaCode()!,
-                                          label: wilaya.getWilayaName(appTheme
-                                                      .locale!.languageCode
-                                                      .toUpperCase() ==
-                                                  "AR"
-                                              ? Language.AR
-                                              : Language.FR)!,
-                                        );
-                                      }).toList(),
-                                      onSelected: (item) {
-                                        setState(() {
-                                          wilaya = item.value!;
-                                          wilayaName = dzair
-                                                  .searchWilayatByName(
-                                                      item.label,
+                    width: 80.w,
+                    height: 90.h,
+                    child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Container(
+                          decoration: const BoxDecoration(
+                            border: Border(
+                              top: BorderSide(),
+                              left: BorderSide(),
+                              right: BorderSide(),
+                              bottom: BorderSide(),
+                            ),
+                          ),
+                          width: 70.w,
+                          height: 80.h,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: StaggeredGrid.count(
+                              axisDirection: AxisDirection.down,
+                              crossAxisCount:
+                                  MediaQuery.of(context).orientation ==
+                                          Orientation.portrait
+                                      ? 1
+                                      : 3,
+                              crossAxisSpacing: 5,
+                              mainAxisSpacing: 5,
+                              children: [
+                                StaggeredGridTile.fit(
+                                    crossAxisCellCount: 1,
+                                    child: SizedBox(
+                                      height: 18.h,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'pays',
+                                            style: tstyle,
+                                          ).tr(),
+                                          CountryCodePicker(
+                                            boxDecoration: BoxDecoration(
+                                                color: appTheme.mode ==
+                                                        ThemeMode.dark
+                                                    ? Colors.grey
+                                                    : appTheme.mode ==
+                                                            ThemeMode.light
+                                                        ? Colors.white
+                                                        : ThemeMode.system ==
+                                                                ThemeMode.light
+                                                            ? Colors.white
+                                                            : Colors.grey,
+                                                boxShadow:
+                                                    kElevationToShadow[2]),
+                                            padding: const EdgeInsets.all(3),
+                                            searchDecoration: inputDecoration,
+                                            dialogSize: Size(40.w, 60.h),
+                                            initialSelection: pays,
+                                            showCountryOnly: true,
+                                            showDropDownButton: true,
+                                            showFlagDialog: true,
+                                            showOnlyCountryWhenClosed: true,
+                                            onChanged: (c) {
+                                              setState(() {
+                                                pays = c.code ?? 'DZ';
+                                              });
+                                            },
+                                          ),
+                                          Text(
+                                            'wilaya',
+                                            style: tstyle,
+                                          ).tr(),
+                                          SizedBox(
+                                            height: 5.h,
+                                            child: AutoSuggestBox<String>(
+                                              placeholder: 'wilaya'.tr(),
+                                              placeholderStyle: placeStyle,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[20],
+                                              ),
+                                              items: dzair
+                                                  .getWilayat()!
+                                                  .map((wilaya) {
+                                                return AutoSuggestBoxItem<
+                                                    String>(
+                                                  value:
+                                                      wilaya!.getWilayaCode()!,
+                                                  label: wilaya.getWilayaName(
                                                       appTheme.locale!
                                                                   .languageCode
                                                                   .toUpperCase() ==
                                                               "AR"
                                                           ? Language.AR
-                                                          : Language.FR)
-                                                  ?.first
-                                                  ?.getWilayaName(
-                                                      Language.FR) ??
-                                              '';
-                                        });
-                                      },
-                                      onChanged: (s, r) {
-                                        if (r == TextChangedReason.userInput) {
-                                          setState(() => wilayaName = s);
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ));
-
-                        case 1:
-                          return SizedBox(
-                            width: double.infinity,
-                            height: 18.h,
-                            child: Container(
-                              padding: EdgeInsets.zero,
-                              decoration: const BoxDecoration(
-                                border: Border(
-                                  left: BorderSide(),
-                                  right: BorderSide(),
-                                  bottom: BorderSide(),
-                                ),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'nummat',
-                                    style: tstyle,
-                                  ).tr(),
-                                  const Spacer(),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 5.0),
-                                    child: autreMat
-                                        ? TextBox(
-                                            controller: matriculeEtr,
-                                            placeholder: 'XXXXXXXXXXXXXX',
-                                            textAlign: TextAlign.center,
-                                            placeholderStyle: placeStyle,
-                                            decoration: BoxDecoration(
-                                              color: Colors.grey[20],
+                                                          : Language.FR)!,
+                                                );
+                                              }).toList(),
+                                              onSelected: (item) {
+                                                setState(() {
+                                                  wilaya = item.value!;
+                                                  wilayaName = dzair
+                                                          .searchWilayatByName(
+                                                              item.label,
+                                                              appTheme.locale!
+                                                                          .languageCode
+                                                                          .toUpperCase() ==
+                                                                      "AR"
+                                                                  ? Language.AR
+                                                                  : Language.FR)
+                                                          ?.first
+                                                          ?.getWilayaName(
+                                                              Language.FR) ??
+                                                      '';
+                                                });
+                                              },
+                                              onChanged: (s, r) {
+                                                if (r ==
+                                                    TextChangedReason
+                                                        .userInput) {
+                                                  setState(
+                                                      () => wilayaName = s);
+                                                }
+                                              },
                                             ),
-                                          )
-                                        : Row(
+                                          ),
+                                        ],
+                                      ),
+                                    )),
+                                StaggeredGridTile.fit(
+                                  crossAxisCellCount: 1,
+                                  child: SizedBox(
+                                    height: 18.h,
+                                    child: Container(
+                                      padding: EdgeInsets.zero,
+                                      decoration: const BoxDecoration(
+                                        border: Border(
+                                          top: BorderSide(),
+                                          left: BorderSide(),
+                                          right: BorderSide(),
+                                          bottom: BorderSide(),
+                                        ),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8.0),
+                                            child: Text(
+                                              'nummat',
+                                              style: tstyle,
+                                            ).tr(),
+                                          ),
+                                          const Spacer(),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 5.0),
+                                            child: autreMat
+                                                ? TextBox(
+                                                    controller: matriculeEtr,
+                                                    placeholder:
+                                                        'XXXXXXXXXXXXXX',
+                                                    textAlign: TextAlign.center,
+                                                    placeholderStyle:
+                                                        placeStyle,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[20],
+                                                    ),
+                                                  )
+                                                : Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Flexible(
+                                                        flex: 6,
+                                                        child: TextBox(
+                                                          controller: matr1,
+                                                          placeholder: '123456',
+                                                          placeholderStyle:
+                                                              placeStyle,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color:
+                                                                Colors.grey[20],
+                                                          ),
+                                                          maxLength: 6,
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          inputFormatters: [
+                                                            FilteringTextInputFormatter
+                                                                .digitsOnly
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      smallSpace,
+                                                      Text(
+                                                        '-',
+                                                        style: tstyle,
+                                                      ),
+                                                      smallSpace,
+                                                      Flexible(
+                                                        flex: 3,
+                                                        child: TextBox(
+                                                          controller: matr2,
+                                                          placeholder: '123',
+                                                          maxLength: 3,
+                                                          placeholderStyle:
+                                                              placeStyle,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color:
+                                                                Colors.grey[20],
+                                                          ),
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          inputFormatters: [
+                                                            FilteringTextInputFormatter
+                                                                .digitsOnly
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      smallSpace,
+                                                      Text(
+                                                        '-',
+                                                        style: tstyle,
+                                                      ),
+                                                      smallSpace,
+                                                      Flexible(
+                                                        flex: 2,
+                                                        child: TextBox(
+                                                          controller: matr3,
+                                                          placeholder: '12',
+                                                          maxLength: 2,
+                                                          placeholderStyle:
+                                                              placeStyle,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color:
+                                                                Colors.grey[20],
+                                                          ),
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          inputFormatters: [
+                                                            FilteringTextInputFormatter
+                                                                .digitsOnly
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                          ),
+                                          const Spacer(),
+                                          Row(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                                MainAxisAlignment.end,
                                             children: [
-                                              Flexible(
-                                                flex: 6,
-                                                child: TextBox(
-                                                  controller: matr1,
-                                                  placeholder: '123456',
-                                                  placeholderStyle: placeStyle,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.grey[20],
-                                                  ),
-                                                  maxLength: 6,
-                                                  textAlign: TextAlign.center,
-                                                  inputFormatters: [
-                                                    FilteringTextInputFormatter
-                                                        .digitsOnly
-                                                  ],
-                                                ),
+                                              Checkbox(
+                                                checked: autreMat,
+                                                content: Text(
+                                                  'autremat',
+                                                  style: TextStyle(
+                                                      color: Colors.grey[100]),
+                                                ).tr(),
+                                                onChanged: (s) {
+                                                  if (s != null) {
+                                                    setState(() {
+                                                      autreMat = s;
+                                                    });
+                                                  }
+                                                },
                                               ),
                                               smallSpace,
-                                              Text(
-                                                '-',
-                                                style: tstyle,
-                                              ),
-                                              smallSpace,
-                                              Flexible(
-                                                flex: 3,
-                                                child: TextBox(
-                                                  controller: matr2,
-                                                  placeholder: '123',
-                                                  maxLength: 3,
-                                                  placeholderStyle: placeStyle,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.grey[20],
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                  inputFormatters: [
-                                                    FilteringTextInputFormatter
-                                                        .digitsOnly
-                                                  ],
-                                                ),
-                                              ),
-                                              smallSpace,
-                                              Text(
-                                                '-',
-                                                style: tstyle,
-                                              ),
-                                              smallSpace,
-                                              Flexible(
-                                                flex: 2,
-                                                child: TextBox(
-                                                  controller: matr3,
-                                                  placeholder: '12',
-                                                  maxLength: 2,
-                                                  placeholderStyle: placeStyle,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.grey[20],
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                  inputFormatters: [
-                                                    FilteringTextInputFormatter
-                                                        .digitsOnly
-                                                  ],
-                                                ),
-                                              ),
                                             ],
                                           ),
+                                          smallSpace,
+                                          smallSpace,
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                  const Spacer(),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Checkbox(
-                                        checked: autreMat,
-                                        content: Text(
-                                          'autremat',
-                                          style: TextStyle(
-                                              color: Colors.grey[100]),
+                                ),
+                                StaggeredGridTile.fit(
+                                    crossAxisCellCount: 1,
+                                    child: SizedBox(
+                                      height: 18.h,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'daira',
+                                            style: tstyle,
+                                          ).tr(),
+                                          SizedBox(
+                                            height: 5.h,
+                                            child: AutoSuggestBox<String>(
+                                              placeholder: 'daira'.tr(),
+                                              placeholderStyle: placeStyle,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[20],
+                                              ),
+                                              items: getDairas().map((daira) {
+                                                return AutoSuggestBoxItem<
+                                                    String>(
+                                                  value: daira?.getDairaName(
+                                                          Language.FR) ??
+                                                      '',
+                                                  label: daira?.getDairaName(appTheme
+                                                                  .locale
+                                                                  ?.languageCode
+                                                                  .toUpperCase() ==
+                                                              "AR"
+                                                          ? Language.AR
+                                                          : Language.FR) ??
+                                                      '',
+                                                );
+                                              }).toList(),
+                                              onSelected: (item) {
+                                                setState(() =>
+                                                    daira = item.value ?? "");
+                                              },
+                                              onChanged: (s, r) {
+                                                if (r ==
+                                                    TextChangedReason
+                                                        .userInput) {
+                                                  setState(() => daira = s);
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                          Text(
+                                            'commune',
+                                            style: tstyle,
+                                          ).tr(),
+                                          SizedBox(
+                                            height: 5.h,
+                                            child: AutoSuggestBox<String>(
+                                              placeholder: 'commune'.tr(),
+                                              placeholderStyle: placeStyle,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[20],
+                                              ),
+                                              items:
+                                                  getCommune().map((commune) {
+                                                return AutoSuggestBoxItem<
+                                                    String>(
+                                                  value: commune == null
+                                                      ? ''
+                                                      : commune.getCommuneName(
+                                                              Language.FR) ??
+                                                          '',
+                                                  label: commune == null
+                                                      ? ''
+                                                      : commune.getCommuneName(appTheme
+                                                                      .locale
+                                                                      ?.languageCode
+                                                                      .toUpperCase() ==
+                                                                  "AR"
+                                                              ? Language.AR
+                                                              : Language.FR) ??
+                                                          '',
+                                                );
+                                              }).toList(),
+                                              onSelected: (item) {
+                                                setState(() =>
+                                                    commune = item.value ?? "");
+                                              },
+                                              onChanged: (s, r) {
+                                                if (r ==
+                                                    TextChangedReason
+                                                        .userInput) {
+                                                  setState(() => commune = s);
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )),
+                                StaggeredGridTile.fit(
+                                    crossAxisCellCount: 1,
+                                    child: SizedBox(
+                                      height: 10.h,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'date',
+                                            style: tstyle,
+                                          ).tr(),
+                                          smallSpace,
+                                          SizedBox(
+                                              width: 15.w,
+                                              child: DatePicker(
+                                                  selected: selectedDate)),
+                                        ],
+                                      ),
+                                    )),
+                                StaggeredGridTile.fit(
+                                  crossAxisCellCount: 1,
+                                  child: SizedBox(
+                                    height: 10.h,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        if (MediaQuery.of(context)
+                                                .orientation ==
+                                            Orientation.landscape)
+                                          const SizedBox(
+                                            height: 8,
+                                          ),
+                                        Text(
+                                          'quittance',
+                                          style: tstyle,
                                         ).tr(),
-                                        onChanged: (s) {
-                                          if (s != null) {
-                                            setState(() {
-                                              autreMat = s;
-                                            });
-                                          }
-                                        },
-                                      ),
-                                      smallSpace,
-                                    ],
-                                  ),
-                                  smallSpace,
-                                  smallSpace,
-                                ],
-                              ),
-                            ),
-                          );
-                        case 2:
-                          return SizedBox(
-                              width: double.infinity,
-                              height: 18.h,
-                              child: Column(
-                                children: [
-                                  Text(
-                                    'daira',
-                                    style: tstyle,
-                                  ).tr(),
-                                  SizedBox(
-                                    height: 5.h,
-                                    child: AutoSuggestBox<String>(
-                                      placeholder: 'daira'.tr(),
-                                      placeholderStyle: placeStyle,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[20],
-                                      ),
-                                      items: getDairas().map((daira) {
-                                        return AutoSuggestBoxItem<String>(
-                                          value: daira
-                                                  ?.getDairaName(Language.FR) ??
-                                              '',
-                                          label: daira?.getDairaName(appTheme
-                                                          .locale?.languageCode
-                                                          .toUpperCase() ==
-                                                      "AR"
-                                                  ? Language.AR
-                                                  : Language.FR) ??
-                                              '',
-                                        );
-                                      }).toList(),
-                                      onSelected: (item) {
-                                        setState(
-                                            () => daira = item.value ?? "");
-                                      },
-                                      onChanged: (s, r) {
-                                        if (r == TextChangedReason.userInput) {
-                                          setState(() => daira = s);
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                  Text(
-                                    'commune',
-                                    style: tstyle,
-                                  ).tr(),
-                                  SizedBox(
-                                    height: 5.h,
-                                    child: AutoSuggestBox<String>(
-                                      placeholder: 'commune'.tr(),
-                                      placeholderStyle: placeStyle,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[20],
-                                      ),
-                                      items: getCommune().map((commune) {
-                                        return AutoSuggestBoxItem<String>(
-                                          value: commune == null
-                                              ? ''
-                                              : commune.getCommuneName(
-                                                      Language.FR) ??
-                                                  '',
-                                          label: commune == null
-                                              ? ''
-                                              : commune.getCommuneName(appTheme
-                                                              .locale
-                                                              ?.languageCode
-                                                              .toUpperCase() ==
-                                                          "AR"
-                                                      ? Language.AR
-                                                      : Language.FR) ??
-                                                  '',
-                                        );
-                                      }).toList(),
-                                      onSelected: (item) {
-                                        setState(
-                                            () => commune = item.value ?? "");
-                                      },
-                                      onChanged: (s, r) {
-                                        if (r == TextChangedReason.userInput) {
-                                          setState(() => commune = s);
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ));
-
-                        case 3:
-                          return SizedBox(
-                            width: 15.w,
-                              height: 7.h,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'date',
-                                    style: tstyle,
-                                  ).tr(),
-                                  smallSpace,
-                                  SizedBox(
-                                      width: 15.w,
-                                      child: DatePicker(selected: selectedDate)),
-                                ],
-                              ));
-
-                        case 4:
-                          return SizedBox(
-                            width: 10.w,
-                              height: 7.h,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'quittance',
-                                    style: tstyle,
-                                  ).tr(),
-                                  smallSpace,
-                                  Flexible(
-                                    child: TextBox(
-                                      placeholder: 'quittance'.tr(),
-                                      placeholderStyle: placeStyle,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[20],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ));
-                        case 5:
-                          return SizedBox(
-                            width: 20.w,
-                              height: 7.h,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'num',
-                                    style: tstyle,
-                                  ).tr(),
-                                  smallSpace,
-                                  SizedBox(
-                                      width: 20.w,
-                                      child: TextBox(
-                                        placeholder: 'num'.tr(),
-                                        placeholderStyle: placeStyle,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[20],
-                                        ),
-                                      )),
-                                ],
-                              ));/*
-                        case 6:
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'nomf',
-                                style: tstyle,
-                              ).tr(),
-                              smallSpace,
-                              SizedBox(
-                                  width: 15.w,
-                                  child: TextBox(
-                                    placeholder: 'nomf'.tr(),
-                                    placeholderStyle: placeStyle,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[20],
-                                    ),
-                                  )),
-                            ],
-                          );
-                        case 7:
-                          return SizedBox(
-                              width: 17.w,
-                              height: 15.h,
-                              child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'prenom',
-                                      style: tstyle,
-                                    ).tr(),
-                                    smallSpace,
-                                    SizedBox(
-                                        width: 15.w,
-                                        child: TextBox(
-                                          placeholder: 'prenom'.tr(),
+                                        smallSpace,
+                                        TextBox(
+                                          placeholder: 'quittance'.tr(),
                                           placeholderStyle: placeStyle,
                                           decoration: BoxDecoration(
                                             color: Colors.grey[20],
                                           ),
-                                        )),
-                                  ]));
-                        case 8:
-                          return SizedBox(
-                              width: 17.w,
-                              height: 15.h,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'profession',
-                                    style: tstyle,
-                                  ).tr(),
-                                  smallSpace,
-                                  SizedBox(
-                                      width: 15.w,
-                                      child: TextBox(
-                                        placeholder: 'profession'.tr(),
-                                        placeholderStyle: placeStyle,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[20],
                                         ),
-                                      )),
-                                ],
-                              ));
-                        case 9:
-                          SizedBox(
-                              width: 17.w,
-                              height: 15.h,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'adresse',
-                                    style: tstyle,
-                                  ).tr(),
-                                  smallSpace,
-                                  SizedBox(
-                                      width: 30.w,
-                                      child: TextBox(
-                                        placeholder: 'adresse'.tr(),
-                                        placeholderStyle: placeStyle,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[20],
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                StaggeredGridTile.fit(
+                                  crossAxisCellCount: 1,
+                                  child: SizedBox(
+                                    height: 10.h,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'num',
+                                          style: tstyle,
+                                        ).tr(),
+                                        smallSpace,
+                                        TextBox(
+                                          placeholder: 'num'.tr(),
+                                          placeholderStyle: placeStyle,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[20],
+                                          ),
                                         ),
-                                      )),
-                                ],
-                              ));
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                StaggeredGridTile.fit(
+                                  crossAxisCellCount: 1,
+                                  child: SizedBox(
+                                    height: 10.h,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'nomf',
+                                          style: tstyle,
+                                        ).tr(),
+                                        smallSpace,
+                                        SizedBox(
+                                            height: 5.h,
+                                            child: TextBox(
+                                              placeholder: 'nomf'.tr(),
+                                              placeholderStyle: placeStyle,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[20],
+                                              ),
+                                            )),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                StaggeredGridTile.fit(
+                                  crossAxisCellCount: 1,
+                                  child: SizedBox(
+                                    height: 10.h,
+                                    child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'prenom',
+                                            style: tstyle,
+                                          ).tr(),
+                                          smallSpace,
+                                          SizedBox(
+                                              height: 5.h,
+                                              child: TextBox(
+                                                placeholder: 'prenom'.tr(),
+                                                placeholderStyle: placeStyle,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey[20],
+                                                ),
+                                              )),
+                                        ]),
+                                  ),
+                                ),
+                                StaggeredGridTile.fit(
+                                  crossAxisCellCount: 1,
+                                  child: SizedBox(
+                                    height: 10.h,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'profession',
+                                          style: tstyle,
+                                        ).tr(),
+                                        smallSpace,
+                                        SizedBox(
+                                            height: 5.h,
+                                            child: TextBox(
+                                              placeholder: 'profession'.tr(),
+                                              placeholderStyle: placeStyle,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[20],
+                                              ),
+                                            )),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                StaggeredGridTile.fit(
+                                  crossAxisCellCount: 3,
+                                  child: SizedBox(
+                                    height: 10.h,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'adresse',
+                                          style: tstyle,
+                                        ).tr(),
+                                        smallSpace,
+                                        SizedBox(
+                                            height: 5.h,
+                                            child: TextBox(
+                                              placeholder: 'adresse'.tr(),
+                                              placeholderStyle: placeStyle,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[20],
+                                              ),
+                                            )),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ))))),
+        /*
                         case 10:
-                          SizedBox(
+                          return SizedBox(
                               width: 17.w,
                               height: 15.h,
                               child: Row(
@@ -690,7 +785,7 @@ class _VehicleFormState extends State<VehicleForm>
                                 ],
                               ));
                         case 11:
-                          SizedBox(
+                          return SizedBox(
                               width: 17.w,
                               height: 15.h,
                               child: Row(
@@ -889,7 +984,7 @@ class _VehicleFormState extends State<VehicleForm>
                                 ],
                               ));
                         case 12:
-                          SizedBox(
+                          return SizedBox(
                             width: 70.w,
                             height: 15.h,
                             child: Row(
@@ -959,15 +1054,10 @@ class _VehicleFormState extends State<VehicleForm>
                               ],
                             ),
                           );*/
-                      }
-                      return const SizedBox();
-                    },
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
+
+        //return const SizedBox();
+        // },
+
         bottomBar: Padding(
           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
           child: Row(
