@@ -82,7 +82,8 @@ class _VehicleFormState extends State<VehicleForm>
                               padding: const EdgeInsets.all(5.0),
                               child: Container(
                                 decoration: BoxDecoration(
-                                  border: Border.all(),
+                                  border: Border.all(
+                                  ),
                                 ),
                                 width: 70.w,
                                 child: Padding(
@@ -239,12 +240,9 @@ class _VehicleFormState extends State<VehicleForm>
                                             child: Container(
                                               padding: EdgeInsets.zero,
                                               decoration:
-                                                  const BoxDecoration(
-                                                border: Border(
-                                                  top: BorderSide(),
-                                                  left: BorderSide(),
-                                                  right: BorderSide(),
-                                                  bottom: BorderSide(),
+                                                   BoxDecoration(
+                                                border: Border.all(
+                                                  color: appTheme.color,
                                                 ),
                                               ),
                                               child: Column(
@@ -824,7 +822,9 @@ class _VehicleFormState extends State<VehicleForm>
                                             height: 10.h,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
-                                              border: Border.all(),
+                                              border: Border.all(
+                                                color: appTheme.color,
+                                              ),
                                             ),
                                             child: Padding(
                                               padding: const EdgeInsets
@@ -861,7 +861,9 @@ class _VehicleFormState extends State<VehicleForm>
                                             height: 10.h,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
-                                              border: Border.all(),
+                                              border: Border.all(
+                                                color: appTheme.color,
+                                              ),
                                             ),
                                             child: Padding(
                                               padding: const EdgeInsets
@@ -898,7 +900,9 @@ class _VehicleFormState extends State<VehicleForm>
                                             height: 10.h,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
-                                              border: Border.all(),
+                                              border: Border.all(
+                                                color: appTheme.color,
+                                              ),
                                             ),
                                             child: Padding(
                                               padding: const EdgeInsets
@@ -935,7 +939,9 @@ class _VehicleFormState extends State<VehicleForm>
                                             height: 10.h,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
-                                              border: Border.all(),
+                                              border: Border.all(
+                                                color: appTheme.color,
+                                              ),
                                             ),
                                             child: Padding(
                                               padding: const EdgeInsets
@@ -972,7 +978,9 @@ class _VehicleFormState extends State<VehicleForm>
                                             height: 10.h,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
-                                              border: Border.all(),
+                                              border: Border.all(
+                                                color: appTheme.color,
+                                              ),
                                             ),
                                             child: Padding(
                                               padding: const EdgeInsets
@@ -1009,7 +1017,9 @@ class _VehicleFormState extends State<VehicleForm>
                                             height: 10.h,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
-                                              border: Border.all(),
+                                              border: Border.all(
+                                                color: appTheme.color,
+                                              ),
                                             ),
                                             child: Padding(
                                               padding: const EdgeInsets
@@ -1046,7 +1056,9 @@ class _VehicleFormState extends State<VehicleForm>
                                             height: 10.h,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
-                                              border: Border.all(),
+                                              border: Border.all(
+                                                color: appTheme.color,
+                                              ),
                                             ),
                                             child: Padding(
                                               padding: const EdgeInsets
@@ -1082,7 +1094,9 @@ class _VehicleFormState extends State<VehicleForm>
                                             height: 10.h,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
-                                              border: Border.all(),
+                                              border: Border.all(
+                                                color: appTheme.color,
+                                              ),
                                             ),
                                             child: Padding(
                                               padding: const EdgeInsets
@@ -1118,7 +1132,9 @@ class _VehicleFormState extends State<VehicleForm>
                                             height: 10.h,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
-                                              border: Border.all(),
+                                              border: Border.all(
+                                                color: appTheme.color,
+                                              ),
                                             ),
                                             child: Padding(
                                               padding: const EdgeInsets
@@ -1154,7 +1170,9 @@ class _VehicleFormState extends State<VehicleForm>
                                             height: 10.h,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
-                                              border: Border.all(),
+                                              border: Border.all(
+                                                color: appTheme.color,
+                                              ),
                                             ),
                                             child: Padding(
                                               padding: const EdgeInsets
@@ -1190,7 +1208,9 @@ class _VehicleFormState extends State<VehicleForm>
                                             height: 10.h,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
-                                              border: Border.all(),
+                                              border: Border.all(
+                                                color: appTheme.color,
+                                              ),
                                             ),
                                             child: Padding(
                                               padding: const EdgeInsets
@@ -1228,7 +1248,9 @@ class _VehicleFormState extends State<VehicleForm>
                                             height: 10.h,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
-                                              border: Border.all(),
+                                              border: Border.all(
+                                                color: appTheme.color,
+                                              ),
                                             ),
                                             child: Padding(
                                               padding: const EdgeInsets
