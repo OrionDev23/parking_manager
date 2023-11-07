@@ -1289,10 +1289,6 @@ class _VehicleFormState extends State<VehicleForm>
                     ),
                   ],
                 ))),
-
-        //return const SizedBox();
-        // },
-
         bottomBar: Padding(
           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
           child: Row(
