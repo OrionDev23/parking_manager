@@ -559,7 +559,7 @@ class _VehicleFormState extends State<VehicleForm>
                                               ),
                                             )),
                                         StaggeredGridTile.fit(
-                                            crossAxisCellCount: 3,
+                                            crossAxisCellCount: 2,
                                             child: Container(
                                               height: 10.h,
                                               padding: const EdgeInsets
@@ -578,14 +578,19 @@ class _VehicleFormState extends State<VehicleForm>
                                                     style: tstyle,
                                                   ).tr(),
                                                   smallSpace,
-                                                  SizedBox(
-                                                      width: MediaQuery.of(context).orientation==Orientation.landscape?double.infinity:15.w,
-                                                      child: DatePicker(
-                                                          selected:
-                                                              selectedDate)),
+                                                  DatePicker(
+                                                      selected:
+                                                          selectedDate),
                                                 ],
                                               ),
                                             )),
+                                        if(MediaQuery.of(context).orientation==Orientation.landscape)
+                                          StaggeredGridTile.fit(
+                                           crossAxisCellCount: 1,
+                                           child: SizedBox(
+                                             height: 5.h,
+                                           ),
+                                          ),
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 1,
                                           child: Container(
