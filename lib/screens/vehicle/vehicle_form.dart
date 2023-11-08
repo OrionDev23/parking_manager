@@ -1298,7 +1298,8 @@ class _VehicleFormState extends State<VehicleForm>
                   child: const Text('confirmer').tr(), onPressed: () {}),
             ],
           ),
-        ));
+        )
+    );
   }
 
   List<Commune?> getCommune() {
@@ -1311,7 +1312,6 @@ class _VehicleFormState extends State<VehicleForm>
     }
     return result;
   }
-
   List<Daira?> getDairas() {
     List<Daira?> result = List.empty(growable: true);
     for (var element in dzair.getWilayat()!) {
@@ -1322,7 +1322,6 @@ class _VehicleFormState extends State<VehicleForm>
     }
     return result;
   }
-
   @override
   bool get wantKeepAlive => true;
 }
