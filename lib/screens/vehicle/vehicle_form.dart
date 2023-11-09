@@ -1,7 +1,4 @@
 import 'package:country_code_picker/country_code_picker.dart';
-import 'package:dzair_data_usage/commune.dart';
-import 'package:dzair_data_usage/daira.dart';
-import 'package:dzair_data_usage/dzair.dart';
 import 'package:dzair_data_usage/langs.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -13,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../theme.dart';
+import '../../utilities/algeria_lists.dart';
 
 class VehicleForm extends StatefulWidget {
   final Vehicle? vehicle;
@@ -33,10 +31,25 @@ class _VehicleFormState extends State<VehicleForm>
   TextEditingController matr1 = TextEditingController();
   TextEditingController matr2 = TextEditingController();
   TextEditingController matr3 = TextEditingController();
+  TextEditingController quittance=TextEditingController(text:'800');
+  TextEditingController numero=TextEditingController();
+  TextEditingController lname=TextEditingController();
+  TextEditingController fname=TextEditingController();
+  TextEditingController profession=TextEditingController();
+  TextEditingController adresse=TextEditingController();
+  TextEditingController type=TextEditingController();
+  TextEditingController numSer=TextEditingController();
+  TextEditingController caross=TextEditingController();
+  TextEditingController energie=TextEditingController();
+  TextEditingController puissance=TextEditingController();
+  TextEditingController places=TextEditingController();
+  TextEditingController poidsT=TextEditingController();
+  TextEditingController charg=TextEditingController();
+  TextEditingController matrPrec=TextEditingController();
+  DateTime? selectedAnnee=DateTime(2023);
   bool autreMat = false;
 
   String pays = 'DZ';
-  Dzair dzair = Dzair();
 
   final tstyle = const TextStyle(fontWeight: FontWeight.bold);
   final placeStyle = TextStyle(color: Colors.grey[100]);
@@ -47,12 +60,21 @@ class _VehicleFormState extends State<VehicleForm>
     isDense: true,
   );
 
-  String wilaya = "01";
-  String wilayaName = "Adrar";
+  String wilaya = "16";
+  String wilayaName = "Alger";
   String commune = "";
   String daira = "";
 
   DateTime selectedDate = DateTime.now();
+
+
+
+
+  @override
+  void initState() {
+  AlgeriaList();
+  super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -179,7 +201,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                         color:
                                                             Colors.grey[20],
                                                       ),
-                                                      items: dzair
+                                                      items: AlgeriaList.dzair!
                                                           .getWilayat()!
                                                           .map((wilaya) {
                                                         return AutoSuggestBoxItem<
@@ -200,7 +222,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                         setState(() {
                                                           wilaya =
                                                               item.value!;
-                                                          wilayaName = dzair
+                                                          wilayaName = AlgeriaList.dzair!
                                                                   .searchWilayatByName(
                                                                       item
                                                                           .label,
@@ -459,7 +481,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                         color:
                                                             Colors.grey[20],
                                                       ),
-                                                      items: getDairas()
+                                                      items: AlgeriaList().getDairas(wilayaName)
                                                           .map((daira) {
                                                         return AutoSuggestBoxItem<
                                                             String>(
@@ -514,7 +536,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                         color:
                                                             Colors.grey[20],
                                                       ),
-                                                      items: getCommune()
+                                                      items: AlgeriaList().getCommune(wilayaName)
                                                           .map((commune) {
                                                         return AutoSuggestBoxItem<
                                                             String>(
@@ -1264,18 +1286,17 @@ class _VehicleFormState extends State<VehicleForm>
                                                   ).tr(),
                                                   smallSpace,
                                                   Flexible(
-                                                      child: TextBox(
-                                                    placeholder: 'XXXX',
-                                                    placeholderStyle:
-                                                        placeStyle,
-                                                        cursorColor: appTheme.color.darker,
-                                                        style: wrtingStyle,
-                                                    decoration:
-                                                        BoxDecoration(
-                                                      color:
-                                                          Colors.grey[20],
-                                                    ),
-                                                  )),
+                                                      child: DatePicker(
+                                                        showDay: false,
+                                                        showMonth: false,
+                                                        selected: selectedAnnee,
+                                                        onChanged: (s){
+                                                          setState(() {
+                                                            selectedAnnee=s;
+                                                          });
+                                                        },
+
+                                                      )),
                                                 ],
                                               ),
                                             ),
@@ -1302,25 +1323,10 @@ class _VehicleFormState extends State<VehicleForm>
     );
   }
 
-  List<Commune?> getCommune() {
-    List<Commune?> result = List.empty(growable: true);
-    for (var element in dzair.getWilayat()!) {
-      if (element!.getWilayaName(Language.FR) == wilayaName) {
-        result.addAll(element.getCommunes()!);
-        break;
-      }
-    }
-    return result;
-  }
-  List<Daira?> getDairas() {
-    List<Daira?> result = List.empty(growable: true);
-    for (var element in dzair.getWilayat()!) {
-      if (element!.getWilayaName(Language.FR) == wilayaName) {
-        result.addAll(element.getDairas()!);
-        break;
-      }
-    }
-    return result;
+
+
+  void updateOverMatricule(){
+
   }
   @override
   bool get wantKeepAlive => true;
