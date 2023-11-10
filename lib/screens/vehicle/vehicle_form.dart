@@ -51,6 +51,8 @@ class _VehicleFormState extends State<VehicleForm>
 
   String pays = 'DZ';
 
+  final double height=9.h;
+
   final tstyle = const TextStyle(fontWeight: FontWeight.bold);
   final placeStyle = TextStyle(color: Colors.grey[100]);
   final wrtingStyle=const TextStyle(color: Colors.black);
@@ -93,8 +95,7 @@ class _VehicleFormState extends State<VehicleForm>
                               : Colors.grey,
                   boxShadow: kElevationToShadow[4],
                 ),
-                width: 80.w,
-                height: 90.h,
+                width: 70.w,
                 child: Column(
                   children: [
                     Flexible(
@@ -107,7 +108,8 @@ class _VehicleFormState extends State<VehicleForm>
                                   border: Border.all(
                                   ),
                                 ),
-                                width: 70.w,
+                                width: 60.w,
+                                height: 75.h,
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 8.0),
@@ -124,7 +126,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                             crossAxisCellCount: 2,
                                             child: Container(
-                                              height: 17.h,
+                                              height: 16.5.h,
                                               padding: const EdgeInsets
                                                   .symmetric(
                                                   horizontal: 10),
@@ -255,7 +257,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 2,
                                           child: Container(
-                                            height: 17.h,
+                                            height: 16.5.h,
                                             padding:
                                                 const EdgeInsets.symmetric(
                                                     horizontal: 10),
@@ -453,7 +455,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                             crossAxisCellCount: 2,
                                             child: Container(
-                                              height: 17.h,
+                                              height: 16.5.h,
                                               padding: const EdgeInsets
                                                   .symmetric(
                                                   horizontal: 10),
@@ -581,7 +583,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                             crossAxisCellCount: 2,
                                             child: Container(
-                                              height: 10.h,
+                                              height: height,
                                               padding: const EdgeInsets
                                                   .symmetric(
                                                   horizontal: 10),
@@ -597,7 +599,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                     'date',
                                                     style: tstyle,
                                                   ).tr(),
-                                                  smallSpace,
                                                   DatePicker(
                                                       selected:
                                                           selectedDate),
@@ -608,13 +609,13 @@ class _VehicleFormState extends State<VehicleForm>
                                           StaggeredGridTile.fit(
                                            crossAxisCellCount: 1,
                                            child: SizedBox(
-                                             height: 5.h,
+                                             height: height,
                                            ),
                                           ),
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 1,
                                           child: Container(
-                                            height: 10.h,
+                                            height: height,
                                             padding:
                                                 const EdgeInsets.symmetric(
                                                     horizontal: 10),
@@ -626,13 +627,12 @@ class _VehicleFormState extends State<VehicleForm>
                                                         .orientation ==
                                                     Orientation.landscape)
                                                   const SizedBox(
-                                                    height: 8,
+                                                    height: 5,
                                                   ),
                                                 Text(
                                                   'quittance',
                                                   style: tstyle,
                                                 ).tr(),
-                                                smallSpace,
                                                 TextBox(
                                                   placeholder:
                                                       'quittance'.tr(),
@@ -654,7 +654,7 @@ class _VehicleFormState extends State<VehicleForm>
                                             padding:
                                                 const EdgeInsets.symmetric(
                                                     horizontal: 10),
-                                            height: 10.h,
+                                            height: height,
                                             child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
@@ -665,7 +665,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                   'num',
                                                   style: tstyle,
                                                 ).tr(),
-                                                smallSpace,
                                                 TextBox(
                                                   placeholder: 'num'.tr(),
                                                   placeholderStyle:
@@ -686,7 +685,7 @@ class _VehicleFormState extends State<VehicleForm>
                                             padding:
                                                 const EdgeInsets.symmetric(
                                                     horizontal: 10),
-                                            height: 10.h,
+                                            height: height,
                                             child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
@@ -697,7 +696,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                   'nomf',
                                                   style: tstyle,
                                                 ).tr(),
-                                                smallSpace,
                                                 SizedBox(
                                                     height: 5.h,
                                                     child: TextBox(
@@ -723,7 +721,7 @@ class _VehicleFormState extends State<VehicleForm>
                                             padding:
                                                 const EdgeInsets.symmetric(
                                                     horizontal: 10),
-                                            height: 10.h,
+                                            height: height,
                                             child: Column(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment
@@ -736,7 +734,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                     'prenom',
                                                     style: tstyle,
                                                   ).tr(),
-                                                  smallSpace,
                                                   SizedBox(
                                                       height: 5.h,
                                                       child: TextBox(
@@ -761,7 +758,7 @@ class _VehicleFormState extends State<VehicleForm>
                                             padding:
                                                 const EdgeInsets.symmetric(
                                                     horizontal: 10),
-                                            height: 10.h,
+                                            height: height,
                                             child: Column(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
@@ -772,7 +769,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                   'profession',
                                                   style: tstyle,
                                                 ).tr(),
-                                                smallSpace,
                                                 SizedBox(
                                                     height: 5.h,
                                                     child: TextBox(
@@ -798,7 +794,7 @@ class _VehicleFormState extends State<VehicleForm>
                                             padding:
                                                 const EdgeInsets.symmetric(
                                                     horizontal: 10),
-                                            height: 10.h,
+                                            height: height,
                                             child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
@@ -809,7 +805,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                   'adresse',
                                                   style: tstyle,
                                                 ).tr(),
-                                                smallSpace,
                                                 SizedBox(
                                                     height: 5.h,
                                                     child: TextBox(
@@ -835,13 +830,13 @@ class _VehicleFormState extends State<VehicleForm>
                                           StaggeredGridTile.fit(
                                             crossAxisCellCount: 2,
                                             child: SizedBox(
-                                              height: 10.h,
+                                              height: height,
                                             ),
                                           ),
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 1,
                                           child: Container(
-                                            height: 10.h,
+                                            height: height,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
                                               border: Border.all(
@@ -858,7 +853,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                     'genre',
                                                     style: tstyle,
                                                   ).tr(),
-                                                  smallSpace,
                                                   TextBox(
                                                     placeholder:
                                                         'genre'.tr(),
@@ -880,7 +874,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 1,
                                           child: Container(
-                                            height: 10.h,
+                                            height: height,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
                                               border: Border.all(
@@ -897,7 +891,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                     'marque',
                                                     style: tstyle,
                                                   ).tr(),
-                                                  smallSpace,
                                                   TextBox(
                                                     placeholder:
                                                         'marque'.tr(),
@@ -919,7 +912,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 1,
                                           child: Container(
-                                            height: 10.h,
+                                            height: height,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
                                               border: Border.all(
@@ -936,7 +929,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                     'type',
                                                     style: tstyle,
                                                   ).tr(),
-                                                  smallSpace,
                                                   TextBox(
                                                     placeholder:
                                                         'type'.tr(),
@@ -958,7 +950,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 3,
                                           child: Container(
-                                            height: 10.h,
+                                            height: height,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
                                               border: Border.all(
@@ -975,7 +967,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                     'numerserie',
                                                     style: tstyle,
                                                   ).tr(),
-                                                  smallSpace,
                                                   TextBox(
                                                     placeholder:
                                                         'numerserie'.tr(),
@@ -997,7 +988,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 1,
                                           child: Container(
-                                            height: 10.h,
+                                            height: height,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
                                               border: Border.all(
@@ -1014,7 +1005,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                     'caross',
                                                     style: tstyle,
                                                   ).tr(),
-                                                  smallSpace,
                                                   TextBox(
                                                     placeholder:
                                                         'caross'.tr(),
@@ -1036,7 +1026,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 1,
                                           child: Container(
-                                            height: 10.h,
+                                            height: height,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
                                               border: Border.all(
@@ -1053,7 +1043,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                     'energie',
                                                     style: tstyle,
                                                   ).tr(),
-                                                  smallSpace,
                                                   TextBox(
                                                     placeholder:
                                                         'energie'.tr(),
@@ -1075,7 +1064,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 1,
                                           child: Container(
-                                            height: 10.h,
+                                            height:height,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
                                               border: Border.all(
@@ -1092,7 +1081,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                     'puissance',
                                                     style: tstyle,
                                                   ).tr(),
-                                                  smallSpace,
                                                   TextBox(
                                                     placeholder: '000',
                                                     placeholderStyle:
@@ -1113,7 +1101,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 1,
                                           child: Container(
-                                            height: 10.h,
+                                            height: height,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
                                               border: Border.all(
@@ -1130,7 +1118,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                     'placeassise',
                                                     style: tstyle,
                                                   ).tr(),
-                                                  smallSpace,
                                                   TextBox(
                                                     placeholder: '000',
                                                     placeholderStyle:
@@ -1151,7 +1138,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 1,
                                           child: Container(
-                                            height: 10.h,
+                                            height: height,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
                                               border: Border.all(
@@ -1168,7 +1155,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                     'poidstotal',
                                                     style: tstyle,
                                                   ).tr(),
-                                                  smallSpace,
                                                   TextBox(
                                                     placeholder: '000000',
                                                     placeholderStyle:
@@ -1189,7 +1175,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 1,
                                           child: Container(
-                                            height: 10.h,
+                                            height: height,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
                                               border: Border.all(
@@ -1206,7 +1192,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                     'chargeutil',
                                                     style: tstyle,
                                                   ).tr(),
-                                                  smallSpace,
                                                   TextBox(
                                                     placeholder: '000000',
                                                     placeholderStyle:
@@ -1227,7 +1212,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 4,
                                           child: Container(
-                                            height: 10.h,
+                                            height: height,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
                                               border: Border.all(
@@ -1244,7 +1229,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                     'precmat',
                                                     style: tstyle,
                                                   ).tr(),
-                                                  smallSpace,
                                                   Flexible(
                                                       child: TextBox(
                                                     placeholder:
@@ -1267,7 +1251,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 2,
                                           child: Container(
-                                            height: 10.h,
+                                            height:height,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
                                               border: Border.all(
@@ -1284,7 +1268,6 @@ class _VehicleFormState extends State<VehicleForm>
                                                     'anneeutil',
                                                     style: tstyle,
                                                   ).tr(),
-                                                  smallSpace,
                                                   Flexible(
                                                       child: DatePicker(
                                                         showDay: false,

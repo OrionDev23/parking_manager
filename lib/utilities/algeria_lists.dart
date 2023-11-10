@@ -6,7 +6,7 @@ import 'package:dzair_data_usage/langs.dart';
 class AlgeriaList{
   static Dzair? dzair;
   AlgeriaList(){
-    dzair??=dzair;
+    dzair??=Dzair();
   }
 
   List<Commune?> getCommune(String wilayaName) {
