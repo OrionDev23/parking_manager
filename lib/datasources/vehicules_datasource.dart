@@ -82,7 +82,7 @@ class VehiculesDataSource extends AsyncDataTableSource {
               DataCell(Text(vehicle.matricule)),
               DataCell(Text(vehicle.marque??'')),
               DataCell(Text(vehicle.type??'')),
-              DataCell(Text(vehicle.anneeUtil??(VehiclesUtilities.getAnneeFromMatricule(vehicle.matricule) == 0?'NA':VehiclesUtilities.getAnneeFromMatricule(vehicle.matricule)))),
+              DataCell(Text(vehicle.anneeUtil.toString())),
               DataCell(Text('${vehicle.dateCreation}')),
               DataCell(Text('${vehicle.dateModification}')),
               const DataCell(Icon(Icons.more_vert_sharp)),

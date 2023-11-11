@@ -2,11 +2,14 @@ import 'package:dzair_data_usage/commune.dart';
 import 'package:dzair_data_usage/daira.dart';
 import 'package:dzair_data_usage/dzair.dart';
 import 'package:dzair_data_usage/langs.dart';
+import 'package:dzair_data_usage/wilaya.dart';
 
 class AlgeriaList{
   static Dzair? dzair;
+  static List<Wilaya?>?wilayas;
   AlgeriaList(){
     dzair??=Dzair();
+    wilayas??=dzair!.getWilayat();
   }
 
   List<Commune?> getCommune(String wilayaName) {
@@ -28,5 +31,17 @@ class AlgeriaList{
       }
     }
     return result;
+  }
+
+
+  String? getWilayaByNum(String wilayaNum){
+    if(wilayas!=null){
+      for(int i=0;i<wilayas!.length;i++){
+        if(wilayas![i]?.getWilayaCode()==wilayaNum){
+          return wilayas![i]?.getWilayaName(Language.FR);
+        }
+      }
+    }
+    return '';
   }
 }

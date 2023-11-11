@@ -8,20 +8,20 @@ class VehicleTabs extends StatefulWidget {
   const VehicleTabs({super.key});
 
   @override
-  State<VehicleTabs> createState() => _VehicleTabsState();
+  State<VehicleTabs> createState() => VehicleTabsState();
 }
 
-class _VehicleTabsState extends State<VehicleTabs> {
+class VehicleTabsState extends State<VehicleTabs> {
 
 
   static ValueNotifier<int> currentIndex=ValueNotifier(0);
-  List<Tab> tabs = [];
+  static List<Tab> tabs = [];
 
   Tab generateTab(int index) {
     late Tab tab;
     tab = Tab(
-      text: Text('${'nouvvehicule'.tr()} ${index-1}'),
-      semanticLabel: '${'nouvvehicule'.tr()} ${index-1}',
+      text: Text('nouvvehicule'.tr()),
+      semanticLabel: 'nouvvehicule'.tr(),
       icon: const Icon(Bootstrap.car_front),
       body: const VehicleForm(),
       onClosed: () {
@@ -36,13 +36,15 @@ class _VehicleTabsState extends State<VehicleTabs> {
   @override
   void initState() {
     currentIndex.value=0;
-    tabs.add(Tab(
-      text: Text('gestionvehicles'.tr()),
-      closeIcon: null,
-      icon: const Icon(IonIcons.settings),
-      body: const VehicleManagement(),
-      onClosed: null,
-    ));
+    if(tabs.isEmpty){
+      tabs.add(Tab(
+        text: Text('gestionvehicles'.tr()),
+        closeIcon: null,
+        icon: const Icon(IonIcons.settings),
+        body: const VehicleManagement(),
+        onClosed: null,
+      ));
+    }
     super.initState();
   }
   @override

@@ -1,3 +1,5 @@
+import 'package:appwrite/appwrite.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:dzair_data_usage/langs.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -5,16 +7,21 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as m;
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/screens/vehicle/vehicle_tabs.dart';
 import 'package:parc_oto/serializables/vehicle.dart';
+import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:select_dialog/select_dialog.dart';
 
 import '../../theme.dart';
 import '../../utilities/algeria_lists.dart';
 
 class VehicleForm extends StatefulWidget {
   final Vehicle? vehicle;
-  const VehicleForm({super.key, this.vehicle});
+  final Tab? tab;
+  const VehicleForm({super.key, this.vehicle, this.tab});
 
   @override
   State<VehicleForm> createState() => _VehicleFormState();
@@ -31,52 +38,63 @@ class _VehicleFormState extends State<VehicleForm>
   TextEditingController matr1 = TextEditingController();
   TextEditingController matr2 = TextEditingController();
   TextEditingController matr3 = TextEditingController();
-  TextEditingController quittance=TextEditingController(text:'800');
-  TextEditingController numero=TextEditingController();
-  TextEditingController lname=TextEditingController();
-  TextEditingController fname=TextEditingController();
-  TextEditingController profession=TextEditingController();
-  TextEditingController adresse=TextEditingController();
-  TextEditingController type=TextEditingController();
-  TextEditingController numSer=TextEditingController();
-  TextEditingController caross=TextEditingController();
-  TextEditingController energie=TextEditingController();
-  TextEditingController puissance=TextEditingController();
-  TextEditingController places=TextEditingController();
-  TextEditingController poidsT=TextEditingController();
-  TextEditingController charg=TextEditingController();
-  TextEditingController matrPrec=TextEditingController();
-  DateTime? selectedAnnee=DateTime(2023);
+  TextEditingController wilayaCont=TextEditingController();
+  TextEditingController dairaCont=TextEditingController();
+  TextEditingController communeCont=TextEditingController();
+  TextEditingController quittance = TextEditingController(text: '800');
+  TextEditingController numero = TextEditingController();
+  TextEditingController lname = TextEditingController();
+  TextEditingController fname = TextEditingController();
+  TextEditingController profession = TextEditingController();
+  TextEditingController adresse = TextEditingController();
+  TextEditingController type = TextEditingController();
+  TextEditingController numSer = TextEditingController();
+  TextEditingController caross = TextEditingController();
+  TextEditingController energie = TextEditingController();
+  TextEditingController puissance = TextEditingController();
+  TextEditingController places = TextEditingController();
+  TextEditingController poidsT = TextEditingController();
+  TextEditingController charg = TextEditingController();
+  TextEditingController matrPrec = TextEditingController();
+  DateTime? selectedAnnee = DateTime(2023);
   bool autreMat = false;
+  int? marque=1;
+
+  bool erreurMatricule=false;
+
+  int? genre=1;
 
   String pays = 'DZ';
 
-  final double height=9.h;
+  final double height = 9.h;
+  final double heightFirst=17.h;
 
   final tstyle = const TextStyle(fontWeight: FontWeight.bold);
   final placeStyle = TextStyle(color: Colors.grey[100]);
-  final wrtingStyle=const TextStyle(color: Colors.black);
+  final writingStyle = const TextStyle(color: Colors.black);
   final inputDecoration = m.InputDecoration(
-    fillColor: Colors.grey[100],
+    fillColor: Colors.grey[20],
+    labelStyle: TextStyle(color: Colors.grey[100]),
+
     filled: true,
     isDense: true,
   );
 
   String wilaya = "16";
-  String wilayaName = "Alger";
-  String commune = "";
-  String daira = "";
 
   DateTime selectedDate = DateTime.now();
 
-
-
-
   @override
   void initState() {
-  AlgeriaList();
-  super.initState();
+    initValues();
+    documentID ??= ClientDatabase.ref.difference(DateTime.now()).inMilliseconds.abs().toString();
+    AlgeriaList();
+    super.initState();
   }
+  void initValues(){
+
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -100,40 +118,37 @@ class _VehicleFormState extends State<VehicleForm>
                   children: [
                     Flexible(
                       child: ListView(
+                        primary: true,
                         children: [
                           Padding(
                               padding: const EdgeInsets.all(5.0),
                               child: Container(
                                 decoration: BoxDecoration(
-                                  border: Border.all(
-                                  ),
+                                  border: Border.all(),
                                 ),
                                 width: 60.w,
-                                height: 75.h,
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 8.0),
                                   child: StaggeredGrid.count(
-                                      axisDirection: AxisDirection.down,
-                                      crossAxisCount: MediaQuery.of(context)
-                                                  .orientation ==
-                                              Orientation.portrait
-                                          ? 1
-                                          : 6,
+                                      crossAxisCount:
+                                          MediaQuery.of(context).orientation ==
+                                                  Orientation.portrait
+                                              ? 1
+                                              : 6,
                                       mainAxisSpacing: 0,
                                       crossAxisSpacing: 0,
                                       children: [
                                         StaggeredGridTile.fit(
                                             crossAxisCellCount: 2,
                                             child: Container(
-                                              height: 16.5.h,
-                                              padding: const EdgeInsets
-                                                  .symmetric(
-                                                  horizontal: 10),
+                                              height: heightFirst,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
                                               child: Column(
                                                 crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .start,
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     'pays',
@@ -146,8 +161,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                                         .mode ==
                                                                     ThemeMode
                                                                         .dark
-                                                                ? Colors
-                                                                    .grey
+                                                                ? Colors.grey
                                                                 : appTheme.mode ==
                                                                         ThemeMode
                                                                             .light
@@ -164,23 +178,20 @@ class _VehicleFormState extends State<VehicleForm>
                                                                 kElevationToShadow[
                                                                     2]),
                                                     padding:
-                                                        const EdgeInsets
-                                                            .all(3),
+                                                        const EdgeInsets.all(3),
                                                     searchDecoration:
                                                         inputDecoration,
                                                     dialogSize:
                                                         Size(40.w, 60.h),
                                                     initialSelection: pays,
                                                     showCountryOnly: true,
-                                                    showDropDownButton:
-                                                        true,
+                                                    showDropDownButton: true,
                                                     showFlagDialog: true,
                                                     showOnlyCountryWhenClosed:
                                                         true,
                                                     onChanged: (c) {
                                                       setState(() {
-                                                        pays =
-                                                            c.code ?? 'DZ';
+                                                        pays = c.code ?? 'DZ';
                                                       });
                                                     },
                                                   ),
@@ -190,18 +201,18 @@ class _VehicleFormState extends State<VehicleForm>
                                                   ).tr(),
                                                   SizedBox(
                                                     height: 5.h,
-                                                    child: AutoSuggestBox<
-                                                        String>(
-                                                      placeholder:
+                                                    child:
+                                                        AutoSuggestBox<String>(
+                                                          controller: wilayaCont,
+                                                          placeholder:
                                                           'wilaya'.tr(),
                                                       placeholderStyle:
                                                           placeStyle,
-                                                      cursorColor: appTheme.color.darker,
-                                                      style: wrtingStyle,
-                                                      decoration:
-                                                          BoxDecoration(
-                                                        color:
-                                                            Colors.grey[20],
+                                                      cursorColor:
+                                                          appTheme.color.darker,
+                                                      style: writingStyle,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.grey[20],
                                                       ),
                                                       items: AlgeriaList.dzair!
                                                           .getWilayat()!
@@ -216,19 +227,19 @@ class _VehicleFormState extends State<VehicleForm>
                                                                       .toUpperCase() ==
                                                                   "AR"
                                                               ? Language.AR
-                                                              : Language
-                                                                  .FR)!,
+                                                              : Language.FR)!,
                                                         );
                                                       }).toList(),
                                                       onSelected: (item) {
                                                         setState(() {
-                                                          wilaya =
-                                                              item.value!;
-                                                          wilayaName = AlgeriaList.dzair!
+                                                          wilaya = item.value!;
+                                                          wilayaCont.text = AlgeriaList
+                                                                  .dzair!
                                                                   .searchWilayatByName(
                                                                       item
                                                                           .label,
-                                                                      appTheme.locale!.languageCode.toUpperCase() == "AR"
+                                                                      appTheme.locale!.languageCode.toUpperCase() ==
+                                                                              "AR"
                                                                           ? Language
                                                                               .AR
                                                                           : Language
@@ -245,8 +256,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                             TextChangedReason
                                                                 .userInput) {
                                                           setState(() =>
-                                                              wilayaName =
-                                                                  s);
+                                                              wilayaCont.text = s);
                                                         }
                                                       },
                                                     ),
@@ -257,54 +267,55 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 2,
                                           child: Container(
-                                            height: 16.5.h,
-                                            padding:
-                                                const EdgeInsets.symmetric(
-                                                    horizontal: 10),
+                                            height: heightFirst,
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10),
                                             child: Container(
                                               padding: EdgeInsets.zero,
-                                              decoration:
-                                                   BoxDecoration(
+                                              decoration: BoxDecoration(
                                                 border: Border.all(
                                                   color: appTheme.color,
                                                 ),
                                               ),
                                               child: Column(
                                                 crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .start,
+                                                    CrossAxisAlignment.start,
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.start,
                                                 children: [
                                                   Padding(
-                                                    padding:
-                                                        const EdgeInsets
-                                                            .symmetric(
-                                                            horizontal:
-                                                                8.0),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 8.0),
                                                     child: Text(
                                                       'nummat',
                                                       style: tstyle,
                                                     ).tr(),
                                                   ),
+                                                  if(!erreurMatricule)
                                                   const Spacer(),
+                                                  if(erreurMatricule)
+                                                    Padding(
+                                                      padding: const EdgeInsets.all(8.0),
+                                                      child: Text('erreurmat',style:TextStyle(color:Colors.red)).tr(),
+                                                    ),
                                                   Padding(
-                                                    padding:
-                                                        const EdgeInsets
-                                                            .symmetric(
-                                                            horizontal:
-                                                                5.0),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 5.0),
                                                     child: autreMat
                                                         ? TextBox(
                                                             controller:
                                                                 matriculeEtr,
-                                                            cursorColor: appTheme.color.darker,
-                                                            style: wrtingStyle,
+                                                            maxLength: 30,
+                                                            cursorColor:
+                                                                appTheme.color
+                                                                    .darker,
+                                                            style: writingStyle,
                                                             placeholder:
                                                                 'XXXXXXXXXXXXXX',
-                                                            textAlign:
-                                                                TextAlign
-                                                                    .center,
+                                                            textAlign: TextAlign
+                                                                .center,
                                                             placeholderStyle:
                                                                 placeStyle,
                                                             decoration:
@@ -312,6 +323,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                               color: Colors
                                                                   .grey[20],
                                                             ),
+                                                      inputFormatters: <TextInputFormatter>[
+                                                        FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z.-]")),
+                                                      ],
                                                           )
                                                         : Row(
                                                             mainAxisAlignment:
@@ -320,12 +334,15 @@ class _VehicleFormState extends State<VehicleForm>
                                                             children: [
                                                               Flexible(
                                                                 flex: 6,
-                                                                child:
-                                                                    TextBox(
+                                                                child: TextBox(
                                                                   controller:
                                                                       matr1,
-                                                                      cursorColor: appTheme.color.darker,
-                                                                      style: wrtingStyle,
+                                                                  cursorColor:
+                                                                      appTheme
+                                                                          .color
+                                                                          .darker,
+                                                                  style:
+                                                                      writingStyle,
                                                                   placeholder:
                                                                       '123456',
                                                                   placeholderStyle:
@@ -335,8 +352,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                                     color: Colors
                                                                         .grey[20],
                                                                   ),
-                                                                  maxLength:
-                                                                      6,
+                                                                  maxLength: 6,
                                                                   textAlign:
                                                                       TextAlign
                                                                           .center,
@@ -349,22 +365,23 @@ class _VehicleFormState extends State<VehicleForm>
                                                               smallSpace,
                                                               Text(
                                                                 '-',
-                                                                style:
-                                                                    tstyle,
+                                                                style: tstyle,
                                                               ),
                                                               smallSpace,
                                                               Flexible(
                                                                 flex: 3,
-                                                                child:
-                                                                    TextBox(
+                                                                child: TextBox(
                                                                   controller:
                                                                       matr2,
-                                                                      cursorColor: appTheme.color.darker,
-                                                                      style: wrtingStyle,
+                                                                  cursorColor:
+                                                                      appTheme
+                                                                          .color
+                                                                          .darker,
+                                                                  style:
+                                                                      writingStyle,
                                                                   placeholder:
                                                                       '123',
-                                                                  maxLength:
-                                                                      3,
+                                                                  maxLength: 3,
                                                                   placeholderStyle:
                                                                       placeStyle,
                                                                   decoration:
@@ -379,27 +396,31 @@ class _VehicleFormState extends State<VehicleForm>
                                                                     FilteringTextInputFormatter
                                                                         .digitsOnly
                                                                   ],
+                                                                  onChanged: (s){
+                                                                    updateOverMatricule(appTheme);
+                                                                  },
                                                                 ),
                                                               ),
                                                               smallSpace,
                                                               Text(
                                                                 '-',
-                                                                style:
-                                                                    tstyle,
+                                                                style: tstyle,
                                                               ),
                                                               smallSpace,
                                                               Flexible(
                                                                 flex: 2,
-                                                                child:
-                                                                    TextBox(
+                                                                child: TextBox(
                                                                   controller:
                                                                       matr3,
-                                                                      cursorColor: appTheme.color.darker,
-                                                                      style: wrtingStyle,
+                                                                  cursorColor:
+                                                                      appTheme
+                                                                          .color
+                                                                          .darker,
+                                                                  style:
+                                                                      writingStyle,
                                                                   placeholder:
                                                                       '12',
-                                                                  maxLength:
-                                                                      2,
+                                                                  maxLength: 2,
                                                                   placeholderStyle:
                                                                       placeStyle,
                                                                   decoration:
@@ -414,6 +435,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                                     FilteringTextInputFormatter
                                                                         .digitsOnly
                                                                   ],
+                                                                  onChanged: (s){
+                                                                    updateOverMatricule(appTheme);
+                                                                  },
                                                                 ),
                                                               ),
                                                             ],
@@ -422,8 +446,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                   const Spacer(),
                                                   Row(
                                                     mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .end,
+                                                        MainAxisAlignment.end,
                                                     children: [
                                                       Checkbox(
                                                         checked: autreMat,
@@ -431,8 +454,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                           'autremat',
                                                           style: TextStyle(
                                                               color: Colors
-                                                                      .grey[
-                                                                  100]),
+                                                                  .grey[100]),
                                                         ).tr(),
                                                         onChanged: (s) {
                                                           if (s != null) {
@@ -455,14 +477,13 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                             crossAxisCellCount: 2,
                                             child: Container(
-                                              height: 16.5.h,
-                                              padding: const EdgeInsets
-                                                  .symmetric(
-                                                  horizontal: 10),
+                                              height: heightFirst,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
                                               child: Column(
                                                 crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .start,
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     'daira',
@@ -470,51 +491,49 @@ class _VehicleFormState extends State<VehicleForm>
                                                   ).tr(),
                                                   SizedBox(
                                                     height: 5.h,
-                                                    child: AutoSuggestBox<
-                                                        String>(
-                                                      placeholder:
-                                                          'daira'.tr(),
-                                                      cursorColor: appTheme.color.darker,
-                                                      style: wrtingStyle,
+                                                    child:
+                                                        AutoSuggestBox<String>(
+                                                      controller: dairaCont,
+                                                          placeholder: 'daira'.tr(),
+                                                      cursorColor:
+                                                          appTheme.color.darker,
+                                                      style: writingStyle,
                                                       placeholderStyle:
                                                           placeStyle,
-                                                      decoration:
-                                                          BoxDecoration(
-                                                        color:
-                                                            Colors.grey[20],
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.grey[20],
                                                       ),
-                                                      items: AlgeriaList().getDairas(wilayaName)
+                                                      items: AlgeriaList()
+                                                          .getDairas(wilayaCont.text)
                                                           .map((daira) {
                                                         return AutoSuggestBoxItem<
                                                             String>(
-                                                          value: daira?.getDairaName(
-                                                                  Language
-                                                                      .FR) ??
+                                                          value: daira
+                                                                  ?.getDairaName(
+                                                                      Language
+                                                                          .FR) ??
                                                               '',
                                                           label: daira?.getDairaName(appTheme
                                                                           .locale
                                                                           ?.languageCode
                                                                           .toUpperCase() ==
                                                                       "AR"
-                                                                  ? Language
-                                                                      .AR
+                                                                  ? Language.AR
                                                                   : Language
                                                                       .FR) ??
                                                               '',
                                                         );
                                                       }).toList(),
                                                       onSelected: (item) {
-                                                        setState(() =>
-                                                            daira =
-                                                                item.value ??
-                                                                    "");
+                                                        setState(() => dairaCont.text =
+                                                            item.value ?? "");
                                                       },
                                                       onChanged: (s, r) {
                                                         if (r ==
                                                             TextChangedReason
                                                                 .userInput) {
-                                                          setState(() =>
-                                                              daira = s);
+                                                          setState(
+                                                              () => dairaCont.text = s);
                                                         }
                                                       },
                                                     ),
@@ -525,34 +544,37 @@ class _VehicleFormState extends State<VehicleForm>
                                                   ).tr(),
                                                   SizedBox(
                                                     height: 5.h,
-                                                    child: AutoSuggestBox<
-                                                        String>(
-                                                      placeholder:
+                                                    child:
+                                                        AutoSuggestBox<String>(
+                                                      controller: communeCont,
+                                                          placeholder:
                                                           'commune'.tr(),
                                                       placeholderStyle:
                                                           placeStyle,
-                                                      cursorColor: appTheme.color.darker,
-                                                      style: wrtingStyle,
-                                                      decoration:
-                                                          BoxDecoration(
-                                                        color:
-                                                            Colors.grey[20],
+                                                      cursorColor:
+                                                          appTheme.color.darker,
+                                                      style: writingStyle,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.grey[20],
                                                       ),
-                                                      items: AlgeriaList().getCommune(wilayaName)
+                                                      items: AlgeriaList()
+                                                          .getCommune(
+                                                              wilayaCont.text)
                                                           .map((commune) {
                                                         return AutoSuggestBoxItem<
                                                             String>(
-                                                          value: commune ==
-                                                                  null
+                                                          value: commune == null
                                                               ? ''
                                                               : commune.getCommuneName(
                                                                       Language
                                                                           .FR) ??
                                                                   '',
-                                                          label: commune ==
-                                                                  null
+                                                          label: commune == null
                                                               ? ''
-                                                              : commune.getCommuneName(appTheme.locale?.languageCode.toUpperCase() ==
+                                                              : commune.getCommuneName(appTheme
+                                                                              .locale
+                                                                              ?.languageCode
+                                                                              .toUpperCase() ==
                                                                           "AR"
                                                                       ? Language
                                                                           .AR
@@ -562,17 +584,15 @@ class _VehicleFormState extends State<VehicleForm>
                                                         );
                                                       }).toList(),
                                                       onSelected: (item) {
-                                                        setState(() =>
-                                                            commune =
-                                                                item.value ??
-                                                                    "");
+                                                        setState(() => communeCont.text =
+                                                            item.value ?? "");
                                                       },
                                                       onChanged: (s, r) {
                                                         if (r ==
                                                             TextChangedReason
                                                                 .userInput) {
                                                           setState(() =>
-                                                              commune = s);
+                                                              communeCont.text = s);
                                                         }
                                                       },
                                                     ),
@@ -584,41 +604,45 @@ class _VehicleFormState extends State<VehicleForm>
                                             crossAxisCellCount: 2,
                                             child: Container(
                                               height: height,
-                                              padding: const EdgeInsets
-                                                  .symmetric(
-                                                  horizontal: 10),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 10),
                                               child: Column(
                                                 crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .start,
+                                                    CrossAxisAlignment.start,
                                                 mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .center,
+                                                    MainAxisAlignment.center,
                                                 children: [
                                                   Text(
                                                     'date',
                                                     style: tstyle,
                                                   ).tr(),
                                                   DatePicker(
-                                                      selected:
-                                                          selectedDate),
+                                                      selected: selectedDate,
+                                                    onChanged: (s){
+                                                        setState(() {
+                                                          selectedDate=s;
+                                                        });
+                                                    },
+                                                  ),
                                                 ],
                                               ),
                                             )),
-                                        if(MediaQuery.of(context).orientation==Orientation.landscape)
+                                        if (MediaQuery.of(context)
+                                                .orientation ==
+                                            Orientation.landscape)
                                           StaggeredGridTile.fit(
-                                           crossAxisCellCount: 1,
-                                           child: SizedBox(
-                                             height: height,
-                                           ),
+                                            crossAxisCellCount: 1,
+                                            child: SizedBox(
+                                              height: height,
+                                            ),
                                           ),
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 1,
                                           child: Container(
                                             height: height,
-                                            padding:
-                                                const EdgeInsets.symmetric(
-                                                    horizontal: 10),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10),
                                             child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
@@ -634,15 +658,20 @@ class _VehicleFormState extends State<VehicleForm>
                                                   style: tstyle,
                                                 ).tr(),
                                                 TextBox(
-                                                  placeholder:
-                                                      'quittance'.tr(),
-                                                  cursorColor: appTheme.color.darker,
-                                                  style: wrtingStyle,
-                                                  placeholderStyle:
-                                                      placeStyle,
+                                                  controller: quittance,
+                                                  placeholder: 'quittance'.tr(),
+                                                  cursorColor:
+                                                      appTheme.color.darker,
+                                                  style: writingStyle,
+                                                  placeholderStyle: placeStyle,
                                                   decoration: BoxDecoration(
                                                     color: Colors.grey[20],
                                                   ),
+                                                  inputFormatters: [
+                                                    FilteringTextInputFormatter.allow(
+                                                        RegExp(r'^(\d+)?\.?\d{0,2}')
+                                                    )
+                                                  ],
                                                 ),
                                               ],
                                             ),
@@ -651,9 +680,8 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 2,
                                           child: Container(
-                                            padding:
-                                                const EdgeInsets.symmetric(
-                                                    horizontal: 10),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10),
                                             height: height,
                                             child: Column(
                                               crossAxisAlignment:
@@ -666,11 +694,13 @@ class _VehicleFormState extends State<VehicleForm>
                                                   style: tstyle,
                                                 ).tr(),
                                                 TextBox(
+                                                  controller: numero,
                                                   placeholder: 'num'.tr(),
-                                                  placeholderStyle:
-                                                      placeStyle,
-                                                  cursorColor: appTheme.color.darker,
-                                                  style: wrtingStyle,
+                                                  maxLength: 30,
+                                                  placeholderStyle: placeStyle,
+                                                  cursorColor:
+                                                      appTheme.color.darker,
+                                                  style: writingStyle,
                                                   decoration: BoxDecoration(
                                                     color: Colors.grey[20],
                                                   ),
@@ -682,9 +712,8 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 2,
                                           child: Container(
-                                            padding:
-                                                const EdgeInsets.symmetric(
-                                                    horizontal: 10),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10),
                                             height: height,
                                             child: Column(
                                               crossAxisAlignment:
@@ -699,16 +728,16 @@ class _VehicleFormState extends State<VehicleForm>
                                                 SizedBox(
                                                     height: 5.h,
                                                     child: TextBox(
-                                                      placeholder:
-                                                          'nomf'.tr(),
+                                                      controller: lname,
+                                                      maxLength: 30,
+                                                      placeholder: 'nomf'.tr(),
                                                       placeholderStyle:
                                                           placeStyle,
-                                                      cursorColor: appTheme.color.darker,
-                                                      style: wrtingStyle,
-                                                      decoration:
-                                                          BoxDecoration(
-                                                        color:
-                                                            Colors.grey[20],
+                                                      cursorColor:
+                                                          appTheme.color.darker,
+                                                      style: writingStyle,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.grey[20],
                                                       ),
                                                     )),
                                               ],
@@ -718,17 +747,14 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 2,
                                           child: Container(
-                                            padding:
-                                                const EdgeInsets.symmetric(
-                                                    horizontal: 10),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10),
                                             height: height,
                                             child: Column(
                                                 mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .center,
+                                                    MainAxisAlignment.center,
                                                 crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .start,
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     'prenom',
@@ -737,16 +763,19 @@ class _VehicleFormState extends State<VehicleForm>
                                                   SizedBox(
                                                       height: 5.h,
                                                       child: TextBox(
+                                                        controller: fname,
+                                                        maxLength: 30,
                                                         placeholder:
                                                             'prenom'.tr(),
                                                         placeholderStyle:
                                                             placeStyle,
-                                                        cursorColor: appTheme.color.darker,
-                                                        style: wrtingStyle,
+                                                        cursorColor: appTheme
+                                                            .color.darker,
+                                                        style: writingStyle,
                                                         decoration:
                                                             BoxDecoration(
-                                                          color: Colors
-                                                              .grey[20],
+                                                          color:
+                                                              Colors.grey[20],
                                                         ),
                                                       )),
                                                 ]),
@@ -755,9 +784,8 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 2,
                                           child: Container(
-                                            padding:
-                                                const EdgeInsets.symmetric(
-                                                    horizontal: 10),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10),
                                             height: height,
                                             child: Column(
                                               mainAxisAlignment:
@@ -772,16 +800,17 @@ class _VehicleFormState extends State<VehicleForm>
                                                 SizedBox(
                                                     height: 5.h,
                                                     child: TextBox(
+                                                      controller: profession,
+                                                      maxLength: 40,
                                                       placeholder:
                                                           'profession'.tr(),
                                                       placeholderStyle:
                                                           placeStyle,
-                                                      cursorColor: appTheme.color.darker,
-                                                      style: wrtingStyle,
-                                                      decoration:
-                                                          BoxDecoration(
-                                                        color:
-                                                            Colors.grey[20],
+                                                      cursorColor:
+                                                          appTheme.color.darker,
+                                                      style: writingStyle,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.grey[20],
                                                       ),
                                                     )),
                                               ],
@@ -791,9 +820,8 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 4,
                                           child: Container(
-                                            padding:
-                                                const EdgeInsets.symmetric(
-                                                    horizontal: 10),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10),
                                             height: height,
                                             child: Column(
                                               crossAxisAlignment:
@@ -808,16 +836,17 @@ class _VehicleFormState extends State<VehicleForm>
                                                 SizedBox(
                                                     height: 5.h,
                                                     child: TextBox(
+                                                      controller: adresse,
                                                       placeholder:
                                                           'adresse'.tr(),
+                                                      maxLength: 100,
                                                       placeholderStyle:
                                                           placeStyle,
-                                                      cursorColor: appTheme.color.darker,
-                                                      style: wrtingStyle,
-                                                      decoration:
-                                                          BoxDecoration(
-                                                        color:
-                                                            Colors.grey[20],
+                                                      cursorColor:
+                                                          appTheme.color.darker,
+                                                      style: writingStyle,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.grey[20],
                                                       ),
                                                     )),
                                               ],
@@ -844,26 +873,72 @@ class _VehicleFormState extends State<VehicleForm>
                                               ),
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets
-                                                  .symmetric(
-                                                  horizontal: 5.0),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5.0),
                                               child: Column(
                                                 children: [
                                                   Text(
                                                     'genre',
                                                     style: tstyle,
                                                   ).tr(),
-                                                  TextBox(
-                                                    placeholder:
-                                                        'genre'.tr(),
-                                                    placeholderStyle:
-                                                        placeStyle,
-                                                    cursorColor: appTheme.color.darker,
-                                                    style: wrtingStyle,
-                                                    decoration:
-                                                        BoxDecoration(
-                                                      color:
-                                                          Colors.grey[20],
+                                                  Flexible(
+                                                    child: ListTile(
+                                                      title: AutoSizeText(
+                                                        (VehiclesUtilities.genres![genre??1]??'').tr(),
+                                                        minFontSize: 5,
+                                                        softWrap: true,
+                                                        maxLines:1,
+                                                      ),
+                                                      onPressed: () {
+                                                        SelectDialog.showModal<
+                                                            int>(context,
+                                                          selectedValue: genre,
+                                                          items:
+                                                          VehiclesUtilities
+                                                              .genres!.keys.toList(),
+                                                          itemBuilder:
+                                                              (c, v, e) {
+                                                            return Container(
+                                                              padding: const EdgeInsets.all(5.0),
+                                                              color: v%2==0?Colors.transparent:appTheme.color.lightest,
+                                                              child: Row(
+                                                                children:[
+                                                                  Text(v.toString()),
+                                                                  smallSpace,
+                                                                  smallSpace,
+                                                                  smallSpace,
+                                                                  Text(VehiclesUtilities.genres?[v]??'').tr(),
+                                                                ],
+                                                              ),
+                                                            );
+                                                          },
+                                                          onChange: (s){
+                                                            setState(() {
+                                                              genre=s;
+                                                            });
+                                                          },
+                                                          onFind: VehiclesUtilities.findGenres,
+                                                          emptyBuilder: (s){
+                                                            return Center(
+                                                              child: Text('lvide',style: TextStyle(color:Colors.grey[100]),).tr(),
+                                                            );
+                                                          },
+                                                          loadingBuilder: (s){
+                                                            return Center(
+                                                              child: Text('telechargement',style:TextStyle(color:Colors.grey[100])).tr(),
+                                                            );
+                                                          },
+                                                          searchBoxDecoration: inputDecoration.copyWith(
+                                                            labelText: 'search'.tr(),
+                                                            labelStyle: placeStyle,
+                                                          ),
+                                                          searchTextStyle: writingStyle,
+                                                          searchCursorColor: appTheme.color,
+
+                                                        );
+                                                      },
+
                                                     ),
                                                   ),
                                                 ],
@@ -882,26 +957,60 @@ class _VehicleFormState extends State<VehicleForm>
                                               ),
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets
-                                                  .symmetric(
-                                                  horizontal: 5.0),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5.0),
                                               child: Column(
                                                 children: [
                                                   Text(
                                                     'marque',
                                                     style: tstyle,
                                                   ).tr(),
-                                                  TextBox(
-                                                    placeholder:
-                                                        'marque'.tr(),
-                                                    placeholderStyle:
-                                                        placeStyle,
-                                                    cursorColor: appTheme.color.darker,
-                                                    style: wrtingStyle,
-                                                    decoration:
-                                                        BoxDecoration(
-                                                      color:
-                                                          Colors.grey[20],
+                                                  Flexible(
+                                                    child: ListTile(
+                                                      leading: Image.asset('assets/images/marques/$marque.webp',width: 4.h,height: 4.h,),
+                                                      title: AutoSizeText(VehiclesUtilities.marques![marque??1]??'',minFontSize: 5,maxLines: 1,),
+                                                      onPressed: () {
+                                                        SelectDialog.showModal<
+                                                                int>(context,
+                                                            selectedValue: marque,
+                                                            gridView: true,
+                                                            constraints: BoxConstraints.loose(Size(60.w,70.h)),
+                                                            items:
+                                                                VehiclesUtilities
+                                                                    .marques!.keys.toList(),
+                                                            itemBuilder:
+                                                                (c, v, e) {
+                                                          return Card(
+                                                              child: Image.asset(
+                                                                  'assets/images/marques/$v.webp'));
+                                                        },
+                                                          onChange: (s){
+                                                                  setState(() {
+                                                                    marque=s;
+                                                                  });
+                                                          },
+                                                          onFind: VehiclesUtilities.findMarque,
+                                                          emptyBuilder: (s){
+                                                                  return Center(
+                                                                   child: Text('lvide',style: TextStyle(color:Colors.grey[100]),).tr(),
+                                                                  );
+                                                          },
+                                                          loadingBuilder: (s){
+                                                                  return Center(
+                                                                    child: Text('telechargement',style:TextStyle(color:Colors.grey[100])).tr(),
+                                                                  );
+                                                          },
+                                                          searchBoxDecoration: inputDecoration.copyWith(
+                                                            labelText: 'search'.tr(),
+                                                            labelStyle: placeStyle,
+                                                          ),
+                                                          searchTextStyle: writingStyle,
+                                                          searchCursorColor: appTheme.color,
+
+                                                        );
+                                                              },
+
                                                     ),
                                                   ),
                                                 ],
@@ -920,9 +1029,9 @@ class _VehicleFormState extends State<VehicleForm>
                                               ),
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets
-                                                  .symmetric(
-                                                  horizontal: 5.0),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5.0),
                                               child: Column(
                                                 children: [
                                                   Text(
@@ -930,16 +1039,16 @@ class _VehicleFormState extends State<VehicleForm>
                                                     style: tstyle,
                                                   ).tr(),
                                                   TextBox(
-                                                    placeholder:
-                                                        'type'.tr(),
+                                                    controller: type,
+                                                    placeholder: 'type'.tr(),
+                                                    maxLength: 30,
                                                     placeholderStyle:
                                                         placeStyle,
-                                                    cursorColor: appTheme.color.darker,
-                                                    style: wrtingStyle,
-                                                    decoration:
-                                                        BoxDecoration(
-                                                      color:
-                                                          Colors.grey[20],
+                                                    cursorColor:
+                                                        appTheme.color.darker,
+                                                    style: writingStyle,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[20],
                                                     ),
                                                   ),
                                                 ],
@@ -958,9 +1067,9 @@ class _VehicleFormState extends State<VehicleForm>
                                               ),
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets
-                                                  .symmetric(
-                                                  horizontal: 5.0),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5.0),
                                               child: Column(
                                                 children: [
                                                   Text(
@@ -968,16 +1077,17 @@ class _VehicleFormState extends State<VehicleForm>
                                                     style: tstyle,
                                                   ).tr(),
                                                   TextBox(
+                                                    controller: numSer,
+                                                    maxLength: 30,
                                                     placeholder:
                                                         'numerserie'.tr(),
                                                     placeholderStyle:
                                                         placeStyle,
-                                                    cursorColor: appTheme.color.darker,
-                                                    style: wrtingStyle,
-                                                    decoration:
-                                                        BoxDecoration(
-                                                      color:
-                                                          Colors.grey[20],
+                                                    cursorColor:
+                                                        appTheme.color.darker,
+                                                    style: writingStyle,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[20],
                                                     ),
                                                   ),
                                                 ],
@@ -996,9 +1106,9 @@ class _VehicleFormState extends State<VehicleForm>
                                               ),
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets
-                                                  .symmetric(
-                                                  horizontal: 5.0),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5.0),
                                               child: Column(
                                                 children: [
                                                   Text(
@@ -1006,16 +1116,16 @@ class _VehicleFormState extends State<VehicleForm>
                                                     style: tstyle,
                                                   ).tr(),
                                                   TextBox(
-                                                    placeholder:
-                                                        'caross'.tr(),
+                                                    controller: caross,
+                                                    maxLength: 30,
+                                                    placeholder: 'caross'.tr(),
                                                     placeholderStyle:
                                                         placeStyle,
-                                                    cursorColor: appTheme.color.darker,
-                                                    style: wrtingStyle,
-                                                    decoration:
-                                                        BoxDecoration(
-                                                      color:
-                                                          Colors.grey[20],
+                                                    cursorColor:
+                                                        appTheme.color.darker,
+                                                    style: writingStyle,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[20],
                                                     ),
                                                   ),
                                                 ],
@@ -1034,9 +1144,9 @@ class _VehicleFormState extends State<VehicleForm>
                                               ),
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets
-                                                  .symmetric(
-                                                  horizontal: 5.0),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5.0),
                                               child: Column(
                                                 children: [
                                                   Text(
@@ -1044,53 +1154,16 @@ class _VehicleFormState extends State<VehicleForm>
                                                     style: tstyle,
                                                   ).tr(),
                                                   TextBox(
-                                                    placeholder:
-                                                        'energie'.tr(),
+                                                    controller: energie,
+                                                    maxLength: 20,
+                                                    placeholder: 'energie'.tr(),
                                                     placeholderStyle:
                                                         placeStyle,
-                                                    cursorColor: appTheme.color.darker,
-                                                    style: wrtingStyle,
-                                                    decoration:
-                                                        BoxDecoration(
-                                                      color:
-                                                          Colors.grey[20],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 1,
-                                          child: Container(
-                                            height:height,
-                                            padding: EdgeInsets.zero,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: appTheme.color,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding: const EdgeInsets
-                                                  .symmetric(
-                                                  horizontal: 5.0),
-                                              child: Column(
-                                                children: [
-                                                  Text(
-                                                    'puissance',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  TextBox(
-                                                    placeholder: '000',
-                                                    placeholderStyle:
-                                                        placeStyle,
-                                                    cursorColor: appTheme.color.darker,
-                                                    style: wrtingStyle,
-                                                    decoration:
-                                                        BoxDecoration(
-                                                      color:
-                                                          Colors.grey[20],
+                                                    cursorColor:
+                                                        appTheme.color.darker,
+                                                    style: writingStyle,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[20],
                                                     ),
                                                   ),
                                                 ],
@@ -1109,9 +1182,48 @@ class _VehicleFormState extends State<VehicleForm>
                                               ),
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets
-                                                  .symmetric(
-                                                  horizontal: 5.0),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5.0),
+                                              child: Column(
+                                                children: [
+                                                  Text(
+                                                    'puissance',
+                                                    style: tstyle,
+                                                  ).tr(),
+                                                  TextBox(
+                                                    placeholder: '0000',
+                                                    controller: puissance,
+                                                    maxLength: 4,
+                                                    placeholderStyle:
+                                                        placeStyle,
+                                                    cursorColor:
+                                                        appTheme.color.darker,
+                                                    style: writingStyle,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[20],
+                                                    ),
+                                                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        StaggeredGridTile.fit(
+                                          crossAxisCellCount: 1,
+                                          child: Container(
+                                            height: height,
+                                            padding: EdgeInsets.zero,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: appTheme.color,
+                                              ),
+                                            ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5.0),
                                               child: Column(
                                                 children: [
                                                   Text(
@@ -1120,15 +1232,18 @@ class _VehicleFormState extends State<VehicleForm>
                                                   ).tr(),
                                                   TextBox(
                                                     placeholder: '000',
+                                                    controller: places,
+                                                    maxLength: 3,
                                                     placeholderStyle:
                                                         placeStyle,
-                                                    cursorColor: appTheme.color.darker,
-                                                    style: wrtingStyle,
-                                                    decoration:
-                                                        BoxDecoration(
-                                                      color:
-                                                          Colors.grey[20],
+                                                    cursorColor:
+                                                        appTheme.color.darker,
+                                                    style: writingStyle,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[20],
                                                     ),
+                                                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+
                                                   ),
                                                 ],
                                               ),
@@ -1146,9 +1261,9 @@ class _VehicleFormState extends State<VehicleForm>
                                               ),
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets
-                                                  .symmetric(
-                                                  horizontal: 5.0),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5.0),
                                               child: Column(
                                                 children: [
                                                   Text(
@@ -1157,14 +1272,16 @@ class _VehicleFormState extends State<VehicleForm>
                                                   ).tr(),
                                                   TextBox(
                                                     placeholder: '000000',
+                                                    controller: poidsT,
+                                                    maxLength: 15,
+                                                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                                     placeholderStyle:
                                                         placeStyle,
-                                                    cursorColor: appTheme.color.darker,
-                                                    style: wrtingStyle,
-                                                    decoration:
-                                                        BoxDecoration(
-                                                      color:
-                                                          Colors.grey[20],
+                                                    cursorColor:
+                                                        appTheme.color.darker,
+                                                    style: writingStyle,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[20],
                                                     ),
                                                   ),
                                                 ],
@@ -1183,9 +1300,9 @@ class _VehicleFormState extends State<VehicleForm>
                                               ),
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets
-                                                  .symmetric(
-                                                  horizontal: 5.0),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5.0),
                                               child: Column(
                                                 children: [
                                                   Text(
@@ -1194,14 +1311,17 @@ class _VehicleFormState extends State<VehicleForm>
                                                   ).tr(),
                                                   TextBox(
                                                     placeholder: '000000',
+                                                    controller: charg,
+                                                    maxLength: 15,
+                                                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+
                                                     placeholderStyle:
                                                         placeStyle,
-                                                    cursorColor: appTheme.color.darker,
-                                                    style: wrtingStyle,
-                                                    decoration:
-                                                        BoxDecoration(
-                                                      color:
-                                                          Colors.grey[20],
+                                                    cursorColor:
+                                                        appTheme.color.darker,
+                                                    style: writingStyle,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[20],
                                                     ),
                                                   ),
                                                 ],
@@ -1220,9 +1340,9 @@ class _VehicleFormState extends State<VehicleForm>
                                               ),
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets
-                                                  .symmetric(
-                                                  horizontal: 5.0),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5.0),
                                               child: Column(
                                                 children: [
                                                   Text(
@@ -1231,17 +1351,20 @@ class _VehicleFormState extends State<VehicleForm>
                                                   ).tr(),
                                                   Flexible(
                                                       child: TextBox(
-                                                    placeholder:
-                                                        'precmat'.tr(),
+                                                        controller: matrPrec,
+                                                    maxLength: 30,
+                                                    placeholder: 'precmat'.tr(),
                                                     placeholderStyle:
                                                         placeStyle,
-                                                        cursorColor: appTheme.color.darker,
-                                                        style: wrtingStyle,
-                                                    decoration:
-                                                        BoxDecoration(
-                                                      color:
-                                                          Colors.grey[20],
+                                                    cursorColor:
+                                                        appTheme.color.darker,
+                                                    style: writingStyle,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey[20],
                                                     ),
+                                                        inputFormatters: <TextInputFormatter>[
+                                                          FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z.-]")),
+                                                        ],
                                                   )),
                                                 ],
                                               ),
@@ -1251,7 +1374,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         StaggeredGridTile.fit(
                                           crossAxisCellCount: 2,
                                           child: Container(
-                                            height:height,
+                                            height: height,
                                             padding: EdgeInsets.zero,
                                             decoration: BoxDecoration(
                                               border: Border.all(
@@ -1259,9 +1382,9 @@ class _VehicleFormState extends State<VehicleForm>
                                               ),
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets
-                                                  .symmetric(
-                                                  horizontal: 5.0),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5.0),
                                               child: Column(
                                                 children: [
                                                   Text(
@@ -1270,16 +1393,15 @@ class _VehicleFormState extends State<VehicleForm>
                                                   ).tr(),
                                                   Flexible(
                                                       child: DatePicker(
-                                                        showDay: false,
-                                                        showMonth: false,
-                                                        selected: selectedAnnee,
-                                                        onChanged: (s){
-                                                          setState(() {
-                                                            selectedAnnee=s;
-                                                          });
-                                                        },
-
-                                                      )),
+                                                    showDay: false,
+                                                    showMonth: false,
+                                                    selected: selectedAnnee,
+                                                    onChanged: (s) {
+                                                      setState(() {
+                                                        selectedAnnee = s;
+                                                      });
+                                                    },
+                                                  )),
                                                 ],
                                               ),
                                             ),
@@ -1298,18 +1420,152 @@ class _VehicleFormState extends State<VehicleForm>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              if(errorUploading)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Text('errupld',style:TextStyle(color:Colors.red)).tr(),
+                ),
               FilledButton(
-                  child: const Text('confirmer').tr(), onPressed: () {}),
+                  onPressed: uploading?null:confirmAndUpload,
+                  child: uploading?const ProgressRing():const Text('confirmer').tr()),
             ],
           ),
-        )
-    );
+        ));
   }
 
+  void updateOverMatricule(AppTheme appTheme) {
+    if(!autreMat){
+        if(matr3.text.isNotEmpty){
+          wilaya=matr3.text;
+          wilayaCont.text=AlgeriaList().getWilayaByNum(matr3.text)??'';
+          dairaCont.text=AlgeriaList().getDairas(wilayaCont.text).firstOrNull?.getDairaName(appTheme
+              .locale
+              ?.languageCode
+              .toUpperCase() ==
+              "AR"
+              ? Language.AR
+              : Language
+              .FR)??'';
+          communeCont.text=AlgeriaList().getCommune(wilayaCont.text).firstOrNull?.getDairaName(appTheme
+              .locale
+              ?.languageCode
+              .toUpperCase() ==
+              "AR"
+              ? Language.AR
+              : Language
+              .FR)??'';
+          setState(() {
+          });
+        }
+        if(matr2.text.isNotEmpty){
+          genre=(int.tryParse(matr2.text)??100)~/100;
+          selectedAnnee=DateTime(VehiclesUtilities.getAnneeFromMatricule('0000-${matr2.text}-00'));
+          setState(() {
+          });
+        }
+    }
+  }
+   String? documentID;
+  bool uploading=false;
+  bool errorUploading=false;
+  void confirmAndUpload()async{
+    if(autreMat){
+      if(matriculeEtr.text.isEmpty || matriculeEtr.text.length<4){
+        if(!erreurMatricule){
+          setState(() {
+            erreurMatricule=true;
+          });
+        }
+      }
+      else{
+        if(erreurMatricule){
+          setState(() {
+            erreurMatricule=false;
+          });
+        }
+
+      }
+    }
+    else{
+      if(matr1.text.isEmpty || matr2.text.length<3 || matr3.text.length<2){
+        if(!erreurMatricule){
+          setState(() {
+            erreurMatricule=true;
+          });
+        }
+      }
+      else{
+        if(erreurMatricule){
+          setState(() {
+            erreurMatricule=false;
+          });
+        }
+
+      }
+    }
 
 
-  void updateOverMatricule(){
+    if(!erreurMatricule){
+      setState(() {
+        uploading=true;
+        errorUploading=false;
+      });
+      Vehicle vehicle=Vehicle(
+          matricule: autreMat
+              ?matriculeEtr.text
+              :'${matr1.text}-${matr2.text}-${matr3.text}',
+          martriculeEtrang: autreMat,
+          wilaya: int.tryParse(wilaya),
+          commune: communeCont.text,
+          date: selectedDate.difference(ClientDatabase.ref).inMilliseconds.abs(),
+          adresse: adresse.text,
+          quittance: double.tryParse(quittance.text),
+          numero: numero.text,
+          numeroSerie: numSer.text,
+          anneeUtil: selectedAnnee?.year,
+          energie: energie.text,
+          pays: pays,
+          placeAssises: int.tryParse(places.text),
+          poidsTotal: int.tryParse(poidsT.text),
+          prenom: fname.text,
+          nom: lname.text,
+          type: type.text,
+          profession: profession.text,
+          puissance: int.tryParse(puissance.text),
+          daira: dairaCont.text,
+          genre: genre.toString(),
+          marque: marque.toString(),
+          matriculePrec: matrPrec.text,
+          carosserie: caross.text,
+          chargeUtile: int.tryParse(charg.text),
+          userCreation: ClientDatabase.me.value?.id,
 
+      );
+      
+      await ClientDatabase.database!.createDocument(
+          databaseId: databaseId, 
+          collectionId: vehiculeid, 
+          documentId: documentID!, 
+          data: vehicle.toJson(),
+        permissions: [
+          Permission.read(Role.users()),
+          Permission.update(Role.user(ClientDatabase.me.value!.id)),
+          Permission.write(Role.user(ClientDatabase.me.value!.id)),
+        ]
+      
+      ).then((value) {
+        if(widget.tab!=null){
+          VehicleTabsState.tabs.remove(widget.tab);
+        }
+        if(VehicleTabsState.currentIndex.value>0)VehicleTabsState.currentIndex.value--;
+      }).onError((AppwriteException error, stackTrace) {
+        print(error.message);
+        setState(() {
+          uploading=false;
+          errorUploading=true;
+        });
+      });
+    }
   }
   @override
   bool get wantKeepAlive => true;

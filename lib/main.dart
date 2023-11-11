@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'providers/client_database.dart';
 import 'screens/sidemenu/sidemenu.dart';
 import 'theme.dart';
@@ -27,7 +28,7 @@ void main() async {
 
 void launchApp() async{
   final prefs = await SharedPreferences.getInstance();
-
+  VehiclesUtilities();
   EasyLocalization.logger.enableBuildModes = [];
   await EasyLocalization.ensureInitialized();
   runApp(EasyLocalization(

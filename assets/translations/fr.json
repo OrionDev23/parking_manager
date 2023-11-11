@@ -10,7 +10,7 @@
  "prenom": "Prénom",
  "numerserie": "N° dans la serie du type",
  "marque": "Marque",
- "type": "Type",
+ "type": "Modèle",
  "profession": "Profession",
  "genre": "Genre",
  "chargeutil": "Charge utile",
@@ -21,6 +21,7 @@
  "caross": "Carrosserie",
  "anneeutil": "Année de premiere utilisation",
  "precmat": "Matricule précédant",
+ "erreurmat": "Matricule invalide",
 
  "oui": "Oui",
  "non": "Non",

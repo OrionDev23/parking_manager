@@ -25,7 +25,7 @@ Map<String,dynamic> toJson(){
 }
 
 
-static ParcUser fromJson(Map<String,dynamic> json){
+factory ParcUser.fromJson(Map<String,dynamic> json){
 
   return ParcUser(
     email: json['email'],
