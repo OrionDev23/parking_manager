@@ -1,14 +1,16 @@
-import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/screens/vehicle/vehicle_form.dart';
 import 'package:parc_oto/screens/vehicle/vehicle_tabs.dart';
+import 'package:parc_oto/screens/vehicle/vehicles_table.dart';
 import 'package:parc_oto/widgets/button_container.dart';
 import 'package:parc_oto/widgets/page_header.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-import '../../datasources/vehicules_datasource.dart';
+import '../../theme.dart';
 
 class VehicleManagement extends StatefulWidget {
   const VehicleManagement({super.key});
@@ -18,101 +20,17 @@ class VehicleManagement extends StatefulWidget {
 }
 
 class _VehicleManagementState extends State<VehicleManagement> {
-  VehiculesDataSource vehicleDataSource = VehiculesDataSource();
 
-  bool assending = false;
-
-  late List<DataColumn2> columns;
-
-  @override
-  void initState() {
-    initColumns();
-    super.initState();
-  }
 
   final tstyle=TextStyle(
     fontSize: 10.sp,
   );
 
-  int sortColumn=0;
 
-  void initColumns() {
-    columns = [
-      DataColumn2(
-        label:  Text('nummat',style: tstyle,).tr(),
-        size:ColumnSize.L,
-        onSort: (s, c) {
-          sortColumn=0;
-          assending=!assending;
-
-          vehicleDataSource.sort(1, assending);
-          setState(() {
-
-          });
-        },
-      ),
-      DataColumn2(
-        label: Text('marque',style: tstyle,).tr(),
-        size:ColumnSize.M,
-        onSort: (s, c)  {
-          sortColumn=1;
-          assending=!assending;
-
-          vehicleDataSource.sort(2, assending);
-          setState(() {
-
-          });
-        },
-      ),
-      DataColumn2(
-        label: Text('type',style: tstyle,).tr(),
-        size:ColumnSize.M,
-        onSort: (s, c)  {
-          sortColumn=2;
-          assending=!assending;
-
-          vehicleDataSource.sort(3, assending);
-          setState(() {
-
-          });
-        },
-      ),
-      DataColumn2(
-        label: Text('year',style: tstyle,).tr(),
-        size:ColumnSize.M,
-        onSort: (s, c)  {
-          sortColumn=3;
-          assending=!assending;
-
-          vehicleDataSource.sort(4, assending);
-          setState(() {
-
-          });
-        },
-      ),
-      DataColumn2(
-        label: Text('dateModif',style: tstyle,).tr(),
-        size:ColumnSize.L,
-        onSort: (s, c)  {
-          sortColumn=4;
-          assending=!assending;
-
-          vehicleDataSource.sort(6, assending);
-          setState(() {
-
-          });
-        },
-      ),
-      const DataColumn2(
-        label: Text(''),
-        size:ColumnSize.S,
-        onSort: null,
-      ),
-    ];
-  }
 
   @override
   Widget build(BuildContext context) {
+    var appTheme=context.watch<AppTheme>();
     return ScaffoldPage(
       header: PageTitle(
         text: 'gestionvehicles'.tr(),
@@ -132,18 +50,91 @@ class _VehicleManagementState extends State<VehicleManagement> {
               },
             )),
       ),
-      content: AsyncPaginatedDataTable2(
-        sortAscending: assending,
-        horizontalMargin: 5,
-        sortColumnIndex: sortColumn,
-        pageSyncApproach: PageSyncApproach.goToLast,
-        showFirstLastButtons: true,
-        renderEmptyRowsInTheEnd: false,
-        fit: FlexFit.tight,
-        columns: columns,
-        source: vehicleDataSource,
-        sortArrowAlwaysVisible: true,
-        hidePaginator: false,
+      content: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0,horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(icon: const Icon(FluentIcons.filter), onPressed: (){}),
+                const SizedBox(width: 10,),
+
+                SizedBox(
+                  width: 30.w,
+                  height: 7.h,
+                  child: TextBox(
+                    placeholder: 'search'.tr(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Flexible(
+            child: Row(
+              children: [
+                SizedBox(
+                    width:60.w,
+                    child: const VehicleTable()),
+                const SizedBox(width: 10,),
+                Flexible(
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height:20.h,
+                                                child: PieChart(
+                          PieChartData(
+                          sections: [
+                            PieChartSectionData(
+                              value: 120,
+                              color: appTheme.color.darkest,
+                            ),
+                            PieChartSectionData(
+                              value: 60,
+                              color: appTheme.color,
+                            ),
+                            PieChartSectionData(
+                              value: 180,
+                              color: appTheme.color.lightest,
+                            ),
+                          ]
+                          )
+                        ),
+                      ),
+                      const SizedBox(height: 10,),
+
+                    ],
+
+                  ),
+                ),
+                const SizedBox(width: 10,),
+                Flexible(child: Column(
+                  children: [
+                    SizedBox(height: 10.h,),
+                    Row(children: [
+                      Container(color: appTheme.color.darkest,width: 2.w,height: 1.w,),
+                      const SizedBox(width: 5,),
+                      Text('Bon état',style: tstyle,),
+                    ],),
+                    const SizedBox(height: 5,),
+                    Row(children: [
+                      Container(color: appTheme.color,width: 2.w,height: 1.w,),
+                      const SizedBox(width: 5,),
+                      Text('En panne',style: tstyle,),
+                    ],),
+                    const SizedBox(height: 5,),
+                    Row(children: [
+                      Container(color: appTheme.color,width: 2.w,height: 1.w,),
+                      const SizedBox(width: 5,),
+                      Text('En réparation',style: tstyle,),
+                    ],),
+                  ],
+                )),
+                const SizedBox(width: 10,),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

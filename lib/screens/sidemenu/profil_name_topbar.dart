@@ -41,7 +41,7 @@ class ProfilNameTopBar extends StatelessWidget {
                         child: me != null &&
                                 me.avatar != null &&
                                 me.avatar!.isNotEmpty
-                            ? FutureImage(me.avatar!)
+                            ? FutureImage(me.avatar!,user:me)
                             : Text(
                                 ProfilUtilitis.getFirstLetters(me)
                                     .toUpperCase(),

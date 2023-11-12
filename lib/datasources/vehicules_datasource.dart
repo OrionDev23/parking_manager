@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../providers/client_database.dart';
 import '../serializables/vehicle.dart';
@@ -59,6 +60,10 @@ class VehiculesDataSource extends AsyncDataTableSource {
       decimalDigits: 0,
     );
     final dateFormat=DateFormat('y/M/d hh:mm:ss','fr');
+    final tstyle=TextStyle(
+      fontSize: 10.sp,
+    );
+
     assert(startIndex >= 0);
 
     // List returned will be empty is there're fewer items than startingAt
@@ -79,13 +84,13 @@ class VehiculesDataSource extends AsyncDataTableSource {
               }
             },
             cells: [
-              DataCell(Text(vehicle.matricule)),
-              DataCell(Text(vehicle.marque ?? '')),
-              DataCell(Text(vehicle.type ?? '')),
-              DataCell(Text(vehicle.anneeUtil.toString())),
+              DataCell(Text(vehicle.matricule,style: tstyle,)),
+              DataCell(Text(vehicle.marque ?? '',style: tstyle)),
+              DataCell(Text(vehicle.type ?? '',style: tstyle)),
+              DataCell(Text(vehicle.anneeUtil.toString(),style: tstyle)),
               DataCell(Text(
                   dateFormat.format(ClientDatabase.ref.add(Duration(milliseconds:vehicle.dateModification!)))
-              )),
+                  ,style: tstyle)),
               DataCell(IconButton(onPressed: (){}, icon: const Icon(Icons.more_vert_sharp))),
             ],
           );
@@ -180,6 +185,7 @@ class VehiculesWebService {
         ]).then((value) {
       for (var element in value.documents) {
 
+
         _vehicles.add( element.convertTo<Vehicle>((p0) {
 
           return Vehicle.fromJson(p0 as Map<String,dynamic>);
@@ -195,11 +201,12 @@ class VehiculesWebService {
               .abs());
       }
 
+
       var result = _vehicles;
 
       result.sort(_getComparisonFunction(sortedBy, sortedAsc));
       return VehiculesWebServiceResponse(
-          result.length, result.skip(startingAt).take(count).toList());
+          value.total, result.skip(startingAt).take(count).toList());
     }).onError((error, stackTrace) {
       return Future.value(VehiculesWebServiceResponse(0,_vehicles));
     });

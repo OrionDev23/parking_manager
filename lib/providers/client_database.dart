@@ -24,7 +24,6 @@ class ClientDatabase {
 
   static ValueNotifier<ParcUser?> me=ValueNotifier(null);
 
-  static String? jwt;
   ClientDatabase() {
     client ??= Client()
       ..setEndpoint(endpoint)

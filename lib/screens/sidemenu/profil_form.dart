@@ -114,7 +114,7 @@ class _ProfilFormState extends State<ProfilForm> {
                       ? widget.user != null &&
                               widget.user!.avatar != null &&
                               widget.user!.avatar!.isNotEmpty
-                          ? FutureImage(widget.user!.avatar!)
+                          ? FutureImage(widget.user!.avatar!,user: widget.user,)
                           : Text(
                               ProfilUtilitis.getFirstLetters(widget.user)
                                   .toUpperCase(),
@@ -364,7 +364,12 @@ class _ProfilFormState extends State<ProfilForm> {
     String? result;
     if (imageFile != null) {
       if(widget.user!=null && widget.user!.avatar!=null && widget.user!.avatar!.isNotEmpty){
-        await ClientDatabase.storage!.deleteFile(bucketId: buckedId, fileId: userID);
+        try{
+          await ClientDatabase.storage!.deleteFile(bucketId: buckedId, fileId: userID);
+        }
+        catch(e){
+          //
+        }
         await ClientDatabase.storage!.createFile(
             bucketId: buckedId,
             fileId: userID,
@@ -374,10 +379,12 @@ class _ProfilFormState extends State<ProfilForm> {
               Permission.write(Role.user(userID)),
               Permission.update(Role.user(userID)),
               Permission.delete(Role.user(userID)),
+              Permission.delete(Role.team('1')),
               Permission.read(Role.users()),
             ]).then((value) async {
           result =userID;
-        }).onError((error, stackTrace) {});
+        }).onError((AppwriteException error, stackTrace) {
+        });
       }
       else{
         await ClientDatabase.storage!.createFile(
