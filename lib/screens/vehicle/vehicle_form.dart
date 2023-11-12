@@ -13,10 +13,10 @@ import 'package:parc_oto/serializables/vehicle.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:select_dialog/select_dialog.dart';
 
 import '../../theme.dart';
 import '../../utilities/algeria_lists.dart';
+import '../../widgets/select_dialog/select_dialog.dart';
 
 class VehicleForm extends StatefulWidget {
   final Vehicle? vehicle;
@@ -1559,7 +1559,6 @@ class _VehicleFormState extends State<VehicleForm>
         }
         if(VehicleTabsState.currentIndex.value>0)VehicleTabsState.currentIndex.value--;
       }).onError((AppwriteException error, stackTrace) {
-        print(error.message);
         setState(() {
           uploading=false;
           errorUploading=true;
