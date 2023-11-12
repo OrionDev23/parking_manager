@@ -57,7 +57,15 @@ class Vehicle{
 
 
 /*
-* Vehicle _$VehicleFromJson(Map<String, dynamic> json) => Vehicle(
+* // GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'vehicle.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+Vehicle _$VehicleFromJson(Map<String, dynamic> json) => Vehicle(
       matricule: json['matricule'] as String,
       martriculeEtrang: json['martricule_etrang'] as bool,
       wilaya: json['wilaya'] as int?,
@@ -76,14 +84,14 @@ class Vehicle{
       chargeUtile: json['charge_utile'] as int?,
       daira: json['daira'] as String?,
       energie: json['energie'] as String?,
-      genre: json['genre'] as String?,
-      marque: json['marque'] as String?,
+      genre: json['genre']["\$id"] as String?,
+      marque: json['marque']["\$id"] as String?,
       matriculePrec: json['matricule_prec'] as String?,
       pays: json['pays'] as String?,
       placeAssises: json['place_assises'] as int?,
       poidsTotal: json['poids_total'] as int?,
       puissance: json['puissance'] as int?,
-      userCreation: json['user_creation'] as String?,
+      userCreation: json['user_creation']["\$id"] as String?,
     );
 
 Map<String, dynamic> _$VehicleToJson(Vehicle instance) => <String, dynamic>{
@@ -113,4 +121,6 @@ Map<String, dynamic> _$VehicleToJson(Vehicle instance) => <String, dynamic>{
       'matricule_prec': instance.matriculePrec,
       'user_creation': instance.userCreation,
       'pays': instance.pays,
+    };
+
     };*/

@@ -1,9 +1,11 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 
+import '../providers/client_database.dart';
 import '../serializables/vehicle.dart';
 
 class VehiculesDataSource extends AsyncDataTableSource {
@@ -23,7 +25,6 @@ class VehiculesDataSource extends AsyncDataTableSource {
 
   bool _empty = false;
   int? _errorCounter;
-
 
   final VehiculesWebService _repo = VehiculesWebService();
 
@@ -63,8 +64,7 @@ class VehiculesDataSource extends AsyncDataTableSource {
     var x = _empty
         ? await Future.delayed(const Duration(milliseconds: 2000),
             () => VehiculesWebServiceResponse(0, []))
-        : await _repo.getData(
-        startIndex, count,  _sortColumn, _sortAscending);
+        : await _repo.getData(startIndex, count, _sortColumn, _sortAscending);
 
     var r = AsyncRowsResponse(
         x.totalRecords,
@@ -80,8 +80,8 @@ class VehiculesDataSource extends AsyncDataTableSource {
             cells: [
               DataCell(Text(vehicle.id!)),
               DataCell(Text(vehicle.matricule)),
-              DataCell(Text(vehicle.marque??'')),
-              DataCell(Text(vehicle.type??'')),
+              DataCell(Text(vehicle.marque ?? '')),
+              DataCell(Text(vehicle.type ?? '')),
               DataCell(Text(vehicle.anneeUtil.toString())),
               DataCell(Text('${vehicle.dateCreation}')),
               DataCell(Text('${vehicle.dateModification}')),
@@ -112,76 +112,103 @@ class VehiculesWebService {
       //id
       case 0:
         return (Vehicle d1, Vehicle d2) => coef * d1.id!.compareTo(d2.id!);
-        //matricule
-        case 1:
-        return (Vehicle d1, Vehicle d2) => coef * d1.matricule.compareTo(d2.matricule);
-        //marque
-        case 2:
-          return (Vehicle d1, Vehicle d2) {
-            if(d1.marque==null){
-              return -1;
-            }
-            else if(d2.marque==null){
-              return 1;
-            }
-            else{
-              return coef * d1.marque!.compareTo(d2.marque!);
-            }
-          };
-        //type
+      //matricule
+      case 1:
+        return (Vehicle d1, Vehicle d2) =>
+            coef * d1.matricule.compareTo(d2.matricule);
+      //marque
+      case 2:
+        return (Vehicle d1, Vehicle d2) {
+          if (d1.marque == null) {
+            return -1;
+          } else if (d2.marque == null) {
+            return 1;
+          } else {
+            return coef * d1.marque!.compareTo(d2.marque!);
+          }
+        };
+      //type
       case 3:
         return (Vehicle d1, Vehicle d2) {
-          if(d1.type==null){
+          if (d1.type == null) {
             return -1;
-          }
-          else if(d2.type==null){
+          } else if (d2.type == null) {
             return 1;
-          }
-          else{
+          } else {
             return coef * d1.type!.compareTo(d2.type!);
           }
         };
-        //annee
+      //annee
       case 4:
         return (Vehicle d1, Vehicle d2) {
-          int annee1=d1.anneeUtil??VehiclesUtilities.getAnneeFromMatricule(d1.matricule);
-          int annee2=d2.anneeUtil??VehiclesUtilities.getAnneeFromMatricule(d2.matricule);
+          int annee1 = d1.anneeUtil ??
+              VehiclesUtilities.getAnneeFromMatricule(d1.matricule);
+          int annee2 = d2.anneeUtil ??
+              VehiclesUtilities.getAnneeFromMatricule(d2.matricule);
 
-            return coef * annee1.compareTo(annee2);
+          return coef * annee1.compareTo(annee2);
         };
-        //dateAjout
+      //dateAjout
       case 5:
-        return (Vehicle d1, Vehicle d2) => coef * d1.dateCreation!.compareTo(d2.dateCreation!);
+        return (Vehicle d1, Vehicle d2) =>
+            coef * d1.dateCreation!.compareTo(d2.dateCreation!);
       //date modif
-        case 6:
-        return (Vehicle d1, Vehicle d2) => coef * d1.dateModification!.compareTo(d2.dateModification!);
+      case 6:
+        return (Vehicle d1, Vehicle d2) =>
+            coef * d1.dateModification!.compareTo(d2.dateModification!);
     }
 
     return null;
   }
 
-  Future<VehiculesWebServiceResponse> getData(int startingAt, int count,int sortedBy, bool sortedAsc) async {
-    return Future.delayed(
-        Duration(
-            milliseconds: startingAt == 0
-                ? 2650
-                : startingAt < 20
-                ? 2000
-                : 400), () {
+  Future<VehiculesWebServiceResponse> getData(
+      int startingAt, int count, int sortedBy, bool sortedAsc) async {
+    return ClientDatabase.database!.listDocuments(
+        databaseId: databaseId,
+        collectionId: vehiculeid,
+        queries: [
+          Query.limit(count),
+          Query.offset(startingAt),
+          if(sortedAsc)
+          Query.orderAsc('\$id'),
+          if(!sortedAsc)
+            Query.orderDesc('\$id'),
+        ]).then((value) {
+      for (var element in value.documents) {
+
+        _vehicles.add( element.convertTo<Vehicle>((p0) {
+
+          return Vehicle.fromJson(p0 as Map<String,dynamic>);
+        })
+          ..id = element.$id
+          ..dateCreation = DateTime.parse(element.$createdAt)
+              .difference(ClientDatabase.ref)
+              .inMilliseconds
+              .abs()
+          ..dateModification = DateTime.parse(element.$updatedAt)
+              .difference(ClientDatabase.ref)
+              .inMilliseconds
+              .abs());
+      }
+
       var result = _vehicles;
 
       result.sort(_getComparisonFunction(sortedBy, sortedAsc));
       return VehiculesWebServiceResponse(
           result.length, result.skip(startingAt).take(count).toList());
+    }).onError((error, stackTrace) {
+      return Future.value(VehiculesWebServiceResponse(0,_vehicles));
     });
   }
 }
 
 int _selectedCount = 0;
 
-List<Vehicle> _vehicles = List.empty();
+List<Vehicle> _vehicles = List.empty(growable: true);
 
 _showSnackbar(BuildContext context, String text, [Color? color]) {
-  snackBar(context,content: Text(text),duration: const Duration(seconds: 1),backgroundColor: color);
-
+  snackBar(context,
+      content: Text(text),
+      duration: const Duration(seconds: 1),
+      backgroundColor: color);
 }
