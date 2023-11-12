@@ -20,6 +20,7 @@ class VehicleTabsState extends State<VehicleTabs> {
   Tab generateTab(int index) {
     late Tab tab;
     tab = Tab(
+      key: UniqueKey(),
       text: Text('nouvvehicule'.tr()),
       semanticLabel: 'nouvvehicule'.tr(),
       icon: const Icon(Bootstrap.car_front),

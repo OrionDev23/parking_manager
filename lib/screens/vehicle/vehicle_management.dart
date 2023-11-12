@@ -18,10 +18,9 @@ class VehicleManagement extends StatefulWidget {
 }
 
 class _VehicleManagementState extends State<VehicleManagement> {
+  VehiculesDataSource vehicleDataSource = VehiculesDataSource();
 
-  VehiculesDataSource vehicleDataSource=VehiculesDataSource();
-
-  bool assending=false;
+  bool assending = false;
 
   late List<DataColumn2> columns;
 
@@ -31,90 +30,128 @@ class _VehicleManagementState extends State<VehicleManagement> {
     super.initState();
   }
 
-  void initColumns(){
-    columns=[
+  final tstyle=TextStyle(
+    fontSize: 10.sp,
+  );
 
+  int sortColumn=0;
+
+  void initColumns() {
+    columns = [
       DataColumn2(
-        label: const Text('id'),
-        onSort: (s,c)=>vehicleDataSource.sort(0,assending),
-      ), DataColumn2(
-        label: const Text('matricule'),
-        onSort: (s,c)=>vehicleDataSource.sort(1,assending),
-      ), DataColumn2(
-        label: const Text('marque'),
-        onSort:(s,c)=> vehicleDataSource.sort(2,assending),
-      ), DataColumn2(
-        label: const Text('modele'),
-        onSort:(s,c)=> vehicleDataSource.sort(3,assending),
-      ), DataColumn2(
-        label: const Text('annee'),
-        onSort:(s,c)=> vehicleDataSource.sort(4,assending),
-      ), DataColumn2(
-        label: const Text('dateC'),
-        onSort:(s,c)=> vehicleDataSource.sort(5,assending),
-      ), DataColumn2(
-        label: const Text('dateM'),
-        onSort:(s,c)=> vehicleDataSource.sort(6,assending),
-      ), const DataColumn2(
+        label:  Text('nummat',style: tstyle,).tr(),
+        size:ColumnSize.L,
+        onSort: (s, c) {
+          sortColumn=0;
+          assending=!assending;
+
+          vehicleDataSource.sort(1, assending);
+          setState(() {
+
+          });
+        },
+      ),
+      DataColumn2(
+        label: Text('marque',style: tstyle,).tr(),
+        size:ColumnSize.M,
+        onSort: (s, c)  {
+          sortColumn=1;
+          assending=!assending;
+
+          vehicleDataSource.sort(2, assending);
+          setState(() {
+
+          });
+        },
+      ),
+      DataColumn2(
+        label: Text('type',style: tstyle,).tr(),
+        size:ColumnSize.M,
+        onSort: (s, c)  {
+          sortColumn=2;
+          assending=!assending;
+
+          vehicleDataSource.sort(3, assending);
+          setState(() {
+
+          });
+        },
+      ),
+      DataColumn2(
+        label: Text('year',style: tstyle,).tr(),
+        size:ColumnSize.M,
+        onSort: (s, c)  {
+          sortColumn=3;
+          assending=!assending;
+
+          vehicleDataSource.sort(4, assending);
+          setState(() {
+
+          });
+        },
+      ),
+      DataColumn2(
+        label: Text('dateModif',style: tstyle,).tr(),
+        size:ColumnSize.L,
+        onSort: (s, c)  {
+          sortColumn=4;
+          assending=!assending;
+
+          vehicleDataSource.sort(6, assending);
+          setState(() {
+
+          });
+        },
+      ),
+      const DataColumn2(
         label: Text(''),
+        size:ColumnSize.S,
         onSort: null,
       ),
     ];
   }
-   @override
+
+  @override
   Widget build(BuildContext context) {
     return ScaffoldPage(
-      header: PageTitle(text:'gestionvehicles'.tr()),
-      content: ListView(
-        padding: const EdgeInsets.all(10),
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              SizedBox(
-                  width: 15.w,
-                  height: 10.h,
-                  child: ButtonContainer(
-                    icon: FluentIcons.add,
-                    text: 'add'.tr(),
-                    showBottom: false,
-                    showCounter: false,
-                    action: (){
-                      final index = VehicleTabsState.tabs.length + 1;
-                      final tab = generateTab(index);
-                      VehicleTabsState.tabs.add(tab);
-                      VehicleTabsState.currentIndex.value=index-1;
-                    },
-
-                  )),
-            ],
-          ),
-
-          SizedBox(
-            width: 80.w,
-            height: 70.h,
-            child: AsyncPaginatedDataTable2(
-              key: GlobalKey(),
-                renderEmptyRowsInTheEnd: false,
-                autoRowsToHeight: true,
-                columns: columns,
-                source: vehicleDataSource,
-                  sortArrowAlwaysVisible: true,
-              hidePaginator: false,
-              errorBuilder: (s){
-                  return Center(child: Text('Error $s',style: TextStyle(color:Colors.grey[100]),));
+      header: PageTitle(
+        text: 'gestionvehicles'.tr(),
+        trailing: SizedBox(
+            width: 15.w,
+            height: 10.h,
+            child: ButtonContainer(
+              icon: FluentIcons.add,
+              text: 'add'.tr(),
+              showBottom: false,
+              showCounter: false,
+              action: () {
+                final index = VehicleTabsState.tabs.length + 1;
+                final tab = generateTab(index);
+                VehicleTabsState.tabs.add(tab);
+                VehicleTabsState.currentIndex.value = index - 1;
               },
-            ),
-          ),
-        ],
+            )),
+      ),
+      content: AsyncPaginatedDataTable2(
+        sortAscending: assending,
+        horizontalMargin: 5,
+        sortColumnIndex: sortColumn,
+        pageSyncApproach: PageSyncApproach.goToLast,
+        showFirstLastButtons: true,
+        renderEmptyRowsInTheEnd: false,
+        fit: FlexFit.tight,
+        columns: columns,
+        source: vehicleDataSource,
+        sortArrowAlwaysVisible: true,
+        hidePaginator: false,
       ),
     );
   }
 
-
   Tab generateTab(int index) {
     late Tab tab;
     tab = Tab(
+      key: UniqueKey(),
       text: Text('nouvvehicule'.tr()),
       semanticLabel: 'nouvvehicule'.tr(),
       icon: const Icon(Bootstrap.car_front),
@@ -122,7 +159,9 @@ class _VehicleManagementState extends State<VehicleManagement> {
       onClosed: () {
         VehicleTabsState.tabs.remove(tab);
 
-        if (VehicleTabsState.currentIndex.value > 0) VehicleTabsState.currentIndex.value--;
+        if (VehicleTabsState.currentIndex.value > 0) {
+          VehicleTabsState.currentIndex.value--;
+        }
       },
     );
     return tab;

@@ -58,6 +58,7 @@ class VehiculesDataSource extends AsyncDataTableSource {
       locale: 'fr',
       decimalDigits: 0,
     );
+    final dateFormat=DateFormat('y/M/d hh:mm:ss','fr');
     assert(startIndex >= 0);
 
     // List returned will be empty is there're fewer items than startingAt
@@ -78,14 +79,14 @@ class VehiculesDataSource extends AsyncDataTableSource {
               }
             },
             cells: [
-              DataCell(Text(vehicle.id!)),
               DataCell(Text(vehicle.matricule)),
               DataCell(Text(vehicle.marque ?? '')),
               DataCell(Text(vehicle.type ?? '')),
               DataCell(Text(vehicle.anneeUtil.toString())),
-              DataCell(Text('${vehicle.dateCreation}')),
-              DataCell(Text('${vehicle.dateModification}')),
-              const DataCell(Icon(Icons.more_vert_sharp)),
+              DataCell(Text(
+                  dateFormat.format(ClientDatabase.ref.add(Duration(milliseconds:vehicle.dateModification!)))
+              )),
+              DataCell(IconButton(onPressed: (){}, icon: const Icon(Icons.more_vert_sharp))),
             ],
           );
         }).toList());
@@ -163,6 +164,9 @@ class VehiculesWebService {
 
   Future<VehiculesWebServiceResponse> getData(
       int startingAt, int count, int sortedBy, bool sortedAsc) async {
+    if(startingAt==0){
+      _vehicles.clear();
+    }
     return ClientDatabase.database!.listDocuments(
         databaseId: databaseId,
         collectionId: vehiculeid,

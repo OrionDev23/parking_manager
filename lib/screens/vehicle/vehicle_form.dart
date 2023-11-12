@@ -975,6 +975,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                                 int>(context,
                                                             selectedValue: marque,
                                                             gridView: true,
+                                                            numberOfGridCross: 3,
                                                             constraints: BoxConstraints.loose(Size(60.w,70.h)),
                                                             items:
                                                                 VehiclesUtilities
