@@ -71,14 +71,7 @@ class _VehicleFormState extends State<VehicleForm>
 
   final tstyle = const TextStyle(fontWeight: FontWeight.bold);
   final placeStyle = TextStyle(color: Colors.grey[100]);
-  final writingStyle = const TextStyle(color: Colors.black);
-  final inputDecoration = m.InputDecoration(
-    fillColor: Colors.grey[20],
-    labelStyle: TextStyle(color: Colors.grey[100]),
 
-    filled: true,
-    isDense: true,
-  );
 
   String wilaya = "16";
 
@@ -99,18 +92,50 @@ class _VehicleFormState extends State<VehicleForm>
   Widget build(BuildContext context) {
     super.build(context);
     var appTheme = context.watch<AppTheme>();
+
+
+    final fillColor=appTheme.mode == ThemeMode.dark
+        ? Colors.grey[150]
+        : appTheme.mode == ThemeMode.light
+        ? Colors.grey[20]
+        : ThemeMode.system == ThemeMode.light
+        ? Colors.grey[20]
+        : Colors.grey[150];
+
+
+    final TextStyle writingStyle = TextStyle(
+
+        color: appTheme.mode == ThemeMode.dark
+            ? Colors.white
+            : appTheme.mode == ThemeMode.light
+            ? Colors.black
+            : ThemeMode.system == ThemeMode.light
+            ? Colors.black
+            : Colors.white);
+
+
+    final backGroundColor=appTheme.mode == ThemeMode.dark
+        ? Colors.grey
+        : appTheme.mode == ThemeMode.light
+        ? Colors.white
+        : ThemeMode.system == ThemeMode.light
+        ? Colors.white
+        : Colors.grey;
+
+
+    final inputDecoration= m.InputDecoration(
+      fillColor: fillColor,
+      labelStyle: TextStyle(color: Colors.grey[100]),
+      filled: true,
+      isDense: true,
+    );
+
     return ScaffoldPage(
         content: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Container(
                 decoration: BoxDecoration(
-                  color: appTheme.mode == ThemeMode.dark
-                      ? Colors.grey
-                      : appTheme.mode == ThemeMode.light
-                          ? Colors.white
-                          : ThemeMode.system == ThemeMode.light
-                              ? Colors.white
-                              : Colors.grey,
+                  color: backGroundColor,
                   boxShadow: kElevationToShadow[4],
                 ),
                 width: 70.w,
@@ -157,23 +182,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                   CountryCodePicker(
                                                     boxDecoration:
                                                         BoxDecoration(
-                                                            color: appTheme
-                                                                        .mode ==
-                                                                    ThemeMode
-                                                                        .dark
-                                                                ? Colors.grey
-                                                                : appTheme.mode ==
-                                                                        ThemeMode
-                                                                            .light
-                                                                    ? Colors
-                                                                        .white
-                                                                    : ThemeMode.system ==
-                                                                            ThemeMode
-                                                                                .light
-                                                                        ? Colors
-                                                                            .white
-                                                                        : Colors
-                                                                            .grey,
+                                                            color: backGroundColor,
                                                             boxShadow:
                                                                 kElevationToShadow[
                                                                     2]),
@@ -212,7 +221,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                           appTheme.color.darker,
                                                       style: writingStyle,
                                                       decoration: BoxDecoration(
-                                                        color: Colors.grey[20],
+                                                        color: fillColor,
                                                       ),
                                                       items: AlgeriaList.dzair!
                                                           .getWilayat()!
@@ -320,8 +329,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                                 placeStyle,
                                                             decoration:
                                                                 BoxDecoration(
-                                                              color: Colors
-                                                                  .grey[20],
+                                                              color: fillColor,
                                                             ),
                                                       inputFormatters: <TextInputFormatter>[
                                                         FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z.-]")),
@@ -349,8 +357,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                                       placeStyle,
                                                                   decoration:
                                                                       BoxDecoration(
-                                                                    color: Colors
-                                                                        .grey[20],
+                                                                    color: fillColor,
                                                                   ),
                                                                   maxLength: 6,
                                                                   textAlign:
@@ -386,8 +393,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                                       placeStyle,
                                                                   decoration:
                                                                       BoxDecoration(
-                                                                    color: Colors
-                                                                        .grey[20],
+                                                                    color: fillColor,
                                                                   ),
                                                                   textAlign:
                                                                       TextAlign
@@ -425,8 +431,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                                       placeStyle,
                                                                   decoration:
                                                                       BoxDecoration(
-                                                                    color: Colors
-                                                                        .grey[20],
+                                                                    color: fillColor,
                                                                   ),
                                                                   textAlign:
                                                                       TextAlign
@@ -453,8 +458,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                         content: Text(
                                                           'autremat',
                                                           style: TextStyle(
-                                                              color: Colors
-                                                                  .grey[100]),
+                                                              color: fillColor),
                                                         ).tr(),
                                                         onChanged: (s) {
                                                           if (s != null) {
@@ -501,7 +505,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                       placeholderStyle:
                                                           placeStyle,
                                                       decoration: BoxDecoration(
-                                                        color: Colors.grey[20],
+                                                        color: fillColor,
                                                       ),
                                                       items: AlgeriaList()
                                                           .getDairas(wilayaCont.text)
@@ -555,7 +559,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                           appTheme.color.darker,
                                                       style: writingStyle,
                                                       decoration: BoxDecoration(
-                                                        color: Colors.grey[20],
+                                                        color: fillColor,
                                                       ),
                                                       items: AlgeriaList()
                                                           .getCommune(
@@ -665,7 +669,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                   style: writingStyle,
                                                   placeholderStyle: placeStyle,
                                                   decoration: BoxDecoration(
-                                                    color: Colors.grey[20],
+                                                    color: backGroundColor,
                                                   ),
                                                   inputFormatters: [
                                                     FilteringTextInputFormatter.allow(
@@ -702,7 +706,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                       appTheme.color.darker,
                                                   style: writingStyle,
                                                   decoration: BoxDecoration(
-                                                    color: Colors.grey[20],
+                                                    color: backGroundColor,
                                                   ),
                                                 ),
                                               ],
@@ -737,7 +741,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                           appTheme.color.darker,
                                                       style: writingStyle,
                                                       decoration: BoxDecoration(
-                                                        color: Colors.grey[20],
+                                                        color: backGroundColor,
                                                       ),
                                                     )),
                                               ],
@@ -775,7 +779,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                         decoration:
                                                             BoxDecoration(
                                                           color:
-                                                              Colors.grey[20],
+                                                          backGroundColor,
                                                         ),
                                                       )),
                                                 ]),
@@ -810,7 +814,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                           appTheme.color.darker,
                                                       style: writingStyle,
                                                       decoration: BoxDecoration(
-                                                        color: Colors.grey[20],
+                                                        color: backGroundColor,
                                                       ),
                                                     )),
                                               ],
@@ -846,7 +850,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                           appTheme.color.darker,
                                                       style: writingStyle,
                                                       decoration: BoxDecoration(
-                                                        color: Colors.grey[20],
+                                                        color: backGroundColor,
                                                       ),
                                                     )),
                                               ],
@@ -1049,7 +1053,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                         appTheme.color.darker,
                                                     style: writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: Colors.grey[20],
+                                                      color: backGroundColor,
                                                     ),
                                                   ),
                                                 ],
@@ -1088,7 +1092,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                         appTheme.color.darker,
                                                     style: writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: Colors.grey[20],
+                                                      color: backGroundColor,
                                                     ),
                                                   ),
                                                 ],
@@ -1126,7 +1130,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                         appTheme.color.darker,
                                                     style: writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: Colors.grey[20],
+                                                      color: backGroundColor,
                                                     ),
                                                   ),
                                                 ],
@@ -1164,7 +1168,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                         appTheme.color.darker,
                                                     style: writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: Colors.grey[20],
+                                                      color: backGroundColor,
                                                     ),
                                                   ),
                                                 ],
@@ -1202,7 +1206,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                         appTheme.color.darker,
                                                     style: writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: Colors.grey[20],
+                                                      color: backGroundColor,
                                                     ),
                                                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                                   ),
@@ -1241,7 +1245,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                         appTheme.color.darker,
                                                     style: writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: Colors.grey[20],
+                                                      color: backGroundColor,
                                                     ),
                                                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
 
@@ -1282,7 +1286,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                         appTheme.color.darker,
                                                     style: writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: Colors.grey[20],
+                                                      color: backGroundColor,
                                                     ),
                                                   ),
                                                 ],
@@ -1322,7 +1326,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                         appTheme.color.darker,
                                                     style: writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: Colors.grey[20],
+                                                      color: backGroundColor,
                                                     ),
                                                   ),
                                                 ],
@@ -1361,7 +1365,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                         appTheme.color.darker,
                                                     style: writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: Colors.grey[20],
+                                                      color: backGroundColor,
                                                     ),
                                                         inputFormatters: <TextInputFormatter>[
                                                           FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z.-]")),

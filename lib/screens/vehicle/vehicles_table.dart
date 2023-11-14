@@ -49,26 +49,13 @@ class _VehicleTableState extends State<VehicleTable> {
         },
       ),
       DataColumn2(
-        label: Text('marque',style: tstyle,).tr(),
-        size:ColumnSize.M,
+        label: Text('type',style: tstyle,).tr(),
+        size:ColumnSize.L,
         onSort: (s, c)  {
           sortColumn=1;
           assending=!assending;
 
           vehicleDataSource.sort(2, assending);
-          setState(() {
-
-          });
-        },
-      ),
-      DataColumn2(
-        label: Text('type',style: tstyle,).tr(),
-        size:ColumnSize.M,
-        onSort: (s, c)  {
-          sortColumn=2;
-          assending=!assending;
-
-          vehicleDataSource.sort(3, assending);
           setState(() {
 
           });
@@ -108,20 +95,25 @@ class _VehicleTableState extends State<VehicleTable> {
     ];
   }
 
-
+  int rowPerPage=12;
   @override
   Widget build(BuildContext context) {
     return AsyncPaginatedDataTable2(
       sortAscending: assending,
       horizontalMargin: 8,
       columnSpacing: 0,
-      dataRowHeight: 4.h,
+      dataRowHeight: 3.5.h,
       onPageChanged: (s){
 
       },
-      pageSyncApproach: PageSyncApproach.goToLast,
       sortColumnIndex: sortColumn,
-      rowsPerPage: 10,
+      rowsPerPage: rowPerPage,
+      onRowsPerPageChanged: (nbr){
+         rowPerPage=nbr??12;
+      },
+      availableRowsPerPage: const [
+        12,24,50,100,200
+      ],
       showFirstLastButtons: true,
       renderEmptyRowsInTheEnd: false,
       fit: FlexFit.tight,

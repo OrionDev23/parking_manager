@@ -85,8 +85,13 @@ class VehiculesDataSource extends AsyncDataTableSource {
             },
             cells: [
               DataCell(Text(vehicle.matricule,style: tstyle,)),
-              DataCell(Text(vehicle.marque ?? '',style: tstyle)),
-              DataCell(Text(vehicle.type ?? '',style: tstyle)),
+              DataCell(Row(
+                children: [
+                  Image.asset('assets/images/marques/${vehicle.marque ?? ''}.webp',width: 4.h,height: 4.h,),
+                  const SizedBox(width: 5,),
+                  Text(vehicle.type ?? '',style: tstyle),
+                ],
+              )),
               DataCell(Text(vehicle.anneeUtil.toString(),style: tstyle)),
               DataCell(Text(
                   dateFormat.format(ClientDatabase.ref.add(Duration(milliseconds:vehicle.dateModification!)))
@@ -125,11 +130,15 @@ class VehiculesWebService {
       //marque
       case 2:
         return (Vehicle d1, Vehicle d2) {
-          if (d1.marque == null) {
+          if (d1.marque == null && d1.type==null) {
             return -1;
-          } else if (d2.marque == null) {
+          } else if (d2.marque == null && d2.type==null) {
             return 1;
-          } else {
+          }
+          else if(d2.marque==d1.marque) {
+            return coef * d1.type!.compareTo(d2.type!);
+          }
+          else {
             return coef * d1.marque!.compareTo(d2.marque!);
           }
         };
