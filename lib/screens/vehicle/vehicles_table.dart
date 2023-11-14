@@ -65,7 +65,7 @@ class _VehicleTableState extends State<VehicleTable> {
         label: Text('year',style: tstyle,).tr(),
         size:ColumnSize.M,
         onSort: (s, c)  {
-          sortColumn=3;
+          sortColumn=2;
           assending=!assending;
 
           vehicleDataSource.sort(4, assending);
@@ -78,7 +78,7 @@ class _VehicleTableState extends State<VehicleTable> {
         label: Text('dateModif',style: tstyle,).tr(),
         size:ColumnSize.L,
         onSort: (s, c)  {
-          sortColumn=4;
+          sortColumn=3;
           assending=!assending;
 
           vehicleDataSource.sort(6, assending);

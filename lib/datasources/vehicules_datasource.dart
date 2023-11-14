@@ -59,7 +59,7 @@ class VehiculesDataSource extends AsyncDataTableSource {
       locale: 'fr',
       decimalDigits: 0,
     );
-    final dateFormat=DateFormat('y/M/d hh:mm:ss','fr');
+    final dateFormat=DateFormat('y/M/d HH:mm:ss','fr');
     final tstyle=TextStyle(
       fontSize: 10.sp,
     );
@@ -187,10 +187,7 @@ class VehiculesWebService {
         queries: [
           Query.limit(count),
           Query.offset(startingAt),
-          if(sortedAsc)
-          Query.orderAsc('\$id'),
-          if(!sortedAsc)
-            Query.orderDesc('\$id'),
+          getQuery(sortedBy,sortedAsc),
         ]).then((value) {
       for (var element in value.documents) {
 
@@ -219,6 +216,40 @@ class VehiculesWebService {
     }).onError((error, stackTrace) {
       return Future.value(VehiculesWebServiceResponse(0,_vehicles));
     });
+  }
+  
+  
+  String getQuery(int sortedBy,bool sortedAsc){
+    
+    switch (sortedBy){
+      case 1: if(sortedAsc){
+        return Query.orderAsc('matricule');
+      }
+      else{
+        return Query.orderDesc('matricule');
+      }
+      case 2: if(sortedAsc){
+        return Query.orderAsc('type');
+      }
+      else{
+        return Query.orderDesc('type');
+      }
+      case 4:
+        if(sortedAsc){
+          return Query.orderAsc('annee_util');
+        }
+        else{
+          return Query.orderDesc('annee_util');
+        }
+      case 6:
+        if(sortedAsc){
+          return Query.orderAsc('\$updatedAt');
+        }
+        else{
+          return Query.orderDesc('\$updatedAt');
+        }
+    }
+    return Query.orderAsc('\$id');
   }
 }
 
