@@ -1,27 +1,27 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
-import 'package:nb_utils/nb_utils.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-
 import '../providers/client_database.dart';
+import '../screens/vehicle/vehicle_form.dart';
+import '../screens/vehicle/vehicle_tabs.dart';
 import '../serializables/vehicle.dart';
 
 class VehiculesDataSource extends AsyncDataTableSource {
-  VehiculesDataSource() {
-    print('DessertDataSourceAsync created');
-  }
 
-  VehiculesDataSource.empty() {
+  BuildContext current;
+  VehiculesDataSource({required this.current});
+
+  VehiculesDataSource.empty({required this.current}) {
     _empty = true;
-    print('DessertDataSourceAsync.empty created');
   }
 
-  VehiculesDataSource.error() {
+  VehiculesDataSource.error({required this.current}) {
     _errorCounter = 0;
-    print('DessertDataSourceAsync.error created');
   }
 
   bool _empty = false;
@@ -45,7 +45,6 @@ class VehiculesDataSource extends AsyncDataTableSource {
 
   @override
   Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
-    print('getRows($startIndex, $count)');
     if (_errorCounter != null) {
       _errorCounter = _errorCounter! + 1;
 
@@ -55,10 +54,6 @@ class VehiculesDataSource extends AsyncDataTableSource {
       }
     }
 
-    final format = NumberFormat.decimalPercentPattern(
-      locale: 'fr',
-      decimalDigits: 0,
-    );
     final dateFormat=DateFormat('y/M/d HH:mm:ss','fr');
     final tstyle=TextStyle(
       fontSize: 10.sp,
@@ -96,7 +91,44 @@ class VehiculesDataSource extends AsyncDataTableSource {
               DataCell(Text(
                   dateFormat.format(ClientDatabase.ref.add(Duration(milliseconds:vehicle.dateModification!)))
                   ,style: tstyle)),
-              DataCell(IconButton(onPressed: (){}, icon: const Icon(Icons.more_vert_sharp))),
+              DataCell(f.FlyoutTarget(
+                controller: vehicle.controller,
+                child: IconButton(
+                    splashRadius: 15,
+                    onPressed: (){
+                      vehicle.controller.showFlyout(builder: (context){
+                        return f.MenuFlyout(
+                          items: [
+                            f.MenuFlyoutItem(
+                              text: const Text('mod').tr(),
+                              onPressed: (){
+                                Navigator.of(current).pop();
+                                late f.Tab tab;
+                                tab = f.Tab(
+                                  key: UniqueKey(),
+                                  text: Text('${"mod".tr()} ${'vehicle'.tr()} ${vehicle.matricule}'),
+                                  semanticLabel: '${'mod'.tr()} ${vehicle.matricule}',
+                                  icon: const Icon(Bootstrap.car_front),
+                                  body: VehicleForm(vehicle: vehicle,),
+                                  onClosed: () {
+                                    VehicleTabsState.tabs.remove(tab);
+
+                                    if (VehicleTabsState.currentIndex.value > 0) {
+                                      VehicleTabsState.currentIndex.value--;
+                                    }
+                                  },
+                                );
+                                final index = VehicleTabsState.tabs.length + 1;
+                                VehicleTabsState.tabs.add(tab);
+                                VehicleTabsState.currentIndex.value = index - 1;
+                              }
+                            ),
+                          ],
+                        );
+                      });
+                    },
+                    icon: const Icon(Icons.more_vert_sharp)),
+              )),
             ],
           );
         }).toList());
@@ -248,9 +280,3 @@ int _selectedCount = 0;
 
 List<Vehicle> _vehicles = List.empty(growable: true);
 
-_showSnackbar(BuildContext context, String text, [Color? color]) {
-  snackBar(context,
-      content: Text(text),
-      duration: const Duration(seconds: 1),
-      backgroundColor: color);
-}

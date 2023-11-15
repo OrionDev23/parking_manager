@@ -1,5 +1,4 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' as m;
 import '../theme.dart';
 import '../utilities/color_manip.dart';
 import 'package:provider/provider.dart';
@@ -7,13 +6,14 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import 'on_tap_scale.dart';
 
-class ButtonContainer extends StatelessWidget {
+class ButtonContainer extends StatefulWidget {
   final IconData icon;
   final int? counter;
   final String text;
   final String textList;
   final String textNouveau;
 
+  final Future<int> Function()? getCount;
 
   final bool showBottom;
   final bool showBothLN;
@@ -35,20 +35,37 @@ class ButtonContainer extends StatelessWidget {
       this.textList = "Liste",
       this.textNouveau = "Nouveau",
       this.showBothLN = true,
-        this.showBottom=true,
-      this.showCounter = true});
+      this.showBottom = true,
+      this.showCounter = true,
+      this.getCount});
+
+  @override
+  State<ButtonContainer> createState() => _ButtonContainerState();
+}
+
+class _ButtonContainerState extends State<ButtonContainer> {
+  bool loadingCount = true;
+
+  int count = 0;
+
+  @override
+  void initState() {
+    getCount();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
-    var textStyle = TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold,color: Colors.white);
+    var textStyle = TextStyle(
+        fontSize: 12.sp, fontWeight: FontWeight.bold, color: Colors.white);
     var textStyleButton = TextStyle(fontSize: 10.sp, color: Colors.white);
     return OnTapScaleAndFade(
-      onTap: action,
+      onTap: widget.action,
       child: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: color ?? appTheme.color,
+          color: widget.color ?? appTheme.color,
           borderRadius: BorderRadius.circular(5),
           boxShadow: kElevationToShadow[2],
         ),
@@ -60,11 +77,11 @@ class ButtonContainer extends StatelessWidget {
           children: [
             Container(
               height: 11.8.h,
-              color: ColorManipulation.darken(color ?? appTheme.color),
+              color: ColorManipulation.darken(widget.color ?? appTheme.color),
               child: Padding(
                 padding: const EdgeInsets.all(15),
                 child: Icon(
-                  icon,
+                  widget.icon,
                   size: 20.sp,
                   color: Colors.white,
                 ),
@@ -78,47 +95,71 @@ class ButtonContainer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  showCounter == true ? '${counter ?? 0} $text' : text,
+                  widget.showCounter == true
+                      ? loadingCount?
+                      '- ${widget.text}'
+                    :'$count ${widget.text}'
+                      : widget.text,
                   style: textStyle,
                 ),
                 const SizedBox(
                   height: 10,
                 ),
-                if(showBottom)
+                if (widget.showBottom)
                   Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    FilledButton(
-                      onPressed: actionList,
-                      child: Text(
-                        textList,
-                        style: textStyleButton,
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    if(showBothLN)
-                    Container(
-                      color: Colors.grey[100],
-                      width: 0.05.w,
-                      height: 30,
-                    ),
-                    if(showBothLN)
-                      const SizedBox(width: 5),
-                    if(showBothLN)
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                       FilledButton(
-                      onPressed: actionNouveau,
-                      child: Text(
-                        textNouveau,
-                        style: textStyleButton,
+                        onPressed: widget.actionList,
+                        child: Text(
+                          widget.textList,
+                          style: textStyleButton,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                      const SizedBox(width: 5),
+                      if (widget.showBothLN)
+                        Container(
+                          color: Colors.grey[100],
+                          width: 0.05.w,
+                          height: 30,
+                        ),
+                      if (widget.showBothLN) const SizedBox(width: 5),
+                      if (widget.showBothLN)
+                        FilledButton(
+                          onPressed: widget.actionNouveau,
+                          child: Text(
+                            widget.textNouveau,
+                            style: textStyleButton,
+                          ),
+                        ),
+                    ],
+                  ),
               ],
             ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> getCount() async {
+    if (widget.getCount == null) {
+      loadingCount = false;
+      count = 0;
+    }
+    else {
+      loadingCount = true;
+      if (mounted) {
+        setState(() {});
+      }
+
+      count = await widget.getCount!();
+
+      if(mounted) {
+        setState(() {
+        loadingCount = false;
+      });
+      }
+    }
   }
 }

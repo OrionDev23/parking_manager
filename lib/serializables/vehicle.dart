@@ -1,4 +1,5 @@
 
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/serializables/genre_vehicule.dart';
@@ -10,6 +11,9 @@ part 'vehicle.g.dart';
 class Vehicle{
   @JsonKey(includeToJson: false,includeFromJson: false)
   bool selected=false;
+
+  @JsonKey(includeFromJson: false,includeToJson: false)
+  FlyoutController controller=FlyoutController();
   @JsonKey(includeToJson: false,name: '\$id')
 
   String? id;

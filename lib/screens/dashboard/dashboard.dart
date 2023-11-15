@@ -1,10 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:icons_plus/icons_plus.dart';
+import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import '../../theme.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../widgets/button_container.dart';
 import '../../widgets/page_header.dart';
+import '../vehicle/vehicle_form.dart';
+import '../vehicle/vehicle_tabs.dart';
 import 'transaction_chart.dart';
 import 'table_stats.dart';
 
@@ -33,6 +38,36 @@ class HomePage extends StatelessWidget {
                   ButtonContainer(
                     icon: FluentIcons.car,
                     text: 'vehicules'.tr(),
+                    getCount: ClientDatabase().countVehicles,
+                    action: (){
+                      PanesListState.index.value=2;
+                    },
+                    actionList: (){
+                      PanesListState.index.value=2;
+                    },
+                    actionNouveau: () {
+                      PanesListState.index.value=2;
+                      Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
+                        late Tab tab;
+                        tab = Tab(
+                          key: UniqueKey(),
+                          text: Text('nouvvehicule'.tr()),
+                          semanticLabel: 'nouvvehicule'.tr(),
+                          icon: const Icon(Bootstrap.car_front),
+                          body: const VehicleForm(),
+                          onClosed: () {
+                            VehicleTabsState.tabs.remove(tab);
+
+                            if (VehicleTabsState.currentIndex.value > 0) {
+                              VehicleTabsState.currentIndex.value--;
+                            }
+                          },
+                        );
+                        final index = VehicleTabsState.tabs.length + 1;
+                        VehicleTabsState.tabs.add(tab);
+                        VehicleTabsState.currentIndex.value = index - 1;
+                      });
+                    },
                   ),
                   smallSpace,
                   ButtonContainer(

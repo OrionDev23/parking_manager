@@ -78,4 +78,26 @@ class ClientDatabase {
           Permission.delete(Role.user(me.value!.id)),
         ]);
   }
+
+
+
+
+  Future<int> countVehicles() async{
+    int result=0;
+
+
+      await database!.listDocuments(
+          databaseId: databaseId,
+          collectionId: vehiculeid,
+        queries: [
+          Query.limit(1),
+        ]
+      ).then((value) {
+        result=value.total;
+      });
+
+
+
+    return result;
+  }
 }

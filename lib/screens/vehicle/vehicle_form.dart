@@ -82,11 +82,52 @@ class _VehicleFormState extends State<VehicleForm>
   @override
   void initState() {
     initValues();
-    documentID ??= ClientDatabase.ref.difference(DateTime.now()).inMilliseconds.abs().toString();
-    AlgeriaList();
     super.initState();
   }
   void initValues(){
+    AlgeriaList();
+    if(widget.vehicle!=null){
+      documentID=widget.vehicle!.id;
+      if(widget.vehicle!.matriculeEtrang){
+        autreMat=true;
+        matriculeEtr.text=widget.vehicle!.matricule;
+      }
+      else{
+        autreMat=false;
+        var mats=widget.vehicle!.matricule.split('-');
+        if(mats.length>=3){
+          matr1.text=mats[0];
+          matr2.text=mats[1];
+          matr3.text=mats[2];
+        }
+
+      }
+      pays=widget.vehicle!.pays??'DZ';
+      wilayaCont.text=AlgeriaList().getWilayaByNum(widget.vehicle!.wilaya?.toString()??'16')??'';
+      wilaya=widget.vehicle!.wilaya?.toString()??'';
+      communeCont.text=widget.vehicle!.commune??'';
+      dairaCont.text=widget.vehicle!.daira??'';
+      selectedDate=ClientDatabase.ref.add(Duration(milliseconds:widget.vehicle!.date??0));
+      quittance.text=widget.vehicle!.quittance?.toString()??'';
+      numero.text=widget.vehicle!.numero??'';
+      lname.text=widget.vehicle!.nom??'';
+      fname.text=widget.vehicle!.prenom??'';
+      profession.text=widget.vehicle!.profession??'';
+      adresse.text=widget.vehicle!.adresse??'';
+      genre=int.tryParse(widget.vehicle!.genre?.id??'-1');
+      marque=int.tryParse(widget.vehicle!.marque?.id??'-1');
+      type.text=widget.vehicle!.type??'';
+      numSer.text=widget.vehicle!.numeroSerie??'';
+      caross.text=widget.vehicle!.carrosserie??'';
+      energie.text=widget.vehicle!.energie??'';
+      puissance.text=widget.vehicle!.puissance?.toString()??'';
+      places.text=widget.vehicle!.placesAssises?.toString()??'';
+      poidsT.text=widget.vehicle!.poidsTotal?.toString()??'';
+      charg.text=widget.vehicle!.charegeUtile?.toString()??'';
+      matrPrec.text=widget.vehicle!.matriculePrec??'';
+      selectedDate=DateTime(widget.vehicle!.anneeUtil??DateTime.now().year);
+    }
+    documentID ??= ClientDatabase.ref.difference(DateTime.now()).inMilliseconds.abs().toString();
 
   }
 
@@ -155,8 +196,8 @@ class _VehicleFormState extends State<VehicleForm>
                                 ),
                                 width: 60.w,
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0),
+                                  padding: const EdgeInsets.all(
+                                       5.0),
                                   child: StaggeredGrid.count(
                                       crossAxisCount:
                                           MediaQuery.of(context).orientation ==
@@ -1422,7 +1463,7 @@ class _VehicleFormState extends State<VehicleForm>
                   ],
                 ))),
         bottomBar: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [

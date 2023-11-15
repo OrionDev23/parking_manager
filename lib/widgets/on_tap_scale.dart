@@ -48,11 +48,15 @@ class OnTapScaleAndFadeState extends State<OnTapScaleAndFade>
       },
       onTapUp: (dp) {
         Timer(const Duration(milliseconds: 150), () {
-          _controllerA.fling();
+          if(mounted) {
+            _controllerA.fling();
+          }
         });
       },
       onTapCancel: () {
-        _controllerA.fling();
+        if(mounted) {
+          _controllerA.fling();
+        }
       },
       child: Transform.scale(
         scale: squareScaleA,
