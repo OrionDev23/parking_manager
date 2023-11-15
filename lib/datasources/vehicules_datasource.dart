@@ -195,16 +195,7 @@ class VehiculesWebService {
         _vehicles.add( element.convertTo<Vehicle>((p0) {
 
           return Vehicle.fromJson(p0 as Map<String,dynamic>);
-        })
-          ..id = element.$id
-          ..dateCreation = DateTime.parse(element.$createdAt)
-              .difference(ClientDatabase.ref)
-              .inMilliseconds
-              .abs()
-          ..dateModification = DateTime.parse(element.$updatedAt)
-              .difference(ClientDatabase.ref)
-              .inMilliseconds
-              .abs());
+        }));
       }
 
 
