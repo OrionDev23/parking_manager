@@ -106,7 +106,7 @@ class VehiculesDataSource extends AsyncDataTableSource {
                                 late f.Tab tab;
                                 tab = f.Tab(
                                   key: UniqueKey(),
-                                  text: Text('${"mod".tr()} ${'vehicle'.tr()} ${vehicle.matricule}'),
+                                  text: Text('${"mod".tr()} ${'vehicule'.tr().toLowerCase()} ${vehicle.matricule}'),
                                   semanticLabel: '${'mod'.tr()} ${vehicle.matricule}',
                                   icon: const Icon(Bootstrap.car_front),
                                   body: VehicleForm(vehicle: vehicle,),
