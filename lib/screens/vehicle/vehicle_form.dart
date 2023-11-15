@@ -9,11 +9,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/vehicle/vehicle_tabs.dart';
+import 'package:parc_oto/serializables/genre_vehicule.dart';
 import 'package:parc_oto/serializables/vehicle.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../serializables/marque.dart';
 import '../../theme.dart';
 import '../../utilities/algeria_lists.dart';
 import '../../widgets/select_dialog/select_dialog.dart';
@@ -58,11 +60,11 @@ class _VehicleFormState extends State<VehicleForm>
   TextEditingController matrPrec = TextEditingController();
   DateTime? selectedAnnee = DateTime(2023);
   bool autreMat = false;
-  int? marque=1;
+  int? marque;
 
   bool erreurMatricule=false;
 
-  int? genre=1;
+  int? genre;
 
   String pays = 'DZ';
 
@@ -888,7 +890,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                   Flexible(
                                                     child: ListTile(
                                                       title: AutoSizeText(
-                                                        (VehiclesUtilities.genres![genre??1]??'').tr(),
+                                                        (VehiclesUtilities.genres![genre??-1]??'nonind').tr(),
                                                         minFontSize: 5,
                                                         softWrap: true,
                                                         maxLines:1,
@@ -971,11 +973,11 @@ class _VehicleFormState extends State<VehicleForm>
                                                   ).tr(),
                                                   Flexible(
                                                     child: ListTile(
-                                                      leading: Image.asset('assets/images/marques/$marque.webp',width: 4.h,height: 4.h,),
-                                                      title: AutoSizeText(VehiclesUtilities.marques![marque??1]??'',minFontSize: 5,maxLines: 1,),
+                                                      leading: Image.asset('assets/images/marques/${marque??'default'}.webp',width: 4.h,height: 4.h,),
+                                                      title: AutoSizeText(VehiclesUtilities.marques![marque??0]??'nonind'.tr(),minFontSize: 5,maxLines: 1,),
                                                       onPressed: () {
                                                         SelectDialog.showModal<
-                                                                int>(context,
+                                                                int?>(context,
                                                             selectedValue: marque,
                                                             gridView: true,
                                                             numberOfGridCross: 3,
@@ -987,7 +989,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                                 (c, v, e) {
                                                           return Card(
                                                               child: Image.asset(
-                                                                  'assets/images/marques/$v.webp'));
+                                                                  'assets/images/marques/${v??'default'}.webp'));
                                                         },
                                                           onChange: (s){
                                                                   setState(() {
@@ -1518,7 +1520,7 @@ class _VehicleFormState extends State<VehicleForm>
           matricule: autreMat
               ?matriculeEtr.text
               :'${matr1.text}-${matr2.text}-${matr3.text}',
-          martriculeEtrang: autreMat,
+          matriculeEtrang: autreMat,
           wilaya: int.tryParse(wilaya),
           commune: communeCont.text,
           date: selectedDate.difference(ClientDatabase.ref).inMilliseconds.abs(),
@@ -1529,7 +1531,7 @@ class _VehicleFormState extends State<VehicleForm>
           anneeUtil: selectedAnnee?.year,
           energie: energie.text,
           pays: pays,
-          placeAssises: int.tryParse(places.text),
+          placesAssises: int.tryParse(places.text),
           poidsTotal: int.tryParse(poidsT.text),
           prenom: fname.text,
           nom: lname.text,
@@ -1537,12 +1539,12 @@ class _VehicleFormState extends State<VehicleForm>
           profession: profession.text,
           puissance: int.tryParse(puissance.text),
           daira: dairaCont.text,
-          genre: genre.toString(),
-          marque: marque.toString(),
+          genre: GenreVehicle(id:genre.toString()),
+          marque: Marque(id:marque.toString()),
           matriculePrec: matrPrec.text,
-          carosserie: caross.text,
-          chargeUtile: int.tryParse(charg.text),
-          userCreation: ClientDatabase.me.value?.id,
+          carrosserie: caross.text,
+          charegeUtile: int.tryParse(charg.text),
+          createdBy: ClientDatabase.me.value,
 
       );
       

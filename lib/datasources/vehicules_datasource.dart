@@ -87,7 +87,7 @@ class VehiculesDataSource extends AsyncDataTableSource {
               DataCell(Text(vehicle.matricule,style: tstyle,)),
               DataCell(Row(
                 children: [
-                  Image.asset('assets/images/marques/${vehicle.marque ?? ''}.webp',width: 4.h,height: 4.h,),
+                  Image.asset('assets/images/marques/${vehicle.marque?.id ?? 'default'}.webp',width: 4.h,height: 4.h,),
                   const SizedBox(width: 5,),
                   Text(vehicle.type ?? '',style: tstyle),
                 ],
@@ -139,7 +139,7 @@ class VehiculesWebService {
             return coef * d1.type!.compareTo(d2.type!);
           }
           else {
-            return coef * d1.marque!.compareTo(d2.marque!);
+            return coef * d1.marque!.id.compareTo(d2.marque!.id);
           }
         };
       //type

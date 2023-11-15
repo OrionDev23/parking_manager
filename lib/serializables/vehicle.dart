@@ -1,19 +1,31 @@
 
 import 'package:json_annotation/json_annotation.dart';
+import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/serializables/genre_vehicule.dart';
+import 'package:parc_oto/serializables/marque.dart';
+import 'package:parc_oto/serializables/parc_user.dart';
 
 part 'vehicle.g.dart';
 @JsonSerializable()
 class Vehicle{
-
+  @JsonKey(includeToJson: false,includeFromJson: false)
   bool selected=false;
+  @JsonKey(includeToJson: false,name: '\$id')
+
   String? id;
   String matricule;
-  bool martriculeEtrang;
+  @JsonKey(name: 'martricule_etrang')
+
+  bool matriculeEtrang;
   int? wilaya;
   String? commune;
   String? daira;
   String? adresse;
+  @JsonKey(includeToJson: false,name: '\$createdAt')
+
   int? dateCreation;
+  @JsonKey(includeToJson: false,name: '\$updatedAt')
+
   int? dateModification;
   int? date;
   double? quittance;
@@ -22,30 +34,44 @@ class Vehicle{
   String? prenom;
   String? profession;
 
+  @JsonKey(name: 'numero_serie')
+
   String? numeroSerie;
   String? type;
-  String? marque;
-  String? genre;
-  int? chargeUtile;
+  Marque? marque;
+  GenreVehicle? genre;
+  @JsonKey(name: 'charge_utile')
+
+  int? charegeUtile;
+  @JsonKey(name: 'poids_total')
+
   int? poidsTotal;
-  int? placeAssises;
+  @JsonKey(name: 'place_assises')
+
+  int? placesAssises;
   int? puissance;
   String? energie;
-  String? carosserie;
+  String? carrosserie;
+  @JsonKey(name: 'annee_util')
+
   int? anneeUtil;
+  @JsonKey(name: 'matricule_prec')
+
   String? matriculePrec;
-  String? userCreation;
+  @JsonKey(name: 'user_creation')
+
+  ParcUser? createdBy;
   String? pays;
 
-  Vehicle({required this.matricule,required this.martriculeEtrang,this.wilaya,
+  Vehicle({required this.matricule,required this.matriculeEtrang,this.wilaya,
     this.commune,this.date,
     this.adresse,this.quittance,this.numero,
     this.nom,this.prenom,this.profession,
     this.numeroSerie,this.type,this.anneeUtil,
-    this.carosserie,this.chargeUtile,this.daira,
+    this.carrosserie,this.charegeUtile,this.daira,
     this.energie,this.genre,this.marque,
-    this.matriculePrec, this.pays,this.placeAssises,
-    this.poidsTotal, this.puissance, this.userCreation,
+    this.matriculePrec, this.pays,this.placesAssises,
+    this.poidsTotal, this.puissance, this.createdBy,
   });
 
 

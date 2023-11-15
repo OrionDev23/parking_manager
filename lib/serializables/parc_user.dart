@@ -1,42 +1,26 @@
-class ParcUser{
+
+import 'package:json_annotation/json_annotation.dart';
+
+part 'parc_user.g.dart';
+
+@JsonSerializable()
+class ParcUser {
   final String? name;
   final String email;
   final int? datec;
   final int? datea;
   final int? datel;
   final String? tel;
+  @JsonKey(includeToJson: false,name: '\$id')
+
   final String id;
 
   final String? avatar;
 
   ParcUser({this.avatar, this.name, required this.email, this.datec, this.datea, this.datel, this.tel, required this.id});
 
-Map<String,dynamic> toJson(){
-  return {
-    'name':name,
-    'email':email,
-    'datec':datec,
-    'datel':datel,
-    'datea':datea,
-    'tel':tel,
-    'id':id,
-    'avatar':avatar,
-  };
-}
 
+  factory ParcUser.fromJson(Map<String, dynamic> json) => _$ParcUserFromJson(json);
+  Map<String, dynamic> toJson() => _$ParcUserToJson(this);
 
-factory ParcUser.fromJson(Map<String,dynamic> json){
-
-  return ParcUser(
-    email: json['email'],
-    avatar: json['avatar'],
-    name: json['name'],
-    datea: json['datea'],
-    datec: json['datec'],
-    datel: json['datel'],
-    tel:json['tel'],
-    id: json['id'],
-
-  );
-}
 }
