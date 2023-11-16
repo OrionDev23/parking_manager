@@ -123,6 +123,12 @@ class VehiculesDataSource extends AsyncDataTableSource {
                                 VehicleTabsState.currentIndex.value = index - 1;
                               }
                             ),
+                            f.MenuFlyoutItem(
+                              text: const Text('delete').tr(),
+                              onPressed: (){
+                                showDeleteConfirmation(vehicle);
+                              }
+                            ),
                           ],
                         );
                       });
@@ -135,6 +141,50 @@ class VehiculesDataSource extends AsyncDataTableSource {
 
     return r;
   }
+
+  void showDeleteConfirmation(Vehicle v){
+
+    f.showDialog(
+        context: current,
+        builder: (context){
+          return f.ContentDialog(
+            content: Text('${'supvehic'.tr()} ${v.matricule}'),
+            actions: [
+              f.FilledButton(onPressed: (){
+                Navigator.of(context).pop();
+              }, child: const Text('annuler').tr()),
+              f.Button(onPressed: (){
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+                deleteVehicle(v);
+
+              },child: const Text('confirmer').tr(),)
+            ],
+          );
+        }
+        );
+  }
+
+
+  void deleteVehicle(Vehicle v) async{
+    await ClientDatabase.database!.deleteDocument(
+        databaseId: databaseId,
+        collectionId: vehiculeid,
+        documentId: v.id!).then((value) {
+      _vehicles.remove(v);
+      notifyListeners();
+    }).onError((error, stackTrace) {
+
+      f.showSnackbar(current,f.InfoBar(
+         title: const Text('erreur').tr(),
+          severity: f.InfoBarSeverity.error
+      ),
+        alignment: Alignment.lerp(Alignment.topCenter, Alignment.center, 0.6)!,
+      );
+    });
+
+  }
+
 }
 
 class VehiculesWebServiceResponse {

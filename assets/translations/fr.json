@@ -22,9 +22,12 @@
  "anneeutil": "Année de premiere utilisation",
  "precmat": "Matricule précédant",
  "erreurmat": "Matricule invalide",
+"supvehic": "Supprimer le véhicule",
+
 
  "oui": "Oui",
  "non": "Non",
+ "le": "Le",
  "vp": "Véhicule particulier",
  "presid": "Présidence",
  "camion": "Camion",

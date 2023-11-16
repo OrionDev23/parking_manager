@@ -23,6 +23,8 @@
   "precmat": "Previous Registration Number",
   "erreurmat": "Invalid number",
   "vstates": "Vehicle states",
+  "le": "The",
+  "supvehic": "Delete the vehicle",
 
   "vp": "Particular vehicle",
   "presid": "Presidency",

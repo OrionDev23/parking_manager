@@ -37,7 +37,10 @@ class _VehicleTableState extends State<VehicleTable> {
   void initColumns() {
     columns = [
       DataColumn2(
-        label:  Text('nummat',style: tstyle,).tr(),
+        label:  Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text('nummat',style: tstyle,).tr(),
+        ),
         size:ColumnSize.L,
         onSort: (s, c) {
           sortColumn=0;
@@ -50,7 +53,10 @@ class _VehicleTableState extends State<VehicleTable> {
         },
       ),
       DataColumn2(
-        label: Text('type',style: tstyle,).tr(),
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text('type',style: tstyle,).tr(),
+        ),
         size:ColumnSize.L,
         onSort: (s, c)  {
           sortColumn=1;
@@ -63,7 +69,10 @@ class _VehicleTableState extends State<VehicleTable> {
         },
       ),
       DataColumn2(
-        label: Text('year',style: tstyle,).tr(),
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text('year',style: tstyle,).tr(),
+        ),
         size:ColumnSize.M,
         onSort: (s, c)  {
           sortColumn=2;
@@ -76,7 +85,10 @@ class _VehicleTableState extends State<VehicleTable> {
         },
       ),
       DataColumn2(
-        label: Text('dateModif',style: tstyle,).tr(),
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text('dateModif',style: tstyle,).tr(),
+        ),
         size:ColumnSize.L,
         onSort: (s, c)  {
           sortColumn=3;
@@ -87,9 +99,10 @@ class _VehicleTableState extends State<VehicleTable> {
           });
         },
       ),
-      const DataColumn2(
-        label: Text(''),
+      DataColumn2(
+        label: const Text(''),
         size:ColumnSize.S,
+        fixedWidth: 2.w,
         onSort: null,
       ),
     ];
@@ -103,6 +116,7 @@ class _VehicleTableState extends State<VehicleTable> {
       horizontalMargin: 8,
       columnSpacing: 0,
       dataRowHeight: 3.5.h,
+
       onPageChanged: (s){
 
       },

@@ -1598,6 +1598,7 @@ class _VehicleFormState extends State<VehicleForm>
           Permission.read(Role.users()),
           Permission.update(Role.user(ClientDatabase.me.value!.id)),
           Permission.write(Role.user(ClientDatabase.me.value!.id)),
+          Permission.delete(Role.team('managers')),
         ]
       
       ).then((value) {
