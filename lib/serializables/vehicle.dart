@@ -5,6 +5,7 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/serializables/genre_vehicule.dart';
 import 'package:parc_oto/serializables/marque.dart';
 import 'package:parc_oto/serializables/parc_user.dart';
+import 'package:parc_oto/serializables/state.dart';
 
 part 'vehicle.g.dart';
 @JsonSerializable()
@@ -67,6 +68,9 @@ class Vehicle{
   ParcUser? createdBy;
   String? pays;
 
+
+  Etat? etat;
+
   Vehicle({required this.matricule,required this.matriculeEtrang,this.wilaya,
     this.commune,this.date,
     this.adresse,this.quittance,this.numero,
@@ -75,7 +79,7 @@ class Vehicle{
     this.carrosserie,this.charegeUtile,this.daira,
     this.energie,this.genre,this.marque,
     this.matriculePrec, this.pays,this.placesAssises,
-    this.poidsTotal, this.puissance, this.createdBy,
+    this.poidsTotal, this.puissance, this.createdBy,this.etat
   });
 
 
@@ -88,6 +92,7 @@ class Vehicle{
 
 /*
 * // GENERATED CODE - DO NOT MODIFY BY HAND
+// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'vehicle.dart';
 
@@ -97,7 +102,7 @@ part of 'vehicle.dart';
 
 Vehicle _$VehicleFromJson(Map<String, dynamic> json) => Vehicle(
       matricule: json['matricule'] as String,
-      martriculeEtrang: json['martricule_etrang'] as bool,
+      matriculeEtrang: json['martricule_etrang'] as bool,
       wilaya: json['wilaya'] as int?,
       commune: json['commune'] as String?,
       date: json['date'] as int?,
@@ -110,23 +115,33 @@ Vehicle _$VehicleFromJson(Map<String, dynamic> json) => Vehicle(
       numeroSerie: json['numero_serie'] as String?,
       type: json['type'] as String?,
       anneeUtil: json['annee_util'] as int?,
-      carosserie: json['carrosserie'] as String?,
-      chargeUtile: json['charge_utile'] as int?,
+      carrosserie: json['carrosserie'] as String?,
+      charegeUtile: json['charge_utile'] as int?,
       daira: json['daira'] as String?,
       energie: json['energie'] as String?,
-      genre: json['genre']["\$id"] as String?,
-      marque: json['marque']["\$id"] as String?,
+      genre: json['genre'] == null
+          ? null
+          : GenreVehicle.fromJson(json['genre'] as Map<String, dynamic>),
+      marque: json['marque'] == null
+          ? null
+          : Marque.fromJson(json['marque'] as Map<String, dynamic>),
       matriculePrec: json['matricule_prec'] as String?,
       pays: json['pays'] as String?,
-      placeAssises: json['place_assises'] as int?,
+      placesAssises: json['place_assises'] as int?,
       poidsTotal: json['poids_total'] as int?,
       puissance: json['puissance'] as int?,
-      userCreation: json['user_creation']["\$id"] as String?,
-    );
+      createdBy: json['user_creation'] == null
+          ? null
+          : ParcUser.fromJson(json['user_creation'] as Map<String, dynamic>),
+    )
+      ..id = json[r'$id'] as String?
+      ..dateCreation = DateTime.tryParse(json[r'$createdAt'])?.difference(ClientDatabase.ref).inMilliseconds.abs()
+      ..dateModification = DateTime.tryParse(json[r'$updatedAt'])?.difference(ClientDatabase.ref).inMilliseconds.abs();
+
 
 Map<String, dynamic> _$VehicleToJson(Vehicle instance) => <String, dynamic>{
       'matricule': instance.matricule,
-      'martricule_etrang': instance.martriculeEtrang,
+      'martricule_etrang': instance.matriculeEtrang,
       'wilaya': instance.wilaya,
       'commune': instance.commune,
       'daira': instance.daira,
@@ -139,18 +154,18 @@ Map<String, dynamic> _$VehicleToJson(Vehicle instance) => <String, dynamic>{
       'profession': instance.profession,
       'numero_serie': instance.numeroSerie,
       'type': instance.type,
-      'marque': instance.marque,
-      'genre': instance.genre,
-      'charge_utile': instance.chargeUtile,
+      'marque': instance.marque?.id,
+      'genre': instance.genre?.id,
+      'charge_utile': instance.charegeUtile,
       'poids_total': instance.poidsTotal,
-      'place_assises': instance.placeAssises,
+      'place_assises': instance.placesAssises,
       'puissance': instance.puissance,
       'energie': instance.energie,
-      'carrosserie': instance.carosserie,
+      'carrosserie': instance.carrosserie,
       'annee_util': instance.anneeUtil,
       'matricule_prec': instance.matriculePrec,
-      'user_creation': instance.userCreation,
+      'user_creation': instance.createdBy?.id,
       'pays': instance.pays,
     };
 
-    };*/
+*/

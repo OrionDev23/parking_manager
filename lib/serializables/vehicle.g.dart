@@ -39,6 +39,9 @@ Vehicle _$VehicleFromJson(Map<String, dynamic> json) => Vehicle(
       createdBy: json['user_creation'] == null
           ? null
           : ParcUser.fromJson(json['user_creation'] as Map<String, dynamic>),
+      etat: json['etat'] == null
+          ? null
+          : Etat.fromJson(json['etat'] as Map<String, dynamic>),
     )
       ..id = json[r'$id'] as String?
       ..dateCreation = DateTime.tryParse(json[r'$createdAt'])?.difference(ClientDatabase.ref).inMilliseconds.abs()
@@ -72,4 +75,5 @@ Map<String, dynamic> _$VehicleToJson(Vehicle instance) => <String, dynamic>{
       'matricule_prec': instance.matriculePrec,
       'user_creation': instance.createdBy?.id,
       'pays': instance.pays,
+      'etat': instance.etat?.id,
     };

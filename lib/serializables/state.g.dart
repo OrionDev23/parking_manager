@@ -15,6 +15,9 @@ Etat _$EtatFromJson(Map<String, dynamic> json) => Etat(
       createdBy: json['createdBy'] == null
           ? null
           : ParcUser.fromJson(json['createdBy'] as Map<String, dynamic>),
+      vehicle: json['vehicle'] == null
+          ? null
+          : Vehicle.fromJson(json['vehicle'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$EtatToJson(Etat instance) => <String, dynamic>{
@@ -23,4 +26,5 @@ Map<String, dynamic> _$EtatToJson(Etat instance) => <String, dynamic>{
       'remarque': instance.remarque,
       'date': instance.date,
       'createdBy': instance.createdBy?.id,
+      'vehicle': instance.vehicle?.id,
     };

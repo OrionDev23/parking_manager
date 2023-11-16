@@ -269,6 +269,11 @@ class PanesListState extends State<PanesList> with WindowListener {
             title: const Text('brands').tr(),
             body: const Placeholder(),
           ),
+          PaneItem(
+            icon: const Icon(FluentIcons.health),
+            title: const Text('vstates').tr(),
+            body: const Placeholder(),
+          ),
         ],
         body: const Text(''));
     chauffeurs = PaneItem(

@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:parc_oto/serializables/parc_user.dart';
+import 'package:parc_oto/serializables/vehicle.dart';
 part 'state.g.dart';
 
 @JsonSerializable()
@@ -14,7 +15,9 @@ class Etat {
   int? date;
   ParcUser? createdBy;
 
-  Etat({required this.id,required this.type,this.valeur,this.remarque,this.date,this.createdBy});
+  Vehicle? vehicle;
+
+  Etat({required this.id,required this.type,this.valeur,this.remarque,this.date,this.createdBy,this.vehicle});
   factory Etat.fromJson(Map<String, dynamic> json) => _$EtatFromJson(json);
 
   Map<String, dynamic> toJson() => _$EtatToJson(this);
