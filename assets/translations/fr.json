@@ -191,6 +191,11 @@
  "codeParent": "Catégorie mère",
  "dateModif": "Date Dern. modificaiton",
  "vstates": "Etats des véhicules",
+ "chstates": "M-A-J l'état",
+ "gstate": "Bon",
+ "bstate": "En panne",
+ "rstate": "En réparation",
+
  "pic": "Image",
  "generer": "Générer",
  "retry": "Réessayer",

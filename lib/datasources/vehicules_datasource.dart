@@ -129,6 +129,32 @@ class VehiculesDataSource extends AsyncDataTableSource {
                                 showDeleteConfirmation(vehicle);
                               }
                             ),
+                            const f.MenuFlyoutSeparator(),
+                            f.MenuFlyoutSubItem(
+                              text: const Text('chstates').tr(),
+                              items: (BuildContext context) {
+                                return [
+                                  f.MenuFlyoutItem(
+                                      text: const Text('gstate').tr(),
+                                      onPressed: (){
+
+                                      }
+                                  ),
+                                  f.MenuFlyoutItem(
+                                      text: const Text('bstate').tr(),
+                                      onPressed: (){
+
+                                      }
+                                  ),
+                                  f.MenuFlyoutItem(
+                                      text: const Text('rstate').tr(),
+                                      onPressed: (){
+
+                                      }
+                                  ),
+                                ];
+                              },
+                            ),
                           ],
                         );
                       });

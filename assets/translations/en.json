@@ -23,6 +23,11 @@
   "precmat": "Previous Registration Number",
   "erreurmat": "Invalid number",
   "vstates": "Vehicle states",
+  "chstates": "Update state",
+  "gstate": "Good",
+  "bstate": "Broken down",
+  "rstate": "Under repair",
+
   "le": "The",
   "supvehic": "Delete the vehicle",
 
