@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/login.dart';
 import 'package:parc_oto/screens/logout.dart';
 import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
-import 'package:parc_oto/screens/vehicle/vehicle_tabs.dart';
+import 'package:parc_oto/screens/vehicle/documents/document_tabs.dart';
+import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../dashboard/dashboard.dart';
 import '../dashboard/notif_list.dart';
@@ -33,14 +35,14 @@ class PanesList extends StatefulWidget {
 }
 
 class PanesListState extends State<PanesList> with WindowListener {
-  static  ValueNotifier<int> _index = ValueNotifier(0);
+  static ValueNotifier<int> _index = ValueNotifier(0);
   static ValueNotifier<int> get index => _index;
 
   static int previousValue = 0;
 
   static set index(ValueNotifier<int> v) {
     previousValue = _index.value;
-    _index.value = v.value;
+    _index=v;
   }
 
   final viewKey = GlobalKey(debugLabel: 'Navigation View Key');
@@ -58,6 +60,8 @@ class PanesListState extends State<PanesList> with WindowListener {
   late PaneItem chauffeurs;
 
   late PaneItem evenements;
+
+  late PaneItem reparations;
   void listenToSigningChanges() {}
 
   static List<NavigationPaneItem> originalItems = List.empty(growable: true);
@@ -66,9 +70,10 @@ class PanesListState extends State<PanesList> with WindowListener {
   bool loading = false;
   @override
   void initState() {
-    if(!kIsWeb && (Platform.isMacOS || Platform.isLinux || Platform.isWindows)) {
+    if (!kIsWeb &&
+        (Platform.isMacOS || Platform.isLinux || Platform.isWindows)) {
       windowManager.setPreventClose(true);
-    windowManager.addListener(this);
+      windowManager.addListener(this);
     }
     adjustSize();
 
@@ -91,25 +96,20 @@ class PanesListState extends State<PanesList> with WindowListener {
     }
   }
 
-  double pwidth=20.w;
+  double pwidth = 20.w;
 
-  void adjustSize(){
-    if(kIsWeb){
-
-    }
-    else{
-      if(Platform.isAndroid || Platform.isIOS){
-        pwidth=60.w;
-      }
-      else{
-        pwidth=20.w;
+  void adjustSize() {
+    if (kIsWeb) {
+    } else {
+      if (Platform.isAndroid || Platform.isIOS) {
+        pwidth = 60.w;
+      } else {
+        pwidth = 20.w;
       }
     }
   }
 
-
-
-  FlyoutController flyoutController=FlyoutController();
+  FlyoutController flyoutController = FlyoutController();
   @override
   Widget build(BuildContext context) {
     final appTheme = context.watch<AppTheme>();
@@ -144,48 +144,52 @@ class PanesListState extends State<PanesList> with WindowListener {
                                   FlyoutTarget(
                                     controller: flyoutController,
                                     child: Button(
-                                      style: ButtonStyle(
-                                        shape: ButtonState.all<OutlinedBorder>(
-                                            const RoundedRectangleBorder()),
-                                        padding: ButtonState.all<EdgeInsets>(
-                                            const EdgeInsets.all(15)),
-                                      ),
-                                      child:  Row(
-                                        children: [
-                                          const Icon(FluentIcons.ringer),
-
-                                          const  SizedBox(
-                                            width: 10,
-                                          ),
-
-                                          const  Text('Alertes'),
-                                          const SizedBox(width: 5,),
-
-                                          m.Badge(
-                                            backgroundColor: appTheme.color.darkest,
-                                            alignment: Alignment.topLeft,
-                                            label:const Text('10'),),
-                                        ],
-                                      ),
-                                      onPressed: () {
-                                        flyoutController.showFlyout(
-                                            autoModeConfiguration: FlyoutAutoConfiguration(preferredMode: FlyoutPlacementMode.bottomLeft),
-                                            builder: (context){
-                                              return FlyoutContent(
-                                                child:
-                                                SizedBox(
-                                                  height: 30.h,
-                                                  width: 30.w,
-                                                  child:const NotifList(),
-                                                ),
-
-                                              );
-                                        });
-                                      }),),
-
+                                        style: ButtonStyle(
+                                          shape: ButtonState.all<
+                                                  OutlinedBorder>(
+                                              const RoundedRectangleBorder()),
+                                          padding: ButtonState.all<EdgeInsets>(
+                                              const EdgeInsets.all(15)),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            const Icon(FluentIcons.ringer),
+                                            const SizedBox(
+                                              width: 10,
+                                            ),
+                                            const Text('Alertes'),
+                                            const SizedBox(
+                                              width: 5,
+                                            ),
+                                            m.Badge(
+                                              backgroundColor:
+                                                  appTheme.color.darkest,
+                                              alignment: Alignment.topLeft,
+                                              label: const Text('10'),
+                                            ),
+                                          ],
+                                        ),
+                                        onPressed: () {
+                                          flyoutController.showFlyout(
+                                              autoModeConfiguration:
+                                                  FlyoutAutoConfiguration(
+                                                      preferredMode:
+                                                          FlyoutPlacementMode
+                                                              .bottomLeft),
+                                              builder: (context) {
+                                                return FlyoutContent(
+                                                  child: SizedBox(
+                                                    height: 30.h,
+                                                    width: 30.w,
+                                                    child: const NotifList(),
+                                                  ),
+                                                );
+                                              });
+                                        }),
+                                  ),
                                 if (!loading && signedIn.value)
                                   const SizedBox(width: 10),
-                                  if (!loading && signedIn.value)
+                                if (!loading && signedIn.value)
                                   const ProfilNameTopBar(),
                                 const SizedBox(
                                   width: 150,
@@ -250,7 +254,6 @@ class PanesListState extends State<PanesList> with WindowListener {
     });
   }
 
-
   void updateOriginalItems() {
     acceuil = PaneItem(
         icon: const Icon(FluentIcons.home),
@@ -261,7 +264,7 @@ class PanesListState extends State<PanesList> with WindowListener {
         title: const Text('vehicules').tr(),
         items: [
           PaneItem(
-              icon: const Icon(FluentIcons.edit),
+              icon: const Icon(FluentIcons.list),
               title: const Text('gestionvehicles').tr(),
               body: const VehicleTabs()),
           PaneItem(
@@ -274,12 +277,50 @@ class PanesListState extends State<PanesList> with WindowListener {
             title: const Text('vstates').tr(),
             body: const Placeholder(),
           ),
+          PaneItem(
+            icon: const Icon(FluentIcons.document_set),
+            title: const Text('documents').tr(),
+            body: const DocumentTabs(),
+          ),
         ],
         body: const Text(''));
-    chauffeurs = PaneItem(
+    reparations = PaneItemExpander(
+        icon: const Icon(FluentIcons.repair),
+        title: const Text('reparations').tr(),
+        items: [
+          PaneItem(
+            icon: const Icon(FluentIcons.list),
+            title: const Text('greparations').tr(),
+            body: const Placeholder(),
+          ),
+          PaneItem(
+            icon: const Icon(FluentIcons.service_activity),
+            title: const Text('prestataires').tr(),
+            body: const Placeholder(),
+          ),
+        ],
+        body: const SizedBox());
+    chauffeurs = PaneItemExpander(
         icon: const Icon(FluentIcons.people),
         title: const Text("chauffeurs").tr(),
-        body: const Placeholder());
+        body: const Placeholder(),
+        items: [
+          PaneItem(
+            icon: const Icon(FluentIcons.list),
+            body: const Placeholder(),
+            title: const Text('gchauffeurs').tr(),
+          ),
+          PaneItem(
+            icon: const Icon(FluentIcons.document_set),
+            title: const Text('documents').tr(),
+            body: const Placeholder(),
+          ),
+          PaneItem(
+            icon: const Icon(LineAwesome.check_double_solid),
+            title: const Text('disponibilite').tr(),
+            body: const Placeholder(),
+          ),
+        ]);
     evenements = PaneItemExpander(
         items: [
           PaneItem(
@@ -316,8 +357,9 @@ class PanesListState extends State<PanesList> with WindowListener {
       originalItems = [
         acceuil,
         vehicles,
-        evenements,
+        reparations,
         chauffeurs,
+        evenements,
       ];
     } else {
       originalItems = [
@@ -331,8 +373,6 @@ class PanesListState extends State<PanesList> with WindowListener {
       parametres,
     ];
   }
-
-
 }
 
 class WindowButtons extends StatelessWidget {
@@ -345,14 +385,13 @@ class WindowButtons extends StatelessWidget {
     return SizedBox(
       width: 138,
       height: 50,
-      child:
-        (!kIsWeb && (Platform.isMacOS || Platform.isLinux || Platform.isWindows))
-    ?
-      WindowCaption(
-        brightness: theme.brightness,
-        backgroundColor: Colors.transparent,
-      )
-          :const SizedBox(),
+      child: (!kIsWeb &&
+              (Platform.isMacOS || Platform.isLinux || Platform.isWindows))
+          ? WindowCaption(
+              brightness: theme.brightness,
+              backgroundColor: Colors.transparent,
+            )
+          : const SizedBox(),
     );
   }
 }

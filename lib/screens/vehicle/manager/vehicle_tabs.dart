@@ -1,8 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:parc_oto/screens/vehicle/vehicle_form.dart';
-import 'package:parc_oto/screens/vehicle/vehicle_management.dart';
+import 'package:parc_oto/screens/vehicle/manager/vehicle_form.dart';
+import 'package:parc_oto/screens/vehicle/manager/vehicle_management.dart';
 
 class VehicleTabs extends StatefulWidget {
   const VehicleTabs({super.key});

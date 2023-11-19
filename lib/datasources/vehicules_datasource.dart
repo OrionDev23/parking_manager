@@ -6,8 +6,8 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/datasources/vehicle_webservice.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../providers/client_database.dart';
-import '../screens/vehicle/vehicle_form.dart';
-import '../screens/vehicle/vehicle_tabs.dart';
+import '../screens/vehicle/manager/vehicle_form.dart';
+import '../screens/vehicle/manager/vehicle_tabs.dart';
 import '../serializables/vehicle.dart';
 
 class VehiculesDataSource extends AsyncDataTableSource {

@@ -2,15 +2,15 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:parc_oto/screens/vehicle/vehicle_form.dart';
-import 'package:parc_oto/screens/vehicle/vehicle_tabs.dart';
+import 'package:parc_oto/screens/vehicle/manager/vehicle_form.dart';
+import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
 import 'package:parc_oto/screens/vehicle/vehicles_table.dart';
 import 'package:parc_oto/widgets/button_container.dart';
 import 'package:parc_oto/widgets/page_header.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-import '../../theme.dart';
+import '../../../theme.dart';
 
 class VehicleManagement extends StatefulWidget {
   const VehicleManagement({super.key});
@@ -52,24 +52,6 @@ class _VehicleManagementState extends State<VehicleManagement> {
       ),
       content: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5.0,horizontal: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(icon: const Icon(FluentIcons.filter), onPressed: (){}),
-                const SizedBox(width: 10,),
-
-                SizedBox(
-                  width: 30.w,
-                  height: 7.h,
-                  child: TextBox(
-                    placeholder: 'search'.tr(),
-                  ),
-                ),
-              ],
-            ),
-          ),
           Flexible(
             child: Row(
               children: [

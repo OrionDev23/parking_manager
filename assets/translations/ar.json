@@ -28,6 +28,10 @@
   "gstate": "جيدة",
   "bstate": "معطلة",
   "rstate": "تحت الاصلاح",
+  "documents": "الوثائق",
+  "reparations": "الإصلاحات",
+  "greparations": "إدارة الإصلاحات",
+  "prestataires": "مقدمي الخدمات",
 
   "le": "ال",
   "supvehic": "حذف السيارة",
@@ -142,6 +146,11 @@
   "lfacture": "قائمة الفواتير",
   "chauffeurl": "قائمة السائقين",
   "chauffeurs": "السائقين",
+  "gchauffeurs": "إدارة السائقين",
+  "disponibilite": "التوفر",
+  "nouvdocument": "وثيقة جديدة",
+  "gestiondocument": "إدارة الوثائق",
+
   "journal": "سجل الأحداث",
   "lclient": "قائمة الزبائن",
   "feuille": "خرائط الطريق",

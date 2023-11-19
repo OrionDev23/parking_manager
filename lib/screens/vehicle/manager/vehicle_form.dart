@@ -8,17 +8,17 @@ import 'package:flutter/material.dart' as m;
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/screens/vehicle/vehicle_tabs.dart';
+import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
 import 'package:parc_oto/serializables/genre_vehicule.dart';
 import 'package:parc_oto/serializables/vehicle.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-import '../../serializables/marque.dart';
-import '../../theme.dart';
-import '../../utilities/algeria_lists.dart';
-import '../../widgets/select_dialog/select_dialog.dart';
+import '../../../serializables/marque.dart';
+import '../../../theme.dart';
+import '../../../utilities/algeria_lists.dart';
+import '../../../widgets/select_dialog/select_dialog.dart';
 
 class VehicleForm extends StatefulWidget {
   final Vehicle? vehicle;

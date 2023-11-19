@@ -112,11 +112,29 @@ class _VehicleTableState extends State<VehicleTable> {
   @override
   Widget build(BuildContext context) {
     return AsyncPaginatedDataTable2(
+      header:
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5.0,horizontal: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            IconButton(icon: const Icon(FluentIcons.filter), onPressed: (){}),
+            const SizedBox(width: 10,),
+
+            SizedBox(
+              width: 30.w,
+              height: 7.h,
+              child: TextBox(
+                placeholder: 'search'.tr(),
+              ),
+            ),
+          ],
+        ),
+      ),
       sortAscending: assending,
       horizontalMargin: 8,
       columnSpacing: 0,
       dataRowHeight: 3.5.h,
-
       onPageChanged: (s){
 
       },

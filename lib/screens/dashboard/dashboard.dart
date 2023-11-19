@@ -8,8 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../widgets/button_container.dart';
 import '../../widgets/page_header.dart';
-import '../vehicle/vehicle_form.dart';
-import '../vehicle/vehicle_tabs.dart';
+import '../vehicle/manager/vehicle_form.dart';
+import '../vehicle/manager/vehicle_tabs.dart';
 import 'transaction_chart.dart';
 import 'table_stats.dart';
 
