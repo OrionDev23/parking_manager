@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/models.dart';
 import 'package:parc_oto/datasources/vehicules_datasource.dart';
 
 import '../providers/client_database.dart';
@@ -12,131 +13,197 @@ class VehiculesWebServiceResponse {
   final int totalRecords;
 
   /// One page, e.g. 10 reocrds
-  final List<Vehicle> data;
+  final List<MapEntry<String,Vehicle>> data;
 }
 
 class VehiculesWebService {
-  int Function(Vehicle, Vehicle)? _getComparisonFunction(
+  int Function(MapEntry<String,Vehicle>, MapEntry<String,Vehicle>)? _getComparisonFunction(
       int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
-    //id
+      //id
       case 0:
-        return (Vehicle d1, Vehicle d2) => coef * d1.id!.compareTo(d2.id!);
-    //matricule
+        return (MapEntry<String,Vehicle> d1, MapEntry<String,Vehicle> d2) => coef * d1.key.compareTo(d2.key);
+      //matricule
       case 1:
-        return (Vehicle d1, Vehicle d2) =>
-        coef * d1.matricule.compareTo(d2.matricule);
-    //marque
+        return (MapEntry<String,Vehicle> d1, MapEntry<String,Vehicle> d2) =>
+            coef * d1.value.matricule.compareTo(d2.value.matricule);
+      //marque
       case 2:
-        return (Vehicle d1, Vehicle d2) {
-          if (d1.marque == null && d1.type==null) {
+        return (MapEntry<String,Vehicle> d1, MapEntry<String,Vehicle> d2) {
+          if (d1.value.marque == null && d1.value.type == null) {
             return -1;
-          } else if (d2.marque == null && d2.type==null) {
+          } else if (d2.value.marque == null && d2.value.type == null) {
             return 1;
-          }
-          else if(d2.marque==d1.marque) {
-            return coef * d1.type!.compareTo(d2.type!);
-          }
-          else {
-            return coef * d1.marque!.id.compareTo(d2.marque!.id);
+          } else if (d2.value.marque == d1.value.marque) {
+            return coef * d1.value.type!.compareTo(d2.value.type!);
+          } else {
+            return coef * d1.value.marque!.id.compareTo(d2.value.marque!.id);
           }
         };
-    //type
+      //type
       case 3:
-        return (Vehicle d1, Vehicle d2) {
-          if (d1.type == null) {
+        return (d1, d2) {
+          if (d1.value.type == null) {
             return -1;
-          } else if (d2.type == null) {
+          } else if (d2.value.type == null) {
             return 1;
           } else {
-            return coef * d1.type!.compareTo(d2.type!);
+            return coef * d1.value.type!.compareTo(d2.value.type!);
           }
         };
-    //annee
+      //annee
       case 4:
-        return (Vehicle d1, Vehicle d2) {
-          int annee1 = d1.anneeUtil ??
-              VehiclesUtilities.getAnneeFromMatricule(d1.matricule);
-          int annee2 = d2.anneeUtil ??
-              VehiclesUtilities.getAnneeFromMatricule(d2.matricule);
+        return ( d1,  d2) {
+          int annee1 = d1.value.anneeUtil ??
+              VehiclesUtilities.getAnneeFromMatricule(d1.value.matricule);
+          int annee2 = d2.value.anneeUtil ??
+              VehiclesUtilities.getAnneeFromMatricule(d2.value.matricule);
 
           return coef * annee1.compareTo(annee2);
         };
-    //dateAjout
+      //dateAjout
       case 5:
-        return (Vehicle d1, Vehicle d2) =>
-        coef * d1.dateCreation!.compareTo(d2.dateCreation!);
-    //date modif
+        return ( d1,  d2) =>
+            coef * d1.value.dateCreation!.compareTo(d2.value.dateCreation!);
+      //date modif
       case 6:
-        return (Vehicle d1, Vehicle d2) =>
-        coef * d1.dateModification!.compareTo(d2.dateModification!);
+        return ( d1,  d2) =>
+            coef * d1.value.dateModification!.compareTo(d2.value.dateModification!);
     }
 
     return null;
   }
 
-  Future<VehiculesWebServiceResponse> getData(
-      int startingAt, int count, int sortedBy, bool sortedAsc) async {
-    if(startingAt==0){
+  Future<VehiculesWebServiceResponse> getData(int startingAt, int count,
+      int sortedBy, bool sortedAsc, {String? searchKey,Map<String,String>?filters}) async {
+    if (startingAt == 0) {
       vehicles.clear();
     }
-    return ClientDatabase.database!.listDocuments(
-        databaseId: databaseId,
-        collectionId: vehiculeid,
-        queries: [
-          Query.limit(count),
-          Query.offset(startingAt),
-          getQuery(sortedBy,sortedAsc),
-        ]).then((value) {
+    return getSearchResult(searchKey,filters??{},count,startingAt,sortedBy,sortedAsc).then((value) {
+
       for (var element in value.documents) {
+        if(!testIfVehiculesContained(element.$id)){
+          vehicles.add(MapEntry(element.$id, element.convertTo<Vehicle>((p0) {
+            return Vehicle.fromJson(p0 as Map<String, dynamic>);
+          })));
 
+        }
 
-        vehicles.add( element.convertTo<Vehicle>((p0) {
-
-          return Vehicle.fromJson(p0 as Map<String,dynamic>);
-        }));
       }
-
-
       var result = vehicles;
 
       result.sort(_getComparisonFunction(sortedBy, sortedAsc));
       return VehiculesWebServiceResponse(
           value.total, result.skip(startingAt).take(count).toList());
     }).onError((error, stackTrace) {
-      return Future.value(VehiculesWebServiceResponse(0,vehicles));
+      return Future.value(VehiculesWebServiceResponse(0, vehicles));
     });
   }
 
 
-  String getQuery(int sortedBy,bool sortedAsc){
 
-    switch (sortedBy){
-      case 1: if(sortedAsc){
-        return Query.orderAsc('matricule');
+  Future<DocumentList> getSearchResult(String? searchKey,Map<String,String>filters,
+      int count,int startingAt,int sortedBy,bool sortedAsc) async{
+
+    if(searchKey!=null && searchKey.isNotEmpty){
+      late DocumentList d;
+      for(int i=0;i<8;i++){
+         d=await ClientDatabase.database!.listDocuments(
+            databaseId: databaseId,
+            collectionId: vehiculeid,
+            queries: [
+              if(i==2)
+                Query.equal('annee_util', int.tryParse(searchKey)??9999),
+              if(i!=2)
+              Query.search(getAttributeForSearch(i), searchKey),
+              if(filters.containsKey('yearmin'))
+                Query.greaterThanEqual('annee_util', int.tryParse(filters['yearmin']!)),
+              if(filters.containsKey('yearmax'))
+                Query.lessThanEqual('annee_util', int.tryParse(filters['yearmax']!)),
+              if(filters.containsKey('genre'))
+                Query.equal('genre', filters['genre']),
+              if(filters.containsKey('marque'))
+                Query.equal('marque', filters['marque']),
+              Query.limit(count),
+              Query.offset(startingAt),
+              getQuery(sortedBy, sortedAsc),
+            ]);
+         if(d.documents.isNotEmpty){
+           break;
+         }
       }
-      else{
-        return Query.orderDesc('matricule');
+      return d;
+    }
+    else{
+      return await ClientDatabase.database!.listDocuments(
+          databaseId: databaseId,
+          collectionId: vehiculeid,
+          queries: [
+            if(filters.containsKey('yearmin'))
+              Query.greaterThanEqual('annee_util', int.tryParse(filters['yearmin']!)),
+            if(filters.containsKey('yearmax'))
+              Query.lessThanEqual('annee_util', int.tryParse(filters['yearmax']!)),
+            if(filters.containsKey('genre'))
+              Query.equal('genre', filters['genre']),
+            if(filters.containsKey('marque'))
+              Query.equal('marque', filters['marque']),
+            Query.limit(count),
+            Query.offset(startingAt),
+            getQuery(sortedBy, sortedAsc),
+          ]);
+    }
+  }
+
+
+
+  String getAttributeForSearch(int att){
+    switch (att){
+      case 0:return 'matricule';
+      case 1:return 'type';
+      case 3:return 'nom';
+      case 4:return 'prenom';
+      case 5:return 'numero_serie';
+      case 6:return 'numero';
+      case 7:return 'matricule_prec';
+      default:return 'matricule';
+    }
+  }
+
+
+  bool testIfVehiculesContained(String id){
+    for(int i=0;i<vehicles.length;i++){
+      if(vehicles[i].key==id){
+        return true;
       }
-      case 2: if(sortedAsc){
-        return Query.orderAsc('type');
-      }
-      else{
-        return Query.orderDesc('type');
-      }
-      case 4:
-        if(sortedAsc){
-          return Query.orderAsc('annee_util');
+    }
+    return false;
+  }
+
+  String getQuery(int sortedBy, bool sortedAsc) {
+    switch (sortedBy) {
+      case 1:
+        if (sortedAsc) {
+          return Query.orderAsc('matricule');
+        } else {
+          return Query.orderDesc('matricule');
         }
-        else{
+      case 2:
+        if (sortedAsc) {
+          return Query.orderAsc('type');
+        } else {
+          return Query.orderDesc('type');
+        }
+      case 4:
+        if (sortedAsc) {
+          return Query.orderAsc('annee_util');
+        } else {
           return Query.orderDesc('annee_util');
         }
       case 6:
-        if(sortedAsc){
+        if (sortedAsc) {
           return Query.orderAsc('\$updatedAt');
-        }
-        else{
+        } else {
           return Query.orderDesc('\$updatedAt');
         }
     }

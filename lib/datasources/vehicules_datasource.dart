@@ -37,6 +37,21 @@ class VehiculesDataSource extends AsyncDataTableSource {
     refreshDatasource();
   }
 
+  String? searchKey;
+
+  void search(String searchKey){
+    this.searchKey=searchKey;
+    refreshDatasource();
+  }
+
+  void filter(Map<String,String> filters){
+    this.filters=filters;
+    refreshDatasource();
+
+  }
+
+  Map<String,String>? filters;
+
   Future<int> getTotalRecords() {
     return Future<int>.delayed(
         const Duration(milliseconds: 0), () => _empty ? 0 : vehicles.length);
@@ -62,40 +77,40 @@ class VehiculesDataSource extends AsyncDataTableSource {
 
     // List returned will be empty is there're fewer items than startingAt
     var x = _empty
-        ? await Future.delayed(const Duration(milliseconds: 2000),
+        ? await Future.delayed(const Duration(milliseconds: 1000),
             () => VehiculesWebServiceResponse(0, []))
-        : await _repo.getData(startIndex, count, _sortColumn, _sortAscending);
+        : await _repo.getData(startIndex, count, _sortColumn, _sortAscending,searchKey: searchKey,filters: filters);
 
     var r = AsyncRowsResponse(
         x.totalRecords,
-        x.data.map((vehicle) {
+        x.data.map((vahicle) {
           return DataRow(
-            key: ValueKey<String>(vehicle.id!),
-            selected: vehicle.selected,
+            key: ValueKey<String>(vahicle.value.id!),
+            selected: vahicle.value.selected,
             onSelectChanged: (value) {
               if (value != null) {
-                setRowSelection(ValueKey<String>(vehicle.id!), value);
+                setRowSelection(ValueKey<String>(vahicle.value.id!), value);
               }
             },
             cells: [
-              DataCell(Text(vehicle.matricule,style: tstyle,)),
+              DataCell(SelectableText(vahicle.value.matricule,style: tstyle,)),
               DataCell(Row(
                 children: [
-                  Image.asset('assets/images/marques/${vehicle.marque?.id ?? 'default'}.webp',width: 4.h,height: 4.h,),
+                  Image.asset('assets/images/marques/${vahicle.value.marque?.id ?? 'default'}.webp',width: 4.h,height: 4.h,),
                   const SizedBox(width: 5,),
-                  Text(vehicle.type ?? '',style: tstyle),
+                  SelectableText(vahicle.value.type ?? '',style: tstyle),
                 ],
               )),
-              DataCell(Text(vehicle.anneeUtil.toString(),style: tstyle)),
-              DataCell(Text(
-                  dateFormat.format(ClientDatabase.ref.add(Duration(milliseconds:vehicle.dateModification!)))
+              DataCell(SelectableText(vahicle.value.anneeUtil.toString(),style: tstyle)),
+              DataCell(SelectableText(
+                  dateFormat.format(ClientDatabase.ref.add(Duration(milliseconds:vahicle.value.dateModification!)))
                   ,style: tstyle)),
               DataCell(f.FlyoutTarget(
-                controller: vehicle.controller,
+                controller: vahicle.value.controller,
                 child: IconButton(
                     splashRadius: 15,
                     onPressed: (){
-                      vehicle.controller.showFlyout(builder: (context){
+                      vahicle.value.controller.showFlyout(builder: (context){
                         return f.MenuFlyout(
                           items: [
                             f.MenuFlyoutItem(
@@ -105,10 +120,10 @@ class VehiculesDataSource extends AsyncDataTableSource {
                                 late f.Tab tab;
                                 tab = f.Tab(
                                   key: UniqueKey(),
-                                  text: Text('${"mod".tr()} ${'vehicule'.tr().toLowerCase()} ${vehicle.matricule}'),
-                                  semanticLabel: '${'mod'.tr()} ${vehicle.matricule}',
+                                  text: Text('${"mod".tr()} ${'vehicule'.tr().toLowerCase()} ${vahicle.value.matricule}'),
+                                  semanticLabel: '${'mod'.tr()} ${vahicle.value.matricule}',
                                   icon: const Icon(Bootstrap.car_front),
-                                  body: VehicleForm(vehicle: vehicle,),
+                                  body: VehicleForm(vehicle: vahicle.value,),
                                   onClosed: () {
                                     VehicleTabsState.tabs.remove(tab);
 
@@ -125,7 +140,7 @@ class VehiculesDataSource extends AsyncDataTableSource {
                             f.MenuFlyoutItem(
                               text: const Text('delete').tr(),
                               onPressed: (){
-                                showDeleteConfirmation(vehicle);
+                                showDeleteConfirmation(vahicle.value);
                               }
                             ),
                             const f.MenuFlyoutSeparator(),
@@ -196,7 +211,7 @@ class VehiculesDataSource extends AsyncDataTableSource {
         databaseId: databaseId,
         collectionId: vehiculeid,
         documentId: v.id!).then((value) {
-      vehicles.remove(v);
+      vehicles.remove(MapEntry(v.id!, v));
       notifyListeners();
     }).onError((error, stackTrace) {
 
@@ -214,7 +229,5 @@ class VehiculesDataSource extends AsyncDataTableSource {
 
 
 
-int _selectedCount = 0;
-
-List<Vehicle> vehicles = List.empty(growable: true);
+List<MapEntry<String,Vehicle>> vehicles = List.empty(growable: true);
 

@@ -19,7 +19,7 @@ class VehicleManagement extends StatefulWidget {
   State<VehicleManagement> createState() => _VehicleManagementState();
 }
 
-class _VehicleManagementState extends State<VehicleManagement> {
+class _VehicleManagementState extends State<VehicleManagement> with AutomaticKeepAliveClientMixin<VehicleManagement> {
 
 
   final tstyle=TextStyle(
@@ -30,6 +30,7 @@ class _VehicleManagementState extends State<VehicleManagement> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     var appTheme=context.watch<AppTheme>();
     return ScaffoldPage(
       header: PageTitle(
@@ -139,4 +140,7 @@ class _VehicleManagementState extends State<VehicleManagement> {
     );
     return tab;
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

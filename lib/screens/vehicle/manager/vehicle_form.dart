@@ -4,7 +4,6 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:dzair_data_usage/langs.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' as m;
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:parc_oto/providers/client_database.dart';
@@ -31,10 +30,7 @@ class VehicleForm extends StatefulWidget {
 
 class _VehicleFormState extends State<VehicleForm>
     with AutomaticKeepAliveClientMixin<VehicleForm> {
-  final smallSpace = const SizedBox(
-    width: 5,
-    height: 5,
-  );
+
 
   TextEditingController matriculeEtr = TextEditingController();
   TextEditingController matr1 = TextEditingController();
@@ -71,8 +67,7 @@ class _VehicleFormState extends State<VehicleForm>
   final double height = 9.h;
   final double heightFirst=17.h;
 
-  final tstyle = const TextStyle(fontWeight: FontWeight.bold);
-  final placeStyle = TextStyle(color: Colors.grey[100]);
+
 
 
   String wilaya = "16";
@@ -137,48 +132,12 @@ class _VehicleFormState extends State<VehicleForm>
     var appTheme = context.watch<AppTheme>();
 
 
-    final fillColor=appTheme.mode == ThemeMode.dark
-        ? Colors.grey[150]
-        : appTheme.mode == ThemeMode.light
-        ? Colors.grey[20]
-        : ThemeMode.system == ThemeMode.light
-        ? Colors.grey[20]
-        : Colors.grey[150];
-
-
-    final TextStyle writingStyle = TextStyle(
-
-        color: appTheme.mode == ThemeMode.dark
-            ? Colors.white
-            : appTheme.mode == ThemeMode.light
-            ? Colors.black
-            : ThemeMode.system == ThemeMode.light
-            ? Colors.black
-            : Colors.white);
-
-
-    final backGroundColor=appTheme.mode == ThemeMode.dark
-        ? Colors.grey
-        : appTheme.mode == ThemeMode.light
-        ? Colors.white
-        : ThemeMode.system == ThemeMode.light
-        ? Colors.white
-        : Colors.grey;
-
-
-    final inputDecoration= m.InputDecoration(
-      fillColor: fillColor,
-      labelStyle: TextStyle(color: Colors.grey[100]),
-      filled: true,
-      isDense: true,
-    );
-
     return ScaffoldPage(
         content: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Container(
                 decoration: BoxDecoration(
-                  color: backGroundColor,
+                  color: appTheme.backGroundColor,
                   boxShadow: kElevationToShadow[4],
                 ),
                 width: 70.w,
@@ -218,21 +177,21 @@ class _VehicleFormState extends State<VehicleForm>
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(
+                                                  const Text(
                                                     'pays',
                                                     style: tstyle,
                                                   ).tr(),
                                                   CountryCodePicker(
                                                     boxDecoration:
                                                         BoxDecoration(
-                                                            color: backGroundColor,
+                                                            color: appTheme.backGroundColor,
                                                             boxShadow:
                                                                 kElevationToShadow[
                                                                     2]),
                                                     padding:
                                                         const EdgeInsets.all(3),
                                                     searchDecoration:
-                                                        inputDecoration,
+                                                    appTheme.inputDecoration,
                                                     dialogSize:
                                                         Size(40.w, 60.h),
                                                     initialSelection: pays,
@@ -247,7 +206,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                       });
                                                     },
                                                   ),
-                                                  Text(
+                                                  const Text(
                                                     'wilaya',
                                                     style: tstyle,
                                                   ).tr(),
@@ -262,9 +221,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                           placeStyle,
                                                       cursorColor:
                                                           appTheme.color.darker,
-                                                      style: writingStyle,
+                                                      style: appTheme.writingStyle,
                                                       decoration: BoxDecoration(
-                                                        color: fillColor,
+                                                        color: appTheme.fillColor,
                                                       ),
                                                       items: AlgeriaList.dzair!
                                                           .getWilayat()!
@@ -339,7 +298,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                     padding: const EdgeInsets
                                                         .symmetric(
                                                         horizontal: 8.0),
-                                                    child: Text(
+                                                    child: const Text(
                                                       'nummat',
                                                       style: tstyle,
                                                     ).tr(),
@@ -363,7 +322,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                             cursorColor:
                                                                 appTheme.color
                                                                     .darker,
-                                                            style: writingStyle,
+                                                            style: appTheme.writingStyle,
                                                             placeholder:
                                                                 'XXXXXXXXXXXXXX',
                                                             textAlign: TextAlign
@@ -372,7 +331,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                                 placeStyle,
                                                             decoration:
                                                                 BoxDecoration(
-                                                              color: fillColor,
+                                                              color: appTheme.fillColor,
                                                             ),
                                                       inputFormatters: <TextInputFormatter>[
                                                         FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z.-]")),
@@ -393,14 +352,14 @@ class _VehicleFormState extends State<VehicleForm>
                                                                           .color
                                                                           .darker,
                                                                   style:
-                                                                      writingStyle,
+                                                                  appTheme.writingStyle,
                                                                   placeholder:
                                                                       '123456',
                                                                   placeholderStyle:
                                                                       placeStyle,
                                                                   decoration:
                                                                       BoxDecoration(
-                                                                    color: fillColor,
+                                                                    color: appTheme.fillColor,
                                                                   ),
                                                                   maxLength: 6,
                                                                   textAlign:
@@ -413,7 +372,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                                 ),
                                                               ),
                                                               smallSpace,
-                                                              Text(
+                                                              const Text(
                                                                 '-',
                                                                 style: tstyle,
                                                               ),
@@ -428,7 +387,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                                           .color
                                                                           .darker,
                                                                   style:
-                                                                      writingStyle,
+                                                                  appTheme.writingStyle,
                                                                   placeholder:
                                                                       '123',
                                                                   maxLength: 3,
@@ -436,7 +395,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                                       placeStyle,
                                                                   decoration:
                                                                       BoxDecoration(
-                                                                    color: fillColor,
+                                                                    color: appTheme.fillColor,
                                                                   ),
                                                                   textAlign:
                                                                       TextAlign
@@ -451,7 +410,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                                 ),
                                                               ),
                                                               smallSpace,
-                                                              Text(
+                                                              const Text(
                                                                 '-',
                                                                 style: tstyle,
                                                               ),
@@ -466,7 +425,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                                           .color
                                                                           .darker,
                                                                   style:
-                                                                      writingStyle,
+                                                                  appTheme.writingStyle,
                                                                   placeholder:
                                                                       '12',
                                                                   maxLength: 2,
@@ -474,7 +433,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                                       placeStyle,
                                                                   decoration:
                                                                       BoxDecoration(
-                                                                    color: fillColor,
+                                                                    color: appTheme.fillColor,
                                                                   ),
                                                                   textAlign:
                                                                       TextAlign
@@ -531,7 +490,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(
+                                                  const Text(
                                                     'daira',
                                                     style: tstyle,
                                                   ).tr(),
@@ -543,11 +502,11 @@ class _VehicleFormState extends State<VehicleForm>
                                                           placeholder: 'daira'.tr(),
                                                       cursorColor:
                                                           appTheme.color.darker,
-                                                      style: writingStyle,
+                                                      style: appTheme.writingStyle,
                                                       placeholderStyle:
                                                           placeStyle,
                                                       decoration: BoxDecoration(
-                                                        color: fillColor,
+                                                        color: appTheme.fillColor,
                                                       ),
                                                       items: AlgeriaList()
                                                           .getDairas(wilayaCont.text)
@@ -584,7 +543,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                       },
                                                     ),
                                                   ),
-                                                  Text(
+                                                  const Text(
                                                     'commune',
                                                     style: tstyle,
                                                   ).tr(),
@@ -599,9 +558,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                           placeStyle,
                                                       cursorColor:
                                                           appTheme.color.darker,
-                                                      style: writingStyle,
+                                                      style: appTheme.writingStyle,
                                                       decoration: BoxDecoration(
-                                                        color: fillColor,
+                                                        color: appTheme.fillColor,
                                                       ),
                                                       items: AlgeriaList()
                                                           .getCommune(
@@ -659,7 +618,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
                                                 children: [
-                                                  Text(
+                                                  const Text(
                                                     'date',
                                                     style: tstyle,
                                                   ).tr(),
@@ -699,7 +658,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                   const SizedBox(
                                                     height: 5,
                                                   ),
-                                                Text(
+                                                const Text(
                                                   'quittance',
                                                   style: tstyle,
                                                 ).tr(),
@@ -708,10 +667,10 @@ class _VehicleFormState extends State<VehicleForm>
                                                   placeholder: 'quittance'.tr(),
                                                   cursorColor:
                                                       appTheme.color.darker,
-                                                  style: writingStyle,
+                                                  style: appTheme.writingStyle,
                                                   placeholderStyle: placeStyle,
                                                   decoration: BoxDecoration(
-                                                    color: fillColor,
+                                                    color: appTheme.fillColor,
                                                   ),
                                                   inputFormatters: [
                                                     FilteringTextInputFormatter.allow(
@@ -735,7 +694,7 @@ class _VehicleFormState extends State<VehicleForm>
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: [
-                                                Text(
+                                                const Text(
                                                   'num',
                                                   style: tstyle,
                                                 ).tr(),
@@ -746,9 +705,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                   placeholderStyle: placeStyle,
                                                   cursorColor:
                                                       appTheme.color.darker,
-                                                  style: writingStyle,
+                                                  style: appTheme.writingStyle,
                                                   decoration: BoxDecoration(
-                                                    color: fillColor,
+                                                    color: appTheme.fillColor,
                                                   ),
                                                 ),
                                               ],
@@ -767,7 +726,7 @@ class _VehicleFormState extends State<VehicleForm>
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: [
-                                                Text(
+                                                const Text(
                                                   'nomf',
                                                   style: tstyle,
                                                 ).tr(),
@@ -781,9 +740,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                           placeStyle,
                                                       cursorColor:
                                                           appTheme.color.darker,
-                                                      style: writingStyle,
+                                                      style: appTheme.writingStyle,
                                                       decoration: BoxDecoration(
-                                                        color: fillColor,
+                                                        color: appTheme.fillColor,
                                                       ),
                                                     )),
                                               ],
@@ -802,7 +761,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(
+                                                  const Text(
                                                     'prenom',
                                                     style: tstyle,
                                                   ).tr(),
@@ -817,11 +776,11 @@ class _VehicleFormState extends State<VehicleForm>
                                                             placeStyle,
                                                         cursorColor: appTheme
                                                             .color.darker,
-                                                        style: writingStyle,
+                                                        style: appTheme.writingStyle,
                                                         decoration:
                                                             BoxDecoration(
                                                           color:
-                                                          fillColor,
+                                                          appTheme.fillColor,
                                                         ),
                                                       )),
                                                 ]),
@@ -839,7 +798,7 @@ class _VehicleFormState extends State<VehicleForm>
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                Text(
+                                                const Text(
                                                   'profession',
                                                   style: tstyle,
                                                 ).tr(),
@@ -854,9 +813,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                           placeStyle,
                                                       cursorColor:
                                                           appTheme.color.darker,
-                                                      style: writingStyle,
+                                                      style: appTheme.writingStyle,
                                                       decoration: BoxDecoration(
-                                                        color: fillColor,
+                                                        color: appTheme.fillColor,
                                                       ),
                                                     )),
                                               ],
@@ -875,7 +834,7 @@ class _VehicleFormState extends State<VehicleForm>
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               children: [
-                                                Text(
+                                                const Text(
                                                   'adresse',
                                                   style: tstyle,
                                                 ).tr(),
@@ -890,9 +849,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                           placeStyle,
                                                       cursorColor:
                                                           appTheme.color.darker,
-                                                      style: writingStyle,
+                                                      style: appTheme.writingStyle,
                                                       decoration: BoxDecoration(
-                                                        color: fillColor,
+                                                        color: appTheme.fillColor,
                                                       ),
                                                     )),
                                               ],
@@ -924,7 +883,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                       horizontal: 5.0),
                                               child: Column(
                                                 children: [
-                                                  Text(
+                                                  const Text(
                                                     'genre',
                                                     style: tstyle,
                                                   ).tr(),
@@ -975,11 +934,11 @@ class _VehicleFormState extends State<VehicleForm>
                                                               child: Text('telechargement',style:TextStyle(color:Colors.grey[100])).tr(),
                                                             );
                                                           },
-                                                          searchBoxDecoration: inputDecoration.copyWith(
+                                                          searchBoxDecoration: appTheme.inputDecoration.copyWith(
                                                             labelText: 'search'.tr(),
                                                             labelStyle: placeStyle,
                                                           ),
-                                                          searchTextStyle: writingStyle,
+                                                          searchTextStyle: appTheme.writingStyle,
                                                           searchCursorColor: appTheme.color,
 
                                                         );
@@ -1008,7 +967,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                       horizontal: 5.0),
                                               child: Column(
                                                 children: [
-                                                  Text(
+                                                  const Text(
                                                     'marque',
                                                     style: tstyle,
                                                   ).tr(),
@@ -1048,11 +1007,11 @@ class _VehicleFormState extends State<VehicleForm>
                                                                     child: Text('telechargement',style:TextStyle(color:Colors.grey[100])).tr(),
                                                                   );
                                                           },
-                                                          searchBoxDecoration: inputDecoration.copyWith(
+                                                          searchBoxDecoration: appTheme.inputDecoration.copyWith(
                                                             labelText: 'search'.tr(),
                                                             labelStyle: placeStyle,
                                                           ),
-                                                          searchTextStyle: writingStyle,
+                                                          searchTextStyle: appTheme.writingStyle,
                                                           searchCursorColor: appTheme.color,
 
                                                         );
@@ -1081,7 +1040,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                       horizontal: 5.0),
                                               child: Column(
                                                 children: [
-                                                  Text(
+                                                  const Text(
                                                     'type',
                                                     style: tstyle,
                                                   ).tr(),
@@ -1093,9 +1052,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: writingStyle,
+                                                    style: appTheme.writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: fillColor,
+                                                      color: appTheme.fillColor,
                                                     ),
                                                   ),
                                                 ],
@@ -1119,7 +1078,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                       horizontal: 5.0),
                                               child: Column(
                                                 children: [
-                                                  Text(
+                                                  const Text(
                                                     'numerserie',
                                                     style: tstyle,
                                                   ).tr(),
@@ -1132,9 +1091,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: writingStyle,
+                                                    style: appTheme.writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: fillColor,
+                                                      color: appTheme.fillColor,
                                                     ),
                                                   ),
                                                 ],
@@ -1158,7 +1117,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                       horizontal: 5.0),
                                               child: Column(
                                                 children: [
-                                                  Text(
+                                                  const Text(
                                                     'caross',
                                                     style: tstyle,
                                                   ).tr(),
@@ -1170,9 +1129,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: writingStyle,
+                                                    style: appTheme.writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: fillColor,
+                                                      color: appTheme.fillColor,
                                                     ),
                                                   ),
                                                 ],
@@ -1196,7 +1155,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                       horizontal: 5.0),
                                               child: Column(
                                                 children: [
-                                                  Text(
+                                                  const Text(
                                                     'energie',
                                                     style: tstyle,
                                                   ).tr(),
@@ -1208,9 +1167,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: writingStyle,
+                                                    style: appTheme.writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: fillColor,
+                                                      color: appTheme.fillColor,
                                                     ),
                                                   ),
                                                 ],
@@ -1234,7 +1193,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                       horizontal: 5.0),
                                               child: Column(
                                                 children: [
-                                                  Text(
+                                                  const Text(
                                                     'puissance',
                                                     style: tstyle,
                                                   ).tr(),
@@ -1246,9 +1205,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: writingStyle,
+                                                    style: appTheme.writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: fillColor,
+                                                      color: appTheme.fillColor,
                                                     ),
                                                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                                   ),
@@ -1273,7 +1232,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                       horizontal: 5.0),
                                               child: Column(
                                                 children: [
-                                                  Text(
+                                                  const Text(
                                                     'placeassise',
                                                     style: tstyle,
                                                   ).tr(),
@@ -1285,9 +1244,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: writingStyle,
+                                                    style: appTheme.writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: fillColor,
+                                                      color: appTheme.fillColor,
                                                     ),
                                                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
 
@@ -1313,7 +1272,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                       horizontal: 5.0),
                                               child: Column(
                                                 children: [
-                                                  Text(
+                                                  const Text(
                                                     'poidstotal',
                                                     style: tstyle,
                                                   ).tr(),
@@ -1326,9 +1285,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: writingStyle,
+                                                    style: appTheme.writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: fillColor,
+                                                      color: appTheme.fillColor,
                                                     ),
                                                   ),
                                                 ],
@@ -1352,7 +1311,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                       horizontal: 5.0),
                                               child: Column(
                                                 children: [
-                                                  Text(
+                                                  const Text(
                                                     'chargeutil',
                                                     style: tstyle,
                                                   ).tr(),
@@ -1366,9 +1325,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: writingStyle,
+                                                    style: appTheme.writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: fillColor,
+                                                      color: appTheme.fillColor,
                                                     ),
                                                   ),
                                                 ],
@@ -1392,7 +1351,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                       horizontal: 5.0),
                                               child: Column(
                                                 children: [
-                                                  Text(
+                                                  const Text(
                                                     'precmat',
                                                     style: tstyle,
                                                   ).tr(),
@@ -1405,9 +1364,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: writingStyle,
+                                                    style: appTheme.writingStyle,
                                                     decoration: BoxDecoration(
-                                                      color: fillColor,
+                                                      color: appTheme.fillColor,
                                                     ),
                                                         inputFormatters: <TextInputFormatter>[
                                                           FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z.-]")),
@@ -1434,7 +1393,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                       horizontal: 5.0),
                                               child: Column(
                                                 children: [
-                                                  Text(
+                                                  const Text(
                                                     'anneeutil',
                                                     style: tstyle,
                                                   ).tr(),

@@ -27,6 +27,10 @@
   "gstate": "Good",
   "bstate": "Broken down",
   "rstate": "Under repair",
+  "min": "Min",
+  "max": "Max",
+  "clear": "Clear",
+
   "documents": "Documents",
   "reparations": "Repairs",
   "greparations": "Manage repairs",

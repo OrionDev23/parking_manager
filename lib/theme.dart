@@ -5,8 +5,15 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'utilities/theme_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_theme/system_theme.dart';
+import 'package:flutter/material.dart' as m;
 enum NavigationIndicators { sticky, end }
 
+const tstyle = TextStyle(fontWeight: FontWeight.bold);
+final placeStyle = TextStyle(color: Colors.grey[100]);
+const smallSpace = SizedBox(
+  width: 5,
+  height: 5,
+);
 class AppTheme extends ChangeNotifier {
   AccentColor _color = systemAccentColor;
 
@@ -21,8 +28,13 @@ class AppTheme extends ChangeNotifier {
 
   ThemeMode get mode => _mode;
 
+  late TextStyle writingStyle;
+  late Color fillColor;
+  late Color backGroundColor;
+  late m.InputDecoration inputDecoration;
   set mode(ThemeMode mode) {
     _mode = mode;
+    changeDecorations();
     notifyListeners();
   }
 
@@ -78,6 +90,43 @@ class AppTheme extends ChangeNotifier {
         : getDisplayMode(savedSettings.getInt('display')!);
     locale=Locale(savedSettings.getString('lang')??'fr');
 
+    changeDecorations();
+
+  }
+
+  void changeDecorations(){
+    fillColor=mode == ThemeMode.dark
+        ? Colors.grey[150]
+        : mode == ThemeMode.light
+        ? Colors.grey[20]
+        : ThemeMode.system == ThemeMode.light
+        ? Colors.grey[20]
+        : Colors.grey[150];
+
+
+    writingStyle = TextStyle(
+
+        color: mode == ThemeMode.dark
+            ? Colors.white
+            : mode == ThemeMode.light
+            ? Colors.black
+            : ThemeMode.system == ThemeMode.light
+            ? Colors.black
+            : Colors.white);
+
+    backGroundColor=mode == ThemeMode.dark
+        ? Colors.grey
+        : mode == ThemeMode.light
+        ? Colors.white
+        : ThemeMode.system == ThemeMode.light
+        ? Colors.white
+        : Colors.grey;
+
+    inputDecoration= m.InputDecoration(
+        fillColor: fillColor,
+        labelStyle: TextStyle(color: Colors.grey[100]),
+        filled: true,
+        isDense: true);
   }
 
   AccentColor getColor(dynamic color){

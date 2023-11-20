@@ -171,6 +171,14 @@ class _ProfilFormState extends State<ProfilForm> {
                         testIfSomethingChanged();
                       }
                     },
+                    placeholderStyle:
+                    placeStyle,
+                    cursorColor:
+                    appTheme.color.darker,
+                    style: appTheme.writingStyle,
+                    decoration: BoxDecoration(
+                      color: appTheme.fillColor,
+                    ),
                   ),
                 ),
               ],
@@ -195,6 +203,14 @@ class _ProfilFormState extends State<ProfilForm> {
                   onChanged: (s) {
                     testIfSomethingChanged();
                   },
+                  placeholderStyle:
+                  placeStyle,
+                  cursorColor:
+                  appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: BoxDecoration(
+                    color: appTheme.fillColor,
+                  ),
                 ),
               ),
             ],
@@ -221,14 +237,7 @@ class _ProfilFormState extends State<ProfilForm> {
                   testIfSomethingChanged();
                 },
                 boxDecoration: BoxDecoration(
-                    color: appTheme.mode == ThemeMode.dark
-                        ? Colors.grey
-                        : appTheme.mode == ThemeMode.light
-                            ? Colors.white
-                            : ThemeMode.system == ThemeMode.light
-                                ? Colors.white
-                                : Colors.grey,
-                    backgroundBlendMode: BlendMode.difference,
+                    color: appTheme.backGroundColor,
                     boxShadow: kElevationToShadow[2]),
                 dialogSize: Size(40.w, 45.h),
               ),
@@ -246,6 +255,14 @@ class _ProfilFormState extends State<ProfilForm> {
                 onChanged: (s) {
                   testIfSomethingChanged();
                 },
+                    placeholderStyle:
+                    placeStyle,
+                    cursorColor:
+                    appTheme.color.darker,
+                    style: appTheme.writingStyle,
+                    decoration: BoxDecoration(
+                      color: appTheme.fillColor,
+                    ),
               )),
             ],
           ),

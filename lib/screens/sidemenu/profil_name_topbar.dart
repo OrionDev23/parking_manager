@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/client_database.dart';
+import '../../widgets/on_tap_scale.dart';
 import 'futur_image.dart';
 
 class ProfilNameTopBar extends StatelessWidget {
@@ -18,12 +19,7 @@ class ProfilNameTopBar extends StatelessWidget {
     return ValueListenableBuilder(
         valueListenable: ClientDatabase.me,
         builder: (context, me, _) {
-          return Button(
-              style: ButtonStyle(
-                shape: ButtonState.all<OutlinedBorder>(
-                    const RoundedRectangleBorder()),
-                padding: ButtonState.all<EdgeInsets>(const EdgeInsets.all(4)),
-              ),
+          return OnTapScaleAndFade(
               child: Row(
                 children: [
                   CircleAvatar(
@@ -58,7 +54,7 @@ class ProfilNameTopBar extends StatelessWidget {
                   Text(me?.email ?? ''),
                 ],
               ),
-              onPressed: () {
+              onTap: () {
                 showProfilForm(context, me);
               });
         });

@@ -8,6 +8,7 @@ import 'package:parc_oto/screens/logout.dart';
 import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
 import 'package:parc_oto/screens/vehicle/documents/document_tabs.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
+import 'package:parc_oto/widgets/on_tap_scale.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../dashboard/dashboard.dart';
 import '../dashboard/notif_list.dart';
@@ -143,14 +144,7 @@ class PanesListState extends State<PanesList> with WindowListener {
                                 if (!loading && signedIn.value)
                                   FlyoutTarget(
                                     controller: flyoutController,
-                                    child: Button(
-                                        style: ButtonStyle(
-                                          shape: ButtonState.all<
-                                                  OutlinedBorder>(
-                                              const RoundedRectangleBorder()),
-                                          padding: ButtonState.all<EdgeInsets>(
-                                              const EdgeInsets.all(15)),
-                                        ),
+                                    child: OnTapScaleAndFade(
                                         child: Row(
                                           children: [
                                             const Icon(FluentIcons.ringer),
@@ -169,7 +163,7 @@ class PanesListState extends State<PanesList> with WindowListener {
                                             ),
                                           ],
                                         ),
-                                        onPressed: () {
+                                        onTap: () {
                                           flyoutController.showFlyout(
                                               autoModeConfiguration:
                                                   FlyoutAutoConfiguration(
