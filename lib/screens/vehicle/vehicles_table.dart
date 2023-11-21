@@ -139,19 +139,25 @@ class _VehicleTableState extends State<VehicleTable> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             SizedBox(
-              width: 3.w,
+              width: 75.px,
               child: Stack(
                 children: [
                   Positioned.fill(
                     child: FlyoutTarget(
                       controller: filterFlyout,
                       child: IconButton(
-                          icon: filtered
-                              ? Icon(
-                                  FluentIcons.filter_solid,
-                                  color: appTheme.color,
-                                )
-                              : const Icon(FluentIcons.filter),
+                          icon: Row(
+                            children: [
+                              Text('filter',style: TextStyle(fontSize: 12.sp),).tr(),
+                              const SizedBox(width: 5,),
+                              filtered
+                                  ? Icon(
+                                      FluentIcons.filter_solid,
+                                      color: appTheme.color,
+                                    )
+                                  : const Icon(FluentIcons.filter),
+                            ],
+                          ),
                           onPressed: () {
                             filterFlyout.showFlyout(builder: (context) {
                               return FlyoutContent(
@@ -449,26 +455,42 @@ class _VehicleTableState extends State<VehicleTable> {
                                             child: Row(
                                               mainAxisAlignment: MainAxisAlignment.end,
                                               children: [
-                                                Button(child: const Text('annuler').tr(),onPressed:(){
-                                                  Navigator.of(context).pop();
-                                                }),
-                                                smallSpace,
-
-                                                FilledButton(onPressed: filtered?(){
-
-                                                  Navigator.of(context).pop();
-                                                      setState(() {
-                                                        filtered=false;
-                                                        filters.clear();
-                                                      });
-                                                  vehicleDataSource.filter(filters);
-
-                                                }
-                                                    :null,child: const Text('clear').tr(),
+                                                FilledButton(
+                                                  style:ButtonStyle(
+                                                    backgroundColor: ButtonState.all<Color>(
+                                                        appTheme.color.lightest
                                                     ),
+                                                  ),
+                                                  onPressed: filtered?(){
+
+                                                    Navigator.of(context).pop();
+                                                    setState(() {
+                                                      filtered=false;
+                                                      filters.clear();
+                                                    });
+                                                    vehicleDataSource.filter(filters);
+
+                                                  }
+                                                      :null,child: const Text('clear').tr(),
+                                                ),
+                                                const Spacer(),
+                                                Button(
+                                                    onPressed:(){
+                                                  Navigator.of(context).pop();
+                                                },
+                                                    child: const Text('annuler').tr()),
                                                 smallSpace,
 
-                                                FilledButton(child: const Text('confirmer').tr(),
+
+                                                smallSpace,
+
+                                                FilledButton(
+                                                    style:ButtonStyle(
+                                                      backgroundColor: ButtonState.all<Color>(
+                                                          appTheme.color.lighter
+                                                      ),
+                                                    ),
+                                                    child: const Text('confirmer').tr(),
                                                     onPressed: (){
                                                       Navigator.of(context).pop();
 

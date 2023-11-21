@@ -30,6 +30,8 @@
   "min": "Min",
   "max": "Max",
   "clear": "Clear",
+  "filter": "Filter",
+
 
   "documents": "Documents",
   "reparations": "Repairs",

@@ -1,10 +1,6 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
+
 
 part of 'vehicle.dart';
-
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
 
 Vehicle _$VehicleFromJson(Map<String, dynamic> json) => Vehicle(
       matricule: json['matricule'] as String,
@@ -42,7 +38,7 @@ Vehicle _$VehicleFromJson(Map<String, dynamic> json) => Vehicle(
       etat: json['etat'] == null
           ? null
           : Etat.fromJson(json['etat'] as Map<String, dynamic>),
-    )
+)
       ..id = json[r'$id'] as String?
       ..dateCreation = DateTime.tryParse(json[r'$createdAt'])?.difference(ClientDatabase.ref).inMilliseconds.abs()
       ..dateModification = DateTime.tryParse(json[r'$updatedAt'])?.difference(ClientDatabase.ref).inMilliseconds.abs();
@@ -76,4 +72,4 @@ Map<String, dynamic> _$VehicleToJson(Vehicle instance) => <String, dynamic>{
       'user_creation': instance.createdBy?.id,
       'pays': instance.pays,
       'etat': instance.etat?.id,
-    };
+};

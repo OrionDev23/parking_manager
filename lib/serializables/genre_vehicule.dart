@@ -16,7 +16,6 @@ class GenreVehicle{
 
   factory GenreVehicle.fromJson(Map<String, dynamic> json) => _$GenreVehicleFromJson(json);
 
-  /// Connect the generated [_$PersonToJson] function to the `toJson` method.
   Map<String, dynamic> toJson() => _$GenreVehicleToJson(this);
 
 }
