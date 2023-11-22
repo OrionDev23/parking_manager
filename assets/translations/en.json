@@ -154,7 +154,8 @@
   "disponibilite": "Availability",
   "nouvdocument": "New document",
   "gestiondocument": "Manage documents",
-
+  "done": "Done !",
+ "suprdoc": "Delete the document",
   "journal": "Activities log",
   "factures" : "Invoices",
   "facture" : "Invoice",

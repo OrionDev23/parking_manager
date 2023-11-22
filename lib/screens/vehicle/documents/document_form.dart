@@ -24,7 +24,7 @@ class DocumentForm extends StatefulWidget {
 class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClientMixin<DocumentForm>{
 
 
-  DateTime selectedDate=DateTime.now();
+  DateTime? selectedDate;
   TextEditingController nom=TextEditingController();
 
   Vehicle? selectedVehicle;
@@ -49,6 +49,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
     if(widget.v!=null){
       selectedVehicle=widget.v;
     }
+    documentID??=DateTime.now().difference(ClientDatabase.ref).inMilliseconds.toString();
   }
   @override
   Widget build(BuildContext context) {
@@ -101,6 +102,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
                     setState(() {
 
                     });
+                    checkForChanges();
                   }:null,
                 ),
               ),
@@ -120,6 +122,9 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
                   cursorColor: appTheme.color.darker,
                   placeholderStyle: placeStyle,
                   placeholder: 'nom'.tr(),
+                  onChanged: (s){
+                    checkForChanges();
+                  },
                 ),
               ),
             ),
@@ -137,7 +142,10 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
                     setState(() {
                       selectedDate=d;
                     });
-                  },),
+                      checkForChanges();
+                  },
+
+                ),
               ),
             ),
           )
@@ -149,10 +157,10 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
           width: 30.w,
           child: Row(mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            FilledButton(child: Padding(
+            FilledButton(onPressed:changes?()=>confirm(appTheme):null, child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0,vertical: 5),
-              child: const Text('confirmer',).tr(),
-            ), onPressed: (){}),
+              child: uploading?const ProgressRing():const Text('confirmer',).tr(),
+            )),
           ],),
         ),
 
@@ -165,6 +173,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
 
 
   bool changes=false;
+  bool uploading=false;
   void checkForChanges(){
     if(widget.vd!=null){
       if(nom.text.isNotEmpty && nom.text!=widget.vd!.nom){
@@ -175,6 +184,23 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
         }
         return;
       }
+      if((widget.v!=null && selectedVehicle!=null && widget.v!.id!=selectedVehicle!.id)|| (widget.v==null && selectedVehicle!=null)){
+        if(!changes){
+          setState(() {
+            changes=true;
+          });
+        }
+        return;
+      }
+      if(selectedDate!=null && (widget.vd!.dateExpiration==null || ClientDatabase.ref.add(Duration(milliseconds:widget.vd!.dateExpiration??0))==selectedDate))
+    {
+      if(!changes){
+        setState(() {
+          changes=true;
+        });
+      }
+      return;
+    }
     }
     else{
       if(nom.text.isNotEmpty){
@@ -187,7 +213,65 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
       }
     }
   }
-  void confirm()async{
+  void confirm(AppTheme appTheme)async{
+    checkForChanges();
+    if(changes){
+      setState(() {
+        uploading=true;
+      });
 
+      DocumentVehicle dv=DocumentVehicle(id: documentID!, nom: nom.text,vehicle: selectedVehicle,
+          dateExpiration: selectedDate?.difference(ClientDatabase.ref).inMilliseconds.abs(),
+      createdBy: ClientDatabase.me.value);
+      if(widget.vd!=null){
+        await ClientDatabase.database!.updateDocument(
+            databaseId: databaseId,
+            collectionId: vehicDoc,
+            documentId: documentID!,
+            data: dv.toJson()
+        );
+      }
+      else{
+        await ClientDatabase.database!.createDocument(
+            databaseId: databaseId,
+            collectionId: vehicDoc,
+            documentId: documentID!,
+            data: dv.toJson()
+        );
+      }
+
+
+      setState(() {
+        changes=false;
+        uploading=false;
+      });
+
+      Future.delayed(Duration.zero).whenComplete(() {
+        displayInfoBar(context,
+            builder: (BuildContext context, void Function() close) {
+              return InfoBar(
+                  title: const Text('done').tr(),
+                  severity: InfoBarSeverity.success,
+                  style: InfoBarThemeData(
+                      iconColor: (c){
+                        switch(c){
+                          case InfoBarSeverity.success :return appTheme.color.lightest;
+                          case InfoBarSeverity.error: return appTheme.color.darkest;
+                          case InfoBarSeverity.info:return appTheme.color;
+                          default: return appTheme.color;
+                        }})
+              );
+            },
+            duration: snackbarShortDuration);
+        Future.delayed(snackbarShortDuration).whenComplete(() {
+
+          if(widget.v!=null){
+         Navigator.pop(context);
+        }
+        else{
+
+        }
+      });});
+    }
   }
 }

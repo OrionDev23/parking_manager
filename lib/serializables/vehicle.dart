@@ -82,11 +82,15 @@ class Vehicle{
     this.poidsTotal, this.puissance, this.createdBy,this.etat
   });
 
-
   factory Vehicle.fromJson(Map<String, dynamic> json) => _$VehicleFromJson(json);
 
   /// Connect the generated [_$PersonToJson] function to the `toJson` method.
   Map<String, dynamic> toJson() => _$VehicleToJson(this);
+
+  int compareTo(Vehicle vehicle) {
+
+    return id!.compareTo(vehicle.id!);
+  }
 }
 
 

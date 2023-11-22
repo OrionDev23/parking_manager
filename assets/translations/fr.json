@@ -206,6 +206,7 @@
  "bstate": "En panne",
  "rstate": "En réparation",
  "documents": "Documents",
+ "suprdoc": "Supprimer le document",
  "reparations": "Réparations",
  "greparations": "Gestion des réparations",
  "prestataires": "Prestataires",
@@ -234,5 +235,6 @@
  "iraction": "Cette action est irreversible",
  "mod": "Modifier",
  "values": "Valeurs",
+ "done": "Terminé !",
  "entervalues": "Entrez une valeur pour cette option et pressez 'Entrée'"
 }

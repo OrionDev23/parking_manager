@@ -1,103 +1,79 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
-import 'package:parc_oto/datasources/vehicules_datasource.dart';
+import 'package:parc_oto/serializables/document_vehicle.dart';
 
-import '../providers/client_database.dart';
-import '../serializables/vehicle.dart';
-import '../utilities/vehicle_util.dart';
+import '../../providers/client_database.dart';
+import 'document_datasource.dart';
 
-class VehiculesWebServiceResponse {
-  VehiculesWebServiceResponse(this.totalRecords, this.data);
+class DocumentWebServiceResponse {
+  DocumentWebServiceResponse(this.totalRecords, this.data);
 
   /// THe total ammount of records on the server, e.g. 100
   final int totalRecords;
 
   /// One page, e.g. 10 reocrds
-  final List<MapEntry<String,Vehicle>> data;
+  final List<MapEntry<String,DocumentVehicle>> data;
 }
 
-class VehiculesWebService {
-  int Function(MapEntry<String,Vehicle>, MapEntry<String,Vehicle>)? _getComparisonFunction(
+class DocumentWebService {
+  int Function(MapEntry<String,DocumentVehicle>, MapEntry<String,DocumentVehicle>)? _getComparisonFunction(
       int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
       //id
       case 0:
-        return (MapEntry<String,Vehicle> d1, MapEntry<String,Vehicle> d2) => coef * d1.key.compareTo(d2.key);
-      //matricule
+        return ( d1,  d2) => coef * d1.key.compareTo(d2.key);
+      //nom
       case 1:
-        return (MapEntry<String,Vehicle> d1, MapEntry<String,Vehicle> d2) =>
-            coef * d1.value.matricule.compareTo(d2.value.matricule);
-      //marque
+        return ( d1, d2) =>
+            coef * d1.value.nom.compareTo(d2.value.nom);
+      //vehicle
       case 2:
-        return (MapEntry<String,Vehicle> d1, MapEntry<String,Vehicle> d2) {
-          if (d1.value.marque == null && d1.value.type == null) {
+        return ( d1, d2) {
+          if (d1.value.vehicle == null && d2.value.vehicle == null) {
             return -1;
-          } else if (d2.value.marque == null && d2.value.type == null) {
-            return 1;
-          } else if (d2.value.marque == d1.value.marque) {
-            return coef * d1.value.type!.compareTo(d2.value.type!);
+          } else if (d2.value.vehicle == d1.value.vehicle) {
+            return 0;
           } else {
-            return coef * d1.value.marque!.id.compareTo(d2.value.marque!.id);
+            return coef * d1.value.vehicle!.id!.compareTo(d2.value.vehicle!.id!);
           }
         };
-      //type
+      //date d'expiration
       case 3:
-        return (d1, d2) {
-          if (d1.value.type == null) {
-            return -1;
-          } else if (d2.value.type == null) {
-            return 1;
-          } else {
-            return coef * d1.value.type!.compareTo(d2.value.type!);
-          }
-        };
-      //annee
-      case 4:
-        return ( d1,  d2) {
-          int annee1 = d1.value.anneeUtil ??
-              VehiclesUtilities.getAnneeFromMatricule(d1.value.matricule);
-          int annee2 = d2.value.anneeUtil ??
-              VehiclesUtilities.getAnneeFromMatricule(d2.value.matricule);
-
-          return coef * annee1.compareTo(annee2);
-        };
-      //dateAjout
-      case 5:
         return ( d1,  d2) =>
-            coef * d1.value.dateCreation!.compareTo(d2.value.dateCreation!);
+            coef * d1.value.dateExpiration!.compareTo(d2.value.dateExpiration!);
       //date modif
-      case 6:
+      case 4:
         return ( d1,  d2) =>
-            coef * d1.value.dateModification!.compareTo(d2.value.dateModification!);
+            coef * d1.value.dateModif!.compareTo(d2.value.dateModif!);
     }
 
     return null;
   }
 
-  Future<VehiculesWebServiceResponse> getData(int startingAt, int count,
+  Future<DocumentWebServiceResponse> getData(int startingAt, int count,
       int sortedBy, bool sortedAsc, {String? searchKey,Map<String,String>?filters}) async {
     if (startingAt == 0) {
-      vehicles.clear();
+      documents.clear();
     }
     return getSearchResult(searchKey,filters??{},count,startingAt,sortedBy,sortedAsc).then((value) {
 
       for (var element in value.documents) {
         if(!testIfVehiculesContained(element.$id)){
-          vehicles.add(MapEntry(element.$id, element.convertTo<Vehicle>((p0) {
-            return Vehicle.fromJson(p0 as Map<String, dynamic>);
+          documents.add(MapEntry(element.$id, element.convertTo<DocumentVehicle>((p0) {
+            return DocumentVehicle.fromJson(p0 as Map<String, dynamic>);
           })));
 
         }
 
       }
-      var result = vehicles;
+      var result = documents;
 
       result.sort(_getComparisonFunction(sortedBy, sortedAsc));
-      return VehiculesWebServiceResponse(
+      return DocumentWebServiceResponse(
           value.total, result.skip(startingAt).take(count).toList());
     }).onError((error, stackTrace) {
-      return Future.value(VehiculesWebServiceResponse(0, vehicles));
+      return Future.value(DocumentWebServiceResponse(0, documents));
     });
   }
 
@@ -172,8 +148,8 @@ class VehiculesWebService {
 
 
   bool testIfVehiculesContained(String id){
-    for(int i=0;i<vehicles.length;i++){
-      if(vehicles[i].key==id){
+    for(int i=0;i<documents.length;i++){
+      if(documents[i].key==id){
         return true;
       }
     }
