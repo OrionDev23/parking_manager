@@ -61,6 +61,9 @@
   "emailempty": "Please enter an E-mail",
   "entervalidemail": "Please enter a valid Email ",
   "emptypassword": "Please enter your password",
+  "dateexp": "Expiration date",
+  "selectvehicle": "Select a vehicle",
+
   "user_invalid_credentials": "Invalid credentials. Please check the email and password",
   "general_argument_invalid": "Password must contain at least 8 characters",
   "telcl": "Downloading clients...",

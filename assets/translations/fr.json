@@ -193,6 +193,9 @@
  "option": "Option",
  "nom": "Nom",
  "nomf": "Nom",
+ "dateexp": "Date d'expiration",
+ "selectvehicle": "Selectionnez un véhicule",
+
  "code": "Code",
  "name": "Nom",
  "codeParent": "Catégorie mère",

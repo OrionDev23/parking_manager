@@ -144,6 +144,8 @@
   "parking": "الموقف",
   "aide": "المساعدة",
   "oaide": "الحصول على المساعدة",
+  "dateexp": "تاريخ انتهاء الصلاحية",
+  "selectvehicle": "اختر سيارة",
   "gestionevent": "إدارة الأحداث",
   "creationdefactures": "إنشاء الفواتير",
   "creationdebons": "إنشاء أوامر الشراء",

@@ -12,7 +12,8 @@ import '../../widgets/select_dialog/select_dialog.dart';
 import '../../widgets/zone_box.dart';
 
 class VehicleTable extends StatefulWidget {
-  const VehicleTable({super.key});
+  final bool selectV;
+  const VehicleTable({super.key,this.selectV=false});
 
   @override
   State<VehicleTable> createState() => _VehicleTableState();
@@ -27,7 +28,7 @@ class _VehicleTableState extends State<VehicleTable> {
 
   @override
   void initState() {
-    vehicleDataSource = VehiculesDataSource(current: context);
+    vehicleDataSource = VehiculesDataSource(current: context,selectV:widget.selectV);
     initColumns();
     super.initState();
   }
@@ -132,6 +133,7 @@ class _VehicleTableState extends State<VehicleTable> {
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
+    vehicleDataSource.appTheme=appTheme;
     return AsyncPaginatedDataTable2(
       header: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
@@ -599,6 +601,7 @@ class _VehicleTableState extends State<VehicleTable> {
       columnSpacing: 0,
       dataRowHeight: 3.5.h,
       onPageChanged: (s) {},
+      showCheckboxColumn: false,
       sortColumnIndex: sortColumn,
       rowsPerPage: rowPerPage,
       onRowsPerPageChanged: (nbr) {
