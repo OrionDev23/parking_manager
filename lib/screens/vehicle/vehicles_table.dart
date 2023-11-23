@@ -37,7 +37,7 @@ class _VehicleTableState extends State<VehicleTable> {
     fontSize: 10.sp,
   );
 
-  int sortColumn = 0;
+  int sortColumn = 3;
 
   void initColumns() {
     columns = [
@@ -54,7 +54,7 @@ class _VehicleTableState extends State<VehicleTable> {
           sortColumn = 0;
           assending = !assending;
 
-          vehicleDataSource.sort(1, assending);
+          vehicleDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -71,7 +71,7 @@ class _VehicleTableState extends State<VehicleTable> {
           sortColumn = 1;
           assending = !assending;
 
-          vehicleDataSource.sort(2, assending);
+          vehicleDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -88,7 +88,7 @@ class _VehicleTableState extends State<VehicleTable> {
           sortColumn = 2;
           assending = !assending;
 
-          vehicleDataSource.sort(4, assending);
+          vehicleDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -104,7 +104,7 @@ class _VehicleTableState extends State<VehicleTable> {
         onSort: (s, c) {
           sortColumn = 3;
           assending = !assending;
-          vehicleDataSource.sort(6, assending);
+          vehicleDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),

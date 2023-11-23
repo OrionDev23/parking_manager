@@ -21,15 +21,13 @@ class VehiculesWebService {
       int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
-      //id
-      case 0:
-        return (MapEntry<String,Vehicle> d1, MapEntry<String,Vehicle> d2) => coef * d1.key.compareTo(d2.key);
+
       //matricule
-      case 1:
+      case 0:
         return (MapEntry<String,Vehicle> d1, MapEntry<String,Vehicle> d2) =>
             coef * d1.value.matricule.compareTo(d2.value.matricule);
       //marque
-      case 2:
+      case 1:
         return (MapEntry<String,Vehicle> d1, MapEntry<String,Vehicle> d2) {
           if (d1.value.marque == null && d1.value.type == null) {
             return -1;
@@ -41,19 +39,8 @@ class VehiculesWebService {
             return coef * d1.value.marque!.id.compareTo(d2.value.marque!.id);
           }
         };
-      //type
-      case 3:
-        return (d1, d2) {
-          if (d1.value.type == null) {
-            return -1;
-          } else if (d2.value.type == null) {
-            return 1;
-          } else {
-            return coef * d1.value.type!.compareTo(d2.value.type!);
-          }
-        };
       //annee
-      case 4:
+      case 2:
         return ( d1,  d2) {
           int annee1 = d1.value.anneeUtil ??
               VehiclesUtilities.getAnneeFromMatricule(d1.value.matricule);
@@ -62,14 +49,12 @@ class VehiculesWebService {
 
           return coef * annee1.compareTo(annee2);
         };
-      //dateAjout
-      case 5:
-        return ( d1,  d2) =>
-            coef * d1.value.dateCreation!.compareTo(d2.value.dateCreation!);
       //date modif
-      case 6:
+      case 3:
         return ( d1,  d2) =>
             coef * d1.value.dateModification!.compareTo(d2.value.dateModification!);
+    default:
+    return (MapEntry<String,Vehicle> d1, MapEntry<String,Vehicle> d2) => coef * d1.key.compareTo(d2.key);
     }
 
     return null;
@@ -113,6 +98,7 @@ class VehiculesWebService {
             databaseId: databaseId,
             collectionId: vehiculeid,
             queries: [
+              getQuery(sortedBy, sortedAsc),
               if(i==2)
                 Query.equal('annee_util', int.tryParse(searchKey)??9999),
               if(i!=2)
@@ -127,7 +113,6 @@ class VehiculesWebService {
                 Query.equal('marque', filters['marque']),
               Query.limit(count),
               Query.offset(startingAt),
-              getQuery(sortedBy, sortedAsc),
             ]);
          if(d.documents.isNotEmpty){
            break;
@@ -140,6 +125,8 @@ class VehiculesWebService {
           databaseId: databaseId,
           collectionId: vehiculeid,
           queries: [
+            getQuery(sortedBy, sortedAsc),
+
             if(filters.containsKey('yearmin'))
               Query.greaterThanEqual('annee_util', int.tryParse(filters['yearmin']!)),
             if(filters.containsKey('yearmax'))
@@ -150,7 +137,6 @@ class VehiculesWebService {
               Query.equal('marque', filters['marque']),
             Query.limit(count),
             Query.offset(startingAt),
-            getQuery(sortedBy, sortedAsc),
           ]);
     }
   }
@@ -182,25 +168,25 @@ class VehiculesWebService {
 
   String getQuery(int sortedBy, bool sortedAsc) {
     switch (sortedBy) {
-      case 1:
+      case 0:
         if (sortedAsc) {
           return Query.orderAsc('matricule');
         } else {
           return Query.orderDesc('matricule');
         }
-      case 2:
+      case 1:
         if (sortedAsc) {
           return Query.orderAsc('type');
         } else {
           return Query.orderDesc('type');
         }
-      case 4:
+      case 2:
         if (sortedAsc) {
           return Query.orderAsc('annee_util');
         } else {
           return Query.orderDesc('annee_util');
         }
-      case 6:
+      case 3:
         if (sortedAsc) {
           return Query.orderAsc('\$updatedAt');
         } else {
