@@ -2,6 +2,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
 import 'package:parc_oto/widgets/on_tap_scale.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -75,10 +76,11 @@ class _BrandContainerState extends State<BrandContainer> {
         ),
       ),
       onTap: (){
+        PanesListState.index.value=2;
+        VehicleTabsState.currentIndex.value=0;
+
         VehicleTableState.filterNow=true;
         VehicleTableState.filterMarque.value=widget.id;
-        PanesListState.index.value=2;
-
       },
     );
   }
