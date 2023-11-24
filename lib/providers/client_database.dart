@@ -95,6 +95,7 @@ class ClientDatabase {
         ]
       ).then((value) {
         result=value.total;
+      }).onError((AppwriteException error, stackTrace) {
       });
 
 

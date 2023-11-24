@@ -6,6 +6,7 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/login.dart';
 import 'package:parc_oto/screens/logout.dart';
 import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
+import 'package:parc_oto/screens/vehicle/brand/brand_list.dart';
 import 'package:parc_oto/screens/vehicle/documents/document_tabs.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
 import 'package:parc_oto/widgets/on_tap_scale.dart';
@@ -264,7 +265,7 @@ class PanesListState extends State<PanesList> with WindowListener {
           PaneItem(
             icon: const Icon(FluentIcons.verified_brand),
             title: const Text('brands').tr(),
-            body: const Placeholder(),
+            body: const BrandList(),
           ),
           PaneItem(
             icon: const Icon(FluentIcons.health),

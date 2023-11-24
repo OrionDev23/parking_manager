@@ -59,7 +59,7 @@ class DocumentWebService {
     return getSearchResult(searchKey,filters??{},count,startingAt,sortedBy,sortedAsc).then((value) {
 
       for (var element in value.documents) {
-        if(!testIfVehiculesContained(element.$id)){
+        if(!testIfContained(element.$id)){
           documents.add(MapEntry(element.$id, element.convertTo<DocumentVehicle>((p0) {
             return DocumentVehicle.fromJson(p0 as Map<String, dynamic>);
           })));
@@ -72,7 +72,7 @@ class DocumentWebService {
       result.sort(_getComparisonFunction(sortedBy, sortedAsc));
       return DocumentWebServiceResponse(
           value.total, result.skip(startingAt).take(count).toList());
-    }).onError((error, stackTrace) {
+    }).onError((AppwriteException error, stackTrace) {
       return Future.value(DocumentWebServiceResponse(0, documents));
     });
   }
@@ -83,71 +83,50 @@ class DocumentWebService {
       int count,int startingAt,int sortedBy,bool sortedAsc) async{
 
     if(searchKey!=null && searchKey.isNotEmpty){
-      late DocumentList d;
-      for(int i=0;i<8;i++){
-         d=await ClientDatabase.database!.listDocuments(
-            databaseId: databaseId,
-            collectionId: vehiculeid,
-            queries: [
-              if(i==2)
-                Query.equal('annee_util', int.tryParse(searchKey)??9999),
-              if(i!=2)
-              Query.search(getAttributeForSearch(i), searchKey),
-              if(filters.containsKey('yearmin'))
-                Query.greaterThanEqual('annee_util', int.tryParse(filters['yearmin']!)),
-              if(filters.containsKey('yearmax'))
-                Query.lessThanEqual('annee_util', int.tryParse(filters['yearmax']!)),
-              if(filters.containsKey('genre'))
-                Query.equal('genre', filters['genre']),
-              if(filters.containsKey('marque'))
-                Query.equal('marque', filters['marque']),
-              Query.limit(count),
-              Query.offset(startingAt),
-              getQuery(sortedBy, sortedAsc),
-            ]);
-         if(d.documents.isNotEmpty){
-           break;
-         }
-      }
-      return d;
+
+
+      return  await ClientDatabase.database!.listDocuments(
+          databaseId: databaseId,
+          collectionId: vehicDoc,
+          queries: [
+            getQuery(sortedBy, sortedAsc),
+            Query.search('nom', searchKey),
+            if(filters.containsKey('datemin'))
+              Query.greaterThanEqual('date_expiration', int.tryParse(filters['datemin']!)),
+            if(filters.containsKey('datemax'))
+              Query.lessThanEqual('date_expiration', int.tryParse(filters['datemax']!)),
+            if(filters.containsKey('createdBy'))
+              Query.equal('createdBy', filters['createdBy']),
+            if(filters.containsKey('vehicle'))
+              Query.equal('vehicle', filters['vehicle']),
+            Query.limit(count),
+            Query.offset(startingAt),
+          ]);
     }
     else{
       return await ClientDatabase.database!.listDocuments(
           databaseId: databaseId,
-          collectionId: vehiculeid,
+          collectionId: vehicDoc,
           queries: [
-            if(filters.containsKey('yearmin'))
-              Query.greaterThanEqual('annee_util', int.tryParse(filters['yearmin']!)),
-            if(filters.containsKey('yearmax'))
-              Query.lessThanEqual('annee_util', int.tryParse(filters['yearmax']!)),
-            if(filters.containsKey('genre'))
-              Query.equal('genre', filters['genre']),
-            if(filters.containsKey('marque'))
-              Query.equal('marque', filters['marque']),
+            getQuery(sortedBy, sortedAsc),
+            if(filters.containsKey('datemin'))
+              Query.greaterThanEqual('date_expiration', int.tryParse(filters['datemin']!)),
+            if(filters.containsKey('datemax'))
+              Query.lessThanEqual('date_expiration', int.tryParse(filters['datemax']!)),
+            if(filters.containsKey('createdBy'))
+              Query.equal('createdBy', filters['createdBy']),
+            if(filters.containsKey('vehicle'))
+              Query.equal('vehicle', filters['vehicle']),
             Query.limit(count),
             Query.offset(startingAt),
-            getQuery(sortedBy, sortedAsc),
-          ]);
+          ]).onError((AppwriteException error, stackTrace) {
+            return Future.value(DocumentList.fromMap({}));      });
     }
   }
 
 
 
-  String getAttributeForSearch(int att){
-    switch (att){
-      case 0:return 'matricule';
-      case 1:return 'type';
-      case 3:return 'nom';
-      case 4:return 'prenom';
-      case 5:return 'numero_serie';
-      case 6:return 'numero';
-      case 7:return 'matricule_prec';
-      default:return 'matricule';
-    }
-  }
-
-
-  bool testIfVehiculesContained(String id){
+  bool testIfContained(String id){
     for(int i=0;i<documents.length;i++){
       if(documents[i].key==id){
         return true;
@@ -158,25 +137,19 @@ class DocumentWebService {
 
   String getQuery(int sortedBy, bool sortedAsc) {
     switch (sortedBy) {
+      case 0:
+        if (sortedAsc) {
+          return Query.orderAsc('nom');
+        } else {
+          return Query.orderDesc('nom');
+        }
       case 1:
         if (sortedAsc) {
-          return Query.orderAsc('matricule');
+          return Query.orderAsc('date_expiration');
         } else {
-          return Query.orderDesc('matricule');
+          return Query.orderDesc('date_expiration');
         }
-      case 2:
-        if (sortedAsc) {
-          return Query.orderAsc('type');
-        } else {
-          return Query.orderDesc('type');
-        }
-      case 4:
-        if (sortedAsc) {
-          return Query.orderAsc('annee_util');
-        } else {
-          return Query.orderDesc('annee_util');
-        }
-      case 6:
+      case 3:
         if (sortedAsc) {
           return Query.orderAsc('\$updatedAt');
         } else {

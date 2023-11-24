@@ -16,14 +16,16 @@ class VehiculesDataSource extends AsyncDataTableSource {
 
   BuildContext current;
   bool? selectV;
-  AppTheme? appTheme;
-  VehiculesDataSource({required this.current,this.selectV=false,this.appTheme});
 
-  VehiculesDataSource.empty({required this.current,this.selectV=false,this.appTheme}) {
+  AppTheme? appTheme;
+  String? searchKey;
+  VehiculesDataSource({required this.current,this.selectV=false,this.appTheme,this.filters,this.searchKey});
+
+  VehiculesDataSource.empty({required this.current,this.selectV=false,this.appTheme,this.filters,this.searchKey}) {
     _empty = true;
   }
 
-  VehiculesDataSource.error({required this.current,this.selectV=false,this.appTheme}) {
+  VehiculesDataSource.error({required this.current,this.selectV=false,this.appTheme,this.filters,this.searchKey}) {
     _errorCounter = 0;
   }
 
@@ -40,8 +42,6 @@ class VehiculesDataSource extends AsyncDataTableSource {
     _sortAscending = ascending;
     refreshDatasource();
   }
-
-  String? searchKey;
 
   void search(String searchKey){
     this.searchKey=searchKey;
@@ -68,7 +68,7 @@ class VehiculesDataSource extends AsyncDataTableSource {
       _errorCounter = _errorCounter! + 1;
 
       if (_errorCounter! % 2 == 1) {
-        await Future.delayed(const Duration(milliseconds: 1000));
+        await Future.delayed(const Duration(milliseconds: 500));
         throw 'Error #${((_errorCounter! - 1) / 2).round() + 1} has occured';
       }
     }

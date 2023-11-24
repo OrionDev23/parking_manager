@@ -57,7 +57,6 @@ class VehiculesWebService {
     return (MapEntry<String,Vehicle> d1, MapEntry<String,Vehicle> d2) => coef * d1.key.compareTo(d2.key);
     }
 
-    return null;
   }
 
   Future<VehiculesWebServiceResponse> getData(int startingAt, int count,
@@ -98,7 +97,7 @@ class VehiculesWebService {
             databaseId: databaseId,
             collectionId: vehiculeid,
             queries: [
-              getQuery(sortedBy, sortedAsc),
+
               if(i==2)
                 Query.equal('annee_util', int.tryParse(searchKey)??9999),
               if(i!=2)
@@ -113,6 +112,7 @@ class VehiculesWebService {
                 Query.equal('marque', filters['marque']),
               Query.limit(count),
               Query.offset(startingAt),
+              getQuery(sortedBy, sortedAsc),
             ]);
          if(d.documents.isNotEmpty){
            break;
@@ -125,8 +125,6 @@ class VehiculesWebService {
           databaseId: databaseId,
           collectionId: vehiculeid,
           queries: [
-            getQuery(sortedBy, sortedAsc),
-
             if(filters.containsKey('yearmin'))
               Query.greaterThanEqual('annee_util', int.tryParse(filters['yearmin']!)),
             if(filters.containsKey('yearmax'))
@@ -137,6 +135,8 @@ class VehiculesWebService {
               Query.equal('marque', filters['marque']),
             Query.limit(count),
             Query.offset(startingAt),
+            getQuery(sortedBy, sortedAsc),
+
           ]);
     }
   }
@@ -195,4 +195,7 @@ class VehiculesWebService {
     }
     return Query.orderAsc('\$id');
   }
+
+
+
 }

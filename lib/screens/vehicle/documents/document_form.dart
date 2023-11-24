@@ -41,7 +41,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
     if(widget.vd!=null){
       nom.text=widget.vd!.nom;
       documentID=widget.vd!.id;
-      selectedVehicle=widget.v;
+      selectedVehicle=widget.vd!.vehicle;
       if(widget.vd!.dateExpiration!=null) {
         selectedDate=ClientDatabase.ref.add(Duration(milliseconds: widget.vd!.dateExpiration??0));
       }
@@ -78,7 +78,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
                 padding: const EdgeInsets.all(10.0),
                 child: ListTile(
                   title: Text(selectedVehicle?.matricule??'/'),
-                  onPressed: widget.v==null?() async{
+                  onPressed: widget.vd?.vehicle==null && widget.v==null?() async{
                     selectedVehicle=await showDialog<Vehicle>(context: context,
                         barrierDismissible: true,
                         builder: (context){

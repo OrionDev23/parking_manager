@@ -16,7 +16,7 @@ DocumentVehicle _$DocumentVehicleFromJson(Map<String, dynamic> json) =>
         createdBy: json['createdBy'] == null
             ? null
             : ParcUser.fromJson(json['createdBy'] as Map<String, dynamic>),
-      dateExpiration:DateTime.tryParse(json['date_expiration'])?.difference(ClientDatabase.ref).inMilliseconds.abs(),
+        dateExpiration:json['date_expiration'],
         dateAjout : DateTime.tryParse(json[r'$createdAt']),
         dateModif: DateTime.tryParse(json[r'$updatedAt']),
 
