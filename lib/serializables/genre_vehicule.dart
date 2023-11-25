@@ -1,6 +1,8 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:parc_oto/serializables/parc_user.dart';
 
+import '../utilities/profil_beautifier.dart';
+
 
 part 'genre_vehicule.g.dart';
 
@@ -10,6 +12,8 @@ class GenreVehicle{
 
   String id;
   String? name;
+
+  @JsonKey(toJson: userToJson)
   ParcUser? user;
 
   GenreVehicle({required this.id,this.name,this.user});

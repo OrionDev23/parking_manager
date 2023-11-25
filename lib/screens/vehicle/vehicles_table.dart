@@ -144,6 +144,7 @@ class VehicleTableState extends State<VehicleTable> {
     ];
   }
 
+  final rowPerPageC = 12;
   int rowPerPage = 12;
 
   TextEditingController searchController = TextEditingController();
@@ -181,6 +182,7 @@ class VehicleTableState extends State<VehicleTable> {
                 if (!startedWithFiltersOn && v != null && filterNow) {
                   searchController.text = v;
                   vehicleDataSource.search(v);
+                  notEmpty=true;
                   filtered = true;
                   filterNow = false;
                 }
@@ -758,9 +760,9 @@ class VehicleTableState extends State<VehicleTable> {
                   sortColumnIndex: sortColumn,
                   rowsPerPage: rowPerPage,
                   onRowsPerPageChanged: (nbr) {
-                    rowPerPage = nbr ?? 12;
+                    rowPerPage = nbr ?? rowPerPageC;
                   },
-                  availableRowsPerPage: const [12, 24, 50, 100, 200],
+                  availableRowsPerPage:  [rowPerPageC, rowPerPageC*2, rowPerPageC*4, rowPerPageC*10, rowPerPageC*20],
                   showFirstLastButtons: true,
                   renderEmptyRowsInTheEnd: false,
                   fit: FlexFit.tight,

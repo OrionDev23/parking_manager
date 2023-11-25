@@ -8,13 +8,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
-import 'package:parc_oto/serializables/genre_vehicule.dart';
 import 'package:parc_oto/serializables/vehicle.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-import '../../../serializables/marque.dart';
 import '../../../theme.dart';
 import '../../../utilities/algeria_lists.dart';
 import '../../../widgets/select_dialog/select_dialog.dart';
@@ -109,8 +107,8 @@ class _VehicleFormState extends State<VehicleForm>
       fname.text=widget.vehicle!.prenom??'';
       profession.text=widget.vehicle!.profession??'';
       adresse.text=widget.vehicle!.adresse??'';
-      genre=int.tryParse(widget.vehicle!.genre?.id??'-1');
-      marque=int.tryParse(widget.vehicle!.marque?.id??'-1');
+      genre=int.tryParse(widget.vehicle!.genre??'-1');
+      marque=int.tryParse(widget.vehicle!.marque??'-1');
       type.text=widget.vehicle!.type??'';
       numSer.text=widget.vehicle!.numeroSerie??'';
       caross.text=widget.vehicle!.carrosserie??'';
@@ -1517,6 +1515,7 @@ class _VehicleFormState extends State<VehicleForm>
         errorUploading=false;
       });
       Vehicle vehicle=Vehicle(
+          id: documentID!,
           matricule: autreMat
               ?matriculeEtr.text
               :'${matr1.text}-${matr2.text}-${matr3.text}',
@@ -1539,38 +1538,53 @@ class _VehicleFormState extends State<VehicleForm>
           profession: profession.text,
           puissance: int.tryParse(puissance.text),
           daira: dairaCont.text,
-          genre: GenreVehicle(id:genre.toString()),
-          marque: Marque(id:marque.toString()),
+          genre: genre.toString(),
+          marque: marque.toString(),
           matriculePrec: matrPrec.text,
           carrosserie: caross.text,
           charegeUtile: int.tryParse(charg.text),
-          createdBy: ClientDatabase.me.value,
+          createdBy: ClientDatabase.me.value?.id,
 
       );
-      
-      await ClientDatabase.database!.createDocument(
-          databaseId: databaseId, 
-          collectionId: vehiculeid, 
-          documentId: documentID!, 
-          data: vehicle.toJson(),
-        permissions: [
-          Permission.read(Role.users()),
-          Permission.update(Role.user(ClientDatabase.me.value!.id)),
-          Permission.write(Role.user(ClientDatabase.me.value!.id)),
-          Permission.delete(Role.team('managers')),
-        ]
-      
-      ).then((value) {
-        if(widget.tab!=null){
-          VehicleTabsState.tabs.remove(widget.tab);
-        }
-        if(VehicleTabsState.currentIndex.value>0)VehicleTabsState.currentIndex.value--;
-      }).onError((AppwriteException error, stackTrace) {
-        setState(() {
-          uploading=false;
-          errorUploading=true;
+      if(widget.vehicle!=null){
+        await ClientDatabase.database!.updateDocument(
+            databaseId: databaseId,
+            collectionId: vehiculeid,
+            documentId: documentID!,
+            data: vehicle.toJson(),
+
+        ).then((value) {
+          if(widget.tab!=null){
+            VehicleTabsState.tabs.remove(widget.tab);
+          }
+          if(VehicleTabsState.currentIndex.value>0)VehicleTabsState.currentIndex.value--;
+        }).onError((AppwriteException error, stackTrace) {
+          setState(() {
+            uploading=false;
+            errorUploading=true;
+          });
         });
-      });
+      }
+      else{
+        await ClientDatabase.database!.createDocument(
+            databaseId: databaseId,
+            collectionId: vehiculeid,
+            documentId: documentID!,
+            data: vehicle.toJson(),
+
+        ).then((value) {
+          if(widget.tab!=null){
+            VehicleTabsState.tabs.remove(widget.tab);
+          }
+          if(VehicleTabsState.currentIndex.value>0)VehicleTabsState.currentIndex.value--;
+        }).onError((AppwriteException error, stackTrace) {
+          setState(() {
+            uploading=false;
+            errorUploading=true;
+          });
+        });
+      }
+
     }
   }
   @override

@@ -36,7 +36,7 @@ class VehiculesWebService {
           } else if (d2.value.marque == d1.value.marque) {
             return coef * d1.value.type!.compareTo(d2.value.type!);
           } else {
-            return coef * d1.value.marque!.compareTo(d2.value.marque!);
+            return coef * d1.value.marque!.id.compareTo(d2.value.marque!.id);
           }
         };
       //annee
@@ -64,17 +64,14 @@ class VehiculesWebService {
     if (startingAt == 0) {
       vehicles.clear();
     }
-  //  final stopwatch = Stopwatch()..start();
     return getSearchResult(searchKey,filters??{},count,startingAt,sortedBy,sortedAsc).then((value) {
-
-      //stopwatch.stop();
-     // print("finished in ${stopwatch.elapsed.inMilliseconds} s");
 
       for (var element in value.documents) {
         if(!testIfVehiculesContained(element.$id)){
-            vehicles.add(MapEntry(element.$id, element.convertTo<Vehicle>((p0) {
-              return Vehicle.fromJson(p0 as Map<String, dynamic>);
-            })));
+          vehicles.add(MapEntry(element.$id, element.convertTo<Vehicle>((p0) {
+            return Vehicle.fromJson(p0 as Map<String, dynamic>);
+          })));
+
         }
 
       }

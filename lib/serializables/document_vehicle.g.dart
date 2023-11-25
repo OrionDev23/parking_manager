@@ -13,20 +13,18 @@ DocumentVehicle _$DocumentVehicleFromJson(Map<String, dynamic> json) =>
       vehicle: json['vehicle'] == null
           ? null
           : Vehicle.fromJson(json['vehicle'] as Map<String, dynamic>),
-        createdBy: json['createdBy'] == null
-            ? null
-            : ParcUser.fromJson(json['createdBy'] as Map<String, dynamic>),
-        dateExpiration:json['date_expiration'],
-        dateAjout : DateTime.tryParse(json[r'$createdAt']),
-        dateModif: DateTime.tryParse(json[r'$updatedAt']),
-
+      dateExpiration: json['date_expiration'] as int?,
+      createdBy: json['createdBy'] == null
+          ? null
+          : ParcUser.fromJson(json['createdBy'] as Map<String, dynamic>),
+      dateAjout: createdAtJson(json[r'$createdAt'] as String),
+      dateModif: updatedAtJson(json[r'$updatedAt'] as String),
     );
-
 
 Map<String, dynamic> _$DocumentVehicleToJson(DocumentVehicle instance) =>
     <String, dynamic>{
       'date_expiration': instance.dateExpiration,
       'nom': instance.nom,
-      'vehicle': instance.vehicle?.id,
-      'createdBy': instance.createdBy?.id,
+      'vehicle': vehiculeToJson(instance.vehicle),
+      'createdBy': userToJson(instance.createdBy),
     };

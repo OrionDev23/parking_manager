@@ -2,8 +2,8 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:parc_oto/serializables/parc_user.dart';
 import 'package:parc_oto/serializables/vehicle.dart';
+import 'package:parc_oto/utilities/profil_beautifier.dart';
 
-import '../providers/client_database.dart';
 
 part 'document_vehicle.g.dart';
 
@@ -17,13 +17,14 @@ class DocumentVehicle{
   @JsonKey(name:"date_expiration")
   int? dateExpiration;
   String nom;
+  @JsonKey(toJson: vehiculeToJson)
 
   Vehicle? vehicle;
-
+  @JsonKey(toJson: userToJson)
   ParcUser? createdBy;
-  @JsonKey(includeToJson: false,name: '\$createdAt')
+  @JsonKey(includeToJson: false,name: '\$createdAt',fromJson: createdAtJson)
   DateTime? dateAjout;
-  @JsonKey(includeToJson: false,name: '\$updatedAt')
+  @JsonKey(includeToJson: false,name: '\$updatedAt',fromJson: updatedAtJson)
   DateTime? dateModif;
   @JsonKey(includeFromJson: false,includeToJson: false)
   FlyoutController controller=FlyoutController();

@@ -9,6 +9,9 @@ import 'package:parc_oto/screens/vehicle/documents/document_tabs.dart';
 import 'package:parc_oto/serializables/document_vehicle.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../providers/client_database.dart';
+import '../../screens/sidemenu/sidemenu.dart';
+import '../../screens/vehicle/manager/vehicle_tabs.dart';
+import '../../screens/vehicle/vehicles_table.dart';
 import '../../theme.dart';
 
 class DocumentsDataSource extends AsyncDataTableSource {
@@ -61,6 +64,16 @@ class DocumentsDataSource extends AsyncDataTableSource {
         const Duration(milliseconds: 0), () => _empty ? 0 : documents.length);
   }
 
+
+  void showMyVehicule(String? matricule){
+    if(matricule!=null){
+      PanesListState.index.value=2;
+      VehicleTabsState.currentIndex.value=0;
+
+      VehicleTableState.filterNow=true;
+      VehicleTableState.filterVehicule.value=matricule;
+    }
+  }
   @override
   Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
     if (_errorCounter != null) {
@@ -105,7 +118,12 @@ class DocumentsDataSource extends AsyncDataTableSource {
                 style: tstyle,
               )),
               DataCell(SelectableText(document.value.vehicle?.matricule ?? '',
-                  style: tstyle)),
+                  style: tstyle),
+                onTap: (){
+                  showMyVehicule(document.value.vehicle?.matricule);
+                }
+
+              ),
               DataCell(SelectableText(
                 document.value.dateExpiration!=null?
                   dateFormat2.format(ClientDatabase.ref.add(

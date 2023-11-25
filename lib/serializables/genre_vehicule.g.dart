@@ -17,5 +17,5 @@ GenreVehicle _$GenreVehicleFromJson(Map<String, dynamic> json) => GenreVehicle(
 Map<String, dynamic> _$GenreVehicleToJson(GenreVehicle instance) =>
     <String, dynamic>{
       'name': instance.name,
-      'user': instance.user?.id,
+      'user': userToJson(instance.user),
     };

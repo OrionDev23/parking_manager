@@ -12,20 +12,20 @@ import '../../screens/vehicle/manager/vehicle_tabs.dart';
 import '../../serializables/vehicle.dart';
 import '../../theme.dart';
 
-class VehiculesDataSource extends AsyncDataTableSource {
+class ConducteurDataSource extends AsyncDataTableSource {
 
   BuildContext current;
   bool? selectV;
 
   AppTheme? appTheme;
   String? searchKey;
-  VehiculesDataSource({required this.current,this.selectV=false,this.appTheme,this.filters,this.searchKey});
+  ConducteurDataSource({required this.current,this.selectV=false,this.appTheme,this.filters,this.searchKey});
 
-  VehiculesDataSource.empty({required this.current,this.selectV=false,this.appTheme,this.filters,this.searchKey}) {
+  ConducteurDataSource.empty({required this.current,this.selectV=false,this.appTheme,this.filters,this.searchKey}) {
     _empty = true;
   }
 
-  VehiculesDataSource.error({required this.current,this.selectV=false,this.appTheme,this.filters,this.searchKey}) {
+  ConducteurDataSource.error({required this.current,this.selectV=false,this.appTheme,this.filters,this.searchKey}) {
     _errorCounter = 0;
   }
 
@@ -90,7 +90,7 @@ class VehiculesDataSource extends AsyncDataTableSource {
         x.totalRecords,
         x.data.map((vehicle) {
           return DataRow(
-            key: ValueKey<String>(vehicle.value.id),
+            key: ValueKey<String>(vehicle.value.id!),
             onSelectChanged: selectV==true? (value) {
               if (value ==true) {
                 selectVehicle(vehicle.value);
@@ -100,14 +100,14 @@ class VehiculesDataSource extends AsyncDataTableSource {
               DataCell(SelectableText(vehicle.value.matricule,style: tstyle,)),
               DataCell(Row(
                 children: [
-                  Image.asset('assets/images/marques/${vehicle.value.marque ?? 'default'}.webp',width: 4.h,height: 4.h,),
+                  Image.asset('assets/images/marques/${vehicle.value.marque?.id ?? 'default'}.webp',width: 4.h,height: 4.h,),
                   const SizedBox(width: 5,),
                   SelectableText(vehicle.value.type ?? '',style: tstyle),
                 ],
               )),
               DataCell(SelectableText(vehicle.value.anneeUtil.toString(),style: tstyle)),
               DataCell(SelectableText(
-                  dateFormat.format(vehicle.value.dateModification!)
+                  dateFormat.format(ClientDatabase.ref.add(Duration(milliseconds:vehicle.value.dateModification!)))
                   ,style: tstyle)),
               DataCell(f.FlyoutTarget(
                 controller: vehicle.value.controller,
@@ -228,8 +228,8 @@ class VehiculesDataSource extends AsyncDataTableSource {
     await ClientDatabase.database!.deleteDocument(
         databaseId: databaseId,
         collectionId: vehiculeid,
-        documentId: v.id).then((value) {
-      vehicles.remove(MapEntry(v.id, v));
+        documentId: v.id!).then((value) {
+      vehicles.remove(MapEntry(v.id!, v));
       notifyListeners();
     }).onError((error, stackTrace) {
 

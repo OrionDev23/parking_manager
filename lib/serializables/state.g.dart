@@ -25,6 +25,6 @@ Map<String, dynamic> _$EtatToJson(Etat instance) => <String, dynamic>{
       'valeur': instance.valeur,
       'remarque': instance.remarque,
       'date': instance.date,
-      'createdBy': instance.createdBy?.id,
-      'vehicle': instance.vehicle?.id,
+      'createdBy': userToJson(instance.createdBy),
+      'vehicle': vehiculeToJson(instance.vehicle),
     };

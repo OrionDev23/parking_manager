@@ -1,4 +1,10 @@
+import 'package:parc_oto/serializables/genre_vehicule.dart';
 import 'package:parc_oto/serializables/parc_user.dart';
+
+import '../providers/client_database.dart';
+import '../serializables/marque.dart';
+import '../serializables/state.dart';
+import '../serializables/vehicle.dart';
 
 class ProfilUtilitis{
  static  String getFirstLetters(ParcUser? user) {
@@ -18,4 +24,37 @@ class ProfilUtilitis{
     }
     return result;
   }
+}
+
+int? dateToIntJson(DateTime? date){
+  return date?.difference(ClientDatabase.ref).inMilliseconds;
+}
+
+String? userToJson(ParcUser? value){
+  return value?.id;
+}
+
+String? vehiculeToJson(Vehicle? value){
+  return value?.id;
+}
+
+String? stateToJson(Etat? etat){
+  return etat?.id;
+}
+
+String? marqueToJson(Marque? marque){
+  return marque?.id;
+}
+
+String? genreToJson(GenreVehicle? genre){
+  return genre?.id;
+}
+
+
+DateTime? createdAtJson(String json){
+  return DateTime.tryParse(json);
+}
+
+DateTime? updatedAtJson(String json){
+  return DateTime.tryParse(json);
 }

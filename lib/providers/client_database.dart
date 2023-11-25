@@ -13,7 +13,6 @@ const vehicDoc="doc_vehic";
 const buckedId="images";
 const endpoint ="https://cloud.appwrite.io/v1";
 const project="6531ace99382e496a904";
-
 class ClientDatabase {
   static Client? client;
   static Account? account;

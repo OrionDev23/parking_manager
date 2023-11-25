@@ -1,8 +1,13 @@
-
+// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'vehicle.dart';
 
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
 Vehicle _$VehicleFromJson(Map<String, dynamic> json) => Vehicle(
+      id: json[r'$id'] as String,
       matricule: json['matricule'] as String,
       matriculeEtrang: json['martricule_etrang'] as bool,
       wilaya: json['wilaya'] as int?,
@@ -21,28 +26,19 @@ Vehicle _$VehicleFromJson(Map<String, dynamic> json) => Vehicle(
       charegeUtile: json['charge_utile'] as int?,
       daira: json['daira'] as String?,
       energie: json['energie'] as String?,
-      genre: json['genre'] == null
-          ? null
-          : GenreVehicle.fromJson(json['genre'] as Map<String, dynamic>),
-      marque: json['marque'] == null
-          ? null
-          : Marque.fromJson(json['marque'] as Map<String, dynamic>),
+      genre: json['genre'] as String?,
+      marque: json['marque'] as String?,
       matriculePrec: json['matricule_prec'] as String?,
       pays: json['pays'] as String?,
       placesAssises: json['place_assises'] as int?,
       poidsTotal: json['poids_total'] as int?,
       puissance: json['puissance'] as int?,
-      createdBy: json['user_creation'] == null
-          ? null
-          : ParcUser.fromJson(json['user_creation'] as Map<String, dynamic>),
-      etat: json['etat'] == null
-          ? null
-          : Etat.fromJson(json['etat'] as Map<String, dynamic>),
-)
-      ..id = json[r'$id'] as String?
-      ..dateCreation = DateTime.tryParse(json[r'$createdAt'])?.difference(ClientDatabase.ref).inMilliseconds.abs()
-      ..dateModification = DateTime.tryParse(json[r'$updatedAt'])?.difference(ClientDatabase.ref).inMilliseconds.abs();
-
+      createdBy: json['user_creation'] as String?,
+      etat: json['etat'] as String?,
+      etatactuel: json['etatactuel'] as int?,
+    )
+      ..dateCreation = updatedAtJson(json[r'$createdAt'] as String)
+      ..dateModification = updatedAtJson(json[r'$updatedAt'] as String);
 
 Map<String, dynamic> _$VehicleToJson(Vehicle instance) => <String, dynamic>{
       'matricule': instance.matricule,
@@ -59,8 +55,8 @@ Map<String, dynamic> _$VehicleToJson(Vehicle instance) => <String, dynamic>{
       'profession': instance.profession,
       'numero_serie': instance.numeroSerie,
       'type': instance.type,
-      'marque': instance.marque?.id,
-      'genre': instance.genre?.id,
+      'marque': instance.marque,
+      'genre': instance.genre,
       'charge_utile': instance.charegeUtile,
       'poids_total': instance.poidsTotal,
       'place_assises': instance.placesAssises,
@@ -69,7 +65,8 @@ Map<String, dynamic> _$VehicleToJson(Vehicle instance) => <String, dynamic>{
       'carrosserie': instance.carrosserie,
       'annee_util': instance.anneeUtil,
       'matricule_prec': instance.matriculePrec,
-      'user_creation': instance.createdBy?.id,
+      'user_creation': instance.createdBy,
       'pays': instance.pays,
-      'etat': instance.etat?.id,
-};
+      'etat': instance.etat,
+      'etatactuel': instance.etatactuel,
+    };
