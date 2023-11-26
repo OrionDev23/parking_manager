@@ -29,15 +29,8 @@ class VehiculesWebService {
       //marque
       case 1:
         return (MapEntry<String,Vehicle> d1, MapEntry<String,Vehicle> d2) {
-          if (d1.value.marque == null && d1.value.type == null) {
-            return -1;
-          } else if (d2.value.marque == null && d2.value.type == null) {
-            return 1;
-          } else if (d2.value.marque == d1.value.marque) {
-            return coef * d1.value.type!.compareTo(d2.value.type!);
-          } else {
-            return coef * d1.value.marque!.compareTo(d2.value.marque!);
-          }
+
+            return coef * (d1.value.type??'').compareTo((d2.value.type??''));
         };
       //annee
       case 2:
@@ -139,7 +132,6 @@ class VehiculesWebService {
             Query.limit(count),
             Query.offset(startingAt),
             getQuery(sortedBy, sortedAsc),
-
           ]);
     }
   }
@@ -197,6 +189,42 @@ class VehiculesWebService {
         }
     }
     return Query.orderAsc('\$id');
+  }
+
+  String getSelected(){
+    return Query.select([
+      r'$id',
+      r'$createdAt',
+      r'$updatedAt',
+      'matricule',
+      'martricule_etrang',
+      'wilaya',
+      'commune',
+      'daira',
+      'adresse',
+      'date',
+      'quittance',
+      'numero',
+      'nom',
+      'prenom',
+      'profession',
+      'numero_serie',
+      'type',
+      'marque',
+      'genre',
+      'charge_utile',
+      'poids_total',
+      'place_assises',
+      'puissance',
+      'energie',
+      'carrosserie',
+      'annee_util',
+      'matricule_prec',
+      'user_creation',
+      'pays',
+      'etat',
+      'etatactuel',
+    ]);
   }
 
 
