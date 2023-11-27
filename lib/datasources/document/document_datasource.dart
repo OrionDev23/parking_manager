@@ -7,36 +7,22 @@ import 'package:parc_oto/datasources/document/document_webservice.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/screens/vehicle/documents/document_form.dart';
 import 'package:parc_oto/screens/vehicle/documents/document_tabs.dart';
-import 'package:parc_oto/serializables/document_vehicle.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../providers/client_database.dart';
 import '../../screens/sidemenu/sidemenu.dart';
 import '../../screens/vehicle/manager/vehicle_tabs.dart';
 import '../../screens/vehicle/vehicles_table.dart';
-import '../../theme.dart';
+import '../parcoto_webservice_response.dart';
 
 class DocumentsDataSource extends ParcOtoDatasource {
 
 
   late final DocumentWebService repo;
 
-  int _sortColumn = 0;
-  bool _sortAscending = true;
 
-  DocumentsDataSource({required super.current}){
-    repo = DocumentWebService(data,vehicDoc,1);
+  DocumentsDataSource({required super.current, required super.collectionID}){
+    repo = DocumentWebService(data,collectionID,1);
   }
-
-
-
-  String? searchKey;
-
-
-
-
-
-
-
 
   void showMyVehicule(String? matricule){
     if(matricule!=null){
@@ -67,10 +53,10 @@ class DocumentsDataSource extends ParcOtoDatasource {
     assert(startIndex >= 0);
 
     // List returned will be empty is there're fewer items than startingAt
-    var x = _empty
+    var x = empty
         ? await Future.delayed(const Duration(milliseconds: 500),
-            () => DocumentWebServiceResponse(0, []))
-        : await _repo.getData(startIndex, count, _sortColumn, _sortAscending,
+            () => ParcOtoWebServiceResponse(0, []))
+        : await repo.getData(startIndex, count, sortColumn, sortAscending,
             searchKey: searchKey, filters: filters);
 
     var r = AsyncRowsResponse(
@@ -78,10 +64,10 @@ class DocumentsDataSource extends ParcOtoDatasource {
         x.data.map((document) {
           return DataRow(
             key: ValueKey<String>(document.value.id),
-            onSelectChanged: selectD == true
+            onSelectChanged: selectC == true
                 ? (value) {
                     if (value == true) {
-                      selectDocument(document.value);
+                      selectRow(document.value);
                     }
                   }
                 : null,
@@ -162,16 +148,14 @@ class DocumentsDataSource extends ParcOtoDatasource {
     return r;
   }
 
-  void selectDocument(DocumentVehicle v) {
-    Navigator.of(current).pop(v);
-  }
 
-  void showDeleteConfirmation(DocumentVehicle v) {
+  @override
+  void showDeleteConfirmation(dynamic c) {
     f.showDialog(
         context: current,
         builder: (context) {
           return f.ContentDialog(
-            content: Text('${'suprdoc'.tr()} ${v.nom} ${v.vehicle?.matricule}'),
+            content: Text('${'suprdoc'.tr()} ${c.nom} ${c.vehicle?.matricule}'),
             actions: [
               f.FilledButton(
                   onPressed: () {
@@ -182,7 +166,7 @@ class DocumentsDataSource extends ParcOtoDatasource {
                 onPressed: () {
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();
-                  deleteDocument(v);
+                  deleteRow(c);
                 },
                 child: const Text('confirmer').tr(),
               )
@@ -191,33 +175,6 @@ class DocumentsDataSource extends ParcOtoDatasource {
         });
   }
 
-  void deleteDocument(DocumentVehicle v) async {
-    await ClientDatabase.database!
-        .deleteDocument(
-            databaseId: databaseId, collectionId: vehiculeid, documentId: v.id)
-        .then((value) {
-      documents.remove(MapEntry(v.id, v));
-      notifyListeners();
-    }).onError((error, stackTrace) {
-      f.showSnackbar(
-        current,
-        f.InfoBar(
-            title: const Text('erreur').tr(),
-            severity: f.InfoBarSeverity.error),
-        alignment: Alignment.lerp(Alignment.topCenter, Alignment.center, 0.6)!,
-      );
-    });
-  }
 
-  @override
-  void deleteRow(c) {
-    // TODO: implement deleteRow
-  }
 
-  @override
-  void selectColumn(c) {
-    // TODO: implement selectColumn
-  }
 }
-
-List<MapEntry<String, DocumentVehicle>> documents = List.empty(growable: true);

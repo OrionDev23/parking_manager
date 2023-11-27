@@ -2,8 +2,6 @@ import 'package:appwrite/appwrite.dart';
 import 'package:parc_oto/datasources/parcoto_webservice.dart';
 import 'package:parc_oto/serializables/document_vehicle.dart';
 
-import 'document_datasource.dart';
-
 
 class DocumentWebService extends ParcOtoWebService{
   DocumentWebService(super.data, super.collectionID, super.columnForSearch);
@@ -44,19 +42,6 @@ class DocumentWebService extends ParcOtoWebService{
     return null;
   }
 
-
-
-
-
-
-  bool testIfContained(String id){
-    for(int i=0;i<documents.length;i++){
-      if(documents[i].key==id){
-        return true;
-      }
-    }
-    return false;
-  }
 
   @override
   String getSortingQuery(int sortedBy, bool sortedAsc) {
