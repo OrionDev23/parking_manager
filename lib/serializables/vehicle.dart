@@ -1,24 +1,14 @@
 
-import 'package:fluent_ui/fluent_ui.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:parc_oto/serializables/genre_vehicule.dart';
-import 'package:parc_oto/serializables/marque.dart';
-import 'package:parc_oto/serializables/parc_user.dart';
-import 'package:parc_oto/serializables/state.dart';
+import 'package:parc_oto/serializables/parc_oto_serializable.dart';
 
 import '../utilities/profil_beautifier.dart';
 
 part 'vehicle.g.dart';
 @JsonSerializable()
-class Vehicle{
-  @JsonKey(includeToJson: false,includeFromJson: false)
-  bool selected=false;
+class Vehicle extends ParcOtoDefault{
 
-  @JsonKey(includeFromJson: false,includeToJson: false)
-  FlyoutController controller=FlyoutController();
-  @JsonKey(includeToJson: false,name: '\$id')
 
-  String id;
   String matricule;
   @JsonKey(name: 'martricule_etrang')
 
@@ -27,12 +17,6 @@ class Vehicle{
   String? commune;
   String? daira;
   String? adresse;
-  @JsonKey(includeToJson: false,name: '\$createdAt',fromJson: updatedAtJson)
-
-  DateTime? dateCreation;
-  @JsonKey(includeToJson: false,name: '\$updatedAt',fromJson: updatedAtJson)
-
-  DateTime? dateModification;
   int? date;
   double? quittance;
   String? numero;
@@ -75,7 +59,7 @@ class Vehicle{
 
   int? etatactuel;
 
-  Vehicle({required this.id,required this.matricule,required this.matriculeEtrang,this.wilaya,
+  Vehicle({required super.id,super.createdAt,super.updatedAt,required this.matricule,required this.matriculeEtrang,this.wilaya,
     this.commune,this.date,
     this.adresse,this.quittance,this.numero,
     this.nom,this.prenom,this.profession,
@@ -86,9 +70,11 @@ class Vehicle{
     this.poidsTotal, this.puissance, this.createdBy,this.etat,this.etatactuel
   });
 
+  @override
   factory Vehicle.fromJson(Map<String, dynamic> json) => _$VehicleFromJson(json);
 
   /// Connect the generated [_$PersonToJson] function to the `toJson` method.
+  @override
   Map<String, dynamic> toJson() => _$VehicleToJson(this);
 
   int compareTo(Vehicle vehicle) {

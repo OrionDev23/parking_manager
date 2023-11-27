@@ -4,6 +4,7 @@ import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/datasources/document/document_webservice.dart';
+import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/screens/vehicle/documents/document_form.dart';
 import 'package:parc_oto/screens/vehicle/documents/document_tabs.dart';
 import 'package:parc_oto/serializables/document_vehicle.dart';
@@ -14,55 +15,27 @@ import '../../screens/vehicle/manager/vehicle_tabs.dart';
 import '../../screens/vehicle/vehicles_table.dart';
 import '../../theme.dart';
 
-class DocumentsDataSource extends AsyncDataTableSource {
-  BuildContext current;
-  bool? selectD;
-  AppTheme? appTheme;
-  DocumentsDataSource(
-      {required this.current, this.selectD = false, this.appTheme});
+class DocumentsDataSource extends ParcOtoDatasource {
 
-  DocumentsDataSource.empty(
-      {required this.current, this.selectD = false, this.appTheme}) {
-    _empty = true;
-  }
 
-  DocumentsDataSource.error(
-      {required this.current, this.selectD = false, this.appTheme}) {
-    _errorCounter = 0;
-  }
-
-  bool _empty = false;
-  int? _errorCounter;
-
-  final DocumentWebService _repo = DocumentWebService();
+  late final DocumentWebService repo;
 
   int _sortColumn = 0;
   bool _sortAscending = true;
 
-  void sort(int column, bool ascending) {
-    _sortColumn = column;
-    _sortAscending = ascending;
-    refreshDatasource();
+  DocumentsDataSource({required super.current}){
+    repo = DocumentWebService(data,vehicDoc,1);
   }
+
+
 
   String? searchKey;
 
-  void search(String searchKey) {
-    this.searchKey = searchKey;
-    refreshDatasource();
-  }
 
-  void filter(Map<String, String> filters) {
-    this.filters = filters;
-    refreshDatasource();
-  }
 
-  Map<String, String>? filters;
 
-  Future<int> getTotalRecords() {
-    return Future<int>.delayed(
-        const Duration(milliseconds: 0), () => _empty ? 0 : documents.length);
-  }
+
+
 
 
   void showMyVehicule(String? matricule){
@@ -76,12 +49,12 @@ class DocumentsDataSource extends AsyncDataTableSource {
   }
   @override
   Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
-    if (_errorCounter != null) {
-      _errorCounter = _errorCounter! + 1;
+    if (errorCounter != null) {
+      errorCounter = errorCounter! + 1;
 
-      if (_errorCounter! % 2 == 1) {
+      if (errorCounter! % 2 == 1) {
         await Future.delayed(const Duration(milliseconds: 1000));
-        throw 'Error #${((_errorCounter! - 1) / 2).round() + 1} has occured';
+        throw 'Error #${((errorCounter! - 1) / 2).round() + 1} has occured';
       }
     }
 
@@ -234,6 +207,16 @@ class DocumentsDataSource extends AsyncDataTableSource {
         alignment: Alignment.lerp(Alignment.topCenter, Alignment.center, 0.6)!,
       );
     });
+  }
+
+  @override
+  void deleteRow(c) {
+    // TODO: implement deleteRow
+  }
+
+  @override
+  void selectColumn(c) {
+    // TODO: implement selectColumn
   }
 }
 

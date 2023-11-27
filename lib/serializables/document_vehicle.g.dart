@@ -17,8 +17,8 @@ DocumentVehicle _$DocumentVehicleFromJson(Map<String, dynamic> json) =>
       createdBy: json['createdBy'] == null
           ? null
           : ParcUser.fromJson(json['createdBy'] as Map<String, dynamic>),
-      dateAjout: createdAtJson(json[r'$createdAt'] as String),
-      dateModif: updatedAtJson(json[r'$updatedAt'] as String),
+      createdAt: createdAtJson(json[r'$createdAt'] as String),
+      updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
     );
 
 Map<String, dynamic> _$DocumentVehicleToJson(DocumentVehicle instance) =>

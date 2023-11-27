@@ -1,22 +1,15 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/models.dart';
+import 'package:parc_oto/datasources/parcoto_webservice.dart';
 import 'package:parc_oto/serializables/document_vehicle.dart';
 
-import '../../providers/client_database.dart';
 import 'document_datasource.dart';
 
-class DocumentWebServiceResponse {
-  DocumentWebServiceResponse(this.totalRecords, this.data);
 
-  /// THe total ammount of records on the server, e.g. 100
-  final int totalRecords;
+class DocumentWebService extends ParcOtoWebService{
+  DocumentWebService(super.data, super.collectionID, super.columnForSearch);
 
-  /// One page, e.g. 10 reocrds
-  final List<MapEntry<String,DocumentVehicle>> data;
-}
-
-class DocumentWebService {
-  int Function(MapEntry<String,DocumentVehicle>, MapEntry<String,DocumentVehicle>)? _getComparisonFunction(
+  @override
+  num Function(MapEntry<String,dynamic>, MapEntry<String,dynamic>)? getComparisonFunction(
       int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
@@ -45,84 +38,14 @@ class DocumentWebService {
       //date modif
       case 4:
         return ( d1,  d2) =>
-            coef * d1.value.dateModif!.compareTo(d2.value.dateModif!);
+            coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
     }
 
     return null;
   }
 
-  Future<DocumentWebServiceResponse> getData(int startingAt, int count,
-      int sortedBy, bool sortedAsc, {String? searchKey,Map<String,String>?filters}) async {
-    if (startingAt == 0) {
-      documents.clear();
-    }
-    return getSearchResult(searchKey,filters??{},count,startingAt,sortedBy,sortedAsc).then((value) {
-
-      for (var element in value.documents) {
-        if(!testIfContained(element.$id)){
-          documents.add(MapEntry(element.$id, element.convertTo<DocumentVehicle>((p0) {
-            return DocumentVehicle.fromJson(p0 as Map<String, dynamic>);
-          })));
-
-        }
-
-      }
-      var result = documents;
-
-      result.sort(_getComparisonFunction(sortedBy, sortedAsc));
-      return DocumentWebServiceResponse(
-          value.total, result.skip(startingAt).take(count).toList());
-    }).onError((AppwriteException error, stackTrace) {
-      return Future.value(DocumentWebServiceResponse(0, documents));
-    });
-  }
 
 
-
-  Future<DocumentList> getSearchResult(String? searchKey,Map<String,String>filters,
-      int count,int startingAt,int sortedBy,bool sortedAsc) async{
-
-    if(searchKey!=null && searchKey.isNotEmpty){
-
-
-      return  await ClientDatabase.database!.listDocuments(
-          databaseId: databaseId,
-          collectionId: vehicDoc,
-          queries: [
-            getQuery(sortedBy, sortedAsc),
-            Query.search('nom', searchKey),
-            if(filters.containsKey('datemin'))
-              Query.greaterThanEqual('date_expiration', int.tryParse(filters['datemin']!)),
-            if(filters.containsKey('datemax'))
-              Query.lessThanEqual('date_expiration', int.tryParse(filters['datemax']!)),
-            if(filters.containsKey('createdBy'))
-              Query.equal('createdBy', filters['createdBy']),
-            if(filters.containsKey('vehicle'))
-              Query.equal('vehicle', filters['vehicle']),
-            Query.limit(count),
-            Query.offset(startingAt),
-          ]);
-    }
-    else{
-      return await ClientDatabase.database!.listDocuments(
-          databaseId: databaseId,
-          collectionId: vehicDoc,
-          queries: [
-            getQuery(sortedBy, sortedAsc),
-            if(filters.containsKey('datemin'))
-              Query.greaterThanEqual('date_expiration', int.tryParse(filters['datemin']!)),
-            if(filters.containsKey('datemax'))
-              Query.lessThanEqual('date_expiration', int.tryParse(filters['datemax']!)),
-            if(filters.containsKey('createdBy'))
-              Query.equal('createdBy', filters['createdBy']),
-            if(filters.containsKey('vehicle'))
-              Query.equal('vehicle', filters['vehicle']),
-            Query.limit(count),
-            Query.offset(startingAt),
-          ]).onError((AppwriteException error, stackTrace) {
-            return Future.value(DocumentList.fromMap({}));      });
-    }
-  }
 
 
 
@@ -135,7 +58,8 @@ class DocumentWebService {
     return false;
   }
 
-  String getQuery(int sortedBy, bool sortedAsc) {
+  @override
+  String getSortingQuery(int sortedBy, bool sortedAsc) {
     switch (sortedBy) {
       case 0:
         if (sortedAsc) {
@@ -158,4 +82,30 @@ class DocumentWebService {
     }
     return Query.orderAsc('\$id');
   }
+
+  @override
+  fromJsonFunction(Map<String, dynamic> json) {
+    return DocumentVehicle.fromJson(json);
+  }
+
+  @override
+  String getAttributeForSearch(int att) {
+    return 'nom';
+  }
+
+  @override
+  List<String> getFilterQueries(Map<String, String> filters, int count, int startingAt, int sortedBy, bool sortedAsc, {int? index}) {
+    return [
+      if(filters.containsKey('datemin'))
+        Query.greaterThanEqual('date_expiration', int.tryParse(filters['datemin']!)),
+      if(filters.containsKey('datemax'))
+        Query.lessThanEqual('date_expiration', int.tryParse(filters['datemax']!)),
+      if(filters.containsKey('createdBy'))
+        Query.equal('createdBy', filters['createdBy']),
+      if(filters.containsKey('vehicle'))
+        Query.equal('vehicle', filters['vehicle']),
+    ];
+  }
+
+
 }

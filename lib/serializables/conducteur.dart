@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:parc_oto/serializables/parc_oto_serializable.dart';
 import 'package:parc_oto/serializables/parc_user.dart';
 
 import '../utilities/profil_beautifier.dart';
@@ -6,10 +7,9 @@ import '../utilities/profil_beautifier.dart';
 part 'conducteur.g.dart';
 
 @JsonSerializable()
-class Conducteur{
+class Conducteur extends ParcOtoDefault{
 
-  @JsonKey(includeToJson: false,name: '\$id')
-  String id;
+
   String name;
   String prenom;
   String? search;
@@ -20,19 +20,14 @@ class Conducteur{
 
   @JsonKey(toJson: dateToIntJson,)
   DateTime? dateNaissance;
-  @JsonKey(toJson: userToJson,)
 
-  ParcUser? createdBy;
+  String? createdBy;
 
-  @JsonKey(includeToJson: false,name: '\$createdAt')
-  DateTime? dateAjout;
-  @JsonKey(includeToJson: false,name: '\$updatedAt')
 
-  DateTime? dateModif;
-
-  Conducteur({required this.name,required this.prenom,required this.id,this.search,this.adresse,this.createdBy,this.email,this.dateNaissance,this.telephone});
+  Conducteur({required this.name,required this.prenom,required super.id,this.createdBy,super.createdAt,super.updatedAt,this.search,this.adresse,this.email,this.dateNaissance,this.telephone});
 
   factory Conducteur.fromJson(Map<String, dynamic> json) => _$ConducteurFromJson(json);
+  @override
   Map<String, dynamic> toJson() => _$ConducteurToJson(this);
 
 

@@ -8,6 +8,8 @@ part of 'state.dart';
 
 Etat _$EtatFromJson(Map<String, dynamic> json) => Etat(
       id: json[r'$id'] as String,
+      createdAt: createdAtJson(json[r'$createdAt'] as String),
+      updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
       type: json['type'] as int,
       valeur: (json['valeur'] as num?)?.toDouble(),
       remarque: json['remarque'] as String?,

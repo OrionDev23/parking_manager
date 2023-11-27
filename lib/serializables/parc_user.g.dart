@@ -7,6 +7,9 @@ part of 'parc_user.dart';
 // **************************************************************************
 
 ParcUser _$ParcUserFromJson(Map<String, dynamic> json) => ParcUser(
+      id: json[r'$id'] as String,
+      createdAt: createdAtJson(json[r'$createdAt'] as String),
+      updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
       avatar: json['avatar'] as String?,
       name: json['name'] as String?,
       email: json['email'] as String,
@@ -14,7 +17,6 @@ ParcUser _$ParcUserFromJson(Map<String, dynamic> json) => ParcUser(
       datea: json['datea'] as int?,
       datel: json['datel'] as int?,
       tel: json['tel'] as String?,
-      id: json[r'$id'] as String,
     );
 
 Map<String, dynamic> _$ParcUserToJson(ParcUser instance) => <String, dynamic>{

@@ -12,6 +12,8 @@ GenreVehicle _$GenreVehicleFromJson(Map<String, dynamic> json) => GenreVehicle(
       user: json['user'] == null
           ? null
           : ParcUser.fromJson(json['user'] as Map<String, dynamic>),
+      createdAt: createdAtJson(json[r'$createdAt'] as String),
+      updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
     );
 
 Map<String, dynamic> _$GenreVehicleToJson(GenreVehicle instance) =>

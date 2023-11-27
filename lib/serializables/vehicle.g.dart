@@ -8,6 +8,8 @@ part of 'vehicle.dart';
 
 Vehicle _$VehicleFromJson(Map<String, dynamic> json) => Vehicle(
       id: json[r'$id'] as String,
+      createdAt: createdAtJson(json[r'$createdAt'] as String),
+      updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
       matricule: json['matricule'] as String,
       matriculeEtrang: json['martricule_etrang'] as bool,
       wilaya: json['wilaya'] as int?,
@@ -36,9 +38,7 @@ Vehicle _$VehicleFromJson(Map<String, dynamic> json) => Vehicle(
       createdBy: json['user_creation'] as String?,
       etat: json['etat'] as String?,
       etatactuel: json['etatactuel'] as int?,
-    )
-      ..dateCreation = updatedAtJson(json[r'$createdAt'] as String)
-      ..dateModification = updatedAtJson(json[r'$updatedAt'] as String);
+    );
 
 Map<String, dynamic> _$VehicleToJson(Vehicle instance) => <String, dynamic>{
       'matricule': instance.matricule,

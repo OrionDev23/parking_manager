@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:parc_oto/serializables/parc_oto_serializable.dart';
 import 'package:parc_oto/serializables/parc_user.dart';
 
 import '../utilities/profil_beautifier.dart';
@@ -7,19 +8,18 @@ import '../utilities/profil_beautifier.dart';
 part 'genre_vehicule.g.dart';
 
 @JsonSerializable()
-class GenreVehicle{
-  @JsonKey(includeToJson: false,name: '\$id')
+class GenreVehicle extends ParcOtoDefault{
 
-  String id;
   String? name;
 
   @JsonKey(toJson: userToJson)
   ParcUser? user;
 
-  GenreVehicle({required this.id,this.name,this.user});
+  GenreVehicle({required super.id,this.name,this.user,super.createdAt,super.updatedAt});
 
   factory GenreVehicle.fromJson(Map<String, dynamic> json) => _$GenreVehicleFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$GenreVehicleToJson(this);
 
 }

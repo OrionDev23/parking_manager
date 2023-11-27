@@ -10,90 +10,50 @@ import '../../providers/client_database.dart';
 import '../../screens/vehicle/manager/vehicle_form.dart';
 import '../../screens/vehicle/manager/vehicle_tabs.dart';
 import '../../serializables/vehicle.dart';
-import '../../theme.dart';
+import '../parcoto_datasource.dart';
+import '../parcoto_webservice_response.dart';
 
-class VehiculesDataSource extends AsyncDataTableSource {
+class VehiculesDataSource extends ParcOtoDatasource<Vehicle> {
 
-  BuildContext current;
-  bool? selectV;
 
-  AppTheme? appTheme;
-  String? searchKey;
-  VehiculesDataSource({required this.current,this.selectV=false,this.appTheme,this.filters,this.searchKey});
 
-  VehiculesDataSource.empty({required this.current,this.selectV=false,this.appTheme,this.filters,this.searchKey}) {
-    _empty = true;
+
+  VehiculesDataSource({required super.current,super.appTheme,super.filters,super.searchKey,super.selectC}){
+    repo =VehiculesWebService(data,vehiculeid,8);
   }
 
-  VehiculesDataSource.error({required this.current,this.selectV=false,this.appTheme,this.filters,this.searchKey}) {
-    _errorCounter = 0;
-  }
-
-  bool _empty = false;
-  int? _errorCounter;
-
-  final VehiculesWebService _repo = VehiculesWebService();
-
-  int _sortColumn = 0;
-  bool _sortAscending = true;
-
-  void sort(int column, bool ascending) {
-    _sortColumn = column;
-    _sortAscending = ascending;
-    refreshDatasource();
-  }
-
-  void search(String searchKey){
-    this.searchKey=searchKey;
-    refreshDatasource();
-  }
-
-  void filter(Map<String,String> filters){
-    this.filters=filters;
-    refreshDatasource();
-
-  }
-
-  Map<String,String>? filters;
-
-  Future<int> getTotalRecords() {
-    return Future<int>.delayed(
-        const Duration(milliseconds: 0), () => _empty ? 0 : vehicles.length);
-  }
+  late final VehiculesWebService repo;
 
   @override
   Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
+    if (errorCounter != null) {
+      errorCounter = errorCounter! + 1;
 
-    if (_errorCounter != null) {
-      _errorCounter = _errorCounter! + 1;
-
-      if (_errorCounter! % 2 == 1) {
+      if (errorCounter! % 2 == 1) {
         await Future.delayed(const Duration(milliseconds: 500));
-        throw 'Error #${((_errorCounter! - 1) / 2).round() + 1} has occured';
+        throw 'Error #${((errorCounter! - 1) / 2).round() + 1} has occured';
       }
     }
-
-    final dateFormat=DateFormat('y/M/d HH:mm:ss','fr');
-    final tstyle=TextStyle(
-      fontSize: 10.sp,
-    );
 
     assert(startIndex >= 0);
 
     // List returned will be empty is there're fewer items than startingAt
-    var x = _empty
+    var x = empty
         ? await Future.delayed(const Duration(milliseconds: 500),
-            () => VehiculesWebServiceResponse(0, []))
-        : await _repo.getData(startIndex, count, _sortColumn, _sortAscending,searchKey: searchKey,filters: filters);
-
+            () => ParcOtoWebServiceResponse<Vehicle>(0, []))
+        : await repo.getData(startIndex, count, sortColumn, sortAscending,searchKey: searchKey,filters: filters);
+    final dateFormat=DateFormat('y/M/d HH:mm:ss','fr');
+    final tstyle=TextStyle(
+      fontSize: 10.sp,
+    );
     var r = AsyncRowsResponse(
         x.totalRecords,
         x.data.map((vehicle) {
           return DataRow(
             key: ValueKey<String>(vehicle.value.id),
-            onSelectChanged: selectV==true? (value) {
+            onSelectChanged: selectC==true? (value) {
               if (value ==true) {
-                selectVehicle(vehicle.value);
+                selectColumn(vehicle.value);
               }
             }:null,
             cells: [
@@ -196,17 +156,19 @@ class VehiculesDataSource extends AsyncDataTableSource {
     return r;
   }
 
-  void selectVehicle(Vehicle v){
-    Navigator.of(current).pop(v);
+  @override
+  void selectColumn(Vehicle c){
+    Navigator.of(current).pop(c);
   }
 
-  void showDeleteConfirmation(Vehicle v){
+  @override
+  void showDeleteConfirmation(Vehicle c){
 
     f.showDialog(
         context: current,
         builder: (context){
           return f.ContentDialog(
-            content: Text('${'supvehic'.tr()} ${v.matricule}'),
+            content: Text('${'supvehic'.tr()} ${c.matricule}'),
             actions: [
               f.FilledButton(onPressed: (){
                 Navigator.of(context).pop();
@@ -214,7 +176,7 @@ class VehiculesDataSource extends AsyncDataTableSource {
               f.Button(onPressed: (){
                 Navigator.of(context).pop();
                 Navigator.of(context).pop();
-                deleteVehicle(v);
+                deleteRow(c);
 
               },child: const Text('confirmer').tr(),)
             ],
@@ -224,12 +186,13 @@ class VehiculesDataSource extends AsyncDataTableSource {
   }
 
 
-  void deleteVehicle(Vehicle v) async{
+  @override
+  void deleteRow(Vehicle c) async{
     await ClientDatabase.database!.deleteDocument(
         databaseId: databaseId,
         collectionId: vehiculeid,
-        documentId: v.id).then((value) {
-      vehicles.remove(MapEntry(v.id, v));
+        documentId: c.id).then((value) {
+      data.remove(MapEntry(c.id, c));
       notifyListeners();
     }).onError((error, stackTrace) {
 
@@ -247,5 +210,6 @@ class VehiculesDataSource extends AsyncDataTableSource {
 
 
 
-List<MapEntry<String,Vehicle>> vehicles = List.empty(growable: true);
+
+
 
