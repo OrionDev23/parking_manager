@@ -222,7 +222,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
 
       DocumentVehicle dv=DocumentVehicle(id: documentID!, nom: nom.text,vehicle: selectedVehicle,
           dateExpiration: selectedDate?.difference(ClientDatabase.ref).inMilliseconds.abs(),
-      createdBy: ClientDatabase.me.value);
+      createdBy: ClientDatabase.me.value?.id);
       if(widget.vd!=null){
         await ClientDatabase.database!.updateDocument(
             databaseId: databaseId,

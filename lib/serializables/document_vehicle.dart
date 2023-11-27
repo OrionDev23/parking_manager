@@ -1,7 +1,5 @@
-import 'package:fluent_ui/fluent_ui.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:parc_oto/serializables/parc_oto_serializable.dart';
-import 'package:parc_oto/serializables/parc_user.dart';
 import 'package:parc_oto/serializables/vehicle.dart';
 import 'package:parc_oto/utilities/profil_beautifier.dart';
 
@@ -19,8 +17,7 @@ class DocumentVehicle extends ParcOtoDefault{
   @JsonKey(toJson: vehiculeToJson)
 
   Vehicle? vehicle;
-  @JsonKey(toJson: userToJson)
-  ParcUser? createdBy;
+  String? createdBy;
 
   DocumentVehicle({required super.id,required this.nom,this.vehicle,this.dateExpiration,this.createdBy,super.createdAt,super.updatedAt});
 
