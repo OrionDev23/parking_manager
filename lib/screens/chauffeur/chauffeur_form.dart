@@ -7,6 +7,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/serializables/conducteur.dart';
 import 'package:parc_oto/widgets/zone_box.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../theme.dart';
 
@@ -23,7 +24,6 @@ class ChauffeurForm extends StatefulWidget {
 
 class ChauffeurFormState extends State<ChauffeurForm> {
   bool uploading = false;
-  bool loading = false;
   double progress = 0;
   String? chaufID;
 
@@ -66,21 +66,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   @override
   Widget build(BuildContext context) {
 
-    if (loading) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Text('Chargement en cours ...'),
-            smallSpace,
-            ProgressBar(
-              value: progress,
-            ),
-          ],
-        ),
-      );
-    }
+    var appTheme=context.watch<AppTheme>();
     if (uploading) {
       return Center(
         child: Column(
@@ -96,83 +82,147 @@ class ChauffeurFormState extends State<ChauffeurForm> {
         ),
       );
     }
-    return ScaffoldPage.scrollable(
-      bottomBar: SizedBox(
-        height: 40,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            FilledButton(
-              onPressed: !uploading ? upload : null,
-              child: const Text('Sauvegarder'),
+    return Container(
+      color: appTheme.backGroundColor,
+      child: Column(
+        children: [
+          Container(
+            color: appTheme.backGroundColor,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 45.h,
+                  width: 40.w,
+                  child: Column(
+                    children: [
+                      Flexible(
+                        child: ZoneBox(
+                          label: 'fullname'.tr(),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Row(
+                              children: [
+                                Flexible(
+                                    child: TextBox(
+                                      controller: nom,
+                                      placeholder: 'Nom',
+                                      style: appTheme.writingStyle,
+                                      placeholderStyle: placeStyle,
+                                      cursorColor: appTheme.color.darker,
+                                      decoration: BoxDecoration(
+                                        color: appTheme.fillColor,
+                                      ),
+                                    )),
+                                smallSpace,
+                                Flexible(
+                                    child: TextBox(
+                                      controller: prenom,
+                                      placeholder: 'Prénom',
+                                      style: appTheme.writingStyle,
+                                      placeholderStyle: placeStyle,
+                                      cursorColor: appTheme.color.darker,
+                                      decoration: BoxDecoration(
+                                        color: appTheme.fillColor,
+                                      ),
+                                    )),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      smallSpace,
+                      Flexible(
+                        child: ZoneBox(label: 'birthday'.tr(),
+                            child:
+                            Container(height: 5.h,
+                              padding: const EdgeInsets.all(10),
+                              child: DatePicker(selected: birthDay,onChanged: (d){
+                                setState(() {
+                                  birthDay=d;
+                                });
+                              },),)
+                        ),
+                      ),
+                      smallSpace,
+                      Flexible(
+                        flex: 2,
+                        child: ZoneBox(
+                          label:'contact'.tr(),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 250,
+                                      child: TextBox(
+                                        controller: email,
+                                        placeholder: 'email'.tr(),
+                                        style: appTheme.writingStyle,
+                                        placeholderStyle: placeStyle,
+                                        cursorColor: appTheme.color.darker,
+                                        decoration: BoxDecoration(
+                                          color: appTheme.fillColor,
+                                        ),
+                                      ),
+                                    ),
+                                    smallSpace,
+                                    SizedBox(
+                                        width: 187,
+                                        child: TextBox(
+                                          controller: telephone,
+                                          placeholder: 'telephone'.tr(),
+                                          style: appTheme.writingStyle,
+                                          placeholderStyle: placeStyle,
+                                          cursorColor: appTheme.color.darker,
+                                          decoration: BoxDecoration(
+                                            color: appTheme.fillColor,
+                                          ),
+                                        )),
+                                  ],
+                                ),
+                                smallSpace,
+                                Flexible(child: TextBox(
+                                  controller: adresse,
+                                  placeholder: 'adresse'.tr(),
+                                  maxLines: 3,
+                                  style: appTheme.writingStyle,
+                                  placeholderStyle: placeStyle,
+                                  cursorColor: appTheme.color.darker,
+                                  decoration: BoxDecoration(
+                                    color: appTheme.fillColor,
+                                  ),
+                                )),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 10),
-          ],
-        ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(10),
+            width: 40.w,
+
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                FilledButton(
+                  onPressed: !uploading ? upload : null,
+                  child: const Text('Sauvegarder'),
+                ),
+                const SizedBox(width: 10),
+              ],
+            ),
+          ),
+        ],
       ),
-      children: [
-        ZoneBox(
-          label: 'fullname'.tr(),
-          child: Row(
-            children: [
-              Flexible(
-                  child: TextBox(
-                controller: nom,
-                placeholder: 'Nom',
-              )),
-              smallSpace,
-              Flexible(
-                  child: TextBox(
-                controller: prenom,
-                placeholder: 'Prénom',
-              )),
-            ],
-          ),
-        ),
-        smallSpace,
-        ZoneBox(label: 'birthday'.tr(),
-        child:
-        SizedBox(height: 5.h,
-          child: DatePicker(selected: birthDay,onChanged: (d){
-          setState(() {
-            birthDay=d;
-          });
-        },),)
-        ),
-        smallSpace,
-        ZoneBox(
-          label:'contact'.tr(),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  SizedBox(
-                    width: 250,
-                    child: TextBox(
-                      controller: email,
-                      placeholder: 'email'.tr(),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                  SizedBox(
-                      width: 187,
-                      child: TextBox(
-                        controller: telephone,
-                        placeholder: 'telephone'.tr(),
-                      )),
-                ],
-              ),
-              Flexible(child: TextBox(
-                controller: adresse,
-                maxLength: 3,
-              )),
-            ],
-          ),
-        ),
-      ],
     );
   }
 
@@ -214,8 +264,6 @@ class ChauffeurFormState extends State<ChauffeurForm> {
     }
   }
 
-
-  Map<int, String> linksGenerated = {};
 
   Future<Document> uploadChauffeur() async {
 
