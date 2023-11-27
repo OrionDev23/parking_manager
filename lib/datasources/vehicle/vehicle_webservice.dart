@@ -5,7 +5,7 @@ import '../../serializables/vehicle.dart';
 import '../../utilities/vehicle_util.dart';
 
 
-class VehiculesWebService extends ParcOtoWebService {
+class VehiculesWebService extends ParcOtoWebService<Vehicle> {
   VehiculesWebService(super.data, super.collectionID, super.columnForSearch);
 
 
@@ -88,14 +88,10 @@ class VehiculesWebService extends ParcOtoWebService {
     return Query.orderAsc('\$id');
   }
 
-  @override
-  fromJsonFunction(Map<String, dynamic> json) {
-    return Vehicle.fromJson(json);
-  }
 
   @override
-  num Function(MapEntry<String, dynamic> p1, MapEntry<String,
-      dynamic> p2)? getComparisonFunction(int column, bool ascending) {
+  int Function(MapEntry<String, Vehicle> p1, MapEntry<String,
+      Vehicle> p2)? getComparisonFunction(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
     //matricule
@@ -120,9 +116,14 @@ class VehiculesWebService extends ParcOtoWebService {
     //date modif
       case 3:
         return (d1, d2) =>
-        coef * d1.value.dateModification!.compareTo(d2.value.dateModification!);
+        coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
       default:
         return (d1, d2) => coef * d1.key.compareTo(d2.key);
     }
+  }
+
+  @override
+  Vehicle fromJsonFunction(Map<String, dynamic> json) {
+    return Vehicle.fromJson(json);
   }
 }

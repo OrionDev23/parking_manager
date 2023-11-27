@@ -1,24 +1,23 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parc_oto/screens/vehicle/documents/document_form.dart';
-import 'package:parc_oto/screens/vehicle/documents/document_table.dart';
+import 'package:parc_oto/screens/chauffeur/chauffeur_form.dart';
+import 'package:parc_oto/screens/chauffeur/chauffeur_table.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-
 import '../../../theme.dart';
 import '../../../widgets/button_container.dart';
 import '../../../widgets/page_header.dart';
-import 'document_tabs.dart';
+import 'chauffeur_tabs.dart';
 
-class VehiculeDocuments extends StatefulWidget {
-  const VehiculeDocuments({super.key});
+class ChauffeurGestion extends StatefulWidget {
+  const ChauffeurGestion({super.key});
 
   @override
-  VehiculeDocumentsState createState() => VehiculeDocumentsState();
+  ChauffeurGestionsState createState() => ChauffeurGestionsState();
 }
 
-class VehiculeDocumentsState extends State<VehiculeDocuments> {
+class ChauffeurGestionsState extends State<ChauffeurGestion> {
   final tstyle=TextStyle(
     fontSize: 10.sp,
   );
@@ -30,7 +29,7 @@ class VehiculeDocumentsState extends State<VehiculeDocuments> {
     var appTheme=context.watch<AppTheme>();
     return ScaffoldPage(
       header: PageTitle(
-        text: 'gestiondocument'.tr(),
+        text: 'gestionchauf'.tr(),
         trailing: SizedBox(
             width: 15.w,
             height: 10.h,
@@ -40,10 +39,10 @@ class VehiculeDocumentsState extends State<VehiculeDocuments> {
               showBottom: false,
               showCounter: false,
               action: () {
-                final index = DocumentTabsState.tabs.length + 1;
+                final index = ChauffeurTabsState.tabs.length + 1;
                 final tab = generateTab(index);
-                DocumentTabsState.tabs.add(tab);
-                DocumentTabsState.currentIndex.value = index - 1;
+                ChauffeurTabsState.tabs.add(tab);
+                ChauffeurTabsState.currentIndex.value = index - 1;
               },
             )),
       ),
@@ -72,7 +71,7 @@ class VehiculeDocumentsState extends State<VehiculeDocuments> {
               children: [
                 SizedBox(
                     width:60.w,
-                    child: const DocumentTable()),
+                    child: const ChauffeurTable()),
                 const SizedBox(width: 10,),
                 Flexible(
                   child: Column(
@@ -140,15 +139,15 @@ class VehiculeDocumentsState extends State<VehiculeDocuments> {
     late Tab tab;
     tab = Tab(
       key: UniqueKey(),
-      text: Text('nouvdocument'.tr()),
-      semanticLabel: 'nouvdocument'.tr(),
+      text: Text('nouvchauf'.tr()),
+      semanticLabel: 'nouvchauf'.tr(),
       icon: const Icon(FluentIcons.document),
-      body: const DocumentForm(),
+      body: ChauffeurForm(),
       onClosed: () {
-        DocumentTabsState.tabs.remove(tab);
+        ChauffeurTabsState.tabs.remove(tab);
 
-        if (DocumentTabsState.currentIndex.value > 0) {
-          DocumentTabsState.currentIndex.value--;
+        if (ChauffeurTabsState.currentIndex.value > 0) {
+          ChauffeurTabsState.currentIndex.value--;
         }
       },
     );

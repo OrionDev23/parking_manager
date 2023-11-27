@@ -1,26 +1,24 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parc_oto/datasources/document/document_datasource.dart';
+import 'package:flutter/services.dart';
+import 'package:parc_oto/datasources/conducteurs/conducteur_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-import '../../../serializables/vehicle.dart';
 import '../../../theme.dart';
 import '../../../widgets/zone_box.dart';
-import '../vehicles_table.dart';
-
-class DocumentTable extends StatefulWidget {
+class ChauffeurTable extends StatefulWidget {
   final bool selectD;
-  const DocumentTable({super.key,this.selectD=false});
+  const ChauffeurTable({super.key,this.selectD=false});
 
   @override
-  State<DocumentTable> createState() => DocumentTableState();
+  State<ChauffeurTable> createState() => ChauffeurTableState();
 }
 
-class DocumentTableState extends State<DocumentTable> {
-  late DocumentsDataSource documentsDataSource;
+class ChauffeurTableState extends State<ChauffeurTable> {
+  late ConducteurDataSource conducteurDataSource;
 
   bool assending = false;
 
@@ -28,7 +26,7 @@ class DocumentTableState extends State<DocumentTable> {
 
   @override
   void initState() {
-    documentsDataSource = DocumentsDataSource(current: context, collectionID: vehicDoc,selectC: widget.selectD);
+    conducteurDataSource = ConducteurDataSource(current: context, collectionID: chauffeurid,selectC: widget.selectD);
     initColumns();
     super.initState();
   }
@@ -37,7 +35,7 @@ class DocumentTableState extends State<DocumentTable> {
     fontSize: 10.sp,
   );
 
-  int sortColumn = 3;
+  int sortColumn = 5;
 
   void initColumns() {
     columns = [
@@ -54,7 +52,7 @@ class DocumentTableState extends State<DocumentTable> {
           sortColumn = 0;
           assending = !assending;
 
-          documentsDataSource.sort(sortColumn, assending);
+          conducteurDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -62,7 +60,7 @@ class DocumentTableState extends State<DocumentTable> {
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Text(
-            'vehicule',
+            'email',
             style: tstyle,
           ).tr(),
         ),
@@ -71,7 +69,7 @@ class DocumentTableState extends State<DocumentTable> {
           sortColumn = 1;
           assending = !assending;
 
-          documentsDataSource.sort(sortColumn, assending);
+          conducteurDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -79,32 +77,65 @@ class DocumentTableState extends State<DocumentTable> {
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Text(
-            'dateexp',
-            style: tstyle,
-          ).tr(),
-        ),
-        size: ColumnSize.M,
-        onSort: (s, c) {
-          sortColumn = 2;
-          assending = !assending;
-
-          documentsDataSource.sort(sortColumn, assending);
-          setState(() {});
-        },
-      ),
-      DataColumn2(
-        label: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'dateModif',
+            'telephone',
             style: tstyle,
           ).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
+          sortColumn = 2;
+          assending = !assending;
+
+          conducteurDataSource.sort(sortColumn, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'adresse',
+            style: tstyle,
+          ).tr(),
+        ),
+        size: ColumnSize.M,
+        onSort: (s, c) {
           sortColumn = 3;
           assending = !assending;
-          documentsDataSource.sort(sortColumn, assending);
+
+          conducteurDataSource.sort(sortColumn, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'birthday',
+            style: tstyle,
+          ).tr(),
+        ),
+        size: ColumnSize.L,
+        onSort: (s, c) {
+          sortColumn = 4;
+          assending = !assending;
+          conducteurDataSource.sort(sortColumn, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'datemodif',
+            style: tstyle,
+          ).tr(),
+        ),
+        size: ColumnSize.L,
+        onSort: (s, c) {
+          sortColumn = 5;
+          assending = !assending;
+          conducteurDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -125,14 +156,13 @@ class DocumentTableState extends State<DocumentTable> {
   bool filtered = false;
 
   FlyoutController filterFlyout = FlyoutController();
-  Vehicle? selectedVehicle;
-  DateTime? dateMin;
-  DateTime? dateMax;
+  TextEditingController ageMin=TextEditingController();
+  TextEditingController ageMax=TextEditingController();
   Map<String,String> filters={};
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
-    documentsDataSource.appTheme=appTheme;
+    conducteurDataSource.appTheme=appTheme;
     return AsyncPaginatedDataTable2(
       header: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
@@ -172,7 +202,7 @@ class DocumentTableState extends State<DocumentTable> {
                                         children: [
                                           Flexible(
                                             child: ZoneBox(
-                                              label: 'dateexp'.tr(),
+                                              label: 'age'.tr(),
                                               child: Padding(
                                                 padding: const EdgeInsets.all(10.0),
                                                 child: Column(
@@ -185,15 +215,9 @@ class DocumentTableState extends State<DocumentTable> {
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
-                                                          child: DatePicker(
-                                                            selected: dateMin,
-                                                            endDate: dateMax,
-                                                            onChanged: (d){
-                                                              dateMin=d;
-                                                              setState(() {
-                                                              });
-                                                              setS((){});
-                                                            },
+                                                          child: TextBox(
+                                                            controller: ageMin,
+                                                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                                           ),
                                                         ),
                                                       ],
@@ -207,60 +231,14 @@ class DocumentTableState extends State<DocumentTable> {
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
-                                                          child: DatePicker(
-                                                            selected: dateMax,
-                                                            startDate: dateMin,
-                                                            onChanged: (d){
-                                                              dateMax=d;
-                                                              setState(() {
-                                                              });
-                                                              setS((){});
-
-                                                            },
+                                                          child: TextBox(
+                                                            controller: ageMax,
+                                                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                                                           ),
                                                         ),
                                                       ],
                                                     ),
                                                   ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          smallSpace,
-                                          Flexible(
-                                            child: ZoneBox(
-                                              label:'vehicule'.tr(),
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(10.0),
-                                                child: ListTile(
-                                                  title: Text(selectedVehicle?.matricule??'/'),
-                                                  onPressed: () async{
-                                                    selectedVehicle=await showDialog<Vehicle>(context: context,
-                                                        barrierDismissible: true,
-                                                        builder: (context){
-                                                          return  ContentDialog(
-                                                            constraints: BoxConstraints.tight(Size(
-                                                                60.w,60.h
-                                                            )),
-                                                            title: const Text('selectvehicle').tr(),
-                                                            style: ContentDialogThemeData(
-                                                                titleStyle: appTheme.writingStyle.copyWith(fontWeight: FontWeight.bold)
-                                                            ),
-                                                            content: Container(
-                                                                color: appTheme.backGroundColor,
-                                                                width: 60.w,
-                                                                height: 60.h,
-                                                                child: const VehicleTable(selectV: true,)
-                                                            ),
-                                                          );
-                                                        }
-                                                    );
-                                                    setState(() {
-
-                                                    });
-                                                    setS((){});
-
-                                                  },
                                                 ),
                                               ),
                                             ),
@@ -282,13 +260,12 @@ class DocumentTableState extends State<DocumentTable> {
 
                                                     Navigator.of(context).pop();
                                                     setState(() {
-                                                      dateMax=null;
-                                                      dateMin=null;
-                                                      selectedVehicle=null;
+                                                      ageMax.clear();
+                                                      ageMin.clear();
                                                       filtered=false;
                                                       filters.clear();
                                                     });
-                                                    documentsDataSource.filter(filters);
+                                                    conducteurDataSource.filter(filters);
 
                                                   }
                                                       :null,child: const Text('clear').tr(),
@@ -314,28 +291,22 @@ class DocumentTableState extends State<DocumentTable> {
                                                     onPressed: (){
                                                       Navigator.of(context).pop();
 
-                                                      if(dateMin!=null){
-                                                        filters['datemin']=dateMin!.difference(ClientDatabase.ref).inMilliseconds.toString();
+                                                      if(ageMin.text.isNotEmpty){
+                                                        filters['agemin']=ageMin.text;
                                                       }
                                                       else{
-                                                        filters.remove('datemin');
+                                                        filters.remove('agemin');
                                                       }
-                                                      if(dateMax!=null){
-                                                        filters['datemax']=dateMax!.difference(ClientDatabase.ref).inMilliseconds.toString();
-                                                      }
-                                                      else{
-                                                        filters.remove('datemax');
-                                                      }
-                                                      if(selectedVehicle!=null){
-                                                        filters['vehicle']=selectedVehicle!.id!;
+                                                      if(ageMax.text.isNotEmpty){
+                                                        filters['ageMax']=ageMax.text;
                                                       }
                                                       else{
-                                                        filters.remove('vehicle');
+                                                        filters.remove('ageMax');
                                                       }
 
                                                       filtered=true;
                                                       setState((){});
-                                                      documentsDataSource.filter(filters);
+                                                      conducteurDataSource.filter(filters);
 
                                                     }),
                                               ],
@@ -385,7 +356,7 @@ class DocumentTableState extends State<DocumentTable> {
                 ),
                 onSubmitted: (s) {
                   if (s.isNotEmpty) {
-                    documentsDataSource.search(s);
+                    conducteurDataSource.search(s);
                     if (!notEmpty) {
                       setState(() {
                         notEmpty = true;
@@ -406,7 +377,7 @@ class DocumentTableState extends State<DocumentTable> {
                       searchController.text = "";
                       notEmpty = false;
                       setState(() {});
-                      documentsDataSource.search('');
+                      conducteurDataSource.search('');
                     })
                     : null,
               ),
@@ -430,7 +401,7 @@ class DocumentTableState extends State<DocumentTable> {
       renderEmptyRowsInTheEnd: false,
       fit: FlexFit.tight,
       columns: columns,
-      source: documentsDataSource,
+      source: conducteurDataSource,
       sortArrowAlwaysVisible: true,
       hidePaginator: false,
     );
@@ -438,7 +409,7 @@ class DocumentTableState extends State<DocumentTable> {
 
   @override
   void dispose() {
-    documentsDataSource.dispose();
+    conducteurDataSource.dispose();
     super.dispose();
   }
 }

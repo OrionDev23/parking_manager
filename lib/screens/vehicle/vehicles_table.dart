@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -39,12 +40,12 @@ class VehicleTableState extends State<VehicleTable> {
         filtered = true;
         filters['marque'] = filterMarque.value.toString();
         vehicleDataSource = VehiculesDataSource(
-            current: context, selectV: widget.selectV, filters: filters);
+            current: context, selectC: widget.selectV, collectionID:vehiculeid,filters: filters);
       } else {
         searchController.text = filterVehicule.value!;
         vehicleDataSource = VehiculesDataSource(
             current: context,
-            selectV: widget.selectV,
+            selectC: widget.selectV, collectionID:vehiculeid,
             searchKey: filterVehicule.value);
       }
       filterMarque.value = null;
@@ -53,7 +54,7 @@ class VehicleTableState extends State<VehicleTable> {
       startedWithFiltersOn = false;
       vehicleDataSource = VehiculesDataSource(
         current: context,
-        selectV: widget.selectV,
+        selectC: widget.selectV, collectionID:vehiculeid,
       );
     }
     initColumns();

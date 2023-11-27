@@ -3,11 +3,11 @@ import 'package:parc_oto/datasources/parcoto_webservice.dart';
 import 'package:parc_oto/serializables/document_vehicle.dart';
 
 
-class DocumentWebService extends ParcOtoWebService{
+class DocumentWebService extends ParcOtoWebService<DocumentVehicle>{
   DocumentWebService(super.data, super.collectionID, super.columnForSearch);
 
   @override
-  num Function(MapEntry<String,dynamic>, MapEntry<String,dynamic>)? getComparisonFunction(
+  int Function(MapEntry<String,DocumentVehicle>, MapEntry<String,DocumentVehicle>)? getComparisonFunction(
       int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
@@ -26,7 +26,7 @@ class DocumentWebService extends ParcOtoWebService{
           } else if (d2.value.vehicle == d1.value.vehicle) {
             return 0;
           } else {
-            return coef * d1.value.vehicle!.id!.compareTo(d2.value.vehicle!.id!);
+            return coef * d1.value.vehicle!.id.compareTo(d2.value.vehicle!.id);
           }
         };
       //date d'expiration
@@ -69,7 +69,7 @@ class DocumentWebService extends ParcOtoWebService{
   }
 
   @override
-  fromJsonFunction(Map<String, dynamic> json) {
+  DocumentVehicle fromJsonFunction(Map<String, dynamic> json) {
     return DocumentVehicle.fromJson(json);
   }
 

@@ -1,72 +1,92 @@
-import 'package:adv_log_fact/screens/chauffeur/chauffeur_form.dart';
-import 'package:adv_log_fact/screens/chauffeur/chauffeur_list.dart';
-import 'package:fluent_ui/fluent_ui.dart';
 
-import '../../main.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:fluent_ui/fluent_ui.dart';
+import 'package:icons_plus/icons_plus.dart';
+import 'package:parc_oto/screens/chauffeur/chauffeur_form.dart';
+
+import 'chauffeur_gestion.dart';
+
 
 class ChauffeurTabs extends StatefulWidget {
-  const ChauffeurTabs({Key? key}) : super(key: key);
+  const ChauffeurTabs({super.key});
 
   @override
-  State<ChauffeurTabs> createState() => ChauffeurTabsState();
+  ChauffeurTabsState createState() => ChauffeurTabsState();
 }
 
 class ChauffeurTabsState extends State<ChauffeurTabs> {
-  static List<Tab> tabs = [
-    Tab(
-      text: const Text('Liste des Chauffeurs'),
-      body: const ChauffeurList(),
-      icon: const Icon(FluentIcons.delivery_truck),
-      semanticLabel: 'Chauffeur list',
-      onClosed: null,
-      closeIcon: null,
-    ),
-  ];
-  static int currentIndex = 0;
-  static ValueNotifier<int> changing = ValueNotifier(0);
+  static ValueNotifier<int> currentIndex=ValueNotifier(0);
+  static List<Tab> tabs = [];
+
   Tab generateTab(int index) {
-    Tab? tab;
+    late Tab tab;
     tab = Tab(
-      text: const Text('Nouveau chauffeur'),
+      key: UniqueKey(),
+      text: Text('nouvchauf'.tr()),
+      semanticLabel: 'nouvchauf'.tr(),
+      icon: const Icon(Bootstrap.car_front),
       body: ChauffeurForm(),
-      icon: const Icon(FluentIcons.switch_user),
-      semanticLabel: 'Nouveau chauffeur',
       onClosed: () {
-        setState(() {
-          tabs.remove(tab);
-          if (currentIndex > 0) currentIndex--;
-        });
+        tabs.remove(tab);
+
+        if (currentIndex.value > 0) currentIndex.value--;
       },
     );
     return tab;
   }
 
   @override
+  void initState() {
+    currentIndex.value=0;
+    if(tabs.isEmpty){
+      tabs.add(Tab(
+        text: Text('gestionchauf'.tr()),
+        closeIcon: null,
+        icon: const Icon(IonIcons.settings),
+        body: const ChauffeurGestion(),
+        onClosed: null,
+      ));
+    }
+    super.initState();
+  }
+  @override
   Widget build(BuildContext context) {
+
     return ValueListenableBuilder(
-      valueListenable: changing,
-      builder: (c, v, w) {
-        return ScaffoldPage(
-          content: Card(
-            child: TabView(
-              currentIndex: currentIndex,
-              tabs: tabs,
-              onChanged: (index) => setState(() => currentIndex = index),
-              tabWidthBehavior: TabWidthBehavior.equal,
-              closeButtonVisibility: CloseButtonVisibilityMode.always,
-              onNewPressed: MyAppState.userType.value == 0 ||
-                      MyAppState.userType.value == 3
-                  ? () {
-                      tabs.add(generateTab(tabs.length));
-                      setState(() {
-                        currentIndex = tabs.length - 1;
-                      });
-                    }
-                  : null,
-            ),
-          ),
-        );
-      },
+        valueListenable: currentIndex,
+        builder: (context,value,_) {
+          return TabView(
+            tabs: tabs,
+            currentIndex: value,
+            onChanged: (index) =>  currentIndex.value = index,
+            tabWidthBehavior: TabWidthBehavior.equal,
+            closeButtonVisibility: CloseButtonVisibilityMode.always,
+            showScrollButtons: true,
+            onNewPressed: () {
+              setState(() {
+                final index = tabs.length + 1;
+                final tab = generateTab(index);
+                tabs.add(tab);
+                currentIndex.value=index-1;
+              });
+            },
+            onReorder: (oldIndex, newIndex) {
+              setState(() {
+                if (oldIndex < newIndex) {
+                  newIndex -= 1;
+                }
+                final item = tabs.removeAt(oldIndex);
+                tabs.insert(newIndex, item);
+
+                if (currentIndex.value == newIndex) {
+                  currentIndex.value = oldIndex;
+                } else if (currentIndex.value == oldIndex) {
+                  currentIndex.value = newIndex;
+                }
+              });
+            },
+          );
+        }
     );
   }
 }

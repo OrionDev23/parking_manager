@@ -25,6 +25,7 @@
  "precmat": "Matricule précédant",
  "erreurmat": "Matricule invalide",
 "supvehic": "Supprimer le véhicule",
+"supchauf": "Supprimer le conducteur",
 "nouvdocument": "Nouveau document",
 "gestiondocument": "Gestion des documents",
 

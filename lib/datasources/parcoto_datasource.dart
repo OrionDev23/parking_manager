@@ -1,14 +1,15 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/parcoto_webservice.dart';
 import 'package:parc_oto/datasources/parcoto_webservice_response.dart';
 
 import '../providers/client_database.dart';
+import '../serializables/parc_oto_serializable.dart';
 import '../theme.dart';
 
-abstract class ParcOtoDatasource<ParcOtoDefault,T> extends AsyncDataTableSource{
+abstract class ParcOtoDatasource<T> extends AsyncDataTableSource{
   BuildContext current;
   bool? selectC;
   AppTheme? appTheme;
@@ -20,7 +21,7 @@ abstract class ParcOtoDatasource<ParcOtoDefault,T> extends AsyncDataTableSource{
   bool sortAscending = true;
   final String collectionID;
 
-  List<MapEntry<String,ParcOtoDefault>> data = List.empty(growable: true);
+  List<MapEntry<String,T>> data = List.empty(growable: true);
 
   late final ParcOtoWebService repo;
 
@@ -81,13 +82,49 @@ abstract class ParcOtoDatasource<ParcOtoDefault,T> extends AsyncDataTableSource{
   }
 
 
-  DataRow rowDisplay(int startIndex,int count,dynamic element);
+  DataRow rowDisplay(int startIndex,int count,MapEntry<String,dynamic> element){
+    return DataRow(
+        key: ValueKey<String>(element.value.id),
+    onSelectChanged: selectC==true? (value) {
+    if (value ==true) {
+    selectRow(element.value);
+    }
+    }:null,
+    cells: getCellsToShow(element as MapEntry<String,T>),);
+  }
+
+  List<DataCell> getCellsToShow(MapEntry<String,T> element);
 
   void selectRow(ParcOtoDefault c){
     Navigator.of(current).pop(c);
   }
 
-  void showDeleteConfirmation(ParcOtoDefault c);
+  void showDeleteConfirmation(dynamic c){
+    f.showDialog(
+        context: current,
+        builder: (context) {
+          return f.ContentDialog(
+            content: Text(deleteConfirmationMessage( c)),
+            actions: [
+              f.FilledButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('annuler').tr()),
+              f.Button(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                  deleteRow(c);
+                },
+                child: const Text('confirmer').tr(),
+              )
+            ],
+          );
+        });
+  }
+  
+  String deleteConfirmationMessage(T c);
 
   void deleteRow(dynamic c) async{
     await ClientDatabase.database!.deleteDocument(
@@ -98,9 +135,9 @@ abstract class ParcOtoDatasource<ParcOtoDefault,T> extends AsyncDataTableSource{
       notifyListeners();
     }).onError((error, stackTrace) {
 
-      showSnackbar(current,InfoBar(
+      f.showSnackbar(current,f.InfoBar(
           title: const Text('erreur').tr(),
-          severity: InfoBarSeverity.error
+          severity: f.InfoBarSeverity.error
       ),
         alignment: Alignment.lerp(Alignment.topCenter, Alignment.center, 0.6)!,
       );

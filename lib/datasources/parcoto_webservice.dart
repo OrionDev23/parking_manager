@@ -4,19 +4,19 @@ import 'package:parc_oto/datasources/parcoto_webservice_response.dart';
 
 import '../providers/client_database.dart';
 
-abstract class ParcOtoWebService<ParcOtoDefault> {
+abstract class ParcOtoWebService<T> {
 
 
-  List <MapEntry<String,ParcOtoDefault>> data;
+  List <MapEntry<String,T>> data;
 
   String collectionID;
 
   int columnForSearch;
   ParcOtoWebService(this.data,this.collectionID,this.columnForSearch);
-  num Function(MapEntry<String,dynamic>, MapEntry<String,dynamic>)? getComparisonFunction(
+  int Function(MapEntry<String,T>, MapEntry<String,T>)? getComparisonFunction(
       int column, bool ascending);
 
-  Future<ParcOtoWebServiceResponse<ParcOtoDefault>> getData(int startingAt, int count,
+  Future<ParcOtoWebServiceResponse<T>> getData(int startingAt, int count,
       int sortedBy, bool sortedAsc, {String? searchKey,Map<String,String>?filters}) async {
     if (startingAt == 0) {
       data.clear();
@@ -29,24 +29,25 @@ abstract class ParcOtoWebService<ParcOtoDefault> {
 
       for (var element in value.documents) {
         if(!testIfElementContained(element.$id)){
-          data.add(MapEntry(element.$id, element.convertTo<ParcOtoDefault>((p0) {
+          data.add(MapEntry(element.$id, element.convertTo<T>((p0) {
             return fromJsonFunction(p0 as Map<String,dynamic>);
           })));
         }
       }
       var result = data;
 
-      result.sort(getComparisonFunction(sortedBy, sortedAsc) as int Function(MapEntry<String, ParcOtoDefault> a, MapEntry<String, ParcOtoDefault> b)?);
-      return ParcOtoWebServiceResponse(
+      result.sort(getComparisonFunction(sortedBy, sortedAsc));
+
+      return ParcOtoWebServiceResponse<T>(
           value.total, result.skip(startingAt).take(count).toList());
     }).onError((error, stackTrace) {
-      return Future.value(ParcOtoWebServiceResponse(0, data));
+      return Future.value(ParcOtoWebServiceResponse<T>(0, data));
     });
   }
 
 
 
-  ParcOtoDefault fromJsonFunction(Map<String,dynamic> json);
+  T fromJsonFunction(Map<String,dynamic> json);
   
   Future<DocumentList> getSearchResult(String? searchKey,Map<String,String>filters,
       int count,int startingAt,int sortedBy,bool sortedAsc,) async{
