@@ -30,9 +30,9 @@ int? dateToIntJson(DateTime? date){
   return date?.difference(ClientDatabase.ref).inMilliseconds;
 }
 
-DateTime? dateFromIntJson(String? json){
+DateTime? dateFromIntJson(int? json){
   if(json!=null){
-    return ClientDatabase.ref.add(Duration(milliseconds:int.parse(json)));
+    return ClientDatabase.ref.add(Duration(milliseconds:json));
   }
   else{
     return null;

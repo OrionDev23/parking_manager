@@ -22,8 +22,11 @@ class Conducteur extends ParcOtoDefault{
 
   String? createdBy;
 
+  String? etatactuel;
+  int? etat;
 
-  Conducteur({required this.name,required this.prenom,required super.id,this.createdBy,super.createdAt,super.updatedAt,this.search,this.adresse,this.email,this.dateNaissance,this.telephone});
+
+  Conducteur({required this.name,required this.prenom,this.etat,this.etatactuel,required super.id,this.createdBy,super.createdAt,super.updatedAt,this.search,this.adresse,this.email,this.dateNaissance,this.telephone});
 
   factory Conducteur.fromJson(Map<String, dynamic> json) => _$ConducteurFromJson(json);
   @override

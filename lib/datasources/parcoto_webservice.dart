@@ -57,7 +57,7 @@ abstract class ParcOtoWebService<T> {
       for(int i=0;i<columnForSearch;i++){
         d=await ClientDatabase.database!.listDocuments(
             databaseId: databaseId,
-            collectionId: vehiculeid,
+            collectionId: collectionID,
             queries: getQueriesForSearch(searchKey, filters, count, startingAt, sortedBy, sortedAsc, i));
         if(d.documents.isNotEmpty){
           break;

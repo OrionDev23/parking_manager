@@ -9,7 +9,6 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../screens/chauffeur/chauffeur_tabs.dart';
 import '../../screens/vehicle/documents/document_form.dart';
-import '../../screens/vehicle/manager/vehicle_tabs.dart';
 import '../../serializables/conducteur.dart';
 
 class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
@@ -25,7 +24,6 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
   @override
   List<DataCell> getCellsToShow(MapEntry<String, Conducteur> element) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
-    final dateFormat2 = DateFormat('y/M/d', 'fr');
     final tstyle = TextStyle(
       fontSize: 10.sp,
     );
@@ -75,7 +73,7 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
                                 }
                               },
                             );
-                            final index = VehicleTabsState.tabs.length + 1;
+                            final index = ChauffeurTabsState.tabs.length + 1;
                             ChauffeurTabsState.tabs.add(tab);
                             ChauffeurTabsState.currentIndex.value = index - 1;
                           }

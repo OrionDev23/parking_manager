@@ -101,4 +101,15 @@ class ClientDatabase {
 
     return result;
   }
+
+
+  static String getEtat(int etat){
+    switch(etat){
+      case 0:return 'disponible';
+      case 1:return 'mission';
+      case 2:return 'absent';
+      case 3:return 'quitteentre';
+    }
+    return '';
+  }
 }

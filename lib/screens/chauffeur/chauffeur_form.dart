@@ -50,6 +50,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
 
   void initValues() {
     if (widget.chauf != null) {
+      chaufID=widget.chauf!.id;
       nom.text = widget.chauf!.name;
       prenom.text = widget.chauf!.prenom;
       email.text = widget.chauf!.email ?? '';
@@ -60,6 +61,8 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   }
 
   bool? selected = false;
+
+  int? etat;
 
 
 
