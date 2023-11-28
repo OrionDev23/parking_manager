@@ -11,8 +11,9 @@ Marque _$MarqueFromJson(Map<String, dynamic> json) => Marque(
       nom: json['nom'] as String?,
       createdAt: createdAtJson(json[r'$createdAt'] as String),
       updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
-    );
+    )..createdBy = json['createdBy'] as String?;
 
 Map<String, dynamic> _$MarqueToJson(Marque instance) => <String, dynamic>{
       'nom': instance.nom,
+      'createdBy': instance.createdBy,
     };

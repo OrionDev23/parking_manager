@@ -12,6 +12,8 @@ part 'marque.g.dart';
 class Marque extends ParcOtoDefault{
   String? nom;
 
+  String? createdBy;
+
   Marque({required super.id,this.nom,super.createdAt,super.updatedAt});
 
   factory Marque.fromJson(Map<String, dynamic> json) => _$MarqueFromJson(json);

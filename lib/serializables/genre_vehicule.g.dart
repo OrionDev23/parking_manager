@@ -9,9 +9,7 @@ part of 'genre_vehicule.dart';
 GenreVehicle _$GenreVehicleFromJson(Map<String, dynamic> json) => GenreVehicle(
       id: json[r'$id'] as String,
       name: json['name'] as String?,
-      user: json['user'] == null
-          ? null
-          : ParcUser.fromJson(json['user'] as Map<String, dynamic>),
+      createdBy: json['createdBy'] as String?,
       createdAt: createdAtJson(json[r'$createdAt'] as String),
       updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
     );
@@ -19,5 +17,5 @@ GenreVehicle _$GenreVehicleFromJson(Map<String, dynamic> json) => GenreVehicle(
 Map<String, dynamic> _$GenreVehicleToJson(GenreVehicle instance) =>
     <String, dynamic>{
       'name': instance.name,
-      'user': userToJson(instance.user),
+      'createdBy': instance.createdBy,
     };

@@ -135,10 +135,12 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource{
       refreshDatasource();
     }).onError((error, stackTrace) {
 
-      f.showSnackbar(current,f.InfoBar(
-          title: const Text('erreur').tr(),
-          severity: f.InfoBarSeverity.error
-      ),
+      f.displayInfoBar(current,builder: (c,s){
+       return  f.InfoBar(
+            title: const Text('erreur').tr(),
+            severity: f.InfoBarSeverity.error
+        );
+      },
         alignment: Alignment.lerp(Alignment.topCenter, Alignment.center, 0.6)!,
       );
     });

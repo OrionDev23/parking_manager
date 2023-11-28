@@ -14,10 +14,8 @@ class Etat extends ParcOtoDefault{
   double? valeur;
   String? remarque;
   int? date;
-  @JsonKey(toJson: userToJson)
-  ParcUser? createdBy;
-  @JsonKey(toJson: vehiculeToJson)
-  Vehicle? vehicle;
+  String? createdBy;
+  String? vehicle;
 
   Etat({required super.id,super.createdAt,super.updatedAt,required this.type,this.valeur,this.remarque,this.date,this.createdBy,this.vehicle});
   factory Etat.fromJson(Map<String, dynamic> json) => _$EtatFromJson(json);

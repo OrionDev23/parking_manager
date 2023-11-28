@@ -897,6 +897,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                         SelectDialog.showModal<
                                                             int>(context,
                                                           selectedValue: genre,
+                                                          backgroundColor: appTheme.backGroundColor,
                                                           items:
                                                           VehiclesUtilities
                                                               .genres!.keys.toList(),
@@ -971,12 +972,13 @@ class _VehicleFormState extends State<VehicleForm>
                                                   ).tr(),
                                                   Flexible(
                                                     child: ListTile(
-                                                      leading: Image.asset('assets/images/marques/${marque??'default'}.webp',width: 4.h,height: 4.h,),
-                                                      title: AutoSizeText(VehiclesUtilities.marques![marque??0]??'nonind'.tr(),minFontSize: 5,maxLines: 1,),
+                                                      leading: Image.asset('assets/images/marques/${marque==null || marque!<=0 ?'default':marque!}.webp',width: 4.h,height: 4.h,),
+                                                      title: AutoSizeText(VehiclesUtilities.marques![marque==null || marque!<=0?0:marque!]??'nonind'.tr(),minFontSize: 5,maxLines: 1,),
                                                       onPressed: () {
                                                         SelectDialog.showModal<
                                                                 int?>(context,
                                                             selectedValue: marque,
+                                                            backgroundColor: appTheme.backGroundColor,
                                                             gridView: true,
                                                             numberOfGridCross: 3,
                                                             constraints: BoxConstraints.loose(Size(60.w,70.h)),

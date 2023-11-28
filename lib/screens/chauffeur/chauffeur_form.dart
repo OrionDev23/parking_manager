@@ -6,6 +6,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/serializables/conducteur.dart';
+import 'package:parc_oto/serializables/disponibilite_chauffeur.dart';
 import 'package:parc_oto/widgets/zone_box.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -26,6 +27,8 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   bool uploading = false;
   double progress = 0;
   String? chaufID;
+
+  int ? etat;
 
   TextEditingController nom = TextEditingController();
   TextEditingController prenom = TextEditingController();
@@ -51,6 +54,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   void initValues() {
     if (widget.chauf != null) {
       chaufID=widget.chauf!.id;
+      etat=widget.chauf!.etat;
       nom.text = widget.chauf!.name;
       prenom.text = widget.chauf!.prenom;
       email.text = widget.chauf!.email ?? '';
@@ -61,9 +65,6 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   }
 
   bool? selected = false;
-
-  int? etat;
-
 
 
   @override
@@ -94,7 +95,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
             child: Column(
               children: [
                 SizedBox(
-                  height: 45.h,
+                  height: 55.h,
                   width: 40.w,
                   child: Column(
                     children: [
@@ -202,6 +203,45 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                           ),
                         ),
                       ),
+                      smallSpace,
+                      Flexible(
+                        child: ZoneBox(
+                          label: 'disponibilite'.tr(),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: DropDownButton(
+                              title: Text(ClientDatabase.getEtat(etat)).tr(),
+                              placement: FlyoutPlacementMode.bottomLeft,
+                              items: [
+                                MenuFlyoutItem(text: const Text('disponible').tr(), onPressed: () {
+                                  setState(() {
+                                    etat=0;
+                                  });
+                                }),
+                                const MenuFlyoutSeparator(),
+                                MenuFlyoutItem(text: const Text('mission').tr(), onPressed: () {
+                                  setState(() {
+                                    etat=1;
+                                  });
+                                }),
+                                const MenuFlyoutSeparator(),
+                                MenuFlyoutItem(text: const Text('absent').tr(), onPressed: () {
+                                  setState(() {
+                                    etat=2;
+                                  });
+                                }),
+                                const MenuFlyoutSeparator(),
+                                MenuFlyoutItem(text: const Text('quitteentre').tr(), onPressed: () {
+                                  setState(() {
+                                    etat=3;
+                                  });
+                                }),
+                              ],
+
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -268,6 +308,8 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   }
 
 
+
+
   Future<Document> uploadChauffeur() async {
 
     var dateFormat=DateFormat('y/M/d','fr');
@@ -298,6 +340,10 @@ class ChauffeurFormState extends State<ChauffeurForm> {
           data: chauf.toJson());
     }
 
+  }
+
+  Future<Document> uploadEtat() async{
+    DisponibiliteChauffeur disp=DisponibiliteChauffeur(id: id, type: type)
   }
 
 

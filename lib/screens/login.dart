@@ -163,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         Button(
                             style:ButtonStyle(
-                              border: ButtonState.all<BorderSide>(BorderSide.none),
+                              shape: ButtonState.all(null),
                                 backgroundColor: ButtonState.all<Color>(Colors.transparent)
                             ),
                             onPressed: forgotPassword,

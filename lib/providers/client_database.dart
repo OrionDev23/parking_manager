@@ -9,6 +9,7 @@ const userid = "users";
 const chauffeurid = "6537d87b492c80f255e8";
 const genreid = "6537960246d5b0e1ab77";
 const vehiculeid = "6531ad22153b2a49ca2c";
+const chaufDispID="chauf_disponibilite";
 const vehicDoc="doc_vehic";
 const buckedId="images";
 const endpoint ="https://cloud.appwrite.io/v1";
@@ -103,13 +104,13 @@ class ClientDatabase {
   }
 
 
-  static String getEtat(int etat){
+  static String getEtat(int? etat){
     switch(etat){
       case 0:return 'disponible';
       case 1:return 'mission';
       case 2:return 'absent';
       case 3:return 'quitteentre';
+      default:return 'disponible';
     }
-    return '';
   }
 }
