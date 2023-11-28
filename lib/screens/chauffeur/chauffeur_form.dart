@@ -215,7 +215,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
               children: [
                 FilledButton(
                   onPressed: !uploading ? upload : null,
-                  child: const Text('Sauvegarder'),
+                  child: const Text('confirmer'),
                 ),
                 const SizedBox(width: 10),
               ],
@@ -228,7 +228,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
 
   void upload() async {
     if (nom.value.text.isEmpty || prenom.text.isEmpty) {
-      showMessage('Nom et prénom obligatoires', 'Erreur');
+      showMessage('nomprenreq', 'erreur');
       return;
     }
     if (!uploading) {
@@ -246,15 +246,15 @@ class ChauffeurFormState extends State<ChauffeurForm> {
           progress = 90;
         });
         if (widget.chauf == null) {
-          showMessage('Conducteur ajouté !', "Fait");
+          showMessage('chaufsuccess', "ok");
         } else {
-          showMessage('Conducteur mis à jour !', "Fait");
+          showMessage('chaufupdate', "ok");
         }
       } catch (e) {
         setState(() {
           uploading = false;
-          showMessage('Erreur d\'upload, vérifiez votre connexion et réessayez',
-              'Erreur');
+          showMessage('errupld',
+              'erreur');
         });
       }
       setState(() {
@@ -267,7 +267,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
 
   Future<Document> uploadChauffeur() async {
 
-    var dateFormat=DateFormat('y/m/d','fr');
+    var dateFormat=DateFormat('y/M/d','fr');
     Conducteur chauf = Conducteur(
         id:chaufID!,
         name: nom.value.text,
@@ -280,11 +280,21 @@ class ChauffeurFormState extends State<ChauffeurForm> {
             '${nom.value.text} ${prenom.value.text} ${email.value.text} '
             '${telephone.value.text} ${adresse.value.text} $chaufID',
         );
-    return await ClientDatabase.database!.createDocument(
-        databaseId: databaseId,
-        collectionId: chauffeurid,
-        documentId: chaufID!,
-        data: chauf.toJson());
+    if(widget.chauf!=null){
+      return await ClientDatabase.database!.updateDocument(
+          databaseId: databaseId,
+          collectionId: chauffeurid,
+          documentId: chaufID!,
+          data: chauf.toJson());
+    }
+    else{
+      return await ClientDatabase.database!.createDocument(
+          databaseId: databaseId,
+          collectionId: chauffeurid,
+          documentId: chaufID!,
+          data: chauf.toJson());
+    }
+
   }
 
 
@@ -292,13 +302,13 @@ class ChauffeurFormState extends State<ChauffeurForm> {
     showDialog<String>(
       context: context,
       builder: (context) => ContentDialog(
-        title: Text(title),
+        title: Text(title).tr(),
         content: Text(
           message,
-        ),
+        ).tr(),
         actions: [
           Button(
-            child: const Text('OK'),
+            child: const Text('OK').tr(),
             onPressed: () async {
               Navigator.of(context).pop();
             },

@@ -14,8 +14,9 @@ import '../../../theme.dart';
 class DocumentForm extends StatefulWidget {
 
   final DocumentVehicle? vd;
-  final Vehicle? v;
-  const DocumentForm({super.key, this.vd, this.v});
+  final String? v;
+  final Vehicle? ve;
+  const DocumentForm({super.key, this.vd, this.v, this.ve});
 
   @override
   DocumentFormState createState() => DocumentFormState();
@@ -31,6 +32,8 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
 
   String? documentID;
 
+
+  bool loadingVehicle=false;
   @override
   void initState() {
     initValues();
@@ -41,15 +44,38 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
     if(widget.vd!=null){
       nom.text=widget.vd!.nom;
       documentID=widget.vd!.id;
-      selectedVehicle=widget.vd!.vehicle;
+      if(widget.vd!.vehicle!=null) {
+        downloadVehicle(widget.vd!.vehicle!);
+      }
       if(widget.vd!.dateExpiration!=null) {
         selectedDate=ClientDatabase.ref.add(Duration(milliseconds: widget.vd!.dateExpiration??0));
       }
     }
-    if(widget.v!=null){
-      selectedVehicle=widget.v;
+    else if(widget.ve!=null){
+      selectedVehicle=widget.ve;
+    }
+    else if(widget.v!=null){
+      downloadVehicle(widget.v!);
     }
     documentID??=DateTime.now().difference(ClientDatabase.ref).inMilliseconds.toString();
+  }
+
+
+  void downloadVehicle(String id)async{
+    loadingVehicle=true;
+    await ClientDatabase.database!.getDocument(
+        databaseId: databaseId,
+        collectionId: vehiculeid,
+        documentId: id).then((value) {
+          if(value.data.isNotEmpty){
+            selectedVehicle=value.convertTo((p0) => Vehicle.fromJson(p0 as Map<String,dynamic>));
+          }
+    });
+    if(mounted){
+      setState(() {
+        loadingVehicle=false;
+      });
+    }
   }
   @override
   Widget build(BuildContext context) {
@@ -78,7 +104,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
                 padding: const EdgeInsets.all(10.0),
                 child: ListTile(
                   title: Text(selectedVehicle?.matricule??'/'),
-                  onPressed: widget.vd?.vehicle==null && widget.v==null?() async{
+                  onPressed: widget.ve!=null && !loadingVehicle && widget.vd?.vehicle==null && widget.v==null?() async{
                     selectedVehicle=await showDialog<Vehicle>(context: context,
                         barrierDismissible: true,
                         builder: (context){
@@ -184,7 +210,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
         }
         return;
       }
-      if((widget.v!=null && selectedVehicle!=null && widget.v!.id!=selectedVehicle!.id)|| (widget.v==null && selectedVehicle!=null)){
+      if((widget.v!=null && selectedVehicle!=null && widget.v!=selectedVehicle!.id)|| (widget.v==null && selectedVehicle!=null)){
         if(!changes){
           setState(() {
             changes=true;
@@ -220,7 +246,8 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
         uploading=true;
       });
 
-      DocumentVehicle dv=DocumentVehicle(id: documentID!, nom: nom.text,vehicle: selectedVehicle,
+      DocumentVehicle dv=DocumentVehicle(id: documentID!, nom: nom.text,vehicle: selectedVehicle?.id,
+          vehiclemat:selectedVehicle?.matricule,
           dateExpiration: selectedDate?.difference(ClientDatabase.ref).inMilliseconds.abs(),
       createdBy: ClientDatabase.me.value?.id);
       if(widget.vd!=null){

@@ -30,6 +30,15 @@ int? dateToIntJson(DateTime? date){
   return date?.difference(ClientDatabase.ref).inMilliseconds;
 }
 
+DateTime? dateFromIntJson(String? json){
+  if(json!=null){
+    return ClientDatabase.ref.add(Duration(milliseconds:int.parse(json)));
+  }
+  else{
+    return null;
+  }
+}
+
 String? userToJson(ParcUser? value){
   return value?.id;
 }

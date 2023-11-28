@@ -7,6 +7,7 @@ import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/screens/chauffeur/chauffeur_form.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../screens/chauffeur/chauffeur_tabs.dart';
 import '../../screens/vehicle/documents/document_form.dart';
 import '../../screens/vehicle/manager/vehicle_tabs.dart';
 import '../../serializables/conducteur.dart';
@@ -39,20 +40,7 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
           style: tstyle,
         )),
         DataCell(SelectableText(
-          element.value.email??'',
-          style: tstyle,
-        )),
-        DataCell(SelectableText(
           element.value.telephone ??'',
-          style: tstyle,
-        )),
-        DataCell(SelectableText(
-          element.value.adresse ??'',
-          style: tstyle,
-        )),
-        DataCell(SelectableText(
-          element.value.dateNaissance==null?'':
-          dateFormat2.format(element.value.dateNaissance!),
           style: tstyle,
         )),
         DataCell(SelectableText(
@@ -80,16 +68,16 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
                               icon: const Icon(Bootstrap.car_front),
                               body: ChauffeurForm(chauf: element.value,),
                               onClosed: () {
-                                VehicleTabsState.tabs.remove(tab);
+                                ChauffeurTabsState.tabs.remove(tab);
 
-                                if (VehicleTabsState.currentIndex.value > 0) {
-                                  VehicleTabsState.currentIndex.value--;
+                                if (ChauffeurTabsState.currentIndex.value > 0) {
+                                  ChauffeurTabsState.currentIndex.value--;
                                 }
                               },
                             );
                             final index = VehicleTabsState.tabs.length + 1;
-                            VehicleTabsState.tabs.add(tab);
-                            VehicleTabsState.currentIndex.value = index - 1;
+                            ChauffeurTabsState.tabs.add(tab);
+                            ChauffeurTabsState.currentIndex.value = index - 1;
                           }
                       ),
                       f.MenuFlyoutItem(
@@ -110,23 +98,28 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
                           }
                       ),
                       f.MenuFlyoutSubItem(
-                        text: const Text('chstates').tr(),
+                        text: const Text('disponibilite').tr(),
                         items: (BuildContext context) {
                           return [
                             f.MenuFlyoutItem(
-                                text: const Text('gstate').tr(),
+                                text: const Text('disponible').tr(),
                                 onPressed: (){
 
                                 }
                             ),
                             f.MenuFlyoutItem(
-                                text: const Text('bstate').tr(),
+                                text: const Text('mission').tr(),
                                 onPressed: (){
 
                                 }
                             ),
                             f.MenuFlyoutItem(
-                                text: const Text('rstate').tr(),
+                                text: const Text('absent').tr(),
+                                onPressed: (){
+
+                                }
+                            ),f.MenuFlyoutItem(
+                                text: const Text('quitteentre').tr(),
                                 onPressed: (){
 
                                 }

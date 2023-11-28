@@ -29,7 +29,7 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
     var appTheme=context.watch<AppTheme>();
     return ScaffoldPage(
       header: PageTitle(
-        text: 'gestionchauf'.tr(),
+        text: 'gchauffeurs'.tr(),
         trailing: SizedBox(
             width: 15.w,
             height: 10.h,

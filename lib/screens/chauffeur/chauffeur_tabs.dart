@@ -40,7 +40,7 @@ class ChauffeurTabsState extends State<ChauffeurTabs> {
     currentIndex.value=0;
     if(tabs.isEmpty){
       tabs.add(Tab(
-        text: Text('gestionchauf'.tr()),
+        text: Text('gchauffeurs'.tr()),
         closeIcon: null,
         icon: const Icon(IonIcons.settings),
         body: const ChauffeurGestion(),

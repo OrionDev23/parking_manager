@@ -21,12 +21,12 @@ class DocumentWebService extends ParcOtoWebService<DocumentVehicle>{
       //vehicle
       case 2:
         return ( d1, d2) {
-          if (d1.value.vehicle == null && d2.value.vehicle == null) {
-            return -1;
-          } else if (d2.value.vehicle == d1.value.vehicle) {
+          if (d1.value.vehiclemat == null || d2.value.vehiclemat == null) {
+            return 0;
+          } else if (d2.value.vehiclemat == d1.value.vehiclemat) {
             return 0;
           } else {
-            return coef * d1.value.vehicle!.id.compareTo(d2.value.vehicle!.id);
+            return coef * d1.value.vehiclemat!.compareTo(d2.value.vehiclemat!);
           }
         };
       //date d'expiration
@@ -88,7 +88,7 @@ class DocumentWebService extends ParcOtoWebService<DocumentVehicle>{
       if(filters.containsKey('createdBy'))
         Query.equal('createdBy', filters['createdBy']),
       if(filters.containsKey('vehicle'))
-        Query.equal('vehicle', filters['vehicle']),
+        Query.equal('vehiclemat', filters['vehicle']),
     ];
   }
 

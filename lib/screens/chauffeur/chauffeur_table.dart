@@ -35,7 +35,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
     fontSize: 10.sp,
   );
 
-  int sortColumn = 5;
+  int sortColumn = 3;
 
   void initColumns() {
     columns = [
@@ -81,7 +81,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
             style: tstyle,
           ).tr(),
         ),
-        size: ColumnSize.L,
+        size: ColumnSize.M,
         onSort: (s, c) {
           sortColumn = 2;
           assending = !assending;
@@ -94,48 +94,15 @@ class ChauffeurTableState extends State<ChauffeurTable> {
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Text(
-            'adresse',
+            'dateModif',
             style: tstyle,
           ).tr(),
         ),
-        size: ColumnSize.M,
+        size: ColumnSize.L,
         onSort: (s, c) {
           sortColumn = 3;
           assending = !assending;
-
-          conducteurDataSource.sort(sortColumn, assending);
-          setState(() {});
-        },
-      ),
-      DataColumn2(
-        label: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'birthday',
-            style: tstyle,
-          ).tr(),
-        ),
-        size: ColumnSize.L,
-        onSort: (s, c) {
-          sortColumn = 4;
-          assending = !assending;
-          conducteurDataSource.sort(sortColumn, assending);
-          setState(() {});
-        },
-      ),
-      DataColumn2(
-        label: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'datemodif',
-            style: tstyle,
-          ).tr(),
-        ),
-        size: ColumnSize.L,
-        onSort: (s, c) {
-          sortColumn = 5;
-          assending = !assending;
-          conducteurDataSource.sort(sortColumn, assending);
+          conducteurDataSource.sort(5, assending);
           setState(() {});
         },
       ),

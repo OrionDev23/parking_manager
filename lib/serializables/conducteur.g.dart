@@ -16,9 +16,7 @@ Conducteur _$ConducteurFromJson(Map<String, dynamic> json) => Conducteur(
       search: json['search'] as String?,
       adresse: json['adresse'] as String?,
       email: json['email'] as String?,
-      dateNaissance: json['dateNaissance'] == null
-          ? null
-          : DateTime.parse(json['dateNaissance'] as String),
+      dateNaissance: dateFromIntJson(json['dateNaissance'] as String?),
       telephone: json['telephone'] as String?,
     );
 

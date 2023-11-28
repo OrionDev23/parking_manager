@@ -132,7 +132,7 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource{
         collectionId: collectionID,
         documentId: c.id).then((value) {
       data.remove(MapEntry(c.id, c));
-      notifyListeners();
+      refreshDatasource();
     }).onError((error, stackTrace) {
 
       f.showSnackbar(current,f.InfoBar(

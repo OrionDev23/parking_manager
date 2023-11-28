@@ -43,10 +43,10 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
         element.value.nom,
         style: tstyle,
       )),
-      DataCell(SelectableText(element.value.vehicle?.matricule ?? '',
+      DataCell(SelectableText(element.value.vehiclemat ?? '',
           style: tstyle),
           onTap: (){
-            showMyVehicule(element.value.vehicle?.matricule);
+            showMyVehicule(element.value.vehiclemat);
           }
 
       ),
@@ -113,7 +113,7 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
 
   @override
   String deleteConfirmationMessage(c) {
-   return '${'suprdoc'.tr()} ${c.nom} ${c.vehicle?.matricule}';
+   return '${'suprdoc'.tr()} ${c.nom} ${c.vehiclemat}';
   }
 
 

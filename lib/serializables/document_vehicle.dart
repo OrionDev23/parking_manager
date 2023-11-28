@@ -14,12 +14,12 @@ class DocumentVehicle extends ParcOtoDefault{
   @JsonKey(name:"date_expiration")
   int? dateExpiration;
   String nom;
-  @JsonKey(toJson: vehiculeToJson)
+  String? vehicle;
 
-  Vehicle? vehicle;
+  String? vehiclemat;
   String? createdBy;
 
-  DocumentVehicle({required super.id,required this.nom,this.vehicle,this.dateExpiration,this.createdBy,super.createdAt,super.updatedAt});
+  DocumentVehicle({required super.id,required this.nom,this.vehiclemat,this.vehicle,this.dateExpiration,this.createdBy,super.createdAt,super.updatedAt});
 
   factory DocumentVehicle.fromJson(Map<String, dynamic> json) => _$DocumentVehicleFromJson(json);
 
