@@ -2,48 +2,29 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
+import 'package:parc_oto/screens/chauffeur/disponibilite/disponibilite_gestion.dart';
 
-import 'manager/chauffeur_gestion.dart';
-
-
-class ChauffeurTabs extends StatefulWidget {
-  const ChauffeurTabs({super.key});
+class DisponbiliteTabs extends StatefulWidget {
+  const DisponbiliteTabs({super.key});
 
   @override
-  ChauffeurTabsState createState() => ChauffeurTabsState();
+  DisponbiliteTabsState createState() => DisponbiliteTabsState();
 }
 
-class ChauffeurTabsState extends State<ChauffeurTabs> {
+class DisponbiliteTabsState extends State<DisponbiliteTabs> {
   static ValueNotifier<int> currentIndex=ValueNotifier(0);
   static List<Tab> tabs = [];
 
-  Tab generateTab(int index) {
-    late Tab tab;
-    tab = Tab(
-      key: UniqueKey(),
-      text: Text('nouvchauf'.tr()),
-      semanticLabel: 'nouvchauf'.tr(),
-      icon: const Icon(Bootstrap.car_front),
-      body: ChauffeurForm(),
-      onClosed: () {
-        tabs.remove(tab);
-
-        if (currentIndex.value > 0) currentIndex.value--;
-      },
-    );
-    return tab;
-  }
 
   @override
   void initState() {
     currentIndex.value=0;
     if(tabs.isEmpty){
       tabs.add(Tab(
-        text: Text('gchauffeurs'.tr()),
+        text: Text('disponibilite'.tr()),
         closeIcon: null,
         icon: const Icon(IonIcons.settings),
-        body: const ChauffeurGestion(),
+        body: const DisponibiliteGestion(),
         onClosed: null,
       ));
     }
@@ -62,14 +43,7 @@ class ChauffeurTabsState extends State<ChauffeurTabs> {
             tabWidthBehavior: TabWidthBehavior.equal,
             closeButtonVisibility: CloseButtonVisibilityMode.always,
             showScrollButtons: true,
-            onNewPressed: () {
-              setState(() {
-                final index = tabs.length + 1;
-                final tab = generateTab(index);
-                tabs.add(tab);
-                currentIndex.value=index-1;
-              });
-            },
+            onNewPressed: null,
             onReorder: (oldIndex, newIndex) {
               setState(() {
                 if (oldIndex < newIndex) {

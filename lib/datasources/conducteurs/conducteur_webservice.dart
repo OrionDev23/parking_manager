@@ -70,6 +70,9 @@ class ConducteurWebService extends ParcOtoWebService<Conducteur>{
       case 5:
         return ( d1,  d2) =>
         coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
+      case 6:
+        return ( d1,  d2) =>
+        coef * d1.value.etat!.compareTo(d2.value.etat!);
     }
 
     return null;
@@ -119,6 +122,12 @@ class ConducteurWebService extends ParcOtoWebService<Conducteur>{
           return Query.orderAsc('\$updatedAt');
         } else {
           return Query.orderDesc('\$updatedAt');
+        }
+      case 6:
+        if (sortedAsc) {
+          return Query.orderAsc('etat');
+        } else {
+          return Query.orderDesc('etat');
         }
     }
     return Query.orderAsc('\$id');

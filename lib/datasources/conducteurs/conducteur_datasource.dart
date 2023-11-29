@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/datasources/conducteurs/conducteur_webservice.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
-import 'package:parc_oto/screens/chauffeur/chauffeur_form.dart';
+import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../screens/chauffeur/chauffeur_tabs.dart';
@@ -39,6 +40,10 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
         )),
         DataCell(SelectableText(
           element.value.telephone ??'',
+          style: tstyle,
+        )),
+        DataCell(SelectableText(
+          ClientDatabase.getEtat(element.value.etat).tr(),
           style: tstyle,
         )),
         DataCell(SelectableText(

@@ -35,7 +35,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
     fontSize: 10.sp,
   );
 
-  int sortColumn = 3;
+  int sortColumn = 4;
 
   void initColumns() {
     columns = [
@@ -94,13 +94,30 @@ class ChauffeurTableState extends State<ChauffeurTable> {
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Text(
+            'disponibilite',
+            style: tstyle,
+          ).tr(),
+        ),
+        size: ColumnSize.M,
+        onSort: (s, c) {
+          sortColumn = 3;
+          assending = !assending;
+
+          conducteurDataSource.sort(6, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
             'dateModif',
             style: tstyle,
           ).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
-          sortColumn = 3;
+          sortColumn = 4;
           assending = !assending;
           conducteurDataSource.sort(5, assending);
           setState(() {});

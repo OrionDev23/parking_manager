@@ -8,9 +8,11 @@ part 'disponibilite_chauffeur.g.dart';
 class DisponibiliteChauffeur extends ParcOtoDefault{
 
   int type;
-  String? chauffeur;
+  String chauffeur;
+
+  String chauffeurNom;
   String? createdBy;
-  DisponibiliteChauffeur({required super.id,super.createdAt,super.updatedAt,required this.type,this.createdBy,this.chauffeur});
+  DisponibiliteChauffeur({required super.id,required this.chauffeurNom,super.createdAt,super.updatedAt,required this.type,this.createdBy,required this.chauffeur});
   factory DisponibiliteChauffeur.fromJson(Map<String, dynamic> json) => _$DisponibiliteChauffeurFromJson(json);
   @override
   Map<String, dynamic> toJson() => _$DisponibiliteChauffeurToJson(this);

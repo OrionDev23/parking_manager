@@ -5,6 +5,8 @@
   "pays": "Country",
   "wilaya": "District",
   "commune": "Commune",
+  "supdisp": "Delete the state",
+  "dateajout": "Creation date",
   "daira": "Daira",
   "quittance": "Receipt",
   "prenom": "First Name",

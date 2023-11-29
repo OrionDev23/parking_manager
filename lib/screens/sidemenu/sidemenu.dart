@@ -12,6 +12,7 @@ import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
 import 'package:parc_oto/widgets/on_tap_scale.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../chauffeur/chauffeur_tabs.dart';
+import '../chauffeur/disponibilite/disponibilite_tabs.dart';
 import '../dashboard/dashboard.dart';
 import '../dashboard/notif_list.dart';
 import '../settings.dart';
@@ -314,7 +315,7 @@ class PanesListState extends State<PanesList> with WindowListener {
           PaneItem(
             icon: const Icon(LineAwesome.check_double_solid),
             title: const Text('disponibilite').tr(),
-            body: const Placeholder(),
+            body: const DisponbiliteTabs(),
           ),
         ]);
     evenements = PaneItemExpander(

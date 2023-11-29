@@ -149,6 +149,7 @@
  "quitteentre": "N'est plus employé",
  "gchauffeurs": "Gestion des conducteurs",
  "disponibilite": "Disponibilité",
+ "supdisp": "Supprimer le statut",
  "journal": "Log d'activités",
  "lfacture": "Liste des factures",
  "lclient": "Liste des clients",
@@ -206,7 +207,7 @@
  "fullname": "Nom complet",
  "dateexp": "Date d'expiration",
  "selectvehicle": "Selectionnez un véhicule",
-
+"dateajout": "Date d'ajout",
  "code": "Code",
  "name": "Nom",
  "codeParent": "Catégorie mère",

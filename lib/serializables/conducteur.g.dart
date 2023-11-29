@@ -9,7 +9,7 @@ part of 'conducteur.dart';
 Conducteur _$ConducteurFromJson(Map<String, dynamic> json) => Conducteur(
       name: json['name'] as String,
       prenom: json['prenom'] as String,
-      etat: json['etat'] as int?,
+      etat: json['etat'] as int? ?? 0,
       etatactuel: json['etatactuel'] as String?,
       id: json[r'$id'] as String,
       createdBy: json['createdBy'] as String?,
