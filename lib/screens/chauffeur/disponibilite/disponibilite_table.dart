@@ -10,7 +10,7 @@ import '../../../theme.dart';
 import '../../../widgets/zone_box.dart';
 class DisponibliteTable extends StatefulWidget {
   final bool selectD;
-  const DisponibliteTable({super.key,this.selectD=false});
+  const DisponibliteTable({super.key,this.selectD=false,});
 
   @override
   State<DisponibliteTable> createState() => DisponibliteTableState();

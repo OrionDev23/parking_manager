@@ -8,13 +8,14 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-import '../../screens/chauffeur/chauffeur_tabs.dart';
+import '../../screens/chauffeur/manager/chauffeur_tabs.dart';
 import '../../screens/vehicle/documents/document_form.dart';
 import '../../serializables/conducteur.dart';
 
 class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
-  ConducteurDataSource({required super.collectionID, super.selectC,super.searchKey,super.appTheme,super.filters,required super.current}){
-    repo=ConducteurWebService(data, collectionID, 1);
+  final bool archive;
+  ConducteurDataSource({this.archive=false,required super.collectionID, super.selectC,super.searchKey,super.appTheme,super.filters,required super.current}){
+    repo=ConducteurWebService(data, collectionID, 1,archive: archive);
   }
 
   @override

@@ -7,11 +7,12 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../../theme.dart';
 import '../../../../widgets/button_container.dart';
 import '../../../../widgets/page_header.dart';
-import '../chauffeur_tabs.dart';
+import 'chauffeur_tabs.dart';
 import 'chauffeur_table.dart';
 
 class ChauffeurGestion extends StatefulWidget {
-  const ChauffeurGestion({super.key});
+  final bool archive;
+  const ChauffeurGestion({super.key,this.archive=false});
 
   @override
   ChauffeurGestionsState createState() => ChauffeurGestionsState();

@@ -5,7 +5,8 @@ import 'package:parc_oto/providers/client_database.dart';
 import '../../serializables/conducteur.dart';
 
 class ConducteurWebService extends ParcOtoWebService<Conducteur>{
-  ConducteurWebService(super.data, super.collectionID, super.columnForSearch);
+  final bool archive;
+  ConducteurWebService(super.data, super.collectionID, super.columnForSearch,{this.archive=false});
 
   @override
   Conducteur fromJsonFunction(Map<String, dynamic> json) {
@@ -81,6 +82,10 @@ class ConducteurWebService extends ParcOtoWebService<Conducteur>{
   @override
   List<String> getFilterQueries(Map<String, String> filters, int count, int startingAt, int sortedBy, bool sortedAsc, {int? index}) {
     return [
+      if(archive)
+      Query.equal('type', 3),
+      if(!archive)
+        Query.notEqual('type',3),
       if(filters.containsKey('agemin'))
         Query.greaterThanEqual('dateNaissance', DateTime.now().add(Duration(days: 365 * int.parse(filters['agemin']!))).difference(ClientDatabase.ref).inMilliseconds),
       if(filters.containsKey('agemax'))

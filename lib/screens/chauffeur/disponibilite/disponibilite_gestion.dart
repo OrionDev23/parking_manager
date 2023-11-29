@@ -8,7 +8,7 @@ import '../../../../widgets/page_header.dart';
 import 'disponibilite_table.dart';
 
 class DisponibiliteGestion extends StatefulWidget {
-  const DisponibiliteGestion({super.key});
+  const DisponibiliteGestion({super.key,});
 
   @override
   DisponibiliteGestionState createState() => DisponibiliteGestionState();

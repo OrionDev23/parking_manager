@@ -4,11 +4,12 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
 
-import 'manager/chauffeur_gestion.dart';
+import 'chauffeur_gestion.dart';
 
 
 class ChauffeurTabs extends StatefulWidget {
-  const ChauffeurTabs({super.key});
+  final bool archive;
+  const ChauffeurTabs({super.key,this.archive=false});
 
   @override
   ChauffeurTabsState createState() => ChauffeurTabsState();
@@ -16,7 +17,9 @@ class ChauffeurTabs extends StatefulWidget {
 
 class ChauffeurTabsState extends State<ChauffeurTabs> {
   static ValueNotifier<int> currentIndex=ValueNotifier(0);
+  static ValueNotifier<int> currentIndex2=ValueNotifier(0);
   static List<Tab> tabs = [];
+  static List<Tab> tabs2 = [];
 
   Tab generateTab(int index) {
     late Tab tab;
@@ -25,11 +28,18 @@ class ChauffeurTabsState extends State<ChauffeurTabs> {
       text: Text('nouvchauf'.tr()),
       semanticLabel: 'nouvchauf'.tr(),
       icon: const Icon(Bootstrap.car_front),
-      body: ChauffeurForm(),
+      body: const ChauffeurForm(),
       onClosed: () {
-        tabs.remove(tab);
+        if(widget.archive){
+          tabs2.remove(tab);
+          if (currentIndex2.value > 0) currentIndex2.value--;
+        }
+        else{
+          tabs.remove(tab);
 
-        if (currentIndex.value > 0) currentIndex.value--;
+          if (currentIndex.value > 0) currentIndex.value--;
+        }
+
       },
     );
     return tab;
@@ -37,13 +47,19 @@ class ChauffeurTabsState extends State<ChauffeurTabs> {
 
   @override
   void initState() {
+    if(archive){
+      currentIndex2.value=0;
+    }
+    else{
+      currentIndex.value=0;
+    }
     currentIndex.value=0;
     if(tabs.isEmpty){
       tabs.add(Tab(
         text: Text('gchauffeurs'.tr()),
         closeIcon: null,
         icon: const Icon(IonIcons.settings),
-        body: const ChauffeurGestion(),
+        body:  ChauffeurGestion(archive: widget.archive,),
         onClosed: null,
       ));
     }

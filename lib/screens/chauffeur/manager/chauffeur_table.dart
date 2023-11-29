@@ -11,7 +11,8 @@ import '../../../theme.dart';
 import '../../../widgets/zone_box.dart';
 class ChauffeurTable extends StatefulWidget {
   final bool selectD;
-  const ChauffeurTable({super.key,this.selectD=false});
+  final bool archive;
+  const ChauffeurTable({super.key,this.selectD=false,this.archive=false});
 
   @override
   State<ChauffeurTable> createState() => ChauffeurTableState();
@@ -26,7 +27,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
 
   @override
   void initState() {
-    conducteurDataSource = ConducteurDataSource(current: context, collectionID: chauffeurid,selectC: widget.selectD);
+    conducteurDataSource = ConducteurDataSource(current: context, collectionID: chauffeurid,selectC: widget.selectD,archive: widget.archive);
     initColumns();
     super.initState();
   }

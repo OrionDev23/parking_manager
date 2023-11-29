@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/screens/chauffeur/chauffeur_tabs.dart';
+import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import '../../theme.dart';
