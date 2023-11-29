@@ -16,8 +16,7 @@ int chaufCounter = 0;
 
 class ChauffeurForm extends StatefulWidget {
   final Conducteur? chauf;
-  final int id = chaufCounter++;
-  ChauffeurForm({super.key, this.chauf,});
+  const ChauffeurForm({super.key, this.chauf,});
 
   @override
   State<ChauffeurForm> createState() => ChauffeurFormState();
@@ -38,15 +37,10 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   DateTime? birthDay;
   PaginatorController controller = PaginatorController();
 
-  static Map<int, ValueNotifier<int>> updates = {};
-
   List<TableRow> rows = List.empty(growable: true);
 
   @override
   void initState() {
-    if (updates[widget.id] == null) {
-      updates[widget.id] = ValueNotifier(0);
-    }
     initValues();
     super.initState();
   }

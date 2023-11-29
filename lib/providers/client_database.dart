@@ -103,6 +103,26 @@ class ClientDatabase {
     return result;
   }
 
+  Future<int> countChauffeur() async{
+    int result=0;
+
+
+    await database!.listDocuments(
+        databaseId: databaseId,
+        collectionId: chauffeurid,
+        queries: [
+          Query.limit(1),
+        ]
+    ).then((value) {
+      result=value.total;
+    }).onError((AppwriteException error, stackTrace) {
+    });
+
+
+
+    return result;
+  }
+
 
   static String getEtat(int? etat){
     switch(etat){

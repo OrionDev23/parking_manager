@@ -2,6 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/screens/chauffeur/chauffeur_tabs.dart';
+import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import '../../theme.dart';
 import 'package:provider/provider.dart';
@@ -74,7 +76,38 @@ class HomePage extends StatelessWidget {
                       icon: FluentIcons.edit_event, text: 'reservation'.tr()),
                   smallSpace,
                   ButtonContainer(
-                      icon: FluentIcons.people, text: 'chauffeurs'.tr()),
+                      icon: FluentIcons.people, text: 'chauffeurs'.tr(),
+                    getCount:  ClientDatabase().countChauffeur,
+                    action: (){
+                      PanesListState.index.value=10;
+                    },
+                    actionList: (){
+                      PanesListState.index.value=10;
+                    },
+                    actionNouveau: () {
+                      PanesListState.index.value=10;
+                      Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
+                        late Tab tab;
+                        tab = Tab(
+                          key: UniqueKey(),
+                          text: Text('nouvchauf'.tr()),
+                          semanticLabel: 'nouvchauf'.tr(),
+                          icon: const Icon(Bootstrap.person_add),
+                          body: const ChauffeurForm(),
+                          onClosed: () {
+                            ChauffeurTabsState.tabs.remove(tab);
+
+                            if (ChauffeurTabsState.currentIndex.value > 0) {
+                              ChauffeurTabsState.currentIndex.value--;
+                            }
+                          },
+                        );
+                        final index = ChauffeurTabsState.tabs.length + 1;
+                        ChauffeurTabsState.tabs.add(tab);
+                        ChauffeurTabsState.currentIndex.value = index - 1;
+                      });
+                    },
+                      ),
                   smallSpace,
                   ButtonContainer(
                     icon: FluentIcons.report_alert,
