@@ -31,7 +31,7 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
     return ScaffoldPage(
       header: PageTitle(
         text: 'gchauffeurs'.tr(),
-        trailing: SizedBox(
+        trailing: widget.archive?null:SizedBox(
             width: 15.w,
             height: 10.h,
             child: ButtonContainer(
@@ -51,7 +51,7 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
         children: [
           SizedBox(
               width:60.w,
-              child: const ChauffeurTable()),
+              child: ChauffeurTable(archive: widget.archive,)),
           const SizedBox(width: 10,),
           Flexible(
             child: Column(

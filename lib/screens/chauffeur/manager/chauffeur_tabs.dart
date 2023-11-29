@@ -47,21 +47,29 @@ class ChauffeurTabsState extends State<ChauffeurTabs> {
 
   @override
   void initState() {
-    if(archive){
+    if(widget.archive){
       currentIndex2.value=0;
+      if(tabs2.isEmpty){
+        tabs2.add(Tab(
+          text: Text('gchauffeurs'.tr()),
+          closeIcon: null,
+          icon: const Icon(IonIcons.settings),
+          body:  ChauffeurGestion(archive: widget.archive,),
+          onClosed: null,
+        ));
+      }
     }
     else{
       currentIndex.value=0;
-    }
-    currentIndex.value=0;
-    if(tabs.isEmpty){
-      tabs.add(Tab(
-        text: Text('gchauffeurs'.tr()),
-        closeIcon: null,
-        icon: const Icon(IonIcons.settings),
-        body:  ChauffeurGestion(archive: widget.archive,),
-        onClosed: null,
-      ));
+      if(tabs.isEmpty){
+        tabs.add(Tab(
+          text: Text('gchauffeurs'.tr()),
+          closeIcon: null,
+          icon: const Icon(IonIcons.settings),
+          body:  ChauffeurGestion(archive: widget.archive,),
+          onClosed: null,
+        ));
+      }
     }
     super.initState();
   }
@@ -69,16 +77,16 @@ class ChauffeurTabsState extends State<ChauffeurTabs> {
   Widget build(BuildContext context) {
 
     return ValueListenableBuilder(
-        valueListenable: currentIndex,
+        valueListenable: widget.archive?currentIndex2:currentIndex,
         builder: (context,value,_) {
           return TabView(
-            tabs: tabs,
+            tabs:  widget.archive?tabs2:tabs,
             currentIndex: value,
-            onChanged: (index) =>  currentIndex.value = index,
+            onChanged: (index) =>   widget.archive?currentIndex2.value=index:currentIndex.value = index,
             tabWidthBehavior: TabWidthBehavior.equal,
             closeButtonVisibility: CloseButtonVisibilityMode.always,
             showScrollButtons: true,
-            onNewPressed: () {
+            onNewPressed:widget.archive?null: () {
               setState(() {
                 final index = tabs.length + 1;
                 final tab = generateTab(index);
@@ -91,14 +99,27 @@ class ChauffeurTabsState extends State<ChauffeurTabs> {
                 if (oldIndex < newIndex) {
                   newIndex -= 1;
                 }
-                final item = tabs.removeAt(oldIndex);
-                tabs.insert(newIndex, item);
+                if(widget.archive){
+                  final item = tabs2.removeAt(oldIndex);
+                  tabs2.insert(newIndex, item);
 
-                if (currentIndex.value == newIndex) {
-                  currentIndex.value = oldIndex;
-                } else if (currentIndex.value == oldIndex) {
-                  currentIndex.value = newIndex;
+                  if (currentIndex2.value == newIndex) {
+                    currentIndex2.value = oldIndex;
+                  } else if (currentIndex2.value == oldIndex) {
+                    currentIndex2.value = newIndex;
+                  }
                 }
+                else{
+                  final item = tabs.removeAt(oldIndex);
+                  tabs.insert(newIndex, item);
+
+                  if (currentIndex.value == newIndex) {
+                    currentIndex.value = oldIndex;
+                  } else if (currentIndex.value == oldIndex) {
+                    currentIndex.value = newIndex;
+                  }
+                }
+
               });
             },
           );

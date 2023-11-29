@@ -83,9 +83,9 @@ class ConducteurWebService extends ParcOtoWebService<Conducteur>{
   List<String> getFilterQueries(Map<String, String> filters, int count, int startingAt, int sortedBy, bool sortedAsc, {int? index}) {
     return [
       if(archive)
-      Query.equal('type', 3),
+      Query.equal('etat', 3),
       if(!archive)
-        Query.notEqual('type',3),
+        Query.notEqual('etat',3),
       if(filters.containsKey('agemin'))
         Query.greaterThanEqual('dateNaissance', DateTime.now().add(Duration(days: 365 * int.parse(filters['agemin']!))).difference(ClientDatabase.ref).inMilliseconds),
       if(filters.containsKey('agemax'))
