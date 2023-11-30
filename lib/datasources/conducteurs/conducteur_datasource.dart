@@ -8,8 +8,8 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../screens/chauffeur/document/chauf_document_form.dart';
 import '../../screens/chauffeur/manager/chauffeur_tabs.dart';
-import '../../screens/vehicle/documents/document_form.dart';
 import '../../serializables/conducteur.dart';
 
 class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
@@ -97,7 +97,9 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
                             f.showDialog(context: context,
                                 barrierDismissible: true,
                                 builder: (context){
-                                  return  const DocumentForm();
+                                  return  CDocumentForm(
+                                    c: element.value,
+                                  );
                                 });
                           }
                       ),

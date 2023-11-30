@@ -10,6 +10,7 @@ const chauffeurid = "6537d87b492c80f255e8";
 const genreid = "6537960246d5b0e1ab77";
 const vehiculeid = "6531ad22153b2a49ca2c";
 const chaufDispID="chauf_disponibilite";
+const chaufDoc="doc_chauffeur";
 const vehicDoc="doc_vehic";
 const buckedId="images";
 const endpoint ="https://cloud.appwrite.io/v1";

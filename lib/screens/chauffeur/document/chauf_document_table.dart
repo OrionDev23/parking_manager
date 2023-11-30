@@ -1,36 +1,27 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/services.dart';
-import 'package:parc_oto/datasources/conducteurs/conducteur_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/screens/chauffeur/manager/chauffeur_table.dart';
+import 'package:parc_oto/serializables/conducteur.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../../datasources/chauf_doc/cdocument_datasource.dart';
 import '../../../theme.dart';
 import '../../../widgets/empty_table_widget.dart';
 import '../../../widgets/zone_box.dart';
-class ChauffeurTable extends StatefulWidget {
+
+class CDocumentTable extends StatefulWidget {
   final bool selectD;
-  final bool archive;
-  const ChauffeurTable({super.key,this.selectD=false,this.archive=false});
+  const CDocumentTable({super.key,this.selectD=false});
 
   @override
-  State<ChauffeurTable> createState() => ChauffeurTableState();
+  State<CDocumentTable> createState() => CDocumentTableState();
 }
 
-class ChauffeurTableState extends State<ChauffeurTable> {
-  late ConducteurDataSource conducteurDataSource;
-
-  late final bool startedWithFiltersOn;
-
-  static ValueNotifier<String?> filterDocument = ValueNotifier(null);
-
-
-  static bool filterNow = false;
-
-  bool filteredAlready = false;
-  bool filtered = false;
+class CDocumentTableState extends State<CDocumentTable> {
+  late ChaufDocumentsDataSource documentsDataSource;
 
   bool assending = false;
 
@@ -38,21 +29,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
 
   @override
   void initState() {
-    if (filterDocument.value != null){
-      startedWithFiltersOn = true;
-      searchController.text = filterDocument.value!;
-      conducteurDataSource = ConducteurDataSource(
-          current: context,
-          selectC: widget.selectD, collectionID:vehiculeid,
-          searchKey: filterDocument.value);
-      filterDocument.value=null;
-    }
-    else{
-      startedWithFiltersOn = false;
-
-      conducteurDataSource = ConducteurDataSource(current: context, collectionID: chauffeurid,selectC: widget.selectD,archive: widget.archive);
-
-    }
+    documentsDataSource = ChaufDocumentsDataSource(current: context, collectionID: chaufDoc,selectC: widget.selectD);
     initColumns();
     super.initState();
   }
@@ -61,7 +38,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
     fontSize: 10.sp,
   );
 
-  int sortColumn = 4;
+  int sortColumn = 3;
 
   void initColumns() {
     columns = [
@@ -78,7 +55,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
           sortColumn = 0;
           assending = !assending;
 
-          conducteurDataSource.sort(sortColumn, assending);
+          documentsDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -86,7 +63,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Text(
-            'email',
+            'vehicule',
             style: tstyle,
           ).tr(),
         ),
@@ -95,7 +72,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
           sortColumn = 1;
           assending = !assending;
 
-          conducteurDataSource.sort(sortColumn, assending);
+          documentsDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -103,7 +80,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Text(
-            'telephone',
+            'dateexp',
             style: tstyle,
           ).tr(),
         ),
@@ -112,24 +89,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
           sortColumn = 2;
           assending = !assending;
 
-          conducteurDataSource.sort(sortColumn, assending);
-          setState(() {});
-        },
-      ),
-      DataColumn2(
-        label: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'disponibilite',
-            style: tstyle,
-          ).tr(),
-        ),
-        size: ColumnSize.M,
-        onSort: (s, c) {
-          sortColumn = 3;
-          assending = !assending;
-
-          conducteurDataSource.sort(6, assending);
+          documentsDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -143,9 +103,9 @@ class ChauffeurTableState extends State<ChauffeurTable> {
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
-          sortColumn = 4;
+          sortColumn = 3;
           assending = !assending;
-          conducteurDataSource.sort(5, assending);
+          documentsDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -163,24 +123,17 @@ class ChauffeurTableState extends State<ChauffeurTable> {
   TextEditingController searchController = TextEditingController();
 
   bool notEmpty = false;
+  bool filtered = false;
+
   FlyoutController filterFlyout = FlyoutController();
-  TextEditingController ageMin=TextEditingController();
-  TextEditingController ageMax=TextEditingController();
+  Conducteur? selectedConducteur;
+  DateTime? dateMin;
+  DateTime? dateMax;
   Map<String,String> filters={};
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
-    conducteurDataSource.appTheme=appTheme;
-    return ValueListenableBuilder(
-        valueListenable: filterDocument,
-        builder: (context, v, _) {
-          if (!startedWithFiltersOn && v != null && filterNow) {
-            searchController.text = v;
-            conducteurDataSource.search(v);
-            notEmpty=true;
-            filtered = true;
-            filterNow = false;
-          }
+    documentsDataSource.appTheme=appTheme;
     return AsyncPaginatedDataTable2(
       header: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
@@ -220,7 +173,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
                                         children: [
                                           Flexible(
                                             child: ZoneBox(
-                                              label: 'age'.tr(),
+                                              label: 'dateexp'.tr(),
                                               child: Padding(
                                                 padding: const EdgeInsets.all(10.0),
                                                 child: Column(
@@ -233,9 +186,15 @@ class ChauffeurTableState extends State<ChauffeurTable> {
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
-                                                          child: TextBox(
-                                                            controller: ageMin,
-                                                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                                          child: DatePicker(
+                                                            selected: dateMin,
+                                                            endDate: dateMax,
+                                                            onChanged: (d){
+                                                              dateMin=d;
+                                                              setState(() {
+                                                              });
+                                                              setS((){});
+                                                            },
                                                           ),
                                                         ),
                                                       ],
@@ -249,14 +208,60 @@ class ChauffeurTableState extends State<ChauffeurTable> {
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
-                                                          child: TextBox(
-                                                            controller: ageMax,
-                                                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                                          child: DatePicker(
+                                                            selected: dateMax,
+                                                            startDate: dateMin,
+                                                            onChanged: (d){
+                                                              dateMax=d;
+                                                              setState(() {
+                                                              });
+                                                              setS((){});
+
+                                                            },
                                                           ),
                                                         ),
                                                       ],
                                                     ),
                                                   ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          smallSpace,
+                                          Flexible(
+                                            child: ZoneBox(
+                                              label:'vehicule'.tr(),
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(10.0),
+                                                child: ListTile(
+                                                  title: Text('${selectedConducteur?.name} ${selectedConducteur?.prenom}'),
+                                                  onPressed: () async{
+                                                    selectedConducteur=await showDialog<Conducteur>(context: context,
+                                                        barrierDismissible: true,
+                                                        builder: (context){
+                                                          return  ContentDialog(
+                                                            constraints: BoxConstraints.tight(Size(
+                                                                60.w,60.h
+                                                            )),
+                                                            title: const Text('selectvehicle').tr(),
+                                                            style: ContentDialogThemeData(
+                                                                titleStyle: appTheme.writingStyle.copyWith(fontWeight: FontWeight.bold)
+                                                            ),
+                                                            content: Container(
+                                                                color: appTheme.backGroundColor,
+                                                                width: 60.w,
+                                                                height: 60.h,
+                                                                child: const ChauffeurTable(selectD: true,)
+                                                            ),
+                                                          );
+                                                        }
+                                                    );
+                                                    setState(() {
+
+                                                    });
+                                                    setS((){});
+
+                                                  },
                                                 ),
                                               ),
                                             ),
@@ -278,12 +283,13 @@ class ChauffeurTableState extends State<ChauffeurTable> {
 
                                                     Navigator.of(context).pop();
                                                     setState(() {
-                                                      ageMax.clear();
-                                                      ageMin.clear();
+                                                      dateMax=null;
+                                                      dateMin=null;
+                                                      selectedConducteur=null;
                                                       filtered=false;
                                                       filters.clear();
                                                     });
-                                                    conducteurDataSource.filter(filters);
+                                                    documentsDataSource.filter(filters);
 
                                                   }
                                                       :null,child: const Text('clear').tr(),
@@ -309,22 +315,28 @@ class ChauffeurTableState extends State<ChauffeurTable> {
                                                     onPressed: (){
                                                       Navigator.of(context).pop();
 
-                                                      if(ageMin.text.isNotEmpty){
-                                                        filters['agemin']=ageMin.text;
+                                                      if(dateMin!=null){
+                                                        filters['datemin']=dateMin!.difference(ClientDatabase.ref).inMilliseconds.toString();
                                                       }
                                                       else{
-                                                        filters.remove('agemin');
+                                                        filters.remove('datemin');
                                                       }
-                                                      if(ageMax.text.isNotEmpty){
-                                                        filters['ageMax']=ageMax.text;
+                                                      if(dateMax!=null){
+                                                        filters['datemax']=dateMax!.difference(ClientDatabase.ref).inMilliseconds.toString();
                                                       }
                                                       else{
-                                                        filters.remove('ageMax');
+                                                        filters.remove('datemax');
+                                                      }
+                                                      if(selectedConducteur!=null){
+                                                        filters['vehicle']=selectedConducteur!.id;
+                                                      }
+                                                      else{
+                                                        filters.remove('vehicle');
                                                       }
 
                                                       filtered=true;
                                                       setState((){});
-                                                      conducteurDataSource.filter(filters);
+                                                      documentsDataSource.filter(filters);
 
                                                     }),
                                               ],
@@ -374,7 +386,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
                 ),
                 onSubmitted: (s) {
                   if (s.isNotEmpty) {
-                    conducteurDataSource.search(s);
+                    documentsDataSource.search(s);
                     if (!notEmpty) {
                       setState(() {
                         notEmpty = true;
@@ -395,7 +407,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
                       searchController.text = "";
                       notEmpty = false;
                       setState(() {});
-                      conducteurDataSource.search('');
+                      documentsDataSource.search('');
                     })
                     : null,
               ),
@@ -404,6 +416,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
         ),
       ),
       sortAscending: assending,
+      empty: NoDataWidget(datasource: documentsDataSource,),
       horizontalMargin: 8,
       columnSpacing: 0,
       dataRowHeight: 3.5.h,
@@ -415,20 +428,19 @@ class ChauffeurTableState extends State<ChauffeurTable> {
         rowPerPage = nbr ?? 12;
       },
       availableRowsPerPage: const [12, 24, 50, 100, 200],
-      empty: NoDataWidget(datasource: conducteurDataSource,),
       showFirstLastButtons: true,
       renderEmptyRowsInTheEnd: false,
       fit: FlexFit.tight,
       columns: columns,
-      source: conducteurDataSource,
+      source: documentsDataSource,
       sortArrowAlwaysVisible: true,
       hidePaginator: false,
-    );});
+    );
   }
 
   @override
   void dispose() {
-    conducteurDataSource.dispose();
+    documentsDataSource.dispose();
     super.dispose();
   }
 }

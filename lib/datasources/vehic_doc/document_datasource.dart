@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
-import 'package:parc_oto/datasources/document/document_webservice.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/screens/vehicle/documents/document_form.dart';
 import 'package:parc_oto/screens/vehicle/documents/document_tabs.dart';
@@ -11,7 +10,8 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../providers/client_database.dart';
 import '../../screens/sidemenu/sidemenu.dart';
 import '../../screens/vehicle/manager/vehicle_tabs.dart';
-import '../../screens/vehicle/vehicles_table.dart';
+import '../../screens/vehicle/manager/vehicles_table.dart';
+import 'document_webservice.dart';
 
 class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
 

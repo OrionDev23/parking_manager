@@ -6,11 +6,12 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-import '../../datasources/vehicle/vehicules_datasource.dart';
-import '../../theme.dart';
-import '../../utilities/vehicle_util.dart';
-import '../../widgets/select_dialog/select_dialog.dart';
-import '../../widgets/zone_box.dart';
+import '../../../datasources/vehicle/vehicules_datasource.dart';
+import '../../../theme.dart';
+import '../../../utilities/vehicle_util.dart';
+import '../../../widgets/empty_table_widget.dart';
+import '../../../widgets/select_dialog/select_dialog.dart';
+import '../../../widgets/zone_box.dart';
 
 class VehicleTable extends StatefulWidget {
   final bool selectV;
@@ -24,12 +25,19 @@ class VehicleTableState extends State<VehicleTable> {
   late VehiculesDataSource vehicleDataSource;
   late final bool startedWithFiltersOn;
 
+  static ValueNotifier<int?> filterMarque = ValueNotifier(null);
+  static ValueNotifier<String?> filterVehicule = ValueNotifier(null);
+
+
+  static bool filterNow = false;
+
+  bool filteredAlready = false;
+  bool filtered = false;
+
   bool assending = false;
 
   late List<DataColumn2> columns;
 
-  static ValueNotifier<int?> filterMarque = ValueNotifier(null);
-  static ValueNotifier<String?> filterVehicule = ValueNotifier(null);
 
   @override
   void initState() {
@@ -151,7 +159,6 @@ class VehicleTableState extends State<VehicleTable> {
   TextEditingController searchController = TextEditingController();
 
   bool notEmpty = false;
-  bool filtered = false;
 
   FlyoutController filterFlyout = FlyoutController();
   int? marque;
@@ -160,9 +167,7 @@ class VehicleTableState extends State<VehicleTable> {
   TextEditingController yearMax = TextEditingController();
   Map<String, String> filters = {};
 
-  static bool filterNow = false;
 
-  bool filteredAlready = false;
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
@@ -752,6 +757,7 @@ class VehicleTableState extends State<VehicleTable> {
                     ),
                   ),
                   sortAscending: assending,
+                  empty: NoDataWidget(datasource: vehicleDataSource,),
                   pageSyncApproach: PageSyncApproach.goToFirst,
                   horizontalMargin: 8,
                   columnSpacing: 0,

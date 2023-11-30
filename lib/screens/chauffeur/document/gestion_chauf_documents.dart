@@ -1,27 +1,24 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:icons_plus/icons_plus.dart';
-import 'package:parc_oto/screens/vehicle/manager/vehicle_form.dart';
-import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
-import 'package:parc_oto/screens/vehicle/manager/vehicles_table.dart';
-import 'package:parc_oto/widgets/button_container.dart';
-import 'package:parc_oto/widgets/page_header.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../theme.dart';
+import '../../../widgets/button_container.dart';
+import '../../../widgets/page_header.dart';
+import 'chauf_document_form.dart';
+import 'chauf_document_table.dart';
+import 'chauf_document_tabs.dart';
 
-class VehicleManagement extends StatefulWidget {
-  const VehicleManagement({super.key});
+class ChauffeurDocuments extends StatefulWidget {
+  const ChauffeurDocuments({super.key});
 
   @override
-  State<VehicleManagement> createState() => _VehicleManagementState();
+  ChauffeurDocumentsState createState() => ChauffeurDocumentsState();
 }
 
-class _VehicleManagementState extends State<VehicleManagement> with AutomaticKeepAliveClientMixin<VehicleManagement> {
-
-
+class ChauffeurDocumentsState extends State<ChauffeurDocuments> {
   final tstyle=TextStyle(
     fontSize: 10.sp,
   );
@@ -30,11 +27,10 @@ class _VehicleManagementState extends State<VehicleManagement> with AutomaticKee
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     var appTheme=context.watch<AppTheme>();
     return ScaffoldPage(
       header: PageTitle(
-        text: 'gestionvehicles'.tr(),
+        text: 'gestiondocument'.tr(),
         trailing: SizedBox(
             width: 15.w,
             height: 10.h,
@@ -44,44 +40,62 @@ class _VehicleManagementState extends State<VehicleManagement> with AutomaticKee
               showBottom: false,
               showCounter: false,
               action: () {
-                final index = VehicleTabsState.tabs.length + 1;
+                final index = CDocumentTabsState.tabs.length + 1;
                 final tab = generateTab(index);
-                VehicleTabsState.tabs.add(tab);
-                VehicleTabsState.currentIndex.value = index - 1;
+                CDocumentTabsState.tabs.add(tab);
+                CDocumentTabsState.currentIndex.value = index - 1;
               },
             )),
       ),
       content: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0,horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(icon: const Icon(FluentIcons.filter), onPressed: (){}),
+                const SizedBox(width: 10,),
+
+                SizedBox(
+                  width: 30.w,
+                  height: 7.h,
+                  child: TextBox(
+                    placeholder: 'search'.tr(),
+                  ),
+                ),
+              ],
+            ),
+          ),
           Flexible(
             child: Row(
               children: [
                 SizedBox(
                     width:60.w,
-                    child: const VehicleTable()),
+                    child: const CDocumentTable()),
                 const SizedBox(width: 10,),
                 Flexible(
                   child: Column(
                     children: [
                       SizedBox(
                         height:20.h,
-                                                child: PieChart(
-                          PieChartData(
-                          sections: [
-                            PieChartSectionData(
-                              value: 120,
-                              color: appTheme.color.darkest,
-                            ),
-                            PieChartSectionData(
-                              value: 60,
-                              color: appTheme.color,
-                            ),
-                            PieChartSectionData(
-                              value: 180,
-                              color: appTheme.color.lightest,
-                            ),
-                          ]
-                          )
+                        child: PieChart(
+                            PieChartData(
+                                sections: [
+                                  PieChartSectionData(
+                                    value: 120,
+                                    color: appTheme.color.darkest,
+                                  ),
+                                  PieChartSectionData(
+                                    value: 60,
+                                    color: appTheme.color,
+                                  ),
+                                  PieChartSectionData(
+                                    value: 180,
+                                    color: appTheme.color.lightest,
+                                  ),
+                                ]
+                            )
                         ),
                       ),
                       const SizedBox(height: 10,),
@@ -126,23 +140,18 @@ class _VehicleManagementState extends State<VehicleManagement> with AutomaticKee
     late Tab tab;
     tab = Tab(
       key: UniqueKey(),
-      text: Text('nouvvehicule'.tr()),
-      semanticLabel: 'nouvvehicule'.tr(),
-      icon: const Icon(Bootstrap.car_front),
-      body: const VehicleForm(),
+      text: Text('nouvdocument'.tr()),
+      semanticLabel: 'nouvdocument'.tr(),
+      icon: const Icon(FluentIcons.document),
+      body: const CDocumentForm(),
       onClosed: () {
-        VehicleTabsState.tabs.remove(tab);
+        CDocumentTabsState.tabs.remove(tab);
 
-        if (VehicleTabsState.currentIndex.value > 0) {
-          VehicleTabsState.currentIndex.value--;
+        if (CDocumentTabsState.currentIndex.value > 0) {
+          CDocumentTabsState.currentIndex.value--;
         }
       },
     );
     return tab;
   }
-
-
-
-  @override
-  bool get wantKeepAlive => true;
 }

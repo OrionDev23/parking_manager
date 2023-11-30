@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../theme.dart';
+import '../../../widgets/empty_table_widget.dart';
 import '../../../widgets/zone_box.dart';
 class DisponibliteTable extends StatefulWidget {
   final bool selectD;
@@ -408,7 +409,8 @@ class DisponibliteTableState extends State<DisponibliteTable> {
           ),
         ),
         sortAscending: assending,
-        horizontalMargin: 8,
+      empty: NoDataWidget(datasource: disponibiliteDataSource,),
+      horizontalMargin: 8,
         columnSpacing: 0,
         dataRowHeight: 3.5.h,
         onPageChanged: (s) {},

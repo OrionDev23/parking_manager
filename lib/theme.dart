@@ -14,6 +14,10 @@ const smallSpace = SizedBox(
   width: 5,
   height: 5,
 );
+const bigSpace=SizedBox(
+  width: 10,
+  height: 10,
+);
 const snackbarShortDuration=Duration(seconds: 2);
 class AppTheme extends ChangeNotifier {
   AccentColor _color = systemAccentColor;

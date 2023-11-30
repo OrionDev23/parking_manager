@@ -9,7 +9,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../theme.dart';
 import '../../sidemenu/sidemenu.dart';
-import '../vehicles_table.dart';
+import '../manager/vehicles_table.dart';
 
 class BrandContainer extends StatefulWidget {
 

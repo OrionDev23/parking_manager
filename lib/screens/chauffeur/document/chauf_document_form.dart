@@ -2,38 +2,38 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/screens/vehicle/manager/vehicles_table.dart';
-import 'package:parc_oto/serializables/document_vehicle.dart';
+import 'package:parc_oto/screens/chauffeur/manager/chauffeur_table.dart';
+import 'package:parc_oto/serializables/conducteur.dart';
+import 'package:parc_oto/serializables/document_chauffeur.dart';
 import 'package:parc_oto/widgets/zone_box.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-import '../../../serializables/vehicle.dart';
 import '../../../theme.dart';
 
-class DocumentForm extends StatefulWidget {
+class CDocumentForm extends StatefulWidget {
 
-  final DocumentVehicle? vd;
-  final String? v;
-  final Vehicle? ve;
-  const DocumentForm({super.key, this.vd, this.v, this.ve});
+  final DocumentChauffeur? dc;
+  final String? cid;
+  final Conducteur? c;
+  const CDocumentForm({super.key, this.dc, this.cid, this.c});
 
   @override
-  DocumentFormState createState() => DocumentFormState();
+  CDocumentFormState createState() => CDocumentFormState();
 }
 
-class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClientMixin<DocumentForm>{
+class CDocumentFormState extends State<CDocumentForm> with AutomaticKeepAliveClientMixin<CDocumentForm>{
 
 
   DateTime? selectedDate;
   TextEditingController nom=TextEditingController();
 
-  Vehicle? selectedVehicle;
+  Conducteur? selectedConducteur;
 
   String? documentID;
 
 
-  bool loadingVehicle=false;
+  bool loadingConducteur=false;
   @override
   void initState() {
     initValues();
@@ -41,39 +41,39 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
   }
 
   void initValues(){
-    if(widget.vd!=null){
-      nom.text=widget.vd!.nom;
-      documentID=widget.vd!.id;
-      if(widget.vd!.vehicle!=null) {
-        downloadVehicle(widget.vd!.vehicle!);
+    if(widget.dc!=null){
+      nom.text=widget.dc!.nom;
+      documentID=widget.dc!.id;
+      if(widget.dc!.chauffeur!=null) {
+        downloadChauffeur(widget.dc!.chauffeur!);
       }
-      if(widget.vd!.dateExpiration!=null) {
-        selectedDate=ClientDatabase.ref.add(Duration(milliseconds: widget.vd!.dateExpiration??0));
+      if(widget.dc!.dateExpiration!=null) {
+        selectedDate=ClientDatabase.ref.add(Duration(milliseconds: widget.dc!.dateExpiration??0));
       }
     }
-    else if(widget.ve!=null){
-      selectedVehicle=widget.ve;
+    else if(widget.c!=null){
+      selectedConducteur=widget.c;
     }
-    else if(widget.v!=null){
-      downloadVehicle(widget.v!);
+    else if(widget.cid!=null){
+      downloadChauffeur(widget.cid!);
     }
     documentID??=DateTime.now().difference(ClientDatabase.ref).inMilliseconds.toString();
   }
 
 
-  void downloadVehicle(String id)async{
-    loadingVehicle=true;
+  void downloadChauffeur(String id)async{
+    loadingConducteur=true;
     await ClientDatabase.database!.getDocument(
         databaseId: databaseId,
-        collectionId: vehiculeid,
+        collectionId: chauffeurid,
         documentId: id).then((value) {
           if(value.data.isNotEmpty){
-            selectedVehicle=value.convertTo((p0) => Vehicle.fromJson(p0 as Map<String,dynamic>));
+            selectedConducteur=value.convertTo((p0) => Conducteur.fromJson(p0 as Map<String,dynamic>));
           }
     });
     if(mounted){
       setState(() {
-        loadingVehicle=false;
+        loadingConducteur=false;
       });
     }
   }
@@ -99,20 +99,20 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
         child:Column(children: [
           Flexible(
             child: ZoneBox(
-              label:'vehicule'.tr(),
+              label:'chauffeur'.tr(),
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: ListTile(
-                  title: Text(selectedVehicle?.matricule??'/'),
-                  onPressed: widget.ve!=null && !loadingVehicle && widget.vd?.vehicle==null && widget.v==null?() async{
-                    selectedVehicle=await showDialog<Vehicle>(context: context,
+                  title: Text('${selectedConducteur?.name} ${selectedConducteur?.prenom}'),
+                  onPressed: widget.c!=null || loadingConducteur || widget.dc?.chauffeur!=null || widget.cid!=null?null:() async{
+                    selectedConducteur=await showDialog<Conducteur>(context: context,
                         barrierDismissible: true,
                         builder: (context){
                           return  ContentDialog(
                             constraints: BoxConstraints.tight(Size(
                               60.w,60.h
                             )),
-                            title: const Text('selectvehicle').tr(),
+                            title: const Text('selectchauffeur').tr(),
                             style: ContentDialogThemeData(
                               titleStyle: appTheme.writingStyle.copyWith(fontWeight: FontWeight.bold)
                             ),
@@ -120,7 +120,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
                                 color: appTheme.backGroundColor,
                                 width: 60.w,
                                 height: 60.h,
-                                child: const VehicleTable(selectV: true,)
+                                child: const ChauffeurTable(selectD: true,)
                             ),
                           );
                         }
@@ -129,7 +129,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
 
                     });
                     checkForChanges();
-                  }:null,
+                  },
                 ),
               ),
             ),
@@ -201,8 +201,8 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
   bool changes=false;
   bool uploading=false;
   void checkForChanges(){
-    if(widget.vd!=null){
-      if(nom.text.isNotEmpty && nom.text!=widget.vd!.nom){
+    if(widget.dc!=null){
+      if(nom.text.isNotEmpty && nom.text!=widget.dc!.nom){
         if(!changes){
           setState(() {
             changes=true;
@@ -210,7 +210,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
         }
         return;
       }
-      if((widget.v!=null && selectedVehicle!=null && widget.v!=selectedVehicle!.id)|| (widget.v==null && selectedVehicle!=null)){
+      if((widget.cid!=null && selectedConducteur!=null && widget.cid!=selectedConducteur!.id)|| (widget.cid==null && selectedConducteur!=null)){
         if(!changes){
           setState(() {
             changes=true;
@@ -218,7 +218,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
         }
         return;
       }
-      if(selectedDate!=null && (widget.vd!.dateExpiration==null || ClientDatabase.ref.add(Duration(milliseconds:widget.vd!.dateExpiration??0))==selectedDate))
+      if(selectedDate!=null && (widget.dc!.dateExpiration==null || ClientDatabase.ref.add(Duration(milliseconds:widget.dc!.dateExpiration??0))==selectedDate))
     {
       if(!changes){
         setState(() {
@@ -246,14 +246,14 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
         uploading=true;
       });
 
-      DocumentVehicle dv=DocumentVehicle(id: documentID!, nom: nom.text,vehicle: selectedVehicle?.id,
-          vehiclemat:selectedVehicle?.matricule,
+      DocumentChauffeur dv=DocumentChauffeur(id: documentID!, nom: nom.text,chauffeur: selectedConducteur?.id,
+          chauffeurNom:'${selectedConducteur?.name} ${selectedConducteur?.prenom}',
           dateExpiration: selectedDate?.difference(ClientDatabase.ref).inMilliseconds.abs(),
       createdBy: ClientDatabase.me.value?.id);
-      if(widget.vd!=null){
+      if(widget.dc!=null){
         await ClientDatabase.database!.updateDocument(
             databaseId: databaseId,
-            collectionId: vehicDoc,
+            collectionId: chaufDoc,
             documentId: documentID!,
             data: dv.toJson()
         );
@@ -261,7 +261,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
       else{
         await ClientDatabase.database!.createDocument(
             databaseId: databaseId,
-            collectionId: vehicDoc,
+            collectionId: chaufDoc,
             documentId: documentID!,
             data: dv.toJson()
         );
@@ -292,7 +292,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
             duration: snackbarShortDuration);
         Future.delayed(snackbarShortDuration).whenComplete(() {
 
-          if(widget.v!=null){
+          if(widget.cid!=null){
          Navigator.pop(context);
         }
         else{

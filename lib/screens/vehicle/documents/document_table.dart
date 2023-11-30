@@ -1,15 +1,16 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parc_oto/datasources/document/document_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../../datasources/vehic_doc/document_datasource.dart';
 import '../../../serializables/vehicle.dart';
 import '../../../theme.dart';
+import '../../../widgets/empty_table_widget.dart';
 import '../../../widgets/zone_box.dart';
-import '../vehicles_table.dart';
+import '../manager/vehicles_table.dart';
 
 class DocumentTable extends StatefulWidget {
   final bool selectD;
@@ -327,7 +328,7 @@ class DocumentTableState extends State<DocumentTable> {
                                                         filters.remove('datemax');
                                                       }
                                                       if(selectedVehicle!=null){
-                                                        filters['vehicle']=selectedVehicle!.id!;
+                                                        filters['vehicle']=selectedVehicle!.id;
                                                       }
                                                       else{
                                                         filters.remove('vehicle');
@@ -415,6 +416,7 @@ class DocumentTableState extends State<DocumentTable> {
         ),
       ),
       sortAscending: assending,
+      empty: NoDataWidget(datasource: documentsDataSource,),
       horizontalMargin: 8,
       columnSpacing: 0,
       dataRowHeight: 3.5.h,

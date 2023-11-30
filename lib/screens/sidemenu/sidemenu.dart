@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/screens/chauffeur/document/chauf_document_tabs.dart';
 import 'package:parc_oto/screens/login.dart';
 import 'package:parc_oto/screens/logout.dart';
 import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
@@ -11,6 +12,7 @@ import 'package:parc_oto/screens/vehicle/documents/document_tabs.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
 import 'package:parc_oto/widgets/on_tap_scale.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import '../chauffeur/document/gestion_chauf_documents.dart';
 import '../chauffeur/manager/chauffeur_tabs.dart';
 import '../chauffeur/disponibilite/disponibilite_tabs.dart';
 import '../dashboard/dashboard.dart';
@@ -310,7 +312,7 @@ class PanesListState extends State<PanesList> with WindowListener {
           PaneItem(
             icon: const Icon(FluentIcons.document_set),
             title: const Text('documents').tr(),
-            body: const Placeholder(),
+            body: const CDocumentTabs(),
           ),
           PaneItem(
             icon: const Icon(LineAwesome.check_double_solid),
