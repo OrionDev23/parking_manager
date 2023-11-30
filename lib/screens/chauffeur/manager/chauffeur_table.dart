@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../theme.dart';
+import '../../../widgets/empty_table_widget.dart';
 import '../../../widgets/zone_box.dart';
 class ChauffeurTable extends StatefulWidget {
   final bool selectD;
@@ -382,6 +383,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
         rowPerPage = nbr ?? 12;
       },
       availableRowsPerPage: const [12, 24, 50, 100, 200],
+      empty: const NoDataWidget(),
       showFirstLastButtons: true,
       renderEmptyRowsInTheEnd: false,
       fit: FlexFit.tight,
