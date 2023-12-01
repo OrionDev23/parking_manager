@@ -395,7 +395,7 @@ class _PrestataireFormState extends State<PrestataireForm> {
     Prestataire prest = Prestataire(
       id:prestID!,
       nom: nom.text,
-      email: email.text,
+      email: email.text.isEmpty?null:email.text,
       telephone: telephone.text,
       adresse: adresse.text,
       art: art.text,
