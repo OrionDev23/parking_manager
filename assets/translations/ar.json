@@ -10,6 +10,7 @@
   "dateajout": "تاريخ الإنشاء",
   "refresh": "إعادة البحت",
   "selectchauffeur": "اختر سائقًا",
+  "supprest": "حذف الموفر",
   "daira": " الدائرة",
   "quittance": "اصال",
   "prenom": "الاسم",
@@ -33,8 +34,7 @@
   "min": "الأدنى",
   "clear": "مسح",
   "filter": "تصفية",
-
-
+  "nomadresreq": "الاسم والعنوان مطلوبان",
   "max": "الأعلى",
   "bstate": "معطلة",
   "rstate": "تحت الاصلاح",
@@ -42,9 +42,10 @@
   "reparations": "الإصلاحات",
   "greparations": "إدارة الإصلاحات",
   "prestataires": "مقدمي الخدمات",
-
+  "prestataire": "الموفر",
   "le": "ال",
   "supvehic": "حذف السيارة",
+  "legalinfo": "المعلومات القانونية",
 
   "vp": "سيارة خاصة",
   "presid": "رئاسة",
@@ -152,6 +153,10 @@
   "nomprenreq": "مطلوب كل من الاسم واللقب",
   "chaufsuccess": "تمت إضافة السائق",
   "chaufupdate": "تم تحديث السائق",
+  "prestsuccess": "تمت إضافة الموفر",
+  "prestupdate": "تم تحديث الموفر",
+  "nouvprest": "موفر جديد",
+
   "birthday": "يوم الميلاد",
   "contact": "اتصال",
   "done": "انتهى !",

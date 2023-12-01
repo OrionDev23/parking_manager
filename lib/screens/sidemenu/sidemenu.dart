@@ -12,11 +12,11 @@ import 'package:parc_oto/screens/vehicle/documents/document_tabs.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
 import 'package:parc_oto/widgets/on_tap_scale.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import '../chauffeur/document/gestion_chauf_documents.dart';
 import '../chauffeur/manager/chauffeur_tabs.dart';
 import '../chauffeur/disponibilite/disponibilite_tabs.dart';
 import '../dashboard/dashboard.dart';
 import '../dashboard/notif_list.dart';
+import '../prestataire/prestataire_tabs.dart';
 import '../settings.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -295,7 +295,7 @@ class PanesListState extends State<PanesList> with WindowListener {
           PaneItem(
             icon: const Icon(FluentIcons.service_activity),
             title: const Text('prestataires').tr(),
-            body: const Placeholder(),
+            body: const PrestataireTabs(),
           ),
         ],
         body: const SizedBox());

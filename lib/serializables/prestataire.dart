@@ -10,13 +10,14 @@ class Prestataire extends ParcOtoDefault{
   String nom;
   String adresse;
   String? telephone;
+  String? description;
   String? nif;
   String? nis;
   String? rc;
   String? art;
   String? email;
   String? search;
-  Prestataire({required super.id,super.createdAt,super.updatedAt,
+  Prestataire({required super.id,super.createdAt,super.updatedAt,this.description,
     required this.nom,required this.adresse,this.email,
     this.telephone,this.search,this.art,this.nif,
     this.nis,this.rc});

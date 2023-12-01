@@ -6,6 +6,7 @@
   "wilaya": "District",
   "commune": "Commune",
   "supdisp": "Delete the state",
+  "supprest": "Delete the provider",
   "dateajout": "Creation date",
   "refresh": "Refresh",
   "selectchauffeur": "Select a driver",
@@ -41,6 +42,8 @@
   "reparations": "Repairs",
   "greparations": "Manage repairs",
   "prestataires": "Providers",
+  "prestataire": "Provider",
+  "legalinfo": "Legal information",
 
   "le": "The",
   "supvehic": "Delete the vehicle",
@@ -159,8 +162,14 @@
   "nouvdocument": "New document",
   "gestiondocument": "Manage documents",
   "nomprenreq": "Both first AND second name are required",
+  "nomadresreq": "Name and address are required",
+
   "chaufsuccess": "Driver added !",
   "chaufupdate": "Driver updated !",
+  "prestsuccess": "Provider added !",
+  "prestupdate": "Provider updated !",
+  "nouvprest": "New provider",
+
   "contact": "Contact",
   "birthday": "Birthday",
   "fullname": "Full name",

@@ -35,10 +35,6 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   TextEditingController telephone = TextEditingController();
   TextEditingController adresse = TextEditingController();
   DateTime? birthDay;
-  PaginatorController controller = PaginatorController();
-
-  List<TableRow> rows = List.empty(growable: true);
-
   @override
   void initState() {
     initValues();

@@ -13,6 +13,7 @@ const chaufDispID="chauf_disponibilite";
 const chaufDoc="doc_chauffeur";
 const vehicDoc="doc_vehic";
 const buckedId="images";
+const prestataireId="prestataire";
 const endpoint ="https://cloud.appwrite.io/v1";
 const project="6531ace99382e496a904";
 class ClientDatabase {
