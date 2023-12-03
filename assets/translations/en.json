@@ -163,7 +163,9 @@
   "gestiondocument": "Manage documents",
   "nomprenreq": "Both first AND second name are required",
   "nomadresreq": "Name and address are required",
-
+  "picklogo": "Choose a logo",
+  "entrepsuccess": "Company infos created successfully!",
+  "entrepupdate": "Company infos updated successfully!",
   "chaufsuccess": "Driver added !",
   "chaufupdate": "Driver updated !",
   "prestsuccess": "Provider added !",

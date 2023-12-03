@@ -1,4 +1,8 @@
+import 'dart:io' as io;
+import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/serializables/entreprise.dart';
 import 'package:parc_oto/theme.dart';
@@ -7,6 +11,8 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../providers/client_database.dart';
+
+const logoid="mylogo.png";
 
 class MyEntreprise extends StatefulWidget {
   const MyEntreprise({super.key});
@@ -28,6 +34,8 @@ class MyEntrepriseState extends State<MyEntreprise> {
 
   static Entreprise? p;
 
+  static io.File? imageFile;
+
   bool changes = false;
 
   static bool downloading = false;
@@ -40,10 +48,18 @@ class MyEntrepriseState extends State<MyEntreprise> {
       if (p == null) {
         downloadData();
       } else {
+        checkLogoOrDownload();
         initValues();
       }
     }
     super.initState();
+  }
+
+  void checkLogoOrDownload() async{
+    await checkIfLogoExists();
+    if(!logoExists){
+      downloadLogo();
+    }
   }
 
   void waitForDownload() async {
@@ -71,6 +87,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
           .then((value) {
         p = value
             .convertTo((p0) => Entreprise.fromJson(p0 as Map<String, dynamic>));
+        downloadLogo();
         initValues();
       });
       setState(() {
@@ -120,12 +137,92 @@ class MyEntrepriseState extends State<MyEntreprise> {
           });
         }
       }
-    } else {
-      if (!changes) {
-        setState(() {
-          changes = true;
-        });
+    } else if(imageFile!=null){
+      setState(() {
+        changes=true;
+      });}
+      else{
+        if (!changes) {
+          setState(() {
+            changes = true;
+          });
+        }
       }
+    }
+
+  bool pickingFile = false;
+
+  void pickImage() async {
+    setState(() {
+      pickingFile = true;
+    });
+    await FilePicker.platform
+        .pickFiles(
+      dialogTitle: 'picklogo'.tr(),
+      type: FileType.image,
+    )
+        .then((value) {
+      imageFile = io.File(value!.files.first.path!);
+      setState(() {});
+    }).onError((error, stackTrace) {});
+    setState(() {
+      pickingFile = false;
+    });
+  }
+
+  bool downloadingLogo = false;
+  bool uploading=false;
+  double progress=0;
+  Future<void> downloadLogo() async {
+    downloadingLogo = true;
+    if (mounted) {
+      setState(() {});
+    }
+    String link = "";
+    if (p != null && p!.logo != null && p!.logo!.isNotEmpty) {
+      link = p!.logo!;
+    } else {
+      link = logoid;
+    }
+    await ClientDatabase.storage!
+        .getFileDownload(bucketId: buckedId, fileId: link)
+        .then((value) {
+      io.File file = io.File(logoid);
+      file.writeAsBytes(value).then((value) {
+        downloadingLogo = false;
+        if (mounted) {
+          setState(() {});
+        }
+      }).onError((error, stackTrace) {
+        downloadingLogo = false;
+        if (mounted) {
+          setState(() {});
+        }
+      });
+    }).onError((error, stackTrace) {
+      downloadingLogo = false;
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
+
+  static bool checkingFile = false;
+  static bool logoExists = false;
+
+  Future<void> checkIfLogoExists() async {
+    checkingFile = true;
+    if (mounted) {
+      setState(() {});
+    }
+    if (await io.File(logoid).exists()) {
+      logoExists = true;
+    } else {
+      logoExists = false;
+    }
+    checkingFile = false;
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -153,9 +250,28 @@ class MyEntrepriseState extends State<MyEntreprise> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              CircleAvatar(
-                                maxRadius: 50,
-                                backgroundColor: appTheme.color.lighter,
+                              Container(
+                                width: 8.w,
+                                height: 8.w,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: appTheme.color.lighter,
+                                  boxShadow: kElevationToShadow[2],
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: imageFile != null
+                                    ? Image.file(
+                                  imageFile!,
+                                  fit: BoxFit.cover,
+                                ):
+                                logoExists?
+                                    Image.file(io.File(logoid),
+                                      fit: BoxFit.cover,
+                                    )
+                                    : Image.asset(
+                                        'assets/images/logo.webp',
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                               smallSpace,
                               Column(
@@ -163,11 +279,21 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                 children: [
                                   IconButton(
                                       icon: const Icon(FluentIcons.file_image),
-                                      onPressed: downloading ? null : () {}),
+                                      onPressed: checkingFile ||
+                                              downloadingLogo ||
+                                              downloading ||
+                                              pickingFile
+                                          ? null
+                                          : pickImage),
                                   smallSpace,
                                   IconButton(
                                       icon: const Icon(FluentIcons.refresh),
-                                      onPressed: downloading ? null : () {}),
+                                      onPressed: checkingFile ||
+                                              downloadingLogo ||
+                                              downloading ||
+                                              pickingFile
+                                          ? null
+                                          : downloadLogo),
                                 ],
                               ),
                             ],
@@ -381,12 +507,12 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Button(
-                          onPressed: downloading ? null : downloadData,
+                          onPressed: uploading|| downloading ? null : downloadData,
                           child: const Text('refresh').tr()),
                       smallSpace,
                       FilledButton(
-                          onPressed: downloading ? null : () {},
-                          child: const Text('save').tr()),
+                          onPressed:uploading||  downloading ? null : upload,
+                          child: uploading ? ProgressBar(value: progress,):const Text('save').tr()),
                     ],
                   ),
                 ),
@@ -401,10 +527,133 @@ class MyEntrepriseState extends State<MyEntreprise> {
   }
 
 
+  void upload() async {
+    if (nom.value.text.isEmpty || adresse.text.isEmpty) {
+      showMessage('nomadresreq', 'erreur');
+      return;
+    }
+    if (!uploading) {
+      setState(() {
+        uploading = true;
+        progress = 0;
+      });
+      try {
+        setState(() {
+          progress = 10;
+        });
+        await uploadLogo();
+        setState(() {
+          progress = 50;
+        });
+        await uploadEntreprise();
+
+        setState(() {
+          progress = 90;
+        });
+        await Future.delayed(const Duration(milliseconds: 300));
+        setState(() {
+          progress = 100;
+          changes=false;
+        });
+        if (p == null) {
+          showMessage('entrepsuccess', "ok");
+        } else {
+          showMessage('entrepupdate', "ok");
+        }
+      } catch (e) {
+        setState(() {
+          uploading = false;
+          showMessage('errupld',
+              'erreur');
+        });
+      }
+      setState(() {
+        uploading = false;
+        progress = 100;
+      });
+    }
+  }
+
+  Future<Document> uploadEntreprise() async {
+
+    Entreprise prest = Entreprise(
+      id:p?.id??'1',
+      nom: nom.text,
+      email: email.text.isEmpty?null:email.text,
+      telephone: telephone.text,
+      adresse: adresse.text,
+      art: art.text,
+      rc:rc.text,
+      nif: nif.text,
+      nis:nis.text,
+      logo: logoid,
+      description: descr.text,
+      search: '${nom.text} ${nif.text} ${nis.text} ${rc.text} ${email.text} '
+          '${telephone.text} ${adresse.text} ${descr.text} 1 $logoid ${art.text}',
+    );
+    if(p!=null){
+      return await ClientDatabase.database!.updateDocument(
+          databaseId: databaseId,
+          collectionId: entrepriseid,
+          documentId: p!.id,
+          data: prest.toJson());
+    }
+    else{
+      return await ClientDatabase.database!.createDocument(
+          databaseId: databaseId,
+          collectionId: entrepriseid,
+          documentId: '1',
+          data: prest.toJson());
+    }
+
+  }
+
+
+  Future<void> uploadLogo() async{
+    if(imageFile!=null){
+      var bytes=await imageFile!.readAsBytes();
+      try{
+        await ClientDatabase.storage!.deleteFile(bucketId: buckedId, fileId: logoid);
+      }
+      catch (e){
+        //
+      }
+      await ClientDatabase.storage!.createFile(bucketId: buckedId, fileId:logoid, file: InputFile.fromBytes(
+          bytes: bytes,
+          filename: logoid,)).then((value) async{
+            io.File file=io.File(logoid);
+            await file.writeAsBytes(bytes,mode: io.FileMode.write);
+      }).onError((AppwriteException error, stackTrace) {
+
+      });
+    }
+  }
+
+
+  void showMessage(String message, String title) {
+    showDialog<String>(
+      context: context,
+      builder: (context) => ContentDialog(
+        title: Text(title).tr(),
+        content: Text(
+          message,
+        ).tr(),
+        actions: [
+          Button(
+            child: const Text('OK').tr(),
+            onPressed: () async {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   void dispose() {
-    downloading=false;
+    downloading = false;
+    imageFile=null;
     super.dispose();
   }
 }
