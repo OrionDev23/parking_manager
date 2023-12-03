@@ -16,6 +16,7 @@ import '../chauffeur/manager/chauffeur_tabs.dart';
 import '../chauffeur/disponibilite/disponibilite_tabs.dart';
 import '../dashboard/dashboard.dart';
 import '../dashboard/notif_list.dart';
+import '../entreprise.dart';
 import '../prestataire/prestataire_tabs.dart';
 import '../settings.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -57,6 +58,8 @@ class PanesListState extends State<PanesList> with WindowListener {
 
   late PaneItem acceuil;
   PaneItemSeparator separator = PaneItemSeparator();
+  late PaneItem entreprise;
+
   late PaneItem login;
   late PaneItem logout;
   late PaneItem parametres;
@@ -356,7 +359,11 @@ class PanesListState extends State<PanesList> with WindowListener {
       title: const Text('parametres').tr(),
       body: Settings(widget.prefs),
     );
-
+    entreprise=PaneItem(
+      icon: const Icon(FluentIcons.build_definition),
+      title: const Text('monentreprise').tr(),
+      body: const MyEntreprise(),
+    );
     if (signedIn.value) {
       originalItems = [
         acceuil,
@@ -373,6 +380,7 @@ class PanesListState extends State<PanesList> with WindowListener {
 
     footerItems = [
       PaneItemSeparator(),
+      entreprise,
       if (signedIn.value) logout,
       parametres,
     ];
