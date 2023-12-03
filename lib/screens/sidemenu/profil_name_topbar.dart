@@ -8,7 +8,6 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/client_database.dart';
 import '../../widgets/on_tap_scale.dart';
-import 'futur_image.dart';
 
 class ProfilNameTopBar extends StatelessWidget {
   const ProfilNameTopBar({super.key});
@@ -34,11 +33,8 @@ class ProfilNameTopBar extends StatelessWidget {
                         width: 4.w,
                         height: 4.w,
                         alignment: Alignment.center,
-                        child: me != null &&
-                                me.avatar != null &&
-                                me.avatar!.isNotEmpty
-                            ? FutureImage(me.avatar!,user:me)
-                            : Text(
+                        child:
+                            Text(
                                 ProfilUtilitis.getFirstLetters(me)
                                     .toUpperCase(),
                                 style: const TextStyle(

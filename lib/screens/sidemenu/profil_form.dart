@@ -1,9 +1,7 @@
-import 'dart:io';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:parc_oto/providers/client_database.dart';
@@ -15,8 +13,6 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../theme.dart';
 import '../../utilities/profil_beautifier.dart';
-import 'futur_image.dart';
-
 class ProfilForm extends StatefulWidget {
   final ParcUser? user;
   const ProfilForm({super.key, this.user});
@@ -73,11 +69,8 @@ class _ProfilFormState extends State<ProfilForm> {
       setState(() {
         somethingChanged = true;
       });
-    } else if (imageFile != null) {
-      setState(() {
-        somethingChanged = true;
-      });
-    } else if (somethingChanged) {
+    }
+    else if (somethingChanged) {
       setState(() {
         somethingChanged = false;
       });
@@ -110,12 +103,7 @@ class _ProfilFormState extends State<ProfilForm> {
                   padding: const EdgeInsets.all(2),
                   alignment: Alignment.center,
                   clipBehavior: Clip.antiAlias,
-                  child: imageFile == null
-                      ? widget.user != null &&
-                              widget.user!.avatar != null &&
-                              widget.user!.avatar!.isNotEmpty
-                          ? FutureImage(widget.user!.avatar!,user: widget.user,)
-                          : Text(
+                  child:  Text(
                               ProfilUtilitis.getFirstLetters(widget.user)
                                   .toUpperCase(),
                               style: TextStyle(
@@ -123,22 +111,8 @@ class _ProfilFormState extends State<ProfilForm> {
                                   color: Colors.white,
                                   fontSize: 18.sp),
                             )
-                      : Image.file(
-                          imageFile!,
-                          fit: BoxFit.cover,
-                        ),
                 ),
               ),
-              const SizedBox(
-                width: 10,
-              ),
-              IconButton(
-                  icon: Icon(
-                    FluentIcons.edit,
-                    size: 14.sp,
-                    color: appTheme.color,
-                  ),
-                  onPressed: pickAvatar),
             ],
           ),
           const SizedBox(
@@ -297,21 +271,17 @@ class _ProfilFormState extends State<ProfilForm> {
       });
       var dateLast =
           DateTime.now().difference(ClientDatabase.ref).inMilliseconds.abs();
-      String? url = await uploadPic()??widget.user?.avatar;
+      ParcUser newme= ParcUser(
+        email: email.text,
+        name: name.text,
+        id: userID,
+        datea: dateLast,
+        datec: dateLast,
+        datel: dateLast,
+        tel: '$phoneDial${phone.text}',
+        avatar: null,
+      );
       if (widget.user == null) {
-
-        ParcUser newme= ParcUser(
-          email: email.text,
-          name: name.text,
-          id: userID,
-          datea: dateLast,
-          datec: dateLast,
-          datel: dateLast,
-          tel: '$phoneDial${phone.text}',
-          avatar: url,
-        );
-
-
         await ClientDatabase.database!.createDocument(
             databaseId: databaseId,
             collectionId: userid,
@@ -324,30 +294,11 @@ class _ProfilFormState extends State<ProfilForm> {
 
         });
       } else {
-        ParcUser newme=ParcUser(
-            email:email.text ,
-            id: userID,
-            name: name.text,
-            datec: widget.user!.datec,
-            datel: dateLast,
-            datea: dateLast,
-            avatar: url);
         await ClientDatabase.database!.updateDocument(
             databaseId: databaseId,
             collectionId: userid,
             documentId: userID,
-            data: {
-              if (email.text != widget.user?.email) 'email': email.text,
-              if (name.text != widget.user?.name) 'name': name.text,
-              if (countrySelected !=
-                      Countries.getCountryCodeFromPhone(widget.user?.tel) ||
-                  (widget.user?.tel?.substring(4, widget.user?.tel?.length) !=
-                      phone.text))
-                'tel': '$phoneDial${phone.text}',
-              'datea': dateLast,
-              'datel': dateLast,
-              if (url != null) 'avatar': url,
-            }).then((value) {
+            data: newme.toJson()).then((value) {
           ClientDatabase.me.value=newme;
           Navigator.pop(
             context,
@@ -362,65 +313,5 @@ class _ProfilFormState extends State<ProfilForm> {
     }
   }
 
-  File? imageFile;
-
   late String userID;
-
-  void pickAvatar() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-    );
-
-    if (result != null) {
-      imageFile = File(result.files.single.path!);
-      testIfSomethingChanged();
-    } else {}
-  }
-
-  Future<String?> uploadPic() async {
-    String? result;
-    if (imageFile != null) {
-      if(widget.user!=null && widget.user!.avatar!=null && widget.user!.avatar!.isNotEmpty){
-        try{
-          await ClientDatabase.storage!.deleteFile(bucketId: buckedId, fileId: userID);
-        }
-        catch(e){
-          //
-        }
-        await ClientDatabase.storage!.createFile(
-            bucketId: buckedId,
-            fileId: userID,
-            file: InputFile.fromBytes(
-                bytes: await imageFile!.readAsBytes(), filename: '$userID.jpg'),
-            permissions: [
-              Permission.write(Role.user(userID)),
-              Permission.update(Role.user(userID)),
-              Permission.delete(Role.user(userID)),
-              Permission.delete(Role.team('1')),
-              Permission.read(Role.users()),
-            ]).then((value) async {
-          result =userID;
-        }).onError((AppwriteException error, stackTrace) {
-        });
-      }
-      else{
-        await ClientDatabase.storage!.createFile(
-            bucketId: buckedId,
-            fileId: userID,
-            file: InputFile.fromBytes(
-                bytes: await imageFile!.readAsBytes(), filename: '$userID.jpg'),
-            permissions: [
-              Permission.write(Role.user(userID)),
-              Permission.update(Role.user(userID)),
-              Permission.delete(Role.user(userID)),
-              Permission.read(Role.users()),
-            ]).then((value) async {
-          result =userID;
-        }).onError((error, stackTrace) {});
-      }
-
-
-    }
-    return result;
-  }
 }

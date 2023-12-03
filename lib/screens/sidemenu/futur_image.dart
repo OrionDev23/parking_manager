@@ -6,13 +6,15 @@ import '../../utilities/profil_beautifier.dart';
 
 class FutureImage extends StatelessWidget {
   final String fileID;
+
+  final String bucketID;
   final ParcUser? user;
-  const FutureImage(this.fileID, {super.key, this.user});
+  const FutureImage({super.key, this.user,required this.fileID, required this.bucketID});
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(future: ClientDatabase.storage!.getFileView(
-      bucketId: buckedId,
+      bucketId: bucketID,
       fileId: fileID,
     ),
         builder: (context,snapshot){
@@ -22,7 +24,7 @@ class FutureImage extends StatelessWidget {
             fit: BoxFit.cover,
           ):
               !snapshot.hasData
-                  ?user==null?Image.asset('assets/images/defaultUser.webp',fit: BoxFit.cover,)
+                  ?user==null?Image.asset('assets/images/logo.webp',fit: BoxFit.cover,)
                   :Text(ProfilUtilitis.getFirstLetters(user!))
                   : const ProgressRing();
     });
