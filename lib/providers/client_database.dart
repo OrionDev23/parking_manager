@@ -2,6 +2,8 @@ import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 
+import '../screens/entreprise.dart';
+import '../serializables/entreprise.dart';
 import '../serializables/parc_user.dart';
 
 const databaseId = "6531ad112080ae3b14a7";
@@ -12,6 +14,7 @@ const vehiculeid = "6531ad22153b2a49ca2c";
 const chaufDispID="chauf_disponibilite";
 const chaufDoc="doc_chauffeur";
 const vehicDoc="doc_vehic";
+const entrepriseid="entreprise";
 const buckedId="images";
 const prestataireId="prestataire";
 const endpoint ="https://cloud.appwrite.io/v1";
@@ -34,6 +37,7 @@ class ClientDatabase {
     account ??= Account(client!);
     database ??= Databases(client!);
     storage ??=Storage(client!);
+    getEntreprise();
   }
 
   Future<void> getUser() async {
@@ -65,6 +69,24 @@ class ClientDatabase {
       });
     }
   }
+
+
+  Future<void> getEntreprise() async{
+    if(MyEntrepriseState.p==null){
+      MyEntrepriseState.downloading=true;
+      try{
+        await database!.getDocument(
+            databaseId: databaseId, collectionId: entrepriseid,
+            documentId: "1").then((value) {
+          MyEntrepriseState.p=value.convertTo((p0) => Entreprise.fromJson(p0 as Map<String,dynamic>));
+        });
+      }
+      catch(e){
+        //
+      }
+      MyEntrepriseState.downloading=false;
+    }
+}
 
 
 
