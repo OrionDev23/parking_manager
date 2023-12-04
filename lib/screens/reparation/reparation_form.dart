@@ -1250,7 +1250,10 @@ class _ReparationFormState extends State<ReparationForm> {
         children: [
           Positioned.fill(
             left: 10.px,
-              child: Image.asset('assets/images/car.webp',fit: BoxFit.fitHeight,)),
+              child: Image.asset('assets/images/car.webp',fit: BoxFit.fitWidth,
+                color:appTheme.writingStyle.color
+
+              )),
           Positioned(
               left: -10.px,
               top: 0,
