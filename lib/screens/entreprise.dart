@@ -184,6 +184,12 @@ class MyEntrepriseState extends State<MyEntreprise> {
     } else {
       link = logoid;
     }
+    try{
+      await FileImage(io.File('mylogo.png')).evict();
+    }
+    catch(e){
+      //
+    }
     await ClientDatabase.storage!
         .getFileDownload(bucketId: buckedId, fileId: link)
         .then((value) {
@@ -254,7 +260,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                 width: 8.w,
                                 height: 8.w,
                                 decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
+                                  shape: BoxShape.rectangle,
                                   color: appTheme.color.lighter,
                                   boxShadow: kElevationToShadow[2],
                                 ),
@@ -262,15 +268,15 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                 child: imageFile != null
                                     ? Image.file(
                                   imageFile!,
-                                  fit: BoxFit.cover,
+                                  fit: BoxFit.fitWidth,
                                 ):
                                 logoExists?
                                     Image.file(io.File(logoid),
-                                      fit: BoxFit.cover,
+                                      fit: BoxFit.fitWidth,
                                     )
                                     : Image.asset(
                                         'assets/images/logo.webp',
-                                  fit: BoxFit.cover,
+                                  fit: BoxFit.fitWidth,
                                 ),
                               ),
                               smallSpace,
@@ -616,6 +622,12 @@ class MyEntrepriseState extends State<MyEntreprise> {
         await ClientDatabase.storage!.deleteFile(bucketId: buckedId, fileId: logoid);
       }
       catch (e){
+        //
+      }
+      try{
+        await FileImage(io.File('mylogo.png')).evict();
+      }
+      catch(e){
         //
       }
       await ClientDatabase.storage!.createFile(bucketId: buckedId, fileId:logoid, file: InputFile.fromBytes(

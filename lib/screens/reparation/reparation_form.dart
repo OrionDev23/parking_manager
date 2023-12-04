@@ -1,6 +1,14 @@
+import 'dart:io';
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/screens/entreprise.dart';
+import 'package:parc_oto/screens/prestataire/prestataire_table.dart';
+import 'package:parc_oto/serializables/prestataire.dart';
+import 'package:parc_oto/serializables/vehicle.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:parc_oto/widgets/on_tap_scale.dart';
+import 'package:parc_oto/widgets/zone_box.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -76,294 +84,366 @@ class _ReparationFormState extends State<ReparationForm> {
   bool siegeARD=false;
   bool siegeARG=false;
   bool calandre=false;
-
+ final hstyle=TextStyle(
+   fontSize: 14.sp,
+   fontWeight: FontWeight.bold,
+ );
+ final bstyle=TextStyle(
+   fontSize: 12.sp,
+   fontWeight: FontWeight.bold,
+ );
   final tstyle = TextStyle(fontSize: 10.sp);
+
+  TextEditingController numOrdre=TextEditingController();
+  DateTime selectedDate=DateTime.now();
+
+  Prestataire? selectedPrest;
+  Vehicle? selectedVehicle;
+  TextEditingController marque=TextEditingController();
+  TextEditingController type=TextEditingController();
+  TextEditingController numSerie=TextEditingController();
+  TextEditingController matricule=TextEditingController();
+  TextEditingController km=TextEditingController();
+  TextEditingController couleur=TextEditingController();
+  DateTime anneeUtil=DateTime.now();
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
     return Container(
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: appTheme.backGroundColor,
         border: Border.all(),
       ),
-      child: Column(
+      child: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         children: [
-          Container(
-            decoration:BoxDecoration(
-              border: Border.all(),
-            ),
-            width: 80.w,
-            height: 50.h,
-            padding: const EdgeInsets.all(5),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+          if(MyEntrepriseState.p!=null)
+          Row(
+
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.file(File('mylogo.png'),width: 80.px,height: 80.px,),
+             bigSpace,
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(MyEntrepriseState.p!.nom,style: bstyle,),
+                  Text(MyEntrepriseState.p!.adresse,style: bstyle,),
+                ],
+              ),
+              const Spacer(),
+              Text('ORDRE DE REPARATION',style: hstyle,),
+              smallSpace,
+              Container(
+                width: 200.px,
+                height: 40.px,
+                decoration: BoxDecoration(
+                  border: Border.all(),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: Row(
+                    children: [
+                      Text('num',style: bstyle,).tr(),
+                      smallSpace,
+                      Flexible(
+                        child: TextBox(
+                          controller: numOrdre,
+                          placeholder: 'num'.tr(),
+                          placeholderStyle: placeStyle,
+                          style: appTheme.writingStyle,
+                          cursorColor: appTheme.color.darker,
+                          decoration: BoxDecoration(
+                            color: appTheme.fillColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text('date',style: bstyle,).tr(),
+              smallSpace,
+              SizedBox(
+                width: 200.px,
+                height: 30.px,
+                child: DatePicker(selected: selectedDate,
+                onChanged: (s){
+                  setState(() {
+                    selectedDate=s;
+                  });
+                },),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              SizedBox(
+                width: 250.px,
+                height: 50.px,
+                child: ListTile(
+                  leading: Text('prestataire',style: bstyle,).tr(),
+                  title: Text(selectedPrest?.nom??''),
+                  onPressed: ()async{
+                    selectedPrest=await showDialog<Prestataire?>(context: context, builder: (c,)=>const PrestataireTable(selectD: true,));
+                    setState(() {
+
+                    });
+                    },
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 100.px,
+            child: Table(
+              border: TableBorder.all(),
+              columnWidths: {
+                0:FixedColumnWidth(80.px),
+                1:FixedColumnWidth(80.px),
+                2:FixedColumnWidth(80.px),
+                3:FixedColumnWidth(80.px),
+              },
               children: [
-                topTable(appTheme),
-                vehicleDamage(appTheme),
+                TableRow(
+                  children: [
+                    TableCell(
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(
+                            children: [
+                              Text('marque',style: tstyle,).tr(),
+                              smallSpace,
+                              Flexible(
+                                child: TextBox(
+                                  controller:marque,
+                                  placeholder: 'marque'.tr(),
+                                  style: appTheme.writingStyle,
+                                  decoration: BoxDecoration(
+                                    color: appTheme.fillColor,
+                                  ),
+                                  cursorColor: appTheme.color.darker,
+                                  placeholderStyle: placeStyle,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                        )),
+                    TableCell(
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(
+                            children: [
+                              Text('type',style: tstyle,).tr(),
+                              smallSpace,
+                              Flexible(
+                                child: TextBox(
+                                  controller:type,
+                                  placeholder: 'type'.tr(),
+                                  style: appTheme.writingStyle,
+                                  decoration: BoxDecoration(
+                                    color: appTheme.fillColor,
+                                  ),
+                                  cursorColor: appTheme.color.darker,
+                                  placeholderStyle: placeStyle,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                        )),
+                    TableCell(
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(
+                            children: [
+                              Text('numerserie',style: tstyle,).tr(),
+                              smallSpace,
+                              Flexible(
+                                child: TextBox(
+                                  controller:numSerie,
+                                  placeholder: 'numerserie'.tr(),
+                                  style: appTheme.writingStyle,
+                                  decoration: BoxDecoration(
+                                    color: appTheme.fillColor,
+                                  ),
+                                  cursorColor: appTheme.color.darker,
+                                  placeholderStyle: placeStyle,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                        )),
+                    TableCell(
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(
+                            children: [
+                              Text('matricule',style: tstyle,).tr(),
+                              smallSpace,
+                              Flexible(
+                                child: TextBox(
+                                  controller:matricule,
+                                  placeholder: 'matricule'.tr(),
+                                  style: appTheme.writingStyle,
+                                  decoration: BoxDecoration(
+                                    color: appTheme.fillColor,
+                                  ),
+                                  cursorColor: appTheme.color.darker,
+                                  placeholderStyle: placeStyle,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                        )),
+                  ]
+                ),
+                TableRow(
+                  children: [
+                    TableCell(
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(
+                            children: [
+                              Text('Km',style: tstyle,).tr(),
+                              smallSpace,
+                              Flexible(
+                                child: TextBox(
+                                  controller:km,
+                                  placeholder: 'Km'.tr(),
+                                  style: appTheme.writingStyle,
+                                  decoration: BoxDecoration(
+                                    color: appTheme.fillColor,
+                                  ),
+                                  cursorColor: appTheme.color.darker,
+                                  placeholderStyle: placeStyle,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                        )),
+                    TableCell(
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(
+                            children: [
+                              Text('type',style: tstyle,).tr(),
+                              smallSpace,
+                              Flexible(child: Container()),
+                            ],
+                          ),
+
+                        )),
+                    TableCell(
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(
+                            children: [
+                              Text('couleur',style: tstyle,).tr(),
+                              smallSpace,
+                              Flexible(
+                                child: TextBox(
+                                  controller:couleur,
+                                  placeholder: 'couleur'.tr(),
+                                  style: appTheme.writingStyle,
+                                  decoration: BoxDecoration(
+                                    color: appTheme.fillColor,
+                                  ),
+                                  cursorColor: appTheme.color.darker,
+                                  placeholderStyle: placeStyle,
+                                ),
+                              ),
+                            ],
+                          ),
+
+                        )),
+                    TableCell(
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(
+                            children: [
+                              Text('anneeutil',style: tstyle,).tr(),
+                              smallSpace,
+                              Flexible(child: DatePicker(selected: anneeUtil,showDay: false,showMonth: false,))
+                            ],
+                          ),
+
+                        )),
+                  ]
+                ),
               ],
             ),
           ),
+          bigSpace,
           Container(
+            height: 7.h,
             width: 80.w,
-            height: 30.h,
-            padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
+              color: appTheme.color.lightest,
               border: Border.all(),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ToggleSwitch(
-                      content: Text(
-                        'Vidange moteur',
-                        style: tstyle,
-                      ),
-                      checked: r1,
-                      onChanged: (s) {
-                        setState(() {
-                          r1 = s;
-                        });
-                      },
-                    ),
-                    ToggleSwitch(
-                      content: Text(
-                        'Vidange boite',
-                        style: tstyle,
-                      ),
-                      checked: r2,
-                      onChanged: (s) {
-                        setState(() {
-                          r2 = s;
-                        });
-                      },
-                    ),
-                    ToggleSwitch(
-                      content: Text(
-                        'Vidange pont AV AR',
-                        style: tstyle,
-                      ),
-                      checked: r3,
-                      onChanged: (s) {
-                        setState(() {
-                          r3 = s;
-                        });
-                      },
-                    ),
-                    ToggleSwitch(
-                      content: Text(
-                        'Filtre à air',
-                        style: tstyle,
-                      ),
-                      checked: r4,
-                      onChanged: (s) {
-                        setState(() {
-                          r4 = s;
-                        });
-                      },
-                    ),
-                    ToggleSwitch(
-                      content: Text(
-                        'Filtre à huile',
-                        style: tstyle,
-                      ),
-                      checked: r5,
-                      onChanged: (s) {
-                        setState(() {
-                          r5 = s;
-                        });
-                      },
-                    ),
-                    ToggleSwitch(
-                      content: Text(
-                        'Filtre à carburant',
-                        style: tstyle,
-                      ),
-                      checked: r6,
-                      onChanged: (s) {
-                        setState(() {
-                          r6 = s;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-                smallSpace,
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ToggleSwitch(
-                      content: Text(
-                        "Filtre d'habitacle",
-                        style: tstyle,
-                      ),
-                      checked: r7,
-                      onChanged: (s) {
-                        setState(() {
-                          r7 = s;
-                        });
-                      },
-                    ),
-                    ToggleSwitch(
-                      content: Text(
-                        'Liquide de frein',
-                        style: tstyle,
-                      ),
-                      checked: r8,
-                      onChanged: (s) {
-                        setState(() {
-                          r8 = s;
-                        });
-                      },
-                    ),
-                    ToggleSwitch(
-                      content: Text(
-                        'Liquide de refroidissement',
-                        style: tstyle,
-                      ),
-                      checked: r9,
-                      onChanged: (s) {
-                        setState(() {
-                          r9 = s;
-                        });
-                      },
-                    ),
-                    ToggleSwitch(
-                      content: Text(
-                        'Equilibrage roues',
-                        style: tstyle,
-                      ),
-                      checked: r10,
-                      onChanged: (s) {
-                        setState(() {
-                          r10 = s;
-                        });
-                      },
-                    ),
-                    ToggleSwitch(
-                      content: Text(
-                        'Pneus AV',
-                        style: tstyle,
-                      ),
-                      checked: r11,
-                      onChanged: (s) {
-                        setState(() {
-                          r11 = s;
-                        });
-                      },
-                    ),
-                    ToggleSwitch(
-                      content: Text(
-                        'Pneus AR',
-                        style: tstyle,
-                      ),
-                      checked: r12,
-                      onChanged: (s) {
-                        setState(() {
-                          r12 = s;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-                smallSpace,
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ToggleSwitch(
-                      content: Text(
-                        'Controle niveaux',
-                        style: tstyle,
-                      ),
-                      checked: r13,
-                      onChanged: (s) {
-                        setState(() {
-                          r13 = s;
-                        });
-                      },
-                    ),
-                    ToggleSwitch(
-                      content: Text(
-                        'Entretien climatisation',
-                        style: tstyle,
-                      ),
-                      checked: r14,
-                      onChanged: (s) {
-                        setState(() {
-                          r14 = s;
-                        });
-                      },
-                    ),
-                    ToggleSwitch(
-                      content: Text(
-                        'Balais essuie-glace',
-                        style: tstyle,
-                      ),
-                      checked: r15,
-                      onChanged: (s) {
-                        setState(() {
-                          r15 = s;
-                        });
-                      },
-                    ),
-                    ToggleSwitch(
-                      content: Text(
-                        'Eclairage',
-                        style: tstyle,
-                      ),
-                      checked: r16,
-                      onChanged: (s) {
-                        setState(() {
-                          r16 = s;
-                        });
-                      },
-                    ),
-                    ToggleSwitch(
-                      content: Text(
-                        'OBD',
-                        style: tstyle,
-                      ),
-                      checked: r17,
-                      onChanged: (s) {
-                        setState(() {
-                          r17 = s;
-                        });
-                      },
-                    ),
-                    ToggleSwitch(
-                      content: Text(
-                        'Bougies',
-                        style: tstyle,
-                      ),
-                      checked: r18,
-                      onChanged: (s) {
-                        setState(() {
-                          r18 = s;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            padding: const EdgeInsets.all(10),
+            child: Text('ETAT DU VEHICULE',textAlign: TextAlign.center,style: hstyle,),
           ),
+          etatVehicule(appTheme),
+          Container(
+            height: 7.h,
+            width: 80.w,
+            decoration: BoxDecoration(
+              color: appTheme.color.lightest,
+              border: Border.all(),
+            ),
+            padding: const EdgeInsets.all(10),
+            child: Text('ENTRETIEN DU VEHICULE',textAlign: TextAlign.center,style: hstyle,),
+          ),
+          entretienWidgets(appTheme),
         ],
       ),
     );
   }
 
 
+
+
+  Widget etatVehicule(AppTheme appTheme){
+    return  Container(
+      decoration:BoxDecoration(
+        border: Border.all(),
+      ),
+      width: 80.w,
+      height: 45.h,
+      padding: const EdgeInsets.all(5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          topTable(appTheme),
+          bigSpace,
+          bigSpace,
+          bigSpace,
+          bigSpace,
+          bigSpace,
+          vehicleDamage(appTheme),
+        ],
+      ),
+    );
+  }
   Widget topTable(AppTheme appTheme){
     return SizedBox(
       width: 40.w,
-      height: 40.h,
+      height: 45.h,
       child: Table(
         border: TableBorder.all(),
         columnWidths: {
@@ -1243,19 +1323,19 @@ class _ReparationFormState extends State<ReparationForm> {
 
   Widget vehicleDamage(AppTheme appTheme){
     return SizedBox(
-      width: 323.px,
-      height: 154.px,
+      width: 317.px,
+      height: 148.px,
       child: Stack(
         alignment: Alignment.topCenter,
         children: [
           Positioned.fill(
-            left: 10.px,
+            left: 0.px,
               child: Image.asset('assets/images/car.webp',fit: BoxFit.fitWidth,
                 color:appTheme.writingStyle.color
 
               )),
           Positioned(
-              left: -10.px,
+              left: -15.px,
               top: 0,
               child: SizedBox(
                 width: 4.75.w,
@@ -1329,7 +1409,7 @@ class _ReparationFormState extends State<ReparationForm> {
                 ),
               )),
           Positioned(
-              left: 40.px,
+              left: 35.px,
               top: 0,
               child: SizedBox(
                 width: 4.75.w,
@@ -1607,6 +1687,250 @@ class _ReparationFormState extends State<ReparationForm> {
                   ],
                 ),
               )),
+        ],
+      ),
+    );
+  }
+
+  Widget entretienWidgets(AppTheme appTheme){
+    return  Container(
+      width: 80.w,
+      height: 24.h,
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        border: Border.all(),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ToggleSwitch(
+                content: Text(
+                  'Vidange moteur',
+                  style: tstyle,
+                ),
+                checked: r1,
+                onChanged: (s) {
+                  setState(() {
+                    r1 = s;
+                  });
+                },
+              ),
+              smallSpace,
+              ToggleSwitch(
+                content: Text(
+                  'Vidange boite',
+                  style: tstyle,
+                ),
+                checked: r2,
+                onChanged: (s) {
+                  setState(() {
+                    r2 = s;
+                  });
+                },
+              ),
+              smallSpace,
+              ToggleSwitch(
+                content: Text(
+                  'Vidange pont AV AR',
+                  style: tstyle,
+                ),
+                checked: r3,
+                onChanged: (s) {
+                  setState(() {
+                    r3 = s;
+                  });
+                },
+              ),
+              smallSpace,
+              ToggleSwitch(
+                content: Text(
+                  'Filtre à air',
+                  style: tstyle,
+                ),
+                checked: r4,
+                onChanged: (s) {
+                  setState(() {
+                    r4 = s;
+                  });
+                },
+              ),
+              smallSpace,
+              ToggleSwitch(
+                content: Text(
+                  'Filtre à huile',
+                  style: tstyle,
+                ),
+                checked: r5,
+                onChanged: (s) {
+                  setState(() {
+                    r5 = s;
+                  });
+                },
+              ),
+              smallSpace,
+              ToggleSwitch(
+                content: Text(
+                  'Filtre à carburant',
+                  style: tstyle,
+                ),
+                checked: r6,
+                onChanged: (s) {
+                  setState(() {
+                    r6 = s;
+                  });
+                },
+              ),
+            ],
+          ),
+          smallSpace,
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ToggleSwitch(
+                content: Text(
+                  "Filtre d'habitacle",
+                  style: tstyle,
+                ),
+                checked: r7,
+                onChanged: (s) {
+                  setState(() {
+                    r7 = s;
+                  });
+                },
+              ),
+              smallSpace,
+              ToggleSwitch(
+                content: Text(
+                  'Liquide de frein',
+                  style: tstyle,
+                ),
+                checked: r8,
+                onChanged: (s) {
+                  setState(() {
+                    r8 = s;
+                  });
+                },
+              ),
+              smallSpace,
+              ToggleSwitch(
+                content: Text(
+                  'Liquide de refroidissement',
+                  style: tstyle,
+                ),
+                checked: r9,
+                onChanged: (s) {
+                  setState(() {
+                    r9 = s;
+                  });
+                },
+              ),
+              smallSpace,
+              ToggleSwitch(
+                content: Text(
+                  'Equilibrage roues',
+                  style: tstyle,
+                ),
+                checked: r10,
+                onChanged: (s) {
+                  setState(() {
+                    r10 = s;
+                  });
+                },
+              ),
+              smallSpace,
+              ToggleSwitch(
+                content: Text(
+                  'Controle niveaux',
+                  style: tstyle,
+                ),
+                checked: r13,
+                onChanged: (s) {
+                  setState(() {
+                    r13 = s;
+                  });
+                },
+              ),
+              smallSpace,
+              ToggleSwitch(
+                content: Text(
+                  'Entretien climatisation',
+                  style: tstyle,
+                ),
+                checked: r14,
+                onChanged: (s) {
+                  setState(() {
+                    r14 = s;
+                  });
+                },
+              ),
+            ],
+          ),
+          smallSpace,
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              ToggleSwitch(
+                content: Text(
+                  'Balais essuie-glace',
+                  style: tstyle,
+                ),
+                checked: r15,
+                onChanged: (s) {
+                  setState(() {
+                    r15 = s;
+                  });
+                },
+              ),
+              smallSpace,
+              ToggleSwitch(
+                content: Text(
+                  'Eclairage',
+                  style: tstyle,
+                ),
+                checked: r16,
+                onChanged: (s) {
+                  setState(() {
+                    r16 = s;
+                  });
+                },
+              ),
+              smallSpace,
+              ToggleSwitch(
+                content: Text(
+                  'OBD',
+                  style: tstyle,
+                ),
+                checked: r17,
+                onChanged: (s) {
+                  setState(() {
+                    r17 = s;
+                  });
+                },
+              ),
+              smallSpace,
+              ToggleSwitch(
+                content: Text(
+                  'Bougies',
+                  style: tstyle,
+                ),
+                checked: r18,
+                onChanged: (s) {
+                  setState(() {
+                    r18 = s;
+                  });
+                },
+              ),
+              const Spacer(),
+            ],
+          ),
         ],
       ),
     );
