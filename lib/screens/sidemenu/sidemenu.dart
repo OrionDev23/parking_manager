@@ -18,6 +18,7 @@ import '../dashboard/dashboard.dart';
 import '../dashboard/notif_list.dart';
 import '../entreprise.dart';
 import '../prestataire/prestataire_tabs.dart';
+import '../reparation/reparation_tabs.dart';
 import '../settings.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -293,7 +294,7 @@ class PanesListState extends State<PanesList> with WindowListener {
           PaneItem(
             icon: const Icon(FluentIcons.list),
             title: const Text('greparations').tr(),
-            body: const Placeholder(),
+            body: const ReparationTabs(),
           ),
           PaneItem(
             icon: const Icon(FluentIcons.service_activity),
