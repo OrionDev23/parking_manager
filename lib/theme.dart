@@ -24,6 +24,44 @@ class AppTheme extends ChangeNotifier {
 
   AccentColor get color => _color;
 
+
+  RadialGradient getRadiantStandard() {
+    return RadialGradient(radius: 0.6, colors: [
+      color,
+      color.withAlpha(200),
+      color.withAlpha(150),
+      color.withAlpha(100),
+      color.withAlpha(50),
+      color.withAlpha(20),
+      backGroundColor.withAlpha(10),
+      backGroundColor.withAlpha(0),
+    ]);
+  }
+  RadialGradient getRadiantLighter() {
+    return RadialGradient(radius: 0.6, colors: [
+      color.lightest,
+      color.lightest.withAlpha(200),
+      color.lightest.withAlpha(150),
+      color.lightest.withAlpha(100),
+      color.lightest.withAlpha(50),
+      color.lightest.withAlpha(20),
+      backGroundColor.withAlpha(10),
+      backGroundColor.withAlpha(0),
+    ]);
+  }
+  RadialGradient getRadiantDarker() {
+    return RadialGradient(radius: 0.6, colors: [
+      color.darkest,
+      color.darkest.withAlpha(200),
+      color.darkest.withAlpha(150),
+      color.darkest.withAlpha(100),
+      color.darkest.withAlpha(50),
+      color.darkest.withAlpha(20),
+      backGroundColor.withAlpha(10),
+      backGroundColor.withAlpha(0),
+    ]);
+  }
+
   set color(AccentColor color) {
     _color = color;
     notifyListeners();
