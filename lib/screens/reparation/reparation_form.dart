@@ -1604,6 +1604,47 @@ class _ReparationFormState extends State<ReparationForm> {
                   ],
                 ),
               )),
+          ///Porte avant
+          Positioned(
+              left: 80.px,
+              top: -2.px,
+              child: SizedBox(
+                width: lightWidth,
+                height: 30.h,
+                child: Column(
+                  children: [
+                    OnTapScaleAndFade(
+                      child: Container(
+                        height: lightHeight,
+                        decoration: BoxDecoration(
+                          gradient: porteAVG?appTheme.getRadiantLightest():null,
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          porteAVD=!porteAVD;
+                        });
+                      },
+                    ),
+                    SizedBox(
+                      height: 100.px,
+                    ),
+                    OnTapScaleAndFade(
+                      child: Container(
+                        height: lightHeight,
+                        decoration: BoxDecoration(
+                          gradient: porteAVD?appTheme.getRadiantLightest():null,
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          porteAVD=!porteAVD;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              )),
           ///Pare-brise AV
           Positioned(
               left: 92.px,
@@ -1866,6 +1907,33 @@ class _ReparationFormState extends State<ReparationForm> {
                       onTap: (){
                         setState(() {
                           aileARG=!aileARG;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              )),
+          ///Pare-choc AR
+          Positioned(
+              left: 292.px,
+              top: 60.px,
+              child: SizedBox(
+                width: lightWidth,
+                height: 30.h,
+                child: Column(
+                  children: [
+                    OnTapScaleAndFade(
+                      child: Container(
+                        height: lightHeight,
+                        decoration: BoxDecoration(
+                          gradient: parAR == true
+                              ? appTheme.getRadiantLightest()
+                              : null,
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          parAR=!parAR;
                         });
                       },
                     ),
