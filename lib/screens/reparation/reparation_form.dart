@@ -1617,7 +1617,7 @@ class _ReparationFormState extends State<ReparationForm> {
                       child: Container(
                         height: lightHeight,
                         decoration: BoxDecoration(
-                          gradient: porteAVG?appTheme.getRadiantLightest():null,
+                          gradient: porteAVD?appTheme.getRadiantLightest():null,
                         ),
                       ),
                       onTap: () {
@@ -1633,12 +1633,12 @@ class _ReparationFormState extends State<ReparationForm> {
                       child: Container(
                         height: lightHeight,
                         decoration: BoxDecoration(
-                          gradient: porteAVD?appTheme.getRadiantLightest():null,
+                          gradient: porteAVG?appTheme.getRadiantLightest():null,
                         ),
                       ),
                       onTap: () {
                         setState(() {
-                          porteAVD=!porteAVD;
+                          porteAVG=!porteAVG;
                         });
                       },
                     ),
