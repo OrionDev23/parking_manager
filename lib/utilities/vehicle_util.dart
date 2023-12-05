@@ -61,8 +61,8 @@ class VehiclesUtilities {
     }
   }
 
-  static String getMarqueName(String marque) {
-    int m = int.tryParse(marque) ?? 0;
+  static String getMarqueName(String? marque) {
+    int m = marque==null?0:int.tryParse(marque) ?? 0;
     switch (m) {
       case 0: return 'nonind';
       case 1:

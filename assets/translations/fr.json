@@ -1,6 +1,7 @@
 {
  "@@locale": "fr",
  "nummat": "Numéro d'immatriculation",
+ "matricule": "Immatriculation",
  "autremat": "Matricule étranger ?",
  "min": "Min",
  "max": "Max",

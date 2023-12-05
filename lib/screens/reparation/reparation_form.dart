@@ -4,12 +4,15 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/screens/entreprise.dart';
 import 'package:parc_oto/screens/prestataire/prestataire_table.dart';
+import 'package:parc_oto/screens/vehicle/manager/vehicles_table.dart';
 import 'package:parc_oto/serializables/prestataire.dart';
 import 'package:parc_oto/serializables/vehicle.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:parc_oto/widgets/on_tap_scale.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+
+import '../../utilities/vehicle_util.dart';
 
 class ReparationForm extends StatefulWidget {
   const ReparationForm({super.key});
@@ -105,6 +108,26 @@ class _ReparationFormState extends State<ReparationForm> {
   TextEditingController km=TextEditingController();
   TextEditingController couleur=TextEditingController();
   DateTime anneeUtil=DateTime.now();
+
+
+  void setVehicleValues(){
+    if(selectedVehicle==null){
+      marque.clear();
+      type.clear();
+      numSerie.clear();
+      matricule.clear();
+    }
+    else{
+      marque.text=VehiclesUtilities.getMarqueName(selectedVehicle!.marque);
+      type.text=selectedVehicle!.type??'';
+      numSerie.text=selectedVehicle!.numeroSerie??'';
+      matricule.text=selectedVehicle!.matricule;
+
+    }
+    setState(() {
+
+    });
+  }
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
@@ -189,8 +212,27 @@ class _ReparationFormState extends State<ReparationForm> {
                 width: 250.px,
                 height: 50.px,
                 child: ListTile(
+                  leading: Text('vehicule',style: bstyle,).tr(),
+                  title: Text(selectedVehicle?.matricule??'nonind'.tr()),
+                  onPressed: ()async{
+                    selectedVehicle=await showDialog<Vehicle?>(context: context, builder: (c,)=>const VehicleTable(selectV: true,));
+                    setVehicleValues();
+                  },
+                ),
+              ),
+              smallSpace,
+              if(selectedVehicle!=null)
+              IconButton(icon: const Icon(FluentIcons.cancel), onPressed: (){
+                selectedVehicle=null;
+                setVehicleValues();
+              }),
+              const Spacer(),
+              SizedBox(
+                width: 250.px,
+                height: 50.px,
+                child: ListTile(
                   leading: Text('prestataire',style: bstyle,).tr(),
-                  title: Text(selectedPrest?.nom??''),
+                  title: Text(selectedPrest?.nom??'nonind'.tr()),
                   onPressed: ()async{
                     selectedPrest=await showDialog<Prestataire?>(context: context, builder: (c,)=>const PrestataireTable(selectD: true,));
                     setState(() {
@@ -201,6 +243,7 @@ class _ReparationFormState extends State<ReparationForm> {
               ),
             ],
           ),
+
           SizedBox(
             height: 100.px,
             child: Table(
@@ -293,6 +336,8 @@ class _ReparationFormState extends State<ReparationForm> {
                               Flexible(
                                 child: TextBox(
                                   controller:matricule,
+                                  enabled: selectedVehicle==null,
+                                  //readOnly: selectedVehicle!=null,
                                   placeholder: 'matricule'.tr(),
                                   style: appTheme.writingStyle,
                                   decoration: BoxDecoration(
@@ -460,7 +505,6 @@ class _ReparationFormState extends State<ReparationForm> {
       ),
     );
   }
-
   List<TableRow> getTopRow(AppTheme appTheme){
     return [
       TableRow(children: [
@@ -612,7 +656,6 @@ class _ReparationFormState extends State<ReparationForm> {
                         setState(() {});
                       },
                       divisions: 100,
-                      label: 'AVD',
                     ),
                   ),
                   smallSpace,
@@ -741,7 +784,6 @@ class _ReparationFormState extends State<ReparationForm> {
                         setState(() {});
                       },
                       divisions: 100,
-                      label: 'AVG',
                     ),
                   ),
                   smallSpace,
@@ -850,7 +892,6 @@ class _ReparationFormState extends State<ReparationForm> {
                         setState(() {});
                       },
                       divisions: 100,
-                      label: 'ARD',
                     ),
                   ),
                   smallSpace,
@@ -911,7 +952,6 @@ class _ReparationFormState extends State<ReparationForm> {
                         setState(() {});
                       },
                       divisions: 100,
-                      label: 'ARG',
                     ),
                   ),
                   smallSpace,
@@ -927,7 +967,6 @@ class _ReparationFormState extends State<ReparationForm> {
       ]),
     ];
   }
-
   List<TableRow> getBottomRows(AppTheme appTheme){
     return [
       TableRow(children: [
@@ -1319,10 +1358,10 @@ class _ReparationFormState extends State<ReparationForm> {
       ),
     ];
   }
-
+  double lightHeight=25.px;
+  double lightWidth=25.px;
   Widget vehicleDamage(AppTheme appTheme){
-    double lightHeight=25.px;
-    double lightWidth=25.px;
+
     return SizedBox(
       width: 317.px,
       height: 148.px,
@@ -1336,645 +1375,878 @@ class _ReparationFormState extends State<ReparationForm> {
               child: Image.asset('assets/images/car.webp',fit: BoxFit.fitWidth,
                 color:appTheme.writingStyle.color
               )),
-          ///Feux AV
-          Positioned(
-              left: 10.px,
-              top: 23.px,
-              child: SizedBox(
-                width: lightWidth,
-                height: 30.h,
-                child: Column(
-                  children: [
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: feuAVD == true
-                              ? appTheme.getRadiantLightest()
-                              : null,
-                        ),
-                      ),
-                      onTap: (){
-                        setState(() {
-                          feuAVD=!feuAVD;
-                        });
-                      },
-                    ),
-                    SizedBox(
-                      height: 52.px,
-                    ),
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: feuAVG == true
-                              ? appTheme.getRadiantLightest()
-                              : null,
-                        ),
-                      ),
-                      onTap: (){
-                        setState(() {
-                          feuAVG=!feuAVG;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              )),
-          ///Phare
-          Positioned(
-              left: 19.px,
-              top: 5.px,
-              child: SizedBox(
-                width:lightWidth,
-                height: 30.h,
-                child: Column(
-                  children: [
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: phareD == true
-                              ? appTheme.getRadiantLightest()
-                              : null,
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          phareD=!phareD;
-                        });
-                      },
-                    ),
-                    SizedBox(
-                      height: 85.px,
-                    ),
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: phareG == true
-                              ? appTheme.getRadiantLightest()
-                              : null,
-                        ),
-                      ),
-                      onTap: (){
-                        setState(() {
-                          phareG=!phareG;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              )),
-          ///Ailes AV
-          Positioned(
-              left: 3.px,
-              top: 0.px,
-              child: SizedBox(
-                width: lightWidth,
-                height: 30.h,
-                child: Column(
-                  children: [
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: aileAVD == true
-                              ? appTheme.getRadiantLightest()
-                              : null,
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          aileAVD=!aileAVD;
-                        });
-                      },
-                    ),
-                    SizedBox(
-                      height: 92.px,
-                    ),
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: aileAVG == true
-                              ? appTheme.getRadiantLightest()
-                              : null,
-                        ),
-                      ),
-                      onTap: (){
-                        setState(() {
-                          aileAVG=!aileAVG;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              )),
-          ///Pare-choc AV
-          Positioned(
-              left: -2.px,
-              top:60.px,
-              child: SizedBox(
-                width: lightWidth,
-                height: lightHeight,
-                child: Column(
-                  children: [
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height:lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: parAV?appTheme.getRadiantLightest()
-                              : null,
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          parAV=!parAV;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              )),
-          ///CALANDRE
-          Positioned(
-              left: 9.px,
-              top:60.px,
-              child: SizedBox(
-                width: lightWidth,
-                height: lightHeight,
-                child: Column(
-                  children: [
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height:lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: calandre?appTheme.getRadiantLightest()
-                              : null,
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          calandre=!calandre;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              )),
-          ///Roues avant
-          Positioned(
-              left: 54.px,
-              top: -2.px,
-              child: SizedBox(
-                width: lightWidth,
-                height: 30.h,
-                child: Column(
-                  children: [
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: getLightIntensityFromPourc(avdp,appTheme),
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          if(avdp<=20){
-                            avdp=30;
-                          }
-                          else if(avdp<=30){
-                            avdp=50;
-                          }
-                          else if(avdp<=50){
-                            avdp=60;
-                          }
-                          else if(avdp<=60){
-                            avdp=80;
-                          }
-                          else if(avdp<=80){
-                            avdp=90;
-                          }
-                          else if(avdp<=90){
-                            avdp=100;
-                          }
-                          else{
-                            avdp=20;
-                          }
-                        });
-                      },
-                    ),
-                    SizedBox(
-                      height: 100.px,
-                    ),
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: getLightIntensityFromPourc(avgp,appTheme),
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          if(avgp<=20){
-                            avgp=30;
-                          }
-                          else if(avgp<=30){
-                            avgp=50;
-                          }
-                          else if(avgp<=50){
-                            avgp=60;
-                          }
-                          else if(avgp<=60){
-                            avgp=80;
-                          }
-                          else if(avgp<=80){
-                            avgp=90;
-                          }
-                          else if(avgp<=90){
-                            avgp=100;
-                          }
-                          else{
-                            avgp=20;
-                          }
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              )),
-          ///Porte avant
-          Positioned(
-              left: 130.px,
-              top: 3.px,
-              child: SizedBox(
-                width: lightWidth,
-                height: 30.h,
-                child: Column(
-                  children: [
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: porteAVD?appTheme.getRadiantLightest():null,
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          porteAVD=!porteAVD;
-                        });
-                      },
-                    ),
-                    SizedBox(
-                      height: 90.px,
-                    ),
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: porteAVG?appTheme.getRadiantLightest():null,
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          porteAVG=!porteAVG;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              )),
-          ///Pare-brise AV
-          Positioned(
-              left: 92.px,
-              top:60.px,
-              child: SizedBox(
-                width: lightWidth,
-                height: 4.75.w,
-                child: Column(
-                  children: [
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height:lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: parAve?
-                          appTheme.getRadiantLightest()
-                              :parAvc?appTheme.getRadiantLight():
-                          parAvf?appTheme.getRadiantDarker()
-                              : null,
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          if(parAvf){
-                            parAvf=false;
-                            parAvc=true;
-                            parAve=false;
-                          }
-                          else if(parAvc){
-                            parAvc=false;
-                            parAve=true;
-                            parAvf=false;
-                          }
-                          else if(parAve){
-                            parAve=false;
-                            parAvf=false;
-                            parAvc=false;
-                          }
-                          else {
-                            parAve=false;
-                            parAvf=true;
-                            parAvc=false;
-                          }
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              )),
-          ///Pare-brise AR
-          Positioned(
-              left: 227.px,
-              top:60.px,
-              child: SizedBox(
-                width: lightWidth,
-                height: 30.h,
-                child: Column(
-                  children: [
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: parAre?
-                          appTheme.getRadiantLightest()
-                              :parArc?appTheme.getRadiantLight():
-                          parArf?appTheme.getRadiantDarker()
-                              : null,
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          if(parArf){
-                            parArf=false;
-                            parArc=true;
-                            parAre=false;
-                          }
-                          else if(parArc){
-                            parArc=false;
-                            parAre=true;
-                            parArf=false;
-                          }
-                          else if(parAre){
-                            parAre=false;
-                            parArf=false;
-                            parArc=false;
-                          }
-                          else {
-                            parAre=false;
-                            parArf=true;
-                            parArc=false;
-                          }
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              )),
-          ///Roues arriere
-          Positioned(
-              left: 237.px,
-              top: -2.px,
-              child: SizedBox(
-                width: lightWidth,
-                height: 30.h,
-                child: Column(
-                  children: [
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: getLightIntensityFromPourc(ardp,appTheme),
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          if(ardp<=20){
-                            ardp=30;
-                          }
-                          else if(ardp<=30){
-                            ardp=50;
-                          }
-                          else if(ardp<=50){
-                            ardp=60;
-                          }
-                          else if(ardp<=60){
-                            ardp=80;
-                          }
-                          else if(ardp<=80){
-                            ardp=90;
-                          }
-                          else if(ardp<=90){
-                            ardp=100;
-                          }
-                          else{
-                            ardp=20;
-                          }
-                        });
-                      },
-                    ),
-                    SizedBox(
-                      height: 100.px,
-                    ),
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: getLightIntensityFromPourc(argp,appTheme),
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          if(argp<=20){
-                            argp=30;
-                          }
-                          else if(argp<=30){
-                            argp=50;
-                          }
-                          else if(argp<=50){
-                            argp=60;
-                          }
-                          else if(argp<=60){
-                            argp=80;
-                          }
-                          else if(ardp<=80){
-                            ardp=90;
-                          }
-                          else if(argp<=90){
-                            argp=100;
-                          }
-                          else{
-                            argp=20;
-                          }
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              )),
-          ///Feux AR
-          Positioned(
-              left: 286.px,
-              top: 15.px,
-              child: SizedBox(
-                width: lightWidth,
-                height: 30.h,
-                child: Column(
-                  children: [
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: feuARD == true
-                              ? appTheme.getRadiantLightest()
-                              : null,
-                        ),
-                      ),
-                      onTap: (){
-                        setState(() {
-                          feuARD=!feuARD;
-                        });
-                      },
-                    ),
-                    SizedBox(
-                      height: 65.px,
-                    ),
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: feuARG == true
-                              ? appTheme.getRadiantLightest()
-                              : null,
-                        ),
-                      ),
-                      onTap: (){
-                        setState(() {
-                          feuARG=!feuARG;
-                        });
-                      },
-                    ),
-
-                  ],
-                ),
-              )),
-          ///Aile AV
-          Positioned(
-              left: 290.px,
-              top: 0.px,
-              child: SizedBox(
-                width: lightWidth,
-                height: 30.h,
-                child: Column(
-                  children: [
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: aileARD == true
-                              ? appTheme.getRadiantLightest()
-                              : null,
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          aileARD=!aileARD;
-                        });
-                      },
-                    ),
-                    SizedBox(
-                      height: 95.px,
-                    ),
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: aileARG == true
-                              ? appTheme.getRadiantLightest()
-                              : null,
-                        ),
-                      ),
-                      onTap: (){
-                        setState(() {
-                          aileARG=!aileARG;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              )),
-          ///Pare-choc AR
-          Positioned(
-              left: 292.px,
-              top: 60.px,
-              child: SizedBox(
-                width: lightWidth,
-                height: 30.h,
-                child: Column(
-                  children: [
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: lightHeight,
-                        decoration: BoxDecoration(
-                          gradient: parAR == true
-                              ? appTheme.getRadiantLightest()
-                              : null,
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          parAR=!parAR;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              )),
+          ...getFeux(appTheme),
+          ...getAutres(appTheme),
+          ...getSiegeEtPortes(appTheme),
+          ...getPneumatiques(appTheme),
+          ...getPareBrises(appTheme),
+          ...getAiles(appTheme),
+          ...getPareChocs(appTheme),
         ],
       ),
     );
   }
+  List<Positioned> getAutres(AppTheme appTheme){
+    return [
+      ///CALANDRE
+      Positioned(
+          left: 9.px,
+          top:60.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: lightHeight,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height:lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: calandre?appTheme.getRadiantDarkest()
+                          : null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      calandre=!calandre;
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+      ///Capot
+      Positioned(
+          left: 50.px,
+          top:60.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: lightHeight,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height:lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: capot?appTheme.getRadiantDarkest()
+                          : null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      capot=!capot;
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+      ///Toit
+      Positioned(
+          left: 160.px,
+          top:60.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: lightHeight,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height:lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: toit?appTheme.getRadiantDarkest()
+                          : null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      toit=!toit;
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+      ///Coffre
+      Positioned(
+          left: 263.px,
+          top:60.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: lightHeight,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height:lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: coffre?appTheme.getRadiantDarkest()
+                          : null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      coffre=!coffre;
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+    ];
+  }
+  List<Positioned> getAiles(AppTheme appTheme){
+    return [
+      ///Ailes AV
+      Positioned(
+          left: 3.px,
+          top: 0.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: 30.h,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: aileAVD == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      aileAVD=!aileAVD;
+                    });
+                  },
+                ),
+                SizedBox(
+                  height: 92.px,
+                ),
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: aileAVG == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
+                    ),
+                  ),
+                  onTap: (){
+                    setState(() {
+                      aileAVG=!aileAVG;
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+      ///Aile AR
+      Positioned(
+          left: 290.px,
+          top: 0.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: 30.h,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: aileARD == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      aileARD=!aileARD;
+                    });
+                  },
+                ),
+                SizedBox(
+                  height: 95.px,
+                ),
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: aileARG == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
+                    ),
+                  ),
+                  onTap: (){
+                    setState(() {
+                      aileARG=!aileARG;
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+    ];
+  }
+  List<Positioned> getPareChocs(AppTheme appTheme){
+    return [
+      ///Pare-choc AV
+      Positioned(
+          left: -2.px,
+          top:60.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: lightHeight,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height:lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: parAV?appTheme.getRadiantDarkest()
+                          : null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      parAV=!parAV;
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+      ///Pare-choc AR
+      Positioned(
+          left: 292.px,
+          top: 60.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: 30.h,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: parAR == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      parAR=!parAR;
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+    ];
+  }
+  List<Positioned> getSiegeEtPortes(AppTheme appTheme){
+    return [
+      ///Portes avant
+      Positioned(
+          left: 130.px,
+          top: 3.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: 30.h,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: porteAVD?appTheme.getRadiantDarkest():null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      porteAVD=!porteAVD;
+                    });
+                  },
+                ),
+                SizedBox(
+                  height: 90.px,
+                ),
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: porteAVG?appTheme.getRadiantDarkest():null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      porteAVG=!porteAVG;
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+      ///Sieges avant
+      Positioned(
+          left: 130.px,
+          top: 35.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: 30.h,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: siegeAVD?appTheme.getRadiantDarkest():null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      siegeAVD=!siegeAVD;
+                    });
+                  },
+                ),
+                SizedBox(
+                  height: 30.px,
+                ),
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: siegeAVG?appTheme.getRadiantDarkest():null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      siegeAVG=!siegeAVG;
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+      ///Sieges arriere
+      Positioned(
+          left: 190.px,
+          top: 35.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: 30.h,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: siegeARD?appTheme.getRadiantDarkest():null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      siegeARD=!siegeARD;
+                    });
+                  },
+                ),
+                SizedBox(
+                  height: 30.px,
+                ),
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: siegeARG?appTheme.getRadiantDarkest():null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      siegeARG=!siegeARG;
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+      ///Portes arriere
+      Positioned(
+          left: 180.px,
+          top: 3.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: 30.h,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: porteARD?appTheme.getRadiantDarkest():null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      porteARD=!porteARD;
+                    });
+                  },
+                ),
+                SizedBox(
+                  height: 90.px,
+                ),
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: porteARG?appTheme.getRadiantDarkest():null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      porteARG=!porteARG;
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+    ];
+  }
+  List<Positioned> getFeux(AppTheme appTheme){
+    return [
+      ///Feux AV
+      Positioned(
+          left: 10.px,
+          top: 23.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: 30.h,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: feuAVD == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
+                    ),
+                  ),
+                  onTap: (){
+                    setState(() {
+                      feuAVD=!feuAVD;
+                    });
+                  },
+                ),
+                SizedBox(
+                  height: 52.px,
+                ),
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: feuAVG == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
+                    ),
+                  ),
+                  onTap: (){
+                    setState(() {
+                      feuAVG=!feuAVG;
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+      ///Phare
+      Positioned(
+          left: 19.px,
+          top: 5.px,
+          child: SizedBox(
+            width:lightWidth,
+            height: 30.h,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: phareD == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      phareD=!phareD;
+                    });
+                  },
+                ),
+                SizedBox(
+                  height: 85.px,
+                ),
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: phareG == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
+                    ),
+                  ),
+                  onTap: (){
+                    setState(() {
+                      phareG=!phareG;
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+      ///Feux AR
+      Positioned(
+          left: 286.px,
+          top: 15.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: 30.h,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: feuARD == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
+                    ),
+                  ),
+                  onTap: (){
+                    setState(() {
+                      feuARD=!feuARD;
+                    });
+                  },
+                ),
+                SizedBox(
+                  height: 65.px,
+                ),
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: feuARG == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
+                    ),
+                  ),
+                  onTap: (){
+                    setState(() {
+                      feuARG=!feuARG;
+                    });
+                  },
+                ),
 
-
+              ],
+            ),
+          )),
+    ];
+  }
+  List<Positioned> getPareBrises(AppTheme appTheme){
+    return [
+      ///Pare-brise AV
+      Positioned(
+          left: 92.px,
+          top:60.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: 4.75.w,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height:lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: parAve?
+                      appTheme.getRadiantDarkest()
+                          :parAvc?appTheme.getRadiantStandard():
+                      parAvf?appTheme.getRadiantLight()
+                          : null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      if(parAvf){
+                        parAvf=false;
+                        parAvc=true;
+                        parAve=false;
+                      }
+                      else if(parAvc){
+                        parAvc=false;
+                        parAve=true;
+                        parAvf=false;
+                      }
+                      else if(parAve){
+                        parAve=false;
+                        parAvf=false;
+                        parAvc=false;
+                      }
+                      else {
+                        parAve=false;
+                        parAvf=true;
+                        parAvc=false;
+                      }
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+      ///Pare-brise AR
+      Positioned(
+          left: 227.px,
+          top:60.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: 30.h,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: parAre?
+                      appTheme.getRadiantDarkest()
+                          :parArc?appTheme.getRadiantStandard():
+                      parArf?appTheme.getRadiantLight()
+                          : null,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      if(parArf){
+                        parArf=false;
+                        parArc=true;
+                        parAre=false;
+                      }
+                      else if(parArc){
+                        parArc=false;
+                        parAre=true;
+                        parArf=false;
+                      }
+                      else if(parAre){
+                        parAre=false;
+                        parArf=false;
+                        parArc=false;
+                      }
+                      else {
+                        parAre=false;
+                        parArf=true;
+                        parArc=false;
+                      }
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+    ];
+  }
+  List<Positioned> getPneumatiques(AppTheme appTheme){
+    return [
+      ///Roues avant
+      Positioned(
+          left: 54.px,
+          top: -2.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: 30.h,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: getLightIntensityFromPourc(avdp,appTheme),
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      if(avdp<=20){
+                        avdp=30;
+                      }
+                      else if(avdp<=30){
+                        avdp=50;
+                      }
+                      else if(avdp<=50){
+                        avdp=60;
+                      }
+                      else if(avdp<=60){
+                        avdp=80;
+                      }
+                      else if(avdp<=80){
+                        avdp=90;
+                      }
+                      else if(avdp<=90){
+                        avdp=100;
+                      }
+                      else{
+                        avdp=20;
+                      }
+                    });
+                  },
+                ),
+                SizedBox(
+                  height: 100.px,
+                ),
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: getLightIntensityFromPourc(avgp,appTheme),
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      if(avgp<=20){
+                        avgp=30;
+                      }
+                      else if(avgp<=30){
+                        avgp=50;
+                      }
+                      else if(avgp<=50){
+                        avgp=60;
+                      }
+                      else if(avgp<=60){
+                        avgp=80;
+                      }
+                      else if(avgp<=80){
+                        avgp=90;
+                      }
+                      else if(avgp<=90){
+                        avgp=100;
+                      }
+                      else{
+                        avgp=20;
+                      }
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+      ///Roues arriere
+      Positioned(
+          left: 237.px,
+          top: -2.px,
+          child: SizedBox(
+            width: lightWidth,
+            height: 30.h,
+            child: Column(
+              children: [
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: getLightIntensityFromPourc(ardp,appTheme),
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      if(ardp<=20){
+                        ardp=30;
+                      }
+                      else if(ardp<=30){
+                        ardp=50;
+                      }
+                      else if(ardp<=50){
+                        ardp=60;
+                      }
+                      else if(ardp<=60){
+                        ardp=80;
+                      }
+                      else if(ardp<=80){
+                        ardp=90;
+                      }
+                      else if(ardp<=90){
+                        ardp=100;
+                      }
+                      else{
+                        ardp=20;
+                      }
+                    });
+                  },
+                ),
+                SizedBox(
+                  height: 100.px,
+                ),
+                OnTapScaleAndFade(
+                  child: Container(
+                    height: lightHeight,
+                    decoration: BoxDecoration(
+                      gradient: getLightIntensityFromPourc(argp,appTheme),
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      if(argp<=20){
+                        argp=30;
+                      }
+                      else if(argp<=30){
+                        argp=50;
+                      }
+                      else if(argp<=50){
+                        argp=60;
+                      }
+                      else if(argp<=60){
+                        argp=80;
+                      }
+                      else if(ardp<=80){
+                        ardp=90;
+                      }
+                      else if(argp<=90){
+                        argp=100;
+                      }
+                      else{
+                        argp=20;
+                      }
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+    ];
+  }
   RadialGradient? getLightIntensityFromPourc(double pourc,AppTheme appTheme){
     if(pourc<=20){
-      return appTheme.getRadiantLightest();
+      return appTheme.getRadiantDarkest();
     }
     else if(pourc<=30){
-      return appTheme.getRadiantLighter();
+      return appTheme.getRadiantDarker();
     }
     else if(pourc<=50){
-      return appTheme.getRadiantLight();
+      return appTheme.getRadiantDark();
     }
     else if(pourc<=60){
       return appTheme.getRadiantStandard();
     }
     else if(pourc<=80){
-      return appTheme.getRadiantDark();
+      return appTheme.getRadiantLight();
 
     }
     else if(pourc<=90){
-      return appTheme.getRadiantDarker();
+      return appTheme.getRadiantLighter();
 
     }
     else if(pourc<100){
-      return appTheme.getRadiantDarkest();
+      return appTheme.getRadiantLightest();
     }
     else {
       return null;
     }
   }
-
   Widget entretienWidgets(AppTheme appTheme){
     return  Container(
       width: 80.w,

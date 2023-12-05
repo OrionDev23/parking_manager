@@ -1,6 +1,7 @@
 {
   "@@locale": "en",
   "nummat": "Registration Number",
+  "matricule": "Registration",
   "autremat": "Foreign RN ?",
   "pays": "Country",
   "wilaya": "District",
