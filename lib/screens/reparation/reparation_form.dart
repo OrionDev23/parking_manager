@@ -8,7 +8,6 @@ import 'package:parc_oto/serializables/prestataire.dart';
 import 'package:parc_oto/serializables/vehicle.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:parc_oto/widgets/on_tap_scale.dart';
-import 'package:parc_oto/widgets/zone_box.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
