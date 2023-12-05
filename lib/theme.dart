@@ -37,7 +37,31 @@ class AppTheme extends ChangeNotifier {
       backGroundColor.withAlpha(0),
     ]);
   }
+  RadialGradient getRadiantLight() {
+    return RadialGradient(radius: 0.6, colors: [
+      color.light,
+      color.light.withAlpha(200),
+      color.light.withAlpha(150),
+      color.light.withAlpha(100),
+      color.light.withAlpha(50),
+      color.light.withAlpha(20),
+      backGroundColor.withAlpha(10),
+      backGroundColor.withAlpha(0),
+    ]);
+  }
   RadialGradient getRadiantLighter() {
+    return RadialGradient(radius: 0.6, colors: [
+      color.lighter,
+      color.lighter.withAlpha(200),
+      color.lighter.withAlpha(150),
+      color.lighter.withAlpha(100),
+      color.lighter.withAlpha(50),
+      color.lighter.withAlpha(20),
+      backGroundColor.withAlpha(10),
+      backGroundColor.withAlpha(0),
+    ]);
+  }
+  RadialGradient getRadiantLightest() {
     return RadialGradient(radius: 0.6, colors: [
       color.lightest,
       color.lightest.withAlpha(200),
@@ -49,7 +73,7 @@ class AppTheme extends ChangeNotifier {
       backGroundColor.withAlpha(0),
     ]);
   }
-  RadialGradient getRadiantDarker() {
+  RadialGradient getRadiantDarkest() {
     return RadialGradient(radius: 0.6, colors: [
       color.darkest,
       color.darkest.withAlpha(200),
@@ -57,6 +81,30 @@ class AppTheme extends ChangeNotifier {
       color.darkest.withAlpha(100),
       color.darkest.withAlpha(50),
       color.darkest.withAlpha(20),
+      backGroundColor.withAlpha(10),
+      backGroundColor.withAlpha(0),
+    ]);
+  }
+  RadialGradient getRadiantDarker() {
+    return RadialGradient(radius: 0.6, colors: [
+      color.darker,
+      color.darker.withAlpha(200),
+      color.darker.withAlpha(150),
+      color.darker.withAlpha(100),
+      color.darker.withAlpha(50),
+      color.darker.withAlpha(20),
+      backGroundColor.withAlpha(10),
+      backGroundColor.withAlpha(0),
+    ]);
+  }
+  RadialGradient getRadiantDark() {
+    return RadialGradient(radius: 0.6, colors: [
+      color.dark,
+      color.dark.withAlpha(200),
+      color.dark.withAlpha(150),
+      color.dark.withAlpha(100),
+      color.dark.withAlpha(50),
+      color.dark.withAlpha(20),
       backGroundColor.withAlpha(10),
       backGroundColor.withAlpha(0),
     ]);

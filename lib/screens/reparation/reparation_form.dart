@@ -1322,47 +1322,36 @@ class _ReparationFormState extends State<ReparationForm> {
   }
 
   Widget vehicleDamage(AppTheme appTheme){
+    double lightHeight=25.px;
+    double lightWidth=25.px;
     return SizedBox(
       width: 317.px,
       height: 148.px,
       child: Stack(
         alignment: Alignment.topCenter,
         children: [
+          ///image
           Positioned.fill(
-            left: 0.px,
+            left: 10.px,
+              right: 5.px,
               child: Image.asset('assets/images/car.webp',fit: BoxFit.fitWidth,
                 color:appTheme.writingStyle.color
-
               )),
+          ///Feux AV
           Positioned(
-              left: -15.px,
-              top: 0,
+              left: 10.px,
+              top: 23.px,
               child: SizedBox(
-                width: 4.75.w,
+                width: lightWidth,
                 height: 30.h,
                 child: Column(
                   children: [
                     OnTapScaleAndFade(
                       child: Container(
-                        height: 3.75.h,
-                        decoration: BoxDecoration(
-                          gradient: phareD == true
-                              ? appTheme.getRadiantLighter()
-                              : null,
-                        ),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          phareD=!phareD;
-                        });
-                      },
-                    ),
-                    OnTapScaleAndFade(
-                      child: Container(
-                        height: 3.75.h,
+                        height: lightHeight,
                         decoration: BoxDecoration(
                           gradient: feuAVD == true
-                              ? appTheme.getRadiantLighter()
+                              ? appTheme.getRadiantLightest()
                               : null,
                         ),
                       ),
@@ -1373,14 +1362,14 @@ class _ReparationFormState extends State<ReparationForm> {
                       },
                     ),
                     SizedBox(
-                      height: 5.75.h,
+                      height: 52.px,
                     ),
                     OnTapScaleAndFade(
                       child: Container(
-                        height: 3.75.h,
+                        height: lightHeight,
                         decoration: BoxDecoration(
                           gradient: feuAVG == true
-                              ? appTheme.getRadiantLighter()
+                              ? appTheme.getRadiantLightest()
                               : null,
                         ),
                       ),
@@ -1390,12 +1379,42 @@ class _ReparationFormState extends State<ReparationForm> {
                         });
                       },
                     ),
+                  ],
+                ),
+              )),
+          ///Phare
+          Positioned(
+              left: 19.px,
+              top: 5.px,
+              child: SizedBox(
+                width:lightWidth,
+                height: 30.h,
+                child: Column(
+                  children: [
                     OnTapScaleAndFade(
                       child: Container(
-                        height: 3.75.h,
+                        height: lightHeight,
+                        decoration: BoxDecoration(
+                          gradient: phareD == true
+                              ? appTheme.getRadiantLightest()
+                              : null,
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          phareD=!phareD;
+                        });
+                      },
+                    ),
+                    SizedBox(
+                      height: 85.px,
+                    ),
+                    OnTapScaleAndFade(
+                      child: Container(
+                        height: lightHeight,
                         decoration: BoxDecoration(
                           gradient: phareG == true
-                              ? appTheme.getRadiantLighter()
+                              ? appTheme.getRadiantLightest()
                               : null,
                         ),
                       ),
@@ -1408,34 +1427,137 @@ class _ReparationFormState extends State<ReparationForm> {
                   ],
                 ),
               )),
+          ///Ailes AV
           Positioned(
-              left: 35.px,
-              top: 0,
+              left: 3.px,
+              top: 0.px,
               child: SizedBox(
-                width: 4.75.w,
+                width: lightWidth,
                 height: 30.h,
                 child: Column(
                   children: [
                     OnTapScaleAndFade(
                       child: Container(
-                        height: 3.75.h,
+                        height: lightHeight,
                         decoration: BoxDecoration(
-                          gradient: avdp<=20?
-                          appTheme.getRadiantLighter()
-                              :avdp<=60?appTheme.getRadiantStandard():
-                          avdp<=80?appTheme.getRadiantStandard()
+                          gradient: aileAVD == true
+                              ? appTheme.getRadiantLightest()
                               : null,
                         ),
                       ),
                       onTap: () {
                         setState(() {
+                          aileAVD=!aileAVD;
+                        });
+                      },
+                    ),
+                    SizedBox(
+                      height: 92.px,
+                    ),
+                    OnTapScaleAndFade(
+                      child: Container(
+                        height: lightHeight,
+                        decoration: BoxDecoration(
+                          gradient: aileAVG == true
+                              ? appTheme.getRadiantLightest()
+                              : null,
+                        ),
+                      ),
+                      onTap: (){
+                        setState(() {
+                          aileAVG=!aileAVG;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              )),
+          ///Pare-choc AV
+          Positioned(
+              left: -2.px,
+              top:60.px,
+              child: SizedBox(
+                width: lightWidth,
+                height: lightHeight,
+                child: Column(
+                  children: [
+                    OnTapScaleAndFade(
+                      child: Container(
+                        height:lightHeight,
+                        decoration: BoxDecoration(
+                          gradient: parAV?appTheme.getRadiantLightest()
+                              : null,
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          parAV=!parAV;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              )),
+          ///CALANDRE
+          Positioned(
+              left: 9.px,
+              top:60.px,
+              child: SizedBox(
+                width: lightWidth,
+                height: lightHeight,
+                child: Column(
+                  children: [
+                    OnTapScaleAndFade(
+                      child: Container(
+                        height:lightHeight,
+                        decoration: BoxDecoration(
+                          gradient: calandre?appTheme.getRadiantLightest()
+                              : null,
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          calandre=!calandre;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              )),
+          ///Roues avant
+          Positioned(
+              left: 54.px,
+              top: -2.px,
+              child: SizedBox(
+                width: lightWidth,
+                height: 30.h,
+                child: Column(
+                  children: [
+                    OnTapScaleAndFade(
+                      child: Container(
+                        height: lightHeight,
+                        decoration: BoxDecoration(
+                          gradient: getLightIntensityFromPourc(avdp,appTheme),
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
                           if(avdp<=20){
+                            avdp=30;
+                          }
+                          else if(avdp<=30){
                             avdp=50;
+                          }
+                          else if(avdp<=50){
+                            avdp=60;
                           }
                           else if(avdp<=60){
                             avdp=80;
                           }
                           else if(avdp<=80){
+                            avdp=90;
+                          }
+                          else if(avdp<=90){
                             avdp=100;
                           }
                           else{
@@ -1449,24 +1571,29 @@ class _ReparationFormState extends State<ReparationForm> {
                     ),
                     OnTapScaleAndFade(
                       child: Container(
-                        height: 3.75.h,
+                        height: lightHeight,
                         decoration: BoxDecoration(
-                          gradient: avgp<=20?
-                          appTheme.getRadiantLighter()
-                              :avgp<=60?appTheme.getRadiantStandard():
-                          avgp<=80?appTheme.getRadiantDarker()
-                              : null,
+                          gradient: getLightIntensityFromPourc(avgp,appTheme),
                         ),
                       ),
                       onTap: () {
                         setState(() {
                           if(avgp<=20){
+                            avgp=30;
+                          }
+                          else if(avgp<=30){
                             avgp=50;
+                          }
+                          else if(avgp<=50){
+                            avgp=60;
                           }
                           else if(avgp<=60){
                             avgp=80;
                           }
                           else if(avgp<=80){
+                            avgp=90;
+                          }
+                          else if(avgp<=90){
                             avgp=100;
                           }
                           else{
@@ -1478,22 +1605,23 @@ class _ReparationFormState extends State<ReparationForm> {
                   ],
                 ),
               )),
+          ///Pare-brise AV
           Positioned(
-              left: 11.w,
-              top:65.px,
+              left: 92.px,
+              top:60.px,
               child: SizedBox(
-                width: 4.75.w,
-                height: 30.h,
+                width: lightWidth,
+                height: 4.75.w,
                 child: Column(
                   children: [
                     OnTapScaleAndFade(
                       child: Container(
-                        height: 3.75.h,
+                        height:lightHeight,
                         decoration: BoxDecoration(
                           gradient: parAve?
-                          appTheme.getRadiantLighter()
-                              :parAvc?appTheme.getRadiantLighter():
-                          parAvf?appTheme.getRadiantLighter()
+                          appTheme.getRadiantLightest()
+                              :parAvc?appTheme.getRadiantLight():
+                          parAvf?appTheme.getRadiantDarker()
                               : null,
                         ),
                       ),
@@ -1525,22 +1653,23 @@ class _ReparationFormState extends State<ReparationForm> {
                   ],
                 ),
               )),
+          ///Pare-brise AR
           Positioned(
-              left: 22.w,
-              top:12.h,
+              left: 227.px,
+              top:60.px,
               child: SizedBox(
-                width: 4.75.w,
+                width: lightWidth,
                 height: 30.h,
                 child: Column(
                   children: [
                     OnTapScaleAndFade(
                       child: Container(
-                        height: 3.75.h,
+                        height: lightHeight,
                         decoration: BoxDecoration(
                           gradient: parAre?
-                          appTheme.getRadiantLighter()
-                              :parArc?appTheme.getRadiantLighter():
-                          parArf?appTheme.getRadiantLighter()
+                          appTheme.getRadiantLightest()
+                              :parArc?appTheme.getRadiantLight():
+                          parArf?appTheme.getRadiantDarker()
                               : null,
                         ),
                       ),
@@ -1572,34 +1701,40 @@ class _ReparationFormState extends State<ReparationForm> {
                   ],
                 ),
               )),
+          ///Roues arriere
           Positioned(
-              left: 22.w,
-              top: 2.5.h,
+              left: 237.px,
+              top: -2.px,
               child: SizedBox(
-                width: 4.75.w,
+                width: lightWidth,
                 height: 30.h,
                 child: Column(
                   children: [
                     OnTapScaleAndFade(
                       child: Container(
-                        height: 3.75.h,
+                        height: lightHeight,
                         decoration: BoxDecoration(
-                          gradient: ardp<=20?
-                          appTheme.getRadiantLighter()
-                              :ardp<=60?appTheme.getRadiantLighter():
-                          ardp<=80?appTheme.getRadiantLighter()
-                              : null,
+                          gradient: getLightIntensityFromPourc(ardp,appTheme),
                         ),
                       ),
                       onTap: () {
                         setState(() {
                           if(ardp<=20){
+                            ardp=30;
+                          }
+                          else if(ardp<=30){
                             ardp=50;
+                          }
+                          else if(ardp<=50){
+                            ardp=60;
                           }
                           else if(ardp<=60){
                             ardp=80;
                           }
                           else if(ardp<=80){
+                            ardp=90;
+                          }
+                          else if(ardp<=90){
                             ardp=100;
                           }
                           else{
@@ -1609,28 +1744,33 @@ class _ReparationFormState extends State<ReparationForm> {
                       },
                     ),
                     SizedBox(
-                      height: 16.h,
+                      height: 100.px,
                     ),
                     OnTapScaleAndFade(
                       child: Container(
-                        height: 3.75.h,
+                        height: lightHeight,
                         decoration: BoxDecoration(
-                          gradient: argp<=20?
-                          appTheme.getRadiantLighter()
-                              :argp<=60?appTheme.getRadiantLighter():
-                          argp<=80?appTheme.getRadiantLighter()
-                              : null,
+                          gradient: getLightIntensityFromPourc(argp,appTheme),
                         ),
                       ),
                       onTap: () {
                         setState(() {
                           if(argp<=20){
+                            argp=30;
+                          }
+                          else if(argp<=30){
                             argp=50;
+                          }
+                          else if(argp<=50){
+                            argp=60;
                           }
                           else if(argp<=60){
                             argp=80;
                           }
-                          else if(argp<=80){
+                          else if(ardp<=80){
+                            ardp=90;
+                          }
+                          else if(argp<=90){
                             argp=100;
                           }
                           else{
@@ -1642,20 +1782,21 @@ class _ReparationFormState extends State<ReparationForm> {
                   ],
                 ),
               )),
+          ///Feux AR
           Positioned(
-              left: 26.5.w,
-              top: 5.h,
+              left: 286.px,
+              top: 15.px,
               child: SizedBox(
-                width: 4.75.w,
+                width: lightWidth,
                 height: 30.h,
                 child: Column(
                   children: [
                     OnTapScaleAndFade(
                       child: Container(
-                        height: 3.75.h,
+                        height: lightHeight,
                         decoration: BoxDecoration(
                           gradient: feuARD == true
-                              ? appTheme.getRadiantLighter()
+                              ? appTheme.getRadiantLightest()
                               : null,
                         ),
                       ),
@@ -1666,14 +1807,14 @@ class _ReparationFormState extends State<ReparationForm> {
                       },
                     ),
                     SizedBox(
-                      height: 9.5.h,
+                      height: 65.px,
                     ),
                     OnTapScaleAndFade(
                       child: Container(
-                        height: 3.75.h,
+                        height: lightHeight,
                         decoration: BoxDecoration(
                           gradient: feuARG == true
-                              ? appTheme.getRadiantLighter()
+                              ? appTheme.getRadiantLightest()
                               : null,
                         ),
                       ),
@@ -1687,9 +1828,84 @@ class _ReparationFormState extends State<ReparationForm> {
                   ],
                 ),
               )),
+          ///Aile AV
+          Positioned(
+              left: 290.px,
+              top: 0.px,
+              child: SizedBox(
+                width: lightWidth,
+                height: 30.h,
+                child: Column(
+                  children: [
+                    OnTapScaleAndFade(
+                      child: Container(
+                        height: lightHeight,
+                        decoration: BoxDecoration(
+                          gradient: aileARD == true
+                              ? appTheme.getRadiantLightest()
+                              : null,
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          aileARD=!aileARD;
+                        });
+                      },
+                    ),
+                    SizedBox(
+                      height: 95.px,
+                    ),
+                    OnTapScaleAndFade(
+                      child: Container(
+                        height: lightHeight,
+                        decoration: BoxDecoration(
+                          gradient: aileARG == true
+                              ? appTheme.getRadiantLightest()
+                              : null,
+                        ),
+                      ),
+                      onTap: (){
+                        setState(() {
+                          aileARG=!aileARG;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              )),
         ],
       ),
     );
+  }
+
+
+  RadialGradient? getLightIntensityFromPourc(double pourc,AppTheme appTheme){
+    if(pourc<=20){
+      return appTheme.getRadiantLightest();
+    }
+    else if(pourc<=30){
+      return appTheme.getRadiantLighter();
+    }
+    else if(pourc<=50){
+      return appTheme.getRadiantLight();
+    }
+    else if(pourc<=60){
+      return appTheme.getRadiantStandard();
+    }
+    else if(pourc<=80){
+      return appTheme.getRadiantDark();
+
+    }
+    else if(pourc<=90){
+      return appTheme.getRadiantDarker();
+
+    }
+    else if(pourc<100){
+      return appTheme.getRadiantDarkest();
+    }
+    else {
+      return null;
+    }
   }
 
   Widget entretienWidgets(AppTheme appTheme){
