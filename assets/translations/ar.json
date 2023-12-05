@@ -2,6 +2,8 @@
   "@@locale": "ar",
   "nummat": "رقم التسجيل",
   "matricule": "رقم التسجيل",
+  "carburant": "الوقود",
+
   "autremat": "رقم تسجيل أجنبي؟",
   "nomf": "اللقب",
   "pays": "البلد",

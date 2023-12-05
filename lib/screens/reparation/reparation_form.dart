@@ -11,6 +11,7 @@ import 'package:parc_oto/theme.dart';
 import 'package:parc_oto/widgets/on_tap_scale.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 import '../../utilities/vehicle_util.dart';
 
@@ -109,6 +110,7 @@ class _ReparationFormState extends State<ReparationForm> {
   TextEditingController couleur=TextEditingController();
   DateTime anneeUtil=DateTime.now();
 
+  double carburant=4;
 
   void setVehicleValues(){
     if(selectedVehicle==null){
@@ -122,7 +124,7 @@ class _ReparationFormState extends State<ReparationForm> {
       type.text=selectedVehicle!.type??'';
       numSerie.text=selectedVehicle!.numeroSerie??'';
       matricule.text=selectedVehicle!.matricule;
-
+      anneeUtil=DateTime(selectedVehicle!.anneeUtil??2023);
     }
     setState(() {
 
@@ -245,8 +247,9 @@ class _ReparationFormState extends State<ReparationForm> {
           ),
 
           SizedBox(
-            height: 100.px,
+            height: 150.px,
             child: Table(
+              defaultVerticalAlignment:TableCellVerticalAlignment.middle,
               border: TableBorder.all(),
               columnWidths: {
                 0:FixedColumnWidth(80.px),
@@ -383,9 +386,43 @@ class _ReparationFormState extends State<ReparationForm> {
                           padding: const EdgeInsets.all(5),
                           child: Row(
                             children: [
-                              Text('type',style: tstyle,).tr(),
+                              Text('carburant',style: tstyle,).tr(),
                               smallSpace,
-                              Flexible(child: Container()),
+                              SizedBox(
+                                  height: 150.px,
+                                  width: 150.px,
+                                  child: SfRadialGauge(
+                                axes: [
+                                  RadialAxis(
+                                    minimum: 0,
+                                    maximum: 8,
+                                    ranges: [
+                                      GaugeRange(startValue: 0, endValue: 1,label: 'E',color: appTheme.color.darkest,),
+                                      GaugeRange(startValue:7,endValue:8,label: 'F',color: appTheme.color.lightest,),
+                                    ],
+                                    pointers: [
+                                      NeedlePointer(
+                                        needleLength: 0.4,
+                                        needleColor: appTheme.color,
+                                        needleStartWidth: 1.px,
+                                        needleEndWidth: 5.px,
+                                        knobStyle: KnobStyle(color: appTheme.color.darkest),
+                                        value: carburant,
+                                        enableAnimation: true,
+                                        enableDragging: true,
+                                        onValueChanged: (s){
+                                          carburant=s;
+                                        },
+                                      ),
+                                    ],
+                                    interval: 1,
+                                    startAngle: 180,
+                                    showFirstLabel: true,
+                                    showLastLabel:true,
+                                    endAngle: 360,
+                                  )
+                                ],
+                              )),
                             ],
                           ),
 
