@@ -1606,8 +1606,8 @@ class _ReparationFormState extends State<ReparationForm> {
               )),
           ///Porte avant
           Positioned(
-              left: 80.px,
-              top: -2.px,
+              left: 130.px,
+              top: 3.px,
               child: SizedBox(
                 width: lightWidth,
                 height: 30.h,
@@ -1627,7 +1627,7 @@ class _ReparationFormState extends State<ReparationForm> {
                       },
                     ),
                     SizedBox(
-                      height: 100.px,
+                      height: 90.px,
                     ),
                     OnTapScaleAndFade(
                       child: Container(
