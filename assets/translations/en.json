@@ -14,6 +14,8 @@
   "daira": "Daira",
   "quittance": "Receipt",
   "prenom": "First Name",
+  "nchassi": "Chassis No.",
+  "nmoteur": "Engine No",
   "numerserie": "Series N°",
   "marque": "Brand",
   "type": "Model",

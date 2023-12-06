@@ -23,15 +23,15 @@ class ReparationForm extends StatefulWidget {
 }
 
 class _ReparationFormState extends State<ReparationForm> {
-  bool r1 = false;
-  bool r2 = false;
-  bool r3 = false;
-  bool r4 = false;
-  bool r5 = false;
-  bool r6 = false;
-  bool r7 = false;
-  bool r8 = false;
-  bool r9 = false;
+  bool vidangeMoteur = false;
+  bool vidangeBoite = false;
+  bool vidangePont = false;
+  bool filtreAir = false;
+  bool filtreHuile = false;
+  bool filtreCarburant = false;
+  bool filtreHabitacle = false;
+  bool liquideFrein = false;
+  bool liquideRefroidissement = false;
   bool r10 = false;
   bool r11 = false;
   bool r12 = false;
@@ -62,74 +62,76 @@ class _ReparationFormState extends State<ReparationForm> {
   bool feuARD = false;
   bool feuARG = false;
 
-  bool aileAVD=false;
-  bool aileAVG=false;
-  bool aileARD=false;
-  bool aileARG=false;
+  bool aileAVD = false;
+  bool aileAVG = false;
+  bool aileARD = false;
+  bool aileARG = false;
 
+  bool parAV = false;
+  bool parAR = false;
 
-  bool parAV=false;
-  bool parAR=false;
+  bool porteAVD = false;
+  bool porteAVG = false;
+  bool porteARD = false;
+  bool porteARG = false;
 
-  bool porteAVD=false;
-  bool porteAVG=false;
-  bool porteARD=false;
-  bool porteARG=false;
+  bool toit = false;
 
-  bool toit=false;
+  bool capot = false;
 
-  bool capot=false;
+  bool coffre = false;
 
-  bool coffre=false;
-
-  bool siegeAVD=false;
-  bool siegeAVG=false;
-  bool siegeARD=false;
-  bool siegeARG=false;
-  bool calandre=false;
- final hstyle=TextStyle(
-   fontSize: 14.sp,
-   fontWeight: FontWeight.bold,
- );
- final bstyle=TextStyle(
-   fontSize: 12.sp,
-   fontWeight: FontWeight.bold,
- );
+  bool siegeAVD = false;
+  bool siegeAVG = false;
+  bool siegeARD = false;
+  bool siegeARG = false;
+  bool calandre = false;
+  final hstyle = TextStyle(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.bold,
+  );
+  final bstyle = TextStyle(
+    fontSize: 12.sp,
+    fontWeight: FontWeight.bold,
+  );
   final tstyle = TextStyle(fontSize: 10.sp);
 
-  TextEditingController numOrdre=TextEditingController();
-  DateTime selectedDate=DateTime.now();
+
+
+  TextEditingController numOrdre = TextEditingController();
+  DateTime selectedDate = DateTime.now();
 
   Prestataire? selectedPrest;
   Vehicle? selectedVehicle;
-  TextEditingController marque=TextEditingController();
-  TextEditingController type=TextEditingController();
-  TextEditingController numSerie=TextEditingController();
-  TextEditingController matricule=TextEditingController();
-  TextEditingController km=TextEditingController();
-  TextEditingController couleur=TextEditingController();
-  DateTime anneeUtil=DateTime.now();
+  TextEditingController marque = TextEditingController();
+  TextEditingController type = TextEditingController();
+  TextEditingController numSerie = TextEditingController();
+  TextEditingController matricule = TextEditingController();
+  TextEditingController km = TextEditingController();
+  TextEditingController couleur = TextEditingController();
 
-  double carburant=4;
+  TextEditingController nchassi = TextEditingController();
+  TextEditingController nmoteur = TextEditingController();
+  DateTime anneeUtil = DateTime.now();
 
-  void setVehicleValues(){
-    if(selectedVehicle==null){
+  double carburant = 4;
+
+  void setVehicleValues() {
+    if (selectedVehicle == null) {
       marque.clear();
       type.clear();
       numSerie.clear();
       matricule.clear();
+    } else {
+      marque.text = VehiclesUtilities.getMarqueName(selectedVehicle!.marque);
+      type.text = selectedVehicle!.type ?? '';
+      numSerie.text = selectedVehicle!.numeroSerie ?? '';
+      matricule.text = selectedVehicle!.matricule;
+      anneeUtil = DateTime(selectedVehicle!.anneeUtil ?? 2023);
     }
-    else{
-      marque.text=VehiclesUtilities.getMarqueName(selectedVehicle!.marque);
-      type.text=selectedVehicle!.type??'';
-      numSerie.text=selectedVehicle!.numeroSerie??'';
-      matricule.text=selectedVehicle!.matricule;
-      anneeUtil=DateTime(selectedVehicle!.anneeUtil??2023);
-    }
-    setState(() {
-
-    });
+    setState(() {});
   }
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
@@ -142,68 +144,88 @@ class _ReparationFormState extends State<ReparationForm> {
       child: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         children: [
-          if(MyEntrepriseState.p!=null)
-          Row(
-
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.file(File('mylogo.png'),width: 80.px,height: 80.px,),
-             bigSpace,
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(MyEntrepriseState.p!.nom,style: bstyle,),
-                  Text(MyEntrepriseState.p!.adresse,style: bstyle,),
-                ],
-              ),
-              const Spacer(),
-              Text('ORDRE DE REPARATION',style: hstyle,),
-              smallSpace,
-              Container(
-                width: 200.px,
-                height: 40.px,
-                decoration: BoxDecoration(
-                  border: Border.all(),
+          if (MyEntrepriseState.p != null)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Image.file(
+                  File('mylogo.png'),
+                  width: 80.px,
+                  height: 80.px,
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Text('num',style: bstyle,).tr(),
-                      smallSpace,
-                      Flexible(
-                        child: TextBox(
-                          controller: numOrdre,
-                          placeholder: 'num'.tr(),
-                          placeholderStyle: placeStyle,
-                          style: appTheme.writingStyle,
-                          cursorColor: appTheme.color.darker,
-                          decoration: BoxDecoration(
-                            color: appTheme.fillColor,
+                bigSpace,
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      MyEntrepriseState.p!.nom,
+                      style: bstyle,
+                    ),
+                    Text(
+                      MyEntrepriseState.p!.adresse,
+                      style: bstyle,
+                    ),
+                  ],
+                ),
+                const Spacer(),
+                Text(
+                  'ORDRE DE REPARATION',
+                  style: hstyle,
+                ),
+                smallSpace,
+                Container(
+                  width: 200.px,
+                  height: 40.px,
+                  decoration: BoxDecoration(
+                    border: Border.all(),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Row(
+                      children: [
+                        Text(
+                          'num',
+                          style: bstyle,
+                        ).tr(),
+                        smallSpace,
+                        Flexible(
+                          child: TextBox(
+                            controller: numOrdre,
+                            placeholder: 'num'.tr(),
+                            placeholderStyle: placeStyle,
+                            style: appTheme.writingStyle,
+                            cursorColor: appTheme.color.darker,
+                            decoration: BoxDecoration(
+                              color: appTheme.fillColor,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text('date',style: bstyle,).tr(),
+              Text(
+                'date',
+                style: bstyle,
+              ).tr(),
               smallSpace,
               SizedBox(
                 width: 200.px,
                 height: 30.px,
-                child: DatePicker(selected: selectedDate,
-                onChanged: (s){
-                  setState(() {
-                    selectedDate=s;
-                  });
-                },),
+                child: DatePicker(
+                  selected: selectedDate,
+                  onChanged: (s) {
+                    setState(() {
+                      selectedDate = s;
+                    });
+                  },
+                ),
               ),
             ],
           ),
@@ -214,256 +236,397 @@ class _ReparationFormState extends State<ReparationForm> {
                 width: 250.px,
                 height: 50.px,
                 child: ListTile(
-                  leading: Text('vehicule',style: bstyle,).tr(),
-                  title: Text(selectedVehicle?.matricule??'nonind'.tr()),
-                  onPressed: ()async{
-                    selectedVehicle=await showDialog<Vehicle?>(context: context, builder: (c,)=>const VehicleTable(selectV: true,));
+                  leading: Text(
+                    'vehicule',
+                    style: bstyle,
+                  ).tr(),
+                  title: Text(selectedVehicle?.matricule ?? 'nonind'.tr()),
+                  onPressed: () async {
+                    selectedVehicle = await showDialog<Vehicle?>(
+                        context: context,
+                        builder: (
+                          c,
+                        ) =>
+                            const VehicleTable(
+                              selectV: true,
+                            ));
                     setVehicleValues();
                   },
                 ),
               ),
               smallSpace,
-              if(selectedVehicle!=null)
-              IconButton(icon: const Icon(FluentIcons.cancel), onPressed: (){
-                selectedVehicle=null;
-                setVehicleValues();
-              }),
+              if (selectedVehicle != null)
+                IconButton(
+                    icon: const Icon(FluentIcons.cancel),
+                    onPressed: () {
+                      selectedVehicle = null;
+                      setVehicleValues();
+                    }),
               const Spacer(),
               SizedBox(
                 width: 250.px,
                 height: 50.px,
                 child: ListTile(
-                  leading: Text('prestataire',style: bstyle,).tr(),
-                  title: Text(selectedPrest?.nom??'nonind'.tr()),
-                  onPressed: ()async{
-                    selectedPrest=await showDialog<Prestataire?>(context: context, builder: (c,)=>const PrestataireTable(selectD: true,));
-                    setState(() {
-
-                    });
-                    },
+                  leading: Text(
+                    'prestataire',
+                    style: bstyle,
+                  ).tr(),
+                  title: Text(selectedPrest?.nom ?? 'nonind'.tr()),
+                  onPressed: () async {
+                    selectedPrest = await showDialog<Prestataire?>(
+                        context: context,
+                        builder: (
+                          c,
+                        ) =>
+                            const PrestataireTable(
+                              selectD: true,
+                            ));
+                    setState(() {});
+                  },
                 ),
               ),
             ],
           ),
-
           SizedBox(
             height: 150.px,
             child: Table(
-              defaultVerticalAlignment:TableCellVerticalAlignment.middle,
+              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
               border: TableBorder.all(),
               columnWidths: {
-                0:FixedColumnWidth(80.px),
-                1:FixedColumnWidth(80.px),
-                2:FixedColumnWidth(80.px),
-                3:FixedColumnWidth(80.px),
+                0: FixedColumnWidth(80.px),
+                1: FixedColumnWidth(80.px),
+                2: FixedColumnWidth(80.px),
+                3: FixedColumnWidth(80.px),
               },
               children: [
-                TableRow(
-                  children: [
-                    TableCell(
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(
-                            children: [
-                              Text('marque',style: tstyle,).tr(),
-                              smallSpace,
-                              Flexible(
-                                child: TextBox(
-                                  controller:marque,
-                                  placeholder: 'marque'.tr(),
-                                  style: appTheme.writingStyle,
-                                  decoration: BoxDecoration(
-                                    color: appTheme.fillColor,
+                TableRow(children: [
+                  TableCell(
+                      child: Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: Row(
+                      children: [
+                        Text(
+                          'marque',
+                          style: tstyle,
+                        ).tr(),
+                        const Spacer(),
+                        SizedBox(
+                          width: 160.px,
+                          child: TextBox(
+                            controller: marque,
+                            placeholder: 'marque'.tr(),
+                            style: appTheme.writingStyle,
+                            decoration: BoxDecoration(
+                              color: appTheme.fillColor,
+                            ),
+                            cursorColor: appTheme.color.darker,
+                            placeholderStyle: placeStyle,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+                  TableCell(
+                      child: Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: Row(
+                      children: [
+                        Text(
+                          'type',
+                          style: tstyle,
+                        ).tr(),
+                        const Spacer(),
+                        SizedBox(
+                          width: 160.px,
+                          child: TextBox(
+                            controller: type,
+                            placeholder: 'type'.tr(),
+                            style: appTheme.writingStyle,
+                            decoration: BoxDecoration(
+                              color: appTheme.fillColor,
+                            ),
+                            cursorColor: appTheme.color.darker,
+                            placeholderStyle: placeStyle,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+                  TableCell(
+                      child: Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: Row(
+                      children: [
+                        Text(
+                          'numerserie',
+                          style: tstyle,
+                        ).tr(),
+                        const Spacer(),
+                        SizedBox(
+                          width: 160.px,
+                          child: TextBox(
+                            controller: numSerie,
+                            placeholder: 'numerserie'.tr(),
+                            style: appTheme.writingStyle,
+                            decoration: BoxDecoration(
+                              color: appTheme.fillColor,
+                            ),
+                            cursorColor: appTheme.color.darker,
+                            placeholderStyle: placeStyle,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+                  TableCell(
+                      child: Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: Row(
+                      children: [
+                        Text(
+                          'matricule',
+                          style: tstyle,
+                        ).tr(),
+                        const Spacer(),
+                        SizedBox(
+                          width: 160.px,
+                          child: TextBox(
+                            controller: matricule,
+                            enabled: selectedVehicle == null,
+                            //readOnly: selectedVehicle!=null,
+                            placeholder: 'matricule'.tr(),
+                            style: appTheme.writingStyle,
+                            decoration: BoxDecoration(
+                              color: appTheme.fillColor,
+                            ),
+                            cursorColor: appTheme.color.darker,
+                            placeholderStyle: placeStyle,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+                ]),
+                TableRow(children: [
+                  TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.top,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'nchassi',
+                                  style: tstyle,
+                                ).tr(),
+                                const Spacer(),
+                                SizedBox(
+                                  width: 160.px,
+                                  child: TextBox(
+                                    controller: nchassi,
+                                    placeholder: 'nchassi'.tr(),
+                                    style: appTheme.writingStyle,
+                                    decoration: BoxDecoration(
+                                      color: appTheme.fillColor,
+                                    ),
+                                    cursorColor: appTheme.color.darker,
+                                    placeholderStyle: placeStyle,
                                   ),
-                                  cursorColor: appTheme.color.darker,
-                                  placeholderStyle: placeStyle,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-
-                        )),
-                    TableCell(
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(
-                            children: [
-                              Text('type',style: tstyle,).tr(),
-                              smallSpace,
-                              Flexible(
-                                child: TextBox(
-                                  controller:type,
-                                  placeholder: 'type'.tr(),
-                                  style: appTheme.writingStyle,
-                                  decoration: BoxDecoration(
-                                    color: appTheme.fillColor,
+                          SizedBox(height: 16.px,),
+                          Container(height: 1.px,decoration: const BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(),
+                            ),
+                          ),),
+                          Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'nmoteur',
+                                  style: tstyle,
+                                ).tr(),
+                                const Spacer(),
+                                SizedBox(
+                                  width: 160.px,
+                                  child: TextBox(
+                                    controller: nmoteur,
+                                    placeholder: 'nmoteur'.tr(),
+                                    style: appTheme.writingStyle,
+                                    decoration: BoxDecoration(
+                                      color: appTheme.fillColor,
+                                    ),
+                                    cursorColor: appTheme.color.darker,
+                                    placeholderStyle: placeStyle,
                                   ),
-                                  cursorColor: appTheme.color.darker,
-                                  placeholderStyle: placeStyle,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-
+                        ],
+                      )),
+                  TableCell(
+                      child: Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: SizedBox(
+                        height: 150.px,
+                        width: 180.px,
+                        child: SfRadialGauge(
+                          animationDuration: 500,
+                          title: GaugeTitle(
+                            text: 'carburant'.tr(),
+                            textStyle: tstyle,
+                            alignment: GaugeAlignment.near,
+                          ),
+                          axes: [
+                            RadialAxis(
+                              minimum: 0,
+                              maximum: 8,
+                              radiusFactor: 1,
+                              onAxisTapped: (s) {
+                                setState(() {
+                                  carburant = s;
+                                });
+                              },
+                              ranges: [
+                                GaugeRange(
+                                  startValue: 0,
+                                  endValue: 0.5,
+                                  label: 'E',
+                                  color: appTheme.color.darkest,
+                                ),
+                                GaugeRange(
+                                  startValue: 7.5,
+                                  endValue: 8,
+                                  label: 'F',
+                                  color: appTheme.color.lightest,
+                                ),
+                              ],
+                              pointers: [
+                                NeedlePointer(
+                                  animationDuration: 500,
+                                  needleLength: 0.4,
+                                  needleColor: appTheme.color,
+                                  needleStartWidth: 1.px,
+                                  needleEndWidth: 5.px,
+                                  knobStyle:
+                                      KnobStyle(color: appTheme.color.darkest),
+                                  value: carburant,
+                                  enableAnimation: true,
+                                  enableDragging: true,
+                                ),
+                              ],
+                              interval: 2,
+                              startAngle: 180,
+                              showFirstLabel: false,
+                              showLastLabel: false,
+                              showLabels: false,
+                              endAngle: 360,
+                            )
+                          ],
                         )),
-                    TableCell(
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(
-                            children: [
-                              Text('numerserie',style: tstyle,).tr(),
-                              smallSpace,
-                              Flexible(
-                                child: TextBox(
-                                  controller:numSerie,
-                                  placeholder: 'numerserie'.tr(),
-                                  style: appTheme.writingStyle,
-                                  decoration: BoxDecoration(
-                                    color: appTheme.fillColor,
+                  )),
+                  TableCell(
+                    verticalAlignment: TableCellVerticalAlignment.top,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'KM',
+                                  style: tstyle,
+                                ).tr(),
+                                const Spacer(),
+                                SizedBox(
+                                  width: 160.px,
+                                  child: TextBox(
+                                    controller: km,
+                                    placeholder: 'KM'.tr(),
+                                    style: appTheme.writingStyle,
+                                    decoration: BoxDecoration(
+                                      color: appTheme.fillColor,
+                                    ),
+                                    cursorColor: appTheme.color.darker,
+                                    placeholderStyle: placeStyle,
                                   ),
-                                  cursorColor: appTheme.color.darker,
-                                  placeholderStyle: placeStyle,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-
-                        )),
-                    TableCell(
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(
-                            children: [
-                              Text('matricule',style: tstyle,).tr(),
-                              smallSpace,
-                              Flexible(
-                                child: TextBox(
-                                  controller:matricule,
-                                  enabled: selectedVehicle==null,
-                                  //readOnly: selectedVehicle!=null,
-                                  placeholder: 'matricule'.tr(),
-                                  style: appTheme.writingStyle,
-                                  decoration: BoxDecoration(
-                                    color: appTheme.fillColor,
+                          SizedBox(height: 16.px,),
+                          Container(height: 1.px,decoration: const BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(),
+                            ),
+                          ),),
+                          Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'color',
+                                  style: tstyle,
+                                ).tr(),
+                                const Spacer(),
+                                SizedBox(
+                                  width: 160.px,
+                                  child: TextBox(
+                                    controller: couleur,
+                                    placeholder: 'color'.tr(),
+                                    style: appTheme.writingStyle,
+                                    decoration: BoxDecoration(
+                                      color: appTheme.fillColor,
+                                    ),
+                                    cursorColor: appTheme.color.darker,
+                                    placeholderStyle: placeStyle,
                                   ),
-                                  cursorColor: appTheme.color.darker,
-                                  placeholderStyle: placeStyle,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-
-                        )),
-                  ]
-                ),
-                TableRow(
-                  children: [
-                    TableCell(
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(
-                            children: [
-                              Text('Km',style: tstyle,).tr(),
-                              smallSpace,
-                              Flexible(
-                                child: TextBox(
-                                  controller:km,
-                                  placeholder: 'Km'.tr(),
-                                  style: appTheme.writingStyle,
-                                  decoration: BoxDecoration(
-                                    color: appTheme.fillColor,
-                                  ),
-                                  cursorColor: appTheme.color.darker,
-                                  placeholderStyle: placeStyle,
-                                ),
-                              ),
-                            ],
+                        ],
+                      )),
+                  TableCell(
+                      verticalAlignment: TableCellVerticalAlignment.top,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'anneeutil',
+                                  style: tstyle,
+                                ).tr(),
+                                const Spacer(),
+                                SizedBox(
+                                    width: 80.px,
+                                    child: DatePicker(
+                                  selected: anneeUtil,
+                                  showDay: false,
+                                  showMonth: false,
+                                ))
+                              ],
+                            ),
                           ),
-
-                        )),
-                    TableCell(
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(
-                            children: [
-                              Text('carburant',style: tstyle,).tr(),
-                              smallSpace,
-                              SizedBox(
-                                  height: 150.px,
-                                  width: 150.px,
-                                  child: SfRadialGauge(
-                                axes: [
-                                  RadialAxis(
-                                    minimum: 0,
-                                    maximum: 8,
-                                    ranges: [
-                                      GaugeRange(startValue: 0, endValue: 1,label: 'E',color: appTheme.color.darkest,),
-                                      GaugeRange(startValue:7,endValue:8,label: 'F',color: appTheme.color.lightest,),
-                                    ],
-                                    pointers: [
-                                      NeedlePointer(
-                                        needleLength: 0.4,
-                                        needleColor: appTheme.color,
-                                        needleStartWidth: 1.px,
-                                        needleEndWidth: 5.px,
-                                        knobStyle: KnobStyle(color: appTheme.color.darkest),
-                                        value: carburant,
-                                        enableAnimation: true,
-                                        enableDragging: true,
-                                        onValueChanged: (s){
-                                          carburant=s;
-                                        },
-                                      ),
-                                    ],
-                                    interval: 1,
-                                    startAngle: 180,
-                                    showFirstLabel: true,
-                                    showLastLabel:true,
-                                    endAngle: 360,
-                                  )
-                                ],
-                              )),
-                            ],
-                          ),
-
-                        )),
-                    TableCell(
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(
-                            children: [
-                              Text('couleur',style: tstyle,).tr(),
-                              smallSpace,
-                              Flexible(
-                                child: TextBox(
-                                  controller:couleur,
-                                  placeholder: 'couleur'.tr(),
-                                  style: appTheme.writingStyle,
-                                  decoration: BoxDecoration(
-                                    color: appTheme.fillColor,
-                                  ),
-                                  cursorColor: appTheme.color.darker,
-                                  placeholderStyle: placeStyle,
-                                ),
-                              ),
-                            ],
-                          ),
-
-                        )),
-                    TableCell(
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(
-                            children: [
-                              Text('anneeutil',style: tstyle,).tr(),
-                              smallSpace,
-                              Flexible(child: DatePicker(selected: anneeUtil,showDay: false,showMonth: false,))
-                            ],
-                          ),
-
-                        )),
-                  ]
-                ),
+                          SizedBox(height: 16.px,),
+                          Container(height: 1.px,decoration: const BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(),
+                            ),
+                          ),),
+                        ],
+                      )),
+                ]),
               ],
             ),
           ),
@@ -476,7 +639,11 @@ class _ReparationFormState extends State<ReparationForm> {
               border: Border.all(),
             ),
             padding: const EdgeInsets.all(10),
-            child: Text('ETAT DU VEHICULE',textAlign: TextAlign.center,style: hstyle,),
+            child: Text(
+              'ETAT DU VEHICULE',
+              textAlign: TextAlign.center,
+              style: hstyle,
+            ),
           ),
           etatVehicule(appTheme),
           Container(
@@ -487,7 +654,11 @@ class _ReparationFormState extends State<ReparationForm> {
               border: Border.all(),
             ),
             padding: const EdgeInsets.all(10),
-            child: Text('ENTRETIEN DU VEHICULE',textAlign: TextAlign.center,style: hstyle,),
+            child: Text(
+              'ENTRETIEN DU VEHICULE',
+              textAlign: TextAlign.center,
+              style: hstyle,
+            ),
           ),
           entretienWidgets(appTheme),
         ],
@@ -495,12 +666,9 @@ class _ReparationFormState extends State<ReparationForm> {
     );
   }
 
-
-
-
-  Widget etatVehicule(AppTheme appTheme){
-    return  Container(
-      decoration:BoxDecoration(
+  Widget etatVehicule(AppTheme appTheme) {
+    return Container(
+      decoration: BoxDecoration(
         border: Border.all(),
       ),
       width: 80.w,
@@ -521,429 +689,425 @@ class _ReparationFormState extends State<ReparationForm> {
       ),
     );
   }
-  Widget topTable(AppTheme appTheme){
+
+  Widget topTable(AppTheme appTheme) {
     return SizedBox(
       width: 40.w,
       height: 45.h,
       child: Table(
         border: TableBorder.all(),
         columnWidths: {
-          0:FixedColumnWidth(6.w),
+          0: FixedColumnWidth(6.w),
           1: FixedColumnWidth(6.w),
           2: FixedColumnWidth(4.w),
           3: FixedColumnWidth(4.w),
-          4:  FixedColumnWidth(11.w),
+          4: FixedColumnWidth(11.w),
         },
         children: [
           ...getTopRow(appTheme),
           ...getBottomRows(appTheme),
-
         ],
       ),
     );
   }
-  List<TableRow> getTopRow(AppTheme appTheme){
+
+  List<TableRow> getTopRow(AppTheme appTheme) {
     return [
       TableRow(children: [
-
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('PARE-BRISE AV', style: tstyle),
-            )),
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('PARE-BRISE AV', style: tstyle),
+        )),
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('PARE-BRISE AR', style: tstyle),
-            )),
-        TableCell(
-            child:Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('PHARE', style: tstyle),
-            )),
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('PARE-BRISE AR', style: tstyle),
+        )),
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('FEUX', style: tstyle),
-            )),
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('PHARE', style: tstyle),
+        )),
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('PNEUMATIQUE', style: tstyle),
-            )),
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('FEUX', style: tstyle),
+        )),
+        TableCell(
+            child: Container(
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('PNEUMATIQUE', style: tstyle),
+        )),
       ]),
       TableRow(children: [
-
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'FELURE',
-                    style: tstyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: parAvf,
-                      onChanged: (s) {
-                        if (s == true) {
-                          parAvf = s!;
-                          parAvc = false;
-                          parAve = false;
-                        } else if (s == false) {
-                          parAvf = false;
-                        }
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'FELURE',
+                style: tstyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: parAvf,
+                  onChanged: (s) {
+                    if (s == true) {
+                      parAvf = s!;
+                      parAvc = false;
+                      parAve = false;
+                    } else if (s == false) {
+                      parAvf = false;
+                    }
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'FELURE',
-                    style: tstyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: parArf,
-                      onChanged: (s) {
-                        if (s == true) {
-                          parArf = s!;
-                          parArc = false;
-                          parAre = false;
-                        } else if (s == false) {
-                          parArf = false;
-                        }
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'FELURE',
+                style: tstyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: parArf,
+                  onChanged: (s) {
+                    if (s == true) {
+                      parArf = s!;
+                      parArc = false;
+                      parAre = false;
+                    } else if (s == false) {
+                      parArf = false;
+                    }
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'D',
-                    style: tstyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: phareD,
-                      onChanged: (s) {
-                        if (s == true) {
-                          phareD = s!;
-                        } else if (s == false) {
-                          phareD = false;
-                        }
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'D',
+                style: tstyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: phareD,
+                  onChanged: (s) {
+                    if (s == true) {
+                      phareD = s!;
+                    } else if (s == false) {
+                      phareD = false;
+                    }
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'AVD',
-                    style: tstyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: feuAVD,
-                      onChanged: (s) {
-                        feuAVD = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVD',
+                style: tstyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: feuAVD,
+                  onChanged: (s) {
+                    feuAVD = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    'AVD',
-                    style: tstyle,
-                  ),
-                  smallSpace,
-                  smallSpace,
-                  smallSpace,
-                  SizedBox(
-                    width: 5.w,
-                    child: Slider(
-                      value: avdp,
-                      onChanged: (s) {
-                        avdp = s;
-                        setState(() {});
-                      },
-                      divisions: 100,
-                    ),
-                  ),
-                  smallSpace,
-                  smallSpace,
-                  smallSpace,
-                  Text(
-                    '${avdp.ceil()} %',
-                    style: tstyle,
-                  ),
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                'AVD',
+                style: tstyle,
               ),
-            )),
+              smallSpace,
+              smallSpace,
+              smallSpace,
+              SizedBox(
+                width: 5.w,
+                child: Slider(
+                  value: avdp,
+                  onChanged: (s) {
+                    avdp = s;
+                    setState(() {});
+                  },
+                  divisions: 100,
+                ),
+              ),
+              smallSpace,
+              smallSpace,
+              smallSpace,
+              Text(
+                '${avdp.ceil()} %',
+                style: tstyle,
+              ),
+            ],
+          ),
+        )),
       ]),
       TableRow(children: [
-
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'CASSURE',
-                    style: tstyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: parAvc,
-                      onChanged: (s) {
-                        if (s == true) {
-                          parAvf = false;
-                          parAvc = s!;
-                          parAve = false;
-                        } else if (s == false) {
-                          parAvc = false;
-                        }
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'CASSURE',
+                style: tstyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: parAvc,
+                  onChanged: (s) {
+                    if (s == true) {
+                      parAvf = false;
+                      parAvc = s!;
+                      parAve = false;
+                    } else if (s == false) {
+                      parAvc = false;
+                    }
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'CASSURE',
-                    style: tstyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: parArc,
-                      onChanged: (s) {
-                        if (s == true) {
-                          parArc = s!;
-                          parArf = false;
-                          parAre = false;
-                        } else if (s == false) {
-                          parArc = false;
-                        }
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'CASSURE',
+                style: tstyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: parArc,
+                  onChanged: (s) {
+                    if (s == true) {
+                      parArc = s!;
+                      parArf = false;
+                      parAre = false;
+                    } else if (s == false) {
+                      parArc = false;
+                    }
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'G',
-                    style: tstyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: phareG,
-                      onChanged: (s) {
-                        if (s == true) {
-                          phareG = s!;
-                        } else if (s == false) {
-                          phareG = false;
-                        }
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'G',
+                style: tstyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: phareG,
+                  onChanged: (s) {
+                    if (s == true) {
+                      phareG = s!;
+                    } else if (s == false) {
+                      phareG = false;
+                    }
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'AVG',
-                    style: tstyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: feuAVG,
-                      onChanged: (s) {
-                        feuAVG = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVG',
+                style: tstyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: feuAVG,
+                  onChanged: (s) {
+                    feuAVG = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'AVG',
-                    style: tstyle,
-                  ),
-                  smallSpace,
-                  smallSpace,
-                  smallSpace,
-                  SizedBox(
-                    width: 5.w,
-                    child: Slider(
-                      value: avgp,
-                      onChanged: (s) {
-                        avgp = s;
-                        setState(() {});
-                      },
-                      divisions: 100,
-                    ),
-                  ),
-                  smallSpace,
-                  smallSpace,
-                  smallSpace,
-                  Text(
-                    '${avgp.ceil()} %',
-                    style: tstyle,
-                  ),
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVG',
+                style: tstyle,
               ),
-            )),
+              smallSpace,
+              smallSpace,
+              smallSpace,
+              SizedBox(
+                width: 5.w,
+                child: Slider(
+                  value: avgp,
+                  onChanged: (s) {
+                    avgp = s;
+                    setState(() {});
+                  },
+                  divisions: 100,
+                ),
+              ),
+              smallSpace,
+              smallSpace,
+              smallSpace,
+              Text(
+                '${avgp.ceil()} %',
+                style: tstyle,
+              ),
+            ],
+          ),
+        )),
       ]),
       TableRow(children: [
-
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ECLAT',
-                    style: tstyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: parAve,
-                      onChanged: (s) {
-                        if (s == true) {
-                          parAve = s!;
-                          parAvc = false;
-                          parAvf = false;
-                        } else if (s == false) {
-                          parAve = false;
-                        }
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ECLAT',
+                style: tstyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: parAve,
+                  onChanged: (s) {
+                    if (s == true) {
+                      parAve = s!;
+                      parAvc = false;
+                      parAvf = false;
+                    } else if (s == false) {
+                      parAve = false;
+                    }
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ECLAT',
-                    style: tstyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: parAre,
-                      onChanged: (s) {
-                        if (s == true) {
-                          parAre = s!;
-                          parArf = false;
-                          parArc = false;
-                        } else if (s == false) {
-                          parAre = false;
-                        }
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ECLAT',
+                style: tstyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: parAre,
+                  onChanged: (s) {
+                    if (s == true) {
+                      parAre = s!;
+                      parArf = false;
+                      parArc = false;
+                    } else if (s == false) {
+                      parAre = false;
+                    }
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         const TableCell(
           child: SizedBox(),
         ),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ARD',
-                    style: tstyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: feuARD,
-                      onChanged: (s) {
-                        feuARD = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARD',
+                style: tstyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: feuARD,
+                  onChanged: (s) {
+                    feuARD = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ARD',
-                    style: tstyle,
-                  ),
-                  smallSpace,
-                  smallSpace,
-                  smallSpace,
-                  SizedBox(
-                    width: 5.w,
-                    child: Slider(
-                      value: ardp,
-                      onChanged: (s) {
-                        ardp = s;
-                        setState(() {});
-                      },
-                      divisions: 100,
-                    ),
-                  ),
-                  smallSpace,
-                  smallSpace,
-                  smallSpace,
-                  Text(
-                    '${ardp.ceil()} %',
-                    style: tstyle,
-                  ),
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARD',
+                style: tstyle,
               ),
-            )),
+              smallSpace,
+              smallSpace,
+              smallSpace,
+              SizedBox(
+                width: 5.w,
+                child: Slider(
+                  value: ardp,
+                  onChanged: (s) {
+                    ardp = s;
+                    setState(() {});
+                  },
+                  divisions: 100,
+                ),
+              ),
+              smallSpace,
+              smallSpace,
+              smallSpace,
+              Text(
+                '${ardp.ceil()} %',
+                style: tstyle,
+              ),
+            ],
+          ),
+        )),
       ]),
       TableRow(children: [
-
         const TableCell(child: SizedBox()),
         const TableCell(child: SizedBox()),
         const TableCell(
@@ -951,454 +1115,450 @@ class _ReparationFormState extends State<ReparationForm> {
         ),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ARG',
-                    style: tstyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: feuARG,
-                      onChanged: (s) {
-                        feuARG = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARG',
+                style: tstyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: feuARG,
+                  onChanged: (s) {
+                    feuARG = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ARG',
-                    style: tstyle,
-                  ),
-                  smallSpace,
-                  smallSpace,
-                  smallSpace,
-                  SizedBox(
-                    width: 5.w,
-                    child: Slider(
-                      value: argp,
-                      onChanged: (s) {
-                        argp = s;
-                        setState(() {});
-                      },
-                      divisions: 100,
-                    ),
-                  ),
-                  smallSpace,
-                  smallSpace,
-                  smallSpace,
-                  Text(
-                    '${ardp.ceil()} %',
-                    style: tstyle,
-                  ),
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARG',
+                style: tstyle,
               ),
-            )),
+              smallSpace,
+              smallSpace,
+              smallSpace,
+              SizedBox(
+                width: 5.w,
+                child: Slider(
+                  value: argp,
+                  onChanged: (s) {
+                    argp = s;
+                    setState(() {});
+                  },
+                  divisions: 100,
+                ),
+              ),
+              smallSpace,
+              smallSpace,
+              smallSpace,
+              Text(
+                '${ardp.ceil()} %',
+                style: tstyle,
+              ),
+            ],
+          ),
+        )),
       ]),
     ];
   }
-  List<TableRow> getBottomRows(AppTheme appTheme){
+
+  List<TableRow> getBottomRows(AppTheme appTheme) {
     return [
       TableRow(children: [
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('AILE', style: tstyle),
-            )),
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('AILE', style: tstyle),
+        )),
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('PARE-CHOC', style: tstyle),
-            )),
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('PARE-CHOC', style: tstyle),
+        )),
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('PORTE', style: tstyle),
-            )),
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('PORTE', style: tstyle),
+        )),
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('SIEGE', style: tstyle),
-            )),
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('SIEGE', style: tstyle),
+        )),
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('AUTRE', style: tstyle),
-            )),
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('AUTRE', style: tstyle),
+        )),
       ]),
-      TableRow(
-          children:[
-            TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'AVD',
-                        style: tstyle,
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                          checked: aileAVD,
-                          onChanged: (s) {
-                            aileAVD = s ?? false;
-                            setState(() {});
-                          })
-                    ],
-                  ),
-                )),
-            TableCell(child: Padding(padding: const EdgeInsets.all(5),
-              child: Row(
-                children: [
-                  Text('AV',style:tstyle),
-                  const Spacer(),
-                  Checkbox(checked: parAV, onChanged: (s){
+      TableRow(children: [
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVD',
+                style: tstyle,
+              ),
+              const Spacer(),
+              Checkbox(
+                  checked: aileAVD,
+                  onChanged: (s) {
+                    aileAVD = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5),
+          child: Row(
+            children: [
+              Text('AV', style: tstyle),
+              const Spacer(),
+              Checkbox(
+                  checked: parAV,
+                  onChanged: (s) {
                     setState(() {
-                      parAV=s??false;
-
+                      parAV = s ?? false;
                     });
                   })
-                ],
+            ],
+          ),
+        )),
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVD',
+                style: tstyle,
               ),
-            )),
-            TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'AVD',
-                        style: tstyle,
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                          checked: porteAVD,
-                          onChanged: (s) {
-                            porteAVD = s ?? false;
-                            setState(() {});
-                          })
-                    ],
-                  ),
-                )),
-            TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'AVD',
-                        style: tstyle,
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                          checked: siegeAVD,
-                          onChanged: (s) {
-                            siegeAVD = s ?? false;
-                            setState(() {});
-                          })
-                    ],
-                  ),
-                )),
-            TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'CALANDRE',
-                        style: tstyle,
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                          checked: calandre,
-                          onChanged: (s) {
-                            calandre = s ?? false;
-                            setState(() {});
-                          })
-                    ],
-                  ),
-                )),
-
-          ]
-      ),
-      TableRow(
-          children: [
-            TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'AVG',
-                        style: tstyle,
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                          checked: aileAVG,
-                          onChanged: (s) {
-                            aileAVG = s ?? false;
-                            setState(() {});
-                          })
-                    ],
-                  ),
-                )),
-            TableCell(child: Padding(padding: const EdgeInsets.all(5),
-              child: Row(
-                children: [
-                  Text('AR',style:tstyle),
-                  const Spacer(),
-                  Checkbox(checked: parAR, onChanged: (s){
+              const Spacer(),
+              Checkbox(
+                  checked: porteAVD,
+                  onChanged: (s) {
+                    porteAVD = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVD',
+                style: tstyle,
+              ),
+              const Spacer(),
+              Checkbox(
+                  checked: siegeAVD,
+                  onChanged: (s) {
+                    siegeAVD = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'CALANDRE',
+                style: tstyle,
+              ),
+              const Spacer(),
+              Checkbox(
+                  checked: calandre,
+                  onChanged: (s) {
+                    calandre = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
+      ]),
+      TableRow(children: [
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVG',
+                style: tstyle,
+              ),
+              const Spacer(),
+              Checkbox(
+                  checked: aileAVG,
+                  onChanged: (s) {
+                    aileAVG = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5),
+          child: Row(
+            children: [
+              Text('AR', style: tstyle),
+              const Spacer(),
+              Checkbox(
+                  checked: parAR,
+                  onChanged: (s) {
                     setState(() {
-                      parAR=s??false;
-
+                      parAR = s ?? false;
                     });
                   })
-                ],
+            ],
+          ),
+        )),
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVG',
+                style: tstyle,
               ),
-            )),
-            TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'AVG',
-                        style: tstyle,
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                          checked: porteAVG,
-                          onChanged: (s) {
-                            porteAVG = s ?? false;
-                            setState(() {});
-                          })
-                    ],
-                  ),
-                )),
-            TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'AVG',
-                        style: tstyle,
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                          checked: siegeAVG,
-                          onChanged: (s) {
-                            siegeAVG = s ?? false;
-                            setState(() {});
-                          })
-                    ],
-                  ),
-                )),
-            TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'CAPOT',
-                        style: tstyle,
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                          checked: capot,
-                          onChanged: (s) {
-                            capot = s ?? false;
-                            setState(() {});
-                          })
-                    ],
-                  ),
-                )),
-          ]
-      ),
-      TableRow(
-          children: [
-            TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'ARD',
-                        style: tstyle,
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                          checked: aileARD,
-                          onChanged: (s) {
-                            setState(() {
-                              aileARD = s ?? false;
-
-                            });
-                          })
-                    ],
-                  ),
-                )),
-            const TableCell(child: SizedBox()),
-            TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'ARD',
-                        style: tstyle,
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                          checked: porteARD,
-                          onChanged: (s) {
-                            porteARD = s ?? false;
-                            setState(() {});
-                          })
-                    ],
-                  ),
-                )),
-            TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'ARD',
-                        style: tstyle,
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                          checked: siegeARD,
-                          onChanged: (s) {
-                            siegeARD = s ?? false;
-                            setState(() {});
-                          })
-                    ],
-                  ),
-                )),
-            TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'TOIT',
-                        style: tstyle,
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                          checked: toit,
-                          onChanged: (s) {
-                            toit = s ?? false;
-                            setState(() {});
-                          })
-                    ],
-                  ),
-                )),
-          ]
-      ),
-      TableRow(
-          children: [
-            TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'ARG',
-                        style: tstyle,
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                          checked: aileARG,
-                          onChanged: (s) {
-                            setState(() {
-                              aileARG = s ?? false;
-
-                            });
-                          })
-                    ],
-                  ),
-                )),
-            const TableCell(child: SizedBox()),
-            TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'ARG',
-                        style: tstyle,
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                          checked: porteARG,
-                          onChanged: (s) {
-                            porteARG = s ?? false;
-                            setState(() {});
-                          })
-                    ],
-                  ),
-                )),
-            TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'ARG',
-                        style: tstyle,
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                          checked: siegeARG,
-                          onChanged: (s) {
-                            siegeARG = s ?? false;
-                            setState(() {});
-                          })
-                    ],
-                  ),
-                )),
-            TableCell(
-                child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'COFFRE',
-                        style: tstyle,
-                      ),
-                      const Spacer(),
-                      Checkbox(
-                          checked: coffre,
-                          onChanged: (s) {
-                            coffre = s ?? false;
-                            setState(() {});
-                          })
-                    ],
-                  ),
-                )),
-          ]
-      ),
+              const Spacer(),
+              Checkbox(
+                  checked: porteAVG,
+                  onChanged: (s) {
+                    porteAVG = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVG',
+                style: tstyle,
+              ),
+              const Spacer(),
+              Checkbox(
+                  checked: siegeAVG,
+                  onChanged: (s) {
+                    siegeAVG = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'CAPOT',
+                style: tstyle,
+              ),
+              const Spacer(),
+              Checkbox(
+                  checked: capot,
+                  onChanged: (s) {
+                    capot = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
+      ]),
+      TableRow(children: [
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARD',
+                style: tstyle,
+              ),
+              const Spacer(),
+              Checkbox(
+                  checked: aileARD,
+                  onChanged: (s) {
+                    setState(() {
+                      aileARD = s ?? false;
+                    });
+                  })
+            ],
+          ),
+        )),
+        const TableCell(child: SizedBox()),
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARD',
+                style: tstyle,
+              ),
+              const Spacer(),
+              Checkbox(
+                  checked: porteARD,
+                  onChanged: (s) {
+                    porteARD = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARD',
+                style: tstyle,
+              ),
+              const Spacer(),
+              Checkbox(
+                  checked: siegeARD,
+                  onChanged: (s) {
+                    siegeARD = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'TOIT',
+                style: tstyle,
+              ),
+              const Spacer(),
+              Checkbox(
+                  checked: toit,
+                  onChanged: (s) {
+                    toit = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
+      ]),
+      TableRow(children: [
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARG',
+                style: tstyle,
+              ),
+              const Spacer(),
+              Checkbox(
+                  checked: aileARG,
+                  onChanged: (s) {
+                    setState(() {
+                      aileARG = s ?? false;
+                    });
+                  })
+            ],
+          ),
+        )),
+        const TableCell(child: SizedBox()),
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARG',
+                style: tstyle,
+              ),
+              const Spacer(),
+              Checkbox(
+                  checked: porteARG,
+                  onChanged: (s) {
+                    porteARG = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARG',
+                style: tstyle,
+              ),
+              const Spacer(),
+              Checkbox(
+                  checked: siegeARG,
+                  onChanged: (s) {
+                    siegeARG = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
+        TableCell(
+            child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'COFFRE',
+                style: tstyle,
+              ),
+              const Spacer(),
+              Checkbox(
+                  checked: coffre,
+                  onChanged: (s) {
+                    coffre = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
+      ]),
     ];
   }
-  double lightHeight=25.px;
-  double lightWidth=25.px;
-  Widget vehicleDamage(AppTheme appTheme){
 
+  double lightHeight = 25.px;
+  double lightWidth = 25.px;
+  Widget vehicleDamage(AppTheme appTheme) {
     return SizedBox(
       width: 317.px,
       height: 148.px,
@@ -1407,11 +1567,10 @@ class _ReparationFormState extends State<ReparationForm> {
         children: [
           ///image
           Positioned.fill(
-            left: 10.px,
+              left: 10.px,
               right: 5.px,
-              child: Image.asset('assets/images/car.webp',fit: BoxFit.fitWidth,
-                color:appTheme.writingStyle.color
-              )),
+              child: Image.asset('assets/images/car.webp',
+                  fit: BoxFit.fitWidth, color: appTheme.writingStyle.color)),
           ...getFeux(appTheme),
           ...getAutres(appTheme),
           ...getSiegeEtPortes(appTheme),
@@ -1423,12 +1582,13 @@ class _ReparationFormState extends State<ReparationForm> {
       ),
     );
   }
-  List<Positioned> getAutres(AppTheme appTheme){
+
+  List<Positioned> getAutres(AppTheme appTheme) {
     return [
       ///CALANDRE
       Positioned(
           left: 9.px,
-          top:60.px,
+          top: 60.px,
           child: SizedBox(
             width: lightWidth,
             height: lightHeight,
@@ -1436,25 +1596,25 @@ class _ReparationFormState extends State<ReparationForm> {
               children: [
                 OnTapScaleAndFade(
                   child: Container(
-                    height:lightHeight,
+                    height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: calandre?appTheme.getRadiantDarkest()
-                          : null,
+                      gradient: calandre ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      calandre=!calandre;
+                      calandre = !calandre;
                     });
                   },
                 ),
               ],
             ),
           )),
+
       ///Capot
       Positioned(
           left: 50.px,
-          top:60.px,
+          top: 60.px,
           child: SizedBox(
             width: lightWidth,
             height: lightHeight,
@@ -1462,25 +1622,25 @@ class _ReparationFormState extends State<ReparationForm> {
               children: [
                 OnTapScaleAndFade(
                   child: Container(
-                    height:lightHeight,
+                    height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: capot?appTheme.getRadiantDarkest()
-                          : null,
+                      gradient: capot ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      capot=!capot;
+                      capot = !capot;
                     });
                   },
                 ),
               ],
             ),
           )),
+
       ///Toit
       Positioned(
           left: 160.px,
-          top:60.px,
+          top: 60.px,
           child: SizedBox(
             width: lightWidth,
             height: lightHeight,
@@ -1488,25 +1648,25 @@ class _ReparationFormState extends State<ReparationForm> {
               children: [
                 OnTapScaleAndFade(
                   child: Container(
-                    height:lightHeight,
+                    height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: toit?appTheme.getRadiantDarkest()
-                          : null,
+                      gradient: toit ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      toit=!toit;
+                      toit = !toit;
                     });
                   },
                 ),
               ],
             ),
           )),
+
       ///Coffre
       Positioned(
           left: 263.px,
-          top:60.px,
+          top: 60.px,
           child: SizedBox(
             width: lightWidth,
             height: lightHeight,
@@ -1514,15 +1674,14 @@ class _ReparationFormState extends State<ReparationForm> {
               children: [
                 OnTapScaleAndFade(
                   child: Container(
-                    height:lightHeight,
+                    height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: coffre?appTheme.getRadiantDarkest()
-                          : null,
+                      gradient: coffre ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      coffre=!coffre;
+                      coffre = !coffre;
                     });
                   },
                 ),
@@ -1531,7 +1690,8 @@ class _ReparationFormState extends State<ReparationForm> {
           )),
     ];
   }
-  List<Positioned> getAiles(AppTheme appTheme){
+
+  List<Positioned> getAiles(AppTheme appTheme) {
     return [
       ///Ailes AV
       Positioned(
@@ -1546,14 +1706,13 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: aileAVD == true
-                          ? appTheme.getRadiantDarkest()
-                          : null,
+                      gradient:
+                          aileAVD == true ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      aileAVD=!aileAVD;
+                      aileAVD = !aileAVD;
                     });
                   },
                 ),
@@ -1564,20 +1723,20 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: aileAVG == true
-                          ? appTheme.getRadiantDarkest()
-                          : null,
+                      gradient:
+                          aileAVG == true ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
-                  onTap: (){
+                  onTap: () {
                     setState(() {
-                      aileAVG=!aileAVG;
+                      aileAVG = !aileAVG;
                     });
                   },
                 ),
               ],
             ),
           )),
+
       ///Aile AR
       Positioned(
           left: 290.px,
@@ -1591,14 +1750,13 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: aileARD == true
-                          ? appTheme.getRadiantDarkest()
-                          : null,
+                      gradient:
+                          aileARD == true ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      aileARD=!aileARD;
+                      aileARD = !aileARD;
                     });
                   },
                 ),
@@ -1609,14 +1767,13 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: aileARG == true
-                          ? appTheme.getRadiantDarkest()
-                          : null,
+                      gradient:
+                          aileARG == true ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
-                  onTap: (){
+                  onTap: () {
                     setState(() {
-                      aileARG=!aileARG;
+                      aileARG = !aileARG;
                     });
                   },
                 ),
@@ -1625,12 +1782,13 @@ class _ReparationFormState extends State<ReparationForm> {
           )),
     ];
   }
-  List<Positioned> getPareChocs(AppTheme appTheme){
+
+  List<Positioned> getPareChocs(AppTheme appTheme) {
     return [
       ///Pare-choc AV
       Positioned(
           left: -2.px,
-          top:60.px,
+          top: 60.px,
           child: SizedBox(
             width: lightWidth,
             height: lightHeight,
@@ -1638,21 +1796,21 @@ class _ReparationFormState extends State<ReparationForm> {
               children: [
                 OnTapScaleAndFade(
                   child: Container(
-                    height:lightHeight,
+                    height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: parAV?appTheme.getRadiantDarkest()
-                          : null,
+                      gradient: parAV ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      parAV=!parAV;
+                      parAV = !parAV;
                     });
                   },
                 ),
               ],
             ),
           )),
+
       ///Pare-choc AR
       Positioned(
           left: 292.px,
@@ -1666,14 +1824,13 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: parAR == true
-                          ? appTheme.getRadiantDarkest()
-                          : null,
+                      gradient:
+                          parAR == true ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      parAR=!parAR;
+                      parAR = !parAR;
                     });
                   },
                 ),
@@ -1682,7 +1839,8 @@ class _ReparationFormState extends State<ReparationForm> {
           )),
     ];
   }
-  List<Positioned> getSiegeEtPortes(AppTheme appTheme){
+
+  List<Positioned> getSiegeEtPortes(AppTheme appTheme) {
     return [
       ///Portes avant
       Positioned(
@@ -1697,12 +1855,12 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: porteAVD?appTheme.getRadiantDarkest():null,
+                      gradient: porteAVD ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      porteAVD=!porteAVD;
+                      porteAVD = !porteAVD;
                     });
                   },
                 ),
@@ -1713,18 +1871,19 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: porteAVG?appTheme.getRadiantDarkest():null,
+                      gradient: porteAVG ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      porteAVG=!porteAVG;
+                      porteAVG = !porteAVG;
                     });
                   },
                 ),
               ],
             ),
           )),
+
       ///Sieges avant
       Positioned(
           left: 130.px,
@@ -1738,12 +1897,12 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: siegeAVD?appTheme.getRadiantDarkest():null,
+                      gradient: siegeAVD ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      siegeAVD=!siegeAVD;
+                      siegeAVD = !siegeAVD;
                     });
                   },
                 ),
@@ -1754,18 +1913,19 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: siegeAVG?appTheme.getRadiantDarkest():null,
+                      gradient: siegeAVG ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      siegeAVG=!siegeAVG;
+                      siegeAVG = !siegeAVG;
                     });
                   },
                 ),
               ],
             ),
           )),
+
       ///Sieges arriere
       Positioned(
           left: 190.px,
@@ -1779,12 +1939,12 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: siegeARD?appTheme.getRadiantDarkest():null,
+                      gradient: siegeARD ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      siegeARD=!siegeARD;
+                      siegeARD = !siegeARD;
                     });
                   },
                 ),
@@ -1795,18 +1955,19 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: siegeARG?appTheme.getRadiantDarkest():null,
+                      gradient: siegeARG ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      siegeARG=!siegeARG;
+                      siegeARG = !siegeARG;
                     });
                   },
                 ),
               ],
             ),
           )),
+
       ///Portes arriere
       Positioned(
           left: 180.px,
@@ -1820,12 +1981,12 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: porteARD?appTheme.getRadiantDarkest():null,
+                      gradient: porteARD ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      porteARD=!porteARD;
+                      porteARD = !porteARD;
                     });
                   },
                 ),
@@ -1836,12 +1997,12 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: porteARG?appTheme.getRadiantDarkest():null,
+                      gradient: porteARG ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      porteARG=!porteARG;
+                      porteARG = !porteARG;
                     });
                   },
                 ),
@@ -1850,7 +2011,8 @@ class _ReparationFormState extends State<ReparationForm> {
           )),
     ];
   }
-  List<Positioned> getFeux(AppTheme appTheme){
+
+  List<Positioned> getFeux(AppTheme appTheme) {
     return [
       ///Feux AV
       Positioned(
@@ -1865,14 +2027,13 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: feuAVD == true
-                          ? appTheme.getRadiantDarkest()
-                          : null,
+                      gradient:
+                          feuAVD == true ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
-                  onTap: (){
+                  onTap: () {
                     setState(() {
-                      feuAVD=!feuAVD;
+                      feuAVD = !feuAVD;
                     });
                   },
                 ),
@@ -1883,26 +2044,26 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: feuAVG == true
-                          ? appTheme.getRadiantDarkest()
-                          : null,
+                      gradient:
+                          feuAVG == true ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
-                  onTap: (){
+                  onTap: () {
                     setState(() {
-                      feuAVG=!feuAVG;
+                      feuAVG = !feuAVG;
                     });
                   },
                 ),
               ],
             ),
           )),
+
       ///Phare
       Positioned(
           left: 19.px,
           top: 5.px,
           child: SizedBox(
-            width:lightWidth,
+            width: lightWidth,
             height: 30.h,
             child: Column(
               children: [
@@ -1910,14 +2071,13 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: phareD == true
-                          ? appTheme.getRadiantDarkest()
-                          : null,
+                      gradient:
+                          phareD == true ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      phareD=!phareD;
+                      phareD = !phareD;
                     });
                   },
                 ),
@@ -1928,20 +2088,20 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: phareG == true
-                          ? appTheme.getRadiantDarkest()
-                          : null,
+                      gradient:
+                          phareG == true ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
-                  onTap: (){
+                  onTap: () {
                     setState(() {
-                      phareG=!phareG;
+                      phareG = !phareG;
                     });
                   },
                 ),
               ],
             ),
           )),
+
       ///Feux AR
       Positioned(
           left: 286.px,
@@ -1955,14 +2115,13 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: feuARD == true
-                          ? appTheme.getRadiantDarkest()
-                          : null,
+                      gradient:
+                          feuARD == true ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
-                  onTap: (){
+                  onTap: () {
                     setState(() {
-                      feuARD=!feuARD;
+                      feuARD = !feuARD;
                     });
                   },
                 ),
@@ -1973,29 +2132,28 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: feuARG == true
-                          ? appTheme.getRadiantDarkest()
-                          : null,
+                      gradient:
+                          feuARG == true ? appTheme.getRadiantDarkest() : null,
                     ),
                   ),
-                  onTap: (){
+                  onTap: () {
                     setState(() {
-                      feuARG=!feuARG;
+                      feuARG = !feuARG;
                     });
                   },
                 ),
-
               ],
             ),
           )),
     ];
   }
-  List<Positioned> getPareBrises(AppTheme appTheme){
+
+  List<Positioned> getPareBrises(AppTheme appTheme) {
     return [
       ///Pare-brise AV
       Positioned(
           left: 92.px,
-          top:60.px,
+          top: 60.px,
           child: SizedBox(
             width: lightWidth,
             height: 4.75.w,
@@ -2003,36 +2161,35 @@ class _ReparationFormState extends State<ReparationForm> {
               children: [
                 OnTapScaleAndFade(
                   child: Container(
-                    height:lightHeight,
+                    height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: parAve?
-                      appTheme.getRadiantDarkest()
-                          :parAvc?appTheme.getRadiantStandard():
-                      parAvf?appTheme.getRadiantLight()
-                          : null,
+                      gradient: parAve
+                          ? appTheme.getRadiantDarkest()
+                          : parAvc
+                              ? appTheme.getRadiantStandard()
+                              : parAvf
+                                  ? appTheme.getRadiantLight()
+                                  : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      if(parAvf){
-                        parAvf=false;
-                        parAvc=true;
-                        parAve=false;
-                      }
-                      else if(parAvc){
-                        parAvc=false;
-                        parAve=true;
-                        parAvf=false;
-                      }
-                      else if(parAve){
-                        parAve=false;
-                        parAvf=false;
-                        parAvc=false;
-                      }
-                      else {
-                        parAve=false;
-                        parAvf=true;
-                        parAvc=false;
+                      if (parAvf) {
+                        parAvf = false;
+                        parAvc = true;
+                        parAve = false;
+                      } else if (parAvc) {
+                        parAvc = false;
+                        parAve = true;
+                        parAvf = false;
+                      } else if (parAve) {
+                        parAve = false;
+                        parAvf = false;
+                        parAvc = false;
+                      } else {
+                        parAve = false;
+                        parAvf = true;
+                        parAvc = false;
                       }
                     });
                   },
@@ -2040,10 +2197,11 @@ class _ReparationFormState extends State<ReparationForm> {
               ],
             ),
           )),
+
       ///Pare-brise AR
       Positioned(
           left: 227.px,
-          top:60.px,
+          top: 60.px,
           child: SizedBox(
             width: lightWidth,
             height: 30.h,
@@ -2053,34 +2211,33 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: parAre?
-                      appTheme.getRadiantDarkest()
-                          :parArc?appTheme.getRadiantStandard():
-                      parArf?appTheme.getRadiantLight()
-                          : null,
+                      gradient: parAre
+                          ? appTheme.getRadiantDarkest()
+                          : parArc
+                              ? appTheme.getRadiantStandard()
+                              : parArf
+                                  ? appTheme.getRadiantLight()
+                                  : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      if(parArf){
-                        parArf=false;
-                        parArc=true;
-                        parAre=false;
-                      }
-                      else if(parArc){
-                        parArc=false;
-                        parAre=true;
-                        parArf=false;
-                      }
-                      else if(parAre){
-                        parAre=false;
-                        parArf=false;
-                        parArc=false;
-                      }
-                      else {
-                        parAre=false;
-                        parArf=true;
-                        parArc=false;
+                      if (parArf) {
+                        parArf = false;
+                        parArc = true;
+                        parAre = false;
+                      } else if (parArc) {
+                        parArc = false;
+                        parAre = true;
+                        parArf = false;
+                      } else if (parAre) {
+                        parAre = false;
+                        parArf = false;
+                        parArc = false;
+                      } else {
+                        parAre = false;
+                        parArf = true;
+                        parArc = false;
                       }
                     });
                   },
@@ -2090,7 +2247,8 @@ class _ReparationFormState extends State<ReparationForm> {
           )),
     ];
   }
-  List<Positioned> getPneumatiques(AppTheme appTheme){
+
+  List<Positioned> getPneumatiques(AppTheme appTheme) {
     return [
       ///Roues avant
       Positioned(
@@ -2105,31 +2263,25 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: getLightIntensityFromPourc(avdp,appTheme),
+                      gradient: getLightIntensityFromPourc(avdp, appTheme),
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      if(avdp<=20){
-                        avdp=30;
-                      }
-                      else if(avdp<=30){
-                        avdp=50;
-                      }
-                      else if(avdp<=50){
-                        avdp=60;
-                      }
-                      else if(avdp<=60){
-                        avdp=80;
-                      }
-                      else if(avdp<=80){
-                        avdp=90;
-                      }
-                      else if(avdp<=90){
-                        avdp=100;
-                      }
-                      else{
-                        avdp=20;
+                      if (avdp <= 20) {
+                        avdp = 30;
+                      } else if (avdp <= 30) {
+                        avdp = 50;
+                      } else if (avdp <= 50) {
+                        avdp = 60;
+                      } else if (avdp <= 60) {
+                        avdp = 80;
+                      } else if (avdp <= 80) {
+                        avdp = 90;
+                      } else if (avdp <= 90) {
+                        avdp = 100;
+                      } else {
+                        avdp = 20;
                       }
                     });
                   },
@@ -2141,31 +2293,25 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: getLightIntensityFromPourc(avgp,appTheme),
+                      gradient: getLightIntensityFromPourc(avgp, appTheme),
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      if(avgp<=20){
-                        avgp=30;
-                      }
-                      else if(avgp<=30){
-                        avgp=50;
-                      }
-                      else if(avgp<=50){
-                        avgp=60;
-                      }
-                      else if(avgp<=60){
-                        avgp=80;
-                      }
-                      else if(avgp<=80){
-                        avgp=90;
-                      }
-                      else if(avgp<=90){
-                        avgp=100;
-                      }
-                      else{
-                        avgp=20;
+                      if (avgp <= 20) {
+                        avgp = 30;
+                      } else if (avgp <= 30) {
+                        avgp = 50;
+                      } else if (avgp <= 50) {
+                        avgp = 60;
+                      } else if (avgp <= 60) {
+                        avgp = 80;
+                      } else if (avgp <= 80) {
+                        avgp = 90;
+                      } else if (avgp <= 90) {
+                        avgp = 100;
+                      } else {
+                        avgp = 20;
                       }
                     });
                   },
@@ -2173,6 +2319,7 @@ class _ReparationFormState extends State<ReparationForm> {
               ],
             ),
           )),
+
       ///Roues arriere
       Positioned(
           left: 237.px,
@@ -2186,31 +2333,25 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: getLightIntensityFromPourc(ardp,appTheme),
+                      gradient: getLightIntensityFromPourc(ardp, appTheme),
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      if(ardp<=20){
-                        ardp=30;
-                      }
-                      else if(ardp<=30){
-                        ardp=50;
-                      }
-                      else if(ardp<=50){
-                        ardp=60;
-                      }
-                      else if(ardp<=60){
-                        ardp=80;
-                      }
-                      else if(ardp<=80){
-                        ardp=90;
-                      }
-                      else if(ardp<=90){
-                        ardp=100;
-                      }
-                      else{
-                        ardp=20;
+                      if (ardp <= 20) {
+                        ardp = 30;
+                      } else if (ardp <= 30) {
+                        ardp = 50;
+                      } else if (ardp <= 50) {
+                        ardp = 60;
+                      } else if (ardp <= 60) {
+                        ardp = 80;
+                      } else if (ardp <= 80) {
+                        ardp = 90;
+                      } else if (ardp <= 90) {
+                        ardp = 100;
+                      } else {
+                        ardp = 20;
                       }
                     });
                   },
@@ -2222,31 +2363,25 @@ class _ReparationFormState extends State<ReparationForm> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: getLightIntensityFromPourc(argp,appTheme),
+                      gradient: getLightIntensityFromPourc(argp, appTheme),
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      if(argp<=20){
-                        argp=30;
-                      }
-                      else if(argp<=30){
-                        argp=50;
-                      }
-                      else if(argp<=50){
-                        argp=60;
-                      }
-                      else if(argp<=60){
-                        argp=80;
-                      }
-                      else if(ardp<=80){
-                        ardp=90;
-                      }
-                      else if(argp<=90){
-                        argp=100;
-                      }
-                      else{
-                        argp=20;
+                      if (argp <= 20) {
+                        argp = 30;
+                      } else if (argp <= 30) {
+                        argp = 50;
+                      } else if (argp <= 50) {
+                        argp = 60;
+                      } else if (argp <= 60) {
+                        argp = 80;
+                      } else if (ardp <= 80) {
+                        ardp = 90;
+                      } else if (argp <= 90) {
+                        argp = 100;
+                      } else {
+                        argp = 20;
                       }
                     });
                   },
@@ -2256,36 +2391,29 @@ class _ReparationFormState extends State<ReparationForm> {
           )),
     ];
   }
-  RadialGradient? getLightIntensityFromPourc(double pourc,AppTheme appTheme){
-    if(pourc<=20){
+
+  RadialGradient? getLightIntensityFromPourc(double pourc, AppTheme appTheme) {
+    if (pourc <= 20) {
       return appTheme.getRadiantDarkest();
-    }
-    else if(pourc<=30){
+    } else if (pourc <= 30) {
       return appTheme.getRadiantDarker();
-    }
-    else if(pourc<=50){
+    } else if (pourc <= 50) {
       return appTheme.getRadiantDark();
-    }
-    else if(pourc<=60){
+    } else if (pourc <= 60) {
       return appTheme.getRadiantStandard();
-    }
-    else if(pourc<=80){
+    } else if (pourc <= 80) {
       return appTheme.getRadiantLight();
-
-    }
-    else if(pourc<=90){
+    } else if (pourc <= 90) {
       return appTheme.getRadiantLighter();
-
-    }
-    else if(pourc<100){
+    } else if (pourc < 100) {
       return appTheme.getRadiantLightest();
-    }
-    else {
+    } else {
       return null;
     }
   }
-  Widget entretienWidgets(AppTheme appTheme){
-    return  Container(
+
+  Widget entretienWidgets(AppTheme appTheme) {
+    return Container(
       width: 80.w,
       height: 24.h,
       padding: const EdgeInsets.all(5),
@@ -2305,10 +2433,10 @@ class _ReparationFormState extends State<ReparationForm> {
                   'Vidange moteur',
                   style: tstyle,
                 ),
-                checked: r1,
+                checked: vidangeMoteur,
                 onChanged: (s) {
                   setState(() {
-                    r1 = s;
+                    vidangeMoteur = s;
                   });
                 },
               ),
@@ -2318,10 +2446,10 @@ class _ReparationFormState extends State<ReparationForm> {
                   'Vidange boite',
                   style: tstyle,
                 ),
-                checked: r2,
+                checked: vidangeBoite,
                 onChanged: (s) {
                   setState(() {
-                    r2 = s;
+                    vidangeBoite = s;
                   });
                 },
               ),
@@ -2331,10 +2459,10 @@ class _ReparationFormState extends State<ReparationForm> {
                   'Vidange pont AV AR',
                   style: tstyle,
                 ),
-                checked: r3,
+                checked: vidangePont,
                 onChanged: (s) {
                   setState(() {
-                    r3 = s;
+                    vidangePont = s;
                   });
                 },
               ),
@@ -2344,10 +2472,10 @@ class _ReparationFormState extends State<ReparationForm> {
                   'Filtre à air',
                   style: tstyle,
                 ),
-                checked: r4,
+                checked: filtreAir,
                 onChanged: (s) {
                   setState(() {
-                    r4 = s;
+                    filtreAir = s;
                   });
                 },
               ),
@@ -2357,10 +2485,10 @@ class _ReparationFormState extends State<ReparationForm> {
                   'Filtre à huile',
                   style: tstyle,
                 ),
-                checked: r5,
+                checked: filtreHuile,
                 onChanged: (s) {
                   setState(() {
-                    r5 = s;
+                    filtreHuile = s;
                   });
                 },
               ),
@@ -2370,10 +2498,10 @@ class _ReparationFormState extends State<ReparationForm> {
                   'Filtre à carburant',
                   style: tstyle,
                 ),
-                checked: r6,
+                checked: filtreCarburant,
                 onChanged: (s) {
                   setState(() {
-                    r6 = s;
+                    filtreCarburant = s;
                   });
                 },
               ),
@@ -2389,10 +2517,10 @@ class _ReparationFormState extends State<ReparationForm> {
                   "Filtre d'habitacle",
                   style: tstyle,
                 ),
-                checked: r7,
+                checked: filtreHabitacle,
                 onChanged: (s) {
                   setState(() {
-                    r7 = s;
+                    filtreHabitacle = s;
                   });
                 },
               ),
@@ -2402,10 +2530,10 @@ class _ReparationFormState extends State<ReparationForm> {
                   'Liquide de frein',
                   style: tstyle,
                 ),
-                checked: r8,
+                checked: liquideFrein,
                 onChanged: (s) {
                   setState(() {
-                    r8 = s;
+                    liquideFrein = s;
                   });
                 },
               ),
@@ -2415,10 +2543,10 @@ class _ReparationFormState extends State<ReparationForm> {
                   'Liquide de refroidissement',
                   style: tstyle,
                 ),
-                checked: r9,
+                checked: liquideRefroidissement,
                 onChanged: (s) {
                   setState(() {
-                    r9 = s;
+                    liquideRefroidissement = s;
                   });
                 },
               ),
@@ -2468,7 +2596,6 @@ class _ReparationFormState extends State<ReparationForm> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               ToggleSwitch(
                 content: Text(
                   'Balais essuie-glace',
