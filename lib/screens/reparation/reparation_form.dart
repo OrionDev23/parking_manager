@@ -508,6 +508,9 @@ class _ReparationFormState extends State<ReparationForm> {
                                   color: appTheme.color.lightest,
                                 ),
                               ],
+                              annotations: [
+                                GaugeAnnotation(widget: Text('4/8',style: tstyle,),axisValue: 4,positionFactor: 0.7,),
+                              ],
                               pointers: [
                                 NeedlePointer(
                                   animationDuration: 500,
