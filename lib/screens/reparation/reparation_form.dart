@@ -96,8 +96,6 @@ class _ReparationFormState extends State<ReparationForm> {
   );
   final tstyle = TextStyle(fontSize: 10.sp);
 
-
-
   TextEditingController numOrdre = TextEditingController();
   DateTime selectedDate = DateTime.now();
 
@@ -438,12 +436,17 @@ class _ReparationFormState extends State<ReparationForm> {
                               ],
                             ),
                           ),
-                          SizedBox(height: 16.px,),
-                          Container(height: 1.px,decoration: const BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(),
+                          SizedBox(
+                            height: 16.px,
+                          ),
+                          Container(
+                            height: 1.px,
+                            decoration: const BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(),
+                              ),
                             ),
-                          ),),
+                          ),
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Row(
@@ -509,7 +512,14 @@ class _ReparationFormState extends State<ReparationForm> {
                                 ),
                               ],
                               annotations: [
-                                GaugeAnnotation(widget: Text('4/8',style: tstyle,),axisValue: 4,positionFactor: 0.7,),
+                                GaugeAnnotation(
+                                  widget: Text(
+                                    '4/8',
+                                    style: tstyle,
+                                  ),
+                                  axisValue: 4,
+                                  positionFactor: 0.7,
+                                ),
                               ],
                               pointers: [
                                 NeedlePointer(
@@ -536,7 +546,7 @@ class _ReparationFormState extends State<ReparationForm> {
                         )),
                   )),
                   TableCell(
-                    verticalAlignment: TableCellVerticalAlignment.top,
+                      verticalAlignment: TableCellVerticalAlignment.top,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -565,12 +575,17 @@ class _ReparationFormState extends State<ReparationForm> {
                               ],
                             ),
                           ),
-                          SizedBox(height: 16.px,),
-                          Container(height: 1.px,decoration: const BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(),
+                          SizedBox(
+                            height: 16.px,
+                          ),
+                          Container(
+                            height: 1.px,
+                            decoration: const BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(),
+                              ),
                             ),
-                          ),),
+                          ),
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Row(
@@ -614,19 +629,24 @@ class _ReparationFormState extends State<ReparationForm> {
                                 SizedBox(
                                     width: 80.px,
                                     child: DatePicker(
-                                  selected: anneeUtil,
-                                  showDay: false,
-                                  showMonth: false,
-                                ))
+                                      selected: anneeUtil,
+                                      showDay: false,
+                                      showMonth: false,
+                                    ))
                               ],
                             ),
                           ),
-                          SizedBox(height: 16.px,),
-                          Container(height: 1.px,decoration: const BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(),
+                          SizedBox(
+                            height: 16.px,
+                          ),
+                          Container(
+                            height: 1.px,
+                            decoration: const BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(),
+                              ),
                             ),
-                          ),),
+                          ),
                         ],
                       )),
                 ]),
@@ -687,10 +707,93 @@ class _ReparationFormState extends State<ReparationForm> {
           bigSpace,
           bigSpace,
           bigSpace,
-          vehicleDamage(appTheme),
+          Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            vehicleDamage(appTheme),
+            bigSpace,
+            Row(children: [
+              Button(
+                  onPressed: clearAllVehicleDamage, child: const Text('clear').tr()),
+              smallSpace,
+              FilledButton(
+                  onPressed: selectAllVehicleDamage,
+                  child: const Text('selectall').tr()),
+            ]),
+          ]),
         ],
       ),
     );
+  }
+
+  void clearAllVehicleDamage() {
+    avdp = 100;
+    avgp = 100;
+    ardp = 100;
+    argp = 100;
+    parAvf = false;
+    parAvc = false;
+    parAve = false;
+    parArf = false;
+    parArc = false;
+    parAre = false;
+    phareG = false;
+    phareD = false;
+    feuAVD = false;
+    feuAVG = false;
+    feuARD = false;
+    feuARG = false;
+    aileAVD = false;
+    aileAVG = false;
+    aileARD = false;
+    aileARG = false;
+    parAV = false;
+    parAR = false;
+    porteAVD = false;
+    porteAVG = false;
+    porteARD = false;
+    porteARG = false;
+    toit = false;
+    capot = false;
+    coffre = false;
+    siegeAVD = false;
+    siegeAVG = false;
+    siegeARD = false;
+    siegeARG = false;
+    calandre = false;
+    setState(() {});
+  }
+
+  void selectAllVehicleDamage() {
+    avdp = 0;
+    avgp = 0;
+    ardp = 0;
+    argp = 0;
+    parAve = true;
+    parAre = true;
+    phareG = true;
+    phareD = true;
+    feuAVD = true;
+    feuAVG = true;
+    feuARD = true;
+    feuARG = true;
+    aileAVD = true;
+    aileAVG = true;
+    aileARD = true;
+    aileARG = true;
+    parAV = true;
+    parAR = true;
+    porteAVD = true;
+    porteAVG = true;
+    porteARD = true;
+    porteARG = true;
+    toit = true;
+    capot = true;
+    coffre = true;
+    siegeAVD = true;
+    siegeAVG = true;
+    siegeARD = true;
+    siegeARG = true;
+    calandre = true;
+    setState(() {});
   }
 
   Widget topTable(AppTheme appTheme) {

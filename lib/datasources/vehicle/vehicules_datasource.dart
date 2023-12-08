@@ -12,9 +12,6 @@ import '../parcoto_datasource.dart';
 
 class VehiculesDataSource extends ParcOtoDatasource<Vehicle> {
 
-
-
-
   VehiculesDataSource({required super.current,super.appTheme,super.filters,super.searchKey,super.selectC, required super.collectionID}){
     repo =VehiculesWebService(data,collectionID,8);
   }
