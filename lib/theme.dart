@@ -2,6 +2,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'utilities/theme_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_theme/system_theme.dart';
@@ -18,6 +19,15 @@ const bigSpace=SizedBox(
   width: 10,
   height: 10,
 );
+final  headerStyle = TextStyle(
+  fontSize: 14.sp,
+  fontWeight: FontWeight.bold,
+);
+final boldStyle = TextStyle(
+  fontSize: 12.sp,
+  fontWeight: FontWeight.bold,
+);
+final littleStyle = TextStyle(fontSize: 10.sp);
 const snackbarShortDuration=Duration(seconds: 2);
 class AppTheme extends ChangeNotifier {
   AccentColor _color = systemAccentColor;

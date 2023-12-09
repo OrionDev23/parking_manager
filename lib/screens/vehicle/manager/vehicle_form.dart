@@ -1079,14 +1079,14 @@ class _VehicleFormState extends State<VehicleForm>
                                               child: Column(
                                                 children: [
                                                   const Text(
-                                                    'numerserie',
+                                                    'nchassi',
                                                     style: tstyle,
                                                   ).tr(),
                                                   TextBox(
                                                     controller: numSer,
                                                     maxLength: 30,
                                                     placeholder:
-                                                        'numerserie'.tr(),
+                                                        'nchassi'.tr(),
                                                     placeholderStyle:
                                                         placeStyle,
                                                     cursorColor:
