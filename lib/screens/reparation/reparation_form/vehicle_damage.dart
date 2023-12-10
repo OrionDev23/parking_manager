@@ -42,7 +42,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
               height: 40.px,
               child: Row(
                 children: [
-                  Text(
+                  const Text(
                     "Vérifier l'état de la voiture ?",
                   ),
                   const Spacer(),
