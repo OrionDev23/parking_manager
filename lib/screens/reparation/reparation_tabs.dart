@@ -28,7 +28,7 @@ class ReparationTabsState extends State<ReparationTabs> {
       text: Text('nouvrepar'.tr()),
       semanticLabel: 'nouvrepar'.tr(),
       icon: const Icon(Bootstrap.shop),
-      body: const ReparationForm(),
+      body: ReparationForm(key: UniqueKey(),),
       onClosed: () {
         if(widget.archive){
           tabs2.remove(tab);

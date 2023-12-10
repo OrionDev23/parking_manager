@@ -3,9 +3,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/screens/reparation/reparation_form.dart';
 import 'package:parc_oto/screens/reparation/reparation_table.dart';
 import 'package:parc_oto/screens/reparation/reparation_tabs.dart';
-import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import '../../../../theme.dart';
 import '../../../../widgets/button_container.dart';
 import '../../../../widgets/page_header.dart';
 
@@ -26,7 +24,6 @@ class ReparationGestionState extends State<ReparationGestion> {
 
   @override
   Widget build(BuildContext context) {
-    var appTheme=context.watch<AppTheme>();
     return ScaffoldPage(
         header: PageTitle(
           text: 'reparations'.tr(),
@@ -60,7 +57,7 @@ class ReparationGestionState extends State<ReparationGestion> {
       text: Text('nouvprest'.tr()),
       semanticLabel: 'nouvprest'.tr(),
       icon: const Icon(FluentIcons.document),
-      body: const ReparationForm(),
+      body: ReparationForm(key: UniqueKey(),),
       onClosed: () {
         ReparationTabsState.tabs.remove(tab);
 

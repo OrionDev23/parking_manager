@@ -41,10 +41,12 @@ EtatVehicle _$EtatVehicleFromJson(Map<String, dynamic> json) => EtatVehicle(
       siegeAVD: json['siegeAVD'] as bool? ?? false,
       siegeAVG: json['siegeAVG'] as bool? ?? false,
       toit: json['toit'] as bool? ?? false,
+      showOnList: json['showOnList'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$EtatVehicleToJson(EtatVehicle instance) =>
     <String, dynamic>{
+      'showOnList': instance.showOnList,
       'avdp': instance.avdp,
       'avgp': instance.avgp,
       'ardp': instance.ardp,

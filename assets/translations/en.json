@@ -19,6 +19,7 @@
   "selectall": "Select all",
   "travaileffect": "tasks to be carried out",
   "ajoutertaches": "(Add tasks to do)",
+  "repare": "Fix ?",
 
   "daira": "Daira",
   "quittance": "Receipt",
@@ -113,6 +114,7 @@
   "nart": "ART",
   "erreur": "Error",
   "numprfact" : "Invoice number already taken",
+  "numprorder" : "Order number already taken",
   "clientselect" : "A client must be sellected/created",
   "neednum" : "You must assign a number to this invoice",
   "needclientfield" : "A client must have atleast a name AND an address",

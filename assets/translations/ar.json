@@ -23,6 +23,7 @@
   "selectall": "اختيار الكل",
   "travaileffect": "المهام المطلوب تنفيذها",
   "ajoutertaches": "(إضافة المهام للقيام بها)",
+  "repare": "إصلاح ؟",
 
   "nchassi": "رقم الطراز",
   "nmoteur": "رقم المحرك",
@@ -118,6 +119,7 @@
   "nart": "ART",
   "erreur": "خطأ",
   "numprfact" : "رقم الفاورة محجوز",
+  "numprorder" : "الرقم محجوز",
   "clientselect" : "يرجأ إنشاء/إختيار عميل",
   "neednum" : "يرجأ تحديد رقم للفاتورة",
   "needclientfield" : "للعميل إسم و عنوان على اﻷقل",

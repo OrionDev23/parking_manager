@@ -38,6 +38,9 @@ DateTime? dateFromIntJson(int? json){
     return null;
   }
 }
+DateTime dateFromIntJsonNonNull(int json){
+  return ClientDatabase.ref.add(Duration(milliseconds:json));
+}
 
 String? userToJson(ParcUser? value){
   return value?.id;

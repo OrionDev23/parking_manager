@@ -36,15 +36,16 @@ class _VehicleDamageState extends State<VehicleDamage> {
           bigSpace,
           bigSpace,
           bigSpace,
-          Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,crossAxisAlignment: CrossAxisAlignment.start, children: [
             SizedBox(
               width: 90.px,
               height: 40.px,
               child: Row(
                 children: [
                   const Text(
-                    "Réparer ?",
-                  ),
+                    "repare",
+                  ).tr(),
                   const Spacer(),
                   Checkbox(
                       checked: widget.etatVehicle.showOnList,
