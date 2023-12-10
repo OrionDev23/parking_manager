@@ -37,26 +37,23 @@ class _VehicleDamageState extends State<VehicleDamage> {
           bigSpace,
           bigSpace,
           Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Row(
-              children: [
-                Text(
-                  'CASSURE',
-                  style: littleStyle,
-                ),
-                const Spacer(),
-                Checkbox(
-                    checked: widget.etatVehicle.parBriseAvc,
-                    onChanged: (s) {
-                      if (s == true) {
-                        widget.etatVehicle.parBriseAvf = false;
-                        widget.etatVehicle.parBriseAvc = s!;
-                        widget.etatVehicle.parBriseAve = false;
-                      } else if (s == false) {
-                        widget.etatVehicle.parBriseAvc = false;
-                      }
-                      setState(() {});
-                    })
-              ],
+            SizedBox(
+              width: 200.px,
+              height: 40.px,
+              child: Row(
+                children: [
+                  Text(
+                    "Vérifier l'état de la voiture ?",
+                  ),
+                  const Spacer(),
+                  Checkbox(
+                      checked: widget.etatVehicle.showOnList,
+                      onChanged: (s) {
+                        widget.etatVehicle.showOnList=s??false;
+                        setState(() {});
+                      })
+                ],
+              ),
             ),
             vehicleDamage(appTheme),
             bigSpace,
