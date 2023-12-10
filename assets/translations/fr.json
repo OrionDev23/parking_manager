@@ -175,7 +175,7 @@
  "entretienvehicule": "ENTRETIEN DU VEHICULE",
  "etatvehicule": "ÉTAT DU VEHICULE",
  "selectentretien": "(Selectionnez ce que vous souhaitez entretenir)",
- "selectetat": "(Selectionnez ce que vous souhaitez vérifier)",
+ "selectetat": "(Indiquer l'etat actuel du vehicule)",
  "actu": "Actualiser",
  "add": "Ajouter",
  "list": "Liste",

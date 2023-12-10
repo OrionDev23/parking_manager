@@ -38,12 +38,12 @@ class _VehicleDamageState extends State<VehicleDamage> {
           bigSpace,
           Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             SizedBox(
-              width: 200.px,
+              width: 90.px,
               height: 40.px,
               child: Row(
                 children: [
                   const Text(
-                    "Vérifier l'état de la voiture ?",
+                    "Réparer ?",
                   ),
                   const Spacer(),
                   Checkbox(

@@ -15,7 +15,7 @@
   "selectentretien": "(Select what you want to maintain)",
   "entretienvehicule": "VEHICLE MAINTENANCE",
   "etatvehicule": "VEHICLE CONDITION",
-  "selectetat": "(Select what you want to check)",
+  "selectetat": "(Indicate the current state of the vehicle)",
   "selectall": "Select all",
   "travaileffect": "tasks to be carried out",
   "ajoutertaches": "(Add tasks to do)",
