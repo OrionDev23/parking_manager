@@ -37,6 +37,27 @@ class _VehicleDamageState extends State<VehicleDamage> {
           bigSpace,
           bigSpace,
           Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Row(
+              children: [
+                Text(
+                  'CASSURE',
+                  style: littleStyle,
+                ),
+                const Spacer(),
+                Checkbox(
+                    checked: widget.etatVehicle.parBriseAvc,
+                    onChanged: (s) {
+                      if (s == true) {
+                        widget.etatVehicle.parBriseAvf = false;
+                        widget.etatVehicle.parBriseAvc = s!;
+                        widget.etatVehicle.parBriseAve = false;
+                      } else if (s == false) {
+                        widget.etatVehicle.parBriseAvc = false;
+                      }
+                      setState(() {});
+                    })
+              ],
+            ),
             vehicleDamage(appTheme),
             bigSpace,
             Row(children: [
@@ -59,11 +80,15 @@ class _VehicleDamageState extends State<VehicleDamage> {
     widget.etatVehicle.avgp = value?0:100;
     widget.etatVehicle.ardp = value?0:100;
     widget.etatVehicle.argp = value?0:100;
-    widget.etatVehicle.parBriseAvf = value;
-    widget.etatVehicle.parBriseAvc = value;
+    if(!value){
+      widget.etatVehicle.parBriseAvf = value;
+      widget.etatVehicle.parBriseAvc = value;
+      widget.etatVehicle.parBriseArf = value;
+      widget.etatVehicle.parBriseArc = value;
+    }
+
     widget.etatVehicle.parBriseAve = value;
-    widget.etatVehicle.parBriseArf = value;
-    widget.etatVehicle.parBriseArc = value;
+
     widget.etatVehicle.parBriseAre = value;
     widget.etatVehicle.phareG = value;
     widget.etatVehicle.phareD = value;

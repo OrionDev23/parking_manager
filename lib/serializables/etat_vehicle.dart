@@ -5,6 +5,8 @@ import 'package:json_annotation/json_annotation.dart';
 part 'etat_vehicle.g.dart';
 @JsonSerializable()
 class EtatVehicle{
+
+  bool showOnList=false;
   double avdp = 100;
   double avgp = 100;
   double ardp = 100;
@@ -60,7 +62,7 @@ class EtatVehicle{
     this.parBriseAvf=false, this.pareChocAR=false, this.pareChocAV=false,
     this.porteARD=false, this.porteARG=false, this.porteAVD=false,
     this.porteAVG=false, this.siegeARD=false, this.siegeARG=false,
-    this.siegeAVD=false, this.siegeAVG=false, this.toit=false,
+    this.siegeAVD=false, this.siegeAVG=false, this.toit=false,this.showOnList=false
   });
 
 
