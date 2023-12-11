@@ -396,8 +396,7 @@ class ReparationFormState extends State<ReparationForm>
                 bigTitle: 'travaileffect',
                 littleTitle: 'ajoutertaches',
               ),
-              smallSpace,
-              designationTable(),
+              designationTable(appTheme),
             ],
           ),
         ),
@@ -754,7 +753,7 @@ class ReparationFormState extends State<ReparationForm>
     setState(() {});
   }
 
-  Widget designationTable() {
+  Widget designationTable(AppTheme appTheme) {
     return Container(
       decoration: BoxDecoration(
         border: Border.all(),
@@ -777,8 +776,12 @@ class ReparationFormState extends State<ReparationForm>
             ),
           ),
           smallSpace,
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          Container(
+            decoration: BoxDecoration(
+              color: appTheme.color.lightest,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(5)),
+            ),
+            padding: const EdgeInsets.all(5),
             child: Table(
               columnWidths: const {
                 0:FlexColumnWidth(3),
@@ -798,37 +801,46 @@ class ReparationFormState extends State<ReparationForm>
               ],
             ),
           ),
-          smallSpace,
-          ...List.generate(designations.length, (index) {
-            return Container(
-              color: index%2==0?appTheme.backGroun,
-              child: Column(
-                children: [
-                  Row(
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: appTheme.fillColor),
+              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(5)),
+            ),
+            child: Column(children:List.generate(designations.length, (index) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+                  decoration: BoxDecoration(
+                    color: index%2==0?appTheme.fillColor:null,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Column(
                     children: [
-                      Checkbox(
-                          checked: designations.entries.toList()[index].value.selected,
-                          onChanged: (s) {
-                            setState(() {
-                              designations.entries.toList()[index].value.selected = s ?? false;
-                            });
-                          }),
-                      smallSpace,
-                      Flexible(
-                        child: SizedBox(
-                          height:35.px,
-                          child: DesignationReparation(
-                            designation: designations.entries.toList()[index].value,
+                      Row(
+                        children: [
+                          Checkbox(
+                              checked: designations.entries.toList()[index].value.selected,
+                              onChanged: (s) {
+                                setState(() {
+                                  designations.entries.toList()[index].value.selected = s ?? false;
+                                });
+                              }),
+                          smallSpace,
+                          Flexible(
+                            child: SizedBox(
+                              height:35.px,
+                              child: DesignationReparation(
+                                designation: designations.entries.toList()[index].value,
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
+                      smallSpace,
                     ],
                   ),
-                  smallSpace,
-                ],
-              ),
-            );
-          }),
+                );
+              }),),
+          ),
         ],
       ),
     );
