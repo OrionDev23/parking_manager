@@ -24,6 +24,7 @@ import '../../serializables/designation.dart';
 import '../../serializables/entretien_vehicle.dart';
 import '../../serializables/reparation.dart';
 import '../../utilities/vehicle_util.dart';
+import '../../widgets/empty_table_widget.dart';
 
 class ReparationForm extends StatefulWidget {
   const ReparationForm({required super.key});
@@ -174,239 +175,266 @@ class ReparationFormState extends State<ReparationForm>
   Widget build(BuildContext context) {
     super.build(context);
     var appTheme = context.watch<AppTheme>();
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: appTheme.backGroundColor,
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Stack(children: [
-        Positioned.fill(
-          child: ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            children: [
-              Row(
-                children: [
-                  if (MyEntrepriseState.p != null) const EntreprisePlacement(),
-                  const Spacer(),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      if (errorNumOrder)
-                        Text(
-                          'numprorder',
-                          style: TextStyle(color: Colors.red),
-                        ).tr(),
-                      if (errorNumOrder) smallSpace,
-                      Row(
-                        children: [
+    return ScaffoldPage(
+      content: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: appTheme.backGroundColor,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(children: [
+          Positioned.fill(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              children: [
+                Row(
+                  children: [
+                    if (MyEntrepriseState.p != null) const EntreprisePlacement(),
+                    const Spacer(),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        if (errorNumOrder)
                           Text(
-                            'ORDRE DE REPARATION',
-                            style: headerStyle,
-                          ),
-                          smallSpace,
-                          Container(
-                            width: 200.px,
-                            height: 40.px,
-                            decoration: BoxDecoration(
-                              border: Border.all(),
+                            'numprorder',
+                            style: TextStyle(color: Colors.red),
+                          ).tr(),
+                        if (errorNumOrder) smallSpace,
+                        Row(
+                          children: [
+                            Text(
+                              'ORDRE DE REPARATION',
+                              style: headerStyle,
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    'num',
-                                    style: boldStyle,
-                                  ).tr(),
-                                  smallSpace,
-                                  Flexible(
-                                    child: TextBox(
-                                      controller: numOrdre,
-                                      placeholder: 'num'.tr(),
-                                      placeholderStyle: placeStyle,
-                                      style: appTheme.writingStyle,
-                                      cursorColor: appTheme.color.darker,
-                                      decoration: BoxDecoration(
-                                        color: appTheme.fillColor,
-                                      ),
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.digitsOnly
-                                      ],
-                                      onChanged: (s) async {
-                                        if (s.isNotEmpty) {
-                                          if (!await testIfOrderNumberExists()) {
-                                            reservedOrders[widget.key!] =
-                                                int.parse(s);
+                            smallSpace,
+                            Container(
+                              width: 200.px,
+                              height: 40.px,
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'num',
+                                      style: boldStyle,
+                                    ).tr(),
+                                    smallSpace,
+                                    Flexible(
+                                      child: TextBox(
+                                        controller: numOrdre,
+                                        placeholder: 'num'.tr(),
+                                        placeholderStyle: placeStyle,
+                                        style: appTheme.writingStyle,
+                                        cursorColor: appTheme.color.darker,
+                                        decoration: BoxDecoration(
+                                          color: appTheme.fillColor,
+                                        ),
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                        onChanged: (s) async {
+                                          if (s.isNotEmpty) {
+                                            if (!await testIfOrderNumberExists()) {
+                                              reservedOrders[widget.key!] =
+                                                  int.parse(s);
+                                            }
                                           }
-                                        }
-                                      },
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    'date',
-                    style: boldStyle,
-                  ).tr(),
-                  smallSpace,
-                  SizedBox(
-                    width: 200.px,
-                    height: 30.px,
-                    child: DatePicker(
-                      selected: selectedDate,
-                      onChanged: (s) {
-                        setState(() {
-                          selectedDate = s;
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    width: 250.px,
-                    height: 50.px,
-                    child: ListTile(
-                      leading: Text(
-                        'vehicule',
-                        style: boldStyle,
-                      ).tr(),
-                      title: Text(selectedVehicle?.matricule ?? 'nonind'.tr()),
-                      onPressed: () async {
-                        selectedVehicle = await showDialog<Vehicle?>(
-                            context: context,
-                            builder: (
-                              c,
-                            ) =>
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: appTheme.backGroundColor,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  clipBehavior: Clip.antiAlias,
-                                  child: const VehicleTable(
-                                    selectV: true,
-                                  ),
-                                ));
-                        setVehicleValues();
-                      },
-                    ),
-                  ),
-                  smallSpace,
-                  if (selectedVehicle != null)
-                    IconButton(
-                        icon: const Icon(FluentIcons.cancel),
-                        onPressed: () {
-                          selectedVehicle = null;
-                          setVehicleValues();
-                        }),
-                  const Spacer(),
-                  SizedBox(
-                    width: 250.px,
-                    height: 50.px,
-                    child: ListTile(
-                      leading: Text(
-                        'prestataire',
-                        style: boldStyle,
-                      ).tr(),
-                      title: Text(selectedPrest?.nom ?? 'nonind'.tr()),
-                      onPressed: () async {
-                        selectedPrest = await showDialog<Prestataire?>(
-                            context: context,
-                            builder: (
-                              c,
-                            ) =>
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: appTheme.backGroundColor,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  clipBehavior: Clip.antiAlias,
-                                  child: const PrestataireTable(
-                                    selectD: true,
-                                  ),
-                                ));
-                        setState(() {});
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              buildTable(appTheme),
-              smallSpace,
-              const BigTitleForm(
-                bigTitle: 'etatvehicule',
-                littleTitle: 'selectetat',
-              ),
-              VehicleDamage(etatVehicle: etatVehicle),
-              smallSpace,
-              const BigTitleForm(
-                bigTitle: 'entretienvehicule',
-                littleTitle: 'selectentretien',
-              ),
-              Container(
-                height: 170.px,
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  border: Border.all(),
-                ),
-                child: Row(
-                  children: [
-                    EntretienWidget(entretienVehicle: entretienVehicle),
-                    bigSpace,
-                    Flexible(
-                      child: ZoneBox(
-                        label: 'remarqueplus'.tr(),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: TextBox(
-                            controller: remarqueEntretien,
-                            placeholder: 'remarqueplus'.tr(),
-                            maxLines: 4,
-                            placeholderStyle: placeStyle,
-                            style: appTheme.writingStyle,
-                            cursorColor: appTheme.color.darker,
-                            decoration: BoxDecoration(
-                              color: appTheme.fillColor,
-                            ),
-                          ),
+                          ],
                         ),
+                      ],
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      'date',
+                      style: boldStyle,
+                    ).tr(),
+                    smallSpace,
+                    SizedBox(
+                      width: 200.px,
+                      height: 30.px,
+                      child: DatePicker(
+                        selected: selectedDate,
+                        onChanged: (s) {
+                          setState(() {
+                            selectedDate = s;
+                          });
+                        },
                       ),
                     ),
                   ],
                 ),
-              ),
-              smallSpace,
-              const BigTitleForm(
-                bigTitle: 'travaileffect',
-                littleTitle: 'ajoutertaches',
-              ),
-              designationTable(appTheme),
-            ],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    SizedBox(
+                      width: 250.px,
+                      height: 50.px,
+                      child: ListTile(
+                        leading: Text(
+                          'vehicule',
+                          style: boldStyle,
+                        ).tr(),
+                        title: Text(selectedVehicle?.matricule ?? 'nonind'.tr()),
+                        onPressed: () async {
+                          selectedVehicle = await showDialog<Vehicle?>(
+                              context: context,
+                              builder: (
+                                c,
+                              ) =>
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: appTheme.backGroundColor,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: const VehicleTable(
+                                      selectV: true,
+                                    ),
+                                  ));
+                          setVehicleValues();
+                        },
+                      ),
+                    ),
+                    smallSpace,
+                    if (selectedVehicle != null)
+                      IconButton(
+                          icon: const Icon(FluentIcons.cancel),
+                          onPressed: () {
+                            selectedVehicle = null;
+                            setVehicleValues();
+                          }),
+                    const Spacer(),
+                    SizedBox(
+                      width: 250.px,
+                      height: 50.px,
+                      child: ListTile(
+                        leading: Text(
+                          'prestataire',
+                          style: boldStyle,
+                        ).tr(),
+                        title: Text(selectedPrest?.nom ?? 'nonind'.tr()),
+                        onPressed: () async {
+                          selectedPrest = await showDialog<Prestataire?>(
+                              context: context,
+                              builder: (
+                                c,
+                              ) =>
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      color: appTheme.backGroundColor,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: const PrestataireTable(
+                                      selectD: true,
+                                    ),
+                                  ));
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                buildTable(appTheme),
+                smallSpace,
+                const BigTitleForm(
+                  bigTitle: 'etatvehicule',
+                  littleTitle: 'selectetat',
+                ),
+                VehicleDamage(etatVehicle: etatVehicle),
+                smallSpace,
+                const BigTitleForm(
+                  bigTitle: 'entretienvehicule',
+                  littleTitle: 'selectentretien',
+                ),
+                Container(
+                  height: 170.px,
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    border: Border.all(),
+                  ),
+                  child: Row(
+                    children: [
+                      EntretienWidget(entretienVehicle: entretienVehicle),
+                      bigSpace,
+                      Flexible(
+                        child: ZoneBox(
+                          label: 'remarqueplus'.tr(),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: TextBox(
+                              controller: remarqueEntretien,
+                              placeholder: 'remarqueplus'.tr(),
+                              maxLines: 4,
+                              placeholderStyle: placeStyle,
+                              style: appTheme.writingStyle,
+                              cursorColor: appTheme.color.darker,
+                              decoration: BoxDecoration(
+                                color: appTheme.fillColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                smallSpace,
+                const BigTitleForm(
+                  bigTitle: 'travaileffect',
+                  littleTitle: 'ajoutertaches',
+                ),
+                designationTable(appTheme),
+              ],
+            ),
           ),
+          if (assigningOrederNumber)
+            Positioned(
+              top: 40.h,
+              left: 40.w,
+              child: const ProgressBar(),
+            )
+        ]),
+      ),
+      bottomBar: Container(
+        decoration: BoxDecoration(
+          color: appTheme.backGroundColor,
         ),
-        if (assigningOrederNumber)
-          Positioned(
-            top: 40.h,
-            left: 40.w,
-            child: const ProgressBar(),
-          )
-      ]),
+        padding: const EdgeInsets.all(10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FilledButton(
+                style: ButtonStyle(
+                  backgroundColor: ButtonState.all(appTheme.color.lightest),
+                ),
+                child: const Text('voir'), onPressed: (){}),
+            smallSpace,
+            FilledButton(
+                style: ButtonStyle(
+                  backgroundColor: ButtonState.all(appTheme.color.darkest),
+                ),
+                child: const Text('save').tr(),
+                onPressed: (){
+                  getAllDataIntoJson();
+                })
+          ],
+        ),
+      ),
     );
   }
 
@@ -746,10 +774,10 @@ class ReparationFormState extends State<ReparationForm>
   @override
   bool get wantKeepAlive => true;
 
-  Map<Key,Designation> designations = {};
+  List<DesignationReparation> designations = List.empty(growable: true);
 
   void addDesignation() {
-    designations[UniqueKey()]=Designation(designation: '');
+    designations.add(DesignationReparation(key:UniqueKey(),designation: Designation(designation: '')));
     setState(() {});
   }
 
@@ -806,7 +834,7 @@ class ReparationFormState extends State<ReparationForm>
               border: Border.all(color: appTheme.fillColor),
               borderRadius: const BorderRadius.vertical(bottom: Radius.circular(5)),
             ),
-            child: Column(children:getDesignationList(appTheme)),
+            child:designations.isEmpty?const NoDataWidget() :Column(children:getDesignationList(appTheme)),
           ),
         ],
       ),
@@ -814,8 +842,8 @@ class ReparationFormState extends State<ReparationForm>
   }
 
   bool selectedDesignationsExist() {
-    for (int i = 0; i < designations.values.length; i++) {
-      if (designations.values.toList()[i].selected) {
+    for (int i = 0; i < designations.length; i++) {
+      if (designations[i].designation.selected) {
         return true;
       }
     }
@@ -823,25 +851,22 @@ class ReparationFormState extends State<ReparationForm>
   }
 
   void deleteAllSelected() {
-    var temp=Map<Key,Designation>.from(designations);
-    temp.forEach((key, value) {
-      if(value.selected){
-        designations.remove(key);
-      }
-    });
+    List<DesignationReparation> temp=List.from(designations);
+    for(int i=0;i<temp.length;i++) {
+      if(temp[i].designation.selected){
+        designations.remove(temp[i]);
+      }}
     setState(() {});
   }
 
 
   List<Widget> getDesignationList(AppTheme appTheme){
-    List<Widget> result=List.empty(growable: true);
-    bool r=false;
-    designations.forEach((key, value) {
-      r=!r;
-      result.add(Container(
+    return List.generate(designations.length, (index)
+    {
+      return Container(
         padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
         decoration: BoxDecoration(
-          color: r?appTheme.fillColor:null,
+          color: index%2==0?appTheme.fillColor:null,
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -849,19 +874,17 @@ class ReparationFormState extends State<ReparationForm>
             Row(
               children: [
                 Checkbox(
-                    checked: value.selected,
+                    checked: designations[index].designation.selected,
                     onChanged: (s) {
                       setState(() {
-                        value.selected = s ?? false;
+                        designations[index].designation.selected = s ?? false;
                       });
                     }),
                 smallSpace,
                 Flexible(
                   child: SizedBox(
                     height:35.px,
-                    child: DesignationReparation(
-                      designation: value,
-                    ),
+                    child: designations[index],
                   ),
                 ),
               ],
@@ -869,9 +892,21 @@ class ReparationFormState extends State<ReparationForm>
             smallSpace,
           ],
         ),
-      ));
+      );
     });
+  }
+
+
+
+  List<Map<String,dynamic>> getAllDataIntoJson(){
+    List<Map<String,dynamic>> result=List.empty(growable: true);
+    for(int i=0;i<designations.length;i++){
+      result.add(designations[i].designation.toJson());
+    }
+    print(result.toString());
 
     return result;
   }
+
+
 }

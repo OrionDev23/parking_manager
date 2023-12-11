@@ -8,30 +8,36 @@ import "package:responsive_sizer/responsive_sizer.dart";
 import "../theme.dart";
 
 class NoDataWidget extends StatelessWidget {
-  final ParcOtoDatasource datasource;
-  const NoDataWidget({super.key, required this.datasource});
+  final ParcOtoDatasource? datasource;
+  const NoDataWidget({super.key, this.datasource});
 
   @override
   Widget build(BuildContext context) {
     var appTheme=context.watch<AppTheme>();
-    return Column(
-      children:[
-        bigSpace,
-        bigSpace,
-        bigSpace,
-        Icon(
-          FluentIcons.error_badge,
-          color: appTheme.color.lightest.withOpacity(0.2),
-          size: 24.sp,
-        ),
-        bigSpace,
-        bigSpace,
-        Text('lvide',style: placeStyle.copyWith(fontStyle: FontStyle.italic),).tr(),
-        bigSpace,
-        FilledButton(child: const Text('refresh').tr(), onPressed: (){
-          datasource.refreshDatasource();
-        })
-      ]
+    return Container(
+      padding: const EdgeInsets.all(10),
+      width: 80.w,
+      child: Column(
+        children:[
+          bigSpace,
+          bigSpace,
+          bigSpace,
+          Icon(
+            FluentIcons.database_block,
+            color: appTheme.color.lightest.withOpacity(0.2),
+            size: 24.sp,
+          ),
+          bigSpace,
+          bigSpace,
+          Text('lvide',style: placeStyle.copyWith(fontStyle: FontStyle.italic,fontWeight: FontWeight.bold),).tr(),
+          if(datasource!=null)
+            bigSpace,
+          if(datasource!=null)
+          FilledButton(child: const Text('refresh').tr(), onPressed: (){
+            datasource?.refreshDatasource();
+          })
+        ]
+      ),
     );
   }
 }

@@ -120,7 +120,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
       width: 40.w,
       height: 45.h,
       child: Table(
-        border: TableBorder.all(),
+        border: TableBorder.all(
+          borderRadius: BorderRadius.circular(5)
+        ),
         columnWidths: {
           0: FixedColumnWidth(6.w),
           1: FixedColumnWidth(6.w),
@@ -141,7 +143,10 @@ class _VehicleDamageState extends State<VehicleDamage> {
       TableRow(children: [
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
+              decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(5)),
+                color: appTheme.color.lightest,
+              ),
               padding: const EdgeInsets.all(5.0),
               child: Text('PARE-BRISE AV', style: littleStyle),
             )),
@@ -165,7 +170,10 @@ class _VehicleDamageState extends State<VehicleDamage> {
             )),
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(topRight: Radius.circular(5)),
+                color: appTheme.color.lightest,
+              ),
               padding: const EdgeInsets.all(5.0),
               child: Text('PNEUMATIQUE', style: littleStyle),
             )),
