@@ -19,259 +19,252 @@ class EntretienWidgetState extends State<EntretienWidget> {
   @override
   Widget build(BuildContext context) {
     var appTheme=context.watch<AppTheme>();
-    return Container(
-      height: 170.px,
-      padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        border: Border.all(),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          bigSpace,
-          bigSpace,
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ToggleSwitch(
-                content: Text(
-                  'Vidange moteur',
-                  style: littleStyle,
-                ),
-                checked: widget.entretienVehicle.vidangeMoteur,
-                onChanged: (s) {
-                  setState(() {
-                    widget.entretienVehicle.vidangeMoteur = s;
-                  });
-                },
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        bigSpace,
+        bigSpace,
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ToggleSwitch(
+              content: Text(
+                'Vidange moteur',
+                style: littleStyle,
               ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Vidange boite',
-                  style: littleStyle,
-                ),
-                checked: widget.entretienVehicle.vidangeBoite,
-                onChanged: (s) {
-                  setState(() {
-                    widget.entretienVehicle.vidangeBoite = s;
-                  });
-                },
+              checked: widget.entretienVehicle.vidangeMoteur,
+              onChanged: (s) {
+                setState(() {
+                  widget.entretienVehicle.vidangeMoteur = s;
+                });
+              },
+            ),
+            smallSpace,
+            ToggleSwitch(
+              content: Text(
+                'Vidange boite',
+                style: littleStyle,
               ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Vidange pont AV AR',
-                  style: littleStyle,
-                ),
-                checked: widget.entretienVehicle.vidangePont,
-                onChanged: (s) {
-                  setState(() {
-                    widget.entretienVehicle.vidangePont = s;
-                  });
-                },
+              checked: widget.entretienVehicle.vidangeBoite,
+              onChanged: (s) {
+                setState(() {
+                  widget.entretienVehicle.vidangeBoite = s;
+                });
+              },
+            ),
+            smallSpace,
+            ToggleSwitch(
+              content: Text(
+                'Vidange pont AV AR',
+                style: littleStyle,
               ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Filtre à air',
-                  style: littleStyle,
-                ),
-                checked: widget.entretienVehicle.filtreAir,
-                onChanged: (s) {
-                  setState(() {
-                    widget.entretienVehicle.filtreAir = s;
-                  });
-                },
+              checked: widget.entretienVehicle.vidangePont,
+              onChanged: (s) {
+                setState(() {
+                  widget.entretienVehicle.vidangePont = s;
+                });
+              },
+            ),
+            smallSpace,
+            ToggleSwitch(
+              content: Text(
+                'Filtre à air',
+                style: littleStyle,
               ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Filtre à huile',
-                  style: littleStyle,
-                ),
-                checked: widget.entretienVehicle.filtreHuile,
-                onChanged: (s) {
-                  setState(() {
-                    widget.entretienVehicle.filtreHuile = s;
-                  });
-                },
+              checked: widget.entretienVehicle.filtreAir,
+              onChanged: (s) {
+                setState(() {
+                  widget.entretienVehicle.filtreAir = s;
+                });
+              },
+            ),
+            smallSpace,
+            ToggleSwitch(
+              content: Text(
+                'Filtre à huile',
+                style: littleStyle,
               ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Filtre à carburant',
-                  style: littleStyle,
-                ),
-                checked: widget.entretienVehicle.filtreCarburant,
-                onChanged: (s) {
-                  setState(() {
-                    widget.entretienVehicle.filtreCarburant = s;
-                  });
-                },
+              checked: widget.entretienVehicle.filtreHuile,
+              onChanged: (s) {
+                setState(() {
+                  widget.entretienVehicle.filtreHuile = s;
+                });
+              },
+            ),
+            smallSpace,
+            ToggleSwitch(
+              content: Text(
+                'Filtre à carburant',
+                style: littleStyle,
               ),
-            ],
-          ),
-          smallSpace,
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ToggleSwitch(
-                content: Text(
-                  "Filtre d'habitacle",
-                  style: littleStyle,
-                ),
-                checked: widget.entretienVehicle.filtreHabitacle,
-                onChanged: (s) {
-                  setState(() {
-                    widget.entretienVehicle.filtreHabitacle = s;
-                  });
-                },
+              checked: widget.entretienVehicle.filtreCarburant,
+              onChanged: (s) {
+                setState(() {
+                  widget.entretienVehicle.filtreCarburant = s;
+                });
+              },
+            ),
+          ],
+        ),
+        smallSpace,
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ToggleSwitch(
+              content: Text(
+                "Filtre d'habitacle",
+                style: littleStyle,
               ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Liquide de frein',
-                  style: littleStyle,
-                ),
-                checked: widget.entretienVehicle.liquideFrein,
-                onChanged: (s) {
-                  setState(() {
-                    widget.entretienVehicle.liquideFrein = s;
-                  });
-                },
+              checked: widget.entretienVehicle.filtreHabitacle,
+              onChanged: (s) {
+                setState(() {
+                  widget.entretienVehicle.filtreHabitacle = s;
+                });
+              },
+            ),
+            smallSpace,
+            ToggleSwitch(
+              content: Text(
+                'Liquide de frein',
+                style: littleStyle,
               ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Liquide de refroidissement',
-                  style: littleStyle,
-                ),
-                checked: widget.entretienVehicle.liquideRefroidissement,
-                onChanged: (s) {
-                  setState(() {
-                    widget.entretienVehicle.liquideRefroidissement = s;
-                  });
-                },
+              checked: widget.entretienVehicle.liquideFrein,
+              onChanged: (s) {
+                setState(() {
+                  widget.entretienVehicle.liquideFrein = s;
+                });
+              },
+            ),
+            smallSpace,
+            ToggleSwitch(
+              content: Text(
+                'Liquide de refroidissement',
+                style: littleStyle,
               ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Equilibrage roues',
-                  style: littleStyle,
-                ),
-                checked: widget.entretienVehicle.equilibrageRoues,
-                onChanged: (s) {
-                  setState(() {
-                    widget.entretienVehicle.equilibrageRoues = s;
-                  });
-                },
+              checked: widget.entretienVehicle.liquideRefroidissement,
+              onChanged: (s) {
+                setState(() {
+                  widget.entretienVehicle.liquideRefroidissement = s;
+                });
+              },
+            ),
+            smallSpace,
+            ToggleSwitch(
+              content: Text(
+                'Equilibrage roues',
+                style: littleStyle,
               ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Controle niveaux',
-                  style: littleStyle,
-                ),
-                checked: widget.entretienVehicle.controleNiveaux,
-                onChanged: (s) {
-                  setState(() {
-                    widget.entretienVehicle.controleNiveaux = s;
-                  });
-                },
+              checked: widget.entretienVehicle.equilibrageRoues,
+              onChanged: (s) {
+                setState(() {
+                  widget.entretienVehicle.equilibrageRoues = s;
+                });
+              },
+            ),
+            smallSpace,
+            ToggleSwitch(
+              content: Text(
+                'Controle niveaux',
+                style: littleStyle,
               ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Entretien climatisation',
-                  style: littleStyle,
-                ),
-                checked: widget.entretienVehicle.entretienClimatiseur,
-                onChanged: (s) {
-                  setState(() {
-                    widget.entretienVehicle.entretienClimatiseur = s;
-                  });
-                },
+              checked: widget.entretienVehicle.controleNiveaux,
+              onChanged: (s) {
+                setState(() {
+                  widget.entretienVehicle.controleNiveaux = s;
+                });
+              },
+            ),
+            smallSpace,
+            ToggleSwitch(
+              content: Text(
+                'Entretien climatisation',
+                style: littleStyle,
               ),
-            ],
-          ),
-          smallSpace,
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ToggleSwitch(
-                content: Text(
-                  'Balais essuie-glace',
-                  style: littleStyle,
-                ),
-                checked: widget.entretienVehicle.balaisEssuieGlace,
-                onChanged: (s) {
-                  setState(() {
-                    widget.entretienVehicle.balaisEssuieGlace = s;
-                  });
-                },
+              checked: widget.entretienVehicle.entretienClimatiseur,
+              onChanged: (s) {
+                setState(() {
+                  widget.entretienVehicle.entretienClimatiseur = s;
+                });
+              },
+            ),
+          ],
+        ),
+        smallSpace,
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ToggleSwitch(
+              content: Text(
+                'Balais essuie-glace',
+                style: littleStyle,
               ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Eclairage',
-                  style: littleStyle,
-                ),
-                checked: widget.entretienVehicle.eclairage,
-                onChanged: (s) {
-                  setState(() {
-                    widget.entretienVehicle.eclairage = s;
-                  });
-                },
+              checked: widget.entretienVehicle.balaisEssuieGlace,
+              onChanged: (s) {
+                setState(() {
+                  widget.entretienVehicle.balaisEssuieGlace = s;
+                });
+              },
+            ),
+            smallSpace,
+            ToggleSwitch(
+              content: Text(
+                'Eclairage',
+                style: littleStyle,
               ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'OBD',
-                  style: littleStyle,
-                ),
-                checked: widget.entretienVehicle.obd,
-                onChanged: (s) {
-                  setState(() {
-                    widget.entretienVehicle.obd = s;
-                  });
-                },
+              checked: widget.entretienVehicle.eclairage,
+              onChanged: (s) {
+                setState(() {
+                  widget.entretienVehicle.eclairage = s;
+                });
+              },
+            ),
+            smallSpace,
+            ToggleSwitch(
+              content: Text(
+                'OBD',
+                style: littleStyle,
               ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Bougies',
-                  style: littleStyle,
-                ),
-                checked: widget.entretienVehicle.bougies,
-                onChanged: (s) {
-                  setState(() {
-                    widget.entretienVehicle.bougies = s;
-                  });
-                },
+              checked: widget.entretienVehicle.obd,
+              onChanged: (s) {
+                setState(() {
+                  widget.entretienVehicle.obd = s;
+                });
+              },
+            ),
+            smallSpace,
+            ToggleSwitch(
+              content: Text(
+                'Bougies',
+                style: littleStyle,
               ),
-              bigSpace,
-              smallSpace,
-              Row(
-                children: [
-                  Button(
-                      onPressed: () => selectAllEntretien(false),
-                      child: const Text('clear').tr()),
-                  smallSpace,
-                  FilledButton(
-                      onPressed: () => selectAllEntretien(true),
-                      child: const Text('selectall').tr()),
-                ],
-              ),
-            ],
-          ),
+              checked: widget.entretienVehicle.bougies,
+              onChanged: (s) {
+                setState(() {
+                  widget.entretienVehicle.bougies = s;
+                });
+              },
+            ),
+            bigSpace,
+            smallSpace,
+            Row(
+              children: [
+                Button(
+                    onPressed: () => selectAllEntretien(false),
+                    child: const Text('clear').tr()),
+                smallSpace,
+                FilledButton(
+                    onPressed: () => selectAllEntretien(true),
+                    child: const Text('selectall').tr()),
+              ],
+            ),
+          ],
+        ),
 
-        ],
-      ),
+      ],
     );
   }
 

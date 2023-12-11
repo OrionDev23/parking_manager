@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/entreprise.dart';
 import 'package:parc_oto/screens/prestataire/prestataire_table.dart';
+import 'package:parc_oto/screens/reparation/reparation_form/designation_reparation.dart';
 import 'package:parc_oto/screens/reparation/reparation_form/entreprise_placement.dart';
 import 'package:parc_oto/screens/reparation/reparation_form/entretien_widget.dart';
 import 'package:parc_oto/screens/reparation/reparation_form/vehicle_damage.dart';
@@ -19,6 +20,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
+import '../../serializables/designation.dart';
 import '../../serializables/entretien_vehicle.dart';
 import '../../serializables/reparation.dart';
 import '../../utilities/vehicle_util.dart';
@@ -357,36 +359,45 @@ class ReparationFormState extends State<ReparationForm>
                 bigTitle: 'entretienvehicule',
                 littleTitle: 'selectentretien',
               ),
-              Row(
-                children: [
-                  EntretienWidget(entretienVehicle: entretienVehicle),
-                  bigSpace,
-                  Flexible(
-                    child: ZoneBox(
-                      label: 'remarqueplus'.tr(),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: TextBox(
-                          controller: remarqueEntretien,
-                          placeholder: 'remarqueplus'.tr(),
-                          maxLines: 4,
-                          placeholderStyle: placeStyle,
-                          style: appTheme.writingStyle,
-                          cursorColor: appTheme.color.darker,
-                          decoration: BoxDecoration(
-                            color: appTheme.fillColor,
+              Container(
+                height: 170.px,
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  border: Border.all(),
+                ),
+                child: Row(
+                  children: [
+                    EntretienWidget(entretienVehicle: entretienVehicle),
+                    bigSpace,
+                    Flexible(
+                      child: ZoneBox(
+                        label: 'remarqueplus'.tr(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: TextBox(
+                            controller: remarqueEntretien,
+                            placeholder: 'remarqueplus'.tr(),
+                            maxLines: 4,
+                            placeholderStyle: placeStyle,
+                            style: appTheme.writingStyle,
+                            cursorColor: appTheme.color.darker,
+                            decoration: BoxDecoration(
+                              color: appTheme.fillColor,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               smallSpace,
               const BigTitleForm(
                 bigTitle: 'travaileffect',
                 littleTitle: 'ajoutertaches',
               ),
+              smallSpace,
+              designationTable(),
             ],
           ),
         ),
@@ -727,9 +738,6 @@ class ReparationFormState extends State<ReparationForm>
     );
   }
 
-
-
-
   @override
   void dispose() {
     reservedOrders.remove(widget.key);
@@ -738,4 +746,110 @@ class ReparationFormState extends State<ReparationForm>
 
   @override
   bool get wantKeepAlive => true;
+
+  Map<Key,Designation> designations = {};
+
+  void addDesignation() {
+    designations[UniqueKey()]=Designation(designation: '');
+    setState(() {});
+  }
+
+  Widget designationTable() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(),
+      ),
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Button(
+                    onPressed: selectedDesignationsExist() ? deleteAllSelected : null,
+                    child: const Text('delete').tr()),
+                smallSpace,
+                FilledButton(
+                    onPressed: addDesignation, child: const Text('add').tr()),
+              ],
+            ),
+          ),
+          smallSpace,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Table(
+              columnWidths: const {
+                0:FlexColumnWidth(3),
+                1:FlexColumnWidth(),
+                2:FlexColumnWidth(),
+                3:FlexColumnWidth(),
+              },
+              children: [
+                TableRow(
+                  children: [
+                    TableCell(child: const Text('desi',textAlign: TextAlign.center,).tr()),
+                    TableCell(child: const Text('qte',textAlign: TextAlign.center,).tr()),
+                    TableCell(child: const Text('TVA',textAlign: TextAlign.center,).tr()),
+                    TableCell(child: const Text('prix',textAlign: TextAlign.center,).tr()),
+                  ]
+                ),
+              ],
+            ),
+          ),
+          smallSpace,
+          ...List.generate(designations.length, (index) {
+            return Container(
+              color: index%2==0?appTheme.backGroun,
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Checkbox(
+                          checked: designations.entries.toList()[index].value.selected,
+                          onChanged: (s) {
+                            setState(() {
+                              designations.entries.toList()[index].value.selected = s ?? false;
+                            });
+                          }),
+                      smallSpace,
+                      Flexible(
+                        child: SizedBox(
+                          height:35.px,
+                          child: DesignationReparation(
+                            designation: designations.entries.toList()[index].value,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  smallSpace,
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  bool selectedDesignationsExist() {
+    for (int i = 0; i < designations.values.length; i++) {
+      if (designations.values.toList()[i].selected) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void deleteAllSelected() {
+    var temp=Map<Key,Designation>.from(designations);
+    temp.forEach((key, value) {
+      if(value.selected){
+        designations.remove(key);
+      }
+    });
+    setState(() {});
+  }
 }
