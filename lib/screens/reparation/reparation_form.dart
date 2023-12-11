@@ -6,6 +6,7 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/entreprise.dart';
 import 'package:parc_oto/screens/prestataire/prestataire_table.dart';
 import 'package:parc_oto/screens/reparation/reparation_form/entreprise_placement.dart';
+import 'package:parc_oto/screens/reparation/reparation_form/entretien_widget.dart';
 import 'package:parc_oto/screens/reparation/reparation_form/vehicle_damage.dart';
 import 'package:parc_oto/widgets/big_title_form.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicles_table.dart';
@@ -356,7 +357,31 @@ class ReparationFormState extends State<ReparationForm>
                 bigTitle: 'entretienvehicule',
                 littleTitle: 'selectentretien',
               ),
-              entretienWidgets(appTheme),
+              Row(
+                children: [
+                  EntretienWidget(entretienVehicle: entretienVehicle),
+                  bigSpace,
+                  Flexible(
+                    child: ZoneBox(
+                      label: 'remarqueplus'.tr(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: TextBox(
+                          controller: remarqueEntretien,
+                          placeholder: 'remarqueplus'.tr(),
+                          maxLines: 4,
+                          placeholderStyle: placeStyle,
+                          style: appTheme.writingStyle,
+                          cursorColor: appTheme.color.darker,
+                          decoration: BoxDecoration(
+                            color: appTheme.fillColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               smallSpace,
               const BigTitleForm(
                 bigTitle: 'travaileffect',
@@ -702,301 +727,8 @@ class ReparationFormState extends State<ReparationForm>
     );
   }
 
-  Widget entretienWidgets(AppTheme appTheme) {
-    return Container(
-      height: 170.px,
-      padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        border: Border.all(),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          bigSpace,
-          bigSpace,
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ToggleSwitch(
-                content: Text(
-                  'Vidange moteur',
-                  style: littleStyle,
-                ),
-                checked: entretienVehicle.vidangeMoteur,
-                onChanged: (s) {
-                  setState(() {
-                    entretienVehicle.vidangeMoteur = s;
-                  });
-                },
-              ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Vidange boite',
-                  style: littleStyle,
-                ),
-                checked: entretienVehicle.vidangeBoite,
-                onChanged: (s) {
-                  setState(() {
-                    entretienVehicle.vidangeBoite = s;
-                  });
-                },
-              ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Vidange pont AV AR',
-                  style: littleStyle,
-                ),
-                checked: entretienVehicle.vidangePont,
-                onChanged: (s) {
-                  setState(() {
-                    entretienVehicle.vidangePont = s;
-                  });
-                },
-              ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Filtre à air',
-                  style: littleStyle,
-                ),
-                checked: entretienVehicle.filtreAir,
-                onChanged: (s) {
-                  setState(() {
-                    entretienVehicle.filtreAir = s;
-                  });
-                },
-              ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Filtre à huile',
-                  style: littleStyle,
-                ),
-                checked: entretienVehicle.filtreHuile,
-                onChanged: (s) {
-                  setState(() {
-                    entretienVehicle.filtreHuile = s;
-                  });
-                },
-              ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Filtre à carburant',
-                  style: littleStyle,
-                ),
-                checked: entretienVehicle.filtreCarburant,
-                onChanged: (s) {
-                  setState(() {
-                    entretienVehicle.filtreCarburant = s;
-                  });
-                },
-              ),
-            ],
-          ),
-          smallSpace,
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ToggleSwitch(
-                content: Text(
-                  "Filtre d'habitacle",
-                  style: littleStyle,
-                ),
-                checked: entretienVehicle.filtreHabitacle,
-                onChanged: (s) {
-                  setState(() {
-                    entretienVehicle.filtreHabitacle = s;
-                  });
-                },
-              ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Liquide de frein',
-                  style: littleStyle,
-                ),
-                checked: entretienVehicle.liquideFrein,
-                onChanged: (s) {
-                  setState(() {
-                    entretienVehicle.liquideFrein = s;
-                  });
-                },
-              ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Liquide de refroidissement',
-                  style: littleStyle,
-                ),
-                checked: entretienVehicle.liquideRefroidissement,
-                onChanged: (s) {
-                  setState(() {
-                    entretienVehicle.liquideRefroidissement = s;
-                  });
-                },
-              ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Equilibrage roues',
-                  style: littleStyle,
-                ),
-                checked: entretienVehicle.equilibrageRoues,
-                onChanged: (s) {
-                  setState(() {
-                    entretienVehicle.equilibrageRoues = s;
-                  });
-                },
-              ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Controle niveaux',
-                  style: littleStyle,
-                ),
-                checked: entretienVehicle.controleNiveaux,
-                onChanged: (s) {
-                  setState(() {
-                    entretienVehicle.controleNiveaux = s;
-                  });
-                },
-              ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Entretien climatisation',
-                  style: littleStyle,
-                ),
-                checked: entretienVehicle.entretienClimatiseur,
-                onChanged: (s) {
-                  setState(() {
-                    entretienVehicle.entretienClimatiseur = s;
-                  });
-                },
-              ),
-            ],
-          ),
-          smallSpace,
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ToggleSwitch(
-                content: Text(
-                  'Balais essuie-glace',
-                  style: littleStyle,
-                ),
-                checked: entretienVehicle.balaisEssuieGlace,
-                onChanged: (s) {
-                  setState(() {
-                    entretienVehicle.balaisEssuieGlace = s;
-                  });
-                },
-              ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Eclairage',
-                  style: littleStyle,
-                ),
-                checked: entretienVehicle.eclairage,
-                onChanged: (s) {
-                  setState(() {
-                    entretienVehicle.eclairage = s;
-                  });
-                },
-              ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'OBD',
-                  style: littleStyle,
-                ),
-                checked: entretienVehicle.obd,
-                onChanged: (s) {
-                  setState(() {
-                    entretienVehicle.obd = s;
-                  });
-                },
-              ),
-              smallSpace,
-              ToggleSwitch(
-                content: Text(
-                  'Bougies',
-                  style: littleStyle,
-                ),
-                checked: entretienVehicle.bougies,
-                onChanged: (s) {
-                  setState(() {
-                    entretienVehicle.bougies = s;
-                  });
-                },
-              ),
-              bigSpace,
-              smallSpace,
-              Row(
-                children: [
-                  Button(
-                      onPressed: () => selectAllEntretien(false),
-                      child: const Text('clear').tr()),
-                  smallSpace,
-                  FilledButton(
-                      onPressed: () => selectAllEntretien(true),
-                      child: const Text('selectall').tr()),
-                ],
-              ),
-            ],
-          ),
-          bigSpace,
-          Flexible(
-            child: ZoneBox(
-              label: 'remarqueplus'.tr(),
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: TextBox(
-                  controller: remarqueEntretien,
-                  placeholder: 'remarqueplus'.tr(),
-                  maxLines: 4,
-                  placeholderStyle: placeStyle,
-                  style: appTheme.writingStyle,
-                  cursorColor: appTheme.color.darker,
-                  decoration: BoxDecoration(
-                    color: appTheme.fillColor,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  void selectAllEntretien(bool value) {
-    entretienVehicle.vidangeMoteur = value;
-    entretienVehicle.vidangeBoite = value;
-    entretienVehicle.vidangePont = value;
-    entretienVehicle.filtreAir = value;
-    entretienVehicle.filtreHuile = value;
-    entretienVehicle.filtreCarburant = value;
-    entretienVehicle.filtreHabitacle = value;
-    entretienVehicle.liquideFrein = value;
-    entretienVehicle.liquideRefroidissement = value;
-    entretienVehicle.equilibrageRoues = value;
-    entretienVehicle.controleNiveaux = value;
-    entretienVehicle.entretienClimatiseur = value;
-    entretienVehicle.balaisEssuieGlace = value;
-    entretienVehicle.eclairage = value;
-    entretienVehicle.obd = value;
-    entretienVehicle.bougies = value;
-    setState(() {});
-  }
+
 
   @override
   void dispose() {
