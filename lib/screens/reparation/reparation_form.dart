@@ -806,40 +806,7 @@ class ReparationFormState extends State<ReparationForm>
               border: Border.all(color: appTheme.fillColor),
               borderRadius: const BorderRadius.vertical(bottom: Radius.circular(5)),
             ),
-            child: Column(children:List.generate(designations.length, (index) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
-                  decoration: BoxDecoration(
-                    color: index%2==0?appTheme.fillColor:null,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Checkbox(
-                              checked: designations.entries.toList()[index].value.selected,
-                              onChanged: (s) {
-                                setState(() {
-                                  designations.entries.toList()[index].value.selected = s ?? false;
-                                });
-                              }),
-                          smallSpace,
-                          Flexible(
-                            child: SizedBox(
-                              height:35.px,
-                              child: DesignationReparation(
-                                designation: designations.entries.toList()[index].value,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      smallSpace,
-                    ],
-                  ),
-                );
-              }),),
+            child: Column(children:getDesignationList(appTheme)),
           ),
         ],
       ),
@@ -863,5 +830,48 @@ class ReparationFormState extends State<ReparationForm>
       }
     });
     setState(() {});
+  }
+
+
+  List<Widget> getDesignationList(AppTheme appTheme){
+    List<Widget> result=List.empty(growable: true);
+    bool r=false;
+    designations.forEach((key, value) {
+      r=!r;
+      result.add(Container(
+        padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+        decoration: BoxDecoration(
+          color: r?appTheme.fillColor:null,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Checkbox(
+                    checked: value.selected,
+                    onChanged: (s) {
+                      setState(() {
+                        value.selected = s ?? false;
+                      });
+                    }),
+                smallSpace,
+                Flexible(
+                  child: SizedBox(
+                    height:35.px,
+                    child: DesignationReparation(
+                      designation: value,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            smallSpace,
+          ],
+        ),
+      ));
+    });
+
+    return result;
   }
 }
