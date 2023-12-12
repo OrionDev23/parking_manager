@@ -2,6 +2,7 @@ import 'package:parc_oto/serializables/genre_vehicule.dart';
 import 'package:parc_oto/serializables/parc_user.dart';
 
 import '../providers/client_database.dart';
+import '../serializables/designation.dart';
 import '../serializables/marque.dart';
 import '../serializables/state.dart';
 import '../serializables/vehicle.dart';
@@ -69,4 +70,11 @@ DateTime? createdAtJson(String json){
 
 DateTime? updatedAtJson(String json){
   return DateTime.tryParse(json);
+}
+
+
+
+List<String>? designationsToJson(List<Designation>? list){
+
+  return list?.map((e) => e.toJson().toString()).toList();
 }

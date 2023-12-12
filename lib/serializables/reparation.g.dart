@@ -14,7 +14,9 @@ Reparation _$ReparationFromJson(Map<String, dynamic> json) => Reparation(
       anneeUtil: json['anneeUtil'] as int?,
       couleur: json['couleur'] as String?,
       date: dateFromIntJsonNonNull(json['date'] as int),
-      designations: json['designations'] as String?,
+      designations: (json['designations'] as List<dynamic>?)
+          ?.map((e) => Designation.fromJson(e as Map<String, dynamic>))
+          .toList(),
       entretien: json['entretien'] == null
           ? null
           : EntretienVehicle.fromJson(
