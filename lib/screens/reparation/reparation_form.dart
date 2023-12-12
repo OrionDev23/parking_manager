@@ -430,7 +430,7 @@ class ReparationFormState extends State<ReparationForm>
                 ),
                 child: const Text('save').tr(),
                 onPressed: (){
-                  getAllDataIntoJson();
+                  getAllDesignationToJson();
                 })
           ],
         ),
@@ -898,7 +898,7 @@ class ReparationFormState extends State<ReparationForm>
 
 
 
-  List<Map<String,dynamic>> getAllDataIntoJson(){
+  List<Map<String,dynamic>> getAllDesignationToJson(){
     List<Map<String,dynamic>> result=List.empty(growable: true);
     for(int i=0;i<designations.length;i++){
       result.add(designations[i].designation.toJson());
