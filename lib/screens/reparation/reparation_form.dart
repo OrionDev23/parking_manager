@@ -937,8 +937,6 @@ class ReparationFormState extends State<ReparationForm>
 
     );
 
-    print(reparation.toJson());
-
 
     await ClientDatabase.database!.createDocument(
         databaseId: databaseId,
