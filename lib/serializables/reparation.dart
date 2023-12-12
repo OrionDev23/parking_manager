@@ -42,7 +42,10 @@ class Reparation extends ParcOtoDefault{
   List<Designation>? designations;
 
 
+  @JsonKey(toJson:etatVehiculeToJson)
   EtatVehicle? etatActuel;
+
+  @JsonKey(toJson:entretienToJson)
 
   EntretienVehicle? entretien;
 

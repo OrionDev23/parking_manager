@@ -421,17 +421,15 @@ class ReparationFormState extends State<ReparationForm>
             FilledButton(
                 style: ButtonStyle(
                   backgroundColor: ButtonState.all(appTheme.color.lightest),
-                ),
-                child: const Text('voir'), onPressed: (){}),
+                ), onPressed:uploading?null: (){},
+                child: const Text('voir')),
             smallSpace,
             FilledButton(
                 style: ButtonStyle(
                   backgroundColor: ButtonState.all(appTheme.color.darkest),
                 ),
-                child: const Text('save').tr(),
-                onPressed: (){
-                  getAllDesignationToJson();
-                })
+                onPressed: uploading?null:uploadForm,
+                child: const Text('save').tr())
           ],
         ),
       ),
@@ -905,6 +903,57 @@ class ReparationFormState extends State<ReparationForm>
     }
     return result;
   }
+
+
+  String? documentID;
+
+  bool uploading=false;
+  void uploadForm() async{
+    setState(() {
+      uploading=true;
+    });
+
+    documentID??=DateTime.now().difference(ClientDatabase.ref).inMilliseconds.abs().toString();
+
+    Reparation reparation=Reparation(
+        id: documentID!,
+        numero: int.parse(numOrdre.text),
+        date: selectedDate,
+        anneeUtil: anneeUtil.year,
+        couleur: couleur.text,
+        designations: designations.map((e) => e.designation).toList(),
+        entretien: entretienVehicle,
+        etatActuel: etatVehicle,
+        gaz: carburant.ceil(),
+        kilometrage: int.tryParse(km.text),
+        modele: type.text,
+        nchassi: nchassi.text,
+        nmoteur: nmoteur.text,
+        prestataire: selectedPrest?.id,
+        prestatairenom: selectedPrest?.nom,
+        vehicule: selectedVehicle?.id,
+        vehiculemat: selectedVehicle?.matricule,
+        remarque: remarqueEntretien.text,
+
+    );
+
+    print(reparation.toJson());
+
+
+    await ClientDatabase.database!.createDocument(
+        databaseId: databaseId,
+        collectionId: reparationId,
+        documentId: documentID!, data: reparation.toJson());
+
+    uploading=false;
+
+    if(mounted){
+      setState(() {
+      });
+    }
+
+  }
+
 
 
 }

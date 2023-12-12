@@ -54,9 +54,9 @@ Map<String, dynamic> _$ReparationToJson(Reparation instance) =>
       'nchassi': instance.nchassi,
       'couleur': instance.couleur,
       'remarque': instance.remarque,
-      'designations': instance.designations,
-      'etatActuel': instance.etatActuel,
-      'entretien': instance.entretien,
+      'designations': designationsToJson(instance.designations),
+      'etatActuel': etatVehiculeToJson(instance.etatActuel),
+      'entretien': entretienToJson(instance.entretien),
       'anneeUtil': instance.anneeUtil,
       'modele': instance.modele,
     };

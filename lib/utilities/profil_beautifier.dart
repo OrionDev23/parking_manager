@@ -1,8 +1,11 @@
+
+import 'package:parc_oto/serializables/etat_vehicle.dart';
 import 'package:parc_oto/serializables/genre_vehicule.dart';
 import 'package:parc_oto/serializables/parc_user.dart';
 
 import '../providers/client_database.dart';
 import '../serializables/designation.dart';
+import '../serializables/entretien_vehicle.dart';
 import '../serializables/marque.dart';
 import '../serializables/state.dart';
 import '../serializables/vehicle.dart';
@@ -77,4 +80,13 @@ DateTime? updatedAtJson(String json){
 List<String>? designationsToJson(List<Designation>? list){
 
   return list?.map((e) => e.toJson().toString()).toList();
+}
+
+
+String? etatVehiculeToJson(EtatVehicle? etat){
+  return etat?.toJson().toString();
+}
+
+String? entretienToJson(EntretienVehicle? entretienVehicle){
+  return entretienVehicle?.toJson().toString();
 }
