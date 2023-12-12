@@ -63,19 +63,52 @@ class ReparationFormState extends State<ReparationForm>
 
   @override
   void initState() {
-    assignOrderNumber();
+    if(widget.reparation!=null){
+      initValues();
+    }
+    else{
+      assignOrderNumber();
+
+    }
     super.initState();
   }
 
-  void initValues(){
+  void initValues() async{
     if(widget.reparation!=null){
+        assigningOrederNumber=true;
       etatVehicle=widget.reparation!.etatActuel??EtatVehicle();
       entretienVehicle=widget.reparation!.entretien??EntretienVehicle();
       remarqueEntretien.text=widget.reparation!.remarque??'';
       numOrdre.text=widget.reparation!.numero.toString();
       reservedOrders[widget.key!]=widget.reparation!.numero;
+      await Future.wait([getPrestatataire(),getVehicle()]);
+      matricule.text=widget.reparation!.vehiculemat??'';
+      couleur.text=widget.reparation!.couleur??'';
+      type.text=widget.reparation!.modele??'';
+      nchassi.text=widget.reparation!.nchassi??'';
+      nmoteur.text=widget.reparation!.nmoteur??'';
+      km.text=widget.reparation!.kilometrage?.toString()??'0';
+      carburant=widget.reparation!.gaz?.toDouble()??4;
+      selectedDate=widget.reparation!.date;
+      anneeUtil=DateTime(widget.reparation!.anneeUtil??selectedVehicle?.anneeUtil??DateTime.now().year);
+      designations=List.generate(widget.reparation!.designations?.length??0, (index) {
+        return DesignationReparation(key:UniqueKey(),designation: widget.reparation!.designations![index]);
+      });
+      setState(() {
+        assigningOrederNumber=false;
+      });
 
+    }
+  }
 
+  Future<void> getPrestatataire() async{
+    if(widget.reparation!=null && widget.reparation!.prestataire!=null){
+      selectedPrest=await ClientDatabase().getPrestataire(widget.reparation!.prestataire!);
+    }
+  }
+  Future<void> getVehicle() async{
+    if(widget.reparation!=null && widget.reparation!.vehicule!=null){
+      selectedVehicle=await ClientDatabase().getVehicle(widget.reparation!.vehicule!);
     }
   }
 

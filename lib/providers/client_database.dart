@@ -1,10 +1,12 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/serializables/vehicle.dart';
 
 import '../screens/entreprise.dart';
 import '../serializables/entreprise.dart';
 import '../serializables/parc_user.dart';
+import '../serializables/prestataire.dart';
 
 const databaseId = "6531ad112080ae3b14a7";
 const userid = "users";
@@ -157,5 +159,37 @@ class ClientDatabase {
       case 3:return 'quitteentre';
       default:return 'disponible';
     }
+  }
+  
+  Future<Vehicle?> getVehicle(String docID) async{
+    return await database!.getDocument(
+        databaseId: databaseId,
+        collectionId: vehiculeid, documentId: docID).then((value) {
+          return value.convertTo((p0) => Vehicle.fromJson(p0 as Map<String,dynamic>));
+    }).onError((error, stackTrace) {
+      return Future.value(Vehicle(id: docID, matricule: '', matriculeEtrang: false));
+    });
+  }
+
+
+  Future<ParcUser?> getUserFromID(String docID) async{
+    return await database!.getDocument(
+        databaseId: databaseId,
+        collectionId: userid, documentId: docID).then((value) {
+      return value.convertTo((p0) => ParcUser.fromJson(p0 as Map<String,dynamic>));
+    }).onError((error, stackTrace) {
+      return Future.value(ParcUser(id: docID, email: '',));
+    });
+  }
+
+
+  Future<Prestataire?> getPrestataire(String docID) async{
+    return await database!.getDocument(
+        databaseId: databaseId,
+        collectionId: prestataireId, documentId: docID).then((value) {
+      return value.convertTo((p0) => Prestataire.fromJson(p0 as Map<String,dynamic>));
+    }).onError((error, stackTrace) {
+      return Future.value(Prestataire(id: docID, nom: '', adresse: '',));
+    });
   }
 }
