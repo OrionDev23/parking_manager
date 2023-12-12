@@ -903,8 +903,6 @@ class ReparationFormState extends State<ReparationForm>
     for(int i=0;i<designations.length;i++){
       result.add(designations[i].designation.toJson());
     }
-    print(result.toString());
-
     return result;
   }
 
