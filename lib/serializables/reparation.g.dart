@@ -14,17 +14,10 @@ Reparation _$ReparationFromJson(Map<String, dynamic> json) => Reparation(
       anneeUtil: json['anneeUtil'] as int?,
       couleur: json['couleur'] as String?,
       date: dateFromIntJsonNonNull(json['date'] as int),
-      designations: (json['designations'] as List<dynamic>?)
-          ?.map((e) => Designation.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      entretien: json['entretien'] == null
-          ? null
-          : EntretienVehicle.fromJson(
-              json['entretien'] as Map<String, dynamic>),
+      designations: designationsFromJson(json['designations'] as List),
+      entretien: entretienFromJson(json['entretien'] as String?),
       etat: json['etat'] as String?,
-      etatActuel: json['etatActuel'] == null
-          ? null
-          : EtatVehicle.fromJson(json['etatActuel'] as Map<String, dynamic>),
+      etatActuel: etatFromJson(json['etatActuel'] as String?),
       gaz: json['gaz'] as int?,
       kilometrage: json['kilometrage'] as int?,
       modele: json['modele'] as String?,

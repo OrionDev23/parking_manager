@@ -27,7 +27,9 @@ import '../../utilities/vehicle_util.dart';
 import '../../widgets/empty_table_widget.dart';
 
 class ReparationForm extends StatefulWidget {
-  const ReparationForm({required super.key});
+
+  final Reparation? reparation;
+  const ReparationForm({required super.key, this.reparation});
 
   @override
   State<ReparationForm> createState() => ReparationFormState();
@@ -63,6 +65,18 @@ class ReparationFormState extends State<ReparationForm>
   void initState() {
     assignOrderNumber();
     super.initState();
+  }
+
+  void initValues(){
+    if(widget.reparation!=null){
+      etatVehicle=widget.reparation!.etatActuel??EtatVehicle();
+      entretienVehicle=widget.reparation!.entretien??EntretienVehicle();
+      remarqueEntretien.text=widget.reparation!.remarque??'';
+      numOrdre.text=widget.reparation!.numero.toString();
+      reservedOrders[widget.key!]=widget.reparation!.numero;
+
+
+    }
   }
 
   bool assigningOrederNumber = false;
@@ -189,7 +203,8 @@ class ReparationFormState extends State<ReparationForm>
               children: [
                 Row(
                   children: [
-                    if (MyEntrepriseState.p != null) const EntreprisePlacement(),
+                    if (MyEntrepriseState.p != null)
+                      const EntreprisePlacement(),
                     const Spacer(),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -288,7 +303,8 @@ class ReparationFormState extends State<ReparationForm>
                           'vehicule',
                           style: boldStyle,
                         ).tr(),
-                        title: Text(selectedVehicle?.matricule ?? 'nonind'.tr()),
+                        title:
+                            Text(selectedVehicle?.matricule ?? 'nonind'.tr()),
                         onPressed: () async {
                           selectedVehicle = await showDialog<Vehicle?>(
                               context: context,
@@ -421,14 +437,15 @@ class ReparationFormState extends State<ReparationForm>
             FilledButton(
                 style: ButtonStyle(
                   backgroundColor: ButtonState.all(appTheme.color.lightest),
-                ), onPressed:uploading?null: (){},
+                ),
+                onPressed: uploading ? null : () {},
                 child: const Text('voir')),
             smallSpace,
             FilledButton(
                 style: ButtonStyle(
                   backgroundColor: ButtonState.all(appTheme.color.darkest),
                 ),
-                onPressed: uploading?null:uploadForm,
+                onPressed: uploading ? null : uploadForm,
                 child: const Text('save').tr())
           ],
         ),
@@ -775,7 +792,8 @@ class ReparationFormState extends State<ReparationForm>
   List<DesignationReparation> designations = List.empty(growable: true);
 
   void addDesignation() {
-    designations.add(DesignationReparation(key:UniqueKey(),designation: Designation(designation: '')));
+    designations.add(DesignationReparation(
+        key: UniqueKey(), designation: Designation(designation: '')));
     setState(() {});
   }
 
@@ -793,7 +811,8 @@ class ReparationFormState extends State<ReparationForm>
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Button(
-                    onPressed: selectedDesignationsExist() ? deleteAllSelected : null,
+                    onPressed:
+                        selectedDesignationsExist() ? deleteAllSelected : null,
                     child: const Text('delete').tr()),
                 smallSpace,
                 FilledButton(
@@ -805,34 +824,52 @@ class ReparationFormState extends State<ReparationForm>
           Container(
             decoration: BoxDecoration(
               color: appTheme.color.lightest,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(5)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(5)),
             ),
             padding: const EdgeInsets.all(5),
             child: Table(
               columnWidths: const {
-                0:FlexColumnWidth(3),
-                1:FlexColumnWidth(),
-                2:FlexColumnWidth(),
-                3:FlexColumnWidth(),
+                0: FlexColumnWidth(3),
+                1: FlexColumnWidth(),
+                2: FlexColumnWidth(),
+                3: FlexColumnWidth(),
               },
               children: [
-                TableRow(
-                  children: [
-                    TableCell(child: const Text('desi',textAlign: TextAlign.center,).tr()),
-                    TableCell(child: const Text('qte',textAlign: TextAlign.center,).tr()),
-                    TableCell(child: const Text('TVA',textAlign: TextAlign.center,).tr()),
-                    TableCell(child: const Text('prix',textAlign: TextAlign.center,).tr()),
-                  ]
-                ),
+                TableRow(children: [
+                  TableCell(
+                      child: const Text(
+                    'desi',
+                    textAlign: TextAlign.center,
+                  ).tr()),
+                  TableCell(
+                      child: const Text(
+                    'qte',
+                    textAlign: TextAlign.center,
+                  ).tr()),
+                  TableCell(
+                      child: const Text(
+                    'TVA',
+                    textAlign: TextAlign.center,
+                  ).tr()),
+                  TableCell(
+                      child: const Text(
+                    'prix',
+                    textAlign: TextAlign.center,
+                  ).tr()),
+                ]),
               ],
             ),
           ),
           Container(
             decoration: BoxDecoration(
               border: Border.all(color: appTheme.fillColor),
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(5)),
+              borderRadius:
+                  const BorderRadius.vertical(bottom: Radius.circular(5)),
             ),
-            child:designations.isEmpty?const NoDataWidget() :Column(children:getDesignationList(appTheme)),
+            child: designations.isEmpty
+                ? const NoDataWidget()
+                : Column(children: getDesignationList(appTheme)),
           ),
         ],
       ),
@@ -849,22 +886,21 @@ class ReparationFormState extends State<ReparationForm>
   }
 
   void deleteAllSelected() {
-    List<DesignationReparation> temp=List.from(designations);
-    for(int i=0;i<temp.length;i++) {
-      if(temp[i].designation.selected){
+    List<DesignationReparation> temp = List.from(designations);
+    for (int i = 0; i < temp.length; i++) {
+      if (temp[i].designation.selected) {
         designations.remove(temp[i]);
-      }}
+      }
+    }
     setState(() {});
   }
 
-
-  List<Widget> getDesignationList(AppTheme appTheme){
-    return List.generate(designations.length, (index)
-    {
+  List<Widget> getDesignationList(AppTheme appTheme) {
+    return List.generate(designations.length, (index) {
       return Container(
-        padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 5),
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
         decoration: BoxDecoration(
-          color: index%2==0?appTheme.fillColor:null,
+          color: index % 2 == 0 ? appTheme.fillColor : null,
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -881,7 +917,7 @@ class ReparationFormState extends State<ReparationForm>
                 smallSpace,
                 Flexible(
                   child: SizedBox(
-                    height:35.px,
+                    height: 35.px,
                     child: designations[index],
                   ),
                 ),
@@ -894,64 +930,69 @@ class ReparationFormState extends State<ReparationForm>
     });
   }
 
-
-
-  List<Map<String,dynamic>> getAllDesignationToJson(){
-    List<Map<String,dynamic>> result=List.empty(growable: true);
-    for(int i=0;i<designations.length;i++){
+  List<Map<String, dynamic>> getAllDesignationToJson() {
+    List<Map<String, dynamic>> result = List.empty(growable: true);
+    for (int i = 0; i < designations.length; i++) {
       result.add(designations[i].designation.toJson());
     }
     return result;
   }
 
-
   String? documentID;
 
-  bool uploading=false;
-  void uploadForm() async{
+  bool uploading = false;
+  void uploadForm() async {
     setState(() {
-      uploading=true;
+      uploading = true;
     });
 
-    documentID??=DateTime.now().difference(ClientDatabase.ref).inMilliseconds.abs().toString();
-
-    Reparation reparation=Reparation(
-        id: documentID!,
-        numero: int.parse(numOrdre.text),
-        date: selectedDate,
-        anneeUtil: anneeUtil.year,
-        couleur: couleur.text,
-        designations: designations.map((e) => e.designation).toList(),
-        entretien: entretienVehicle,
-        etatActuel: etatVehicle,
-        gaz: carburant.ceil(),
-        kilometrage: int.tryParse(km.text),
-        modele: type.text,
-        nchassi: nchassi.text,
-        nmoteur: nmoteur.text,
-        prestataire: selectedPrest?.id,
-        prestatairenom: selectedPrest?.nom,
-        vehicule: selectedVehicle?.id,
-        vehiculemat: selectedVehicle?.matricule,
-        remarque: remarqueEntretien.text,
-
+    Reparation reparation = Reparation(
+      id: documentID!,
+      numero: int.parse(numOrdre.text),
+      date: selectedDate,
+      anneeUtil: anneeUtil.year,
+      couleur: couleur.text,
+      designations: designations.map((e) => e.designation).toList(),
+      entretien: entretienVehicle,
+      etatActuel: etatVehicle,
+      gaz: carburant.ceil(),
+      kilometrage: int.tryParse(km.text),
+      modele: type.text,
+      nchassi: nchassi.text,
+      nmoteur: nmoteur.text,
+      prestataire: selectedPrest?.id,
+      prestatairenom: selectedPrest?.nom,
+      vehicule: selectedVehicle?.id,
+      vehiculemat: selectedVehicle?.matricule,
+      remarque: remarqueEntretien.text,
     );
 
+    if (documentID == null)
+    {
+      documentID ??= DateTime.now()
+          .difference(ClientDatabase.ref)
+          .inMilliseconds
+          .abs()
+          .toString();
 
-    await ClientDatabase.database!.createDocument(
-        databaseId: databaseId,
-        collectionId: reparationId,
-        documentId: documentID!, data: reparation.toJson());
-
-    uploading=false;
-
-    if(mounted){
-      setState(() {
-      });
+      await ClientDatabase.database!.createDocument(
+          databaseId: databaseId,
+          collectionId: reparationId,
+          documentId: documentID!,
+          data: reparation.toJson());
+    }
+    else {
+      await ClientDatabase.database!.updateDocument(
+          databaseId: databaseId,
+          collectionId: reparationId,
+          documentId: documentID!,
+          data: reparation.toJson());
     }
 
+    uploading = false;
+
+    if (mounted) {
+      setState(() {});
+    }
   }
-
-
-
 }

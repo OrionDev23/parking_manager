@@ -1,18 +1,33 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:parc_oto/datasources/parcoto_webservice.dart';
+import 'package:parc_oto/serializables/reparation.dart';
 
-class ReparationWebService extends ParcOtoWebService{
+class ReparationWebService extends ParcOtoWebService<Reparation>{
   ReparationWebService(super.data, super.collectionID, super.columnForSearch);
 
   @override
   fromJsonFunction(Map<String, dynamic> json) {
-    // TODO: implement fromJsonFunction
-    throw UnimplementedError();
+    return Reparation.fromJson(json);
   }
 
   @override
   String getAttributeForSearch(int att) {
-    // TODO: implement getAttributeForSearch
-    throw UnimplementedError();
+    switch(att){
+      case 0:return 'vehiculemat';
+      case 1:return 'prestatairenom';
+      case 2:return 'nchassi';
+      case 3:return 'modele';
+    }
+    return 'remarque';
+  }
+
+
+  @override
+  String getSearchQueryPerIndex(int index,String searchKey){
+    switch(index){
+      case 2: return Query.equal('annee_util', int.tryParse(searchKey)??9999);
+      default: return Query.search(getAttributeForSearch(index), searchKey);
+    }
   }
 
   @override

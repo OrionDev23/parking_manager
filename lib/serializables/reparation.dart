@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:parc_oto/serializables/parc_oto_serializable.dart';
 import 'package:parc_oto/utilities/profil_beautifier.dart';
@@ -38,14 +40,14 @@ class Reparation extends ParcOtoDefault{
 
   String? remarque;
 
-  @JsonKey(toJson: designationsToJson)
+  @JsonKey(toJson: designationsToJson,fromJson: designationsFromJson)
   List<Designation>? designations;
 
 
-  @JsonKey(toJson:etatVehiculeToJson)
+  @JsonKey(toJson:etatVehiculeToJson,fromJson: etatFromJson)
   EtatVehicle? etatActuel;
 
-  @JsonKey(toJson:entretienToJson)
+  @JsonKey(toJson:entretienToJson,fromJson: entretienFromJson)
 
   EntretienVehicle? entretien;
 

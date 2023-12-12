@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 import 'package:parc_oto/serializables/etat_vehicle.dart';
 import 'package:parc_oto/serializables/genre_vehicule.dart';
 import 'package:parc_oto/serializables/parc_user.dart';
@@ -79,14 +81,25 @@ DateTime? updatedAtJson(String json){
 
 List<String>? designationsToJson(List<Designation>? list){
 
-  return list?.map((e) => e.toJson().toString()).toList();
+  return list?.map((e) => jsonEncode(e.toJson())).toList();
 }
 
 
 String? etatVehiculeToJson(EtatVehicle? etat){
-  return etat?.toJson().toString();
+  return jsonEncode(etat?.toJson());
 }
 
 String? entretienToJson(EntretienVehicle? entretienVehicle){
-  return entretienVehicle?.toJson().toString();
+  return jsonEncode(entretienVehicle?.toJson());
+}
+
+EtatVehicle? etatFromJson(String? json){
+  return json==null?null:EtatVehicle.fromJson(jsonDecode(json));
+}
+EntretienVehicle? entretienFromJson(String? json){
+  return json==null?null:EntretienVehicle.fromJson(jsonDecode(json));
+}
+
+List<Designation>? designationsFromJson(List<dynamic> json){
+  return json.map((e) => Designation.fromJson(jsonDecode(e) as Map<String,dynamic>)).toList();
 }
