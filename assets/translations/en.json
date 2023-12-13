@@ -49,10 +49,15 @@
   "max": "Max",
   "clear": "Clear",
   "filter": "Filter",
+  "prevoir": "Preview",
+  "supreparation": "Delete the order",
 
 
   "documents": "Documents",
   "reparations": "Repairs",
+  "reparation": "Ordre",
+  "nouvrepar": "New order",
+
   "greparations": "Manage repairs",
   "prestataires": "Providers",
   "prestataire": "Provider",
@@ -103,6 +108,7 @@
   "accessoire": "Accessories",
   "qte": "Nbr",
   "prixt": "Total price",
+  "montantt": "Total amount",
   "totalht": "Tax excluded total",
   "totalhtar": "T.E. after discount",
   "totalttc": "Total all taxes included",

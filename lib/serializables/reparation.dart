@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:json_annotation/json_annotation.dart';
 import 'package:parc_oto/serializables/parc_oto_serializable.dart';
 import 'package:parc_oto/utilities/profil_beautifier.dart';
@@ -67,4 +65,18 @@ class Reparation extends ParcOtoDefault{
 
   @override
   Map<String, dynamic> toJson() => _$ReparationToJson(this);
+
+
+  double getPrixTotal(){
+    if(designations==null){
+      return 0;
+    }
+    double result=0;
+
+    for(int i=0;i<designations!.length;i++){
+      result+=designations![i].prix+(designations![i].prix*designations![i].tva)/100;
+    }
+
+    return result;
+  }
 }

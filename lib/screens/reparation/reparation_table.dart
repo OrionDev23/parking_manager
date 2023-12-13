@@ -1,7 +1,7 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parc_oto/datasources/prestataire/prestataire_datasource.dart';
+import 'package:parc_oto/datasources/reparation/reparation_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -18,7 +18,7 @@ class ReparationTable extends StatefulWidget {
 }
 
 class ReparationTableState extends State<ReparationTable> {
-  late PrestataireDataSource prestataireDataSource;
+  late ReparationDataSource reparationDataSource;
 
   late final bool startedWithFiltersOn;
 
@@ -39,7 +39,7 @@ class ReparationTableState extends State<ReparationTable> {
     if (filterDocument.value != null){
       startedWithFiltersOn = true;
       searchController.text = filterDocument.value!;
-      prestataireDataSource = PrestataireDataSource(
+      reparationDataSource = ReparationDataSource(
           current: context,
           selectC: widget.selectD, collectionID:prestataireId,
           searchKey: filterDocument.value);
@@ -48,7 +48,7 @@ class ReparationTableState extends State<ReparationTable> {
     else{
       startedWithFiltersOn = false;
 
-      prestataireDataSource = PrestataireDataSource(current: context, collectionID: prestataireId,selectC: widget.selectD,archive: widget.archive);
+      reparationDataSource = ReparationDataSource(current: context, collectionID: prestataireId,selectC: widget.selectD,archive: widget.archive);
 
     }
     initColumns();
@@ -59,7 +59,7 @@ class ReparationTableState extends State<ReparationTable> {
     fontSize: 10.sp,
   );
 
-  int sortColumn = 5;
+  int sortColumn = 0;
 
   void initColumns() {
     columns = [
@@ -67,7 +67,7 @@ class ReparationTableState extends State<ReparationTable> {
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Text(
-            'nom',
+            'num',
             style: tstyle,
           ).tr(),
         ),
@@ -76,7 +76,7 @@ class ReparationTableState extends State<ReparationTable> {
           sortColumn = 0;
           assending = !assending;
 
-          prestataireDataSource.sort(sortColumn, assending);
+          reparationDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -84,33 +84,16 @@ class ReparationTableState extends State<ReparationTable> {
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Text(
-            'telephone',
-            style: tstyle,
-          ).tr(),
-        ),
-        size: ColumnSize.L,
-        onSort: (s, c) {
-          sortColumn = 1;
-          assending = !assending;
-
-          prestataireDataSource.sort(sortColumn, assending);
-          setState(() {});
-        },
-      ),
-      DataColumn2(
-        label: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'email',
+            'matricule',
             style: tstyle,
           ).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
-          sortColumn = 2;
+          sortColumn = 1;
           assending = !assending;
 
-          prestataireDataSource.sort(sortColumn, assending);
+          reparationDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -118,7 +101,24 @@ class ReparationTableState extends State<ReparationTable> {
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Text(
-            'NIF',
+            'prestataire',
+            style: tstyle,
+          ).tr(),
+        ),
+        size: ColumnSize.L,
+        onSort: (s, c) {
+          sortColumn = 2;
+          assending = !assending;
+
+          reparationDataSource.sort(sortColumn, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'date',
             style: tstyle,
           ).tr(),
         ),
@@ -127,7 +127,7 @@ class ReparationTableState extends State<ReparationTable> {
           sortColumn = 3;
           assending = !assending;
 
-          prestataireDataSource.sort(sortColumn, assending);
+          reparationDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -135,15 +135,15 @@ class ReparationTableState extends State<ReparationTable> {
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Text(
-            'RC',
+            'montantt',
             style: tstyle,
           ).tr(),
         ),
-        size: ColumnSize.L,
+        size: ColumnSize.M,
         onSort: (s, c) {
           sortColumn = 4;
           assending = !assending;
-          prestataireDataSource.sort(sortColumn, assending);
+          reparationDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -159,7 +159,7 @@ class ReparationTableState extends State<ReparationTable> {
         onSort: (s, c) {
           sortColumn = 5;
           assending = !assending;
-          prestataireDataSource.sort(sortColumn, assending);
+          reparationDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -180,13 +180,13 @@ class ReparationTableState extends State<ReparationTable> {
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
-    prestataireDataSource.appTheme=appTheme;
+    reparationDataSource.appTheme=appTheme;
     return ValueListenableBuilder(
         valueListenable: filterDocument,
         builder: (context, v, _) {
           if (!startedWithFiltersOn && v != null && filterNow) {
             searchController.text = v;
-            prestataireDataSource.search(v);
+            reparationDataSource.search(v);
             notEmpty=true;
             filtered = true;
             filterNow = false;
@@ -211,7 +211,7 @@ class ReparationTableState extends State<ReparationTable> {
                       ),
                       onSubmitted: (s) {
                         if (s.isNotEmpty) {
-                          prestataireDataSource.search(s);
+                          reparationDataSource.search(s);
                           if (!notEmpty) {
                             setState(() {
                               notEmpty = true;
@@ -232,7 +232,7 @@ class ReparationTableState extends State<ReparationTable> {
                             searchController.text = "";
                             notEmpty = false;
                             setState(() {});
-                            prestataireDataSource.search('');
+                            reparationDataSource.search('');
                           })
                           : null,
                     ),
@@ -252,12 +252,12 @@ class ReparationTableState extends State<ReparationTable> {
               rowPerPage = nbr ?? 12;
             },
             availableRowsPerPage: const [12, 24, 50, 100, 200],
-            empty: NoDataWidget(datasource: prestataireDataSource,),
+            empty: NoDataWidget(datasource: reparationDataSource,),
             showFirstLastButtons: true,
             renderEmptyRowsInTheEnd: false,
             fit: FlexFit.tight,
             columns: columns,
-            source: prestataireDataSource,
+            source: reparationDataSource,
             sortArrowAlwaysVisible: true,
             hidePaginator: false,
           );});
@@ -265,7 +265,7 @@ class ReparationTableState extends State<ReparationTable> {
 
   @override
   void dispose() {
-    prestataireDataSource.dispose();
+    reparationDataSource.dispose();
     super.dispose();
   }
 }

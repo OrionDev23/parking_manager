@@ -54,8 +54,8 @@ class ReparationGestionState extends State<ReparationGestion> {
     late Tab tab;
     tab = Tab(
       key: UniqueKey(),
-      text: Text('nouvprest'.tr()),
-      semanticLabel: 'nouvprest'.tr(),
+      text: Text('nouvrepar'.tr()),
+      semanticLabel: 'nouvrepar'.tr(),
       icon: const Icon(FluentIcons.document),
       body: ReparationForm(key: UniqueKey(),),
       onClosed: () {

@@ -3,7 +3,7 @@
   "nummat": "رقم التسجيل",
   "matricule": "رقم التسجيل",
   "carburant": "الوقود",
-
+  "prevoir": "عرض",
   "autremat": "رقم تسجيل أجنبي؟",
   "nomf": "اللقب",
   "pays": "البلد",
@@ -55,11 +55,16 @@
   "rstate": "تحت الاصلاح",
   "documents": "الوثائق",
   "reparations": "الإصلاحات",
+  "reparation": "الطلب",
+  "nouvrepar": "طلب جديد",
+  "montantt": "المبلغ الإجمالي",
+
   "greparations": "إدارة الإصلاحات",
   "prestataires": "مقدمي الخدمات",
   "prestataire": "الموفر",
   "le": "ال",
   "supvehic": "حذف السيارة",
+  "supreparation": "حذف الطلب",
   "legalinfo": "المعلومات القانونية",
 
   "vp": "سيارة خاصة",

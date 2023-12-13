@@ -128,9 +128,9 @@ class ReparationFormState extends State<ReparationForm>
           Query.limit(1),
         ]).then((value) {
       if (value.documents.length == 1) {
-        numOrdre.text = value.documents[0]
+        numOrdre.text = (value.documents[0]
             .convertTo((p0) => Reparation.fromJson(p0 as Map<String, dynamic>))
-            .numero
+            .numero+1)
             .toString();
       } else {
         numOrdre.text = (reservedOrders.length + 1).toString();
@@ -149,45 +149,42 @@ class ReparationFormState extends State<ReparationForm>
   }
 
   Future<bool> testIfOrderNumberExists() async {
-    await ClientDatabase.database!.listDocuments(
-        databaseId: databaseId,
-        collectionId: reparationId,
-        queries: [
-          Query.orderDesc('numero'),
-          Query.equal('numero', int.parse(numOrdre.text)),
-          Query.limit(1),
-        ]).then((value) {
-      if (value.documents.length == 1) {
-        setState(() {
-          errorNumOrder = true;
-        });
-        return true;
-      } else {
-        if (testIfReservedContained(int.parse(numOrdre.text))) {
+
+    bool result=false;
+
+    if (testIfReservedContained(int.parse(numOrdre.text))) {
+      setState(() {
+        errorNumOrder = true;
+      });
+      result=true;
+    }
+    else{
+      result= await ClientDatabase.database!.listDocuments(
+          databaseId: databaseId,
+          collectionId: reparationId,
+          queries: [
+            Query.orderDesc('numero'),
+            Query.equal('numero', int.parse(numOrdre.text)),
+            Query.limit(1),
+          ]).then((value) {
+        if (value.documents.length == 1) {
           setState(() {
             errorNumOrder = true;
           });
           return true;
         } else {
           setState(() {
-            errorNumOrder = false;
-          });
-          return false;
-        }
-      }
-    });
+            errorNumOrder=false;
 
-    if (testIfReservedContained(int.parse(numOrdre.text))) {
-      setState(() {
-        errorNumOrder = true;
-      });
-      return true;
-    } else {
-      setState(() {
-        errorNumOrder = false;
-      });
-      return false;
+          });
+         return false;
+        }
+      }).onError((error, stackTrace) {return Future.value(false);});
+
     }
+
+
+    return result;
   }
 
   bool testIfReservedContained(int value) {
@@ -273,6 +270,7 @@ class ReparationFormState extends State<ReparationForm>
                                     Flexible(
                                       child: TextBox(
                                         controller: numOrdre,
+                                        enabled: widget.reparation==null,
                                         placeholder: 'num'.tr(),
                                         placeholderStyle: placeStyle,
                                         style: appTheme.writingStyle,
@@ -288,6 +286,9 @@ class ReparationFormState extends State<ReparationForm>
                                             if (!await testIfOrderNumberExists()) {
                                               reservedOrders[widget.key!] =
                                                   int.parse(s);
+                                              setState(() {
+
+                                              });
                                             }
                                           }
                                         },

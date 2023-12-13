@@ -1,19 +1,96 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart' as f;
+import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
+import 'package:parc_oto/datasources/reparation/reparation_webservice.dart';
+import 'package:parc_oto/screens/reparation/reparation_form.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 
-class ReparationDataSource extends ParcOtoDatasource{
-  ReparationDataSource({required super.collectionID, required super.current,super.appTheme,super.filters,super.searchKey,super.selectC});
+import '../../screens/reparation/reparation_tabs.dart';
+import '../../serializables/reparation.dart';
 
-  @override
-  String deleteConfirmationMessage(c) {
-    // TODO: implement deleteConfirmationMessage
-    throw UnimplementedError();
+class ReparationDataSource extends ParcOtoDatasource<Reparation>{
+  final bool? archive;
+  ReparationDataSource({required super.collectionID,this.archive, required super.current,super.appTheme,super.filters,super.searchKey,super.selectC}){
+    repo=ReparationWebService(data, collectionID, 7);
   }
 
   @override
-  List<DataCell> getCellsToShow(MapEntry<String, dynamic> element) {
-    // TODO: implement getCellsToShow
-    throw UnimplementedError();
+  String deleteConfirmationMessage(c) {
+    return '${'supreparation'.tr()} ${c.numero}';
+
+  }
+
+  @override
+  List<DataCell> getCellsToShow(MapEntry<String, Reparation> element) {
+    final dateFormat=DateFormat('y/M/d HH:mm:ss','fr');
+    final dateFormat2=DateFormat('y/M/d','fr');
+    final numberFormat=NumberFormat('00000000','fr');
+    final numberFormat2=NumberFormat.currency(locale:'fr',symbol: 'DA',decimalDigits: 2);
+    final tstyle=TextStyle(
+      fontSize: 10.sp,
+    );
+    return [
+      DataCell(SelectableText(numberFormat.format(element.value.numero),style: tstyle,)),
+      DataCell(SelectableText(element.value.vehiculemat??'',style: tstyle)),
+      DataCell(SelectableText(element.value.prestatairenom??'',style: tstyle)),
+      DataCell(SelectableText(dateFormat2.format(element.value.date),style: tstyle)),
+      DataCell(SelectableText(numberFormat2.format(element.value.getPrixTotal()),style: tstyle,)),
+      DataCell(SelectableText(
+          dateFormat.format(element.value.updatedAt!)
+          ,style: tstyle)),
+      DataCell(f.FlyoutTarget(
+        controller: element.value.controller,
+        child: IconButton(
+            splashRadius: 15,
+            onPressed: (){
+              element.value.controller.showFlyout(builder: (context){
+                return f.MenuFlyout(
+                  items: [
+                    f.MenuFlyoutItem(
+                        text: const Text('mod').tr(),
+                        onPressed: (){
+                          Navigator.of(current).pop();
+                          late f.Tab tab;
+                          tab = f.Tab(
+                            key: UniqueKey(),
+                            text: Text('${"mod".tr()} ${'reparation'.tr().toLowerCase()} ${element.value.numero}'),
+                            semanticLabel: '${'mod'.tr()} ${element.value.numero}',
+                            icon: const Icon(Bootstrap.car_front),
+                            body: ReparationForm(reparation: element.value,key: UniqueKey(),),
+                            onClosed: () {
+                              ReparationTabsState.tabs.remove(tab);
+
+                              if (ReparationTabsState.currentIndex.value > 0) {
+                                ReparationTabsState.currentIndex.value--;
+                              }
+                            },
+                          );
+                          final index = ReparationTabsState.tabs.length + 1;
+                          ReparationTabsState.tabs.add(tab);
+                          ReparationTabsState.currentIndex.value = index - 1;
+                        }
+                    ),
+                    f.MenuFlyoutItem(
+                        text: const Text('delete').tr(),
+                        onPressed: (){
+                          showDeleteConfirmation(element.value);
+                        }
+                    ),
+                    const f.MenuFlyoutSeparator(),
+                    f.MenuFlyoutItem(
+                        text: const Text('prevoir').tr(),
+                        onPressed: (){
+                        }
+                    ),
+                  ],
+                );
+              });
+            },
+            icon: const Icon(Icons.more_vert_sharp)),
+      )),
+    ];
   }
   
 
