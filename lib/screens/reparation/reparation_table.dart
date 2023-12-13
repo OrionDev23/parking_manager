@@ -41,14 +41,14 @@ class ReparationTableState extends State<ReparationTable> {
       searchController.text = filterDocument.value!;
       reparationDataSource = ReparationDataSource(
           current: context,
-          selectC: widget.selectD, collectionID:prestataireId,
+          selectC: widget.selectD, collectionID:reparationId,
           searchKey: filterDocument.value);
       filterDocument.value=null;
     }
     else{
       startedWithFiltersOn = false;
 
-      reparationDataSource = ReparationDataSource(current: context, collectionID: prestataireId,selectC: widget.selectD,archive: widget.archive);
+      reparationDataSource = ReparationDataSource(current: context, collectionID: reparationId,selectC: widget.selectD,archive: widget.archive);
 
     }
     initColumns();

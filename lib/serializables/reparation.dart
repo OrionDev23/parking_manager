@@ -74,9 +74,8 @@ class Reparation extends ParcOtoDefault{
     double result=0;
 
     for(int i=0;i<designations!.length;i++){
-      result+=designations![i].prix+(designations![i].prix*designations![i].tva)/100;
+      result+=(designations![i].prix+(designations![i].prix*designations![i].tva)/100)*designations![i].qte;
     }
-
     return result;
   }
 }

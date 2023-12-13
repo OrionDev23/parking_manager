@@ -979,7 +979,12 @@ class ReparationFormState extends State<ReparationForm>
     setState(() {
       uploading = true;
     });
-
+    bool modif=documentID!=null;
+    documentID ??= DateTime.now()
+        .difference(ClientDatabase.ref)
+        .inMilliseconds
+        .abs()
+        .toString();
     Reparation reparation = Reparation(
       id: documentID!,
       numero: int.parse(numOrdre.text),
@@ -1001,13 +1006,9 @@ class ReparationFormState extends State<ReparationForm>
       remarque: remarqueEntretien.text,
     );
 
-    if (documentID == null)
+    if (!modif)
     {
-      documentID ??= DateTime.now()
-          .difference(ClientDatabase.ref)
-          .inMilliseconds
-          .abs()
-          .toString();
+
 
       await ClientDatabase.database!.createDocument(
           databaseId: databaseId,
