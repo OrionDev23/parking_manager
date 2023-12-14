@@ -39,11 +39,11 @@ class ReparationPdf {
       letterSpacing: -0.12,
     );
     smallText = const TextStyle(
-      fontSize: 7,
+      fontSize: 9,
       letterSpacing: -0.12,
     );
     smallTextBold = TextStyle(
-      fontSize: 8,
+      fontSize: 9,
       fontWeight: FontWeight.bold,
       letterSpacing: -0.12,
     );
@@ -68,7 +68,10 @@ class ReparationPdf {
     doc.addPage(Page(
         margin: const EdgeInsets.all(PdfPageFormat.cm),
         build: (context) {
-          return Column(children: [
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
             getHeader(entrepriseLogo),
             getVehicleInfo(),
             smallSpace,
@@ -76,146 +79,224 @@ class ReparationPdf {
             vehicleDamage(),
             smallSpace,
             smallSpace,
-            Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: PdfPageFormat.cm*8,
-                    width: PdfPageFormat.cm*15-smallSpace.width!.toDouble(),
-                    child:
-                    Container(
-                        height: PdfPageFormat.cm*10,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(),
-                        ),
-                        child: Column(
-                            children: [
-                              Container(
-                                height: PdfPageFormat.cm*0.75,
-                                padding: const EdgeInsets.all(3),
-                                decoration: BoxDecoration(
-                                    color: orange,
-                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(5))
-                                ),
-                                child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Flexible(child:Text('Désignation',style: smallTextBold),
-                                      ),
-                                      Flexible(child: Text('QTE',style: smallTextBold),),
-                                      Flexible(child: Text('PRIX',style: smallTextBold),),
-                                      Flexible(child: Text('TVA',style: smallTextBold),),
-                                      Flexible(child: Text('TTC',style: smallTextBold),),
-
-
-                                    ]
-                                ),
-                              ),
-                              smallSpace,
-                              Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
-                                child: Container(
-                                  height: PdfPageFormat.cm*0.5,
-                                  padding: const EdgeInsets.all(3),
-                                  decoration: const BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(),
-                                      )
-                                  ),
-                                ),),
-                              Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
-                                child: Container(
-                                  height: PdfPageFormat.cm*0.5,
-                                  padding: const EdgeInsets.all(3),
-                                  decoration: const BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(),
-                                      )
-                                  ),
-                                ),),
-                              Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
-                                child: Container(
-                                  height: PdfPageFormat.cm*0.5,
-                                  padding: const EdgeInsets.all(3),
-                                  decoration: const BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(),
-                                      )
-                                  ),
-                                ),),
-                              Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
-                                child: Container(
-                                  height: PdfPageFormat.cm*0.5,
-                                  padding: const EdgeInsets.all(3),
-                                  decoration: const BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(),
-                                      )
-                                  ),
-                                ),),
-                              Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
-                                child: Container(
-                                  height: PdfPageFormat.cm*0.5,
-                                  padding: const EdgeInsets.all(3),
-                                  decoration: const BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(),
-                                      )
-                                  ),
-                                ),),
-                              Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
-                                child: Container(
-                                  height: PdfPageFormat.cm*0.5,
-                                  padding: const EdgeInsets.all(3),
-                                  decoration: const BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(),
-                                      )
-                                  ),
-                                ),),
-
-                            ]
-                        )
-                    ),),
-                  smallSpace,
-                  smallSpace,
-                  Container(
-                      width: 4*PdfPageFormat.cm,
-                      height: 3*PdfPageFormat.cm,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        border: Border.all(),
-                      ),
-                      child: Column(
-                          children: [
-                            Text('Remarque',style: smallTextBold),
-                            smallSpace,
-                            SizedBox(
-                              height: PdfPageFormat.cm*2,
-                              child: Stack(
-                                  children: [
-                                    Positioned.fill(
-                                        child: Column(
-                                            mainAxisAlignment:MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              dotsSpacer(),
-                                              dotsSpacer(),
-                                              dotsSpacer(),
-                                              dotsSpacer(),
-
-                                            ]
-                                        )
-                                    )
-                                  ]
-                              ),
-                            ),
-
-                          ]
-                      )
+            SizedBox(
+              height: PdfPageFormat.cm*7.75,
+              width: PdfPageFormat.cm*21-smallSpace.width!.toDouble(),
+              child:
+              Container(
+                  height: PdfPageFormat.cm*10,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(),
                   ),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          height: PdfPageFormat.cm*0.75,
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                              color: orange,
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(5))
+                          ),
+                          child:
+                          Row(
+                              children: [
+                                SizedBox(
+                                  width: PdfPageFormat.cm*7,
+                                  child:Text('Désignation',style: smallTextBold),
+                                ),
+                                SizedBox(
+                                  width: PdfPageFormat.cm*1,
+                                  child: Text('QTE',style: smallTextBold,textAlign: TextAlign.center),),
+                                SizedBox(
+                                  width: PdfPageFormat.cm*2.5,
+                                  child: Text('PRIX',style: smallTextBold,textAlign: TextAlign.center),),
+                                SizedBox(
+                                  width: PdfPageFormat.cm*1.5,
+                                  child: Text('TVA',style: smallTextBold,textAlign: TextAlign.center),),
+                                SizedBox(
+                                  width: PdfPageFormat.cm*2.5,
+                                  child: Text('TTC',style: smallTextBold,textAlign: TextAlign.center),),
+                              ]
+                          ),
 
-                ]
+                        ),
+                        Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Container(
+                            height: PdfPageFormat.cm*0.5,
+                            padding: const EdgeInsets.all(3),
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(),
+                                )
+                            ),
+                          ),),
+                        Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Container(
+                            height: PdfPageFormat.cm*0.5,
+                            padding: const EdgeInsets.all(3),
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(),
+                                )
+                            ),
+                          ),),
+                        Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Container(
+                            height: PdfPageFormat.cm*0.5,
+                            padding: const EdgeInsets.all(3),
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(),
+                                )
+                            ),
+                          ),),
+                        Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Container(
+                            height: PdfPageFormat.cm*0.5,
+                            padding: const EdgeInsets.all(3),
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(),
+                                )
+                            ),
+                          ),),
+                        Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Container(
+                            height: PdfPageFormat.cm*0.5,
+                            padding: const EdgeInsets.all(3),
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(),
+                                )
+                            ),
+                          ),),
+                        Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Container(
+                            height: PdfPageFormat.cm*0.5,
+                            padding: const EdgeInsets.all(3),
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(),
+                                )
+                            ),
+                          ),),
+                        Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Container(
+                            height: PdfPageFormat.cm*0.5,
+                            padding: const EdgeInsets.all(3),
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(),
+                                )
+                            ),
+                          ),),
+                        Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Container(
+                            height: PdfPageFormat.cm*0.5,
+                            padding: const EdgeInsets.all(3),
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(),
+                                )
+                            ),
+                          ),),
+                        Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Container(
+                            height: PdfPageFormat.cm*0.5,
+                            padding: const EdgeInsets.all(3),
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(),
+                                )
+                            ),
+                          ),),
+                        Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Container(
+                            height: PdfPageFormat.cm*0.5,
+                            padding: const EdgeInsets.all(3),
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(),
+                                )
+                            ),
+                          ),),
+                        Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Container(
+                            height: PdfPageFormat.cm*0.5,
+                            padding: const EdgeInsets.all(3),
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(),
+                                )
+                            ),
+                          ),),
+                        Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Container(
+                            height: PdfPageFormat.cm*0.5,
+                            padding: const EdgeInsets.all(3),
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(),
+                                )
+                            ),
+                          ),),
+                        Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Container(
+                            height: PdfPageFormat.cm*0.5,
+                            padding: const EdgeInsets.all(3),
+                            decoration: const BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(),
+                                )
+                            ),
+                          ),),
+                        Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Container(
+                            height: PdfPageFormat.cm*0.5,
+                            padding: const EdgeInsets.all(3),
+                          ),),
+
+                      ]
+                  )
+              ),),
+                smallSpace,
+                smallSpace,
+            Container(
+                width: 8*PdfPageFormat.cm,
+                height: 3*PdfPageFormat.cm,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  border: Border.all(),
+                ),
+                child: Column(
+                    children: [
+                      Text('Remarque',style: smallTextBold),
+                      smallSpace,
+                      SizedBox(
+                        height: PdfPageFormat.cm*2,
+                        child: Stack(
+                            children: [
+                              Positioned.fill(
+                                  child: Column(
+                                      mainAxisAlignment:MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        dotsSpacer(),
+                                        dotsSpacer(),
+                                        dotsSpacer(),
+                                        dotsSpacer(),
+
+                                      ]
+                                  )
+                              )
+                            ]
+                        ),
+                      ),
+
+                    ]
+                )
             ),
             Spacer(),
             branding(poLogo),
@@ -705,292 +786,309 @@ class ReparationPdf {
     List<Widget> etats = getTextListFromMap(etatJson, 0, etatJson.length);
 
     return Container(
-        width: 19 * PdfPageFormat.cm,
-        height: 5 * PdfPageFormat.cm,
+        width: 20 * PdfPageFormat.cm,
+        height: 6 * PdfPageFormat.cm,
+        padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
           border: Border.all(),
         ),
-        child: Stack(alignment: Alignment.center, children: [
-          Positioned(
-            left: 0,
-            child: carDrawing(),
-          ),
-          Positioned(
-            left: (180 * 0.4).px,
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                        ),
-                        child: Column(
+        child:
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('État du vehicule',style: kindaBigTextBold),
+            SizedBox(
+                width: 19 * PdfPageFormat.cm,
+                height: 5 * PdfPageFormat.cm,
+              child:  Stack(alignment: Alignment.center, children: [
+                Positioned(
+                  left: 0,
+                  child: carDrawing(),
+                ),
+                Positioned(
+                  left: (180 * 0.4).px,
+                  child:
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
                             mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 2),
-                                width: 3 * PdfPageFormat.cm + 4,
                                 decoration: BoxDecoration(
                                   border: Border.all(),
                                 ),
-                                child: Text('Pneus', style: smallTextBold),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all( 2),
                                 child: Column(
-                                  children:
-                                  etats.getRange(0, 4).toList(growable: false),
-                                ),
-                              )
-                            ]),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                        ),
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                                        width: 3 * PdfPageFormat.cm + 4,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(),
+                                        ),
+                                        child: Text('Pneus', style: smallTextBold),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all( 2),
+                                        child: Column(
+                                          children:
+                                          etats.getRange(0, 4).toList(growable: false),
+                                        ),
+                                      )
+                                    ]),
+                              ),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 2),
-                                width: 3 * PdfPageFormat.cm + 4,
                                 decoration: BoxDecoration(
                                   border: Border.all(),
                                 ),
-                                child: Text('Pare-Brise AV', style: smallTextBold),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all( 2),
                                 child: Column(
-                                  children:
-                                  etats.getRange(4, 7).toList(growable: false),
-                                ),
-                              )
-                            ]),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                        ),
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                                        width: 3 * PdfPageFormat.cm + 4,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(),
+                                        ),
+                                        child: Text('Pare-Brise AV', style: smallTextBold),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all( 2),
+                                        child: Column(
+                                          children:
+                                          etats.getRange(4, 7).toList(growable: false),
+                                        ),
+                                      )
+                                    ]),
+                              ),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 2),
-                                width: 3 * PdfPageFormat.cm + 4,
                                 decoration: BoxDecoration(
                                   border: Border.all(),
                                 ),
-                                child: Text('Phare', style: smallTextBold),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all( 2),
                                 child: Column(
-                                  children:
-                                  etats.getRange(10, 12).toList(growable: false),
-                                ),
-                              )
-                            ]),
-                      ),
-                    ]
-                  ),
-                  Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(),
-                          ),
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                                  width: 3 * PdfPageFormat.cm + 4,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(),
-                                  ),
-                                  child: Text('Feux', style: smallTextBold),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all( 2),
-                                  child: Column(
-                                    children:
-                                    etats.getRange(12, 16).toList(growable: false),
-                                  ),
-                                )
-                              ]),
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                                        width: 3 * PdfPageFormat.cm + 4,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(),
+                                        ),
+                                        child: Text('Phare', style: smallTextBold),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all( 2),
+                                        child: Column(
+                                          children:
+                                          etats.getRange(10, 12).toList(growable: false),
+                                        ),
+                                      )
+                                    ]),
+                              ),
+
+                            ]
                         ),
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(),
-                          ),
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                                  width: 3 * PdfPageFormat.cm + 4,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(),
-                                  ),
-                                  child: Text('Pare-Brise AR', style: smallTextBold),
+                        Column(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all( 2),
-                                  child: Column(
-                                    children:
-                                    etats.getRange(7, 10).toList(growable: false),
-                                  ),
-                                )
-                              ]),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(),
-                          ),
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                                  width: 3 * PdfPageFormat.cm + 4,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(),
-                                  ),
-                                  child: Text('Pare-choc', style: smallTextBold),
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                                        width: 3 * PdfPageFormat.cm + 4,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(),
+                                        ),
+                                        child: Text('Feux', style: smallTextBold),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all( 2),
+                                        child: Column(
+                                          children:
+                                          etats.getRange(12, 16).toList(growable: false),
+                                        ),
+                                      )
+                                    ]),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all( 2),
-                                  child: Column(
-                                    children:
-                                    etats.getRange(20, 22).toList(growable: false),
-                                  ),
-                                )
-                              ]),
-                        ),
-                      ]
-                  ),
-                  Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(),
-                          ),
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                                  width: 3 * PdfPageFormat.cm + 4,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(),
-                                  ),
-                                  child: Text('Ailes', style: smallTextBold),
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                                        width: 3 * PdfPageFormat.cm + 4,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(),
+                                        ),
+                                        child: Text('Pare-Brise AR', style: smallTextBold),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all( 2),
+                                        child: Column(
+                                          children:
+                                          etats.getRange(7, 10).toList(growable: false),
+                                        ),
+                                      )
+                                    ]),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all( 2),
-                                  child: Column(
-                                    children:
-                                    etats.getRange(16, 20).toList(growable: false),
-                                  ),
-                                )
-                              ]),
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                                        width: 3 * PdfPageFormat.cm + 4,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(),
+                                        ),
+                                        child: Text('Pare-choc', style: smallTextBold),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all( 2),
+                                        child: Column(
+                                          children:
+                                          etats.getRange(20, 22).toList(growable: false),
+                                        ),
+                                      )
+                                    ]),
+                              ),
+                            ]
                         ),
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(),
-                          ),
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                                  width: 3 * PdfPageFormat.cm + 4,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(),
-                                  ),
-                                  child: Text('Portes', style: smallTextBold),
+                        Column(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all( 2),
-                                  child: Column(
-                                    children:
-                                    etats.getRange(22, 26).toList(growable: false),
-                                  ),
-                                )
-                              ]),
-                        ),
-                      ]
-                  ),
-                  Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(),
-                          ),
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                                  width: 3 * PdfPageFormat.cm + 4,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(),
-                                  ),
-                                  child: Text('Sièges', style: smallTextBold),
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                                        width: 3 * PdfPageFormat.cm + 4,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(),
+                                        ),
+                                        child: Text('Ailes', style: smallTextBold),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all( 2),
+                                        child: Column(
+                                          children:
+                                          etats.getRange(16, 20).toList(growable: false),
+                                        ),
+                                      )
+                                    ]),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all( 2),
-                                  child: Column(
-                                    children:
-                                    etats.getRange(30, 34).toList(growable: false),
-                                  ),
-                                )
-                              ]),
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                                        width: 3 * PdfPageFormat.cm + 4,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(),
+                                        ),
+                                        child: Text('Portes', style: smallTextBold),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all( 2),
+                                        child: Column(
+                                          children:
+                                          etats.getRange(22, 26).toList(growable: false),
+                                        ),
+                                      )
+                                    ]),
+                              ),
+                            ]
                         ),
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(),
-                          ),
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                                  width: 3 * PdfPageFormat.cm + 4,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(),
-                                  ),
-                                  child: Text('Autre', style: smallTextBold),
+                        Column(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all( 2),
-                                  child: Column(
-                                    children:
-                                    etats.getRange(26, 30).toList(growable: false),
-                                  ),
-                                )
-                              ]),
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                                        width: 3 * PdfPageFormat.cm + 4,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(),
+                                        ),
+                                        child: Text('Sièges', style: smallTextBold),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all( 2),
+                                        child: Column(
+                                          children:
+                                          etats.getRange(30, 34).toList(growable: false),
+                                        ),
+                                      )
+                                    ]),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
+                                ),
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                                        width: 3 * PdfPageFormat.cm + 4,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(),
+                                        ),
+                                        child: Text('Autre', style: smallTextBold),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all( 2),
+                                        child: Column(
+                                          children:
+                                          etats.getRange(26, 30).toList(growable: false),
+                                        ),
+                                      )
+                                    ]),
+                              ),
+                            ]
                         ),
-                      ]
-                  ),
-                ]),
-          ),
-        ]));
+                      ]),
+                ),
+              ])
+            ),
+
+          ]
+        ),
+     );
   }
 
   List<Widget> getTextListFromMap(
@@ -1006,10 +1104,10 @@ class ReparationPdf {
                 children: [
                   Text(
                     key.tr().capitalizeFirstLetter(),
-                    style: smallText,
+                    style: smallText.copyWith(fontSize: 9),
                   ),
                   dotsSpacer(),
-                  if (value is num) Text('${value.ceil()} %', style: smallText),
+                  if (value is num) Text('${value.ceil()} %', style: smallText.copyWith(fontSize: 9)),
                   if (value is bool)
                     Container(
                       width: 7,
