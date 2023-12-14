@@ -5,9 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:parc_oto/utilities/car_svg.dart';
 import 'package:printing/printing.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-
 import 'dart:math' as math;
-
 import '../serializables/etat_vehicle.dart';
 import '../serializables/reparation.dart';
 import 'package:pdf/pdf.dart';
@@ -18,29 +16,36 @@ class ReparationPdf {
 
   late final EtatVehicle etatVehicle;
 
-  ReparationPdf({required this.reparation}){
-    etatVehicle=reparation.etatActuel??EtatVehicle();
+  ReparationPdf({required this.reparation}) {
+    etatVehicle = reparation.etatActuel ?? EtatVehicle();
   }
 
-  Future<void> initFonts() async{
-    Font font=await PdfGoogleFonts.rubikRegular();
-    Font fontBold=await PdfGoogleFonts.rubikSemiBold();
-    bigTitle=  TextStyle (
-    font: fontBold,
-    color: PdfColors.orange200,
-    fontSize: 15,
-    letterSpacing: -0.15,
+  void initFonts() {
+    bigTitle = TextStyle(
+      color: orangeLight,
+      fontWeight: FontWeight.bold,
+      fontSize: 15,
+      letterSpacing: -0.15,
     );
-    kindaBigText = TextStyle(
-      font: font,
+    kindaBigText = const TextStyle(
       fontSize: 12,
       letterSpacing: -0.12,
     );
     kindaBigTextBold = TextStyle(
-      font: fontBold,
-
+      fontWeight: FontWeight.bold,
       fontSize: 12,
       letterSpacing: -0.12,
+    );
+    smallText=const TextStyle(
+      fontSize: 8,
+      letterSpacing: -0.12,
+
+    );
+    smallTextBold=TextStyle(
+      fontSize: 8,
+      fontWeight: FontWeight.bold,
+      letterSpacing: -0.12,
+
     );
   }
 
@@ -48,22 +53,30 @@ class ReparationPdf {
     var entrepriseLogo = MemoryImage(
       await File('mylogo.png').readAsBytes(),
     );
-    var poLogo=MemoryImage((await rootBundle.load('assets/images/logo.webp')).buffer.asUint8List());
-    var doc = Document();
+    var poLogo = MemoryImage((await rootBundle.load('assets/images/logo.webp'))
+        .buffer
+        .asUint8List());
+    var doc = Document(
+      theme: ThemeData.withFont(
+        base: await PdfGoogleFonts.rubikRegular(),
+        bold: await PdfGoogleFonts.rubikSemiBold(),
+        icons: Font.ttf( await rootBundle.load('assets/images/materialicon.ttf')),
+      )
+    );
 
-  await initFonts();
+    initFonts();
 
     doc.addPage(Page(
-
         margin: const EdgeInsets.all(PdfPageFormat.cm),
         build: (context) {
-      return Column(children: [
-        getHeader(entrepriseLogo),
-        vehicleDamage(),
-        Spacer(),
-        branding(poLogo),
-      ]);
-    }));
+          return Column(children: [
+            getHeader(entrepriseLogo),
+            getVehicleInfo(),
+            vehicleDamage(),
+            Spacer(),
+            branding(poLogo),
+          ]);
+        }));
 
     return doc.save();
   }
@@ -71,15 +84,14 @@ class ReparationPdf {
   late final TextStyle bigTitle;
   late final TextStyle kindaBigText;
   late final TextStyle kindaBigTextBold;
+  late final TextStyle smallTextBold;
+  late final TextStyle smallText;
   final numberFormat = NumberFormat('00000000', 'fr');
   final dateFormat = DateFormat('dd MMMM yyyy', 'fr');
   Widget getHeader(MemoryImage entrepriseLogo) {
     return SizedBox(
       height: PdfPageFormat.cm * 7,
-      child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-
-          children: [
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Image(entrepriseLogo,
             width: PdfPageFormat.cm * 3,
             height: PdfPageFormat.cm * 3,
@@ -102,7 +114,7 @@ class ReparationPdf {
                       padding: const EdgeInsets.all(5),
                       width: PdfPageFormat.cm * 6.3,
                       decoration: BoxDecoration(
-                        color: PdfColors.orange700,
+                        color: orangeDeep,
                         borderRadius: BorderRadius.circular(5),
                       ),
                       child: Column(
@@ -140,54 +152,310 @@ class ReparationPdf {
     );
   }
 
-  Widget branding(MemoryImage poLogo){
-    return
-      SizedBox(
-        height: PdfPageFormat.cm*4,
-        width: PdfPageFormat.cm*19,
-        child:
-        Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
+  Widget getVehicleInfo(){
 
-              Container(
-                width: PdfPageFormat.cm*4.5,
-                height: PdfPageFormat.cm*1.5,
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  border: Border.all(),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Column(
+    double width=PdfPageFormat.cm*4;
+    double height=PdfPageFormat.cm*0.6;
+    double bottom=4;
+    double bottomFill=3;
+    return Table(
+      border: TableBorder.all(),
+      children: [
+        TableRow(
+            children: [
+              Padding(padding: const EdgeInsets.all(5),child: Row(
+                children: [
+                  Text('Marque',style: smallTextBold),
+                  SizedBox(
+                    width: width,
+                    height: height,
+                    child:   Stack(
+                        children: [
+                          Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                dotsSpacer(),
+                              ])),
+                          Positioned(
+                            bottom: 5,
+                            left: 5,
+                            right: 5,
+                            child:
+                            Text(reparation.marque??'',style: smallText),
+                          ),
+
+                        ]
+                    ),
+                  ),
+
+                ]
+              )),
+              Padding(padding: const EdgeInsets.all(5),child: Row(
+                children: [
+                  Text('Modele',style: smallTextBold),
+                  SizedBox(
+                    width: width,
+                    height: height,
+                    child:   Stack(
+                        children: [
+                          Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,children: [
+                                dotsSpacer(),
+                              ])),
+                          Positioned(
+                            bottom: bottom,
+                            left: 5,
+                            right: 5,
+                            child:
+                            Text(reparation.modele??'',style: smallText),
+                          ),
+
+                        ]
+                    ),
+                  ),
+
+                ]
+              )),
+              Padding(padding: const EdgeInsets.all(5),child: Row(
+                children: [
+                  Text('Immatriculation',style: smallTextBold),
+                  SizedBox(
+                    width: width,
+                    height: height,
+                    child:   Stack(
+                        children: [
+                          Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,children: [
+                                dotsSpacer(),
+                              ])),
+                          Positioned(
+                            bottom: bottom,
+                            left: 5,
+                            right: 5,
+                            child:
+                            Text(reparation.vehiculemat??'',style: smallText),
+                          ),
+
+                        ]
+                    ),
+                  ),
+
+                ]
+              )),
+              Padding(padding: const EdgeInsets.all(5),child: Row(
+                children: [
+                  Text('N° Chassis',style: smallTextBold),
+                  SizedBox(
+                    width: width,
+                    height: height,
+                    child:   Stack(
+                        children: [
+                          Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,children: [
+                                dotsSpacer(),
+                              ])),
+                          Positioned(
+                            bottom: bottom,
+                            left: 5,
+                            right: 5,
+                            child:
+                            Text(reparation.nchassi??'',style: smallText),
+                          ),
+
+                        ]
+                    ),
+                  ),
+
+                ]
+              )),
+        ]),
+        TableRow(
+            children: [
+              Padding(padding: const EdgeInsets.all(5),child: Row(
+                children: [
+                  Text('N° Moteur',style: smallTextBold),
+                  SizedBox(
+                    width: width,
+                    height: height,
+                    child:   Stack(
+                        children: [
+                          Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                dotsSpacer(),
+                              ])),
+                          Positioned(
+                            bottom: 5,
+                            left: 5,
+                            right: 5,
+                            child:
+                            Text(reparation.nmoteur??'',style: smallText),
+                          ),
+
+                        ]
+                    ),
+                  ),
+
+                ]
+              )),
+              Padding(padding: const EdgeInsets.all(5),child: Row(
+                children: [
+                  Text('Killometrage',style: smallTextBold),
+                  SizedBox(
+                    width: width,
+                    height: height,
+                    child:   Stack(
+                        children: [
+                          Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,children: [
+                                dotsSpacer(),
+                              ])),
+                          Positioned(
+                            bottom: bottom,
+                            left: 5,
+                            right: 5,
+                            child:
+                            Text(reparation.kilometrage?.toString()??'',style: smallText),
+                          ),
+
+                        ]
+                    ),
+                  ),
+
+                ]
+              )),
+              Padding(padding: const EdgeInsets.all(5),child: Row(
+                children: [
+                  Text('Gaz',style: smallTextBold),
+                  SizedBox(
+                    width: width,
+                    height: height,
+                    child:   Stack(
+                        children: [
+                          Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,children: [
+                                dotsSpacer(),
+                              ])),
+                          Positioned(
+                            bottom: bottom,
+                            left: 5,
+                            right: 5,
+                            child:
+                            Text('${reparation.gaz?.toString()??'4'}/8',style: smallText),
+                          ),
+
+                        ]
+                    ),
+                  ),
+
+                ]
+              )),
+              Padding(padding: const EdgeInsets.all(5),child: Row(
+                children: [
+                  Text('Couleur',style: smallTextBold),
+                  SizedBox(
+                    width: width,
+                    height: height,
+                    child:   Stack(
+                        children: [
+                          Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,children: [
+                                dotsSpacer(),
+                              ])),
+                          Positioned(
+                            bottom: bottom,
+                            left: 5,
+                            right: 5,
+                            child:
+                            Text(reparation.couleur??'',style: smallText),
+                          ),
+
+                        ]
+                    ),
+                  ),
+
+                ]
+              )),
+        ]),
+      ]
+    );
+  }
+
+  Widget branding(MemoryImage poLogo) {
+    return SizedBox(
+      height: PdfPageFormat.cm * 4,
+      width: PdfPageFormat.cm * 19,
+      child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: PdfPageFormat.cm * 4.5,
+              height: PdfPageFormat.cm * 1.5,
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                border: Border.all(),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
-                      width: PdfPageFormat.cm*3.9,
-                      child:      Row(
+                      width: PdfPageFormat.cm * 4.3,
+                      child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text('Via ',style: const TextStyle(color: PdfColors.grey)),
+                            Text('Via ',
+                                style: TextStyle(color: orange)),
                             Spacer(),
                             Image(poLogo,
                                 width: PdfPageFormat.cm * 2,
                                 height: PdfPageFormat.cm * 2,
                                 fit: BoxFit.contain,
                                 alignment: Alignment.topCenter),
-                          ]
-                      ),
+                          ]),
                     ),
-                    Text('https://www.parcoto.com',style:const TextStyle(color: PdfColors.blue,fontSize: 10)),
-
-                  ]
-                ),
-              ),
-
-            ]
-        ),
-      );
-
+                    Text('https://www.parcoto.com',
+                        style: const TextStyle(
+                            color: PdfColors.blue, fontSize: 10)),
+                  ]),
+            ),
+          ]),
+    );
   }
 
   Widget dotsSpacer() {
@@ -206,74 +474,91 @@ class ReparationPdf {
   }
 
 
-  double lightHeight = 25.px;
-  double lightWidth = 25.px;
-  Widget vehicleDamage() {
-    return
-    Transform.scale(scale: 0.4,child:  Transform.rotate(
-        angle: math.pi/2,
-        child:
-        SizedBox(
-          width: 317.px,
-          height: 148.px,
-          child: Stack(
-            alignment: Alignment.topCenter,
-            children: [
-              ///image
-              Positioned.fill(
-                  left: 10.px,
-                  right: 5.px,
-                  child: SvgImage(svg:CarSvg.svg,
-                    fit: BoxFit.fitWidth, )),
-              ...getFeux(),
-              ...getAutres(),
-              ...getSiegeEtPortes(),
-              ...getPneumatiques(),
-              ...getPareBrises(),
-              ...getAiles(),
-              ...getPareChocs(),
-            ],
-          ),
-        )
-    ));
 
+  double lightHeight = 0;
+  double lightWidth = 0;
+
+  final dx = 7;
+  final dy = 7;
+
+  int iconCodePoint = 0xe5cd;
+
+  PdfColor orange = PdfColors.orange600;
+  PdfColor orangeLight = PdfColors.orange300;
+  PdfColor orangeDeep = PdfColors.orange900;
+  Widget vehicleDamage() {
+
+    lightHeight = (25-dx).px;
+    lightWidth = (25-dy).px;
+    return Transform.scale(
+        scale: 0.4,
+        child: Transform.rotate(
+            angle: -math.pi/2 ,
+            child: SizedBox(
+              width: 317.px,
+              height: 148.px,
+              child: Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  ///image
+                  Positioned.fill(
+                      left: 10.px,
+                      right: 5.px,
+                      child: SvgImage(
+                        svg: CarSvg.svg,
+                        fit: BoxFit.fitWidth,
+                      )),
+
+                  ...getFeux(),
+                  ...getAutres(),
+                  ...getSiegeEtPortes(),
+                  ...getPneumatiques(),
+                  ...getPareBrises(),
+                  ...getAiles(),
+                  ...getPareChocs(),
+                ],
+              ),
+            )));
   }
 
   List<Positioned> getAutres() {
+    int hpos=56;
     return [
+
+
       ///CALANDRE
       Positioned(
-          left: 9.px,
-          top: 60.px,
+          left: (6 + dx).px,
+          top: (hpos + dy).px,
           child: SizedBox(
             width: lightWidth,
             height: lightHeight,
             child: Column(
               children: [
-                Container(
-                    height: lightHeight,
-                    decoration: BoxDecoration(
-                      gradient: reparation.etatActuel?.calandre==true ?  getRadiantDark() : null,
-                    ),
-                  ),
-                              ],
+                SizedBox(
+                  height: lightHeight,
+                  child: reparation.etatActuel?.calandre == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
+                ),
+              ],
             ),
           )),
 
       ///Capot
       Positioned(
-          left: 50.px,
-          top: 60.px,
+          left: (50+dx).px,
+          top: (hpos+dy).px,
           child: SizedBox(
             width: lightWidth,
             height: lightHeight,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:  etatVehicle.capot ? getRadiantDark() : null,
-                  ),
+                  child: reparation.etatActuel?.capot == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
               ],
             ),
@@ -281,18 +566,18 @@ class ReparationPdf {
 
       ///Toit
       Positioned(
-          left: 160.px,
-          top: 60.px,
+          left: (160+dx).px,
+          top: (hpos+dy).px,
           child: SizedBox(
             width: lightWidth,
             height: lightHeight,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:  etatVehicle.toit ?  getRadiantDark() : null,
-                  ),
+                  child: reparation.etatActuel?.toit == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
               ],
             ),
@@ -300,18 +585,18 @@ class ReparationPdf {
 
       ///Coffre
       Positioned(
-          left: 263.px,
-          top: 60.px,
+          left: (263+dx).px,
+          top: (hpos+dy).px,
           child: SizedBox(
             width: lightWidth,
             height: lightHeight,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:  etatVehicle.coffre ?  getRadiantDark() : null,
-                  ),
+                  child: reparation.etatActuel?.coffre == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
               ],
             ),
@@ -323,29 +608,27 @@ class ReparationPdf {
     return [
       ///Ailes AV
       Positioned(
-          left: 3.px,
-          top: 0.px,
+          left: (3+dx).px,
+          top: (0+dy).px,
           child: SizedBox(
             width: lightWidth,
             height: 30.h,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:
-                     etatVehicle.aileAVD == true ?  getRadiantDark() : null,
-                  ),
+                  child: reparation.etatActuel?.aileAVD == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
                 SizedBox(
-                  height: 92.px,
+                  height: (88+dy).px,
                 ),
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:
-                     etatVehicle.aileAVG == true ?  getRadiantDark() : null,
-                  ),
+                  child: reparation.etatActuel?.aileAVG == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
               ],
             ),
@@ -353,29 +636,27 @@ class ReparationPdf {
 
       ///Aile AR
       Positioned(
-          left: 290.px,
-          top: 0.px,
+          left: (290+dx).px,
+          top: (0+dy).px,
           child: SizedBox(
             width: lightWidth,
             height: 30.h,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:
-                     etatVehicle.aileARD == true ?  getRadiantDark() : null,
-                  ),
+                  child: reparation.etatActuel?.aileARD == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
                 SizedBox(
-                  height: 95.px,
+                  height: (86+dy).px,
                 ),
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:
-                     etatVehicle.aileARG == true ?  getRadiantDark() : null,
-                  ),
+                  child: reparation.etatActuel?.aileARG == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
               ],
             ),
@@ -387,18 +668,18 @@ class ReparationPdf {
     return [
       ///Pare-choc AV
       Positioned(
-          left: -2.px,
-          top: 60.px,
+          left: (-7+dx).px,
+          top: (56+dy).px,
           child: SizedBox(
             width: lightWidth,
             height: lightHeight,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:  etatVehicle.pareChocAV ?  getRadiantDark() : null,
-                  ),
+                  child: reparation.etatActuel?.pareChocAV == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
               ],
             ),
@@ -406,19 +687,18 @@ class ReparationPdf {
 
       ///Pare-choc AR
       Positioned(
-          left: 292.px,
-          top: 60.px,
+          left: (292+dx).px,
+          top: (56+dy).px,
           child: SizedBox(
             width: lightWidth,
             height: 30.h,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:
-                     etatVehicle.pareChocAR == true ?  getRadiantDark() : null,
-                  ),
+                  child: reparation.etatActuel?.pareChocAR == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
               ],
             ),
@@ -430,27 +710,27 @@ class ReparationPdf {
     return [
       ///Portes avant
       Positioned(
-          left: 130.px,
-          top: 3.px,
+          left: (130+dx).px,
+          top: (0+dy).px,
           child: SizedBox(
             width: lightWidth,
             height: 30.h,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:  etatVehicle.porteAVD ?  getRadiantDark() : null,
-                  ),
+                  child: reparation.etatActuel?.porteAVD == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
                 SizedBox(
-                  height: 90.px,
+                  height: (86+dy).px,
                 ),
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:  etatVehicle.porteAVG ?  getRadiantDark() : null,
-                  ),
+                  child: reparation.etatActuel?.porteAVG == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
               ],
             ),
@@ -458,27 +738,27 @@ class ReparationPdf {
 
       ///Sieges avant
       Positioned(
-          left: 130.px,
-          top: 35.px,
+          left: (130+dx).px,
+          top: (28+dy).px,
           child: SizedBox(
             width: lightWidth,
             height: 30.h,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:  etatVehicle.siegeAVD ?  getRadiantDark() : null,
-                  ),
+                  child: reparation.etatActuel?.siegeAVD == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
                 SizedBox(
-                  height: 30.px,
+                  height: (30+dy).px,
                 ),
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:  etatVehicle.siegeAVG ?  getRadiantDark() : null,
-                  ),
+                  child: reparation.etatActuel?.siegeAVG == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
               ],
             ),
@@ -486,27 +766,27 @@ class ReparationPdf {
 
       ///Sieges arriere
       Positioned(
-          left: 190.px,
-          top: 35.px,
+          left: (190+dx).px,
+          top: (28+dy).px,
           child: SizedBox(
             width: lightWidth,
             height: 30.h,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:  etatVehicle.siegeARD ?  getRadiantDark() : null,
-                  ),
+                  child: reparation.etatActuel?.siegeARD == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
                 SizedBox(
-                  height: 30.px,
+                  height: (30+dy).px,
                 ),
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:  etatVehicle.siegeARG ?  getRadiantDark() : null,
-                  ),
+                  child: reparation.etatActuel?.siegeARG == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
               ],
             ),
@@ -514,27 +794,27 @@ class ReparationPdf {
 
       ///Portes arriere
       Positioned(
-          left: 180.px,
-          top: 3.px,
+          left: (180+dx).px,
+          top: (0+dy).px,
           child: SizedBox(
             width: lightWidth,
             height: 30.h,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:  etatVehicle.porteARD ?  getRadiantDark() : null,
-                  ),
+                  child: reparation.etatActuel?.porteARD == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
                 SizedBox(
-                  height: 90.px,
+                  height: (86+dy).px,
                 ),
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:  etatVehicle.porteARG ?  getRadiantDark() : null,
-                  ),
+                  child: reparation.etatActuel?.porteARG == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
               ],
             ),
@@ -546,29 +826,27 @@ class ReparationPdf {
     return [
       ///Feux AV
       Positioned(
-          left: 10.px,
-          top: 23.px,
+          left: (10 + dx).px,
+          top: (23 + dy).px,
           child: SizedBox(
             width: lightWidth,
             height: 30.h,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:
-                     etatVehicle.feuAVD == true ?  getRadiantDark() : null,
-                  ),
+                  child: etatVehicle.feuAVD == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
                 SizedBox(
                   height: 52.px,
                 ),
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:
-                     etatVehicle.feuAVG == true ?  getRadiantDark() : null,
-                  ),
+                  child: etatVehicle.feuAVG == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
               ],
             ),
@@ -576,29 +854,27 @@ class ReparationPdf {
 
       ///Phare
       Positioned(
-          left: 19.px,
-          top: 5.px,
+          left: (19 + dx).px,
+          top: (5 + dy).px,
           child: SizedBox(
             width: lightWidth,
             height: 30.h,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:
-                     etatVehicle.phareD == true ?  getRadiantDark() : null,
-                  ),
+                  child: etatVehicle.phareD == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
                 SizedBox(
-                  height: 85.px,
+                  height: (85 + dy).px,
                 ),
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:
-                     etatVehicle.phareG == true ?  getRadiantDark() : null,
-                  ),
+                  child: etatVehicle.phareG == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
               ],
             ),
@@ -606,29 +882,27 @@ class ReparationPdf {
 
       ///Feux AR
       Positioned(
-          left: 286.px,
-          top: 15.px,
+          left: (286 + dx).px,
+          top: (15 + dy).px,
           child: SizedBox(
             width: lightWidth,
             height: 30.h,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:
-                     etatVehicle.feuARD == true ?  getRadiantDark() : null,
-                  ),
+                  child: etatVehicle.feuARD == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
                 SizedBox(
-                  height: 65.px,
+                  height: (60 + dy).px,
                 ),
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:
-                     etatVehicle.feuARG == true ?  getRadiantDark() : null,
-                  ),
+                  child: etatVehicle.feuARG == true
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : null,
                 ),
               ],
             ),
@@ -640,24 +914,23 @@ class ReparationPdf {
     return [
       ///Pare-brise AV
       Positioned(
-          left: 92.px,
-          top: 60.px,
+          left: (90 + dx).px,
+          top: (56 + dy).px,
           child: SizedBox(
             width: lightWidth,
             height: 4.75.w,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:  etatVehicle.parBriseAve
-                        ?  getRadiantDark()
-                        :  etatVehicle.parBriseAvc
-                        ?  getRadiantStandard()
-                        :  etatVehicle.parBriseAvf
-                        ?  getRadiantLight()
-                        : null,
-                  ),
+                  child: etatVehicle.parBriseAve
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : etatVehicle.parBriseAvc
+                          ? Icon(IconData(iconCodePoint), color: orange)
+                          : etatVehicle.parBriseAvf
+                              ? Icon(IconData(iconCodePoint),
+                                  color: orangeLight)
+                              : null,
                 ),
               ],
             ),
@@ -665,24 +938,23 @@ class ReparationPdf {
 
       ///Pare-brise AR
       Positioned(
-          left: 227.px,
-          top: 60.px,
+          left: (225 + dx).px,
+          top: (56 + dy).px,
           child: SizedBox(
             width: lightWidth,
             height: 30.h,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient:  etatVehicle.parBriseAre
-                        ?  getRadiantDark()
-                        :  etatVehicle.parBriseArc
-                        ?  getRadiantStandard()
-                        :  etatVehicle.parBriseArf
-                        ?  getRadiantLight()
-                        : null,
-                  ),
+                  child: etatVehicle.parBriseAre
+                      ? Icon(IconData(iconCodePoint), color: orangeDeep)
+                      : etatVehicle.parBriseArc
+                          ? Icon(IconData(iconCodePoint), color: orange)
+                          : etatVehicle.parBriseArf
+                              ? Icon(IconData(iconCodePoint),
+                                  color: orangeLight)
+                              : null,
                 ),
               ],
             ),
@@ -694,26 +966,26 @@ class ReparationPdf {
     return [
       ///Roues avant
       Positioned(
-          left: 54.px,
-          top: -2.px,
+          left: (54 + dx).px,
+          top: (-5 + dy).px,
           child: SizedBox(
             width: lightWidth,
             height: 30.h,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient: getLightIntensityFromPourc(reparation.etatActuel?.avdp??100, ),
+                  child: getLightIntensityFromPourc(
+                    reparation.etatActuel?.avdp ?? 100,
                   ),
                 ),
                 SizedBox(
-                  height: 100.px,
+                  height: (96 + dy).px,
                 ),
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient: getLightIntensityFromPourc(reparation.etatActuel?.avgp??100, ),
+                  child: getLightIntensityFromPourc(
+                    reparation.etatActuel?.avgp ?? 100,
                   ),
                 ),
               ],
@@ -722,26 +994,26 @@ class ReparationPdf {
 
       ///Roues arriere
       Positioned(
-          left: 237.px,
-          top: -2.px,
+          left: (237 + dx).px,
+          top: (-5 + dy).px,
           child: SizedBox(
             width: lightWidth,
             height: 30.h,
             child: Column(
               children: [
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient: getLightIntensityFromPourc(reparation.etatActuel?.ardp??100, ),
+                  child: getLightIntensityFromPourc(
+                    reparation.etatActuel?.ardp ?? 100,
                   ),
                 ),
                 SizedBox(
-                  height: 100.px,
+                  height: (96 + dy).px,
                 ),
-                Container(
+                SizedBox(
                   height: lightHeight,
-                  decoration: BoxDecoration(
-                    gradient: getLightIntensityFromPourc(etatVehicle.argp, ),
+                  child: getLightIntensityFromPourc(
+                    etatVehicle.argp,
                   ),
                 ),
               ],
@@ -750,54 +1022,20 @@ class ReparationPdf {
     ];
   }
 
-  RadialGradient? getLightIntensityFromPourc(double pourc,) {
-     if (pourc <= 30) {
-      return getRadiantDark();
+  Widget? getLightIntensityFromPourc(
+    double pourc,
+  ) {
+    if (pourc <= 30) {
+      return Icon(IconData(iconCodePoint), color: orangeDeep);
     } else if (pourc <= 60) {
-      return getRadiantStandard();
+      return Icon(IconData(iconCodePoint), color: orange);
     } else if (pourc < 100) {
-      return getRadiantLight();
+      return Icon(IconData(iconCodePoint), color: orangeLight);
     } else {
       return null;
     }
   }
 
 
-  PdfColor orange=PdfColors.orange;
-  PdfColor orangeLight=PdfColors.orange100;
-  PdfColor orangeDeep=PdfColors.orange700;
-
-  RadialGradient getRadiantStandard() {
-    return RadialGradient(radius: 0.4, colors: [
-      orange,
-      PdfColor(orange.red, orange.green, orange.blue,0.7),
-      PdfColor(orange.red, orange.green, orange.blue,0.4),
-      PdfColor(orange.red, orange.green, orange.blue,0.2),
-      PdfColor(orange.red, orange.green, orange.blue,0.03),
-      PdfColor.fromRYB(0, 0, 0,0.03),
-      PdfColor.fromRYB(0, 0, 0,0),
-    ]);
-  }
-  RadialGradient getRadiantLight() {
-    return RadialGradient(radius: 0.4, colors: [
-      orangeLight,
-      PdfColor(orangeLight.red, orangeLight.green, orangeLight.blue,0.7),
-      PdfColor(orangeLight.red, orangeLight.green, orangeLight.blue,0.4),
-      PdfColor(orangeLight.red, orangeLight.green, orangeLight.blue,0.2),
-      PdfColor(orangeLight.red, orangeLight.green, orangeLight.blue,0.03),
-      PdfColor.fromRYB(0, 0, 0,0.03),
-      PdfColor.fromRYB(0, 0, 0,0),
-    ]);
-  }
-  RadialGradient getRadiantDark() {
-    return RadialGradient(
-        colors: [
-      orangeDeep,
-      PdfColor(orangeDeep.red, orangeDeep.green, orangeDeep.blue,0.5),
-      PdfColor(orangeDeep.red, orangeDeep.green, orangeDeep.blue,0.05),
-      PdfColor(orangeDeep.red, orangeDeep.green, orangeDeep.blue,0),
-      PdfColor.fromHex('#FFFFFF00'),
-        ]);
-  }
 
 }
