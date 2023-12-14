@@ -55,9 +55,6 @@ class ReparationTableState extends State<ReparationTable> {
     super.initState();
   }
 
-  final tstyle = TextStyle(
-    fontSize: 10.sp,
-  );
 
   int sortColumn = 0;
 
@@ -66,7 +63,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'num',
             style: tstyle,
           ).tr(),
@@ -83,7 +80,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'matricule',
             style: tstyle,
           ).tr(),
@@ -100,7 +97,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'prestataire',
             style: tstyle,
           ).tr(),
@@ -117,7 +114,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'date',
             style: tstyle,
           ).tr(),
@@ -134,7 +131,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'montantt',
             style: tstyle,
           ).tr(),
@@ -150,7 +147,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'dateModif',
             style: tstyle,
           ).tr(),
