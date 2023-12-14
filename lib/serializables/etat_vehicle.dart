@@ -6,51 +6,44 @@ part 'etat_vehicle.g.dart';
 @JsonSerializable()
 class EtatVehicle{
 
-  bool showOnList=false;
   double avdp = 100;
   double avgp = 100;
   double ardp = 100;
   double argp = 100;
-
   bool parBriseAvf = false;
   bool parBriseAvc = false;
   bool parBriseAve = false;
   bool parBriseArf = false;
   bool parBriseArc = false;
   bool parBriseAre = false;
-
   bool phareG = false;
   bool phareD = false;
-
   bool feuAVD = false;
   bool feuAVG = false;
   bool feuARD = false;
   bool feuARG = false;
-
   bool aileAVD = false;
   bool aileAVG = false;
   bool aileARD = false;
   bool aileARG = false;
-
   bool pareChocAV = false;
   bool pareChocAR = false;
-
   bool porteAVD = false;
   bool porteAVG = false;
   bool porteARD = false;
   bool porteARG = false;
-
   bool toit = false;
-
   bool capot = false;
-
   bool coffre = false;
+  bool calandre = false;
 
   bool siegeAVD = false;
   bool siegeAVG = false;
   bool siegeARD = false;
   bool siegeARG = false;
-  bool calandre = false;
+
+  bool showOnList=false;
+
 
   EtatVehicle( {
     this.feuARG=false, this.avgp=100, this.avdp=100, this.phareG=false,

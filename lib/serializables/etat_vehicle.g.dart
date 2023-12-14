@@ -46,7 +46,6 @@ EtatVehicle _$EtatVehicleFromJson(Map<String, dynamic> json) => EtatVehicle(
 
 Map<String, dynamic> _$EtatVehicleToJson(EtatVehicle instance) =>
     <String, dynamic>{
-      'showOnList': instance.showOnList,
       'avdp': instance.avdp,
       'avgp': instance.avgp,
       'ardp': instance.ardp,
@@ -76,9 +75,11 @@ Map<String, dynamic> _$EtatVehicleToJson(EtatVehicle instance) =>
       'toit': instance.toit,
       'capot': instance.capot,
       'coffre': instance.coffre,
+      'calandre': instance.calandre,
       'siegeAVD': instance.siegeAVD,
       'siegeAVG': instance.siegeAVG,
       'siegeARD': instance.siegeARD,
       'siegeARG': instance.siegeARG,
-      'calandre': instance.calandre,
+      'showOnList': instance.showOnList,
+
     };

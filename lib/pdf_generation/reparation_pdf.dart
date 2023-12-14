@@ -39,7 +39,7 @@ class ReparationPdf {
       letterSpacing: -0.12,
     );
     smallText = const TextStyle(
-      fontSize: 8,
+      fontSize: 7,
       letterSpacing: -0.12,
     );
     smallTextBold = TextStyle(
@@ -72,7 +72,151 @@ class ReparationPdf {
             getHeader(entrepriseLogo),
             getVehicleInfo(),
             smallSpace,
+            smallSpace,
             vehicleDamage(),
+            smallSpace,
+            smallSpace,
+            Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: PdfPageFormat.cm*8,
+                    width: PdfPageFormat.cm*15-smallSpace.width!.toDouble(),
+                    child:
+                    Container(
+                        height: PdfPageFormat.cm*10,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(),
+                        ),
+                        child: Column(
+                            children: [
+                              Container(
+                                height: PdfPageFormat.cm*0.75,
+                                padding: const EdgeInsets.all(3),
+                                decoration: BoxDecoration(
+                                    color: orange,
+                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(5))
+                                ),
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Flexible(child:Text('Désignation',style: smallTextBold),
+                                      ),
+                                      Flexible(child: Text('QTE',style: smallTextBold),),
+                                      Flexible(child: Text('PRIX',style: smallTextBold),),
+                                      Flexible(child: Text('TVA',style: smallTextBold),),
+                                      Flexible(child: Text('TTC',style: smallTextBold),),
+
+
+                                    ]
+                                ),
+                              ),
+                              smallSpace,
+                              Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                                child: Container(
+                                  height: PdfPageFormat.cm*0.5,
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: const BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(),
+                                      )
+                                  ),
+                                ),),
+                              Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                                child: Container(
+                                  height: PdfPageFormat.cm*0.5,
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: const BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(),
+                                      )
+                                  ),
+                                ),),
+                              Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                                child: Container(
+                                  height: PdfPageFormat.cm*0.5,
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: const BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(),
+                                      )
+                                  ),
+                                ),),
+                              Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                                child: Container(
+                                  height: PdfPageFormat.cm*0.5,
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: const BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(),
+                                      )
+                                  ),
+                                ),),
+                              Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                                child: Container(
+                                  height: PdfPageFormat.cm*0.5,
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: const BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(),
+                                      )
+                                  ),
+                                ),),
+                              Padding(padding: const EdgeInsets.symmetric(horizontal: 2),
+                                child: Container(
+                                  height: PdfPageFormat.cm*0.5,
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: const BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(),
+                                      )
+                                  ),
+                                ),),
+
+                            ]
+                        )
+                    ),),
+                  smallSpace,
+                  smallSpace,
+                  Container(
+                      width: 4*PdfPageFormat.cm,
+                      height: 3*PdfPageFormat.cm,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(),
+                      ),
+                      child: Column(
+                          children: [
+                            Text('Remarque',style: smallTextBold),
+                            smallSpace,
+                            SizedBox(
+                              height: PdfPageFormat.cm*2,
+                              child: Stack(
+                                  children: [
+                                    Positioned.fill(
+                                        child: Column(
+                                            mainAxisAlignment:MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              dotsSpacer(),
+                                              dotsSpacer(),
+                                              dotsSpacer(),
+                                              dotsSpacer(),
+
+                                            ]
+                                        )
+                                    )
+                                  ]
+                              ),
+                            ),
+
+                          ]
+                      )
+                  ),
+
+                ]
+            ),
             Spacer(),
             branding(poLogo),
           ]);
@@ -88,11 +232,12 @@ class ReparationPdf {
   late final TextStyle smallText;
   final numberFormat = NumberFormat('00000000', 'fr');
   final dateFormat = DateFormat('dd MMMM yyyy', 'fr');
-  final smallSpace = SizedBox(width: PdfPageFormat.cm * 0.1,height: PdfPageFormat.cm*0.1);
+  final smallSpace =
+      SizedBox(width: PdfPageFormat.cm * 0.1, height: PdfPageFormat.cm * 0.1);
 
   Widget getHeader(MemoryImage entrepriseLogo) {
     return SizedBox(
-      height: PdfPageFormat.cm * 7,
+      height: PdfPageFormat.cm * 3.5,
       child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,7 +250,7 @@ class ReparationPdf {
             Container(
               padding: const EdgeInsets.all(5),
               width: 9 * PdfPageFormat.cm,
-              height: PdfPageFormat.cm *2.7,
+              height: PdfPageFormat.cm * 2.7,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
                 border: Border.all(),
@@ -114,22 +259,21 @@ class ReparationPdf {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Text(MyEntrepriseState.p?.nom ?? '', style: smallTextBold.copyWith(color: orangeDeep)),
-                    Row(crossAxisAlignment: CrossAxisAlignment.start,
+                    Text(MyEntrepriseState.p?.nom ?? '',
+                        style: smallTextBold.copyWith(color: orangeDeep)),
+                    Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                      Text('Adresse', style: smallTextBold),
-                      smallSpace,
-                      Text(MyEntrepriseState.p?.adresse ?? '',
-                          style: smallText),
-                    ]),
+                          Text('Adresse', style: smallTextBold),
+                          smallSpace,
+                          Text(MyEntrepriseState.p?.adresse ?? '',
+                              style: smallText),
+                        ]),
                     Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                       Text('Email', style: smallTextBold),
                       dotsSpacer(),
                       Text(MyEntrepriseState.p?.email ?? '', style: smallText),
                       smallSpace,
-
-
-
                       Text('Tél', style: smallTextBold),
                       dotsSpacer(),
                       Text(MyEntrepriseState.p?.telephone ?? '',
@@ -555,108 +699,347 @@ class ReparationPdf {
   PdfColor orangeLight = PdfColors.orange300;
   PdfColor orangeDeep = PdfColors.orange900;
   Widget vehicleDamage() {
+    Map<String, dynamic> etatJson =
+        reparation.etatActuel?.toJson() ?? EtatVehicle().toJson();
+
+    List<Widget> etats = getTextListFromMap(etatJson, 0, etatJson.length);
 
     return Container(
-      width: 19*PdfPageFormat.cm,
-      height: 5*PdfPageFormat.cm,
-      decoration:BoxDecoration(
-        borderRadius:BorderRadius.circular(5),
-        border: Border.all(),
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
+        width: 19 * PdfPageFormat.cm,
+        height: 5 * PdfPageFormat.cm,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(),
+        ),
+        child: Stack(alignment: Alignment.center, children: [
           Positioned(
             left: 0,
-            child:    carDrawing(),),
+            child: carDrawing(),
+          ),
           Positioned(
-            left: (180*0.4).px,
-              child: Row(
+            left: (180 * 0.4).px,
+            child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children:
-                  [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: getTextListFromMap(reparation.etatActuel?.toJson()??EtatVehicle().toJson(),0),
-            ),
-            smallSpace,
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-
-              children:getTextListFromMap(reparation.etatActuel?.toJson()??EtatVehicle().toJson(),8),
-            ),
-            smallSpace,
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-
-              children:getTextListFromMap(reparation.etatActuel?.toJson()??EtatVehicle().toJson(),16),
-            ),
-                    smallSpace,
-                    Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-
-              children:getTextListFromMap(reparation.etatActuel?.toJson()??EtatVehicle().toJson(),24),
-            ),
-                    smallSpace,
-
-                    Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children:getTextListFromMap(reparation.etatActuel?.toJson()??EtatVehicle().toJson(),32),
-            ),
-          ]))
-        ]
-      ),
-    );
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(),
+                        ),
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 2),
+                                width: 3 * PdfPageFormat.cm + 4,
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
+                                ),
+                                child: Text('Pneus', style: smallTextBold),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all( 2),
+                                child: Column(
+                                  children:
+                                  etats.getRange(0, 4).toList(growable: false),
+                                ),
+                              )
+                            ]),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(),
+                        ),
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 2),
+                                width: 3 * PdfPageFormat.cm + 4,
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
+                                ),
+                                child: Text('Pare-Brise AV', style: smallTextBold),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all( 2),
+                                child: Column(
+                                  children:
+                                  etats.getRange(4, 7).toList(growable: false),
+                                ),
+                              )
+                            ]),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(),
+                        ),
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 2),
+                                width: 3 * PdfPageFormat.cm + 4,
+                                decoration: BoxDecoration(
+                                  border: Border.all(),
+                                ),
+                                child: Text('Phare', style: smallTextBold),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all( 2),
+                                child: Column(
+                                  children:
+                                  etats.getRange(10, 12).toList(growable: false),
+                                ),
+                              )
+                            ]),
+                      ),
+                    ]
+                  ),
+                  Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                          ),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                                  width: 3 * PdfPageFormat.cm + 4,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(),
+                                  ),
+                                  child: Text('Feux', style: smallTextBold),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all( 2),
+                                  child: Column(
+                                    children:
+                                    etats.getRange(12, 16).toList(growable: false),
+                                  ),
+                                )
+                              ]),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                          ),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                                  width: 3 * PdfPageFormat.cm + 4,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(),
+                                  ),
+                                  child: Text('Pare-Brise AR', style: smallTextBold),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all( 2),
+                                  child: Column(
+                                    children:
+                                    etats.getRange(7, 10).toList(growable: false),
+                                  ),
+                                )
+                              ]),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                          ),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                                  width: 3 * PdfPageFormat.cm + 4,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(),
+                                  ),
+                                  child: Text('Pare-choc', style: smallTextBold),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all( 2),
+                                  child: Column(
+                                    children:
+                                    etats.getRange(20, 22).toList(growable: false),
+                                  ),
+                                )
+                              ]),
+                        ),
+                      ]
+                  ),
+                  Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                          ),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                                  width: 3 * PdfPageFormat.cm + 4,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(),
+                                  ),
+                                  child: Text('Ailes', style: smallTextBold),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all( 2),
+                                  child: Column(
+                                    children:
+                                    etats.getRange(16, 20).toList(growable: false),
+                                  ),
+                                )
+                              ]),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                          ),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                                  width: 3 * PdfPageFormat.cm + 4,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(),
+                                  ),
+                                  child: Text('Portes', style: smallTextBold),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all( 2),
+                                  child: Column(
+                                    children:
+                                    etats.getRange(22, 26).toList(growable: false),
+                                  ),
+                                )
+                              ]),
+                        ),
+                      ]
+                  ),
+                  Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                          ),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                                  width: 3 * PdfPageFormat.cm + 4,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(),
+                                  ),
+                                  child: Text('Sièges', style: smallTextBold),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all( 2),
+                                  child: Column(
+                                    children:
+                                    etats.getRange(30, 34).toList(growable: false),
+                                  ),
+                                )
+                              ]),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                          ),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                                  width: 3 * PdfPageFormat.cm + 4,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(),
+                                  ),
+                                  child: Text('Autre', style: smallTextBold),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all( 2),
+                                  child: Column(
+                                    children:
+                                    etats.getRange(26, 30).toList(growable: false),
+                                  ),
+                                )
+                              ]),
+                        ),
+                      ]
+                  ),
+                ]),
+          ),
+        ]));
   }
 
-
-  List<Widget> getTextListFromMap(Map<String,dynamic> map,int tranche){
-    List<Widget> result=List.empty(growable: true);
+  List<Widget> getTextListFromMap(
+      Map<String, dynamic> map, int debut, int fin) {
+    List<Widget> result = List.empty(growable: true);
     map.forEach((key, value) {
-      if(key!='showOnList'){
-        result.add(
-          SizedBox(
-            width: 2*PdfPageFormat.cm,
-            child:
-            Row(
+      if (key != 'showOnList') {
+        result.add(SizedBox(
+            width: 3 * PdfPageFormat.cm,
+            child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(key.tr().capitalizeFirstLetter(),style: smallTextBold,),
+                  Text(
+                    key.tr().capitalizeFirstLetter(),
+                    style: smallText,
+                  ),
                   dotsSpacer(),
-                  if(value is num)
-                    Text('${value.ceil()} %',style: smallText),
-                  if(value is bool)
+                  if (value is num) Text('${value.ceil()} %', style: smallText),
+                  if (value is bool)
                     Container(
                       width: 7,
                       height: 7,
                       decoration: BoxDecoration(
-                        border: Border.all(
-                            color: orange
-                        ),
+                        border: Border.all(color: orange),
                       ),
-                      child: value?Icon(IconData(iconCodePoint,matchTextDirection: true),color: orangeDeep,size: 6,):null,
+                      child: value
+                          ? Icon(
+                              IconData(iconCodePoint, matchTextDirection: true),
+                              color: orangeDeep,
+                              size: 6,
+                            )
+                          : null,
                     ),
-                ]
-            ))
-            );
+                ])));
       }
-
     });
-    return result.getRange(tranche, tranche+7<result.length?tranche+8:result.length).toList();
+    return result
+        .getRange(debut, fin < result.length ? fin : result.length)
+        .toList();
   }
 
-  Widget carDrawing(){
-
-    double scale=0.4;
+  Widget carDrawing() {
+    double scale = 0.4;
     lightHeight = (25 - dx).px;
     lightWidth = (25 - dy).px;
     return Transform.scale(
         scale: scale,
-        origin: PdfPoint(-200.px,0),
+        origin: PdfPoint(-200.px, 0),
         child: Transform.rotate(
             angle: -math.pi / 2,
             child: SizedBox(
