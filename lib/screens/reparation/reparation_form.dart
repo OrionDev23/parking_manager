@@ -78,6 +78,7 @@ class ReparationFormState extends State<ReparationForm>
 
   void initValues() async{
     if(widget.reparation!=null){
+      documentID=widget.reparation!.id;
         assigningOrederNumber=true;
       etatVehicle=widget.reparation!.etatActuel??EtatVehicle();
       entretienVehicle=widget.reparation!.entretien??EntretienVehicle();
@@ -978,6 +979,7 @@ class ReparationFormState extends State<ReparationForm>
       numero: int.parse(numOrdre.text),
       date: selectedDate,
       anneeUtil: anneeUtil.year,
+      marque: marque.text,
       couleur: couleur.text,
       designations: designations.map((e) => e.designation).toList(),
       entretien: entretienVehicle,
@@ -1015,6 +1017,7 @@ class ReparationFormState extends State<ReparationForm>
         .toString();
     Reparation reparation = Reparation(
       id: documentID!,
+      marque: marque.text,
       numero: int.parse(numOrdre.text),
       date: selectedDate,
       anneeUtil: anneeUtil.year,

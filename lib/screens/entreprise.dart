@@ -602,15 +602,24 @@ class MyEntrepriseState extends State<MyEntreprise> {
           databaseId: databaseId,
           collectionId: entrepriseid,
           documentId: p!.id,
-          data: prest.toJson());
+          data: prest.toJson()).then((value) {
+            p=prest;
+            return value;
+      });
     }
     else{
       return await ClientDatabase.database!.createDocument(
           databaseId: databaseId,
           collectionId: entrepriseid,
           documentId: '1',
-          data: prest.toJson());
+          data: prest.toJson()).then((value) {
+        p=prest;
+        return value;
+      });
+
     }
+
+
 
   }
 
