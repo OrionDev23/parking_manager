@@ -16,10 +16,13 @@ import 'package:parc_oto/serializables/prestataire.dart';
 import 'package:parc_oto/serializables/vehicle.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:parc_oto/widgets/zone_box.dart';
+import 'package:pdf/pdf.dart';
+import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
+import '../../pdf_generation/reparation_pdf.dart';
 import '../../serializables/designation.dart';
 import '../../serializables/entretien_vehicle.dart';
 import '../../serializables/reparation.dart';
@@ -472,7 +475,7 @@ class ReparationFormState extends State<ReparationForm>
                 style: ButtonStyle(
                   backgroundColor: ButtonState.all(appTheme.color.lightest),
                 ),
-                onPressed: uploading ? null : () {},
+                onPressed: uploading ? null : showPdf,
                 child: const Text('voir')),
             smallSpace,
             FilledButton(
@@ -964,17 +967,42 @@ class ReparationFormState extends State<ReparationForm>
     });
   }
 
-  List<Map<String, dynamic>> getAllDesignationToJson() {
-    List<Map<String, dynamic>> result = List.empty(growable: true);
-    for (int i = 0; i < designations.length; i++) {
-      result.add(designations[i].designation.toJson());
-    }
-    return result;
-  }
 
   String? documentID;
 
   bool uploading = false;
+
+  void showPdf(){
+    Reparation reparation = Reparation(
+      id: '',
+      numero: int.parse(numOrdre.text),
+      date: selectedDate,
+      anneeUtil: anneeUtil.year,
+      couleur: couleur.text,
+      designations: designations.map((e) => e.designation).toList(),
+      entretien: entretienVehicle,
+      etatActuel: etatVehicle,
+      gaz: carburant.ceil(),
+      kilometrage: int.tryParse(km.text),
+      modele: type.text,
+      nchassi: nchassi.text,
+      nmoteur: nmoteur.text,
+      prestataire: selectedPrest?.id,
+      prestatairenom: selectedPrest?.nom,
+      vehicule: selectedVehicle?.id,
+      vehiculemat: selectedVehicle?.matricule,
+      remarque: remarqueEntretien.text,
+    );
+
+    showDialog(context: context, builder: (context){
+
+      return PdfPreview(
+        build: (PdfPageFormat format) {
+          return ReparationPdf(reparation: reparation).getDocument();
+        },
+      );
+    });
+  }
   void uploadForm() async {
     setState(() {
       uploading = true;
