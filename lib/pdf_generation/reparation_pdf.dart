@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/entreprise.dart';
 import 'package:parc_oto/utilities/car_svg.dart';
 import 'package:printing/printing.dart';
@@ -65,6 +66,7 @@ class ReparationPdf {
 
     initFonts();
 
+    var prestataire=await getPrestataire();
     doc.addPage(Page(
         margin: const EdgeInsets.all(PdfPageFormat.cm),
         build: (context) {
@@ -75,7 +77,7 @@ class ReparationPdf {
                 getHeader(entrepriseLogo),
                 smallSpace,
                 smallSpace,
-                getPrestataire(),
+                prestataire??SizedBox(),
                 smallSpace,
                 smallSpace,
                 getVehicleInfo(),
@@ -95,35 +97,70 @@ class ReparationPdf {
 
     return doc.save();
   }
-
-  Widget getPrestataire(){
-    return Container(
-        width: 8 * PdfPageFormat.cm,
-        height: 2 * PdfPageFormat.cm,
+  Future<Widget?> getPrestataire() async{
+    if(reparation.prestataire!=null){
+      var p=await ClientDatabase().getPrestataire(reparation.prestataire!);
+      return Container(
+        padding: const EdgeInsets.all(5),
+        width: 9 * PdfPageFormat.cm,
+        height: PdfPageFormat.cm * 2.7,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
           border: Border.all(),
         ),
-        child: Column(children: [
-          Text('Prestataire', style: smallTextBold),
-          smallSpace,
-          SizedBox(
-            height: PdfPageFormat.cm * 2,
-            child: Stack(children: [
-              Positioned.fill(
-                  child: Column(
-                      mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        dotsSpacer(),
-                        dotsSpacer(),
-                        dotsSpacer(),
-                        dotsSpacer(),
-                      ]))
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('Prestataire', style: smallTextBold.copyWith(color: orangeDeep)),
+                    smallSpace,
+                    Text(p?.nom ?? '',
+                        style: smallText),
+                  ]),
+              Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Adresse', style: smallTextBold),
+                    smallSpace,
+                    Text(p?.adresse ?? '',
+                        style: smallText),
+                  ]),
+              Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                Text('Email', style: smallTextBold),
+                dotsSpacer(),
+                Text(p?.email ?? '', style: smallText),
+                smallSpace,
+                Text('Tél', style: smallTextBold),
+                dotsSpacer(),
+                Text(p?.telephone ?? '',
+                    style: smallText),
+              ]),
+              Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                Text('NIF', style: smallTextBold),
+                dotsSpacer(),
+                Text(p?.nif ?? '', style: smallText),
+                smallSpace,
+                Text('NIS', style: smallTextBold),
+                dotsSpacer(),
+                Text(p?.nis ?? '', style: smallText),
+              ]),
+              Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                Text('ART', style: smallTextBold),
+                dotsSpacer(),
+                Text(p?.art ?? '', style: smallText),
+                smallSpace,
+                Text('RC', style: smallTextBold),
+                dotsSpacer(),
+                Text(p?.rc ?? '', style: smallText),
+              ]),
             ]),
-          ),
-        ]));
+      );
+    }
+    return null;
+
 
   }
 
@@ -396,7 +433,7 @@ class ReparationPdf {
 
   Widget getHeader(MemoryImage entrepriseLogo) {
     return SizedBox(
-      height: PdfPageFormat.cm * 3,
+      height: PdfPageFormat.cm * 2.7,
       child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
