@@ -245,7 +245,7 @@ class ReparationPdf {
                             dotsSpacer(),
                           ])),
                   Positioned.fill(
-                      top: -1,
+                      top: -1.5,
                       left: 2,
                       right: 2,
                       child: Text(reparation.remarque??'',style: smallText))
