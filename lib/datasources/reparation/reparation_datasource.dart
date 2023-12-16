@@ -101,6 +101,9 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation>{
   void showPdf(Reparation reparation){
     f.showDialog(context: current, builder: (context){
       return PdfPreview(
+        canDebug: false,
+        canChangeOrientation: false,
+        canChangePageFormat: false,
         build: (PdfPageFormat format) {
           return ReparationPdf(reparation: reparation).getDocument();
         },

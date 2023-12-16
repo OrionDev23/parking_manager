@@ -183,7 +183,10 @@ class ClientDatabase {
   }
 
 
-  Future<Prestataire?> getPrestataire(String docID) async{
+  Future<Prestataire?> getPrestataire(String? docID) async{
+    if(docID==null){
+      return Prestataire(id: '', nom: '', adresse: '');
+    }
     return await database!.getDocument(
         databaseId: databaseId,
         collectionId: prestataireId, documentId: docID).then((value) {
