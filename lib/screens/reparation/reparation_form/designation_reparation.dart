@@ -63,7 +63,11 @@ class DesignationReparationState extends State<DesignationReparation> {
             onChanged: (s)=>setState(() {
               qte=s??1;
               widget.designation.qte=s??1;
+              setState(() {
+
+              });
             }),
+            max: 99,
             placeholderStyle: placeStyle,
             placeholder: 'qte'.tr(),
             style: appTheme.writingStyle,
@@ -78,9 +82,23 @@ class DesignationReparationState extends State<DesignationReparation> {
             controller: tva,
             suffix: Text('%',style: placeStyle,),
             onChanged: (s)=>setState(() {
-              tva.text=s;
-              widget.designation.tva=double.tryParse(s)??0;
+              double value=double.tryParse(s)??0;
+              if(value<0){
+                value=0;
+              }
+              else if(value>99){
+                value=99;
+              }
+
+              widget.designation.tva=value;
+
+              tva.text=value.toString();
+              setState(() {
+
+              });
+
             }),
+            maxLength: 4,
             placeholderStyle: placeStyle,
             inputFormatters: [FilteringTextInputFormatter.allow(
                 RegExp(r'^(\d+)?\.?\d{0,2}')
