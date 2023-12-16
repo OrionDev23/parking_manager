@@ -17,4 +17,8 @@ class Designation {
 
   factory Designation.fromJson(Map<String, dynamic> json) => _$DesignationFromJson(json);
   Map<String, dynamic> toJson() => _$DesignationToJson(this);
+
+  double getTTC(){
+    return (prix+(prix*tva/100))*qte;
+  }
 }

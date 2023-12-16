@@ -42,6 +42,7 @@ class DesignationReparationState extends State<DesignationReparation> {
             placeholder: 'desi'.tr(),
             style: appTheme.writingStyle,
             cursorColor: appTheme.color.darker,
+            maxLength: 60,
             decoration: BoxDecoration(
               color: appTheme.fillColor,
             ),

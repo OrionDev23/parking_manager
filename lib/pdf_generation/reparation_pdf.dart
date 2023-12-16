@@ -156,7 +156,7 @@ class ReparationPdf {
                           top: Radius.circular(5))),
                   child: Row(children: [
                     SizedBox(
-                      width: PdfPageFormat.cm * 7,
+                      width: PdfPageFormat.cm * 10.7,
                       child:
                       Text('Désignation', style: smallTextBold),
                     ),
@@ -164,56 +164,90 @@ class ReparationPdf {
                       width: PdfPageFormat.cm * 1,
                       child: Text('QTE',
                           style: smallTextBold,
-                          textAlign: TextAlign.center),
+                          textAlign: TextAlign.end),
                     ),
                     SizedBox(
                       width: PdfPageFormat.cm * 2.5,
                       child: Text('PRIX',
                           style: smallTextBold,
-                          textAlign: TextAlign.center),
+                          textAlign: TextAlign.end),
                     ),
                     SizedBox(
-                      width: PdfPageFormat.cm * 1.5,
+                      width: PdfPageFormat.cm * 1.8,
                       child: Text('TVA',
                           style: smallTextBold,
-                          textAlign: TextAlign.center),
+                          textAlign: TextAlign.end ),
                     ),
                     SizedBox(
                       width: PdfPageFormat.cm * 2.5,
                       child: Text('TTC',
                           style: smallTextBold,
-                          textAlign: TextAlign.center),
+                          textAlign: TextAlign.end),
                     ),
                   ]),
                 ),
-                getOneDesignationLine(),
-                getOneDesignationLine(),
-                getOneDesignationLine(),
-                getOneDesignationLine(),
-                getOneDesignationLine(),
-                getOneDesignationLine(),
-                getOneDesignationLine(),
-                getOneDesignationLine(),
-                getOneDesignationLine(),
-                getOneDesignationLine(),
+                getOneDesignationLine(0),
+                getOneDesignationLine(1),
+                getOneDesignationLine(2),
+                getOneDesignationLine(3),
+                getOneDesignationLine(4),
+                getOneDesignationLine(5),
+                getOneDesignationLine(6),
+                getOneDesignationLine(7),
+                getOneDesignationLine(8),
+                getOneDesignationLine(9),
               ])),
     );
   }
 
 
-  Widget getOneDesignationLine(){
+  Widget getOneDesignationLine(int index){
     return Padding(
       padding:
       const EdgeInsets.symmetric(horizontal: 2),
       child: Container(
         height: PdfPageFormat.cm * 0.5,
-        padding: const EdgeInsets.all(3),
+        padding: const EdgeInsets.symmetric(horizontal: 3,vertical: 4.5),
         decoration: const BoxDecoration(
             border: Border(
               bottom: BorderSide(
                 style: BorderStyle.dotted
               ),
             )),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: (reparation.designations?.length??0)>index?[
+            SizedBox(
+              width: PdfPageFormat.cm * 11,
+              child:
+              Text(reparation.designations![index].designation, style: smallText),
+            ),
+            SizedBox(
+              width: PdfPageFormat.cm * 1,
+              child: Text(numberFormat2.format(reparation.designations![index].qte),
+                  style: smallText,
+                  textAlign: TextAlign.center),
+            ),
+            SizedBox(
+              width: PdfPageFormat.cm * 2.5,
+              child: Text(prixFormat.format(reparation.designations![index].prix),
+                  style: smallText,
+                  textAlign: TextAlign.end),
+            ),
+            SizedBox(
+              width: PdfPageFormat.cm * 1.5,
+              child: Text(numberFormat3.format(reparation.designations![index].tva),
+                  style: smallText,
+                  textAlign: TextAlign.end),
+            ),
+            SizedBox(
+              width: PdfPageFormat.cm * 2.5,
+              child: Text(prixFormat.format(reparation.designations![index].getTTC()),
+                  style: smallTextBold,
+                  textAlign: TextAlign.end),
+            ),
+          ]:[],
+        ),
       ),
     );
   }

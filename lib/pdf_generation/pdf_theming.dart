@@ -8,6 +8,9 @@ import 'package:printing/printing.dart';
 
 
 final numberFormat = NumberFormat('00000000', 'fr');
+final numberFormat2 = NumberFormat('00', 'fr');
+final numberFormat3 = NumberFormat.currency(locale:'fr',symbol: '%',decimalDigits: 2);
+final prixFormat = NumberFormat.currency(locale: 'fr',symbol: 'DA',decimalDigits: 2);
 final dateFormat = DateFormat('dd MMMM yyyy', 'fr');
 final smallSpace =
 SizedBox(width: PdfPageFormat.cm * 0.1, height: PdfPageFormat.cm * 0.1);
