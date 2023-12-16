@@ -131,13 +131,18 @@ class ReparationPdf {
 
   Widget getDesignations(){
     return  SizedBox(
-      height: PdfPageFormat.cm * 7.75,
+      height: PdfPageFormat.cm * 6.40,
       width: PdfPageFormat.cm * 21 - smallSpace.width!.toDouble(),
       child: Container(
           height: PdfPageFormat.cm * 10,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
-            border: Border.all(),
+            border: const Border(
+              top: BorderSide(color: PdfColors.orange),
+              right: BorderSide(color: PdfColors.orange),
+              left: BorderSide(color: PdfColors.orange),
+              bottom: BorderSide(color: PdfColors.orange),
+            ),
           ),
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -181,178 +186,42 @@ class ReparationPdf {
                     ),
                   ]),
                 ),
-                Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 2),
-                  child: Container(
-                    height: PdfPageFormat.cm * 0.5,
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(),
-                        )),
-                  ),
-                ),
-                Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 2),
-                  child: Container(
-                    height: PdfPageFormat.cm * 0.5,
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(),
-                        )),
-                  ),
-                ),
-                Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 2),
-                  child: Container(
-                    height: PdfPageFormat.cm * 0.5,
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(),
-                        )),
-                  ),
-                ),
-                Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 2),
-                  child: Container(
-                    height: PdfPageFormat.cm * 0.5,
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(),
-                        )),
-                  ),
-                ),
-                Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 2),
-                  child: Container(
-                    height: PdfPageFormat.cm * 0.5,
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(),
-                        )),
-                  ),
-                ),
-                Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 2),
-                  child: Container(
-                    height: PdfPageFormat.cm * 0.5,
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(),
-                        )),
-                  ),
-                ),
-                Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 2),
-                  child: Container(
-                    height: PdfPageFormat.cm * 0.5,
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(),
-                        )),
-                  ),
-                ),
-                Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 2),
-                  child: Container(
-                    height: PdfPageFormat.cm * 0.5,
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(),
-                        )),
-                  ),
-                ),
-                Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 2),
-                  child: Container(
-                    height: PdfPageFormat.cm * 0.5,
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(),
-                        )),
-                  ),
-                ),
-                Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 2),
-                  child: Container(
-                    height: PdfPageFormat.cm * 0.5,
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(),
-                        )),
-                  ),
-                ),
-                Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 2),
-                  child: Container(
-                    height: PdfPageFormat.cm * 0.5,
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(),
-                        )),
-                  ),
-                ),
-                Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 2),
-                  child: Container(
-                    height: PdfPageFormat.cm * 0.5,
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(),
-                        )),
-                  ),
-                ),
-                Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 2),
-                  child: Container(
-                    height: PdfPageFormat.cm * 0.5,
-                    padding: const EdgeInsets.all(3),
-                    decoration: const BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(),
-                        )),
-                  ),
-                ),
-                Padding(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 2),
-                  child: Container(
-                    height: PdfPageFormat.cm * 0.5,
-                    padding: const EdgeInsets.all(3),
-                  ),
-                ),
+                getOneDesignationLine(),
+                getOneDesignationLine(),
+                getOneDesignationLine(),
+                getOneDesignationLine(),
+                getOneDesignationLine(),
+                getOneDesignationLine(),
+                getOneDesignationLine(),
+                getOneDesignationLine(),
+                getOneDesignationLine(),
+                getOneDesignationLine(),
               ])),
+    );
+  }
+
+
+  Widget getOneDesignationLine(){
+    return Padding(
+      padding:
+      const EdgeInsets.symmetric(horizontal: 2),
+      child: Container(
+        height: PdfPageFormat.cm * 0.5,
+        padding: const EdgeInsets.all(3),
+        decoration: const BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                style: BorderStyle.dotted
+              ),
+            )),
+      ),
     );
   }
 
   Widget getRemarque(){
    return Container(
         width: 8 * PdfPageFormat.cm,
-        height: 2.5   * PdfPageFormat.cm,
+        height: 2   * PdfPageFormat.cm,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
           border: Border.all(),
@@ -361,7 +230,7 @@ class ReparationPdf {
           Text('Remarques', style: smallTextBold),
           smallSpace,
           SizedBox(
-            height: PdfPageFormat.cm * 2,
+            height: PdfPageFormat.cm * 1.5,
             child: Stack(
                 children: [
                   Positioned.fill(
@@ -370,7 +239,6 @@ class ReparationPdf {
                           MainAxisAlignment.spaceEvenly,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            dotsSpacer(),
                             dotsSpacer(),
                             dotsSpacer(),
                             dotsSpacer(),
