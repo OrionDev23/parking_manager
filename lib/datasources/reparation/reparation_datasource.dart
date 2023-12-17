@@ -39,7 +39,7 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation>{
       DataCell(SelectableText(element.value.vehiculemat??'',style: tstyle)),
       DataCell(SelectableText(element.value.prestatairenom??'',style: tstyle)),
       DataCell(SelectableText(dateFormat2.format(element.value.date),style: tstyle)),
-      DataCell(SelectableText(numberFormat2.format(element.value.getPrixTotal()),style: tstyle,)),
+      DataCell(SelectableText(numberFormat2.format(element.value.getPrixTTC()),style: tstyle,)),
       DataCell(SelectableText(
           dateFormat.format(element.value.updatedAt!)
           ,style: tstyle)),

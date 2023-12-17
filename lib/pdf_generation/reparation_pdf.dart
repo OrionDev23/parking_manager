@@ -1,8 +1,9 @@
-
 import 'package:flutter/services.dart';
 import 'package:parc_oto/pdf_generation/pdf_theming.dart';
 import 'package:parc_oto/pdf_generation/pdf_utilities.dart';
 import 'package:parc_oto/pdf_generation/reparation/vehicle_damage_pdf.dart';
+import 'package:parc_oto/pdf_generation/reparation/vehicle_entretien_pdf.dart';
+import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/entreprise.dart';
 import '../serializables/prestataire.dart';
 import '../serializables/reparation.dart';
@@ -12,59 +13,96 @@ import 'package:pdf/widgets.dart';
 class ReparationPdf {
   final Reparation reparation;
 
-
   Prestataire? p;
 
   ReparationPdf({required this.reparation});
 
-  PdfUtilities pdfUtilities=PdfUtilities();
+  PdfUtilities pdfUtilities = PdfUtilities();
 
   Future<Uint8List> getDocument() async {
     await Future.wait([
       pdfUtilities.initPrestataire(reparation),
       PDFTheming().initFontsAndLogos()
     ]);
-    p=pdfUtilities.p;
+    p = pdfUtilities.p;
     var doc = Document(
-        theme: ThemeData.withFont(
-      base: baseFont,
-      bold: boldFont,
-      icons: Font.ttf(icons!),
-    ));
+      theme: ThemeData.withFont(
+        base: baseFont,
+        bold: boldFont,
+        icons: Font.ttf(icons!),
+      ),
+      title: 'ordre ${reparation.numero}',
+      author:
+          ClientDatabase.me.value?.name ?? ClientDatabase.me.value?.email ?? '',
+      producer: 'ParcOto',
+    );
 
+    int nbrPages = getNumberOfPages();
 
-    doc.addPage(Page(
+    int lastIndex=0;
+    int nbrTotal=reparation.designations?.length??0;
+
+    print('# of Pages : $nbrPages');
+
+    List<Widget> pages=List.empty(growable: true);
+    for (int i = 0; i < nbrPages; i++) {
+      print('started with last index : $lastIndex');
+      pages.add(getPageContent(i, nbrPages,lastIndex));
+      if(i==0){
+        lastIndex+=nbrPageOne+pageAdition;
+        while(lastIndex>=nbrTotal){
+          lastIndex--;
+        }
+      }
+      else {
+        lastIndex+=nbrMaxMiddlePages;
+          while(lastIndex>=nbrTotal){
+            lastIndex--;
+          }
+      }
+
+      print('last index is now $lastIndex');
+
+    }
+
+    for(int j=0;j<pages.length;j++){
+      doc.addPage(Page(
         margin: const EdgeInsets.all(PdfPageFormat.cm),
         build: (context) {
-          return Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                getHeader(),
-                smallSpace,
-                smallSpace,
-                getPrestataire()??SizedBox(),
-                smallSpace,
-                smallSpace,
-                getVehicleInfo(),
-                smallSpace,
-                smallSpace,
-                VehicleDamagePDF(reparation).vehicleDamage(),
-                smallSpace,
-                smallSpace,
-                getDesignations(),
-                smallSpace,
-                smallSpace,
-                getRemarque(),
-                Spacer(),
-                branding(),
-              ]);
-        }));
+          return pages[j];
+        },
+      ),index: j);
+    }
+
 
     return doc.save();
   }
+
+  Widget getPageContent(int page, int nbrPages,int lastIndex) {
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          getHeader(),
+          bigSpace,
+          if (page == 0) getPrestataire() ?? SizedBox(),
+          if (page == 0) bigSpace,
+          if (page == 0) getVehicleInfo(),
+          if (page == 0) bigSpace,
+          if (page == 0) VehicleDamagePDF(reparation).vehicleDamage(),
+          if (page == 0) bigSpace,
+          if (page == 0) VehicleEntretienPDF(reparation).vehicleEntretien(),
+          if (page == 0) bigSpace,
+          getDesignations(page, nbrPages,lastIndex),
+          bigSpace,
+          if (page == nbrPages - 1) getRemarque(),
+          Spacer(),
+          branding(),
+        ]);
+  }
+
   Widget? getPrestataire() {
-    if(reparation.prestataire!=null){
+    if (reparation.prestataire != null) {
       return Container(
         padding: const EdgeInsets.all(5),
         width: 9 * PdfPageFormat.cm,
@@ -77,22 +115,17 @@ class ReparationPdf {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text('Prestataire', style: smallTextBold.copyWith(color: orangeDeep)),
-                    smallSpace,
-                    Text(p?.nom ?? '',
-                        style: smallText),
-                  ]),
-              Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Adresse', style: smallTextBold),
-                    smallSpace,
-                    Text(p?.adresse ?? '',
-                        style: smallText),
-                  ]),
+              Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                Text('Prestataire',
+                    style: smallTextBold.copyWith(color: orangeDeep)),
+                smallSpace,
+                Text(p?.nom ?? '', style: smallText),
+              ]),
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('Adresse', style: smallTextBold),
+                smallSpace,
+                Text(p?.adresse ?? '', style: smallText),
+              ]),
               Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                 Text('Email', style: smallTextBold),
                 dotsSpacer(),
@@ -100,8 +133,7 @@ class ReparationPdf {
                 smallSpace,
                 Text('Tél', style: smallTextBold),
                 dotsSpacer(),
-                Text(p?.telephone ?? '',
-                    style: smallText),
+                Text(p?.telephone ?? '', style: smallText),
               ]),
               Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                 Text('NIF', style: smallTextBold),
@@ -125,137 +157,260 @@ class ReparationPdf {
       );
     }
     return null;
-
-
   }
 
-  Widget getDesignations(){
-    return  SizedBox(
-      height: PdfPageFormat.cm * 6.40,
-      width: PdfPageFormat.cm * 21 - smallSpace.width!.toDouble(),
-      child: Container(
-          height: PdfPageFormat.cm * 10,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            border: const Border(
-              top: BorderSide(color: PdfColors.orange),
-              right: BorderSide(color: PdfColors.orange),
-              left: BorderSide(color: PdfColors.orange),
-              bottom: BorderSide(color: PdfColors.orange),
-            ),
-          ),
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Container(
-                  height: PdfPageFormat.cm * 0.75,
-                  padding: const EdgeInsets.all(3),
-                  decoration: BoxDecoration(
-                      color: orange,
-                      borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(5))),
-                  child: Row(children: [
-                    SizedBox(
-                      width: PdfPageFormat.cm * 10.7,
-                      child:
-                      Text('Désignation', style: smallTextBold),
-                    ),
-                    SizedBox(
-                      width: PdfPageFormat.cm * 1,
-                      child: Text('QTE',
-                          style: smallTextBold,
-                          textAlign: TextAlign.end),
-                    ),
-                    SizedBox(
-                      width: PdfPageFormat.cm * 2.5,
-                      child: Text('PRIX',
-                          style: smallTextBold,
-                          textAlign: TextAlign.end),
-                    ),
-                    SizedBox(
-                      width: PdfPageFormat.cm * 1.8,
-                      child: Text('TVA',
-                          style: smallTextBold,
-                          textAlign: TextAlign.end ),
-                    ),
-                    SizedBox(
-                      width: PdfPageFormat.cm * 2.5,
-                      child: Text('TTC',
-                          style: smallTextBold,
-                          textAlign: TextAlign.end),
-                    ),
-                  ]),
-                ),
-                getOneDesignationLine(0),
-                getOneDesignationLine(1),
-                getOneDesignationLine(2),
-                getOneDesignationLine(3),
-                getOneDesignationLine(4),
-                getOneDesignationLine(5),
-                getOneDesignationLine(6),
-                getOneDesignationLine(7),
-                getOneDesignationLine(8),
-                getOneDesignationLine(9),
-              ])),
+  int nbrMaxMiddlePages = 43;
+  int nbrPageOne = 8;
+
+  int pageAdition=7;
+  int nbrLastPage = 35;
+
+  int getNumberOfPages() {
+    int nbr = reparation.designations?.length ?? 0;
+    if (nbr <= (nbrPageOne + nbrLastPage+pageAdition)) {
+      if (nbr <= nbrPageOne) {
+        return 1;
+      } else {
+        return 2;
+      }
+    } else {
+      return ((nbr - nbrPageOne - nbrLastPage-pageAdition) / nbrMaxMiddlePages).ceil() + 2;
+    }
+  }
+
+  Widget getDesignations(int page, int nbrPages,int lastIndex) {
+    if(page==0){
+      return getFirstPageDesignations(nbrPages);
+    }
+    else if(page==nbrPages-1){
+      return getLastPageDesignations(nbrPages,lastIndex);
+    }
+    else{
+      return getMiddlePage(nbrPages, page, lastIndex);
+    }
+  }
+
+  Widget designationHeader() {
+    return Container(
+      height: PdfPageFormat.cm * 0.75,
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: orange,
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Row(children: [
+        SizedBox(
+          width: PdfPageFormat.cm * 10.7,
+          child: Text('Désignation', style: smallTextBold),
+        ),
+        SizedBox(
+          width: PdfPageFormat.cm * 1,
+          child: Text('QTE', style: smallTextBold, textAlign: TextAlign.end),
+        ),
+        SizedBox(
+          width: PdfPageFormat.cm * 2.5,
+          child: Text('PRIX', style: smallTextBold, textAlign: TextAlign.end),
+        ),
+        SizedBox(
+          width: PdfPageFormat.cm * 1.8,
+          child: Text('TVA', style: smallTextBold, textAlign: TextAlign.end),
+        ),
+        SizedBox(
+          width: PdfPageFormat.cm * 2.5,
+          child: Text('TTC', style: smallTextBold, textAlign: TextAlign.end),
+        ),
+      ]),
     );
   }
 
+  Widget getLastPageDesignations(int nbrPages,int lastIndex) {
+    print('LAST PAGE : from element number $lastIndex to ${lastIndex+nbrLastPage}');
 
-  Widget getOneDesignationLine(int index){
+
+    double height=(nbrLastPage+3)*0.5+0.75+0.5;
+
+    return SizedBox(
+      height: PdfPageFormat.cm * height,
+      width: PdfPageFormat.cm * 21 - smallSpace.width!.toDouble(),
+      child: SizedBox(
+          height: PdfPageFormat.cm * 10,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            designationHeader(),
+            ...List.generate(nbrLastPage , (index) {
+              return getOneDesignationLine(index+lastIndex, nbrPages - 1, nbrPages);
+            }),
+            getTotal(),
+          ])),
+    );
+  }
+
+  Widget getMiddlePage(int nbrPages,int page,int lastIndex){
+    print('PAGE #${page+1}: from element number $lastIndex to ${lastIndex+nbrMaxMiddlePages}');
+    double height=(nbrMaxMiddlePages)*0.5+0.75+0.5;
+
+    return SizedBox(
+      height: PdfPageFormat.cm * height,
+      width: PdfPageFormat.cm * 21 - smallSpace.width!.toDouble(),
+      child: SizedBox(
+          height: PdfPageFormat.cm * 10,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            designationHeader(),
+            ...List.generate(nbrMaxMiddlePages, (index) {
+              return getOneDesignationLine(lastIndex+index, page, nbrPages);
+            }),
+          ])),
+    );
+  }
+
+  Widget getFirstPageDesignations(int nbrPages) {
+    int nbrLines=nbrPages==1?nbrPageOne:nbrPageOne+pageAdition;
+    double height=nbrLines*0.5+0.75+0.5+(nbrPages == 1?3:0)*0.5;
+
+    print('FIRST PAGE : from element number 0 to $nbrLines');
+
+    return SizedBox(
+      height: PdfPageFormat.cm * height,
+      width: PdfPageFormat.cm * 21 - smallSpace.width!.toDouble(),
+      child: SizedBox(
+          height: PdfPageFormat.cm * 10,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            designationHeader(),
+            ...List.generate(nbrLines, (index) {
+              return getOneDesignationLine(index, 0, nbrPages);
+            }),
+            if (nbrPages == 1) getTotal(),
+          ])),
+    );
+  }
+
+  Widget getOneDesignationLine(int index, int page, int nbrPages) {
+
     return Padding(
-      padding:
-      const EdgeInsets.symmetric(horizontal: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 2),
       child: Container(
         height: PdfPageFormat.cm * 0.5,
-        padding: const EdgeInsets.symmetric(horizontal: 3,vertical: 4.5),
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4.5),
         decoration: const BoxDecoration(
             border: Border(
-              bottom: BorderSide(
-                style: BorderStyle.dotted
-              ),
-            )),
+          bottom: BorderSide(style: BorderStyle.dotted),
+        )),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
-          children: (reparation.designations?.length??0)>index?[
+          children: (reparation.designations==null) || (reparation.designations!.length) <= index  || (page==nbrPages-2 && index==reparation.designations!.length-1)
+              ?[]
+            : [
             SizedBox(
               width: PdfPageFormat.cm * 11,
-              child:
-              Text(reparation.designations![index].designation, style: smallText),
+              child: Text(reparation.designations![index].designation,
+                  style: smallText),
             ),
             SizedBox(
               width: PdfPageFormat.cm * 1,
-              child: Text(numberFormat2.format(reparation.designations![index].qte),
+              child: Text(
+                  numberFormat2
+                      .format(reparation.designations![index].qte),
                   style: smallText,
                   textAlign: TextAlign.center),
             ),
             SizedBox(
               width: PdfPageFormat.cm * 2.5,
-              child: Text(prixFormat.format(reparation.designations![index].prix),
+              child: Text(
+                  prixFormat.format(reparation.designations![index].prix),
                   style: smallText,
                   textAlign: TextAlign.end),
             ),
             SizedBox(
               width: PdfPageFormat.cm * 1.5,
-              child: Text(numberFormat3.format(reparation.designations![index].tva),
+              child: Text(
+                  numberFormat3
+                      .format(reparation.designations![index].tva),
                   style: smallText,
                   textAlign: TextAlign.end),
             ),
             SizedBox(
               width: PdfPageFormat.cm * 2.5,
-              child: Text(prixFormat.format(reparation.designations![index].getTTC()),
+              child: Text(
+                  prixFormat
+                      .format(reparation.designations![index].getTTC()),
                   style: smallTextBold,
                   textAlign: TextAlign.end),
             ),
-          ]:[],
+          ],
         ),
       ),
     );
   }
 
-  Widget getRemarque(){
-   return Container(
+  Widget getTotal() {
+    double width = 3;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        Container(
+          height: PdfPageFormat.cm * 0.5,
+          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4.5),
+          decoration: const BoxDecoration(
+              border: Border(
+            bottom: BorderSide(style: BorderStyle.dotted),
+          )),
+          child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+            SizedBox(
+              width: PdfPageFormat.cm * width,
+              child: Text('Prix total', style: smallTextBold),
+            ),
+            SizedBox(
+              width: PdfPageFormat.cm * width,
+              child: Text(prixFormat.format(reparation.getPrixTotal()),
+                  style: smallText, textAlign: TextAlign.end),
+            ),
+          ]),
+        ),
+        Container(
+          height: PdfPageFormat.cm * 0.5,
+          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4.5),
+          decoration: const BoxDecoration(
+              border: Border(
+            bottom: BorderSide(style: BorderStyle.dotted),
+          )),
+          child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+            SizedBox(
+              width: PdfPageFormat.cm * width,
+              child: Text('TVA', style: smallTextBold),
+            ),
+            SizedBox(
+              width: PdfPageFormat.cm * width,
+              child: Text(prixFormat.format(reparation.getPrixTva()),
+                  style: smallText, textAlign: TextAlign.end),
+            ),
+          ]),
+        ),
+        Container(
+          height: PdfPageFormat.cm * 0.5,
+          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4.5),
+          decoration: const BoxDecoration(
+              border: Border(
+            bottom: BorderSide(style: BorderStyle.dotted),
+          )),
+          child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+            SizedBox(
+              width: PdfPageFormat.cm * width,
+              child: Text('Prix TTC', style: smallTextBold),
+            ),
+            SizedBox(
+              width: PdfPageFormat.cm * width,
+              child: Text(prixFormat.format(reparation.getPrixTTC()),
+                  style: smallTextBold, textAlign: TextAlign.end),
+            ),
+          ]),
+        ),
+      ]),
+    );
+  }
+
+  Widget getRemarque() {
+    return Container(
         width: 8 * PdfPageFormat.cm,
-        height: 2   * PdfPageFormat.cm,
+        height: 2 * PdfPageFormat.cm,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
           border: Border.all(),
@@ -265,25 +420,23 @@ class ReparationPdf {
           smallSpace,
           SizedBox(
             height: PdfPageFormat.cm * 1.5,
-            child: Stack(
-                children: [
-                  Positioned.fill(
-                      child: Column(
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceEvenly,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            dotsSpacer(),
-                            dotsSpacer(),
-                            dotsSpacer(),
-                            dotsSpacer(),
-                          ])),
-                  Positioned.fill(
-                      top: -1.5,
-                      left: 2,
-                      right: 2,
-                      child: Text(reparation.remarque??'',style: smallText))
-                ]),
+            child: Stack(children: [
+              Positioned.fill(
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                    dotsSpacer(),
+                    dotsSpacer(),
+                    dotsSpacer(),
+                    dotsSpacer(),
+                  ])),
+              Positioned.fill(
+                  top: -1.5,
+                  left: 2,
+                  right: 2,
+                  child: Text(reparation.remarque ?? '', style: smallText))
+            ]),
           ),
         ]));
   }
@@ -724,5 +877,4 @@ class ReparationPdf {
           ]),
     );
   }
-
 }

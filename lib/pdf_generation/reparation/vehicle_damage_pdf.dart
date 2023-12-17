@@ -26,8 +26,7 @@ class VehicleDamagePDF{
 
   Widget vehicleDamage() {
     double width = 3.7;
-    Map<String, dynamic> etatJson =
-        reparation.etatActuel?.toJson() ?? EtatVehicle().toJson();
+    Map<String, dynamic> etatJson =etatVehicle.toJson() ;
 
     List<Widget> etats = PdfUtilities.getTextListFromMap(etatJson, 0, etatJson.length);
 

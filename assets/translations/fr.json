@@ -312,5 +312,21 @@
  "siegeAVG": "Avant gauche",
  "siegeARD": "Arrière droit",
  "siegeARG": "Arrière gauche",
- "entervalues": "Entrez une valeur pour cette option et pressez 'Entrée'"
+ "entervalues": "Entrez une valeur pour cette option et pressez 'Entrée'",
+ "vidangeMoteur": "Vidange moteur",
+ "vidangeBoite": "Vidange boite",
+ "vidangePont": "Vidange pont AV AR",
+ "filtreAir": "Filtre à air",
+ "filtreHuile": "Filtre à huile",
+ "filtreCarburant": "Filtre à carburant",
+ "filtreHabitacle": "Filtre d'habitacle",
+ "liquideFrein": "Liquide de frein",
+ "liquideRefroidissement": "Liquide de refroidissement",
+ "equilibrageRoues": "Équilibrage roues",
+ "controleNiveaux": "Controle niveaux",
+ "entretienClimatiseur": "Entretien climatisation",
+ "balaisEssuieGlace": "Balais essuie-glace",
+ "eclairage": "Eclairage",
+ "obd": "OBD",
+ "bougies": "Bougies"
 }

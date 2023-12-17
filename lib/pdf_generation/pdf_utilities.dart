@@ -32,12 +32,12 @@ class PdfUtilities{
 
   }
   static List<Widget> getTextListFromMap(
-      Map<String, dynamic> map, int debut, int fin) {
+      Map<String, dynamic> map, int debut, int fin,{double width=3.7}) {
     List<Widget> result = List.empty(growable: true);
     map.forEach((key, value) {
       if (key != 'showOnList') {
         result.add(SizedBox(
-            width: 3.7 * PdfPageFormat.cm,
+            width: width * PdfPageFormat.cm,
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.end,

@@ -69,7 +69,7 @@ class Reparation extends ParcOtoDefault{
   Map<String, dynamic> toJson() => _$ReparationToJson(this);
 
 
-  double getPrixTotal(){
+  double getPrixTTC(){
     if(designations==null){
       return 0;
     }
@@ -77,6 +77,29 @@ class Reparation extends ParcOtoDefault{
 
     for(int i=0;i<designations!.length;i++){
       result+=(designations![i].prix+(designations![i].prix*designations![i].tva)/100)*designations![i].qte;
+    }
+    return result;
+  }
+
+  double getPrixTotal(){
+    if(designations==null){
+      return 0;
+    }
+    double result=0;
+
+    for(int i=0;i<designations!.length;i++){
+      result+=designations![i].prix*designations![i].qte;
+    }
+    return result;
+  }
+  double getPrixTva(){
+    if(designations==null){
+      return 0;
+    }
+    double result=0;
+
+    for(int i=0;i<designations!.length;i++){
+      result+=((designations![i].prix*designations![i].tva)/100)*designations![i].qte;
     }
     return result;
   }

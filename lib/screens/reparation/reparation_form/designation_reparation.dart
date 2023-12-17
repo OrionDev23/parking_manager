@@ -92,13 +92,11 @@ class DesignationReparationState extends State<DesignationReparation> {
 
               widget.designation.tva=value;
 
-              tva.text=value.toString();
               setState(() {
 
               });
 
             }),
-            maxLength: 4,
             placeholderStyle: placeStyle,
             inputFormatters: [FilteringTextInputFormatter.allow(
                 RegExp(r'^(\d+)?\.?\d{0,2}')

@@ -127,7 +127,7 @@ class ReparationWebService extends ParcOtoWebService<Reparation> {
       case 4:
         return (d1, d2) {
 
-          return coef * d1.value.getPrixTotal().compareTo(d2.value.getPrixTotal());
+          return coef * d1.value.getPrixTTC().compareTo(d2.value.getPrixTTC());
         };
     //date modif
       case 5:

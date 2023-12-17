@@ -14,6 +14,8 @@ final prixFormat = NumberFormat.currency(locale: 'fr',symbol: 'DA',decimalDigits
 final dateFormat = DateFormat('dd MMMM yyyy', 'fr');
 final smallSpace =
 SizedBox(width: PdfPageFormat.cm * 0.1, height: PdfPageFormat.cm * 0.1);
+final bigSpace =
+SizedBox(width: PdfPageFormat.cm * 0.2, height: PdfPageFormat.cm * 0.2);
 
 late TextStyle bigTitle;
 late TextStyle kindaBigText;
