@@ -42,11 +42,9 @@ class ReparationPdf {
     int lastIndex=0;
     int nbrTotal=reparation.designations?.length??0;
 
-    print('# of Pages : $nbrPages');
 
     List<Widget> pages=List.empty(growable: true);
     for (int i = 0; i < nbrPages; i++) {
-      print('started with last index : $lastIndex');
       pages.add(getPageContent(i, nbrPages,lastIndex));
       if(i==0){
         lastIndex+=nbrPageOne+pageAdition;
@@ -61,7 +59,6 @@ class ReparationPdf {
           }
       }
 
-      print('last index is now $lastIndex');
 
     }
 
@@ -95,9 +92,9 @@ class ReparationPdf {
           if (page == 0) bigSpace,
           getDesignations(page, nbrPages,lastIndex),
           bigSpace,
-          if (page == nbrPages - 1) getRemarque(),
+          if (page == nbrPages - 1) getRemarqueAndSignature(),
           Spacer(),
-          branding(),
+          brandingAndPaging(page,nbrPages),
         ]);
   }
 
@@ -200,8 +197,8 @@ class ReparationPdf {
       ),
       child: Row(children: [
         SizedBox(
-          width: PdfPageFormat.cm * 10.7,
-          child: Text('Désignation', style: smallTextBold),
+          width: PdfPageFormat.cm * 11.22,
+          child: Text('Observations', style: smallTextBold),
         ),
         SizedBox(
           width: PdfPageFormat.cm * 1,
@@ -209,10 +206,10 @@ class ReparationPdf {
         ),
         SizedBox(
           width: PdfPageFormat.cm * 2.5,
-          child: Text('PRIX', style: smallTextBold, textAlign: TextAlign.end),
+          child: Text('MONTANT', style: smallTextBold, textAlign: TextAlign.end),
         ),
         SizedBox(
-          width: PdfPageFormat.cm * 1.8,
+          width: PdfPageFormat.cm * 1.5,
           child: Text('TVA', style: smallTextBold, textAlign: TextAlign.end),
         ),
         SizedBox(
@@ -224,7 +221,6 @@ class ReparationPdf {
   }
 
   Widget getLastPageDesignations(int nbrPages,int lastIndex) {
-    print('LAST PAGE : from element number $lastIndex to ${lastIndex+nbrLastPage}');
 
 
     double height=(nbrLastPage+3)*0.5+0.75+0.5;
@@ -245,7 +241,6 @@ class ReparationPdf {
   }
 
   Widget getMiddlePage(int nbrPages,int page,int lastIndex){
-    print('PAGE #${page+1}: from element number $lastIndex to ${lastIndex+nbrMaxMiddlePages}');
     double height=(nbrMaxMiddlePages)*0.5+0.75+0.5;
 
     return SizedBox(
@@ -266,7 +261,6 @@ class ReparationPdf {
     int nbrLines=nbrPages==1?nbrPageOne:nbrPageOne+pageAdition;
     double height=nbrLines*0.5+0.75+0.5+(nbrPages == 1?3:0)*0.5;
 
-    print('FIRST PAGE : from element number 0 to $nbrLines');
 
     return SizedBox(
       height: PdfPageFormat.cm * height,
@@ -310,7 +304,7 @@ class ReparationPdf {
                   numberFormat2
                       .format(reparation.designations![index].qte),
                   style: smallText,
-                  textAlign: TextAlign.center),
+                  textAlign: TextAlign.end),
             ),
             SizedBox(
               width: PdfPageFormat.cm * 2.5,
@@ -356,7 +350,7 @@ class ReparationPdf {
           child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
             SizedBox(
               width: PdfPageFormat.cm * width,
-              child: Text('Prix total', style: smallTextBold),
+              child: Text('Montant total', style: smallTextBold),
             ),
             SizedBox(
               width: PdfPageFormat.cm * width,
@@ -394,7 +388,7 @@ class ReparationPdf {
           child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
             SizedBox(
               width: PdfPageFormat.cm * width,
-              child: Text('Prix TTC', style: smallTextBold),
+              child: Text('Montant TTC', style: smallTextBold),
             ),
             SizedBox(
               width: PdfPageFormat.cm * width,
@@ -407,38 +401,65 @@ class ReparationPdf {
     );
   }
 
-  Widget getRemarque() {
+  Widget getRemarqueAndSignature() {
     return Container(
-        width: 8 * PdfPageFormat.cm,
+        width: 20 * PdfPageFormat.cm,
         height: 2 * PdfPageFormat.cm,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(),
+
+        child: Row(
+          children: [
+
+            Container(
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  border: Border.all(),
+                ),
+              width: 9*PdfPageFormat.cm,
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Remarques', style: smallTextBold),
+                    smallSpace,
+                    SizedBox(
+                      height: PdfPageFormat.cm * 1.5,
+                      child: Stack(children: [
+                        Positioned.fill(
+                            child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  dotsSpacer(),
+                                  dotsSpacer(),
+                                  dotsSpacer(),
+                                  dotsSpacer(),
+                                ])),
+                        Positioned.fill(
+                            top: -1.5,
+                            left: 2,
+                            right: 2,
+                            child: Text(reparation.remarque ?? '', style: smallText))
+                      ]),
+                    ),
+                  ])
+            ),
+            Spacer(),
+            Container(
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+                width: 9*PdfPageFormat.cm,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Cachet et signature', style: smallTextBold),
+                    ])
+            ),
+          ]
         ),
-        child: Column(children: [
-          Text('Remarques', style: smallTextBold),
-          smallSpace,
-          SizedBox(
-            height: PdfPageFormat.cm * 1.5,
-            child: Stack(children: [
-              Positioned.fill(
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                    dotsSpacer(),
-                    dotsSpacer(),
-                    dotsSpacer(),
-                    dotsSpacer(),
-                  ])),
-              Positioned.fill(
-                  top: -1.5,
-                  left: 2,
-                  right: 2,
-                  child: Text(reparation.remarque ?? '', style: smallText))
-            ]),
-          ),
-        ]));
+
+    );
   }
 
   Widget getHeader() {
@@ -834,18 +855,31 @@ class ReparationPdf {
         ]);
   }
 
-  Widget branding() {
+  Widget brandingAndPaging(int page,int nbrPages) {
     return SizedBox(
-      height: PdfPageFormat.cm * 1.5,
-      width: PdfPageFormat.cm * 19,
-      child: Column(
+      height: PdfPageFormat.cm * 1.25,
+      width: PdfPageFormat.cm * 21,
+      child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
           children: [
+            if(nbrPages!=1)
             Container(
-              width: PdfPageFormat.cm * 4.5,
-              height: PdfPageFormat.cm * 1.5,
+              width: PdfPageFormat.cm * 2,
+              height: PdfPageFormat.cm * 0.75,
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: orangeDeep,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Text('Page ${page+1}/$nbrPages',style: smallTextBold),
+            ),
+            if(nbrPages!=1)
+              Spacer(),
+            Container(
+              width: PdfPageFormat.cm *4.5,
+              height: PdfPageFormat.cm * 1.25,
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 border: Border.all(),
@@ -855,7 +889,7 @@ class ReparationPdf {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
-                      width: PdfPageFormat.cm * 4.3,
+                      width: PdfPageFormat.cm * 4.5,
                       child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           crossAxisAlignment: CrossAxisAlignment.end,
