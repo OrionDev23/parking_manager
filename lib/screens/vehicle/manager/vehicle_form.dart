@@ -1549,46 +1549,73 @@ class _VehicleFormState extends State<VehicleForm>
 
       );
       if(widget.vehicle!=null){
-        await ClientDatabase.database!.updateDocument(
-            databaseId: databaseId,
-            collectionId: vehiculeid,
-            documentId: documentID!,
-            data: vehicle.toJson(),
+        await Future.wait([
+        updateVehicle(vehicle),
+          uploadActivity(true,vehicle),
+        ]);
 
-        ).then((value) {
-          if(widget.tab!=null){
-            VehicleTabsState.tabs.remove(widget.tab);
-          }
-          if(VehicleTabsState.currentIndex.value>0)VehicleTabsState.currentIndex.value--;
-        }).onError((AppwriteException error, stackTrace) {
-          setState(() {
-            uploading=false;
-            errorUploading=true;
-          });
-        });
       }
       else{
-        await ClientDatabase.database!.createDocument(
-            databaseId: databaseId,
-            collectionId: vehiculeid,
-            documentId: documentID!,
-            data: vehicle.toJson(),
-
-        ).then((value) {
-          if(widget.tab!=null){
-            VehicleTabsState.tabs.remove(widget.tab);
-          }
-          if(VehicleTabsState.currentIndex.value>0)VehicleTabsState.currentIndex.value--;
-        }).onError((AppwriteException error, stackTrace) {
-          setState(() {
-            uploading=false;
-            errorUploading=true;
-          });
-        });
+        await Future.wait([
+          createVehicle(vehicle),
+          uploadActivity(false,vehicle),
+        ]);
       }
 
     }
   }
+
+  Future<void> updateVehicle(Vehicle vehicle) async{
+    await ClientDatabase.database!.updateDocument(
+      databaseId: databaseId,
+      collectionId: vehiculeid,
+      documentId: documentID!,
+      data: vehicle.toJson(),
+
+    ).then((value) {
+      if(widget.tab!=null){
+        VehicleTabsState.tabs.remove(widget.tab);
+      }
+      if(VehicleTabsState.currentIndex.value>0)VehicleTabsState.currentIndex.value--;
+    }).onError((AppwriteException error, stackTrace) {
+      setState(() {
+        uploading=false;
+        errorUploading=true;
+      });
+    });
+  }
+
+  Future<void> createVehicle(Vehicle vehicle) async{
+    await ClientDatabase.database!.createDocument(
+      databaseId: databaseId,
+      collectionId: vehiculeid,
+      documentId: documentID!,
+      data: vehicle.toJson(),
+
+    ).then((value) {
+      if(widget.tab!=null){
+        VehicleTabsState.tabs.remove(widget.tab);
+      }
+      if(VehicleTabsState.currentIndex.value>0)VehicleTabsState.currentIndex.value--;
+    }).onError((AppwriteException error, stackTrace) {
+      setState(() {
+        uploading=false;
+        errorUploading=true;
+      });
+    });
+  }
+
+  Future<void> uploadActivity(bool update,Vehicle vehicle) async{
+    if(update){
+     await ClientDatabase().ajoutActivity(1, vehicle.id,docName: vehicle.matricule);
+    }
+    else{
+      await ClientDatabase().ajoutActivity(0, vehicle.id,docName: vehicle.matricule);
+
+    }
+  }
+
+
   @override
   bool get wantKeepAlive => true;
 }

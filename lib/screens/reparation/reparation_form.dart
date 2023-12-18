@@ -16,12 +16,13 @@ import 'package:parc_oto/serializables/prestataire.dart';
 import 'package:parc_oto/serializables/vehicle.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:parc_oto/widgets/zone_box.dart';
-import 'package:pdf/pdf.dart';
+import 'package:pdf/pdf.dart' as pdf;
 import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
+import '../../pdf_generation/pdf_theming.dart' as pdf_theme;
 import '../../pdf_generation/reparation_pdf.dart';
 import '../../serializables/designation.dart';
 import '../../serializables/entretien_vehicle.dart';
@@ -999,7 +1000,12 @@ class ReparationFormState extends State<ReparationForm>
     showDialog(context: context, builder: (context){
 
       return PdfPreview(
-        build: (PdfPageFormat format) {
+        pdfFileName: 'ordre${pdf_theme.numberFormat.format(reparation.numero)}',
+        initialPageFormat: pdf.PdfPageFormat.a4,
+        canChangePageFormat: false,
+        canChangeOrientation: false,
+        canDebug: false,
+        build: (pdf.PdfPageFormat format) {
           return ReparationPdf(reparation: reparation).getDocument();
         },
       );
@@ -1039,26 +1045,56 @@ class ReparationFormState extends State<ReparationForm>
 
     if (!modif)
     {
-
-
-      await ClientDatabase.database!.createDocument(
-          databaseId: databaseId,
-          collectionId: reparationId,
-          documentId: documentID!,
-          data: reparation.toJson());
+      await Future.wait([
+        createReparation(reparation),
+        uploadActivity(modif, reparation),
+      ]);
     }
     else {
-      await ClientDatabase.database!.updateDocument(
-          databaseId: databaseId,
-          collectionId: reparationId,
-          documentId: documentID!,
-          data: reparation.toJson());
+      await Future.wait([
+        updateReparation(reparation),
+        uploadActivity(modif, reparation),
+      ]);
+
     }
 
     uploading = false;
 
     if (mounted) {
       setState(() {});
+    }
+  }
+
+
+  Future<void> updateReparation(Reparation reparation) async{
+          await ClientDatabase.database!.updateDocument(
+        databaseId: databaseId,
+        collectionId: reparationId,
+        documentId: documentID!,
+        data: reparation.toJson()).then((value) {
+
+    }).onError((AppwriteException error, stackTrace) {
+      setState(() {
+
+      });
+    });
+  }
+
+  Future<void> createReparation(Reparation reparation) async{
+    await ClientDatabase.database!.createDocument(
+        databaseId: databaseId,
+        collectionId: reparationId,
+        documentId: documentID!,
+        data: reparation.toJson());
+  }
+
+  Future<void> uploadActivity(bool update,Reparation reparation) async{
+    if(update){
+      await ClientDatabase().ajoutActivity(11, reparation.id,docName: pdf_theme.numberFormat.format(reparation.numero));
+    }
+    else{
+      await ClientDatabase().ajoutActivity(10, reparation.id,docName: pdf_theme.numberFormat.format(reparation.numero));
+
     }
   }
 }

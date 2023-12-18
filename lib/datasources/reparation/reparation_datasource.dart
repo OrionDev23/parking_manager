@@ -4,6 +4,7 @@ import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/datasources/reparation/reparation_webservice.dart';
+import 'package:parc_oto/pdf_generation/pdf_theming.dart';
 import 'package:parc_oto/pdf_generation/reparation_pdf.dart';
 import 'package:parc_oto/screens/reparation/reparation_form.dart';
 import 'package:pdf/pdf.dart';
@@ -102,6 +103,8 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation>{
   void showPdf(Reparation reparation){
     f.showDialog(context: current, builder: (context){
       return PdfPreview(
+        pdfFileName: 'ordre${numberFormat.format(reparation.numero)}',
+        initialPageFormat: PdfPageFormat.a4,
         canDebug: false,
         canChangeOrientation: false,
         canChangePageFormat: false,

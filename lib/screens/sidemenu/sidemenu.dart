@@ -17,6 +17,7 @@ import '../chauffeur/disponibilite/disponibilite_tabs.dart';
 import '../dashboard/dashboard.dart';
 import '../dashboard/notif_list.dart';
 import '../entreprise.dart';
+import '../logs/log_management.dart';
 import '../prestataire/prestataire_tabs.dart';
 import '../reparation/reparation_tabs.dart';
 import '../settings.dart';
@@ -334,7 +335,7 @@ class PanesListState extends State<PanesList> with WindowListener {
           PaneItem(
               icon: const Icon(FluentIcons.edit),
               title: const Text("gestionevent").tr(),
-              body: const Placeholder()),
+              body: const LogActivityManagement()),
           PaneItem(
               icon: const Icon(FluentIcons.reservation_orders),
               title: const Text('planifier').tr(),
