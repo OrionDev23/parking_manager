@@ -10,6 +10,8 @@ import '../serializables/reparation.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
+import '../utilities/num_to_word.dart';
+
 class ReparationPdf {
   final Reparation reparation;
 
@@ -39,43 +41,40 @@ class ReparationPdf {
 
     int nbrPages = getNumberOfPages();
 
-    int lastIndex=0;
-    int nbrTotal=reparation.designations?.length??0;
+    int lastIndex = 0;
+    int nbrTotal = reparation.designations?.length ?? 0;
 
-
-    List<Widget> pages=List.empty(growable: true);
+    List<Widget> pages = List.empty(growable: true);
     for (int i = 0; i < nbrPages; i++) {
-      pages.add(getPageContent(i, nbrPages,lastIndex));
-      if(i==0){
-        lastIndex+=nbrPageOne+pageAdition;
-        while(lastIndex>=nbrTotal){
+      pages.add(getPageContent(i, nbrPages, lastIndex));
+      if (i == 0) {
+        lastIndex += nbrPageOne + pageAdition;
+        while (lastIndex >= nbrTotal) {
+          lastIndex--;
+        }
+      } else {
+        lastIndex += nbrMaxMiddlePages;
+        while (lastIndex >= nbrTotal) {
           lastIndex--;
         }
       }
-      else {
-        lastIndex+=nbrMaxMiddlePages;
-          while(lastIndex>=nbrTotal){
-            lastIndex--;
-          }
-      }
-
-
     }
 
-    for(int j=0;j<pages.length;j++){
-      doc.addPage(Page(
-        margin: const EdgeInsets.all(PdfPageFormat.cm),
-        build: (context) {
-          return pages[j];
-        },
-      ),index: j);
+    for (int j = 0; j < pages.length; j++) {
+      doc.addPage(
+          Page(
+            margin: const EdgeInsets.all(PdfPageFormat.cm),
+            build: (context) {
+              return pages[j];
+            },
+          ),
+          index: j);
     }
-
 
     return doc.save();
   }
 
-  Widget getPageContent(int page, int nbrPages,int lastIndex) {
+  Widget getPageContent(int page, int nbrPages, int lastIndex) {
     return Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,11 +89,12 @@ class ReparationPdf {
           if (page == 0) bigSpace,
           if (page == 0) VehicleEntretienPDF(reparation).vehicleEntretien(),
           if (page == 0) bigSpace,
-          getDesignations(page, nbrPages,lastIndex),
-          bigSpace,
+          getDesignations(page, nbrPages, lastIndex),
+          if (page == nbrPages - 1) getPrixInLetter(),
+          if (page == nbrPages - 1) bigSpace,
           if (page == nbrPages - 1) getRemarqueAndSignature(),
           Spacer(),
-          brandingAndPaging(page,nbrPages),
+          brandingAndPaging(page, nbrPages),
         ]);
   }
 
@@ -159,30 +159,31 @@ class ReparationPdf {
   int nbrMaxMiddlePages = 43;
   int nbrPageOne = 8;
 
-  int pageAdition=7;
+  int pageAdition = 7;
   int nbrLastPage = 35;
 
   int getNumberOfPages() {
     int nbr = reparation.designations?.length ?? 0;
-    if (nbr <= (nbrPageOne + nbrLastPage+pageAdition)) {
+    if (nbr <= (nbrPageOne + nbrLastPage + pageAdition)) {
       if (nbr <= nbrPageOne) {
         return 1;
       } else {
         return 2;
       }
     } else {
-      return ((nbr - nbrPageOne - nbrLastPage-pageAdition) / nbrMaxMiddlePages).ceil() + 2;
+      return ((nbr - nbrPageOne - nbrLastPage - pageAdition) /
+                  nbrMaxMiddlePages)
+              .ceil() +
+          2;
     }
   }
 
-  Widget getDesignations(int page, int nbrPages,int lastIndex) {
-    if(page==0){
+  Widget getDesignations(int page, int nbrPages, int lastIndex) {
+    if (page == 0) {
       return getFirstPageDesignations(nbrPages);
-    }
-    else if(page==nbrPages-1){
-      return getLastPageDesignations(nbrPages,lastIndex);
-    }
-    else{
+    } else if (page == nbrPages - 1) {
+      return getLastPageDesignations(nbrPages, lastIndex);
+    } else {
       return getMiddlePage(nbrPages, page, lastIndex);
     }
   }
@@ -206,7 +207,8 @@ class ReparationPdf {
         ),
         SizedBox(
           width: PdfPageFormat.cm * 2.5,
-          child: Text('MONTANT', style: smallTextBold, textAlign: TextAlign.end),
+          child:
+              Text('MONTANT', style: smallTextBold, textAlign: TextAlign.end),
         ),
         SizedBox(
           width: PdfPageFormat.cm * 1.5,
@@ -220,10 +222,8 @@ class ReparationPdf {
     );
   }
 
-  Widget getLastPageDesignations(int nbrPages,int lastIndex) {
-
-
-    double height=(nbrLastPage+3)*0.5+0.75+0.5;
+  Widget getLastPageDesignations(int nbrPages, int lastIndex) {
+    double height = (nbrLastPage + 3) * 0.5 + 0.75 + 0.5;
 
     return SizedBox(
       height: PdfPageFormat.cm * height,
@@ -232,16 +232,17 @@ class ReparationPdf {
           height: PdfPageFormat.cm * 10,
           child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             designationHeader(),
-            ...List.generate(nbrLastPage , (index) {
-              return getOneDesignationLine(index+lastIndex, nbrPages - 1, nbrPages);
+            ...List.generate(nbrLastPage, (index) {
+              return getOneDesignationLine(
+                  index + lastIndex, nbrPages - 1, nbrPages);
             }),
             getTotal(),
           ])),
     );
   }
 
-  Widget getMiddlePage(int nbrPages,int page,int lastIndex){
-    double height=(nbrMaxMiddlePages)*0.5+0.75+0.5;
+  Widget getMiddlePage(int nbrPages, int page, int lastIndex) {
+    double height = (nbrMaxMiddlePages) * 0.5 + 0.75 + 0.5;
 
     return SizedBox(
       height: PdfPageFormat.cm * height,
@@ -251,16 +252,15 @@ class ReparationPdf {
           child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             designationHeader(),
             ...List.generate(nbrMaxMiddlePages, (index) {
-              return getOneDesignationLine(lastIndex+index, page, nbrPages);
+              return getOneDesignationLine(lastIndex + index, page, nbrPages);
             }),
           ])),
     );
   }
 
   Widget getFirstPageDesignations(int nbrPages) {
-    int nbrLines=nbrPages==1?nbrPageOne:nbrPageOne+pageAdition;
-    double height=nbrLines*0.5+0.75+0.5+(nbrPages == 1?3:0)*0.5;
-
+    int nbrLines = nbrPages == 1 ? nbrPageOne : nbrPageOne + pageAdition;
+    double height = nbrLines * 0.5 + 0.75 + 0.5 + (nbrPages == 1 ? 3 : 0) * 0.5;
 
     return SizedBox(
       height: PdfPageFormat.cm * height,
@@ -278,7 +278,6 @@ class ReparationPdf {
   }
 
   Widget getOneDesignationLine(int index, int page, int nbrPages) {
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
       child: Container(
@@ -290,46 +289,49 @@ class ReparationPdf {
         )),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
-          children: (reparation.designations==null) || (reparation.designations!.length) <= index  || (page==nbrPages-2 && index==reparation.designations!.length-1)
-              ?[]
-            : [
-            SizedBox(
-              width: PdfPageFormat.cm * 11,
-              child: Text(reparation.designations![index].designation,
-                  style: smallText),
-            ),
-            SizedBox(
-              width: PdfPageFormat.cm * 1,
-              child: Text(
-                  numberFormat2
-                      .format(reparation.designations![index].qte),
-                  style: smallText,
-                  textAlign: TextAlign.end),
-            ),
-            SizedBox(
-              width: PdfPageFormat.cm * 2.5,
-              child: Text(
-                  prixFormat.format(reparation.designations![index].prix),
-                  style: smallText,
-                  textAlign: TextAlign.end),
-            ),
-            SizedBox(
-              width: PdfPageFormat.cm * 1.5,
-              child: Text(
-                  numberFormat3
-                      .format(reparation.designations![index].tva),
-                  style: smallText,
-                  textAlign: TextAlign.end),
-            ),
-            SizedBox(
-              width: PdfPageFormat.cm * 2.5,
-              child: Text(
-                  prixFormat
-                      .format(reparation.designations![index].getTTC()),
-                  style: smallTextBold,
-                  textAlign: TextAlign.end),
-            ),
-          ],
+          children: (reparation.designations == null) ||
+                  (reparation.designations!.length) <= index ||
+                  (page == nbrPages - 2 &&
+                      index == reparation.designations!.length - 1)
+              ? []
+              : [
+                  SizedBox(
+                    width: PdfPageFormat.cm * 11,
+                    child: Text(reparation.designations![index].designation,
+                        style: smallText),
+                  ),
+                  SizedBox(
+                    width: PdfPageFormat.cm * 1,
+                    child: Text(
+                        numberFormat2
+                            .format(reparation.designations![index].qte),
+                        style: smallText,
+                        textAlign: TextAlign.end),
+                  ),
+                  SizedBox(
+                    width: PdfPageFormat.cm * 2.5,
+                    child: Text(
+                        prixFormat.format(reparation.designations![index].prix),
+                        style: smallText,
+                        textAlign: TextAlign.end),
+                  ),
+                  SizedBox(
+                    width: PdfPageFormat.cm * 1.5,
+                    child: Text(
+                        numberFormat3
+                            .format(reparation.designations![index].tva),
+                        style: smallText,
+                        textAlign: TextAlign.end),
+                  ),
+                  SizedBox(
+                    width: PdfPageFormat.cm * 2.5,
+                    child: Text(
+                        prixFormat
+                            .format(reparation.designations![index].getTTC()),
+                        style: smallTextBold,
+                        textAlign: TextAlign.end),
+                  ),
+                ],
         ),
       ),
     );
@@ -401,64 +403,73 @@ class ReparationPdf {
     );
   }
 
+  Widget getPrixInLetter() {
+    int getCentimes = (double.parse(prixFormat.format(
+                reparation.getPrixTTC() - reparation.getPrixTTC().toInt()).replaceAll('DA', '').replaceAll(',', '.')) *
+            100)
+        .toInt();
+    return Container(
+      height: 0.5 * PdfPageFormat.cm,
+      width: 20 * PdfPageFormat.cm,
+      padding: const EdgeInsets.fromLTRB(2, -7, 2, 2),
+      child: Text(
+          'Le montant total de cet ordre est arreté à ${numToLetters(reparation.getPrixTTC().floor())} dinar${reparation.getPrixTTC().floor() > 1 ? 's' : ''}  ${getCentimes != 0 ? 'et ${numToLetters(getCentimes)} centime${getCentimes > 1 ? 's' : ''}' : ''}'
+              .toUpperCase(),
+          style: smallTextBold),
+    );
+  }
+
   Widget getRemarqueAndSignature() {
     return Container(
-        width: 20 * PdfPageFormat.cm,
-        height: 2 * PdfPageFormat.cm,
-
-        child: Row(
-          children: [
-
-            Container(
-                padding: const EdgeInsets.symmetric(horizontal: 3),
-
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  border: Border.all(),
-                ),
-              width: 9*PdfPageFormat.cm,
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Remarques', style: smallTextBold),
-                    smallSpace,
-                    SizedBox(
-                      height: PdfPageFormat.cm * 1.5,
-                      child: Stack(children: [
-                        Positioned.fill(
-                            child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  dotsSpacer(),
-                                  dotsSpacer(),
-                                  dotsSpacer(),
-                                  dotsSpacer(),
-                                ])),
-                        Positioned.fill(
-                            top: -1.5,
-                            left: 2,
-                            right: 2,
-                            child: Text(reparation.remarque ?? '', style: smallText))
-                      ]),
-                    ),
-                  ])
+      width: 20 * PdfPageFormat.cm,
+      height: 2 * PdfPageFormat.cm,
+      child: Row(children: [
+        Container(
+            padding: const EdgeInsets.symmetric(horizontal: 3),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(),
             ),
-            Spacer(),
-            Container(
-                padding: const EdgeInsets.symmetric(horizontal: 3),
-                width: 9*PdfPageFormat.cm,
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Cachet et signature', style: smallTextBold),
-                    ])
-            ),
-          ]
-        ),
-
+            width: 9 * PdfPageFormat.cm,
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Remarques', style: smallTextBold),
+                  smallSpace,
+                  SizedBox(
+                    height: PdfPageFormat.cm * 1.5,
+                    child: Stack(children: [
+                      Positioned.fill(
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                            dotsSpacer(),
+                            dotsSpacer(),
+                            dotsSpacer(),
+                            dotsSpacer(),
+                          ])),
+                      Positioned.fill(
+                          top: -1.5,
+                          left: 2,
+                          right: 2,
+                          child:
+                              Text(reparation.remarque ?? '', style: smallText))
+                    ]),
+                  ),
+                ])),
+        Spacer(),
+        Container(
+            padding: const EdgeInsets.symmetric(horizontal: 3),
+            width: 9 * PdfPageFormat.cm,
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Cachet et signature', style: smallTextBold),
+                ])),
+      ]),
     );
   }
 
@@ -855,7 +866,7 @@ class ReparationPdf {
         ]);
   }
 
-  Widget brandingAndPaging(int page,int nbrPages) {
+  Widget brandingAndPaging(int page, int nbrPages) {
     return SizedBox(
       height: PdfPageFormat.cm * 1.25,
       width: PdfPageFormat.cm * 21,
@@ -863,22 +874,21 @@ class ReparationPdf {
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            if(nbrPages!=1)
-            Container(
-              width: PdfPageFormat.cm * 2,
-              height: PdfPageFormat.cm * 0.75,
-              alignment: Alignment.center,
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                color: orangeDeep,
-                borderRadius: BorderRadius.circular(5),
+            if (nbrPages != 1)
+              Container(
+                width: PdfPageFormat.cm * 2,
+                height: PdfPageFormat.cm * 0.75,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: orangeDeep,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Text('Page ${page + 1}/$nbrPages', style: smallTextBold),
               ),
-              child: Text('Page ${page+1}/$nbrPages',style: smallTextBold),
-            ),
-            if(nbrPages!=1)
-              Spacer(),
+            if (nbrPages != 1) Spacer(),
             Container(
-              width: PdfPageFormat.cm *4.5,
+              width: PdfPageFormat.cm * 4.5,
               height: PdfPageFormat.cm * 1.25,
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(

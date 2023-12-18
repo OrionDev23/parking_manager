@@ -32,7 +32,7 @@ class VehicleDamagePDF{
 
     return Container(
       width: 20 * PdfPageFormat.cm,
-      height: 6 * PdfPageFormat.cm,
+      height: 5.90 * PdfPageFormat.cm,
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
