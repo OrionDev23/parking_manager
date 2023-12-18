@@ -5,6 +5,7 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/datasources/vehicle/vehicle_webservice.dart';
 import 'package:parc_oto/screens/vehicle/documents/document_form.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import '../../providers/client_database.dart';
 import '../../screens/vehicle/manager/vehicle_form.dart';
 import '../../screens/vehicle/manager/vehicle_tabs.dart';
 import '../../serializables/vehicle.dart';
@@ -124,7 +125,10 @@ class VehiculesDataSource extends ParcOtoDatasource<Vehicle> {
   }
 
 
-
+  @override
+  Future<void> addToActivity(c) async{
+    await ClientDatabase().ajoutActivity(2, c.id,docName: c.matricule);
+  }
 
 
 }

@@ -23,6 +23,7 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
     return '${'supchauf'.tr()} ${c.name} ${c.prenom}';
   }
 
+
   @override
   List<DataCell> getCellsToShow(MapEntry<String, Conducteur> element) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
@@ -140,6 +141,10 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
               icon: const Icon(Icons.more_vert_sharp)),
         )),
     ];
+  }
+  @override
+  Future<void> addToActivity(c) async{
+    await ClientDatabase().ajoutActivity(18, c.id,docName: '${c.name} ${c.prenom}');
   }
 
 

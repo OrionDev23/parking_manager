@@ -81,5 +81,4 @@ Map<String, dynamic> _$EtatVehicleToJson(EtatVehicle instance) =>
       'siegeARD': instance.siegeARD,
       'siegeARG': instance.siegeARG,
       'showOnList': instance.showOnList,
-
     };

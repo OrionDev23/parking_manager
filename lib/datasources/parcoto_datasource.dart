@@ -127,14 +127,18 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource{
   String deleteConfirmationMessage(T c);
 
   void deleteRow(dynamic c) async{
-    await ClientDatabase.database!.deleteDocument(
-        databaseId: databaseId,
-        collectionId: collectionID,
-        documentId: c.id).then((value) {
-      data.remove(MapEntry(c.id, c));
-      refreshDatasource();
-    }).onError((error, stackTrace) {
 
+    await Future.wait([
+      ClientDatabase.database!.deleteDocument(
+          databaseId: databaseId,
+          collectionId: collectionID,
+          documentId: c.id).then((value) {
+        data.remove(MapEntry(c.id, c));
+        refreshDatasource();
+      }),
+      addToActivity(c),
+    ]).onError((error, stackTrace) {
+return [
       f.displayInfoBar(current,builder: (c,s){
        return  f.InfoBar(
             title: const Text('erreur').tr(),
@@ -142,7 +146,9 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource{
         );
       },
         alignment: Alignment.lerp(Alignment.topCenter, Alignment.center, 0.6)!,
-      );
-    });
+      )
+    ];});
   }
+
+  Future<void> addToActivity(T c);
 }

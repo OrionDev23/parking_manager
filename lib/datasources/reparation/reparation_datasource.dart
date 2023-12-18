@@ -10,6 +10,7 @@ import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../providers/client_database.dart';
 import '../../screens/reparation/reparation_tabs.dart';
 import '../../serializables/reparation.dart';
 
@@ -109,6 +110,11 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation>{
         },
       );
     });
+  }
+
+  @override
+  Future<void> addToActivity(c) async{
+    await ClientDatabase().ajoutActivity(12, c.id,docName: c.numero.toString());
   }
   
 

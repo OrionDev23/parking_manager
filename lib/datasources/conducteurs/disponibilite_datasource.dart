@@ -66,5 +66,10 @@ class DisponibiliteDataSource extends ParcOtoDatasource<DisponibiliteChauffeur>{
   void goToChaffeur(String chauf){
 
   }
+
+  @override
+  Future<void> addToActivity(c) async{
+    await ClientDatabase().ajoutActivity(22, c.id,docName: c.chauffeurNom);
+  }
   
 }

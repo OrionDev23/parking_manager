@@ -116,6 +116,11 @@ class ChaufDocumentsDataSource extends ParcOtoDatasource<DocumentChauffeur> {
    return '${'suprdoc'.tr()} ${c.nom} ${c.chauffeurNom}';
   }
 
+  @override
+  Future<void> addToActivity(c) async{
+    await ClientDatabase().ajoutActivity(25, c.id,docName: c.chauffeurNom);
+  }
+
 
 
 }

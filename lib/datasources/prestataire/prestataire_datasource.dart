@@ -8,6 +8,7 @@ import 'package:parc_oto/datasources/prestataire/prestataire_webservice.dart';
 import 'package:parc_oto/serializables/prestataire.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../providers/client_database.dart';
 import '../../screens/prestataire/prestataire_form.dart';
 import '../../screens/prestataire/prestataire_tabs.dart';
 
@@ -98,6 +99,11 @@ class PrestataireDataSource extends ParcOtoDatasource<Prestataire>{
             icon: const Icon(Icons.more_vert_sharp)),
       )),
     ];
+  }
+
+  @override
+  Future<void> addToActivity(c) async{
+    await ClientDatabase().ajoutActivity(15, c.id,docName: c.nom);
   }
 
 }
