@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/models.dart';
 import 'package:dart_appwrite/dart_appwrite.dart' as dap;
 import 'package:dart_appwrite/models.dart' as dam;
 import 'package:easy_localization/easy_localization.dart';
