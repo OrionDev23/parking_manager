@@ -1,7 +1,6 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:icons_plus/icons_plus.dart';
 
 import 'chauf_document_form.dart';
 import 'gestion_chauf_documents.dart';
@@ -23,7 +22,7 @@ class CDocumentTabsState extends State<CDocumentTabs> {
       key: UniqueKey(),
       text: Text('nouvdocument'.tr()),
       semanticLabel: 'nouvdocument'.tr(),
-      icon: const Icon(Bootstrap.car_front),
+      icon: const Icon(FluentIcons.new_folder),
       body: const CDocumentForm(),
       onClosed: () {
         tabs.remove(tab);
@@ -41,7 +40,7 @@ class CDocumentTabsState extends State<CDocumentTabs> {
       tabs.add(Tab(
         text: Text('gestiondocument'.tr()),
         closeIcon: null,
-        icon: const Icon(IonIcons.settings),
+        icon: const Icon(FluentIcons.settings),
         body: const ChauffeurDocuments(),
         onClosed: null,
       ));

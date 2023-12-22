@@ -1,13 +1,14 @@
 import 'dart:io';
+import 'package:flutter_web_plugins/url_strategy.dart';
 
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:parc_oto/router.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'providers/client_database.dart';
-import 'screens/sidemenu/sidemenu.dart';
 import 'theme.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -19,9 +20,11 @@ import 'package:window_manager/window_manager.dart';
 const appTitle="ParcOto";
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  usePathUrlStrategy();
   if(!kIsWeb && (Platform.isMacOS || Platform.isLinux || Platform.isWindows)) {
     await initWindow();
   }
+
   ClientDatabase();
   launchApp();
 }
@@ -90,8 +93,8 @@ class _MyAppState extends State<MyApp> {
           create: (_) => AppTheme(widget.savedSettings),
           builder: (context,_){
             final appTheme = context.watch<AppTheme>();
-            return FluentApp(
-              navigatorKey: navigatorKey,
+            return FluentApp.router(
+              key: navigatorKey,
               title: appTitle,
               themeMode: appTheme.mode,
               debugShowCheckedModeBanner: false,
@@ -136,12 +139,7 @@ class _MyAppState extends State<MyApp> {
                   ),
                 );
               },
-              initialRoute: '/',
-              routes: {
-                '/': (context) => PanesList(
-                  prefs: widget.savedSettings,
-                )
-              },
+              routerConfig: Routes(widget.savedSettings).router,
 
             );
       },);

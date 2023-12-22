@@ -2,7 +2,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
-import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/datasources/prestataire/prestataire_webservice.dart';
 import 'package:parc_oto/serializables/prestataire.dart';
@@ -71,7 +70,7 @@ class PrestataireDataSource extends ParcOtoDatasource<Prestataire>{
                             key: UniqueKey(),
                             text: Text('${"mod".tr()} ${'prestataire'.tr().toLowerCase()} ${element.value.nom}'),
                             semanticLabel: '${'mod'.tr()} ${element.value.nom} ',
-                            icon: const Icon(Bootstrap.car_front),
+                            icon: const Icon(f.FluentIcons.edit),
                             body: PrestataireForm(prest: element.value,),
                             onClosed: () {
                               PrestataireTabsState.tabs.remove(tab);

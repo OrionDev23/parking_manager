@@ -33,7 +33,7 @@ MemoryImage? entrepriseLogo;
 MemoryImage? poLogo;
 Font? baseFont;
 Font? boldFont;
-ByteData? icons;
+Font? icons;
 class PDFTheming{
 
   PDFTheming(){
@@ -86,7 +86,7 @@ class PDFTheming{
     boldFont??=await PdfGoogleFonts.rubikSemiBold();
   }
   Future<void> initIcons() async{
-    icons=await rootBundle.load('assets/images/materialicon.ttf');
+    icons=await PdfGoogleFonts.materialIcons();
   }
   Future<void> initFontsAndLogos() async{
     await Future.wait(

@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicle_form.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicles_table.dart';
@@ -128,7 +127,7 @@ class _VehicleManagementState extends State<VehicleManagement> with AutomaticKee
       key: UniqueKey(),
       text: Text('nouvvehicule'.tr()),
       semanticLabel: 'nouvvehicule'.tr(),
-      icon: const Icon(Bootstrap.car_front),
+      icon: const Icon(FluentIcons.new_folder),
       body: const VehicleForm(),
       onClosed: () {
         VehicleTabsState.tabs.remove(tab);

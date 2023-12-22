@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_table.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
@@ -78,7 +77,7 @@ class ChaufDocumentsDataSource extends ParcOtoDatasource<DocumentChauffeur> {
                                 '${"mod".tr()} ${'document'.tr().toLowerCase()} ${element.value.nom}'),
                             semanticLabel:
                             '${'mod'.tr()} ${element.value.nom}',
-                            icon: const Icon(Bootstrap.car_front),
+                            icon: const Icon(f.FluentIcons.edit),
                             body: CDocumentForm(
                               dc: element.value,
                             ),

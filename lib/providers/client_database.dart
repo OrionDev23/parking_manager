@@ -22,13 +22,16 @@ const buckedId = "images";
 const reparationId = "reparation";
 const activityId = "activity";
 const prestataireId = "prestataire";
-const endpoint = "https://cloud.appwrite.io/v1";
+const endpoint = "https://appwrite.parcoto.com/v1";
 const project = "6531ace99382e496a904";
+const readKey="3413485cc93657a874bc16b98101b0b60752e29db0245f189c07c0f5a8924c6fd6915204bfdf3bed861a7f5255e8f32eab1de23ec5af41a083461aef958aa8cb821c00ceea01ddde9416dcbbf2c2d9557151c2cda5ac548a0492f112880cc4cdb51f8cfbe69f96883b3759bedf457db342ab581aecb8e9775c564c8f96e84e86";
 
 class ClientDatabase {
   static Client? client;
   static Account? account;
   static User? user;
+  
+  static List<Team> myTeams=List.empty(growable: true);
   static Storage? storage;
   static final DateTime ref = DateTime(2023, 11, 01, 12, 13, 15);
 
@@ -39,6 +42,7 @@ class ClientDatabase {
   ClientDatabase() {
     client ??= Client()
       ..setEndpoint(endpoint)
+      ..setSelfSigned(status: true)
       ..setProject(project);
     account ??= Account(client!);
     database ??= Databases(client!);
@@ -86,6 +90,15 @@ class ClientDatabase {
         user = null;
       });
     }
+    if(user!=null){
+      await Teams(client!).list().then((t) {
+        myTeams=t.teams;
+        for (var element in myTeams) {
+          print(element.$id);
+        }
+      });
+    }
+
   }
 
   Future<void> getEntreprise() async {

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/chauffeur/document/chauf_document_tabs.dart';
 import 'package:parc_oto/screens/login.dart';
@@ -320,12 +319,12 @@ class PanesListState extends State<PanesList> with WindowListener {
             body: const CDocumentTabs(),
           ),
           PaneItem(
-            icon: const Icon(LineAwesome.check_double_solid),
+            icon: const Icon(FluentIcons.check_list_check),
             title: const Text('disponibilite').tr(),
             body: const DisponbiliteTabs(),
           ),
           PaneItem(
-            icon: const Icon(LineAwesome.archive_solid),
+            icon: const Icon(FluentIcons.search_bookmark),
             title: const Text('archive').tr(),
             body: const ChauffeurTabs(archive: true,),
           ),

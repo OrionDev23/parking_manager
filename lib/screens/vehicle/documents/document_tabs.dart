@@ -1,7 +1,6 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/screens/vehicle/documents/vehicule_documents.dart';
 
 import 'document_form.dart';
@@ -23,7 +22,7 @@ class DocumentTabsState extends State<DocumentTabs> {
       key: UniqueKey(),
       text: Text('nouvdocument'.tr()),
       semanticLabel: 'nouvdocument'.tr(),
-      icon: const Icon(Bootstrap.car_front),
+      icon: const Icon(FluentIcons.new_folder),
       body: const DocumentForm(),
       onClosed: () {
         tabs.remove(tab);
@@ -41,7 +40,7 @@ class DocumentTabsState extends State<DocumentTabs> {
       tabs.add(Tab(
         text: Text('gestiondocument'.tr()),
         closeIcon: null,
-        icon: const Icon(IonIcons.settings),
+        icon: const Icon(FluentIcons.settings),
         body: const VehiculeDocuments(),
         onClosed: null,
       ));

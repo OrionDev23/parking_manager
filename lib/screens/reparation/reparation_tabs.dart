@@ -1,7 +1,6 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/screens/reparation/reparation_form.dart';
 import 'package:parc_oto/screens/reparation/reparation_gestion.dart';
 
@@ -27,7 +26,7 @@ class ReparationTabsState extends State<ReparationTabs> {
       key: UniqueKey(),
       text: Text('nouvrepar'.tr()),
       semanticLabel: 'nouvrepar'.tr(),
-      icon: const Icon(Bootstrap.shop),
+      icon: const Icon(FluentIcons.shop),
       body: ReparationForm(key: UniqueKey(),),
       onClosed: () {
         if(widget.archive){
@@ -53,7 +52,7 @@ class ReparationTabsState extends State<ReparationTabs> {
         tabs2.add(Tab(
           text: Text('reparations'.tr()),
           closeIcon: null,
-          icon: const Icon(IonIcons.settings),
+          icon: const Icon(FluentIcons.settings),
           body:  ReparationGestion(archive: widget.archive,),
           onClosed: null,
         ));
@@ -65,7 +64,7 @@ class ReparationTabsState extends State<ReparationTabs> {
         tabs.add(Tab(
           text: Text('reparations'.tr()),
           closeIcon: null,
-          icon: const Icon(IonIcons.settings),
+          icon: const Icon(FluentIcons.settings),
           body:  ReparationGestion(archive: widget.archive,),
           onClosed: null,
         ));

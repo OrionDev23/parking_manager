@@ -41,8 +41,14 @@ class _ProfilFormState extends State<ProfilForm> {
     validEmail = FormValidators.isEmail(email.text);
     name = TextEditingController(text: widget.user?.name);
     countrySelected = Countries.getCountryCodeFromPhone(widget.user?.tel);
-    phone = TextEditingController(
-        text: widget.user?.tel?.substring(4, widget.user?.tel?.length));
+    if(widget.user!=null && widget.user!.tel!=null && widget.user!.tel!.length>3){
+      phone = TextEditingController(
+          text: widget.user?.tel?.substring(4, widget.user?.tel?.length));
+    }
+    else{
+      phone=TextEditingController();
+    }
+
   }
 
   bool somethingChanged = false;

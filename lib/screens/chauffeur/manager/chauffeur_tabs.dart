@@ -1,7 +1,6 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
 
 import 'chauffeur_gestion.dart';
@@ -27,7 +26,7 @@ class ChauffeurTabsState extends State<ChauffeurTabs> {
       key: UniqueKey(),
       text: Text('nouvchauf'.tr()),
       semanticLabel: 'nouvchauf'.tr(),
-      icon: const Icon(Bootstrap.car_front),
+      icon: const Icon(FluentIcons.new_folder),
       body: const ChauffeurForm(),
       onClosed: () {
         if(widget.archive){
@@ -53,7 +52,7 @@ class ChauffeurTabsState extends State<ChauffeurTabs> {
         tabs2.add(Tab(
           text: Text('gchauffeurs'.tr()),
           closeIcon: null,
-          icon: const Icon(IonIcons.settings),
+          icon: const Icon(FluentIcons.settings),
           body:  ChauffeurGestion(archive: widget.archive,),
           onClosed: null,
         ));
@@ -65,7 +64,7 @@ class ChauffeurTabsState extends State<ChauffeurTabs> {
         tabs.add(Tab(
           text: Text('gchauffeurs'.tr()),
           closeIcon: null,
-          icon: const Icon(IonIcons.settings),
+          icon: const Icon(FluentIcons.settings),
           body:  ChauffeurGestion(archive: widget.archive,),
           onClosed: null,
         ));

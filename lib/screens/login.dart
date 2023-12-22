@@ -1,6 +1,9 @@
 import 'dart:io';
 
 import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/models.dart';
+import 'package:dart_appwrite/dart_appwrite.dart' as dap;
+import 'package:dart_appwrite/models.dart' as dam;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
@@ -8,6 +11,7 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:parc_oto/utilities/form_validators.dart';
+import 'package:parc_oto/widgets/on_tap_scale.dart';
 import 'package:parc_oto/widgets/page_header.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -161,12 +165,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Button(
-                            style:ButtonStyle(
-                              shape: ButtonState.all(null),
-                                backgroundColor: ButtonState.all<Color>(Colors.transparent)
-                            ),
-                            onPressed: forgotPassword,
+                        OnTapScaleAndFade(
+
+                            onTap: forgotPassword,
                             child: Text('forgot',style: TextStyle(color: Colors.blue),).tr()),
                       ],
                     ),
@@ -222,16 +223,26 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 
-  void forgotPassword(){
-    if(email.text.isEmpty){
+  void forgotPassword() async{
+    if(email.text.isEmpty) {
       setState(() {
         signedIn=false;
         error="emailempty".tr();
       });
     }
     else if(validEmail){
-      ClientDatabase.account!.createRecovery(email: email.text,
-          url:'https://app.parcoto.com/recoverpassword');
+      dap.Client client=dap.Client()
+      ..setEndpoint(endpoint)
+      ..setKey(readKey)
+        ..setSelfSigned(status: true)
+      ..setProject(project);
+      await dap.Account(client).createRecovery(email: email.text,
+          url:'https://app.parcoto.com/recoverpassword?projectid=$project&endpoint=$endpoint').onError((AppwriteException error, stackTrace) {
+            print(error.message);
+            print(error.response);
+            print(stackTrace);
+            return dam.Token($id: '', $createdAt: '', userId: '', secret: '', expire: '');
+      });
       setState(() {
         error="";
       });

@@ -52,7 +52,11 @@
   "prevoir": "Preview PDF",
   "supreparation": "Delete the order",
   "activity": "Activity",
+  "confirmation": "Confirmation",
+  "donepassword": "Success ! You can now login",
+  "linknotvalid": "This link is not valid",
 
+  "passwordmatch": "The password and its confirmation must be identical",
 
   "documents": "Documents",
   "reparations": "Repairs",

@@ -31,7 +31,7 @@ class ReparationPdf {
       theme: ThemeData.withFont(
         base: baseFont,
         bold: boldFont,
-        icons: Font.ttf(icons!),
+        icons: icons!,
       ),
       title: 'ordre ${reparation.numero}',
       author:

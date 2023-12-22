@@ -9,7 +9,9 @@ import "../theme.dart";
 
 class NoDataWidget extends StatelessWidget {
   final ParcOtoDatasource? datasource;
-  const NoDataWidget({super.key, this.datasource});
+  final IconData icon;
+  final String text;
+  const NoDataWidget({super.key, this.datasource,this.icon=FluentIcons.database_block,this.text='lvide'});
 
   @override
   Widget build(BuildContext context) {
@@ -23,13 +25,13 @@ class NoDataWidget extends StatelessWidget {
           bigSpace,
           bigSpace,
           Icon(
-            FluentIcons.database_block,
+            icon,
             color: appTheme.color.lightest.withOpacity(0.2),
             size: 24.sp,
           ),
           bigSpace,
           bigSpace,
-          Text('lvide',style: placeStyle.copyWith(fontStyle: FontStyle.italic,fontWeight: FontWeight.bold),).tr(),
+          Text(text.tr(),style: placeStyle.copyWith(fontStyle: FontStyle.italic,fontWeight: FontWeight.bold),).tr(),
           if(datasource!=null)
             bigSpace,
           if(datasource!=null)

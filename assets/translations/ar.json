@@ -25,6 +25,10 @@
   "ajoutertaches": "(إضافة المهام للقيام بها)",
   "repare": "إصلاح ؟",
   "activity": "الحدت",
+  "passwordmatch": "يجب أن تكون كلمة المرور وتأكيدها متطابقين",
+  "confirmation": "التأكيد",
+  "donepassword": "نجاح ! يمكنك الآن تسجيل الدخول",
+  "linknotvalid": "الرابط غير صالح",
 
   "nchassi": "رقم الطراز",
   "nmoteur": "رقم المحرك",

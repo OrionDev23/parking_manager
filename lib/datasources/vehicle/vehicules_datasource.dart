@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/datasources/vehicle/vehicle_webservice.dart';
 import 'package:parc_oto/screens/vehicle/documents/document_form.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -53,7 +52,7 @@ class VehiculesDataSource extends ParcOtoDatasource<Vehicle> {
                             key: UniqueKey(),
                             text: Text('${"mod".tr()} ${'vehicule'.tr().toLowerCase()} ${element.value.matricule}'),
                             semanticLabel: '${'mod'.tr()} ${element.value.matricule}',
-                            icon: const Icon(Bootstrap.car_front),
+                            icon: const Icon(f.FluentIcons.edit),
                             body: VehicleForm(vehicle: element.value,),
                             onClosed: () {
                               VehicleTabsState.tabs.remove(tab);

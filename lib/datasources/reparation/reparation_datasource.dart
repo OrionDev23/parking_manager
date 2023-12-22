@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
-import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/datasources/reparation/reparation_webservice.dart';
 import 'package:parc_oto/pdf_generation/pdf_theming.dart';
@@ -62,7 +61,7 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation>{
                             key: UniqueKey(),
                             text: Text('${"mod".tr()} ${'reparation'.tr().toLowerCase()} ${element.value.numero}'),
                             semanticLabel: '${'mod'.tr()} ${element.value.numero}',
-                            icon: const Icon(Bootstrap.car_front),
+                            icon: const Icon(f.FluentIcons.edit),
                             body: ReparationForm(reparation: element.value,key: UniqueKey(),),
                             onClosed: () {
                               ReparationTabsState.tabs.remove(tab);

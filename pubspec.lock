@@ -273,6 +273,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  dart_appwrite:
+    dependency: "direct main"
+    description:
+      name: dart_appwrite
+      sha256: da1b7752e7402e76a95824d1292dc337958994d228aca315d6d4562e8fe747f5
+      url: "https://pub.dev"
+    source: hosted
+    version: "10.1.0"
   dart_style:
     dependency: transitive
     description:
@@ -443,14 +451,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.0"
-  flutter_svg:
-    dependency: transitive
-    description:
-      name: flutter_svg
-      sha256: d39e7f95621fc84376bc0f7d504f05c3a41488c562f4a8ad410569127507402c
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.9"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -509,6 +509,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
+  go_router:
+    dependency: "direct main"
+    description:
+      name: go_router
+      sha256: ca7e4a2249f96773152f1853fa25933ac752495cdd7fdf5dafb9691bd05830fd
+      url: "https://pub.dev"
+    source: hosted
+    version: "13.0.0"
   graphs:
     dependency: transitive
     description:
@@ -549,14 +557,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
-  icons_plus:
-    dependency: "direct main"
-    description:
-      name: icons_plus
-      sha256: "8e2f601b8605d45dd55b106a0da084a1809125077a49574ca22e8bcd5b6e86f0"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.0"
   image:
     dependency: transitive
     description:
@@ -1070,26 +1070,26 @@ packages:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: a2427697bfad5b611db78ea4c4daef82d3350b83c729a8dc37959662a31547f9
+      sha256: "69c827931957d5b121ee9f0b9b0b8d7d0d1ac537b61bcdd5c3fbffc044bbe86e"
       url: "https://pub.dev"
     source: hosted
-    version: "23.2.7"
+    version: "24.1.41"
   syncfusion_flutter_gauges:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_gauges
-      sha256: a559712b476b05ad2506925b5031dbba3c9e7ce83f482191a8185a3de054e7e6
+      sha256: "78515dcfbed952c36ab9ca4a1e6c99737beb7c6cf2312efe8beca2bd314a3955"
       url: "https://pub.dev"
     source: hosted
-    version: "23.2.7"
+    version: "24.1.41"
   synchronized:
     dependency: transitive
     description:
       name: synchronized
-      sha256: "5fcbd27688af6082f5abd611af56ee575342c30e87541d0245f7ff99faa02c60"
+      sha256: "539ef412b170d65ecdafd780f924e5be3f60032a1128df156adad6c5b373d558"
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.0"
+    version: "3.1.0+1"
   system_theme:
     dependency: "direct main"
     description:
@@ -1226,30 +1226,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.2.2"
-  vector_graphics:
-    dependency: transitive
-    description:
-      name: vector_graphics
-      sha256: "0f0c746dd2d6254a0057218ff980fc7f5670fd0fcf5e4db38a490d31eed4ad43"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.9+1"
-  vector_graphics_codec:
-    dependency: transitive
-    description:
-      name: vector_graphics_codec
-      sha256: "0edf6d630d1bfd5589114138ed8fada3234deacc37966bec033d3047c29248b7"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.9+1"
-  vector_graphics_compiler:
-    dependency: transitive
-    description:
-      name: vector_graphics_compiler
-      sha256: d24333727332d9bd20990f1483af4e09abdb9b1fc7c3db940b56ab5c42790c26
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.9+1"
   vector_math:
     dependency: transitive
     description:

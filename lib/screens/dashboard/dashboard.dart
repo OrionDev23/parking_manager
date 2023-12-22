@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
@@ -55,7 +54,7 @@ class HomePage extends StatelessWidget {
                           key: UniqueKey(),
                           text: Text('nouvvehicule'.tr()),
                           semanticLabel: 'nouvvehicule'.tr(),
-                          icon: const Icon(Bootstrap.car_front),
+                          icon: const Icon(FluentIcons.new_folder),
                           body: const VehicleForm(),
                           onClosed: () {
                             VehicleTabsState.tabs.remove(tab);
@@ -92,7 +91,7 @@ class HomePage extends StatelessWidget {
                           key: UniqueKey(),
                           text: Text('nouvchauf'.tr()),
                           semanticLabel: 'nouvchauf'.tr(),
-                          icon: const Icon(Bootstrap.person_add),
+                          icon: const Icon(FluentIcons.people_add),
                           body: const ChauffeurForm(),
                           onClosed: () {
                             ChauffeurTabsState.tabs.remove(tab);

@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/datasources/conducteurs/conducteur_webservice.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
@@ -70,7 +69,7 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
                               key: UniqueKey(),
                               text: Text('${"mod".tr()} ${'chauffeur'.tr().toLowerCase()} ${element.value.name}'),
                               semanticLabel: '${'mod'.tr()} ${element.value.name} ${element.value.prenom}',
-                              icon: const Icon(Bootstrap.car_front),
+                              icon: const Icon(f.FluentIcons.edit),
                               body: ChauffeurForm(chauf: element.value,),
                               onClosed: () {
                                 ChauffeurTabsState.tabs.remove(tab);

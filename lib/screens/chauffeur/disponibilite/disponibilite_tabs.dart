@@ -1,7 +1,6 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/screens/chauffeur/disponibilite/disponibilite_gestion.dart';
 
 class DisponbiliteTabs extends StatefulWidget {
@@ -24,7 +23,7 @@ class DisponbiliteTabsState extends State<DisponbiliteTabs> {
       tabs.add(Tab(
         text: Text('disponibilite'.tr()),
         closeIcon: null,
-        icon: const Icon(IonIcons.settings),
+        icon: const Icon(FluentIcons.settings),
         body: const DisponibiliteGestion(),
         onClosed: null,
       ));

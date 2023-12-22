@@ -302,6 +302,9 @@ class Countries {
 
 
   static String getCountryCodeFromPhone(String? phone) {
+    if(phone !=null && phone.length<4){
+      return '+213';
+    }
     String? code=phone?.substring(0,4)??'+213';
     for(int i=0;i<allCountries.length;i++){
       if(code==allCountries[i]['dial_code']){

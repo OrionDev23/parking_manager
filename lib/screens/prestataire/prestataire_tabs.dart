@@ -1,7 +1,6 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:parc_oto/screens/prestataire/prestataire_form.dart';
 import 'package:parc_oto/screens/prestataire/prestataire_gestion.dart';
 
@@ -27,7 +26,7 @@ class PrestataireTabsState extends State<PrestataireTabs> {
       key: UniqueKey(),
       text: Text('nouvprest'.tr()),
       semanticLabel: 'nouvprest'.tr(),
-        icon: const Icon(Bootstrap.shop),
+        icon: const Icon(FluentIcons.shop),
       body: const PrestataireForm(),
       onClosed: () {
         if(widget.archive){
@@ -53,7 +52,7 @@ class PrestataireTabsState extends State<PrestataireTabs> {
         tabs2.add(Tab(
           text: Text('prestataires'.tr()),
           closeIcon: null,
-          icon: const Icon(IonIcons.settings),
+          icon: const Icon(FluentIcons.settings),
           body:  PrestataireGestion(archive: widget.archive,),
           onClosed: null,
         ));
@@ -65,7 +64,7 @@ class PrestataireTabsState extends State<PrestataireTabs> {
         tabs.add(Tab(
           text: Text('prestataires'.tr()),
           closeIcon: null,
-          icon: const Icon(IonIcons.settings),
+          icon: const Icon(FluentIcons.settings),
           body:  PrestataireGestion(archive: widget.archive,),
           onClosed: null,
         ));
