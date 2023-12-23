@@ -2,28 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/screens/chauffeur/document/chauf_document_tabs.dart';
-import 'package:parc_oto/screens/login.dart';
-import 'package:parc_oto/screens/logout.dart';
+import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
-import 'package:parc_oto/screens/vehicle/brand/brand_list.dart';
-import 'package:parc_oto/screens/vehicle/documents/document_tabs.dart';
-import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
 import 'package:parc_oto/widgets/on_tap_scale.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import '../chauffeur/manager/chauffeur_tabs.dart';
-import '../chauffeur/disponibilite/disponibilite_tabs.dart';
-import '../dashboard/dashboard.dart';
 import '../dashboard/notif_list.dart';
-import '../entreprise.dart';
-import '../logs/log_management.dart';
-import '../prestataire/prestataire_tabs.dart';
-import '../reparation/reparation_tabs.dart';
-import '../settings.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 import '../../theme.dart';
 import 'package:flutter/material.dart' as m;
@@ -32,10 +18,10 @@ const defaultUserPic =
     "https://upload.wikimedia.org/wikipedia/commons/7/72/Default-welcomer.png";
 
 class PanesList extends StatefulWidget {
-  final SharedPreferences prefs;
+  final PaneItemsAndFooters paneList;
   const PanesList({
     super.key,
-    required this.prefs,
+    required this.paneList,
   });
 
   @override
@@ -50,32 +36,12 @@ class PanesListState extends State<PanesList> with WindowListener {
 
   static set index(ValueNotifier<int> v) {
     previousValue = _index.value;
-    _index=v;
+    _index = v;
   }
 
-  final viewKey = GlobalKey(debugLabel: 'Navigation View Key');
   static ValueNotifier<bool> signedIn = ValueNotifier(false);
   static bool listening = false;
-
-  late PaneItem acceuil;
-  PaneItemSeparator separator = PaneItemSeparator();
-  late PaneItem entreprise;
-
-  late PaneItem login;
-  late PaneItem logout;
-  late PaneItem parametres;
-
-  late PaneItem vehicles;
-
-  late PaneItem chauffeurs;
-
-  late PaneItem evenements;
-
-  late PaneItem reparations;
   void listenToSigningChanges() {}
-
-  static List<NavigationPaneItem> originalItems = List.empty(growable: true);
-  late List<NavigationPaneItem> footerItems;
 
   bool loading = false;
   @override
@@ -98,8 +64,7 @@ class PanesListState extends State<PanesList> with WindowListener {
       setState(() {});
     }
     await ClientDatabase().getUser();
-    updateOriginalItems();
-    listenToSigningChanges();
+    widget.paneList.initPanes();
     loading = false;
     if (mounted) {
       setState(() {});
@@ -130,12 +95,16 @@ class PanesListState extends State<PanesList> with WindowListener {
     return ValueListenableBuilder(
         valueListenable: signedIn,
         builder: (BuildContext context, bool value, Widget? child) {
-          updateOriginalItems();
+          widget.paneList.initPanes();
           return ValueListenableBuilder(
               valueListenable: index,
               builder: (BuildContext context, int value, Widget? child) {
                 return NavigationView(
-                  key: viewKey,
+                  key: UniqueKey(),
+                  transitionBuilder: (w, d) => DrillInPageTransition(
+                    animation: d,
+                    child: w,
+                  ),
                   appBar: NavigationAppBar(
                     automaticallyImplyLeading: false,
                     title: () {
@@ -194,18 +163,12 @@ class PanesListState extends State<PanesList> with WindowListener {
                                   const SizedBox(width: 10),
                                 if (!loading && signedIn.value)
                                   const ProfilNameTopBar(),
-                                const SizedBox(
-                                  width: 150,
-                                ),
+                                smallSpace,
+                                const WindowButtons(),
                               ],
                             )),
                       );
                     }(),
-                    actions: const Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          WindowButtons(),
-                        ]),
                   ),
                   pane: NavigationPane(
                     selected: value,
@@ -217,8 +180,8 @@ class PanesListState extends State<PanesList> with WindowListener {
                       openMaxWidth: pwidth,
                     ),
                     displayMode: appTheme.displayMode,
-                    items: originalItems,
-                    footerItems: footerItems,
+                    items: widget.paneList.originalItems,
+                    footerItems: widget.paneList.footerItems,
                   ),
                 );
               });
@@ -255,136 +218,6 @@ class PanesListState extends State<PanesList> with WindowListener {
         );
       }
     });
-  }
-
-  void updateOriginalItems() {
-    acceuil = PaneItem(
-        icon: const Icon(FluentIcons.home),
-        body: const HomePage(),
-        title: const Text('home').tr());
-    vehicles = PaneItemExpander(
-        icon: const Icon(FluentIcons.car),
-        title: const Text('vehicules').tr(),
-        items: [
-          PaneItem(
-              icon: const Icon(FluentIcons.list),
-              title: const Text('gestionvehicles').tr(),
-              body: const VehicleTabs()),
-          PaneItem(
-            icon: const Icon(FluentIcons.verified_brand),
-            title: const Text('brands').tr(),
-            body: const BrandList(),
-          ),
-          PaneItem(
-            icon: const Icon(FluentIcons.health),
-            title: const Text('vstates').tr(),
-            body: const Placeholder(),
-          ),
-          PaneItem(
-            icon: const Icon(FluentIcons.document_set),
-            title: const Text('documents').tr(),
-            body: const DocumentTabs(),
-          ),
-        ],
-        body: const Text(''));
-    reparations = PaneItemExpander(
-        icon: const Icon(FluentIcons.repair),
-        title: const Text('reparations').tr(),
-        items: [
-          PaneItem(
-            icon: const Icon(FluentIcons.list),
-            title: const Text('greparations').tr(),
-            body: const ReparationTabs(),
-          ),
-          PaneItem(
-            icon: const Icon(FluentIcons.service_activity),
-            title: const Text('prestataires').tr(),
-            body: const PrestataireTabs(),
-          ),
-        ],
-        body: const SizedBox());
-    chauffeurs = PaneItemExpander(
-        icon: const Icon(FluentIcons.people),
-        title: const Text("chauffeurs").tr(),
-        body: const Placeholder(),
-        items: [
-          PaneItem(
-            icon: const Icon(FluentIcons.list),
-            body: const ChauffeurTabs(),
-            title: const Text('gchauffeurs').tr(),
-          ),
-          PaneItem(
-            icon: const Icon(FluentIcons.document_set),
-            title: const Text('documents').tr(),
-            body: const CDocumentTabs(),
-          ),
-          PaneItem(
-            icon: const Icon(FluentIcons.check_list_check),
-            title: const Text('disponibilite').tr(),
-            body: const DisponbiliteTabs(),
-          ),
-          PaneItem(
-            icon: const Icon(FluentIcons.search_bookmark),
-            title: const Text('archive').tr(),
-            body: const ChauffeurTabs(archive: true,),
-          ),
-        ]);
-    evenements = PaneItemExpander(
-        items: [
-          PaneItem(
-              icon: const Icon(FluentIcons.edit),
-              title: const Text("gestionevent").tr(),
-              body: const LogActivityManagement()),
-          PaneItem(
-              icon: const Icon(FluentIcons.reservation_orders),
-              title: const Text('planifier').tr(),
-              body: const Placeholder()),
-          PaneItem(
-              icon: const Icon(FluentIcons.parking_solid),
-              title: const Text('parking').tr(),
-              body: const Placeholder()),
-        ],
-        icon: const Icon(FluentIcons.event),
-        title: const Text('journal').tr(),
-        body: const Placeholder());
-    login = PaneItem(
-        icon: const Icon(FluentIcons.signin),
-        title: const Text('seconnecter').tr(),
-        body: const LoginScreen());
-    logout = PaneItem(
-        icon: const Icon(FluentIcons.sign_out),
-        title: const Text('decon').tr(),
-        body: const LogoutScreen());
-    parametres = PaneItem(
-      icon: const Icon(FluentIcons.settings),
-      title: const Text('parametres').tr(),
-      body: Settings(widget.prefs),
-    );
-    entreprise=PaneItem(
-      icon: const Icon(FluentIcons.build_definition),
-      title: const Text('monentreprise').tr(),
-      body: const MyEntreprise(),
-    );
-    if (signedIn.value) {
-      originalItems = [
-        acceuil,
-        vehicles,
-        reparations,
-        chauffeurs,
-        evenements,
-      ];
-    } else {
-      originalItems = [
-        login,
-      ];
-    }
-
-    footerItems = [
-      PaneItemSeparator(),
-      entreprise,
-      if (signedIn.value) logout,
-      parametres,
-    ];
   }
 }
 

@@ -1,8 +1,7 @@
 import 'dart:io';
 
 import 'package:appwrite/appwrite.dart';
-import 'package:dart_appwrite/dart_appwrite.dart' as dap;
-import 'package:dart_appwrite/models.dart' as dam;
+import 'package:appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
@@ -48,9 +47,12 @@ class _LoginScreenState extends State<LoginScreen> {
     if(ClientDatabase.user!=null){
       PanesListState.signedIn.value=true;
     }
-    setState(() {
-      checking=false;
-    });
+    checking=false;
+    if(mounted){
+      setState(() {
+      });
+    }
+
   }
 
   void adjustSize(){
@@ -196,6 +198,9 @@ class _LoginScreenState extends State<LoginScreen> {
   String error="";
   void signIn() async{
     if(validEmail && password.text.isNotEmpty){
+      setState(() {
+        checking=true;
+      });
       await ClientDatabase.account!.createEmailSession(
           email: email.text,
           password: password.text).then((value) async{
@@ -208,6 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         error=e.type!.tr();
         setState(() {
+          checking=false;
           signedIn=false;
         });
       });
@@ -216,6 +222,7 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           error="emptypassword".tr();
           signedIn=false;
+          checking=false;
         });
     }
 
@@ -230,17 +237,23 @@ class _LoginScreenState extends State<LoginScreen> {
       });
     }
     else if(validEmail){
-      dap.Client client=dap.Client()
+      /*dap.Client client=dap.Client()
       ..setEndpoint(endpoint)
-      ..setKey(readKey)
-        ..setSelfSigned(status: true)
-      ..setProject(project);
-      await dap.Account(client).createRecovery(email: email.text,
-          url:'https://app.parcoto.com/recoverpassword?projectid=$project&endpoint=$endpoint').onError((AppwriteException error, stackTrace) {
-            print(error.message);
-            print(error.response);
-            print(stackTrace);
-            return dam.Token($id: '', $createdAt: '', userId: '', secret: '', expire: '');
+      ..setKey(secretKey)
+      ..setProject(project);*/
+      await ClientDatabase.account!.createRecovery(email: email.text,
+          url:'https://app.parcoto.com/recoverpassword?projectid=$project&endpoint=$endpoint').then((e){
+            return e;
+      }).onError((AppwriteException error, stackTrace) {
+            if (kDebugMode) {
+              print('message: ${error.message}');
+              print('code: ${error.code}');
+              print('response: ${error.response}');
+              print('type: ${error.type}');
+              print('stacktrace: $stackTrace');
+            }
+
+            return Token($id: '', $createdAt: '', userId: '', secret: '', expire: '');
       });
       setState(() {
         error="";

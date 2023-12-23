@@ -1,6 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:parc_oto/serializables/activity.dart';
 import 'package:parc_oto/serializables/vehicle.dart';
 
@@ -24,7 +24,7 @@ const activityId = "activity";
 const prestataireId = "prestataire";
 const endpoint = "https://appwrite.parcoto.com/v1";
 const project = "6531ace99382e496a904";
-const readKey="3413485cc93657a874bc16b98101b0b60752e29db0245f189c07c0f5a8924c6fd6915204bfdf3bed861a7f5255e8f32eab1de23ec5af41a083461aef958aa8cb821c00ceea01ddde9416dcbbf2c2d9557151c2cda5ac548a0492f112880cc4cdb51f8cfbe69f96883b3759bedf457db342ab581aecb8e9775c564c8f96e84e86";
+const secretKey="50715faccd768576e726c7f51394b1d092b4d492cb307a0b7b63a8ba3ff5c4c94b57560dff8b85133d355bb760cf3276db26c8cee3351e35cb33fec7ea5efc7d023a9a2ca4910fae20d112ee4898c292ec705f0e2a6eb8427675e374123a5cd51ef3e5ebf7836cd001c4829cbef2caf4d3dc35cf51958f88c88d14252276e494";
 
 class ClientDatabase {
   static Client? client;
@@ -50,11 +50,28 @@ class ClientDatabase {
     getEntreprise();
   }
 
+  bool isManager(){
+    for(var element in myTeams){
+      if(element.name.toLowerCase()=='managers'){
+        return true;
+      }
+    }
+    return false;
+  }
+  bool isAdmin(){
+    for(var element in myTeams){
+      if(element.name.toLowerCase()=='admins'){
+        return true;
+      }
+    }
+    return false;
+  }
+
   Future<void> getUser() async {
     if (user == null) {
       await account?.get().then((value) async {
         user = value;
-        database!
+        await database!
             .getDocument(
                 databaseId: databaseId,
                 collectionId: userid,
@@ -93,9 +110,6 @@ class ClientDatabase {
     if(user!=null){
       await Teams(client!).list().then((t) {
         myTeams=t.teams;
-        for (var element in myTeams) {
-          print(element.$id);
-        }
       });
     }
 

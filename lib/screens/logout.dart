@@ -34,7 +34,7 @@ class _LogoutScreenState extends State<LogoutScreen> {
               padding: const EdgeInsets.all(10),
               alignment: Alignment.center,
               width: 25.w,
-              height: 20.h,
+              height: 25.h,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: appTheme.mode == ThemeMode.dark

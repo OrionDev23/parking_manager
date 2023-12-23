@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:parc_oto/theme.dart';
-import 'package:parc_oto/widgets/page_header.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -88,7 +87,6 @@ class _ResetScreenState extends State<ResetScreen> {
         text:linknotvalid?'linknotvalid':'donepassword',);
     }
     return ScaffoldPage(
-      header: PageTitle(text: 'connexion'.tr(),),
       content: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,

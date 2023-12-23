@@ -14,8 +14,8 @@ import '../vehicle/manager/vehicle_tabs.dart';
 import 'transaction_chart.dart';
 import 'table_stats.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class Dashboard extends StatelessWidget {
+  const Dashboard({super.key});
 
   @override
   Widget build(BuildContext context) {
