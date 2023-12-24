@@ -129,14 +129,11 @@ class _MyAppState extends State<MyApp> {
               supportedLocales: context.supportedLocales,
               locale: appTheme.locale,
               builder: (context, child) {
-                return Directionality(
-                  textDirection: appTheme.textDirection,
-                  child: NavigationPaneTheme(
-                    data: const NavigationPaneThemeData(
-                      backgroundColor:  null,
-                    ),
-                    child: child!,
+                return NavigationPaneTheme(
+                  data: const NavigationPaneThemeData(
+                    backgroundColor:  null,
                   ),
+                  child: child!,
                 );
               },
               routerConfig: Routes(widget.savedSettings).router,

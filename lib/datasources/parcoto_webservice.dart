@@ -112,3 +112,39 @@ abstract class ParcOtoWebService<T> {
 
   String getSortingQuery(int sortedBy, bool sortedAsc);
 }
+
+
+abstract class ParcOtoWebServiceUsers<S,T>{
+  List <MapEntry<S,T>> data;
+
+  ParcOtoWebServiceUsers(this.data,);
+  int Function(MapEntry<S,T>, MapEntry<S,T>)? getComparisonFunction(
+      int column, bool ascending);
+
+  Future<UsersWebServiceResponse<S,T>> getData(int startingAt, int count,
+      int sortedBy, bool sortedAsc, {String? searchKey,Map<String,String>?filters}) async {
+    if (startingAt == 0) {
+      data.clear();
+    }
+    //  final stopwatch = Stopwatch()..start();
+    return getSearchResult(searchKey,).then((value) {
+
+      //stopwatch.stop();
+      // print("finished in ${stopwatch.elapsed.inMilliseconds} s");
+
+      data=value.entries.toList();
+      var result = data;
+
+      result.sort(getComparisonFunction(sortedBy, sortedAsc));
+
+      return UsersWebServiceResponse<S,T>(
+          value.length, result.skip(startingAt).take(count).toList());
+    }).onError((error, stackTrace) {
+      return Future.value(UsersWebServiceResponse<S,T>(0, data));
+    });
+  }
+
+
+  Future<Map<S,T>> getSearchResult(String? searchKey);
+
+}

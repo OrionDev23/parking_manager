@@ -162,6 +162,7 @@
  "passwordmatch": "Le mot de passe et sa confirmation doivent être identiques",
  "confirmation": "Confirmation",
  "linknotvalid": "Le lien n'est pas valide",
+ "usermanagement": "Gestion des utilisateurs",
  "home": "Tableau de bord",
  "lproduct":"Liste des produits",
  "seconnecter": "Se connecter",
@@ -367,5 +368,6 @@
  "balaisEssuieGlace": "Balais essuie-glace",
  "eclairage": "Eclairage",
  "obd": "OBD",
- "bougies": "Bougies"
+ "bougies": "Bougies",
+ "supreuser": "Supprimer l'utilisateur"
 }

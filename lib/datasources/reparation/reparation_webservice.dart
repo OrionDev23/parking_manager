@@ -36,9 +36,6 @@ class ReparationWebService extends ParcOtoWebService<Reparation> {
         return Query.search(getAttributeForSearch(index), searchKey);
     }
   }
-
-
-
   @override
   List<String> getFilterQueries(Map<String, String> filters, int count,
       int startingAt, int sortedBy, bool sortedAsc,

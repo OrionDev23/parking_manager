@@ -327,5 +327,7 @@
   "suprentreprise": "تم حذف معلومات الشركة",
   "ajoututilisateur": "تمت إضافة مستخدم جديد",
   "modifutilisateur": "تم تعديل مستخدم",
-  "suprutilisateur": "تم حذف مستخدم"
+  "suprutilisateur": "تم حذف مستخدم",
+  "usermanagement": "إدارة المستخدمين",
+  "supreuser": "حذف المستخدم"
 }

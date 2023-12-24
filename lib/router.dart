@@ -6,7 +6,9 @@ import 'package:parc_oto/screens/reset_password.dart';
 import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:parc_oto/screens/vehicle/brand/brand_list.dart';
+import 'package:parc_oto/screens/vehicle/documents/document_tabs.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
+import 'package:parc_oto/screens/vehicle/states/state_tabs.dart';
 import 'package:parc_oto/screens/vehicle/vehicle_dashboard.dart';
 
 class Routes{
@@ -15,34 +17,34 @@ class Routes{
 
   Routes(this.savedSettings){
     router= GoRouter(
+      initialLocation: '/dashboard',
       routes: [
-        GoRoute(
-          name: 'home',
-          path: '/',
-          builder: (context, state) => PanesList(
+        ShellRoute(
+          builder: (context, state,widget) => PanesList(
             paneList: PaneItemsAndFooters(savedSettings),
           ),
           routes: [
             GoRoute(
               name: 'login',
-              path: 'login',
+              path: '/login',
               builder: (context,state)=>const LoginScreen(),
             ),
             GoRoute(
               name: 'dashboard',
-              path: 'dashboard',
+              path: '/dashboard',
               builder: (context,state)=>const Dashboard(),
             ),
             GoRoute(
-                path: 'vehicles',
-              builder: (context,state)=>const VehicleDashboard(),
-              routes: [
-                GoRoute(path: 'manager',builder: (context,state)=>const VehicleTabs()),
-                GoRoute(path: 'brands',builder: (context,state)=>const BrandList())
+                path: '/vehicles',
+                builder: (context,state)=>const VehicleDashboard(),
+                routes: [
+                  GoRoute(path: 'manager',builder: (context,state)=>const VehicleTabs()),
+                  GoRoute(path: 'brands',builder: (context,state)=>const BrandList()),
+                  GoRoute(path: 'states',builder: (context,state)=>const StateTabs()),
+                  GoRoute(path: 'documents',builder: (context,state)=>const DocumentTabs()),
 
-              ]
+                ]
             ),
-
           ]
         ),
         GoRoute(

@@ -51,6 +51,7 @@
   "filter": "Filter",
   "prevoir": "Preview PDF",
   "supreparation": "Delete the order",
+  "supreuser": "Delete the user",
   "activity": "Activity",
   "confirmation": "Confirmation",
   "donepassword": "Success ! You can now login",
@@ -330,6 +331,6 @@
   "suprentreprise": "Company informations has been deleted",
   "ajoututilisateur": "New user added",
   "modifutilisateur": "A user has been modified",
-  "suprutilisateur": "A user has been deleted"
-
+  "suprutilisateur": "A user has been deleted",
+  "usermanagement": "Users Management"
 }

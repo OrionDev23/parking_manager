@@ -15,9 +15,11 @@ import '../logs/log_management.dart';
 import '../prestataire/prestataire_tabs.dart';
 import '../reparation/reparation_tabs.dart';
 import '../settings.dart';
+import '../user_management/user_management.dart';
 import '../vehicle/brand/brand_list.dart';
 import '../vehicle/documents/document_tabs.dart';
 import '../vehicle/manager/vehicle_tabs.dart';
+import '../vehicle/states/state_tabs.dart';
 import '../vehicle/vehicle_dashboard.dart';
 
 class PaneItemsAndFooters{
@@ -31,6 +33,10 @@ class PaneItemsAndFooters{
         icon: const Icon(FluentIcons.home),
         body: const Dashboard(),
         title: const Text('home').tr());
+    PaneItem usermanagement=PaneItem(
+      title: const Text('usermanagement').tr(),
+        icon: const Icon(FluentIcons.account_management),
+        body: const UserManagement());
     PaneItem vehicles = PaneItemExpander(
         icon: const Icon(FluentIcons.car),
         title: const Text('vehicules').tr(),
@@ -47,7 +53,7 @@ class PaneItemsAndFooters{
           PaneItem(
             icon: const Icon(FluentIcons.health),
             title: const Text('vstates').tr(),
-            body: const Placeholder(),
+            body: const StateTabs(),
           ),
           PaneItem(
             icon: const Icon(FluentIcons.document_set),
@@ -143,6 +149,7 @@ class PaneItemsAndFooters{
     if (PanesListState.signedIn.value) {
       originalItems = [
         if (isAdmin || isManager) dashboard,
+        if(isAdmin) usermanagement,
         if (isAdmin || isManager) vehicles,
         if (isAdmin || isManager) reparations,
         if (isAdmin || isManager) chauffeurs,

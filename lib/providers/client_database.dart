@@ -24,7 +24,6 @@ const activityId = "activity";
 const prestataireId = "prestataire";
 const endpoint = "https://appwrite.parcoto.com/v1";
 const project = "6531ace99382e496a904";
-const secretKey="50715faccd768576e726c7f51394b1d092b4d492cb307a0b7b63a8ba3ff5c4c94b57560dff8b85133d355bb760cf3276db26c8cee3351e35cb33fec7ea5efc7d023a9a2ca4910fae20d112ee4898c292ec705f0e2a6eb8427675e374123a5cd51ef3e5ebf7836cd001c4829cbef2caf4d3dc35cf51958f88c88d14252276e494";
 
 class ClientDatabase {
   static Client? client;
@@ -50,16 +49,16 @@ class ClientDatabase {
     getEntreprise();
   }
 
-  bool isManager(){
-    for(var element in myTeams){
+  bool isManager({List<Team>? teams}){
+    for(var element in teams??myTeams){
       if(element.name.toLowerCase()=='managers'){
         return true;
       }
     }
     return false;
   }
-  bool isAdmin(){
-    for(var element in myTeams){
+  bool isAdmin({List<Team>? teams}){
+    for(var element in teams??myTeams){
       if(element.name.toLowerCase()=='admins'){
         return true;
       }

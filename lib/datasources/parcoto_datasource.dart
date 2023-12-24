@@ -152,3 +152,120 @@ return [
 
   Future<void> addToActivity(T c);
 }
+
+
+
+abstract class ParcOtoDatasourceUsers<S,T> extends AsyncDataTableSource{
+  BuildContext current;
+  bool? selectC;
+  AppTheme? appTheme;
+  String? searchKey;
+  bool empty = false;
+  int? errorCounter;
+  int sortColumn = 0;
+  bool sortAscending = true;
+
+  List<MapEntry<S,T>> data = List.empty(growable: true);
+
+  late final ParcOtoWebServiceUsers<S,T> repo;
+
+  ParcOtoDatasourceUsers({required this.current,this.selectC=false,this.appTheme,this.searchKey});
+
+  ParcOtoDatasourceUsers.empty({required this.current,this.selectC=false,this.appTheme,this.searchKey}) {
+    empty = true;
+  }
+
+  ParcOtoDatasourceUsers.error({required this.current,this.selectC=false,this.appTheme,this.searchKey}) {
+    errorCounter = 0;
+  }
+  void sort(int column, bool ascending) {
+    sortColumn = column;
+    sortAscending = ascending;
+    refreshDatasource();
+  }
+  void search(String searchKey){
+    this.searchKey=searchKey;
+    refreshDatasource();
+  }
+
+  Future<int> getTotalRecords() {
+    return Future<int>.delayed(
+        const Duration(milliseconds: 0), () => empty ? 0 : data.length);
+  }
+  @override
+  Future<AsyncRowsResponse> getRows(int startIndex, int count) async{
+    if (errorCounter != null) {
+      errorCounter = errorCounter! + 1;
+
+      if (errorCounter! % 2 == 1) {
+        await Future.delayed(const Duration(milliseconds: 500));
+        throw 'Error #${((errorCounter! - 1) / 2).round() + 1} has occured';
+      }
+    }
+
+    assert(startIndex >= 0);
+
+    // List returned will be empty is there're fewer items than startingAt
+    var x = empty
+        ? await Future.delayed(const Duration(milliseconds: 500),
+            () => UsersWebServiceResponse<S,T>(0, []))
+        : await repo.getData(startIndex, count, sortColumn, sortAscending,searchKey: searchKey);
+
+    var r = AsyncRowsResponse(
+        x.totalRecords,
+        x.data.map((element) {
+          return rowDisplay(startIndex,count,element);
+        }).toList());
+
+    return r;
+  }
+
+
+  DataRow rowDisplay(int startIndex,int count,MapEntry<S,dynamic> element){
+    return DataRow(
+      key: ValueKey<String>(element.value.id),
+      onSelectChanged: selectC==true? (value) {
+        if (value ==true) {
+          selectRow(element.value);
+        }
+      }:null,
+      cells: getCellsToShow(element as MapEntry<S,T>),);
+  }
+
+  List<DataCell> getCellsToShow(MapEntry<S,T> element);
+
+  void selectRow(ParcOtoDefault c){
+    Navigator.of(current).pop(c);
+  }
+
+  void showDeleteConfirmation(dynamic c,dynamic t){
+    f.showDialog(
+        context: current,
+        builder: (context) {
+          return f.ContentDialog(
+            content: Text(deleteConfirmationMessage( c)),
+            actions: [
+              f.FilledButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('annuler').tr()),
+              f.Button(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                  deleteRow(c,t);
+                },
+                child: const Text('confirmer').tr(),
+              )
+            ],
+          );
+        });
+  }
+
+  String deleteConfirmationMessage(S c);
+
+  void deleteRow(S c,T t);
+
+  Future<void> addToActivity(S c);
+}

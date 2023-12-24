@@ -19,9 +19,10 @@ const defaultUserPic =
 
 class PanesList extends StatefulWidget {
   final PaneItemsAndFooters paneList;
+  final Widget? widget;
   const PanesList({
     super.key,
-    required this.paneList,
+    required this.paneList, this.widget,
   });
 
   @override
