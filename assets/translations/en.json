@@ -332,5 +332,9 @@
   "ajoututilisateur": "New user added",
   "modifutilisateur": "A user has been modified",
   "suprutilisateur": "A user has been deleted",
-  "usermanagement": "Users Management"
+  "usermanagement": "Users Management",
+  "role": "Role",
+  "admins": "Admin",
+  "managers": "Manager"
+
 }

@@ -329,5 +329,9 @@
   "modifutilisateur": "تم تعديل مستخدم",
   "suprutilisateur": "تم حذف مستخدم",
   "usermanagement": "إدارة المستخدمين",
-  "supreuser": "حذف المستخدم"
+  "supreuser": "حذف المستخدم",
+  "role": "الوظيفة",
+  "admins": "مسؤول عام",
+  "managers": "مدير"
+
 }

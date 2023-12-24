@@ -1,14 +1,14 @@
 
+import "package:data_table_2/data_table_2.dart";
 import "package:easy_localization/easy_localization.dart";
 import "package:fluent_ui/fluent_ui.dart";
-import "package:parc_oto/datasources/parcoto_datasource.dart";
 import "package:provider/provider.dart";
 import "package:responsive_sizer/responsive_sizer.dart";
 
 import "../theme.dart";
 
 class NoDataWidget extends StatelessWidget {
-  final ParcOtoDatasource? datasource;
+  final AsyncDataTableSource? datasource;
   final IconData icon;
   final String text;
   const NoDataWidget({super.key, this.datasource,this.icon=FluentIcons.database_block,this.text='lvide'});

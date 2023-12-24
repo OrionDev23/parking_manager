@@ -369,5 +369,8 @@
  "eclairage": "Eclairage",
  "obd": "OBD",
  "bougies": "Bougies",
- "supreuser": "Supprimer l'utilisateur"
+ "supreuser": "Supprimer l'utilisateur",
+ "role": "Role",
+ "admins": "Admin",
+ "managers": "Gérant"
 }

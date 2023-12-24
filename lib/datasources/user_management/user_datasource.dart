@@ -8,8 +8,9 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../providers/client_database.dart';
 import '../parcoto_datasource.dart';
 
-class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Team>?>{
-  UsersManagementDatasource({required super.current,super.appTheme,super.searchKey,super.selectC}){
+class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Membership>?>{
+  final bool archive;
+  UsersManagementDatasource({required super.current,super.appTheme,super.searchKey,super.selectC,this.archive=false}){
     repo=UsersWebservice(data);
   }
 
@@ -56,13 +57,26 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Team>?>
 
 
   @override
-  List<DataCell> getCellsToShow(MapEntry<User, List<Team>?> element) {
+  List<DataCell> getCellsToShow(MapEntry<User, List<Membership>?> element) {
     final dateFormat=DateFormat('y/M/d HH:mm:ss','fr');
     final tstyle=TextStyle(
       fontSize: 10.sp,
     );
+    String roles='';
+    element.value?.forEach((element) {
+      if(roles.isNotEmpty){
+        roles+=', ';
+      }
+      roles+=element.teamName.tr();
+    });
     return [
-      DataCell(SelectableText(element.value?[0].name??''
+      DataCell(SelectableText(element.key.name
+          ,style: tstyle)),
+      DataCell(SelectableText(element.key.email
+          ,style: tstyle)),
+      DataCell(SelectableText(element.key.$id
+          ,style: tstyle)),
+      DataCell(SelectableText((roles).toLowerCase().tr()
           ,style: tstyle)),
       DataCell(SelectableText(
           dateFormat.format(DateTime.parse(element.key.$createdAt))
