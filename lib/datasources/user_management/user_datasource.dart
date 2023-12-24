@@ -58,14 +58,12 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Team>?>
   @override
   List<DataCell> getCellsToShow(MapEntry<User, List<Team>?> element) {
     final dateFormat=DateFormat('y/M/d HH:mm:ss','fr');
-    final dateFormat2=DateFormat('y/M/d','fr');
-    final numberFormat=NumberFormat('00000000','fr');
-    final numberFormat2=NumberFormat.currency(locale:'fr',symbol: 'DA',decimalDigits: 2);
     final tstyle=TextStyle(
       fontSize: 10.sp,
     );
     return [
-
+      DataCell(SelectableText(element.value?[0].name??''
+          ,style: tstyle)),
       DataCell(SelectableText(
           dateFormat.format(DateTime.parse(element.key.$createdAt))
           ,style: tstyle)),
