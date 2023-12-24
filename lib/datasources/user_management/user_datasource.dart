@@ -53,6 +53,8 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Team>?>
       ];});
   }
 
+
+
   @override
   List<DataCell> getCellsToShow(MapEntry<User, List<Team>?> element) {
     final dateFormat=DateFormat('y/M/d HH:mm:ss','fr');
@@ -68,48 +70,23 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Team>?>
           dateFormat.format(DateTime.parse(element.key.$createdAt))
           ,style: tstyle)),
       DataCell(f.FlyoutTarget(
-        controller: element.value.controller,
+        controller: controllers[element.key.$id]!,
         child: IconButton(
             splashRadius: 15,
             onPressed: (){
-              element.value.controller.showFlyout(builder: (context){
+              controllers[element.key.$id]!.showFlyout(builder: (context){
                 return f.MenuFlyout(
                   items: [
                     f.MenuFlyoutItem(
                         text: const Text('mod').tr(),
                         onPressed: (){
                           Navigator.of(current).pop();
-                          late f.Tab tab;
-                          tab = f.Tab(
-                            key: UniqueKey(),
-                            text: Text('${"mod".tr()} ${'reparation'.tr().toLowerCase()} ${element.value.numero}'),
-                            semanticLabel: '${'mod'.tr()} ${element.value.numero}',
-                            icon: const Icon(f.FluentIcons.edit),
-                            body: ReparationForm(reparation: element.value,key: UniqueKey(),),
-                            onClosed: () {
-                              ReparationTabsState.tabs.remove(tab);
-
-                              if (ReparationTabsState.currentIndex.value > 0) {
-                                ReparationTabsState.currentIndex.value--;
-                              }
-                            },
-                          );
-                          final index = ReparationTabsState.tabs.length + 1;
-                          ReparationTabsState.tabs.add(tab);
-                          ReparationTabsState.currentIndex.value = index - 1;
                         }
                     ),
                     f.MenuFlyoutItem(
                         text: const Text('delete').tr(),
                         onPressed: (){
-                          showDeleteConfirmation(element.value);
-                        }
-                    ),
-                    const f.MenuFlyoutSeparator(),
-                    f.MenuFlyoutItem(
-                        text: const Text('prevoir').tr(),
-                        onPressed: (){
-                          showPdf(element.value);
+                          showDeleteConfirmation(element.key,element.value);
                         }
                     ),
                   ],

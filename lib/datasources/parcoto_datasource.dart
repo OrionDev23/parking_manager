@@ -220,10 +220,13 @@ abstract class ParcOtoDatasourceUsers<S,T> extends AsyncDataTableSource{
     return r;
   }
 
+  Map<String,f.FlyoutController> controllers={};
 
-  DataRow rowDisplay(int startIndex,int count,MapEntry<S,dynamic> element){
+
+  DataRow rowDisplay(int startIndex,int count,MapEntry<dynamic,dynamic> element){
+    controllers[element.key.$id]=f.FlyoutController();
     return DataRow(
-      key: ValueKey<String>(element.value.id),
+      key: ValueKey<String>(element.key.$id),
       onSelectChanged: selectC==true? (value) {
         if (value ==true) {
           selectRow(element.value);
