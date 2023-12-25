@@ -94,7 +94,7 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Members
                     f.MenuFlyoutItem(
                       text:const Text('invitmanager').tr(),
                       onPressed: (){
-                        inviteToBecomeManager(element.key);
+                        inviteToBecomeManager(element.key,element.value);
                       },
                     ),
                     f.MenuFlyoutItem(
@@ -126,13 +126,23 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Members
     });
   }
 
-  void inviteToBecomeManager(User user) async{
+  String getMembershipID(List<Membership>? t){
+    if(t!=null){
+      for(var e in t){
+        if(e.teamId=='managers'){
+          return e.$id;
+        }
+      }
+    }
+
+    return '';
+  }
+
+  void inviteToBecomeManager(User user,List<Membership>? t) async{
     await client_aw.Teams(    ClientDatabase.client!).createMembership(
       teamId: 'managers',
       roles: [''],
       email: user.email,
-      userId: user.$id,
-      name: user.name,
       url: 'https://app.parcoto.com/acceptinvitation?projectId=$project&endpoint=$endpoint}'
     ).then((value) {
       f.showDialog(

@@ -77,6 +77,12 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
+    if(MediaQuery.of(context).orientation==Orientation.portrait){
+      pwidth=60.w;
+    }
+    else{
+      pwidth=30.w;
+    }
     return ScaffoldPage(
       header: PageTitle(text: 'connexion'.tr(),),
       content: Center(

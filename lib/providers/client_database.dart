@@ -23,7 +23,7 @@ const buckedId = "images";
 const reparationId = "reparation";
 const activityId = "activity";
 const prestataireId = "prestataire";
-const endpoint = "https://appwrite.parcoto.com/v1";
+const endpoint = "https://cloud.appwrite.io/v1";
 const project = "6531ace99382e496a904";
 
 class ClientDatabase {

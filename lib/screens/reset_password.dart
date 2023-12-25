@@ -4,8 +4,6 @@ import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
-import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -36,29 +34,16 @@ class _ResetScreenState extends State<ResetScreen> {
   @override
   void initState() {
     adjustSize();
-    checkUser();
     super.initState();
-  }
-
-  void checkUser() async{
-    checking=true;
-    await ClientDatabase().getUser();
-    if(ClientDatabase.user!=null){
-      PanesListState.signedIn.value=true;
-      PanesListState.index.value=0;
-    }
-    setState(() {
-      checking=false;
-    });
   }
 
   void adjustSize(){
     if(kIsWeb){
-      pheight=50.h;
+      pheight=80.h;
     }
     else{
       if(Platform.isAndroid || Platform.isIOS){
-        pwidth=60.w;
+        pwidth=80.w;
         pheight=50.h;
       }
       else{
@@ -80,6 +65,12 @@ class _ResetScreenState extends State<ResetScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if(MediaQuery.of(context).orientation==Orientation.portrait){
+      pwidth=60.w;
+    }
+    else{
+      pwidth=30.w;
+    }
     var appTheme = context.watch<AppTheme>();
     if(done){
       return NoDataWidget(
@@ -212,7 +203,7 @@ class _ResetScreenState extends State<ResetScreen> {
 
   String error="";
   void confirm() async{
-    if(validPassword && endpoint.isNotEmpty && projectId.isNotEmpty && userId.isNotEmpty && secret.isNotEmpty){
+    if(validPassword && endpointU.isNotEmpty && projectId.isNotEmpty && userId.isNotEmpty && secret.isNotEmpty){
       setState(() {
         checking=true;
       });
@@ -220,7 +211,6 @@ class _ResetScreenState extends State<ResetScreen> {
         ..setEndpoint(endpointU)
         ..setProject(projectId);
       await Account(client).updateRecovery(userId: userId, secret: secret, password: password.text, passwordAgain: passwordConfirmation.text).then((value) async{
-        await ClientDatabase().getUser();
         setState(() {
           done=true;
         });
@@ -245,7 +235,7 @@ class _ResetScreenState extends State<ResetScreen> {
         checking=false;
       });
     }
-    else if(endpoint.isNotEmpty || projectId.isNotEmpty || userId.isNotEmpty || secret.isNotEmpty){
+    else if(endpointU.isNotEmpty || projectId.isNotEmpty || userId.isNotEmpty || secret.isNotEmpty){
       done=true;
       linknotvalid=true;
 
