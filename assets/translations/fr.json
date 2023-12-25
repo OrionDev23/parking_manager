@@ -372,5 +372,6 @@
  "supreuser": "Supprimer l'utilisateur",
  "role": "Role",
  "admins": "Admin",
- "managers": "Gérant"
+ "managers": "Gérant",
+ "newuser": "Nouvel utilisateur"
 }

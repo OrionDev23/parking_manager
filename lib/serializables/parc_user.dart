@@ -10,14 +10,11 @@ part 'parc_user.g.dart';
 class ParcUser extends ParcOtoDefault{
   final String? name;
   final String email;
-  final int? datec;
-  final int? datea;
-  final int? datel;
   final String? tel;
 
   final String? avatar;
 
-  ParcUser({required super.id,super.createdAt,super.updatedAt,this.avatar, this.name, required this.email, this.datec, this.datea, this.datel, this.tel,});
+  ParcUser({required super.id,super.createdAt,super.updatedAt,this.avatar, this.name, required this.email, this.tel,});
 
 
   factory ParcUser.fromJson(Map<String, dynamic> json) => _$ParcUserFromJson(json);

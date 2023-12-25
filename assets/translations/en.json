@@ -335,6 +335,7 @@
   "usermanagement": "Users Management",
   "role": "Role",
   "admins": "Admin",
-  "managers": "Manager"
+  "managers": "Manager",
+  "newuser": "New user"
 
 }

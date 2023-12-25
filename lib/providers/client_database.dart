@@ -84,22 +84,6 @@ class ClientDatabase {
             id: user!.$id,
             name: user!.name,
             tel: user!.phone,
-            datea: DateTime.parse(user!.accessedAt.isEmpty
-                    ? DateTime.now().toIso8601String()
-                    : user!.accessedAt)
-                .difference(ref)
-                .inMilliseconds
-                .abs(),
-            datec: DateTime.parse(user!.$createdAt)
-                .difference(ref)
-                .inMilliseconds
-                .abs(),
-            datel: DateTime.parse(user!.$updatedAt.isEmpty
-                    ? DateTime.now().toIso8601String()
-                    : user!.$updatedAt)
-                .difference(ref)
-                .inMilliseconds
-                .abs(),
           );
           uploadUser(me.value!);
         });

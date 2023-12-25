@@ -1,34 +1,36 @@
-
-import 'package:appwrite/appwrite.dart';
-import 'package:country_code_picker/country_code_picker.dart';
+import 'package:dart_appwrite/dart_appwrite.dart';
+import 'package:dart_appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/services.dart';
-import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/serializables/parc_user.dart';
-import 'package:parc_oto/utilities/country_list.dart';
-import 'package:parc_oto/utilities/form_validators.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../providers/client_database.dart';
+import '../../serializables/parc_user.dart';
 import '../../theme.dart';
-import '../../utilities/profil_beautifier.dart';
-class ProfilForm extends StatefulWidget {
-  final ParcUser? user;
-  const ProfilForm({super.key, this.user});
+import '../../utilities/country_list.dart';
+import '../../utilities/form_validators.dart';
+
+class UserForm extends StatefulWidget {
+
+  final User? user;
+  const UserForm({super.key, this.user});
 
   @override
-  State<ProfilForm> createState() => _ProfilFormState();
+  State<UserForm> createState() => _UserFormState();
 }
 
-class _ProfilFormState extends State<ProfilForm> {
+class _UserFormState extends State<UserForm> {
+
   late TextEditingController email;
+
+  late TextEditingController password;
+  late TextEditingController passwordConfirm;
   late TextEditingController name;
   late TextEditingController phone;
 
   String countrySelected = 'DZ';
   String phoneDial = "+213";
-
+  String? userID;
   @override
   void initState() {
     initValues();
@@ -36,24 +38,21 @@ class _ProfilFormState extends State<ProfilForm> {
   }
 
   void initValues() {
-    userID = widget.user?.id ?? ID.unique();
+    userID = widget.user?.$id ?? ID.unique();
     email = TextEditingController(text: widget.user?.email);
+    password=TextEditingController(text:widget.user?.password);
+    passwordConfirm=TextEditingController(text: widget.user?.password);
     validEmail = FormValidators.isEmail(email.text);
     name = TextEditingController(text: widget.user?.name);
-    countrySelected = Countries.getCountryCodeFromPhone(widget.user?.tel);
-    if(widget.user!=null && widget.user!.tel!=null && widget.user!.tel!.length>3){
+    countrySelected = Countries.getCountryCodeFromPhone(widget.user?.phone);
+    if(widget.user!=null &&  widget.user!.phone.length>3){
       phone = TextEditingController(
-          text: widget.user?.tel?.substring(4, widget.user?.tel?.length));
+          text: widget.user?.phone.substring(4, widget.user?.phone.length));
     }
     else{
       phone=TextEditingController();
     }
-
   }
-
-  bool somethingChanged = false;
-  bool validEmail = false;
-
   void testIfSomethingChanged() {
     if (email.text != widget.user?.email) {
       setState(() {
@@ -65,12 +64,17 @@ class _ProfilFormState extends State<ProfilForm> {
         somethingChanged = true;
       });
       return;
-    } else if (countrySelected !=
-        Countries.getCountryCodeFromPhone(widget.user?.tel)) {
+    } else if(password.text!=widget.user?.password){
+      setState(() {
+        somethingChanged=true;
+      });
+      return;
+    }else if (countrySelected !=
+        Countries.getCountryCodeFromPhone(widget.user?.phone)) {
       setState(() {
         somethingChanged = true;
       });
-    } else if (widget.user?.tel?.substring(4, widget.user?.tel?.length) !=
+    } else if (widget.user?.phone.substring(4, widget.user?.phone.length) !=
         phone.text) {
       setState(() {
         somethingChanged = true;
@@ -82,12 +86,13 @@ class _ProfilFormState extends State<ProfilForm> {
       });
     }
   }
-
+  bool somethingChanged = false;
+  bool validEmail = false;
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
     return ContentDialog(
-      title: const Text('Profil'),
+      title: Text(widget.user!=null ? widget.user!.name.isNotEmpty?widget.user!.name:widget.user!.email:'newuser'.tr()),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -99,24 +104,24 @@ class _ProfilFormState extends State<ProfilForm> {
               Hero(
                 tag: 'myprofil',
                 child: Container(
-                  width: 15.h,
-                  height: 15.h,
-                  decoration: BoxDecoration(
-                    color: appTheme.color,
-                    shape: BoxShape.circle,
-                    boxShadow: kElevationToShadow[2],
-                  ),
-                  padding: const EdgeInsets.all(2),
-                  alignment: Alignment.center,
-                  clipBehavior: Clip.antiAlias,
-                  child:  Text(
-                              ProfilUtilitis.getFirstLetters(widget.user)
-                                  .toUpperCase(),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontSize: 18.sp),
-                            )
+                    width: 15.h,
+                    height: 15.h,
+                    decoration: BoxDecoration(
+                      color: appTheme.color,
+                      shape: BoxShape.circle,
+                      boxShadow: kElevationToShadow[2],
+                    ),
+                    padding: const EdgeInsets.all(2),
+                    alignment: Alignment.center,
+                    clipBehavior: Clip.antiAlias,
+                    child:  Text(
+                      ProfilUtilitis.getFirstLetters(widget.user)
+                          .toUpperCase(),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 18.sp),
+                    )
                 ),
               ),
             ],
@@ -226,15 +231,15 @@ class _ProfilFormState extends State<ProfilForm> {
               ),
               Expanded(
                   child: TextBox(
-                controller: phone,
-                placeholder: 'telephone'.tr(),
-                maxLength: 9,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
-                onChanged: (s) {
-                  testIfSomethingChanged();
-                },
+                    controller: phone,
+                    placeholder: 'telephone'.tr(),
+                    maxLength: 9,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                    onChanged: (s) {
+                      testIfSomethingChanged();
+                    },
                     placeholderStyle:
                     placeStyle,
                     cursorColor:
@@ -243,7 +248,7 @@ class _ProfilFormState extends State<ProfilForm> {
                     decoration: BoxDecoration(
                       color: appTheme.fillColor,
                     ),
-              )),
+                  )),
             ],
           ),
         ],
@@ -269,6 +274,7 @@ class _ProfilFormState extends State<ProfilForm> {
     );
   }
 
+
   bool uploading = false;
   void onConfirm() async {
     if (email.text.isNotEmpty && validEmail && somethingChanged) {
@@ -278,41 +284,49 @@ class _ProfilFormState extends State<ProfilForm> {
       ParcUser newme= ParcUser(
         email: email.text,
         name: name.text,
-        id: userID,
+        id: userID!,
         tel: '$phoneDial${phone.text}',
         avatar: null,
       );
-      if (widget.user == null) {
-        await ClientDatabase.database!.createDocument(
-            databaseId: databaseId,
-            collectionId: userid,
-            documentId: userID,
-            data: newme.toJson()).then((value) {
-              ClientDatabase.me.value=newme;
-              Navigator.pop(
-                context,
-              );
-
-        });
-      } else {
-        await ClientDatabase.database!.updateDocument(
-            databaseId: databaseId,
-            collectionId: userid,
-            documentId: userID,
-            data: newme.toJson()).then((value) {
-          ClientDatabase.me.value=newme;
-          Navigator.pop(
-            context,
-          );
-        });
-      }
-
-
+      await uploadUserInDB(newme);
       setState(() {
         uploading = false;
       });
     }
   }
 
-  late String userID;
+
+  Future<void> uploadUserInDB(ParcUser newme) async{
+    if (widget.user == null) {
+      await ClientDatabase.database!.createDocument(
+          databaseId: databaseId,
+          collectionId: userid,
+          documentId: userID!,
+          data: newme.toJson()).then((value) {
+        ClientDatabase.me.value=newme;
+        Navigator.pop(
+          context,
+        );
+
+      });
+    }
+    else {
+      await ClientDatabase.database!.updateDocument(
+          databaseId: databaseId,
+          collectionId: userid,
+          documentId: userID!,
+          data: newme.toJson()).then((value) {
+        ClientDatabase.me.value=newme;
+        Navigator.pop(
+          context,
+        );
+      });
+    }
+  }
+
+  Future<void> addUserToUsersList(User newume) async{
+
+  }
+
+
 }
