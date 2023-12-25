@@ -1,6 +1,8 @@
 import 'package:dart_appwrite/dart_appwrite.dart';
+import 'package:appwrite/appwrite.dart' as client_aw;
 import 'package:dart_appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/user_management/user_webservice.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
@@ -90,6 +92,12 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Members
                 return f.MenuFlyout(
                   items: [
                     f.MenuFlyoutItem(
+                      text:const Text('invitmanager').tr(),
+                      onPressed: (){
+                        inviteToBecomeManager(element.key);
+                      },
+                    ),
+                    f.MenuFlyoutItem(
                         text: const Text('mod').tr(),
                         onPressed: (){
                           Navigator.of(current).pop();
@@ -115,6 +123,35 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Members
   void showUserForm(BuildContext context,User user){
     f.showDialog(context: context, builder: (c){
       return  UserForm(user: user,);
+    });
+  }
+
+  void inviteToBecomeManager(User user) async{
+    await client_aw.Teams(    ClientDatabase.client!).createMembership(
+      teamId: 'managers',
+      roles: [''],
+      email: user.email,
+      userId: user.$id,
+      name: user.name,
+      url: 'https://app.parcoto.com/acceptinvitation?projectId=$project&endpoint=$endpoint}'
+    ).then((value) {
+      f.showDialog(
+          barrierDismissible: true,
+          context: current, builder: (co){
+        return const Text('invitationsent').tr();
+      });
+    }).onError((client_aw.AppwriteException error, stackTrace) {
+      if(kDebugMode){
+        print('====================================================');
+        print('error sending invitation');
+        print('type: ${error.type}');
+        print('code: ${error.code}');
+        print('message: ${error.message}');
+        print('response: ${error.response}');
+        print('stacktrace: $stackTrace');
+        print('====================================================');
+
+      }
     });
   }
 

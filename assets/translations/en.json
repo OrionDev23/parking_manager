@@ -336,6 +336,9 @@
   "role": "Role",
   "admins": "Admin",
   "managers": "Manager",
-  "newuser": "New user"
+  "newuser": "New user",
+  "admins, managers": "Admin and gérant",
+  "invitmanager": "Invite to become a manager",
+  "invitationsent": "Invitation sent"
 
 }

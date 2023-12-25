@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:parc_oto/screens/accept_invitation.dart';
 import 'package:parc_oto/screens/dashboard/dashboard.dart';
 import 'package:parc_oto/screens/login.dart';
 import 'package:parc_oto/screens/reset_password.dart';
@@ -51,6 +52,11 @@ class Routes{
             name: 'recoverpassword',
             path: '/recoverpassword',
             builder: (context,state) =>const ResetScreen()
+        ),
+        GoRoute(
+            name: 'acceptinvitation',
+            path: '/acceptinvitation',
+            builder: (context,state) =>const AcceptInvitation()
         ),
       ],
     );

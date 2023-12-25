@@ -4,6 +4,7 @@ import 'package:dart_appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
+import 'package:parc_oto/datasources/user_management/user_webservice.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -15,7 +16,6 @@ import '../../utilities/form_validators.dart';
 import '../../utilities/profil_beautifier.dart';
 
 class UserForm extends StatefulWidget {
-
   final User? user;
   const UserForm({super.key, this.user});
 
@@ -24,7 +24,6 @@ class UserForm extends StatefulWidget {
 }
 
 class _UserFormState extends State<UserForm> {
-
   late TextEditingController email;
 
   late TextEditingController password;
@@ -40,25 +39,26 @@ class _UserFormState extends State<UserForm> {
     initValues();
     super.initState();
   }
-  bool showPassword=false;
-  bool showPasswordConfirm=false;
+
+  bool showPassword = false;
+  bool showPasswordConfirm = false;
 
   void initValues() {
     userID = widget.user?.$id ?? ID.unique();
     email = TextEditingController(text: widget.user?.email);
-    password=TextEditingController(text:widget.user?.password);
-    passwordConfirm=TextEditingController(text: widget.user?.password);
+    password = TextEditingController(text: widget.user?.password);
+    passwordConfirm = TextEditingController(text: widget.user?.password);
     validEmail = FormValidators.isEmail(email.text);
     name = TextEditingController(text: widget.user?.name);
     countrySelected = Countries.getCountryCodeFromPhone(widget.user?.phone);
-    if(widget.user!=null &&  widget.user!.phone.length>3){
+    if (widget.user != null && widget.user!.phone.length > 3) {
       phone = TextEditingController(
           text: widget.user?.phone.substring(4, widget.user?.phone.length));
-    }
-    else{
-      phone=TextEditingController();
+    } else {
+      phone = TextEditingController();
     }
   }
+
   void testIfSomethingChanged() {
     if (email.text != widget.user?.email) {
       setState(() {
@@ -70,12 +70,12 @@ class _UserFormState extends State<UserForm> {
         somethingChanged = true;
       });
       return;
-    } else if(password.text!=widget.user?.password){
+    } else if (password.text != widget.user?.password) {
       setState(() {
-        somethingChanged=true;
+        somethingChanged = true;
       });
       return;
-    }else if (countrySelected !=
+    } else if (countrySelected !=
         Countries.getCountryCodeFromPhone(widget.user?.phone)) {
       setState(() {
         somethingChanged = true;
@@ -85,20 +85,24 @@ class _UserFormState extends State<UserForm> {
       setState(() {
         somethingChanged = true;
       });
-    }
-    else if (somethingChanged) {
+    } else if (somethingChanged) {
       setState(() {
         somethingChanged = false;
       });
     }
   }
+
   bool somethingChanged = false;
   bool validEmail = false;
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
     return ContentDialog(
-      title: Text(widget.user!=null ? widget.user!.name.isNotEmpty?widget.user!.name:widget.user!.email:'newuser'.tr()),
+      title: Text(widget.user != null
+          ? widget.user!.name.isNotEmpty
+              ? widget.user!.name
+              : widget.user!.email
+          : 'newuser'.tr()),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -120,16 +124,19 @@ class _UserFormState extends State<UserForm> {
                     padding: const EdgeInsets.all(2),
                     alignment: Alignment.center,
                     clipBehavior: Clip.antiAlias,
-                    child:  Text(
-                      widget.user!=null?
-                      ProfilUtilitis.getFirstLetters(ParcUser(id: '', email: widget.user!.email,name: widget.user!.name))
-                          .toUpperCase():'',
+                    child: Text(
+                      widget.user != null
+                          ? ProfilUtilitis.getFirstLetters(ParcUser(
+                                  id: '',
+                                  email: widget.user!.email,
+                                  name: widget.user!.name))
+                              .toUpperCase()
+                          : '',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                           fontSize: 18.sp),
-                    )
-                ),
+                    )),
               ),
             ],
           ),
@@ -152,6 +159,7 @@ class _UserFormState extends State<UserForm> {
                   child: TextBox(
                     controller: email,
                     placeholder: 'email'.tr(),
+                    enabled: widget.user == null,
                     onChanged: (s) {
                       if (FormValidators.isEmail(s)) {
                         validEmail = true;
@@ -163,10 +171,8 @@ class _UserFormState extends State<UserForm> {
                         testIfSomethingChanged();
                       }
                     },
-                    placeholderStyle:
-                    placeStyle,
-                    cursorColor:
-                    appTheme.color.darker,
+                    placeholderStyle: placeStyle,
+                    cursorColor: appTheme.color.darker,
                     style: appTheme.writingStyle,
                     decoration: BoxDecoration(
                       color: appTheme.fillColor,
@@ -195,10 +201,8 @@ class _UserFormState extends State<UserForm> {
                   onChanged: (s) {
                     testIfSomethingChanged();
                   },
-                  placeholderStyle:
-                  placeStyle,
-                  cursorColor:
-                  appTheme.color.darker,
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
                   decoration: BoxDecoration(
                     color: appTheme.fillColor,
@@ -223,24 +227,22 @@ class _UserFormState extends State<UserForm> {
                 child: TextBox(
                   controller: password,
                   placeholder: 'motdepasse'.tr(),
-
+                  enabled: widget.user == null,
                   suffix: IconButton(
                     icon: Icon(
-                      showPassword?FluentIcons.hide
-                          :FluentIcons.red_eye,
-                      color: !showPassword?
-                      appTheme.color
-                          :Colors.grey[100]
-                      ,size: 12.sp,), onPressed: (){
-                    setState(() {
-                      showPassword=!showPassword;
-                    });
-                  },),
+                      showPassword ? FluentIcons.hide : FluentIcons.red_eye,
+                      color: !showPassword ? appTheme.color : Colors.grey[100],
+                      size: 12.sp,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        showPassword = !showPassword;
+                      });
+                    },
+                  ),
                   obscureText: !showPassword,
-                  placeholderStyle:
-                  placeStyle,
-                  cursorColor:
-                  appTheme.color.darker,
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
                   decoration: BoxDecoration(
                     color: appTheme.fillColor,
@@ -268,24 +270,26 @@ class _UserFormState extends State<UserForm> {
                 child: TextBox(
                   controller: passwordConfirm,
                   placeholder: 'confirmation'.tr(),
-
+                  enabled: widget.user == null,
                   suffix: IconButton(
                     icon: Icon(
-                      showPasswordConfirm?FluentIcons.hide
-                          :FluentIcons.red_eye,
-                      color: !showPasswordConfirm?
-                      appTheme.color
-                          :Colors.grey[100]
-                      ,size: 12.sp,), onPressed: (){
-                    setState(() {
-                      showPasswordConfirm=!showPasswordConfirm;
-                    });
-                  },),
+                      showPasswordConfirm
+                          ? FluentIcons.hide
+                          : FluentIcons.red_eye,
+                      color: !showPasswordConfirm
+                          ? appTheme.color
+                          : Colors.grey[100],
+                      size: 12.sp,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        showPasswordConfirm = !showPasswordConfirm;
+                      });
+                    },
+                  ),
                   obscureText: !showPasswordConfirm,
-                  placeholderStyle:
-                  placeStyle,
-                  cursorColor:
-                  appTheme.color.darker,
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
                   decoration: BoxDecoration(
                     color: appTheme.fillColor,
@@ -328,24 +332,22 @@ class _UserFormState extends State<UserForm> {
               ),
               Expanded(
                   child: TextBox(
-                    controller: phone,
-                    placeholder: 'telephone'.tr(),
-                    maxLength: 9,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                    ],
-                    onChanged: (s) {
-                      testIfSomethingChanged();
-                    },
-                    placeholderStyle:
-                    placeStyle,
-                    cursorColor:
-                    appTheme.color.darker,
-                    style: appTheme.writingStyle,
-                    decoration: BoxDecoration(
-                      color: appTheme.fillColor,
-                    ),
-                  )),
+                controller: phone,
+                placeholder: 'telephone'.tr(),
+                maxLength: 9,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                ],
+                onChanged: (s) {
+                  testIfSomethingChanged();
+                },
+                placeholderStyle: placeStyle,
+                cursorColor: appTheme.color.darker,
+                style: appTheme.writingStyle,
+                decoration: BoxDecoration(
+                  color: appTheme.fillColor,
+                ),
+              )),
             ],
           ),
         ],
@@ -364,56 +366,65 @@ class _UserFormState extends State<UserForm> {
             onPressed: uploading || !validEmail || !somethingChanged
                 ? null
                 : onConfirm,
-            child: uploading
-                ? const ProgressBar()
-                : const Text('confirmer').tr()),
+            child:
+                uploading ? const ProgressBar() : const Text('confirmer').tr()),
       ],
     );
   }
 
-
   bool uploading = false;
   void onConfirm() async {
-    if (email.text.isNotEmpty && validEmail && somethingChanged) {
+    if (email.text.isNotEmpty && validEmail && somethingChanged && password.text.length>=8 && passwordConfirm.text==password.text) {
       setState(() {
         uploading = true;
       });
-      ParcUser newme= ParcUser(
-        email: email.text,
-        name: name.text,
-        id: userID!,
-        tel: '$phoneDial${phone.text}',
-        avatar: null,
-      );
-      await uploadUserInDB(newme);
+
+     await addUserToUsersList().then((value) async {
+        ParcUser newme = ParcUser(
+          email: email.text,
+          name: name.text,
+          id: userID!,
+          tel: '$phoneDial${phone.text}',
+          avatar: null,
+        );
+        await uploadUserInDB(newme).then((value) {
+        });
+      }).onError((error, stackTrace) {
+       setState(() {
+         uploading = false;
+       });
+     });
+
       setState(() {
         uploading = false;
       });
+
     }
   }
 
-
-  Future<void> uploadUserInDB(ParcUser newme) async{
+  Future<void> uploadUserInDB(ParcUser newme) async {
     if (widget.user == null) {
-      await ClientDatabase.database!.createDocument(
-          databaseId: databaseId,
-          collectionId: userid,
-          documentId: userID!,
-          data: newme.toJson()).then((value) {
-        ClientDatabase.me.value=newme;
+      await ClientDatabase.database!
+          .createDocument(
+              databaseId: databaseId,
+              collectionId: userid,
+              documentId: userID!,
+              data: newme.toJson())
+          .then((value) {
+        ClientDatabase.me.value = newme;
         Navigator.pop(
           context,
         );
-
       });
-    }
-    else {
-      await ClientDatabase.database!.updateDocument(
-          databaseId: databaseId,
-          collectionId: userid,
-          documentId: userID!,
-          data: newme.toJson()).then((value) {
-        ClientDatabase.me.value=newme;
+    } else {
+      await ClientDatabase.database!
+          .updateDocument(
+              databaseId: databaseId,
+              collectionId: userid,
+              documentId: userID!,
+              data: newme.toJson())
+          .then((value) {
+        ClientDatabase.me.value = newme;
         Navigator.pop(
           context,
         );
@@ -421,9 +432,28 @@ class _UserFormState extends State<UserForm> {
     }
   }
 
-  Future<void> addUserToUsersList(User newume) async{
-
+  bool alreadyAdded = false;
+  Future<void> addUserToUsersList() async {
+    Client client = Client()
+      ..setEndpoint(endpoint)
+      ..setProject(project)
+      ..setKey(secretKey);
+    if (widget.user == null) {
+      await Users(client).create(
+          userId: userID!,
+          name: name.text,
+          email: email.text,
+          password: password.text,
+          phone: '$phoneDial${phone.text}');
+    } else {
+      if (widget.user!.name != name.text) {
+        await Users(client)
+            .updateName(userId: widget.user!.$id, name: name.text);
+      }
+      if (widget.user!.phone != '$phoneDial${phone.text}') {
+        await Users(client).updatePhone(
+            userId: widget.user!.$id, number: '$phoneDial${phone.text}');
+      }
+    }
   }
-
-
 }

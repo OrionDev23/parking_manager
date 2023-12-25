@@ -333,6 +333,9 @@
   "role": "الوظيفة",
   "admins": "مسؤول عام",
   "managers": "مدير",
-  "newuser": "مستخدم جديد"
+  "newuser": "مستخدم جديد",
+  "admins, managers": "مسؤول عام و مدير",
+  "invitmanager": "دعوة ليصبح مدير",
+  "invitationsent": "الدعوة أرسلت!"
 
 }

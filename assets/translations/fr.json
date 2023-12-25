@@ -373,5 +373,8 @@
  "role": "Role",
  "admins": "Admin",
  "managers": "Gérant",
- "newuser": "Nouvel utilisateur"
+ "newuser": "Nouvel utilisateur",
+ "invitmanager": "Inivter à devenir manager",
+ "admins, managers": "Admin et gérant",
+ "invitationsent": "Invitation envoyée"
 }
