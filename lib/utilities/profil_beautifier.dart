@@ -13,7 +13,7 @@ import '../serializables/state.dart';
 import '../serializables/vehicle.dart';
 
 class ProfilUtilitis{
- static  String getFirstLetters(ParcUser? user) {
+ static  String getFirstLetters(ParcUser? user,) {
     String result = "";
     if (user != null) {
       if (user.name!=null && user.name!.isNotEmpty) {

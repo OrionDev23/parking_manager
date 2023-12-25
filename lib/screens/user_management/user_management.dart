@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/screens/user_management/user_creation.dart';
 import 'package:parc_oto/screens/user_management/user_table.dart';
 import 'package:parc_oto/widgets/page_header.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -35,7 +36,7 @@ class _UserManagementState extends State<UserManagement> {
                 text: 'add'.tr(),
                 showBottom: false,
                 showCounter: false,
-                action: () {},
+                action: showUserForm,
               )),
         ),
         content: Padding(
@@ -44,5 +45,12 @@ class _UserManagementState extends State<UserManagement> {
             archive: widget.archive,
           ),
         ));
+  }
+
+
+  void showUserForm(){
+    showDialog(context: context, builder: (c){
+      return const UserForm();
+    });
   }
 }

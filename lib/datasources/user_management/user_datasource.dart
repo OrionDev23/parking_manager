@@ -6,6 +6,7 @@ import 'package:parc_oto/datasources/user_management/user_webservice.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../providers/client_database.dart';
+import '../../screens/user_management/user_creation.dart';
 import '../parcoto_datasource.dart';
 
 class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Membership>?>{
@@ -17,7 +18,6 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Members
   @override
   Future<void> addToActivity(User c) async{
     await ClientDatabase().ajoutActivity(35, c.$id,docName: c.name.isEmpty?c.email:c.name);
-
   }
 
   @override
@@ -93,6 +93,7 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Members
                         text: const Text('mod').tr(),
                         onPressed: (){
                           Navigator.of(current).pop();
+                          showUserForm(current,element.key);
                         }
                     ),
                     f.MenuFlyoutItem(
@@ -108,6 +109,13 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Members
             icon: const Icon(Icons.more_vert_sharp)),
       )),
     ];
+  }
+
+
+  void showUserForm(BuildContext context,User user){
+    f.showDialog(context: context, builder: (c){
+      return  UserForm(user: user,);
+    });
   }
 
 }

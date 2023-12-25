@@ -1,14 +1,18 @@
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:dart_appwrite/dart_appwrite.dart';
 import 'package:dart_appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/client_database.dart';
 import '../../serializables/parc_user.dart';
 import '../../theme.dart';
 import '../../utilities/country_list.dart';
 import '../../utilities/form_validators.dart';
+import '../../utilities/profil_beautifier.dart';
 
 class UserForm extends StatefulWidget {
 
@@ -36,6 +40,8 @@ class _UserFormState extends State<UserForm> {
     initValues();
     super.initState();
   }
+  bool showPassword=false;
+  bool showPasswordConfirm=false;
 
   void initValues() {
     userID = widget.user?.$id ?? ID.unique();
@@ -115,8 +121,9 @@ class _UserFormState extends State<UserForm> {
                     alignment: Alignment.center,
                     clipBehavior: Clip.antiAlias,
                     child:  Text(
-                      ProfilUtilitis.getFirstLetters(widget.user)
-                          .toUpperCase(),
+                      widget.user!=null?
+                      ProfilUtilitis.getFirstLetters(ParcUser(id: '', email: widget.user!.email,name: widget.user!.name))
+                          .toUpperCase():'',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -196,6 +203,96 @@ class _UserFormState extends State<UserForm> {
                   decoration: BoxDecoration(
                     color: appTheme.fillColor,
                   ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Row(
+            children: [
+              Icon(
+                FluentIcons.password_field,
+                color: Colors.grey[100],
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: TextBox(
+                  controller: password,
+                  placeholder: 'motdepasse'.tr(),
+
+                  suffix: IconButton(
+                    icon: Icon(
+                      showPassword?FluentIcons.hide
+                          :FluentIcons.red_eye,
+                      color: !showPassword?
+                      appTheme.color
+                          :Colors.grey[100]
+                      ,size: 12.sp,), onPressed: (){
+                    setState(() {
+                      showPassword=!showPassword;
+                    });
+                  },),
+                  obscureText: !showPassword,
+                  placeholderStyle:
+                  placeStyle,
+                  cursorColor:
+                  appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: BoxDecoration(
+                    color: appTheme.fillColor,
+                  ),
+                  onChanged: (s) {
+                    testIfSomethingChanged();
+                  },
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Row(
+            children: [
+              Icon(
+                FluentIcons.password_field,
+                color: Colors.grey[100],
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: TextBox(
+                  controller: passwordConfirm,
+                  placeholder: 'confirmation'.tr(),
+
+                  suffix: IconButton(
+                    icon: Icon(
+                      showPasswordConfirm?FluentIcons.hide
+                          :FluentIcons.red_eye,
+                      color: !showPasswordConfirm?
+                      appTheme.color
+                          :Colors.grey[100]
+                      ,size: 12.sp,), onPressed: (){
+                    setState(() {
+                      showPasswordConfirm=!showPasswordConfirm;
+                    });
+                  },),
+                  obscureText: !showPasswordConfirm,
+                  placeholderStyle:
+                  placeStyle,
+                  cursorColor:
+                  appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: BoxDecoration(
+                    color: appTheme.fillColor,
+                  ),
+                  onChanged: (s) {
+                    testIfSomethingChanged();
+                  },
                 ),
               ),
             ],
