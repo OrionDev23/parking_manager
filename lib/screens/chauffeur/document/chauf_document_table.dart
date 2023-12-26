@@ -419,7 +419,7 @@ class CDocumentTableState extends State<CDocumentTable> {
       empty: NoDataWidget(datasource: documentsDataSource,),
       horizontalMargin: 8,
       columnSpacing: 0,
-      dataRowHeight: 3.5.h,
+      dataRowHeight: rowHeight,
       onPageChanged: (s) {},
       showCheckboxColumn: false,
       sortColumnIndex: sortColumn,

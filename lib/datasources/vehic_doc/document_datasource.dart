@@ -10,6 +10,7 @@ import '../../providers/client_database.dart';
 import '../../screens/sidemenu/sidemenu.dart';
 import '../../screens/vehicle/manager/vehicle_tabs.dart';
 import '../../screens/vehicle/manager/vehicles_table.dart';
+import '../../widgets/on_tap_scale.dart';
 import 'document_webservice.dart';
 
 class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
@@ -62,9 +63,8 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
       ClientDatabase().isAdmin() || ClientDatabase().isManager()
     ? f.FlyoutTarget(
         controller: element.value.controller,
-        child: IconButton(
-            splashRadius: 15,
-            onPressed: () {
+        child: OnTapScaleAndFade(
+            onTap: () {
               element.value.controller.showFlyout(builder: (context) {
                 return f.MenuFlyout(
                   items: [
@@ -108,7 +108,7 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
                 );
               });
             },
-            icon: const Icon(Icons.more_vert_sharp)),
+            child: const Icon(Icons.more_vert_sharp)),
       )
       :const Text('')
       ),

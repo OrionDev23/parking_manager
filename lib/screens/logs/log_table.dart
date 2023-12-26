@@ -92,6 +92,13 @@ class LogTableState extends State<LogTable> {
           setState(() {});
         },
       ),
+      const DataColumn2(
+        label: Text(
+          '',
+        ),
+        size: ColumnSize.S,
+        onSort: null,
+      ),
     ];
   }
 
@@ -396,7 +403,7 @@ class LogTableState extends State<LogTable> {
       empty: NoDataWidget(datasource: logDatasource,),
       horizontalMargin: 8,
       columnSpacing: 0,
-      dataRowHeight: 3.5.h,
+      dataRowHeight: rowHeight,
       onPageChanged: (s) {},
       showCheckboxColumn: false,
       sortColumnIndex: sortColumn,

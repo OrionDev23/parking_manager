@@ -3,6 +3,7 @@ import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/vehicle/vehicle_webservice.dart';
 import 'package:parc_oto/screens/vehicle/documents/document_form.dart';
+import 'package:parc_oto/widgets/on_tap_scale.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../providers/client_database.dart';
 import '../../screens/vehicle/manager/vehicle_form.dart';
@@ -40,10 +41,8 @@ class VehiculesDataSource extends ParcOtoDatasource<Vehicle> {
 
     ?f.FlyoutTarget(
         controller: element.value.controller,
-        child: IconButton(
-            alignment: Alignment.topCenter,
-            splashRadius: 16.px,
-            onPressed: (){
+        child: OnTapScaleAndFade(
+            onTap: (){
               element.value.controller.showFlyout(builder: (context){
                 return f.MenuFlyout(
                   items: [
@@ -118,7 +117,7 @@ class VehiculesDataSource extends ParcOtoDatasource<Vehicle> {
                 );
               });
             },
-            icon: const Icon(Icons.more_vert_sharp)),
+            child: const Icon(Icons.more_vert_sharp)),
       )
       :const Text(''),
       ),

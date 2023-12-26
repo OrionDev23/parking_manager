@@ -240,7 +240,7 @@ class ReparationTableState extends State<ReparationTable> {
             sortAscending: assending,
             horizontalMargin: 8,
             columnSpacing: 0,
-            dataRowHeight: 3.5.h,
+            dataRowHeight: rowHeight,
             onPageChanged: (s) {},
             showCheckboxColumn: false,
             sortColumnIndex: sortColumn,

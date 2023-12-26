@@ -9,6 +9,7 @@ import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../providers/client_database.dart';
 import '../../screens/user_management/user_creation.dart';
+import '../../widgets/on_tap_scale.dart';
 import '../parcoto_datasource.dart';
 
 class UsersManagementDatasource extends ParcOtoDatasourceUsers<String,MapEntry<User,List<Membership>?>>{
@@ -85,9 +86,8 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<String,MapEntry<U
           ,style: tstyle)),
       DataCell(f.FlyoutTarget(
         controller: controllers[element.value.key.$id]!,
-        child: IconButton(
-            splashRadius: 15,
-            onPressed: (){
+        child: OnTapScaleAndFade(
+            onTap: (){
               controllers[element.value.key.$id]!.showFlyout(builder: (context){
                 return f.MenuFlyout(
                   items: [
@@ -101,7 +101,7 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<String,MapEntry<U
                         text: const Text('mod').tr(),
                         onPressed: (){
                           Navigator.of(current).pop();
-                          showUserForm(current,element.value.key);
+                          showUserForm(element.value.key);
                         }
                     ),
                     f.MenuFlyoutItem(
@@ -114,14 +114,15 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<String,MapEntry<U
                 );
               });
             },
-            icon: const Icon(Icons.more_vert_sharp)),
+            child: const Icon(Icons.more_vert_sharp)),
       )),
     ];
   }
 
 
-  void showUserForm(BuildContext context,User user){
-    f.showDialog(context: context, builder: (c){
+  void showUserForm(User user){
+    f.showDialog(context: current,
+        builder: (c){
       return  UserForm(user: user,);
     });
   }
@@ -138,18 +139,22 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<String,MapEntry<U
     return '';
   }
 
-  void inviteToBecomeManager(User user,List<Membership>? t) {
-    client_aw.Teams(    ClientDatabase.client!).createMembership(
+  void inviteToBecomeManager(User user,List<Membership>? t) async{
+   await client_aw.Teams(    ClientDatabase.client!).createMembership(
       teamId: 'managers',
       roles: ['member'],
       userId: user.$id,
       email: user.email,
-      url: 'https://app.parcoto.com/acceptinvitation?projectId=$project&endpoint=$endpoint}'
+      name: user.name,
+      url: 'https://app.parcoto.com/acceptinvitation?projectId=$project&endpoint=$endpoint'
     ).then((value) {
-      f.showDialog(
-          barrierDismissible: true,
-          context: current, builder: (co){
-        return const Text('invitationsent').tr();
+      f.displayInfoBar(
+        current,
+          builder: (co,s){
+        return f.InfoBar(
+          severity: f.InfoBarSeverity.success,
+          title: const Text('invitationsent').tr(),
+        );
       });
     }).onError((client_aw.AppwriteException error, stackTrace) {
       if(kDebugMode){

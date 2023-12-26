@@ -6,6 +6,7 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/serializables/disponibilite_chauffeur.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../widgets/on_tap_scale.dart';
 import 'disponibilite_webservice.dart';
 
 class DisponibiliteDataSource
@@ -52,9 +53,8 @@ class DisponibiliteDataSource
     ClientDatabase().isAdmin()
           ?f.FlyoutTarget(
         controller: element.value.controller,
-        child:  IconButton(
-                splashRadius: 15,
-                onPressed: () {
+        child:  OnTapScaleAndFade(
+                onTap: () {
                   element.value.controller.showFlyout(builder: (context) {
                     return f.MenuFlyout(
                       items: [
@@ -67,7 +67,7 @@ class DisponibiliteDataSource
                     );
                   });
                 },
-                icon: const Icon(Icons.more_vert_sharp))
+                child: const Icon(Icons.more_vert_sharp))
 
       )
         : const Text(''),

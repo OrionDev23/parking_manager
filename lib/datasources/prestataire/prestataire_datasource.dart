@@ -10,6 +10,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../providers/client_database.dart';
 import '../../screens/prestataire/prestataire_form.dart';
 import '../../screens/prestataire/prestataire_tabs.dart';
+import '../../widgets/on_tap_scale.dart';
 
 class PrestataireDataSource extends ParcOtoDatasource<Prestataire>{
   final bool archive;
@@ -58,9 +59,8 @@ class PrestataireDataSource extends ParcOtoDatasource<Prestataire>{
 
     ?f.FlyoutTarget(
         controller: element.value.controller,
-        child: IconButton(
-            splashRadius: 15,
-            onPressed: (){
+        child: OnTapScaleAndFade(
+            onTap: (){
               element.value.controller.showFlyout(builder: (context){
                 return f.MenuFlyout(
                   items: [
@@ -99,7 +99,7 @@ class PrestataireDataSource extends ParcOtoDatasource<Prestataire>{
                 );
               });
             },
-            icon: const Icon(Icons.more_vert_sharp)),
+            child: const Icon(Icons.more_vert_sharp)),
       )
       :const Text(''),
       ),

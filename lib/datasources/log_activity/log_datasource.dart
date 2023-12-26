@@ -7,6 +7,8 @@ import 'package:parc_oto/serializables/activity.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 
+import '../../widgets/on_tap_scale.dart';
+
 class LogDatasource extends ParcOtoDatasource<Activity> {
   LogDatasource(
       {required super.collectionID,
@@ -51,9 +53,8 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
         ClientDatabase().isAdmin()
             ? f.FlyoutTarget(
                 controller: element.value.controller,
-                child: IconButton(
-                    splashRadius: 15,
-                    onPressed: () {
+                child: OnTapScaleAndFade(
+                    onTap: () {
                       element.value.controller.showFlyout(builder: (context) {
                         return f.MenuFlyout(
                           items: [
@@ -66,7 +67,7 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
                         );
                       });
                     },
-                    icon: const Icon(Icons.more_vert_sharp)))
+                    child: const Icon(Icons.more_vert_sharp)))
             : const Text(''),
       )
     ];

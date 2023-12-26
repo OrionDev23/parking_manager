@@ -10,6 +10,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../screens/chauffeur/document/chauf_document_form.dart';
 import '../../screens/chauffeur/manager/chauffeur_tabs.dart';
 import '../../serializables/conducteur.dart';
+import '../../widgets/on_tap_scale.dart';
 
 class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
   final bool archive;
@@ -56,9 +57,8 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
         ClientDatabase().isAdmin() || ClientDatabase().isManager()
             ?f.FlyoutTarget(
           controller: element.value.controller,
-          child: IconButton(
-              splashRadius: 15,
-              onPressed: (){
+          child: OnTapScaleAndFade(
+              onTap: (){
                 element.value.controller.showFlyout(builder: (context){
                   return f.MenuFlyout(
                     items: [
@@ -142,7 +142,7 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
                   );
                 });
               },
-              icon: const Icon(Icons.more_vert_sharp)),
+              child: const Icon(Icons.more_vert_sharp)),
         )
         :const Text('')
         ),

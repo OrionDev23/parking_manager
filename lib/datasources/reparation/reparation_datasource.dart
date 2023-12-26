@@ -13,6 +13,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../providers/client_database.dart';
 import '../../screens/reparation/reparation_tabs.dart';
 import '../../serializables/reparation.dart';
+import '../../widgets/on_tap_scale.dart';
 
 class ReparationDataSource extends ParcOtoDatasource<Reparation> {
   final bool? archive;
@@ -62,9 +63,8 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation> {
 
           f.FlyoutTarget(
         controller: element.value.controller,
-        child: IconButton(
-            splashRadius: 15,
-            onPressed: () {
+        child: OnTapScaleAndFade(
+            onTap: () {
               element.value.controller.showFlyout(builder: (context) {
                 return f.MenuFlyout(
                   items: [
@@ -113,7 +113,7 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation> {
                 );
               });
             },
-            icon: const Icon(Icons.more_vert_sharp)),
+            child: const Icon(Icons.more_vert_sharp)),
       )),
     ];
   }

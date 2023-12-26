@@ -1,6 +1,5 @@
 
 import 'package:appwrite/models.dart';
-import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 
 import 'package:fluent_ui/fluent_ui.dart';

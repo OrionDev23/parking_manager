@@ -10,6 +10,7 @@ import '../../providers/client_database.dart';
 import '../../screens/chauffeur/document/chauf_document_form.dart';
 import '../../screens/chauffeur/document/chauf_document_tabs.dart';
 import '../../screens/sidemenu/sidemenu.dart';
+import '../../widgets/on_tap_scale.dart';
 import 'cdocument_webservice.dart';
 
 class ChaufDocumentsDataSource extends ParcOtoDatasource<DocumentChauffeur> {
@@ -59,10 +60,8 @@ class ChaufDocumentsDataSource extends ParcOtoDatasource<DocumentChauffeur> {
       DataCell(ClientDatabase().isAdmin() || ClientDatabase().isManager()
           ? f.FlyoutTarget(
               controller: element.value.controller,
-              child: IconButton(
-                  alignment: Alignment.topCenter,
-                  splashRadius: 15,
-                  onPressed: () {
+              child: OnTapScaleAndFade(
+                  onTap: () {
                     element.value.controller.showFlyout(builder: (context) {
                       return f.MenuFlyout(
                         items: [
@@ -106,7 +105,7 @@ class ChaufDocumentsDataSource extends ParcOtoDatasource<DocumentChauffeur> {
                       );
                     });
                   },
-                  icon: const Icon(Icons.more_vert_sharp)))
+                  child: const Icon(Icons.more_vert_sharp)))
           : const Text('')),
     ];
   }

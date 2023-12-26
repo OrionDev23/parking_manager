@@ -768,7 +768,7 @@ class VehicleTableState extends State<VehicleTable> {
                   pageSyncApproach: PageSyncApproach.goToFirst,
                   horizontalMargin: 8,
                   columnSpacing: 0,
-                  dataRowHeight: 24.px,
+                  dataRowHeight: rowHeight,
                   onPageChanged: (s) {},
                   showCheckboxColumn: false,
                   sortColumnIndex: sortColumn,
