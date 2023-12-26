@@ -11,20 +11,20 @@ import '../../providers/client_database.dart';
 import '../../screens/user_management/user_creation.dart';
 import '../parcoto_datasource.dart';
 
-class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Membership>?>{
+class UsersManagementDatasource extends ParcOtoDatasourceUsers<String,MapEntry<User,List<Membership>?>>{
   final bool archive;
   UsersManagementDatasource({required super.current,super.appTheme,super.searchKey,super.selectC,this.archive=false}){
     repo=UsersWebservice(data);
   }
 
   @override
-  Future<void> addToActivity(User c) async{
-    await ClientDatabase().ajoutActivity(35, c.$id,docName: c.name.isEmpty?c.email:c.name);
+  Future<void> addToActivity(MapEntry<User,List<Membership>?> c) async{
+    await ClientDatabase().ajoutActivity(35, c.key.$id,docName: c.key.name.isEmpty?c.key.email:c.key.name);
   }
 
   @override
-  String deleteConfirmationMessage(User c) {
-    return '${'supreuser'.tr()} ${c.name.isEmpty?c.email:c.name}';
+  String deleteConfirmationMessage(MapEntry<User,List<Membership>?> c) {
+    return '${'supreuser'.tr()} ${c.key.name.isEmpty?c.key.email:c.key.name}';
   }
 
   @override
@@ -34,15 +34,15 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Members
 
     await Future.wait([
      Users(client)
-        .delete(userId: c.$id).then((value) async{
+        .delete(userId: t.key.$id).then((value) async{
       await Databases(client).deleteDocument(
           databaseId: databaseId,
           collectionId: userid,
-          documentId: c.$id);
+          documentId: t.key.$id);
       data.remove(MapEntry(c, t));
       refreshDatasource();
     }),
-      addToActivity(c),
+      addToActivity(t),
     ]).onError((error, stackTrace) {
       return [
         f.displayInfoBar(current,builder: (c,s){
@@ -59,49 +59,49 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Members
 
 
   @override
-  List<DataCell> getCellsToShow(MapEntry<User, List<Membership>?> element) {
+  List<DataCell> getCellsToShow(MapEntry<String,MapEntry<User, List<Membership>?>> element) {
     final dateFormat=DateFormat('y/M/d HH:mm:ss','fr');
     final tstyle=TextStyle(
       fontSize: 10.sp,
     );
     String roles='';
-    element.value?.forEach((element) {
+    element.value.value?.forEach((element) {
       if(roles.isNotEmpty){
         roles+=', ';
       }
       roles+=element.teamName.tr();
     });
     return [
-      DataCell(SelectableText(element.key.name
+      DataCell(SelectableText(element.value.key.name
           ,style: tstyle)),
-      DataCell(SelectableText(element.key.email
+      DataCell(SelectableText(element.value.key.email
           ,style: tstyle)),
-      DataCell(SelectableText(element.key.$id
+      DataCell(SelectableText(element.value.key.$id
           ,style: tstyle)),
       DataCell(SelectableText((roles).toLowerCase().tr()
           ,style: tstyle)),
       DataCell(SelectableText(
-          dateFormat.format(DateTime.parse(element.key.$createdAt))
+          dateFormat.format(DateTime.parse(element.value.key.$createdAt))
           ,style: tstyle)),
       DataCell(f.FlyoutTarget(
-        controller: controllers[element.key.$id]!,
+        controller: controllers[element.value.key.$id]!,
         child: IconButton(
             splashRadius: 15,
             onPressed: (){
-              controllers[element.key.$id]!.showFlyout(builder: (context){
+              controllers[element.value.key.$id]!.showFlyout(builder: (context){
                 return f.MenuFlyout(
                   items: [
                     f.MenuFlyoutItem(
                       text:const Text('invitmanager').tr(),
                       onPressed: (){
-                        inviteToBecomeManager(element.key,element.value);
+                        inviteToBecomeManager(element.value.key,element.value.value);
                       },
                     ),
                     f.MenuFlyoutItem(
                         text: const Text('mod').tr(),
                         onPressed: (){
                           Navigator.of(current).pop();
-                          showUserForm(current,element.key);
+                          showUserForm(current,element.value.key);
                         }
                     ),
                     f.MenuFlyoutItem(
@@ -138,10 +138,11 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<User,List<Members
     return '';
   }
 
-  void inviteToBecomeManager(User user,List<Membership>? t) async{
-    await client_aw.Teams(    ClientDatabase.client!).createMembership(
+  void inviteToBecomeManager(User user,List<Membership>? t) {
+    client_aw.Teams(    ClientDatabase.client!).createMembership(
       teamId: 'managers',
-      roles: [''],
+      roles: ['member'],
+      userId: user.$id,
       email: user.email,
       url: 'https://app.parcoto.com/acceptinvitation?projectId=$project&endpoint=$endpoint}'
     ).then((value) {

@@ -8,9 +8,16 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import 'disponibilite_webservice.dart';
 
-class DisponibiliteDataSource extends ParcOtoDatasource<DisponibiliteChauffeur>{
-  DisponibiliteDataSource({required super.collectionID, required super.current,super.appTheme,super.filters,super.searchKey,super.selectC}){
-    repo=DisponibiliteWebService(data, collectionID, 1);
+class DisponibiliteDataSource
+    extends ParcOtoDatasource<DisponibiliteChauffeur> {
+  DisponibiliteDataSource(
+      {required super.collectionID,
+      required super.current,
+      super.appTheme,
+      super.filters,
+      super.searchKey,
+      super.selectC}) {
+    repo = DisponibiliteWebService(data, collectionID, 1);
   }
 
   @override
@@ -19,7 +26,8 @@ class DisponibiliteDataSource extends ParcOtoDatasource<DisponibiliteChauffeur>{
   }
 
   @override
-  List<DataCell> getCellsToShow(MapEntry<String, DisponibiliteChauffeur> element) {
+  List<DataCell> getCellsToShow(
+      MapEntry<String, DisponibiliteChauffeur> element) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
     final tstyle = TextStyle(
       fontSize: 10.sp,
@@ -28,7 +36,7 @@ class DisponibiliteDataSource extends ParcOtoDatasource<DisponibiliteChauffeur>{
       DataCell(SelectableText(
         element.value.chauffeurNom,
         style: tstyle,
-        onTap: (){
+        onTap: () {
           goToChaffeur(element.value.chauffeurNom);
         },
       )),
@@ -40,36 +48,37 @@ class DisponibiliteDataSource extends ParcOtoDatasource<DisponibiliteChauffeur>{
         dateFormat.format(element.value.createdAt!),
         style: tstyle,
       )),
-      DataCell(f.FlyoutTarget(
+      DataCell(
+    ClientDatabase().isAdmin()
+          ?f.FlyoutTarget(
         controller: element.value.controller,
-        child: IconButton(
-            splashRadius: 15,
-            onPressed: (){
-              element.value.controller.showFlyout(builder: (context){
-                return f.MenuFlyout(
-                  items: [
-                    f.MenuFlyoutItem(
-                        text: const Text('delete').tr(),
-                        onPressed: (){
-                          showDeleteConfirmation(element.value);
-                        }
-                    ),
-                  ],
-                );
-              });
-            },
-            icon: const Icon(Icons.more_vert_sharp)),
-      )),
+        child:  IconButton(
+                splashRadius: 15,
+                onPressed: () {
+                  element.value.controller.showFlyout(builder: (context) {
+                    return f.MenuFlyout(
+                      items: [
+                        f.MenuFlyoutItem(
+                            text: const Text('delete').tr(),
+                            onPressed: () {
+                              showDeleteConfirmation(element.value);
+                            }),
+                      ],
+                    );
+                  });
+                },
+                icon: const Icon(Icons.more_vert_sharp))
+
+      )
+        : const Text(''),
+      ),
     ];
   }
 
-  void goToChaffeur(String chauf){
-
-  }
+  void goToChaffeur(String chauf) {}
 
   @override
-  Future<void> addToActivity(c) async{
-    await ClientDatabase().ajoutActivity(22, c.id,docName: c.chauffeurNom);
+  Future<void> addToActivity(c) async {
+    await ClientDatabase().ajoutActivity(22, c.id, docName: c.chauffeurNom);
   }
-  
 }

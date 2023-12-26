@@ -132,7 +132,11 @@ abstract class ParcOtoWebServiceUsers<S,T>{
       //stopwatch.stop();
       // print("finished in ${stopwatch.elapsed.inMilliseconds} s");
 
-      data=value.entries.toList();
+      for (var element in value.entries) {
+        if(!testIfContained(data,element)){
+          data.add(element);
+        }
+      }
       var result = data;
 
       result.sort(getComparisonFunction(sortedBy, sortedAsc));
@@ -142,6 +146,15 @@ abstract class ParcOtoWebServiceUsers<S,T>{
     }).onError((error, stackTrace) {
       return Future.value(UsersWebServiceResponse<S,T>(0, data));
     });
+  }
+
+  bool testIfContained(List<MapEntry<dynamic,dynamic>> list,dynamic s){
+    for(var element in list){
+      if(element.key==s.key){
+        return true;
+      }
+    }
+    return false;
   }
 
 

@@ -28,7 +28,6 @@ class VehicleTableState extends State<VehicleTable> {
   static ValueNotifier<int?> filterMarque = ValueNotifier(null);
   static ValueNotifier<String?> filterVehicule = ValueNotifier(null);
 
-
   static bool filterNow = false;
 
   bool filteredAlready = false;
@@ -37,7 +36,6 @@ class VehicleTableState extends State<VehicleTable> {
   bool assending = false;
 
   late List<DataColumn2> columns;
-
 
   @override
   void initState() {
@@ -48,12 +46,16 @@ class VehicleTableState extends State<VehicleTable> {
         filtered = true;
         filters['marque'] = filterMarque.value.toString();
         vehicleDataSource = VehiculesDataSource(
-            current: context, selectC: widget.selectV, collectionID:vehiculeid,filters: filters);
+            current: context,
+            selectC: widget.selectV,
+            collectionID: vehiculeid,
+            filters: filters);
       } else {
         searchController.text = filterVehicule.value!;
         vehicleDataSource = VehiculesDataSource(
             current: context,
-            selectC: widget.selectV, collectionID:vehiculeid,
+            selectC: widget.selectV,
+            collectionID: vehiculeid,
             searchKey: filterVehicule.value);
       }
       filterMarque.value = null;
@@ -62,7 +64,8 @@ class VehicleTableState extends State<VehicleTable> {
       startedWithFiltersOn = false;
       vehicleDataSource = VehiculesDataSource(
         current: context,
-        selectC: widget.selectV, collectionID:vehiculeid,
+        selectC: widget.selectV,
+        collectionID: vehiculeid,
       );
     }
     initColumns();
@@ -167,7 +170,6 @@ class VehicleTableState extends State<VehicleTable> {
   TextEditingController yearMax = TextEditingController();
   Map<String, String> filters = {};
 
-
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
@@ -188,7 +190,7 @@ class VehicleTableState extends State<VehicleTable> {
                 if (!startedWithFiltersOn && v != null && filterNow) {
                   searchController.text = v;
                   vehicleDataSource.search(v);
-                  notEmpty=true;
+                  notEmpty = true;
                   filtered = true;
                   filterNow = false;
                 }
@@ -733,11 +735,14 @@ class VehicleTableState extends State<VehicleTable> {
                                     notEmpty = true;
                                   });
                                 }
-                              } else {
+                              }
+                              else {
                                 if (notEmpty) {
+
                                   setState(() {
                                     notEmpty = false;
                                   });
+                                  vehicleDataSource.search('');
                                 }
                               }
                             },
@@ -757,11 +762,13 @@ class VehicleTableState extends State<VehicleTable> {
                     ),
                   ),
                   sortAscending: assending,
-                  empty: NoDataWidget(datasource: vehicleDataSource,),
+                  empty: NoDataWidget(
+                    datasource: vehicleDataSource,
+                  ),
                   pageSyncApproach: PageSyncApproach.goToFirst,
                   horizontalMargin: 8,
                   columnSpacing: 0,
-                  dataRowHeight: 3.5.h,
+                  dataRowHeight: 24.px,
                   onPageChanged: (s) {},
                   showCheckboxColumn: false,
                   sortColumnIndex: sortColumn,
@@ -769,10 +776,16 @@ class VehicleTableState extends State<VehicleTable> {
                   onRowsPerPageChanged: (nbr) {
                     rowPerPage = nbr ?? rowPerPageC;
                   },
-                  availableRowsPerPage:  [rowPerPageC, rowPerPageC*2, rowPerPageC*4, rowPerPageC*10, rowPerPageC*20],
+                  availableRowsPerPage: [
+                    rowPerPageC,
+                    rowPerPageC * 2,
+                    rowPerPageC * 4,
+                    rowPerPageC * 10,
+                    rowPerPageC * 20
+                  ],
                   showFirstLastButtons: true,
                   renderEmptyRowsInTheEnd: false,
-                  fit: FlexFit.tight,
+                  fit: FlexFit.loose,
                   columns: columns,
                   source: vehicleDataSource,
                   sortArrowAlwaysVisible: true,

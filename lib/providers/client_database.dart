@@ -30,7 +30,7 @@ class ClientDatabase {
   static Client? client;
   static Account? account;
   static User? user;
-  
+
   static List<Team> myTeams=List.empty(growable: true);
   static Storage? storage;
   static final DateTime ref = DateTime(2023, 11, 01, 12, 13, 15);
@@ -49,6 +49,8 @@ class ClientDatabase {
     storage ??= Storage(client!);
     getEntreprise();
   }
+
+
 
   bool isManager({List<Team>? teams}){
     for(var element in teams??myTeams){

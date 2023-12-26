@@ -28,17 +28,21 @@ class VehiculesDataSource extends ParcOtoDatasource<Vehicle> {
         children: [
           Image.asset('assets/images/marques/${element.value.marque ?? 'default'}.webp',width: 4.h,height: 4.h,),
           const SizedBox(width: 5,),
-          SelectableText(element.value.type ?? '',style: tstyle),
+          Text(element.value.type ?? '',style: tstyle),
         ],
       )),
-      DataCell(SelectableText(element.value.anneeUtil.toString(),style: tstyle)),
-      DataCell(SelectableText(
+      DataCell(Text(element.value.anneeUtil.toString(),style: tstyle)),
+      DataCell(Text(
           dateFormat.format(element.value.updatedAt!)
           ,style: tstyle)),
-      DataCell(f.FlyoutTarget(
+      DataCell(
+    ClientDatabase().isAdmin() || ClientDatabase().isManager()
+
+    ?f.FlyoutTarget(
         controller: element.value.controller,
         child: IconButton(
-            splashRadius: 15,
+            alignment: Alignment.topCenter,
+            splashRadius: 16.px,
             onPressed: (){
               element.value.controller.showFlyout(builder: (context){
                 return f.MenuFlyout(
@@ -67,6 +71,7 @@ class VehiculesDataSource extends ParcOtoDatasource<Vehicle> {
                           VehicleTabsState.currentIndex.value = index - 1;
                         }
                     ),
+                    if(ClientDatabase().isAdmin())
                     f.MenuFlyoutItem(
                         text: const Text('delete').tr(),
                         onPressed: (){
@@ -77,7 +82,7 @@ class VehiculesDataSource extends ParcOtoDatasource<Vehicle> {
                     f.MenuFlyoutItem(
                         text: const Text('nouvdocument').tr(),
                         onPressed: (){
-                          f.showDialog(context: context,
+                          f.showDialog(context: current,
                               barrierDismissible: true,
                               builder: (context){
                                 return  DocumentForm(ve: element.value,);
@@ -114,7 +119,9 @@ class VehiculesDataSource extends ParcOtoDatasource<Vehicle> {
               });
             },
             icon: const Icon(Icons.more_vert_sharp)),
-      )),
+      )
+      :const Text(''),
+      ),
     ];
   }
 

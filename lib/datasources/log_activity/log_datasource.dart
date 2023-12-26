@@ -5,6 +5,7 @@ import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/serializables/activity.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:fluent_ui/fluent_ui.dart' as f;
 
 class LogDatasource extends ParcOtoDatasource<Activity> {
   LogDatasource(
@@ -46,6 +47,28 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
               ? dateFormat.format(element.value.updatedAt!)
               : '',
           style: tstyle)),
+      DataCell(
+        ClientDatabase().isAdmin()
+            ? f.FlyoutTarget(
+                controller: element.value.controller,
+                child: IconButton(
+                    splashRadius: 15,
+                    onPressed: () {
+                      element.value.controller.showFlyout(builder: (context) {
+                        return f.MenuFlyout(
+                          items: [
+                            f.MenuFlyoutItem(
+                                text: const Text('delete').tr(),
+                                onPressed: () {
+                                  showDeleteConfirmation(element.value);
+                                }),
+                          ],
+                        );
+                      });
+                    },
+                    icon: const Icon(Icons.more_vert_sharp)))
+            : const Text(''),
+      )
     ];
   }
 

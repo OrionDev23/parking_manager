@@ -14,55 +14,77 @@ import '../../providers/client_database.dart';
 import '../../screens/reparation/reparation_tabs.dart';
 import '../../serializables/reparation.dart';
 
-class ReparationDataSource extends ParcOtoDatasource<Reparation>{
+class ReparationDataSource extends ParcOtoDatasource<Reparation> {
   final bool? archive;
-  ReparationDataSource({required super.collectionID,this.archive, required super.current,super.appTheme,super.filters,super.searchKey,super.selectC}){
-    repo=ReparationWebService(data, collectionID, 7);
+  ReparationDataSource(
+      {required super.collectionID,
+      this.archive,
+      required super.current,
+      super.appTheme,
+      super.filters,
+      super.searchKey,
+      super.selectC}) {
+    repo = ReparationWebService(data, collectionID, 7);
   }
 
   @override
   String deleteConfirmationMessage(c) {
     return '${'supreparation'.tr()} ${c.numero}';
-
   }
 
   @override
   List<DataCell> getCellsToShow(MapEntry<String, Reparation> element) {
-    final dateFormat=DateFormat('y/M/d HH:mm:ss','fr');
-    final dateFormat2=DateFormat('y/M/d','fr');
-    final numberFormat=NumberFormat('00000000','fr');
-    final numberFormat2=NumberFormat.currency(locale:'fr',symbol: 'DA',decimalDigits: 2);
-    final tstyle=TextStyle(
+    final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
+    final dateFormat2 = DateFormat('y/M/d', 'fr');
+    final numberFormat = NumberFormat('00000000', 'fr');
+    final numberFormat2 =
+        NumberFormat.currency(locale: 'fr', symbol: 'DA', decimalDigits: 2);
+    final tstyle = TextStyle(
       fontSize: 10.sp,
     );
     return [
-      DataCell(SelectableText(numberFormat.format(element.value.numero),style: tstyle,)),
-      DataCell(SelectableText(element.value.vehiculemat??'',style: tstyle)),
-      DataCell(SelectableText(element.value.prestatairenom??'',style: tstyle)),
-      DataCell(SelectableText(dateFormat2.format(element.value.date),style: tstyle)),
-      DataCell(SelectableText(numberFormat2.format(element.value.getPrixTTC()),style: tstyle,)),
       DataCell(SelectableText(
-          dateFormat.format(element.value.updatedAt!)
-          ,style: tstyle)),
-      DataCell(f.FlyoutTarget(
+        numberFormat.format(element.value.numero),
+        style: tstyle,
+      )),
+      DataCell(SelectableText(element.value.vehiculemat ?? '', style: tstyle)),
+      DataCell(
+          SelectableText(element.value.prestatairenom ?? '', style: tstyle)),
+      DataCell(SelectableText(dateFormat2.format(element.value.date),
+          style: tstyle)),
+      DataCell(SelectableText(
+        numberFormat2.format(element.value.getPrixTTC()),
+        style: tstyle,
+      )),
+      DataCell(SelectableText(dateFormat.format(element.value.updatedAt!),
+          style: tstyle)),
+      DataCell(
+
+          f.FlyoutTarget(
         controller: element.value.controller,
         child: IconButton(
             splashRadius: 15,
-            onPressed: (){
-              element.value.controller.showFlyout(builder: (context){
+            onPressed: () {
+              element.value.controller.showFlyout(builder: (context) {
                 return f.MenuFlyout(
                   items: [
+                    if(ClientDatabase().isAdmin() || ClientDatabase().isManager())
                     f.MenuFlyoutItem(
                         text: const Text('mod').tr(),
-                        onPressed: (){
+                        onPressed: () {
                           Navigator.of(current).pop();
                           late f.Tab tab;
                           tab = f.Tab(
                             key: UniqueKey(),
-                            text: Text('${"mod".tr()} ${'reparation'.tr().toLowerCase()} ${element.value.numero}'),
-                            semanticLabel: '${'mod'.tr()} ${element.value.numero}',
+                            text: Text(
+                                '${"mod".tr()} ${'reparation'.tr().toLowerCase()} ${element.value.numero}'),
+                            semanticLabel:
+                                '${'mod'.tr()} ${element.value.numero}',
                             icon: const Icon(f.FluentIcons.edit),
-                            body: ReparationForm(reparation: element.value,key: UniqueKey(),),
+                            body: ReparationForm(
+                              reparation: element.value,
+                              key: UniqueKey(),
+                            ),
                             onClosed: () {
                               ReparationTabsState.tabs.remove(tab);
 
@@ -74,21 +96,19 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation>{
                           final index = ReparationTabsState.tabs.length + 1;
                           ReparationTabsState.tabs.add(tab);
                           ReparationTabsState.currentIndex.value = index - 1;
-                        }
-                    ),
-                    f.MenuFlyoutItem(
-                        text: const Text('delete').tr(),
-                        onPressed: (){
-                          showDeleteConfirmation(element.value);
-                        }
-                    ),
+                        }),
+                    if (ClientDatabase().isAdmin())
+                      f.MenuFlyoutItem(
+                          text: const Text('delete').tr(),
+                          onPressed: () {
+                            showDeleteConfirmation(element.value);
+                          }),
                     const f.MenuFlyoutSeparator(),
                     f.MenuFlyoutItem(
                         text: const Text('prevoir').tr(),
-                        onPressed: (){
+                        onPressed: () {
                           showPdf(element.value);
-                        }
-                    ),
+                        }),
                   ],
                 );
               });
@@ -98,26 +118,26 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation>{
     ];
   }
 
-
-  void showPdf(Reparation reparation){
-    f.showDialog(context: current, builder: (context){
-      return PdfPreview(
-        pdfFileName: 'ordre${numberFormat.format(reparation.numero)}',
-        initialPageFormat: PdfPageFormat.a4,
-        canDebug: false,
-        canChangeOrientation: false,
-        canChangePageFormat: false,
-        build: (PdfPageFormat format) {
-          return ReparationPdf(reparation: reparation).getDocument();
-        },
-      );
-    });
+  void showPdf(Reparation reparation) {
+    f.showDialog(
+        context: current,
+        builder: (context) {
+          return PdfPreview(
+            pdfFileName: 'ordre${numberFormat.format(reparation.numero)}',
+            initialPageFormat: PdfPageFormat.a4,
+            canDebug: false,
+            canChangeOrientation: false,
+            canChangePageFormat: false,
+            build: (PdfPageFormat format) {
+              return ReparationPdf(reparation: reparation).getDocument();
+            },
+          );
+        });
   }
 
   @override
-  Future<void> addToActivity(c) async{
-    await ClientDatabase().ajoutActivity(12, c.id,docName: c.numero.toString());
+  Future<void> addToActivity(c) async {
+    await ClientDatabase()
+        .ajoutActivity(12, c.id, docName: c.numero.toString());
   }
-  
-
 }

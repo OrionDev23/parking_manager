@@ -52,7 +52,9 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
           dateFormat.format(element.value.updatedAt!),
           style: tstyle,
         )),
-        DataCell(f.FlyoutTarget(
+        DataCell(
+        ClientDatabase().isAdmin() || ClientDatabase().isManager()
+            ?f.FlyoutTarget(
           controller: element.value.controller,
           child: IconButton(
               splashRadius: 15,
@@ -84,7 +86,8 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
                             ChauffeurTabsState.currentIndex.value = index - 1;
                           }
                       ),
-                      f.MenuFlyoutItem(
+                      if(ClientDatabase().isAdmin() && archive)
+                        f.MenuFlyoutItem(
                           text: const Text('delete').tr(),
                           onPressed: (){
                             showDeleteConfirmation(element.value);
@@ -94,7 +97,7 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
                       f.MenuFlyoutItem(
                           text: const Text('nouvdocument').tr(),
                           onPressed: (){
-                            f.showDialog(context: context,
+                            f.showDialog(context: current,
                                 barrierDismissible: true,
                                 builder: (context){
                                   return  CDocumentForm(
@@ -124,7 +127,9 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
                                 onPressed: (){
 
                                 }
-                            ),f.MenuFlyoutItem(
+                            ),
+                            if(ClientDatabase().isAdmin())
+                              f.MenuFlyoutItem(
                                 text: const Text('quitteentre').tr(),
                                 onPressed: (){
 
@@ -138,7 +143,9 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
                 });
               },
               icon: const Icon(Icons.more_vert_sharp)),
-        )),
+        )
+        :const Text('')
+        ),
     ];
   }
   @override

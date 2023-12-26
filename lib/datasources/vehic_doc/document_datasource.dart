@@ -58,7 +58,9 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
           element.value.updatedAt!=null?
           dateFormat.format(element.value.updatedAt!):'',
           style: tstyle)),
-      DataCell(f.FlyoutTarget(
+      DataCell(
+      ClientDatabase().isAdmin() || ClientDatabase().isManager()
+    ? f.FlyoutTarget(
         controller: element.value.controller,
         child: IconButton(
             splashRadius: 15,
@@ -96,6 +98,7 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
                           DocumentTabsState.currentIndex.value =
                               index - 1;
                         }),
+                    if(ClientDatabase().isAdmin())
                     f.MenuFlyoutItem(
                         text: const Text('delete').tr(),
                         onPressed: () {
@@ -106,7 +109,9 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
               });
             },
             icon: const Icon(Icons.more_vert_sharp)),
-      )),
+      )
+      :const Text('')
+      ),
     ];
   }
 

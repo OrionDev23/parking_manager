@@ -9,6 +9,7 @@ import 'package:system_theme/system_theme.dart';
 import 'package:flutter/material.dart' as m;
 enum NavigationIndicators { sticky, end }
 
+late final  double rowHeight;
 const tstyle = TextStyle(fontWeight: FontWeight.bold);
 final placeStyle = TextStyle(color: Colors.grey[100]);
 const smallSpace = SizedBox(
@@ -190,6 +191,7 @@ class AppTheme extends ChangeNotifier {
         ? PaneDisplayMode.auto
         : getDisplayMode(savedSettings.getInt('display')!);
     locale=Locale(savedSettings.getString('lang')??'fr');
+    rowHeight=24.px;
 
     changeDecorations();
 

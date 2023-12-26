@@ -224,9 +224,9 @@ abstract class ParcOtoDatasourceUsers<S,T> extends AsyncDataTableSource{
 
 
   DataRow rowDisplay(int startIndex,int count,MapEntry<dynamic,dynamic> element){
-    controllers[element.key.$id]=f.FlyoutController();
+    controllers[element.value.key.$id]=f.FlyoutController();
     return DataRow(
-      key: ValueKey<String>(element.key.$id),
+      key: ValueKey<String>(element.key),
       onSelectChanged: selectC==true? (value) {
         if (value ==true) {
           selectRow(element.value);
@@ -237,7 +237,7 @@ abstract class ParcOtoDatasourceUsers<S,T> extends AsyncDataTableSource{
 
   List<DataCell> getCellsToShow(MapEntry<S,T> element);
 
-  void selectRow(ParcOtoDefault c){
+  void selectRow(T c){
     Navigator.of(current).pop(c);
   }
 
@@ -246,7 +246,7 @@ abstract class ParcOtoDatasourceUsers<S,T> extends AsyncDataTableSource{
         context: current,
         builder: (context) {
           return f.ContentDialog(
-            content: Text(deleteConfirmationMessage( c)),
+            content: Text(deleteConfirmationMessage( t)),
             actions: [
               f.FilledButton(
                   onPressed: () {
@@ -266,9 +266,9 @@ abstract class ParcOtoDatasourceUsers<S,T> extends AsyncDataTableSource{
         });
   }
 
-  String deleteConfirmationMessage(S c);
+  String deleteConfirmationMessage(T c);
 
   void deleteRow(S c,T t);
 
-  Future<void> addToActivity(S c);
+  Future<void> addToActivity(T c);
 }
