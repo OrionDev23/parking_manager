@@ -11,7 +11,8 @@ import '../dashboard/dashboard.dart';
 import '../entreprise.dart';
 import '../login.dart';
 import '../logout.dart';
-import '../logs/log_management.dart';
+import '../logs/logging/log_management.dart';
+import '../logs/planning/planing_calendar.dart';
 import '../prestataire/prestataire_tabs.dart';
 import '../reparation/reparation_tabs.dart';
 import '../settings.dart';
@@ -115,7 +116,7 @@ class PaneItemsAndFooters{
           PaneItem(
               icon: const Icon(FluentIcons.reservation_orders),
               title: const Text('planifier').tr(),
-              body: const Placeholder()),
+              body: const PlanningCalendar()),
           PaneItem(
               icon: const Icon(FluentIcons.parking_solid),
               title: const Text('parking').tr(),
