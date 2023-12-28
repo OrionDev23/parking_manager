@@ -44,6 +44,8 @@ class PanesListState extends State<PanesList> with WindowListener {
   static bool listening = false;
   void listenToSigningChanges() {}
 
+  static bool firstLoading=true;
+
   bool loading = false;
   @override
   void initState() {
@@ -65,8 +67,12 @@ class PanesListState extends State<PanesList> with WindowListener {
       setState(() {});
     }
     await ClientDatabase().getUser();
-    widget.paneList.initPanes();
+    if(ClientDatabase.user!=null) {
+      signedIn.value=true;
+    }
+      widget.paneList.initPanes();
     loading = false;
+    firstLoading=false;
     if (mounted) {
       setState(() {});
     }

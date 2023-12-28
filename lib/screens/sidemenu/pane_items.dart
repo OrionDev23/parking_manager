@@ -23,19 +23,19 @@ import '../vehicle/manager/vehicle_tabs.dart';
 import '../vehicle/states/state_tabs.dart';
 import '../vehicle/vehicle_dashboard.dart';
 
-class PaneItemsAndFooters{
+class PaneItemsAndFooters {
   SharedPreferences savedPrefs;
-  PaneItemsAndFooters(this.savedPrefs){
+  PaneItemsAndFooters(this.savedPrefs) {
     initPanes();
   }
 
-  initPanes(){
+  initPanes() {
     PaneItem dashboard = PaneItem(
         icon: const Icon(FluentIcons.home),
         body: const Dashboard(),
         title: const Text('home').tr());
-    PaneItem usermanagement=PaneItem(
-      title: const Text('usermanagement').tr(),
+    PaneItem usermanagement = PaneItem(
+        title: const Text('usermanagement').tr(),
         icon: const Icon(FluentIcons.account_management),
         body: const UserManagement());
     PaneItem vehicles = PaneItemExpander(
@@ -107,24 +107,14 @@ class PaneItemsAndFooters{
             ),
           ),
         ]);
-    PaneItem evenements = PaneItemExpander(
-        items: [
-          PaneItem(
-              icon: const Icon(FluentIcons.edit),
-              title: const Text("gestionevent").tr(),
-              body: const LogActivityManagement()),
-          PaneItem(
-              icon: const Icon(FluentIcons.reservation_orders),
-              title: const Text('planifier').tr(),
-              body: const PlanningManager()),
-          PaneItem(
-              icon: const Icon(FluentIcons.parking_solid),
-              title: const Text('parking').tr(),
-              body: const Placeholder()),
-        ],
+    PaneItem evenements = PaneItem(
         icon: const Icon(FluentIcons.event),
         title: const Text('journal').tr(),
-        body: const Placeholder());
+        body: const LogActivityManagement());
+    PaneItem planner = PaneItem(
+        icon: const Icon(FluentIcons.reservation_orders),
+        title: const Text('planifier').tr(),
+        body: const PlanningManager());
     PaneItem login = PaneItem(
         icon: const Icon(FluentIcons.signin),
         title: const Text('seconnecter').tr(),
@@ -150,11 +140,12 @@ class PaneItemsAndFooters{
     if (PanesListState.signedIn.value) {
       originalItems = [
         if (isAdmin || isManager) dashboard,
-        if(isAdmin) usermanagement,
+        if (isAdmin) usermanagement,
         if (isAdmin || isManager) vehicles,
         if (isAdmin || isManager) reparations,
         if (isAdmin || isManager) chauffeurs,
         if (isAdmin || isManager) evenements,
+        if (isAdmin || isManager) planner,
       ];
     } else {
       originalItems = [
@@ -169,7 +160,7 @@ class PaneItemsAndFooters{
       parametres,
     ];
   }
-  List<NavigationPaneItem> originalItems = List.empty(growable: true);
-  List<NavigationPaneItem> footerItems=List.empty(growable: true);
 
+  List<NavigationPaneItem> originalItems = List.empty(growable: true);
+  List<NavigationPaneItem> footerItems = List.empty(growable: true);
 }

@@ -37,8 +37,16 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     adjustSize();
-    checkUser();
+    waitForFirstLoading();
     super.initState();
+  }
+
+  void waitForFirstLoading() async{
+    while(PanesListState.firstLoading){
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+    checkUser();
+
   }
 
   void checkUser() async{
@@ -86,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return ScaffoldPage(
       header: PageTitle(text: 'connexion'.tr(),),
       content: Center(
-        child: Column(
+        child: PanesListState.firstLoading?const ProgressRing():Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [

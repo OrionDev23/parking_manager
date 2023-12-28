@@ -376,5 +376,19 @@
  "newuser": "Nouvel utilisateur",
  "invitmanager": "Inivter à devenir manager",
  "admins, managers": "Admin et gérant",
- "invitationsent": "Invitation envoyée"
+ "invitationsent": "Invitation envoyée",
+ "addtitle": "Ajoutez un titre",
+ "allday": "Jour entier ?",
+ "starttime": "Date de début",
+ "endtime": "Date de fin",
+ "adddescription": "Ajoutez des notes",
+ "createevent": "Création d'événement",
+ "subjectrequired": "Le titre est requis",
+ "orange": "Orange",
+ "red": "Rouge",
+ "magenta": "Magenta",
+ "purple": "Violet",
+ "blue": "Bleu",
+ "green": "Vert",
+ "users": "Utilisateurs"
 }

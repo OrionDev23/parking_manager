@@ -137,7 +137,7 @@ class AppointmentWidget extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 5),
                         child: Image(
                             image: ExactAssetImage(
-                                'assets/images/${planning.type}.webp'),
+                                'assets/images/planning/${planning.type}.webp'),
                             fit: BoxFit.contain,
                             width: details.bounds.width,
                             height: 60)),
@@ -334,7 +334,7 @@ class AppointmentWidget extends StatelessWidget {
               width: 30,
               alignment: Alignment.center,
               child: Image(
-                  image: ExactAssetImage('assets/images/${planning.type}.webp'),
+                  image: ExactAssetImage('assets/images/planning/${planning.type}.webp'),
                   fit: BoxFit.contain,
                   width: details.bounds.width,
                   height: 20),

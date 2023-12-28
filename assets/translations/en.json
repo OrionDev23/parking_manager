@@ -339,6 +339,20 @@
   "newuser": "New user",
   "admins, managers": "Admin and gérant",
   "invitmanager": "Invite to become a manager",
-  "invitationsent": "Invitation sent"
+  "invitationsent": "Invitation sent",
+  "addtitle": "Add title",
+  "allday": "All day ?",
+  "starttime": "Start date",
+  "endtime": "End date",
+  "adddescription": "Add notes",
+  "createevent": "Event creation",
+  "orange": "Orange",
+  "red": "Red",
+  "magenta": "Magenta",
+  "purple": "Purple",
+  "blue": "Blue",
+  "green": "Green",
+  "users": "Users"
+
 
 }

@@ -31,6 +31,8 @@ class _PlanningManagerState extends State<PlanningManager> {
 
   Planning? selectedPlanning;
 
+  DateTime? selectedDate;
+
   @override
   Widget build(BuildContext context) {
 
@@ -78,7 +80,13 @@ class _PlanningManagerState extends State<PlanningManager> {
                     height: 100.h,
                     child: PlanningCalendar(controller: controller,datasource: datasource,toDo: (s){
                       setState(() {
-                        selectedPlanning=s.appointments?.first;
+                        selectedDate=s.date;
+                        if(s.appointments!=null && s.appointments!.isNotEmpty){
+                          selectedPlanning=s.appointments!.first;
+                        }
+                        else{
+                          selectedPlanning=null;
+                        }
                       });
                     },),
                   )
@@ -108,13 +116,14 @@ class _PlanningManagerState extends State<PlanningManager> {
   void showPlanningCreation(){
     f.showDialog(
         context: context,
+        barrierDismissible: true,
         builder: (c){
           return f.ContentDialog(
-            title: const Text("Création d'evenement"),
+            title: const Text("createevent").tr(),
             constraints: BoxConstraints.loose(f.Size(
-              800.px,400.px
+              800.px,500.px
             )),
-            content: const AppointmentForm(),
+            content: AppointmentForm(startDate: selectedDate,datasource: datasource,),
           );
         });
   }

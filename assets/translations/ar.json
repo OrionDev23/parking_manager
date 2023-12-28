@@ -336,6 +336,19 @@
   "newuser": "مستخدم جديد",
   "admins, managers": "مسؤول عام و مدير",
   "invitmanager": "دعوة ليصبح مدير",
-  "invitationsent": "الدعوة أرسلت!"
+  "invitationsent": "الدعوة أرسلت!",
+  "addtitle": "أضف عنوانا",
+  "allday": "طوال اليوم ؟",
+  "starttime": "تاريخ البدء",
+  "endtime": "تاريخ الانتهاء",
+  "adddescription": "أضف ملاحظات",
+  "createevent": "إنشاء حدث",
+  "orange": "برتقالي",
+  "red": "أحمر",
+  "magenta": "أرجواني",
+  "purple": "بنفسجي",
+  "blue": "أزرق",
+  "green": "أخضر",
+  "users": "المستخدمين"
 
 }
