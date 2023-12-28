@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:parc_oto/router.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
+import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 import 'providers/client_database.dart';
 import 'theme.dart';
 import 'package:provider/provider.dart';
@@ -16,10 +17,15 @@ import 'package:screen_retriever/screen_retriever.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as td;
+
 
 const appTitle="ParcOto";
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+    tz.initializeTimeZones();
+    td.initializeDatabase([]);
   usePathUrlStrategy();
   if(!kIsWeb && (Platform.isMacOS || Platform.isLinux || Platform.isWindows)) {
     await initWindow();
@@ -78,7 +84,8 @@ class _MyAppState extends State<MyApp> {
     List<LocalizationsDelegate>results=List.from(context.localizationDelegates);
     results.addAll([
       CountryLocalizations.delegate,
-      FluentLocalizations.delegate
+      FluentLocalizations.delegate,
+      SfGlobalLocalizations.delegate
     ]);
     return results;
   }

@@ -25,7 +25,7 @@ class FutureImage extends StatelessWidget {
           ):
               !snapshot.hasData
                   ?user==null?Image.asset('assets/images/logo.webp',fit: BoxFit.cover,)
-                  :Text(ProfilUtilitis.getFirstLetters(user!))
+                  :Text(ParcOtoUtilities.getFirstLetters(user!))
                   : const ProgressRing();
     });
   }

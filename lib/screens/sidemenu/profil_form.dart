@@ -110,7 +110,7 @@ class _ProfilFormState extends State<ProfilForm> {
                   alignment: Alignment.center,
                   clipBehavior: Clip.antiAlias,
                   child:  Text(
-                              ProfilUtilitis.getFirstLetters(widget.user)
+                              ParcOtoUtilities.getFirstLetters(widget.user)
                                   .toUpperCase(),
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,

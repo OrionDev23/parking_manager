@@ -35,7 +35,7 @@ class ProfilNameTopBar extends StatelessWidget {
                         alignment: Alignment.center,
                         child:
                             Text(
-                                ProfilUtilitis.getFirstLetters(me)
+                                ParcOtoUtilities.getFirstLetters(me)
                                     .toUpperCase(),
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold,

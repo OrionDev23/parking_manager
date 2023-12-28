@@ -19,6 +19,7 @@ const chaufDispID = "chauf_disponibilite";
 const chaufDoc = "doc_chauffeur";
 const vehicDoc = "doc_vehic";
 const entrepriseid = "entreprise";
+const planningID="planning";
 const buckedId = "images";
 const reparationId = "reparation";
 const activityId = "activity";

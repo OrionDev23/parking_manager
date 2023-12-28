@@ -126,7 +126,7 @@ class _UserFormState extends State<UserForm> {
                     clipBehavior: Clip.antiAlias,
                     child: Text(
                       widget.user != null
-                          ? ProfilUtilitis.getFirstLetters(ParcUser(
+                          ? ParcOtoUtilities.getFirstLetters(ParcUser(
                                   id: '',
                                   email: widget.user!.email,
                                   name: widget.user!.name))

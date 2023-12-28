@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:parc_oto/screens/logs/planning/planning_manager.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 
 import '../../providers/client_database.dart';
@@ -12,7 +13,6 @@ import '../entreprise.dart';
 import '../login.dart';
 import '../logout.dart';
 import '../logs/logging/log_management.dart';
-import '../logs/planning/planing_calendar.dart';
 import '../prestataire/prestataire_tabs.dart';
 import '../reparation/reparation_tabs.dart';
 import '../settings.dart';
@@ -116,7 +116,7 @@ class PaneItemsAndFooters{
           PaneItem(
               icon: const Icon(FluentIcons.reservation_orders),
               title: const Text('planifier').tr(),
-              body: const PlanningCalendar()),
+              body: const PlanningManager()),
           PaneItem(
               icon: const Icon(FluentIcons.parking_solid),
               title: const Text('parking').tr(),

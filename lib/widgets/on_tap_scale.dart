@@ -37,16 +37,16 @@ class OnTapScaleAndFadeState extends State<OnTapScaleAndFade>
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
-      onTap: () {
+      onTap:widget.onTap==null?null:() {
         _controllerA.reverse();
         if(widget.onTap!=null) {
           widget.onTap!();
         }
       },
-      onTapDown: (dp) {
+      onTapDown:widget.onTap==null?null: (dp) {
         _controllerA.reverse();
       },
-      onTapUp: (dp) {
+      onTapUp:widget.onTap==null?null: (dp) {
         Timer(const Duration(milliseconds: 150), () {
           if(mounted) {
             _controllerA.fling();
