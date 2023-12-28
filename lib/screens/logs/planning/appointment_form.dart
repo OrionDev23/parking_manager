@@ -37,7 +37,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
   @override
   void initState() {
     _startDate=widget.startDate??DateTime.now();
-    _endDate=DateTime.now().add(const Duration(hours: 2));
+    _endDate=_startDate.add(const Duration(hours: 2));
     super.initState();
   }
 
@@ -102,7 +102,8 @@ class _AppointmentFormState extends State<AppointmentForm> {
                       Expanded(
                         flex: 7,
                         child: DatePicker(
-                            selected: _startDate,
+                          locale: appTheme.locale,
+                          selected: _startDate,
                             startDate: DateTime(1900),
                             endDate: DateTime(2100),
                             onChanged: (s){
@@ -115,11 +116,14 @@ class _AppointmentFormState extends State<AppointmentForm> {
                                       });}
                             },
                       ),),
+                      smallSpace,
                       Expanded(
                           flex: 3,
                           child: _isAllDay
                               ? const Text('')
                               : TimePicker(
+                            hourFormat: HourFormat.HH,
+                            locale: appTheme.locale,
                             selected: _startDate,
                             onChanged: (s){
                               if(_startDate!=s){
@@ -144,32 +148,41 @@ class _AppointmentFormState extends State<AppointmentForm> {
                         flex: 7,
                         child: DatePicker(
                           selected: _endDate,
+                          locale: appTheme.locale,
                           startDate: DateTime(1900),
                           endDate: DateTime(2100),
                           onChanged: (s){
                             if(s!=_endDate){
-                              if(s.difference(_endDate).inMilliseconds>0){
-                                _endDate.add(const Duration(hours: 5));
-                              }
-                              setState(() {
-                                _endDate=DateTime(s.year,s.month,s.day,_endDate.hour,_endDate.minute,_endDate.second);
-                              });}
-                          },
+                            _endDate=DateTime(s.year,s.month,s.day,_endDate.hour,_endDate.minute,_endDate.second);
+                            if(_startDate.difference(_endDate).inMilliseconds>0){
+                              _endDate.add(const Duration(hours: 5));
+                            }
+                            setState(() {
+
+                            });
+                          }},
                         ),),
+                      smallSpace,
+
                       Expanded(
                           flex: 3,
                           child: _isAllDay
                               ? const Text('')
                               : TimePicker(
+                            locale: appTheme.locale,
+
                             selected: _startDate,
+                            hourFormat: HourFormat.HH,
                             onChanged: (s){
                               if(_endDate!=s){
-                                if(s.difference(_endDate).inMilliseconds>0){
+
+                                  _endDate=DateTime(_endDate.year,_endDate.month,_endDate.day,s.hour,s.minute,s.second);
+                                if(_startDate.difference(_endDate).inMilliseconds>0){
                                   _endDate.add(const Duration(hours: 5));
                                 }
-                                setState(() {
-                                  _endDate=DateTime(_endDate.year,_endDate.month,_endDate.day,s.hour,s.minute,s.second);
-                                });
+                              setState(() {
+                              });
+
                               }
                             },
 
@@ -229,5 +242,10 @@ class _AppointmentFormState extends State<AppointmentForm> {
             ),
           ],
         ));
+  }
+
+
+  void submit(){
+
   }
 }

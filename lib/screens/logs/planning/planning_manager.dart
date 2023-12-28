@@ -112,7 +112,7 @@ class _PlanningManagerState extends State<PlanningManager> {
           return f.ContentDialog(
             title: const Text("Création d'evenement"),
             constraints: BoxConstraints.loose(f.Size(
-              600.px,600.px
+              800.px,400.px
             )),
             content: const AppointmentForm(),
           );
