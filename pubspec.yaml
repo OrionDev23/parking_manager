@@ -60,6 +60,8 @@ dependencies:
   syncfusion_flutter_calendar: ^24.1.43
   timezone: ^0.9.2
   syncfusion_localizations: ^24.1.43
+  sembast: ^3.5.0+1
+  sembast_web: ^2.2.0
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,9 @@
 
-import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:fluent_ui/fluent_ui.dart';
+import 'package:provider/provider.dart';
+
+import '../../../theme.dart';
 
 class ColorPicker extends StatefulWidget {
 
@@ -20,8 +24,14 @@ class ColorPicker extends StatefulWidget {
 class _ColorPickerState extends State<ColorPicker> {
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      content: SizedBox(
+    var appTheme=context.watch<AppTheme>();
+    return Container(
+          decoration: BoxDecoration(
+            color: appTheme.backGroundColor,
+            borderRadius: BorderRadius.circular(5),
+            boxShadow: kElevationToShadow[2]
+          ),
+          padding: const EdgeInsets.all(5),
           width: double.maxFinite,
           child: ListView.builder(
             padding: const EdgeInsets.all(0),
@@ -31,11 +41,11 @@ class _ColorPickerState extends State<ColorPicker> {
                 contentPadding: const EdgeInsets.all(0),
                 leading: Icon(
                     index == widget.selectedColorIndex!
-                        ? Icons.lens
-                        : Icons.trip_origin,
+                        ? FluentIcons.eyedropper
+                        : FluentIcons.eye_shadow,
                     color: widget.listColors![index]),
-                title: Text(widget.colorNames![index]),
-                onTap: () {
+                title: Text(widget.colorNames![index]).tr(),
+                onPressed: () {
                   setState(() {
                     widget.setColor!(index);
                   });
@@ -48,7 +58,6 @@ class _ColorPickerState extends State<ColorPicker> {
                 },
               );
             },
-          )),
-    );
+          ));
   }
 }

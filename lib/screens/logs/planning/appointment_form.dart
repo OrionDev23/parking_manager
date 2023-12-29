@@ -71,7 +71,12 @@ class _AppointmentFormState extends State<AppointmentForm> {
   Widget build(BuildContext context) {
     var appTheme=context.watch<AppTheme>();
     return Container(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: appTheme.backGroundColor,
+        borderRadius: BorderRadius.circular(5),
+        boxShadow: kElevationToShadow[2]
+      ),
+        padding: const EdgeInsets.all(5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
@@ -81,9 +86,9 @@ class _AppointmentFormState extends State<AppointmentForm> {
                 children: <Widget>[
                   ListTile(
                     contentPadding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
-                    leading:const Icon(
+                    leading:Icon(
                       FluentIcons.title,
-                      color: Colors.grey,
+                      color: appTheme.color.lightest,
                     ),
                     title: TextBox(
                       controller: TextEditingController(text: _subject),
@@ -109,7 +114,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                     leading: Row(
                       children: [
                         Icon(FluentIcons.category_classification,
-                            color: _colorCollection[_selectedColorIndex]),
+                            color: appTheme.color.lightest),
                         bigSpace,
                         Text('category',style: placeStyle.copyWith(fontWeight: FontWeight.bold)).tr(),
                       ],
@@ -145,9 +150,9 @@ class _AppointmentFormState extends State<AppointmentForm> {
                   const Divider(),
                   ListTile(
                       contentPadding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
-                      leading: const Icon(
+                      leading: Icon(
                         FluentIcons.buffer_time_before,
-                        color: Colors.grey,
+                        color: appTheme.color.lightest,
                       ),
                       title: Row(children: <Widget>[
                          Text('allday',style: placeStyle.copyWith(fontWeight: FontWeight.bold),).tr(),
@@ -181,11 +186,12 @@ class _AppointmentFormState extends State<AppointmentForm> {
                                   endDate: DateTime(2100),
                                   onChanged: (s){
                                         if(s!=_startDate){
-                                            if(s.difference(_endDate).inMilliseconds>0){
-                                              _endDate.add(const Duration(hours: 5));
+                                          _startDate=DateTime(s.year,s.month,s.day,_startDate.hour,_startDate.minute,_startDate.second);
+
+                                          if(s.difference(_endDate).inMilliseconds>0){
+                                            _endDate=_startDate.add(const Duration(hours: 2));
                                             }
                                             setState(() {
-                                              _startDate=DateTime(s.year,s.month,s.day,_startDate.hour,_startDate.minute,_startDate.second);
                                             });}
                                   },
                             ),),
@@ -200,11 +206,11 @@ class _AppointmentFormState extends State<AppointmentForm> {
                                   selected: _startDate,
                                   onChanged: (s){
                                     if(_startDate!=s){
+                                      _startDate=DateTime(_startDate.year,_startDate.month,_startDate.day,s.hour,s.minute,s.second);
                                       if(s.difference(_endDate).inMilliseconds>0){
-                                        _endDate.add(const Duration(hours: 5));
+                                        _endDate=_startDate.add(const Duration(hours: 2));
                                       }
                                       setState(() {
-                                        _startDate=DateTime(_startDate.year,_startDate.month,_startDate.day,s.hour,s.minute,s.second);
                                       });
                                     }
                                   },
@@ -230,7 +236,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                                   if(s!=_endDate){
                                   _endDate=DateTime(s.year,s.month,s.day,_endDate.hour,_endDate.minute,_endDate.second);
                                   if(_startDate.difference(_endDate).inMilliseconds>0){
-                                    _endDate.add(const Duration(hours: 5));
+                                    _endDate=_startDate.add(const Duration(hours: 2));
                                   }
                                   setState(() {
               
@@ -252,7 +258,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
               
                                         _endDate=DateTime(_endDate.year,_endDate.month,_endDate.day,s.hour,s.minute,s.second);
                                       if(_startDate.difference(_endDate).inMilliseconds>0){
-                                        _endDate=_endDate.add(const Duration(hours: 5));
+                                        _endDate=_startDate.add(const Duration(hours: 2));
                                       }
                                     setState(() {
                                     });
@@ -269,24 +275,29 @@ class _AppointmentFormState extends State<AppointmentForm> {
                     leading: Row(
                       children: [
                         Icon(FluentIcons.color,
-                            color: _colorCollection[_selectedColorIndex]),
+                            color: appTheme.color.lightest),
                         bigSpace,
                         Text('color',style: placeStyle.copyWith(fontWeight: FontWeight.bold)).tr(),
                       ],
                     ),
                     title: Text(
                       _colorNames[_selectedColorIndex],
-                    ),
+                    ).tr(),
                     onPressed: () {
                       showDialog<Widget>(
                         context: context,
                         barrierDismissible: true,
                         builder: (BuildContext context) {
-                          return ColorPicker(listColors: _colorCollection,colorNames:_colorNames,selectedColorIndex: _selectedColorIndex,setColor: (s){
-                            setState(() {
-                              _selectedColorIndex=s;
-                            });
-                          },);
+                          return ContentDialog(
+                            constraints: BoxConstraints.loose(Size(
+                              300.px,300.px
+                            )),
+                            content: ColorPicker(listColors: _colorCollection,colorNames:_colorNames,selectedColorIndex: _selectedColorIndex,setColor: (s){
+                              setState(() {
+                                _selectedColorIndex=s;
+                              });
+                            },),
+                          );
                         },
                       ).then((dynamic value) => setState(() {}));
                     },
@@ -295,9 +306,9 @@ class _AppointmentFormState extends State<AppointmentForm> {
                   ),
                   ListTile(
                     contentPadding: const EdgeInsets.all(5),
-                    leading: const Icon(
+                    leading: Icon(
                       FluentIcons.add_notes,
-                      color: Colors.grey,
+                      color: appTheme.color.lightest,
                     ),
                     title: TextBox(
                       controller: TextEditingController(text: _notes),

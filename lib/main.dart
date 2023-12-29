@@ -8,6 +8,9 @@ import 'package:flutter/foundation.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:parc_oto/router.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
+import 'package:sembast/sembast.dart';
+import 'package:sembast/sembast_io.dart';
+import 'package:sembast_web/sembast_web.dart';
 import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 import 'providers/client_database.dart';
 import 'theme.dart';
@@ -22,11 +25,24 @@ import 'package:timezone/timezone.dart' as td;
 
 
 const appTitle="ParcOto";
+late Database db;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
     tz.initializeTimeZones();
     td.initializeDatabase([]);
   usePathUrlStrategy();
+  // File path to a file in the current directory
+  String dbPath = 'personalData.db';
+  late DatabaseFactory dbFactory;
+
+  if(kIsWeb){
+    dbFactory=databaseFactoryWeb;
+  }
+  else{
+    dbFactory= databaseFactoryIo;
+  }
+  db = await dbFactory.openDatabase(dbPath);
+
   if(!kIsWeb && (Platform.isMacOS || Platform.isLinux || Platform.isWindows)) {
     await initWindow();
   }

@@ -58,7 +58,6 @@ class _PlanningCalendarState extends State<PlanningCalendar> {
         showAgenda: true,
 
       ),
-
       timeSlotViewSettings: const TimeSlotViewSettings(
         timeFormat: "HH:mm",
           nonWorkingDays: [
