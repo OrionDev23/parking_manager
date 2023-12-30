@@ -1,7 +1,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:parc_oto/datasources/parcoto_webservice.dart';
 
-import '../../serializables/vehicle.dart';
+import '../../serializables/vehicle/vehicle.dart';
 import '../../utilities/vehicle_util.dart';
 
 
@@ -80,6 +80,12 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
         }
       case 3:
         if (sortedAsc) {
+          return Query.orderAsc('etatactuel');
+        } else {
+          return Query.orderDesc('etatactuel');
+        }
+      case 4:
+        if (sortedAsc) {
           return Query.orderAsc('\$updatedAt');
         } else {
           return Query.orderDesc('\$updatedAt');
@@ -113,8 +119,11 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
 
           return coef * annee1.compareTo(annee2);
         };
-    //date modif
       case 3:
+        return (d1, d2) =>
+        coef * (d1.value.etatactuel??0).compareTo(d2.value.etatactuel??0);
+    //date modif
+      case 4:
         return (d1, d2) =>
         coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
       default:

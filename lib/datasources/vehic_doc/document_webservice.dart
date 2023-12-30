@@ -1,6 +1,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:parc_oto/datasources/parcoto_webservice.dart';
-import 'package:parc_oto/serializables/document_vehicle.dart';
+
+import '../../serializables/vehicle/document_vehicle.dart';
 
 
 class DocumentWebService extends ParcOtoWebService<DocumentVehicle>{
@@ -11,15 +12,11 @@ class DocumentWebService extends ParcOtoWebService<DocumentVehicle>{
       int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
-      //id
       case 0:
-        return ( d1,  d2) => coef * d1.key.compareTo(d2.key);
-      //nom
-      case 1:
         return ( d1, d2) =>
             coef * d1.value.nom.compareTo(d2.value.nom);
       //vehicle
-      case 2:
+      case 1:
         return ( d1, d2) {
           if (d1.value.vehiclemat == null || d2.value.vehiclemat == null) {
             return 0;
@@ -30,11 +27,11 @@ class DocumentWebService extends ParcOtoWebService<DocumentVehicle>{
           }
         };
       //date d'expiration
-      case 3:
+      case 2:
         return ( d1,  d2) =>
             coef * d1.value.dateExpiration!.compareTo(d2.value.dateExpiration!);
       //date modif
-      case 4:
+      case 3:
         return ( d1,  d2) =>
             coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
     }
@@ -53,6 +50,12 @@ class DocumentWebService extends ParcOtoWebService<DocumentVehicle>{
           return Query.orderDesc('nom');
         }
       case 1:
+        if (sortedAsc) {
+          return Query.orderAsc('vehiclemat');
+        } else {
+          return Query.orderDesc('vehiclemat');
+        }
+      case 2:
         if (sortedAsc) {
           return Query.orderAsc('date_expiration');
         } else {

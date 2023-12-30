@@ -6,7 +6,7 @@ import 'package:parc_oto/pdf_generation/reparation/vehicle_entretien_pdf.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/entreprise.dart';
 import '../serializables/prestataire.dart';
-import '../serializables/reparation.dart';
+import '../serializables/reparation/reparation.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 

@@ -6,10 +6,10 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-import '../../../../serializables/vehicle.dart';
 import '../../../../theme.dart';
 import '../../../../widgets/empty_table_widget.dart';
 import '../../../../widgets/zone_box.dart';
+import '../../../serializables/vehicle/vehicle.dart';
 import '../../vehicle/manager/vehicles_table.dart';
 
 class LogTable extends StatefulWidget {

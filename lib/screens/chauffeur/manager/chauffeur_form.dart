@@ -4,8 +4,8 @@ import 'package:easy_localization/easy_localization.dart';
 
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/serializables/conducteur.dart';
-import 'package:parc_oto/serializables/disponibilite_chauffeur.dart';
+import 'package:parc_oto/serializables/conducteur/conducteur.dart';
+import 'package:parc_oto/serializables/conducteur/disponibilite_chauffeur.dart';
 import 'package:parc_oto/widgets/zone_box.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';

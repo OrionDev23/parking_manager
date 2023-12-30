@@ -2,7 +2,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:parc_oto/datasources/parcoto_webservice.dart';
 import 'package:parc_oto/providers/client_database.dart';
 
-import '../../serializables/conducteur.dart';
+import '../../serializables/conducteur/conducteur.dart';
 
 class ConducteurWebService extends ParcOtoWebService<Conducteur>{
   final bool archive;

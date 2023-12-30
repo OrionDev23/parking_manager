@@ -1,6 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:parc_oto/datasources/parcoto_webservice.dart';
-import 'package:parc_oto/serializables/disponibilite_chauffeur.dart';
+import 'package:parc_oto/serializables/conducteur/disponibilite_chauffeur.dart';
 
 class DisponibiliteWebService extends ParcOtoWebService<DisponibiliteChauffeur>{
   DisponibiliteWebService(super.data, super.collectionID, super.columnForSearch);

@@ -3,7 +3,7 @@ import 'package:appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:parc_oto/serializables/activity.dart';
-import 'package:parc_oto/serializables/vehicle.dart';
+import 'package:parc_oto/serializables/vehicle/vehicle.dart';
 
 import '../screens/entreprise.dart';
 import '../serializables/entreprise.dart';
@@ -15,6 +15,7 @@ const userid = "users";
 const chauffeurid = "6537d87b492c80f255e8";
 const genreid = "6537960246d5b0e1ab77";
 const vehiculeid = "6531ad22153b2a49ca2c";
+const etatId="etat";
 const chaufDispID = "chauf_disponibilite";
 const chaufDoc = "doc_chauffeur";
 const vehicDoc = "doc_vehic";
@@ -328,9 +329,9 @@ class ClientDatabase {
         return "modifentreprise";
       case 31:
         return "suprentreprise";
-      case 32:"ajoututilisateur";
-      case 33:"modifutilisateur";
-      case 35:"suprutilisateur";
+      case 32:return "ajoututilisateur";
+      case 33:return "modifutilisateur";
+      case 35:return "suprutilisateur";
     }
     return '';
   }

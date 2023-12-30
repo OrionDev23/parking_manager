@@ -12,7 +12,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/client_database.dart';
 import '../../screens/reparation/reparation_tabs.dart';
-import '../../serializables/reparation.dart';
+import '../../serializables/reparation/reparation.dart';
 import '../../widgets/on_tap_scale.dart';
 
 class ReparationDataSource extends ParcOtoDatasource<Reparation> {
@@ -59,7 +59,8 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation> {
       )),
       DataCell(SelectableText(dateFormat.format(element.value.updatedAt!),
           style: tstyle)),
-      DataCell(
+      if(selectC!=true)
+        DataCell(
 
           f.FlyoutTarget(
         controller: element.value.controller,

@@ -1,6 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:parc_oto/datasources/parcoto_webservice.dart';
-import '../../serializables/document_chauffeur.dart';
+import '../../serializables/conducteur/document_chauffeur.dart';
 
 
 class ChaufDocumentWebService extends ParcOtoWebService<DocumentChauffeur>{

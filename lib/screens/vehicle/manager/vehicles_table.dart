@@ -22,7 +22,7 @@ class VehicleTable extends StatefulWidget {
 }
 
 class VehicleTableState extends State<VehicleTable> {
-  late VehiculesDataSource vehicleDataSource;
+  late VehiculeDataSource vehicleDataSource;
   late final bool startedWithFiltersOn;
 
   static ValueNotifier<int?> filterMarque = ValueNotifier(null);
@@ -45,14 +45,14 @@ class VehicleTableState extends State<VehicleTable> {
         marque = filterMarque.value;
         filtered = true;
         filters['marque'] = filterMarque.value.toString();
-        vehicleDataSource = VehiculesDataSource(
+        vehicleDataSource = VehiculeDataSource(
             current: context,
             selectC: widget.selectV,
             collectionID: vehiculeid,
             filters: filters);
       } else {
         searchController.text = filterVehicule.value!;
-        vehicleDataSource = VehiculesDataSource(
+        vehicleDataSource = VehiculeDataSource(
             current: context,
             selectC: widget.selectV,
             collectionID: vehiculeid,
@@ -62,7 +62,7 @@ class VehicleTableState extends State<VehicleTable> {
       filterVehicule.value = null;
     } else {
       startedWithFiltersOn = false;
-      vehicleDataSource = VehiculesDataSource(
+      vehicleDataSource = VehiculeDataSource(
         current: context,
         selectC: widget.selectV,
         collectionID: vehiculeid,
@@ -135,19 +135,37 @@ class VehicleTableState extends State<VehicleTable> {
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Text(
+            'etat',
+            style: tstyle,
+          ).tr(),
+        ),
+        size: ColumnSize.M,
+        onSort: (s, c) {
+          sortColumn = 3;
+          assending = !assending;
+
+          vehicleDataSource.sort(sortColumn, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
             'dateModif',
             style: tstyle,
           ).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
-          sortColumn = 3;
+          sortColumn = 4;
           assending = !assending;
           vehicleDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
-      DataColumn2(
+      if(widget.selectV!=true)
+        DataColumn2(
         label: const Text(''),
         size: ColumnSize.S,
         fixedWidth: 2.w,

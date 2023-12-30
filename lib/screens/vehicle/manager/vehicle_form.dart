@@ -8,11 +8,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
-import 'package:parc_oto/serializables/vehicle.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../../serializables/vehicle/vehicle.dart';
 import '../../../theme.dart';
 import '../../../utilities/algeria_lists.dart';
 import '../../../widgets/select_dialog/select_dialog.dart';
@@ -100,7 +100,7 @@ class _VehicleFormState extends State<VehicleForm>
       wilaya=widget.vehicle!.wilaya?.toString()??'';
       communeCont.text=widget.vehicle!.commune??'';
       dairaCont.text=widget.vehicle!.daira??'';
-      selectedDate=ClientDatabase.ref.add(Duration(milliseconds:widget.vehicle!.date??0));
+      selectedDate=widget.vehicle!.date??DateTime.now();
       quittance.text=widget.vehicle!.quittance?.toString()??'';
       numero.text=widget.vehicle!.numero??'';
       lname.text=widget.vehicle!.nom??'';
@@ -1524,7 +1524,7 @@ class _VehicleFormState extends State<VehicleForm>
           matriculeEtrang: autreMat,
           wilaya: int.tryParse(wilaya),
           commune: communeCont.text,
-          date: selectedDate.difference(ClientDatabase.ref).inMilliseconds.abs(),
+          date: selectedDate,
           adresse: adresse.text,
           quittance: double.tryParse(quittance.text),
           numero: numero.text,

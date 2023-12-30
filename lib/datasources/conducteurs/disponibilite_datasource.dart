@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/serializables/disponibilite_chauffeur.dart';
+import 'package:parc_oto/serializables/conducteur/disponibilite_chauffeur.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../widgets/on_tap_scale.dart';

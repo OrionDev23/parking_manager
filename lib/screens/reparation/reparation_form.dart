@@ -11,9 +11,8 @@ import 'package:parc_oto/screens/reparation/reparation_form/entretien_widget.dar
 import 'package:parc_oto/screens/reparation/reparation_form/vehicle_damage.dart';
 import 'package:parc_oto/widgets/big_title_form.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicles_table.dart';
-import 'package:parc_oto/serializables/etat_vehicle.dart';
+import 'package:parc_oto/serializables/reparation/etat_vehicle.dart';
 import 'package:parc_oto/serializables/prestataire.dart';
-import 'package:parc_oto/serializables/vehicle.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:parc_oto/widgets/zone_box.dart';
 import 'package:pdf/pdf.dart' as pdf;
@@ -24,9 +23,10 @@ import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 import '../../pdf_generation/pdf_theming.dart' as pdf_theme;
 import '../../pdf_generation/reparation_pdf.dart';
-import '../../serializables/designation.dart';
-import '../../serializables/entretien_vehicle.dart';
-import '../../serializables/reparation.dart';
+import '../../serializables/reparation/designation.dart';
+import '../../serializables/reparation/entretien_vehicle.dart';
+import '../../serializables/reparation/reparation.dart';
+import '../../serializables/vehicle/vehicle.dart';
 import '../../utilities/vehicle_util.dart';
 import '../../widgets/empty_table_widget.dart';
 

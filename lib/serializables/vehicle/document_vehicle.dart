@@ -10,8 +10,8 @@ class DocumentVehicle extends ParcOtoDefault{
 
 
 
-  @JsonKey(name:"date_expiration")
-  int? dateExpiration;
+  @JsonKey(name:"date_expiration",fromJson: dateFromIntJson,toJson: dateToIntJson)
+  DateTime? dateExpiration;
   String nom;
   String? vehicle;
 

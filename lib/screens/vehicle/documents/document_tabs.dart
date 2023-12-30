@@ -1,7 +1,7 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parc_oto/screens/vehicle/documents/vehicule_documents.dart';
+import 'package:parc_oto/screens/vehicle/documents/vehicule_documents_manager.dart';
 
 import 'document_form.dart';
 

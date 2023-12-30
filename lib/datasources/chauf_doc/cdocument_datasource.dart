@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_table.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
-import 'package:parc_oto/serializables/document_chauffeur.dart';
+import 'package:parc_oto/serializables/conducteur/document_chauffeur.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../providers/client_database.dart';
 import '../../screens/chauffeur/document/chauf_document_form.dart';

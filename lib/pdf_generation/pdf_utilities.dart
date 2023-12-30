@@ -6,7 +6,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
 import '../providers/client_database.dart';
-import '../serializables/reparation.dart';
+import '../serializables/reparation/reparation.dart';
 
 
 Widget dotsSpacer() {

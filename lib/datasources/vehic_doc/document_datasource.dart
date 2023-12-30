@@ -2,14 +2,15 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
+import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/screens/vehicle/documents/document_form.dart';
 import 'package:parc_oto/screens/vehicle/documents/document_tabs.dart';
-import 'package:parc_oto/serializables/document_vehicle.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../providers/client_database.dart';
 import '../../screens/sidemenu/sidemenu.dart';
 import '../../screens/vehicle/manager/vehicle_tabs.dart';
 import '../../screens/vehicle/manager/vehicles_table.dart';
+import '../../serializables/vehicle/document_vehicle.dart';
 import '../../widgets/on_tap_scale.dart';
 import 'document_webservice.dart';
 
@@ -22,9 +23,8 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
 
   void showMyVehicule(String? matricule){
     if(matricule!=null){
-      PanesListState.index.value=2;
+      PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.vehicles)+1;
       VehicleTabsState.currentIndex.value=0;
-
       VehicleTableState.filterNow=true;
       VehicleTableState.filterVehicule.value=matricule;
     }
@@ -52,8 +52,7 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
       ),
       DataCell(SelectableText(
           element.value.dateExpiration!=null?
-          dateFormat2.format(ClientDatabase.ref.add(
-              Duration(milliseconds: element.value.dateExpiration!))):'',
+          dateFormat2.format(element.value.dateExpiration!):'',
           style: tstyle)),
       DataCell(SelectableText(
           element.value.updatedAt!=null?

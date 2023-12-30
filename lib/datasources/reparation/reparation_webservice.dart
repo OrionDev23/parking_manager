@@ -1,6 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:parc_oto/datasources/parcoto_webservice.dart';
-import 'package:parc_oto/serializables/reparation.dart';
+import 'package:parc_oto/serializables/reparation/reparation.dart';
 
 class ReparationWebService extends ParcOtoWebService<Reparation> {
   ReparationWebService(super.data, super.collectionID, super.columnForSearch);

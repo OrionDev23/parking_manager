@@ -1,23 +1,24 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:parc_oto/serializables/parc_oto_serializable.dart';
-import 'package:parc_oto/serializables/parc_user.dart';
-import 'package:parc_oto/serializables/vehicle.dart';
 
-import '../utilities/profil_beautifier.dart';
+import '../../utilities/profil_beautifier.dart';
 part 'state.g.dart';
 
 @JsonSerializable()
 class Etat extends ParcOtoDefault{
-
-
   int type;
   double? valeur;
   String? remarque;
-  int? date;
+  int? ordreNum;
+  String? ordreID;
   String? createdBy;
-  String? vehicle;
+  String vehicle;
+  String vehicleMat;
 
-  Etat({required super.id,super.createdAt,super.updatedAt,required this.type,this.valeur,this.remarque,this.date,this.createdBy,this.vehicle});
+  @JsonKey(toJson:dateToIntJson,fromJson: updatedAtJson)
+  DateTime? date;
+
+  Etat({required super.id,super.createdAt,super.updatedAt,required this.type,this.valeur,this.remarque,this.createdBy,required this.vehicle,this.date,this.ordreID,this.ordreNum,required this.vehicleMat});
   factory Etat.fromJson(Map<String, dynamic> json) => _$EtatFromJson(json);
 
   @override

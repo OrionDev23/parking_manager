@@ -13,16 +13,22 @@ Etat _$EtatFromJson(Map<String, dynamic> json) => Etat(
       type: json['type'] as int,
       valeur: (json['valeur'] as num?)?.toDouble(),
       remarque: json['remarque'] as String?,
-      date: json['date'] as int?,
       createdBy: json['createdBy'] as String?,
-      vehicle: json['vehicle'] as String?,
+      vehicle: json['vehicle'] as String,
+      date: updatedAtJson(json['date'] as String),
+      ordreID: json['ordreID'] as String?,
+      ordreNum: json['ordreNum'] as int?,
+      vehicleMat: json['vehicleMat'] as String,
     );
 
 Map<String, dynamic> _$EtatToJson(Etat instance) => <String, dynamic>{
       'type': instance.type,
       'valeur': instance.valeur,
       'remarque': instance.remarque,
-      'date': instance.date,
+      'ordreNum': instance.ordreNum,
+      'ordreID': instance.ordreID,
       'createdBy': instance.createdBy,
       'vehicle': instance.vehicle,
+      'vehicleMat': instance.vehicleMat,
+      'date': dateToIntJson(instance.date),
     };

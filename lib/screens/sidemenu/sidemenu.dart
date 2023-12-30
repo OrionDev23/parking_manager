@@ -187,8 +187,8 @@ class PanesListState extends State<PanesList> with WindowListener {
                       openMaxWidth: pwidth,
                     ),
                     displayMode: appTheme.displayMode,
-                    items: widget.paneList.originalItems,
-                    footerItems: widget.paneList.footerItems,
+                    items: PaneItemsAndFooters.originalItems,
+                    footerItems: PaneItemsAndFooters.footerItems,
                   ),
                 );
               });

@@ -160,6 +160,7 @@ class ReparationTableState extends State<ReparationTable> {
           setState(() {});
         },
       ),
+      if(widget.selectD!=true)
       DataColumn2(
         label: const Text(''),
         size: ColumnSize.S,

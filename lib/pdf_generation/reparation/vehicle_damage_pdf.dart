@@ -2,8 +2,8 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-import '../../serializables/etat_vehicle.dart';
-import '../../serializables/reparation.dart';
+import '../../serializables/reparation/etat_vehicle.dart';
+import '../../serializables/reparation/reparation.dart';
 import '../pdf_theming.dart';
 import '../pdf_utilities.dart';
 import 'package:parc_oto/utilities/car_svg.dart';

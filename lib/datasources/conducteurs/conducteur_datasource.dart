@@ -9,7 +9,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../screens/chauffeur/document/chauf_document_form.dart';
 import '../../screens/chauffeur/manager/chauffeur_tabs.dart';
-import '../../serializables/conducteur.dart';
+import '../../serializables/conducteur/conducteur.dart';
 import '../../widgets/on_tap_scale.dart';
 
 class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{

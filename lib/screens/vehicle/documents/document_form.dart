@@ -1,22 +1,21 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/screens/vehicle/manager/vehicles_table.dart';
-import 'package:parc_oto/serializables/document_vehicle.dart';
-import 'package:parc_oto/widgets/zone_box.dart';
+import '../../../providers/client_database.dart';
+import '../manager/vehicles_table.dart';
+import '../../../widgets/zone_box.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-import '../../../serializables/vehicle.dart';
+import '../../../serializables/vehicle/document_vehicle.dart';
+import '../../../serializables/vehicle/vehicle.dart';
 import '../../../theme.dart';
 
 class DocumentForm extends StatefulWidget {
 
   final DocumentVehicle? vd;
-  final String? v;
-  final Vehicle? ve;
-  const DocumentForm({super.key, this.vd, this.v, this.ve});
+  final Vehicle? vehicle;
+  const DocumentForm({super.key, this.vd, this.vehicle});
 
   @override
   DocumentFormState createState() => DocumentFormState();
@@ -44,18 +43,13 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
     if(widget.vd!=null){
       nom.text=widget.vd!.nom;
       documentID=widget.vd!.id;
-      if(widget.vd!.vehicle!=null) {
+      selectedDate=widget.vd!.dateExpiration;
+    if(widget.vd!.vehicle!=null) {
         downloadVehicle(widget.vd!.vehicle!);
       }
-      if(widget.vd!.dateExpiration!=null) {
-        selectedDate=ClientDatabase.ref.add(Duration(milliseconds: widget.vd!.dateExpiration??0));
-      }
     }
-    else if(widget.ve!=null){
-      selectedVehicle=widget.ve;
-    }
-    else if(widget.v!=null){
-      downloadVehicle(widget.v!);
+    else if(widget.vehicle!=null){
+      selectedVehicle=widget.vehicle;
     }
     documentID??=DateTime.now().difference(ClientDatabase.ref).inMilliseconds.toString();
   }
@@ -103,8 +97,8 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: ListTile(
-                  title: Text(selectedVehicle?.matricule??'/'),
-                  onPressed: widget.ve!=null || loadingVehicle || widget.vd?.vehicle!=null || widget.v!=null?null:() async{
+                  title: Text(selectedVehicle?.matricule??widget.vehicle?.matricule??widget.vd?.vehiclemat??'/'),
+                  onPressed: widget.vehicle!=null || loadingVehicle || widget.vd?.vehicle!=null ?null:() async{
                     selectedVehicle=await showDialog<Vehicle>(context: context,
                         barrierDismissible: true,
                         builder: (context){
@@ -210,7 +204,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
         }
         return;
       }
-      if((widget.v!=null && selectedVehicle!=null && widget.v!=selectedVehicle!.id)|| (widget.v==null && selectedVehicle!=null)){
+      if(selectedVehicle!=null){
         if(!changes){
           setState(() {
             changes=true;
@@ -218,7 +212,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
         }
         return;
       }
-      if(selectedDate!=null && (widget.vd!.dateExpiration==null || ClientDatabase.ref.add(Duration(milliseconds:widget.vd!.dateExpiration??0))==selectedDate))
+      if(selectedDate!=widget.vd?.dateExpiration)
     {
       if(!changes){
         setState(() {
@@ -248,7 +242,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
 
       DocumentVehicle dv=DocumentVehicle(id: documentID!, nom: nom.text,vehicle: selectedVehicle?.id,
           vehiclemat:selectedVehicle?.matricule,
-          dateExpiration: selectedDate?.difference(ClientDatabase.ref).inMilliseconds.abs(),
+          dateExpiration: selectedDate,
       createdBy: ClientDatabase.me.value?.id);
       if(widget.vd!=null){
         await ClientDatabase.database!.updateDocument(
@@ -292,7 +286,7 @@ class DocumentFormState extends State<DocumentForm> with AutomaticKeepAliveClien
             duration: snackbarShortDuration);
         Future.delayed(snackbarShortDuration).whenComplete(() {
 
-          if(widget.v!=null){
+          if(widget.vehicle!=null){
          Navigator.pop(context);
         }
         else{

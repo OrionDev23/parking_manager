@@ -1,8 +1,8 @@
-import 'package:parc_oto/serializables/entretien_vehicle.dart';
+import 'package:parc_oto/serializables/reparation/entretien_vehicle.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
-import '../../serializables/reparation.dart';
+import '../../serializables/reparation/reparation.dart';
 import '../pdf_theming.dart';
 import '../pdf_utilities.dart';
 

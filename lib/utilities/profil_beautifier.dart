@@ -3,17 +3,17 @@ import 'dart:convert';
 import 'dart:ui';
 import 'dart:math' as math;
 
-import 'package:parc_oto/serializables/etat_vehicle.dart';
-import 'package:parc_oto/serializables/genre_vehicule.dart';
+import 'package:parc_oto/serializables/reparation/etat_vehicle.dart';
+import 'package:parc_oto/serializables/vehicle/genre_vehicule.dart';
 import 'package:parc_oto/serializables/parc_user.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../providers/client_database.dart';
-import '../serializables/designation.dart';
-import '../serializables/entretien_vehicle.dart';
-import '../serializables/marque.dart';
-import '../serializables/state.dart';
-import '../serializables/vehicle.dart';
+import '../serializables/reparation/designation.dart';
+import '../serializables/reparation/entretien_vehicle.dart';
+import '../serializables/vehicle/marque.dart';
+import '../serializables/vehicle/state.dart';
+import '../serializables/vehicle/vehicle.dart';
 
 class ParcOtoUtilities{
  static  String getFirstLetters(ParcUser? user,) {

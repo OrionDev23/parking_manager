@@ -2,7 +2,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:parc_oto/serializables/parc_oto_serializable.dart';
 
-import '../utilities/profil_beautifier.dart';
+import '../../utilities/profil_beautifier.dart';
 
 part 'vehicle.g.dart';
 @JsonSerializable()
@@ -17,7 +17,8 @@ class Vehicle extends ParcOtoDefault{
   String? commune;
   String? daira;
   String? adresse;
-  int? date;
+  @JsonKey(toJson: dateToIntJson,fromJson: dateFromIntJson)
+  DateTime? date;
   double? quittance;
   String? numero;
   String? nom;
@@ -81,6 +82,11 @@ class Vehicle extends ParcOtoDefault{
 
     return id.compareTo(vehicle.id);
   }
+
+ Vehicle changeEtat(String etat){
+    this.etat=etat;
+    return this;
+ }
 }
 
 

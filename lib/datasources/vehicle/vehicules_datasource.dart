@@ -1,19 +1,20 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
-import 'package:parc_oto/datasources/vehicle/vehicle_webservice.dart';
-import 'package:parc_oto/screens/vehicle/documents/document_form.dart';
-import 'package:parc_oto/widgets/on_tap_scale.dart';
+import '../../screens/vehicle/states/state_form.dart';
+import 'vehicle_webservice.dart';
+import '../../screens/vehicle/documents/document_form.dart';
+import '../../widgets/on_tap_scale.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../providers/client_database.dart';
 import '../../screens/vehicle/manager/vehicle_form.dart';
 import '../../screens/vehicle/manager/vehicle_tabs.dart';
-import '../../serializables/vehicle.dart';
+import '../../serializables/vehicle/vehicle.dart';
 import '../parcoto_datasource.dart';
 
-class VehiculesDataSource extends ParcOtoDatasource<Vehicle> {
+class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
 
-  VehiculesDataSource({required super.current,super.appTheme,super.filters,super.searchKey,super.selectC, required super.collectionID}){
+  VehiculeDataSource({required super.current,super.appTheme,super.filters,super.searchKey,super.selectC, required super.collectionID}){
     repo =VehiculesWebService(data,collectionID,8);
   }
 
@@ -33,10 +34,13 @@ class VehiculesDataSource extends ParcOtoDatasource<Vehicle> {
         ],
       )),
       DataCell(Text(element.value.anneeUtil.toString(),style: tstyle)),
+      DataCell(Text(types[element.value.etatactuel??0],style: tstyle).tr()),
       DataCell(Text(
           dateFormat.format(element.value.updatedAt!)
           ,style: tstyle)),
-      DataCell(
+      if(selectC!=true)
+
+        DataCell(
     ClientDatabase().isAdmin() || ClientDatabase().isManager()
 
     ?f.FlyoutTarget(
@@ -84,7 +88,7 @@ class VehiculesDataSource extends ParcOtoDatasource<Vehicle> {
                           f.showDialog(context: current,
                               barrierDismissible: true,
                               builder: (context){
-                                return  DocumentForm(ve: element.value,);
+                                return  DocumentForm(vehicle: element.value,);
                               });
                         }
                     ),

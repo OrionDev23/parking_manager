@@ -11,7 +11,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../../../utilities/theme_colors.dart';
-import 'color_picker.dart';
+import '../../widgets/color_picker.dart';
 
 
 class AppointmentForm extends StatefulWidget {

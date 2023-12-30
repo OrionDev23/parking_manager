@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/planning/planning_datasource.dart';
-import 'package:parc_oto/screens/logs/planning/appointment_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart' ;
 
 import '../../../theme.dart';
+import 'appointment_widget.dart';
 
 class PlanningCalendar extends StatefulWidget {
   final CalendarController controller;

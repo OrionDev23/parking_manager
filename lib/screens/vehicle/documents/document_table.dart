@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../datasources/vehic_doc/document_datasource.dart';
-import '../../../serializables/vehicle.dart';
+import '../../../serializables/vehicle/vehicle.dart';
 import '../../../theme.dart';
 import '../../../widgets/empty_table_widget.dart';
 import '../../../widgets/zone_box.dart';

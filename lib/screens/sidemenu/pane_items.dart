@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:parc_oto/screens/logs/planning/planning_manager.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 
 import '../../providers/client_database.dart';
@@ -13,6 +12,7 @@ import '../entreprise.dart';
 import '../login.dart';
 import '../logout.dart';
 import '../logs/logging/log_management.dart';
+import '../planning/planning_manager.dart';
 import '../prestataire/prestataire_tabs.dart';
 import '../reparation/reparation_tabs.dart';
 import '../settings.dart';
@@ -29,16 +29,28 @@ class PaneItemsAndFooters {
     initPanes();
   }
 
+  static late PaneItem dashboard;
+  static late PaneItem usermanagement;
+  static late PaneItem vehicles;
+  static late PaneItem reparations;
+  static late PaneItem chauffeurs;
+  static late PaneItem evenements;
+  static late PaneItem planner;
+  static late PaneItem login;
+  static late PaneItem parametres;
+  static late PaneItem logout;
+
+  static late PaneItem entreprise;
   initPanes() {
-    PaneItem dashboard = PaneItem(
+    dashboard = PaneItem(
         icon: const Icon(FluentIcons.home),
         body: const Dashboard(),
         title: const Text('home').tr());
-    PaneItem usermanagement = PaneItem(
+    usermanagement = PaneItem(
         title: const Text('usermanagement').tr(),
         icon: const Icon(FluentIcons.account_management),
         body: const UserManagement());
-    PaneItem vehicles = PaneItemExpander(
+    vehicles = PaneItemExpander(
         icon: const Icon(FluentIcons.car),
         title: const Text('vehicules').tr(),
         items: [
@@ -63,7 +75,7 @@ class PaneItemsAndFooters {
           ),
         ],
         body: const VehicleDashboard());
-    PaneItem reparations = PaneItemExpander(
+    reparations = PaneItemExpander(
         icon: const Icon(FluentIcons.repair),
         title: const Text('reparations').tr(),
         items: [
@@ -79,7 +91,7 @@ class PaneItemsAndFooters {
           ),
         ],
         body: const SizedBox());
-    PaneItem chauffeurs = PaneItemExpander(
+    chauffeurs = PaneItemExpander(
         icon: const Icon(FluentIcons.people),
         title: const Text("chauffeurs").tr(),
         body: const Placeholder(),
@@ -107,28 +119,28 @@ class PaneItemsAndFooters {
             ),
           ),
         ]);
-    PaneItem evenements = PaneItem(
+    evenements = PaneItem(
         icon: const Icon(FluentIcons.event),
         title: const Text('journal').tr(),
         body: const LogActivityManagement());
-    PaneItem planner = PaneItem(
+    planner = PaneItem(
         icon: const Icon(FluentIcons.reservation_orders),
         title: const Text('planifier').tr(),
         body: const PlanningManager());
-    PaneItem login = PaneItem(
+    login = PaneItem(
         icon: const Icon(FluentIcons.signin),
         title: const Text('seconnecter').tr(),
         body: const LoginScreen());
-    PaneItem logout = PaneItem(
+    logout = PaneItem(
         icon: const Icon(FluentIcons.sign_out),
         title: const Text('decon').tr(),
         body: const LogoutScreen());
-    PaneItem parametres = PaneItem(
+    parametres = PaneItem(
       icon: const Icon(FluentIcons.settings),
       title: const Text('parametres').tr(),
       body: Settings(savedPrefs),
     );
-    PaneItem entreprise = PaneItem(
+    entreprise = PaneItem(
       icon: const Icon(FluentIcons.build_definition),
       title: const Text('monentreprise').tr(),
       body: const MyEntreprise(),
@@ -161,6 +173,6 @@ class PaneItemsAndFooters {
     ];
   }
 
-  List<NavigationPaneItem> originalItems = List.empty(growable: true);
-  List<NavigationPaneItem> footerItems = List.empty(growable: true);
+  static List<NavigationPaneItem> originalItems = List.empty(growable: true);
+  static List<NavigationPaneItem> footerItems = List.empty(growable: true);
 }

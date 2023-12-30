@@ -2,9 +2,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
-import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/screens/logs/planning/planing_calendar.dart';
-import 'package:parc_oto/widgets/page_header.dart';
+import '../../providers/client_database.dart';
+import 'planing_calendar.dart';
+import '../../widgets/page_header.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
