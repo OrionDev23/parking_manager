@@ -120,7 +120,8 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation> {
   }
 
   void showPdf(Reparation reparation) {
-    f.showDialog(
+    Future.delayed(const Duration(milliseconds: 50)).then((value) =>
+        f.showDialog(
         context: current,
         builder: (context) {
           return PdfPreview(
@@ -133,7 +134,7 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation> {
               return ReparationPdf(reparation: reparation).getDocument();
             },
           );
-        });
+        }));
   }
 
   @override

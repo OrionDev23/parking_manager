@@ -2,6 +2,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
+
 import 'package:parc_oto/datasources/parcoto_webservice.dart';
 import 'package:parc_oto/datasources/parcoto_webservice_response.dart';
 
@@ -99,8 +100,8 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource{
     Navigator.of(current).pop(c);
   }
 
-  void showDeleteConfirmation(dynamic c){
-    f.showDialog(
+  void showDeleteConfirmation(dynamic c) {
+    Future.delayed(const Duration(milliseconds: 50)).then((value) =>  f.showDialog(
         context: current,
         builder: (context) {
           return f.ContentDialog(
@@ -114,14 +115,13 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource{
               f.Button(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.of(context).pop();
                   deleteRow(c);
                 },
                 child: const Text('confirmer').tr(),
               )
             ],
           );
-        });
+        }));
   }
   
   String deleteConfirmationMessage(T c);
@@ -242,28 +242,30 @@ abstract class ParcOtoDatasourceUsers<S,T> extends AsyncDataTableSource{
   }
 
   void showDeleteConfirmation(dynamic c,dynamic t){
-    f.showDialog(
-        context: current,
-        builder: (context) {
-          return f.ContentDialog(
-            content: Text(deleteConfirmationMessage( t)),
-            actions: [
-              f.FilledButton(
+    Future.delayed(const Duration(milliseconds: 50)).then((value) =>
+        f.showDialog(
+          context: current,
+          builder: (context) {
+            return f.ContentDialog(
+              content: Text(deleteConfirmationMessage( t)),
+              actions: [
+                f.FilledButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('annuler').tr()),
+                f.Button(
                   onPressed: () {
                     Navigator.of(context).pop();
+                    deleteRow(c,t);
                   },
-                  child: const Text('annuler').tr()),
-              f.Button(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                  deleteRow(c,t);
-                },
-                child: const Text('confirmer').tr(),
-              )
-            ],
-          );
-        });
+                  child: const Text('confirmer').tr(),
+                )
+              ],
+            );
+          }));
+
+
   }
 
   String deleteConfirmationMessage(T c);

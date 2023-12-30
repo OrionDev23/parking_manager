@@ -62,28 +62,17 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
                 element.value.controller.showFlyout(builder: (context){
                   return f.MenuFlyout(
                     items: [
-                      f.MenuFlyoutItem(
+                      if(!archive || ClientDatabase().isAdmin())
+                        f.MenuFlyoutItem(
                           text: const Text('mod').tr(),
                           onPressed: (){
                             Navigator.of(current).pop();
-                            late f.Tab tab;
-                            tab = f.Tab(
-                              key: UniqueKey(),
-                              text: Text('${"mod".tr()} ${'chauffeur'.tr().toLowerCase()} ${element.value.name}'),
-                              semanticLabel: '${'mod'.tr()} ${element.value.name} ${element.value.prenom}',
-                              icon: const Icon(f.FluentIcons.edit),
-                              body: ChauffeurForm(chauf: element.value,),
-                              onClosed: () {
-                                ChauffeurTabsState.tabs.remove(tab);
-
-                                if (ChauffeurTabsState.currentIndex.value > 0) {
-                                  ChauffeurTabsState.currentIndex.value--;
-                                }
-                              },
-                            );
-                            final index = ChauffeurTabsState.tabs.length + 1;
-                            ChauffeurTabsState.tabs.add(tab);
-                            ChauffeurTabsState.currentIndex.value = index - 1;
+                            if(archive){
+                              showDialogChauffeur(element.value);
+                            }
+                            else{
+                              modifyChauffeur(element.value);
+                            }
                           }
                       ),
                       if(ClientDatabase().isAdmin() && archive)
@@ -97,15 +86,17 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
                       f.MenuFlyoutItem(
                           text: const Text('nouvdocument').tr(),
                           onPressed: (){
-                            f.showDialog(context: current,
+                            Future.delayed(const Duration(milliseconds: 50)).then((value) =>
+                                f.showDialog(context: current,
                                 barrierDismissible: true,
                                 builder: (context){
                                   return  CDocumentForm(
                                     c: element.value,
                                   );
-                                });
+                                }));
                           }
                       ),
+                      if(!archive || ClientDatabase().isAdmin())
                       f.MenuFlyoutSubItem(
                         text: const Text('disponibilite').tr(),
                         items: (BuildContext context) {
@@ -153,6 +144,41 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
     await ClientDatabase().ajoutActivity(18, c.id,docName: '${c.name} ${c.prenom}');
   }
 
+void modifyChauffeur(Conducteur conducteur){
+  late f.Tab tab;
+  tab = f.Tab(
+    key: UniqueKey(),
+    text: Text('${"mod".tr()} ${'chauffeur'.tr().toLowerCase()} ${conducteur.name}'),
+    semanticLabel: '${'mod'.tr()} ${conducteur.name} ${conducteur.prenom}',
+    icon: const Icon(f.FluentIcons.edit),
+    body: ChauffeurForm(chauf: conducteur,),
+    onClosed: () {
+      ChauffeurTabsState.tabs.remove(tab);
 
+      if (ChauffeurTabsState.currentIndex.value > 0) {
+        ChauffeurTabsState.currentIndex.value--;
+      }
+    },
+  );
+  final index = ChauffeurTabsState.tabs.length + 1;
+  ChauffeurTabsState.tabs.add(tab);
+  ChauffeurTabsState.currentIndex.value = index - 1;
+}
+
+void showDialogChauffeur(Conducteur conducteur){
+  Future.delayed(const Duration(milliseconds: 50)).then((value) =>
+  f.showDialog(
+      context: current,
+      barrierDismissible: true,
+      builder: (c){
+    return f.ContentDialog(
+        title: Text('${"mod".tr()} ${'chauffeur'.tr().toLowerCase()} ${conducteur.name}'),
+  constraints: BoxConstraints.loose(f.Size(
+  800.px,550.px
+  )),
+      content: ChauffeurForm(chauf: conducteur,),
+    );
+      }));
+}
 
 }

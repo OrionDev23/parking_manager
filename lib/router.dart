@@ -1,5 +1,4 @@
 import 'package:go_router/go_router.dart';
-import 'package:nb_utils/nb_utils.dart';
 import 'package:parc_oto/screens/accept_invitation.dart';
 import 'package:parc_oto/screens/dashboard/dashboard.dart';
 import 'package:parc_oto/screens/login.dart';
@@ -11,6 +10,7 @@ import 'package:parc_oto/screens/vehicle/documents/document_tabs.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
 import 'package:parc_oto/screens/vehicle/states/state_tabs.dart';
 import 'package:parc_oto/screens/vehicle/vehicle_dashboard.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Routes{
 

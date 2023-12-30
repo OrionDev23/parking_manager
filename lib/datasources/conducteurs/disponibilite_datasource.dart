@@ -38,7 +38,7 @@ class DisponibiliteDataSource
         element.value.chauffeurNom,
         style: tstyle,
         onTap: () {
-          goToChaffeur(element.value.chauffeurNom);
+          goToChauffeur(element.value.chauffeurNom);
         },
       )),
       DataCell(SelectableText(
@@ -75,7 +75,7 @@ class DisponibiliteDataSource
     ];
   }
 
-  void goToChaffeur(String chauf) {}
+  void goToChauffeur(String chauf) {}
 
   @override
   Future<void> addToActivity(c) async {

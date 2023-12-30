@@ -15,7 +15,7 @@ class Etat extends ParcOtoDefault{
   String vehicle;
   String vehicleMat;
 
-  @JsonKey(toJson:dateToIntJson,fromJson: updatedAtJson)
+  @JsonKey(toJson:dateToIntJson,fromJson: dateFromIntJson)
   DateTime? date;
 
   Etat({required super.id,super.createdAt,super.updatedAt,required this.type,this.valeur,this.remarque,this.createdBy,required this.vehicle,this.date,this.ordreID,this.ordreNum,required this.vehicleMat});

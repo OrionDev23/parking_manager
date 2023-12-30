@@ -1,5 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:parc_oto/datasources/parcoto_webservice_response.dart';
 
 import '../providers/client_database.dart';
@@ -40,7 +41,18 @@ abstract class ParcOtoWebService<T> {
 
       return ParcOtoWebServiceResponse<T>(
           value.total, result.skip(startingAt).take(count).toList());
-    }).onError((error, stackTrace) {
+    }).onError(( error, stackTrace) {
+
+      if(kDebugMode ){
+        if(error is AppwriteException){
+          print('error.message : ${error.message}');
+          print('error.response : ${error.response}');
+        }
+
+        print('stacktrace : $stackTrace');
+
+      }
+
       return Future.value(ParcOtoWebServiceResponse<T>(0, data));
     });
   }

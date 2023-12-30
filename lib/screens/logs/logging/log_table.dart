@@ -1,6 +1,7 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+
 import 'package:parc_oto/datasources/log_activity/log_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
@@ -265,8 +266,7 @@ class LogTableState extends State<LogTable> {
                                                   ),
                                                   onPressed: filtered?(){
 
-                                                    Navigator.of(context).pop();
-                                                    setState(() {
+                                                    Navigator.of(context).pop();                                                    setState(() {
                                                       dateMax=null;
                                                       dateMin=null;
                                                       selectedVehicle=null;
@@ -281,8 +281,7 @@ class LogTableState extends State<LogTable> {
                                                 const Spacer(),
                                                 Button(
                                                     onPressed:(){
-                                                      Navigator.of(context).pop();
-                                                    },
+                                                      Navigator.of(context).pop();                                                    },
                                                     child: const Text('annuler').tr()),
                                                 smallSpace,
 

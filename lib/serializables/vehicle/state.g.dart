@@ -15,7 +15,7 @@ Etat _$EtatFromJson(Map<String, dynamic> json) => Etat(
       remarque: json['remarque'] as String?,
       createdBy: json['createdBy'] as String?,
       vehicle: json['vehicle'] as String,
-      date: updatedAtJson(json['date'] as String),
+      date: dateFromIntJson(json['date'] as int?),
       ordreID: json['ordreID'] as String?,
       ordreNum: json['ordreNum'] as int?,
       vehicleMat: json['vehicleMat'] as String,

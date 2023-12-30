@@ -114,7 +114,8 @@ class VStatesDatasource extends ParcOtoDatasource<Etat>{
 
 
   void showStateForm(Etat e){
-    f.showDialog(
+    Future.delayed(const Duration(milliseconds: 50)).then((value) =>
+        f.showDialog(
         context: current,
         barrierDismissible: true,
         builder: (c){
@@ -125,6 +126,6 @@ class VStatesDatasource extends ParcOtoDatasource<Etat>{
             )),
             content: StateForm(etat: e,datasource: this,),
           );
-        });
+        }));
   }
 }

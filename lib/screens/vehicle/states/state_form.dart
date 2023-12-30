@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
+
 import 'package:parc_oto/datasources/vehicle_states/vehicle_states_datasrouce.dart';
 import 'package:parc_oto/screens/reparation/reparation_table.dart';
 import 'package:parc_oto/serializables/reparation/reparation.dart';
@@ -60,6 +61,7 @@ class StateFormState extends State<StateForm> {
     documentID=widget.etat!.id;
     remarque=widget.etat!.remarque??'';
     valeur=widget.etat!.valeur??0;
+    type=widget.etat!.type;
     date=widget.etat!.date??widget.etat!.createdAt??DateTime.now();
     if(widget.etat!.ordreID!=null ){
       downloadReparation(widget.etat!.ordreID!);
@@ -367,11 +369,14 @@ class StateFormState extends State<StateForm> {
     );
     await updateOrCreate(etat).then((value) {
       if(affectNow || widget.vehicle!=null){
-        ClientDatabase.database!.createDocument(
+        ClientDatabase.database!.updateDocument(
             databaseId: databaseId,
             collectionId: vehiculeid,
-            documentId: documentID!,
-            data: etat.toJson()).then((value) {
+            documentId: selectedVehicle?.id??widget.vehicle?.id??widget.etat?.vehicle??'',
+            data: {
+              'etat':documentID,
+              'etatactuel':type,
+            }).then((value) {
               if(widget.vehicle!=null && widget.vehicleDatasource!=null){
                 widget.vehicleDatasource!.data[widget.vehicleDatasource!.data.indexOf(MapEntry(widget.vehicle!.id, widget.vehicle!))]=MapEntry(widget.vehicle!.id, widget.vehicle!.changeEtat(documentID!));
                 widget.vehicleDatasource!.refreshDatasource();
@@ -382,8 +387,10 @@ class StateFormState extends State<StateForm> {
         });
       }
       Navigator.pop(context);
+      displayMessageDone();
     }).onError((error, stackTrace) {
       setState(() {
+        displayMessageError();
         showMessage('erreur','erreur');
         sumbmiting=false;
       });
@@ -429,5 +436,27 @@ class StateFormState extends State<StateForm> {
         ],
       ),
     );
+  }
+
+  void displayMessageDone(){
+    displayInfoBar(
+        context,
+        builder: (co,s){
+          return InfoBar(
+            severity: InfoBarSeverity.success,
+            title: Text(widget.etat!=null?'etatmodif':'etatajout').tr(),
+          );
+        });
+  }
+
+  void displayMessageError(){
+    displayInfoBar(
+        context,
+        builder: (co,s){
+          return InfoBar(
+            severity: InfoBarSeverity.error,
+            title: const Text('erreur').tr(),
+          );
+        });
   }
 }

@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:nb_utils/nb_utils.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../providers/client_database.dart';
 import '../chauffeur/disponibilite/disponibilite_tabs.dart';

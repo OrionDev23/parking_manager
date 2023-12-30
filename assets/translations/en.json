@@ -27,7 +27,10 @@
   "etat": "State",
   "notes": "Notes",
   "nouvetat": "New state",
+  "chauffeur": "Driver",
 
+  "etatmodif": "The state has been updated",
+  "etatajout": "New state created",
   "daira": "Daira",
   "quittance": "Receipt",
   "prenom": "First Name",

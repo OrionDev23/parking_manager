@@ -100,13 +100,15 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<String,MapEntry<U
                     f.MenuFlyoutItem(
                         text: const Text('mod').tr(),
                         onPressed: (){
-                          Navigator.of(current).pop();
-                          showUserForm(element.value.key);
+                          Navigator.of(context).pop();
+                          Future.delayed(const Duration(milliseconds: 50)).then((value) =>
+                              showUserForm(element.value.key));
                         }
                     ),
                     f.MenuFlyoutItem(
                         text: const Text('delete').tr(),
                         onPressed: (){
+                          Navigator.of(context).pop();
                           showDeleteConfirmation(element.key,element.value);
                         }
                     ),

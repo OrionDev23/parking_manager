@@ -3,7 +3,6 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  nb_utils
   printing
   screen_retriever
   system_theme
