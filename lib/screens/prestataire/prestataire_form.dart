@@ -412,14 +412,22 @@ class _PrestataireFormState extends State<PrestataireForm> {
           databaseId: databaseId,
           collectionId: prestataireId,
           documentId: prestID!,
-          data: prest.toJson());
+          data: prest.toJson()).then((value) {
+        ClientDatabase().ajoutActivity(14, prestID!,docName: prest.nom);
+
+        return value;
+      });
     }
     else{
       return await ClientDatabase.database!.createDocument(
           databaseId: databaseId,
           collectionId: prestataireId,
           documentId: prestID!,
-          data: prest.toJson());
+          data: prest.toJson()).then((value) {
+        ClientDatabase().ajoutActivity(13, prestID!,docName: prest.nom);
+
+        return value;
+      });
     }
 
   }

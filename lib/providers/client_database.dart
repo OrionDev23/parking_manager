@@ -331,7 +331,7 @@ class ClientDatabase {
         return "suprentreprise";
       case 32:return "ajoututilisateur";
       case 33:return "modifutilisateur";
-      case 35:return "suprutilisateur";
+      case 34:return "suprutilisateur";
     }
     return '';
   }

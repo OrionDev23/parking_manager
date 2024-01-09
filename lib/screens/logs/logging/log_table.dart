@@ -39,7 +39,7 @@ class LogTableState extends State<LogTable> {
     fontSize: 10.sp,
   );
 
-  int sortColumn = 0;
+  int sortColumn = 2;
 
   void initColumns() {
     columns = [

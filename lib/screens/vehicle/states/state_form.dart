@@ -407,6 +407,8 @@ class StateFormState extends State<StateForm> {
         documentId: documentID!,
         data: etat.toJson(),
       );
+
+      ClientDatabase().ajoutActivity(5, documentID!,docName: etat.vehicleMat);
     }
     else{
       await ClientDatabase.database!.createDocument(
@@ -415,6 +417,8 @@ class StateFormState extends State<StateForm> {
         documentId: documentID!,
         data: etat.toJson(),
       );
+      ClientDatabase().ajoutActivity(4, documentID!,docName: etat.vehicleMat);
+
     }
   }
 

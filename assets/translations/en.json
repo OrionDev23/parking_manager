@@ -28,6 +28,8 @@
   "notes": "Notes",
   "nouvetat": "New state",
   "chauffeur": "Driver",
+  "alreadyinvited": "Invitation to become a manager sent",
+  "enattente": "On hold",
 
   "etatmodif": "The state has been updated",
   "etatajout": "New state created",

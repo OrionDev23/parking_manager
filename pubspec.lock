@@ -149,26 +149,26 @@ packages:
     dependency: "direct main"
     description:
       name: cached_network_image
-      sha256: f98972704692ba679db144261172a8e20feb145636c617af0eb4022132a6797f
+      sha256: "28ea9690a8207179c319965c13cd8df184d5ee721ae2ce60f398ced1219cea1f"
       url: "https://pub.dev"
     source: hosted
-    version: "3.3.0"
+    version: "3.3.1"
   cached_network_image_platform_interface:
     dependency: transitive
     description:
       name: cached_network_image_platform_interface
-      sha256: "56aa42a7a01e3c9db8456d9f3f999931f1e05535b5a424271e9a38cabf066613"
+      sha256: "9e90e78ae72caa874a323d78fa6301b3fb8fa7ea76a8f96dc5b5bf79f283bf2f"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0"
+    version: "4.0.0"
   cached_network_image_web:
     dependency: transitive
     description:
       name: cached_network_image_web
-      sha256: "759b9a9f8f6ccbb66c185df805fac107f05730b1dab9c64626d1008cca532257"
+      sha256: "42a835caa27c220d1294311ac409a43361088625a4f23c820b006dd9bffb3316"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "1.1.1"
   characters:
     dependency: transitive
     description:
@@ -277,10 +277,10 @@ packages:
     dependency: "direct main"
     description:
       name: data_table_2
-      sha256: "3ce61e066aba255b2b346a62984dfb0effddb8ca34c123c23c5c3d0f3c4e9fb7"
+      sha256: cec4010dd756bd7d0cc3eb8a30932b8109608132c6c8d643e80ea412d3e51a9c
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.9"
+    version: "2.5.10"
   device_info_plus:
     dependency: transitive
     description:
@@ -381,10 +381,10 @@ packages:
     dependency: "direct main"
     description:
       name: fluent_ui
-      sha256: "19d172588cac32a98901787ffef751cfc671e1f44e9ff2c0786d748617e32011"
+      sha256: "57b31a68fba8c87790b9d160d8ff94385c155821cad542582566d8c97cb4c3c0"
       url: "https://pub.dev"
     source: hosted
-    version: "4.8.3"
+    version: "4.8.4"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -481,10 +481,10 @@ packages:
     dependency: "direct main"
     description:
       name: go_router
-      sha256: ca7e4a2249f96773152f1853fa25933ac752495cdd7fdf5dafb9691bd05830fd
+      sha256: "3b40e751eaaa855179b416974d59d29669e750d2e50fcdb2b37f1cb0ca8c803a"
       url: "https://pub.dev"
     source: hosted
-    version: "13.0.0"
+    version: "13.0.1"
   graphs:
     dependency: transitive
     description:
@@ -1046,42 +1046,42 @@ packages:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_calendar
-      sha256: b31182b348742b0f2285849179490afd89e321514b8e0eadeab6d7377373c9f2
+      sha256: "12c9750dc5b728cb2eee251533a7bcc0b66171f9c7d2c5a3ed665494534148f0"
       url: "https://pub.dev"
     source: hosted
-    version: "24.1.43"
+    version: "24.1.45"
   syncfusion_flutter_core:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: "1b40729aa10a727150a6cc56e532c770f4baded83846fca8700efd908d0f4d0a"
+      sha256: "4afb43254d436e1d41a2ee2761908650ce3ad3453f5bebd283dfe3185d5026a2"
       url: "https://pub.dev"
     source: hosted
-    version: "24.1.43"
+    version: "24.1.45"
   syncfusion_flutter_datepicker:
     dependency: transitive
     description:
       name: syncfusion_flutter_datepicker
-      sha256: "3f9a8e8b585dd992d2321c899ec8d914634fb99eba02cf7a91c48a098bf62820"
+      sha256: "22e9845e3389a7554f5ccf683032ba4ce4cf9a19f656f5e811a075df31f78c9e"
       url: "https://pub.dev"
     source: hosted
-    version: "24.1.43"
+    version: "24.1.45"
   syncfusion_flutter_gauges:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_gauges
-      sha256: fc837dbcd215d100cf56ffd0cf3eeb0e8ebbb4d009839fa997531822b6a97625
+      sha256: e87f451aa25b50dfaebd62cb538e20c10826a781fc51a6990c6e83439223d76a
       url: "https://pub.dev"
     source: hosted
-    version: "24.1.43"
+    version: "24.1.45"
   syncfusion_localizations:
     dependency: "direct main"
     description:
       name: syncfusion_localizations
-      sha256: "579d5c583bc9e4b8bdc72ec8470c1cbd9461fc7cb80d30cc49c79a14b6727c50"
+      sha256: fbb31d03001bb37d6087acf17ea99a6358bdc1b1ff876e3105832de308386683
       url: "https://pub.dev"
     source: hosted
-    version: "24.1.43"
+    version: "24.1.45"
   synchronized:
     dependency: transitive
     description:

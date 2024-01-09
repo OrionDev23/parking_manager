@@ -77,7 +77,7 @@ class VehicleTableState extends State<VehicleTable> {
     fontSize: 10.sp,
   );
 
-  int sortColumn = 3;
+  int sortColumn = 4;
 
   void initColumns() {
     columns = [

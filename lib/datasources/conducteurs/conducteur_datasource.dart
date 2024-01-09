@@ -10,6 +10,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../screens/chauffeur/document/chauf_document_form.dart';
 import '../../screens/chauffeur/manager/chauffeur_tabs.dart';
 import '../../serializables/conducteur/conducteur.dart';
+import '../../serializables/conducteur/disponibilite_chauffeur.dart';
 import '../../widgets/on_tap_scale.dart';
 
 class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
@@ -104,27 +105,34 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur>{
                             f.MenuFlyoutItem(
                                 text: const Text('disponible').tr(),
                                 onPressed: (){
+                                  uploadEtat(element.value,0);
 
-                                }
+                                },
+                              selected: element.value.etat==0,
                             ),
                             f.MenuFlyoutItem(
                                 text: const Text('mission').tr(),
                                 onPressed: (){
+                                  uploadEtat(element.value,1);
 
-                                }
+                                },
+                              selected: element.value.etat==1,
                             ),
                             f.MenuFlyoutItem(
                                 text: const Text('absent').tr(),
                                 onPressed: (){
+                                  uploadEtat(element.value,2);
 
-                                }
+                                },
+                              selected: element.value.etat==2,
                             ),
                             if(ClientDatabase().isAdmin())
                               f.MenuFlyoutItem(
                                 text: const Text('quitteentre').tr(),
                                 onPressed: (){
-
-                                }
+                                  uploadEtat(element.value,3);
+                                },
+                                selected: element.value.etat==3,
                             ),
                           ];
                         },
@@ -180,5 +188,86 @@ void showDialogChauffeur(Conducteur conducteur){
     );
       }));
 }
+
+
+  Future<void> uploadEtat(Conducteur c,int etat) async {
+      if(etat!=c.etat){
+        String etatID = DateTime.now()
+            .difference(ClientDatabase.ref)
+            .inMilliseconds
+            .abs()
+            .toString();
+        DisponibiliteChauffeur disp = DisponibiliteChauffeur(
+            id: etatID,
+            type: etat,
+            createdBy: ClientDatabase.me.value?.id,
+            chauffeur: c.id,
+            chauffeurNom: '${c.name} ${c.prenom}');
+        await ClientDatabase.database!.createDocument(
+            databaseId: databaseId,
+            collectionId: chaufDispID,
+            documentId: etatID,
+            data: disp.toJson()).then((value) async{
+
+          await ClientDatabase.database!.updateDocument(
+              databaseId: databaseId,
+              collectionId: chauffeurid,
+              documentId: c.id,
+              data: {
+                'etatactuel':etatID,
+                'etat':etat,
+              }).then((value) {
+                if(etat==3){
+                  ClientDatabase().ajoutActivity(19, c.id,docName: '${c.name} ${c.prenom}');
+                }
+                else{
+                  ClientDatabase().ajoutActivity(21, c.id,docName: '${c.name} ${c.prenom}');
+                }
+            displayMessageDone();
+            changeEtat(c,disp);
+          }).onError((error, stackTrace) {
+            displayMessageError();
+          });
+        }).onError((error, stackTrace) {
+          displayMessageError();
+        });
+      }
+
+  }
+
+
+  void changeEtat(Conducteur c,DisponibiliteChauffeur e){
+    for(int i=0;i<data.length;i++){
+      if(data[i].value.id==c.id){
+        data[i].value.etat=e.type;
+        data[i].value.etatactuel=e.id;
+        refreshDatasource();
+        break;
+      }
+    }
+  }
+
+  void displayMessageDone(){
+    f.displayInfoBar(
+        current,
+        builder: (co,s){
+          return f.InfoBar(
+            severity: f.InfoBarSeverity.success,
+            title: const Text('etatmodif').tr(),
+          );
+        });
+  }
+
+
+  void displayMessageError(){
+    f.displayInfoBar(
+        current,
+        builder: (co,s){
+          return f.InfoBar(
+            severity: f.InfoBarSeverity.error,
+            title: const Text('erreur').tr(),
+          );
+        });
+  }
 
 }

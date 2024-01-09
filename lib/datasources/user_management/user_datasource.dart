@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/user_management/user_webservice.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
+import 'package:parc_oto/theme.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../providers/client_database.dart';
 import '../../screens/user_management/user_creation.dart';
@@ -20,7 +21,7 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<String,MapEntry<U
 
   @override
   Future<void> addToActivity(MapEntry<User,List<Membership>?> c) async{
-    await ClientDatabase().ajoutActivity(35, c.key.$id,docName: c.key.name.isEmpty?c.key.email:c.key.name);
+    await ClientDatabase().ajoutActivity(34, c.key.$id,docName: c.key.name.isEmpty?c.key.email:c.key.name);
   }
 
   @override
@@ -66,12 +67,19 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<String,MapEntry<U
       fontSize: 10.sp,
     );
     String roles='';
-    element.value.value?.forEach((element) {
-      if(roles.isNotEmpty){
-        roles+=', ';
-      }
-      roles+=element.teamName.tr();
-    });
+    if(isInvitedButNotJoined(element.value.value)){
+        roles="enattente".tr();
+    }
+    else{
+      element.value.value?.forEach((element) {
+        if(roles.isNotEmpty){
+          roles+=', ';
+        }
+        roles+=element.teamName.tr();
+      });
+      roles=roles.toLowerCase().tr();
+    }
+
     return [
       DataCell(SelectableText(element.value.key.name
           ,style: tstyle)),
@@ -79,7 +87,7 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<String,MapEntry<U
           ,style: tstyle)),
       DataCell(SelectableText(element.value.key.$id
           ,style: tstyle)),
-      DataCell(SelectableText((roles).toLowerCase().tr()
+      DataCell(SelectableText((roles)
           ,style: tstyle)),
       DataCell(SelectableText(
           dateFormat.format(DateTime.parse(element.value.key.$createdAt))
@@ -91,12 +99,18 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<String,MapEntry<U
               controllers[element.value.key.$id]!.showFlyout(builder: (context){
                 return f.MenuFlyout(
                   items: [
+                    if(!isManager(element.value.value) && !isInvitedButNotJoined(element.value.value))
                     f.MenuFlyoutItem(
                       text:const Text('invitmanager').tr(),
                       onPressed: (){
                         inviteToBecomeManager(element.value.key,element.value.value);
                       },
                     ),
+                    if(isInvitedButNotJoined(element.value.value))
+                      f.MenuFlyoutItem(
+                        text:Text('alreadyinvited',style: TextStyle(color: placeStyle.color),).tr(),
+                        onPressed: null
+                      ),
                     f.MenuFlyoutItem(
                         text: const Text('mod').tr(),
                         onPressed: (){
@@ -127,6 +141,38 @@ class UsersManagementDatasource extends ParcOtoDatasourceUsers<String,MapEntry<U
         builder: (c){
       return  UserForm(user: user,);
     });
+  }
+
+  bool isManager(List<Membership>? e){
+    if(e!=null){
+      for(var t in e){
+        if(t.teamName.toLowerCase()=='managers'){
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  bool isInvitedButNotJoined(List<Membership>? e){
+    if(e!=null){
+      for(var t in e){
+        if(t.teamName.toLowerCase()=='managers'){
+          if(t.joined.isEmpty){
+            return true;
+          }
+          else{
+            if (kDebugMode) {
+              print("joined :${t.joined}");
+            }
+            return false;
+          }
+        }
+      }
+    }
+
+    return false;
   }
 
   String getMembershipID(List<Membership>? t){

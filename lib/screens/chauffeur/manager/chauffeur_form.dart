@@ -1,4 +1,3 @@
-
 import 'package:appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
 
@@ -16,7 +15,10 @@ int chaufCounter = 0;
 
 class ChauffeurForm extends StatefulWidget {
   final Conducteur? chauf;
-  const ChauffeurForm({super.key, this.chauf,});
+  const ChauffeurForm({
+    super.key,
+    this.chauf,
+  });
 
   @override
   State<ChauffeurForm> createState() => ChauffeurFormState();
@@ -27,7 +29,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   double progress = 0;
   String? chaufID;
 
-  int ? etat;
+  int? etat;
 
   TextEditingController nom = TextEditingController();
   TextEditingController prenom = TextEditingController();
@@ -43,25 +45,23 @@ class ChauffeurFormState extends State<ChauffeurForm> {
 
   void initValues() {
     if (widget.chauf != null) {
-      chaufID=widget.chauf!.id;
-      etat=widget.chauf!.etat;
-      etatID=widget.chauf!.etatactuel;
+      chaufID = widget.chauf!.id;
+      etat = widget.chauf!.etat;
+      etatID = widget.chauf!.etatactuel;
       nom.text = widget.chauf!.name;
       prenom.text = widget.chauf!.prenom;
       email.text = widget.chauf!.email ?? '';
       telephone.text = widget.chauf!.telephone ?? '';
       adresse.text = widget.chauf!.adresse ?? '';
-      birthDay=widget.chauf!.dateNaissance;
+      birthDay = widget.chauf!.dateNaissance;
     }
   }
 
   bool? selected = false;
 
-
   @override
   Widget build(BuildContext context) {
-
-    var appTheme=context.watch<AppTheme>();
+    var appTheme = context.watch<AppTheme>();
     if (uploading) {
       return Center(
         child: Column(
@@ -99,33 +99,33 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                               children: [
                                 Flexible(
                                     child: TextBox(
-                                      controller: nom,
-                                      placeholder: 'Nom',
-                                      style: appTheme.writingStyle,
-                                      placeholderStyle: placeStyle,
-                                      cursorColor: appTheme.color.darker,
-                                      decoration: BoxDecoration(
-                                        color: appTheme.fillColor,
-                                      ),
-                                      onChanged: (s){
-                                        checkChanges();
-                                      },
-                                    )),
+                                  controller: nom,
+                                  placeholder: 'Nom',
+                                  style: appTheme.writingStyle,
+                                  placeholderStyle: placeStyle,
+                                  cursorColor: appTheme.color.darker,
+                                  decoration: BoxDecoration(
+                                    color: appTheme.fillColor,
+                                  ),
+                                  onChanged: (s) {
+                                    checkChanges();
+                                  },
+                                )),
                                 smallSpace,
                                 Flexible(
                                     child: TextBox(
-                                      controller: prenom,
-                                      placeholder: 'Prénom',
-                                      style: appTheme.writingStyle,
-                                      placeholderStyle: placeStyle,
-                                      cursorColor: appTheme.color.darker,
-                                      decoration: BoxDecoration(
-                                        color: appTheme.fillColor,
-                                      ),
-                                      onChanged: (s){
-                                        checkChanges();
-                                      },
-                                    )),
+                                  controller: prenom,
+                                  placeholder: 'Prénom',
+                                  style: appTheme.writingStyle,
+                                  placeholderStyle: placeStyle,
+                                  cursorColor: appTheme.color.darker,
+                                  decoration: BoxDecoration(
+                                    color: appTheme.fillColor,
+                                  ),
+                                  onChanged: (s) {
+                                    checkChanges();
+                                  },
+                                )),
                               ],
                             ),
                           ),
@@ -133,23 +133,27 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                       ),
                       smallSpace,
                       Flexible(
-                        child: ZoneBox(label: 'birthday'.tr(),
-                            child:
-                            Container(height: 5.h,
+                        child: ZoneBox(
+                            label: 'birthday'.tr(),
+                            child: Container(
+                              height: 5.h,
                               padding: const EdgeInsets.all(10),
-                              child: DatePicker(selected: birthDay,onChanged: (d){
-                                setState(() {
-                                  birthDay=d;
-                                });
-                                checkChanges();
-                              },),)
-                        ),
+                              child: DatePicker(
+                                selected: birthDay,
+                                onChanged: (d) {
+                                  setState(() {
+                                    birthDay = d;
+                                  });
+                                  checkChanges();
+                                },
+                              ),
+                            )),
                       ),
                       smallSpace,
                       Flexible(
                         flex: 2,
                         child: ZoneBox(
-                          label:'contact'.tr(),
+                          label: 'contact'.tr(),
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: Column(
@@ -167,7 +171,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                         decoration: BoxDecoration(
                                           color: appTheme.fillColor,
                                         ),
-                                        onChanged: (s){
+                                        onChanged: (s) {
                                           checkChanges();
                                         },
                                       ),
@@ -184,14 +188,15 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                           decoration: BoxDecoration(
                                             color: appTheme.fillColor,
                                           ),
-                                          onChanged: (s){
+                                          onChanged: (s) {
                                             checkChanges();
                                           },
                                         )),
                                   ],
                                 ),
                                 smallSpace,
-                                Flexible(child: TextBox(
+                                Flexible(
+                                    child: TextBox(
                                   controller: adresse,
                                   placeholder: 'adresse'.tr(),
                                   maxLines: 3,
@@ -201,7 +206,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                   decoration: BoxDecoration(
                                     color: appTheme.fillColor,
                                   ),
-                                  onChanged: (s){
+                                  onChanged: (s) {
                                     checkChanges();
                                   },
                                 )),
@@ -219,44 +224,41 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                             child: DropDownButton(
                               title: Text(ClientDatabase.getEtat(etat)).tr(),
                               placement: FlyoutPlacementMode.bottomLeft,
+                              closeAfterClick: false,
                               items: [
-                                MenuFlyoutItem(text: const Text('disponible').tr(), onPressed: () {
-                                  setState(() {
-                                    etat=0;
-                                    checkChanges();
-                                  });
-                                },
-                                    selected:etat==0,
+                                MenuFlyoutItem(
+                                  text: const Text('disponible').tr(),
+                                  onPressed: () {
+                                      etat = 0;
+                                  },
                                 ),
                                 const MenuFlyoutSeparator(),
-                                MenuFlyoutItem(text: const Text('mission').tr(), onPressed: () {
-                                  setState(() {
-                                    etat=1;
-                                    checkChanges();
-                                  });
-                                },
-                                  selected:etat==1,
+                                MenuFlyoutItem(
+                                  text: const Text('mission').tr(),
+                                  onPressed: () {
+                                      etat = 1;
+                                  },
                                 ),
                                 const MenuFlyoutSeparator(),
-                                MenuFlyoutItem(text: const Text('absent').tr(), onPressed: () {
-                                  setState(() {
-                                    etat=2;
-                                    checkChanges();
-                                  });
-                                },
-                                  selected:etat==2,),
-                                if(ClientDatabase().isAdmin())
-                                const MenuFlyoutSeparator(),
-                                if(ClientDatabase().isAdmin())
-                                  MenuFlyoutItem(text: const Text('quitteentre').tr(), onPressed: () {
-                                  setState(() {
-                                    etat=3;
-                                    checkChanges();
-                                  });
-                                },
-                                  selected:etat==3,),
+                                MenuFlyoutItem(
+                                  text: const Text('absent').tr(),
+                                  onPressed: () {
+                                      etat = 2;
+                                  },
+                                ),
+                                if (ClientDatabase().isAdmin())
+                                  const MenuFlyoutSeparator(),
+                                if (ClientDatabase().isAdmin())
+                                  MenuFlyoutItem(
+                                    text: const Text('quitteentre').tr(),
+                                    onPressed: () {
+                                        etat = 3;
+                                    },
+                                  ),
                               ],
-
+                              onClose: (){
+                                checkChanges();
+                              },
                             ),
                           ),
                         ),
@@ -270,7 +272,6 @@ class ChauffeurFormState extends State<ChauffeurForm> {
           Container(
             padding: const EdgeInsets.all(10),
             width: 40.w,
-
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -287,33 +288,35 @@ class ChauffeurFormState extends State<ChauffeurForm> {
       ),
     );
   }
-  bool changes=false;
 
-  void checkChanges(){
-    if(widget.chauf!=null){
-      if(nom.text==widget.chauf!.name && prenom.text==widget.chauf!.prenom
-      && birthDay==widget.chauf!.dateNaissance && ((disp==null && etat==widget.chauf!.etat)|| (disp!=null && disp!.type ==etat) )
-      && adresse.text==widget.chauf!.adresse && telephone.text==widget.chauf!.telephone
-      && email.text==widget.chauf!.email
-      ){
-        if(changes){
+  bool changes = false;
+
+  void checkChanges() {
+    if (widget.chauf != null) {
+      if (nom.text == widget.chauf!.name &&
+          prenom.text == widget.chauf!.prenom &&
+          birthDay == widget.chauf!.dateNaissance &&
+          ((disp == null && etat == widget.chauf!.etat) ||
+              (disp != null && disp!.type == etat)) &&
+          adresse.text == widget.chauf!.adresse &&
+          telephone.text == widget.chauf!.telephone &&
+          email.text == widget.chauf!.email) {
+        if (changes) {
           setState(() {
-            changes=false;
+            changes = false;
+          });
+        }
+      } else {
+        if (!changes) {
+          setState(() {
+            changes = true;
           });
         }
       }
-      else{
-        if(!changes){
-          setState(() {
-            changes=true;
-          });
-        }
-      }
-    }
-    else{
-      if(!changes){
+    } else {
+      if (!changes) {
         setState(() {
-          changes=true;
+          changes = true;
         });
       }
     }
@@ -333,7 +336,11 @@ class ChauffeurFormState extends State<ChauffeurForm> {
           .difference(ClientDatabase.ref)
           .inMilliseconds
           .toString();
-      etatID??=DateTime.now().difference(ClientDatabase.ref).inMilliseconds.abs().toString();
+      etatID ??= DateTime.now()
+          .difference(ClientDatabase.ref)
+          .inMilliseconds
+          .abs()
+          .toString();
       try {
         await uploadEtat();
         setState(() {
@@ -343,7 +350,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
 
         setState(() {
           progress = 90;
-          changes=false;
+          changes = false;
         });
         if (widget.chauf == null) {
           showMessage('chaufsuccess', "ok");
@@ -353,8 +360,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
       } catch (e) {
         setState(() {
           uploading = false;
-          showMessage('errupld',
-              'erreur');
+          showMessage('errupld', 'erreur');
         });
       }
       setState(() {
@@ -364,63 +370,77 @@ class ChauffeurFormState extends State<ChauffeurForm> {
     }
   }
 
-
   DisponibiliteChauffeur? disp;
   String? etatID;
 
   Future<Document> uploadChauffeur() async {
-
-    var dateFormat=DateFormat('y/MM/dd','fr');
+    var dateFormat = DateFormat('y/MM/dd', 'fr');
     Conducteur chauf = Conducteur(
-        id:chaufID!,
-        name: nom.value.text,
-        prenom: prenom.value.text,
-        email: email.value.text,
-        telephone: telephone.value.text,
-        adresse: adresse.value.text,
-        dateNaissance: birthDay,
-        etat: etat,
-        etatactuel: etatID,
-        search: '${dateFormat.format(birthDay??DateTime.now())} '
-            '${nom.value.text} ${prenom.value.text} ${email.value.text} '
-            '${telephone.value.text} ${adresse.value.text} $chaufID ${ClientDatabase.getEtat(etat)}',
-        );
-    if(widget.chauf!=null){
+      id: chaufID!,
+      name: nom.value.text,
+      prenom: prenom.value.text,
+      email: email.value.text,
+      telephone: telephone.value.text,
+      adresse: adresse.value.text,
+      dateNaissance: birthDay,
+      etat: etat,
+      etatactuel: etatID,
+      search: '${dateFormat.format(birthDay ?? DateTime.now())} '
+          '${nom.value.text} ${prenom.value.text} ${email.value.text} '
+          '${telephone.value.text} ${adresse.value.text} $chaufID ${ClientDatabase.getEtat(etat)}',
+    );
+    if (widget.chauf != null) {
       return await ClientDatabase.database!.updateDocument(
           databaseId: databaseId,
           collectionId: chauffeurid,
           documentId: chaufID!,
-          data: chauf.toJson());
-    }
-    else{
+          data: chauf.toJson()).then((value) {
+        ClientDatabase().ajoutActivity(17, chaufID!,docName: '${chauf.name} ${chauf.prenom}');
+
+        return value;
+      });
+    } else {
       return await ClientDatabase.database!.createDocument(
           databaseId: databaseId,
           collectionId: chauffeurid,
           documentId: chaufID!,
-          data: chauf.toJson());
-    }
+          data: chauf.toJson()).then((value) {
+        ClientDatabase().ajoutActivity(16, chaufID!,docName: '${chauf.name} ${chauf.prenom}');
 
+        return value;
+      });
+    }
   }
 
-  Future<Document?> uploadEtat() async{
-    if(disp==null || disp!.type!=etat  ){
-      if(disp?.id==etatID || etatID==null || etatID==widget.chauf?.etatactuel){
-        etatID=DateTime.now().difference(ClientDatabase.ref).inMilliseconds.abs().toString();
+  Future<Document?> uploadEtat() async {
+    if (disp == null || disp!.type != etat) {
+      if (disp?.id == etatID ||
+          etatID == null ||
+          etatID == widget.chauf?.etatactuel) {
+        etatID = DateTime.now()
+            .difference(ClientDatabase.ref)
+            .inMilliseconds
+            .abs()
+            .toString();
       }
-      disp=DisponibiliteChauffeur(id: etatID!, type: etat??0,createdBy: ClientDatabase.me.value?.id,chauffeur: chaufID!,chauffeurNom: '${nom.text} ${prenom.text}');
+      disp = DisponibiliteChauffeur(
+          id: etatID!,
+          type: etat ?? 0,
+          createdBy: ClientDatabase.me.value?.id,
+          chauffeur: chaufID!,
+          chauffeurNom: '${nom.text} ${prenom.text}');
       return await ClientDatabase.database!.createDocument(
           databaseId: databaseId,
           collectionId: chaufDispID,
           documentId: etatID!,
-          data: disp!.toJson()
-      );
-    }
-    else{
+          data: disp!.toJson()).then((value){
+        ClientDatabase().ajoutActivity(20, etatID!,docName: disp?.chauffeurNom);
+        return value;
+      });
+    } else {
       return null;
     }
-
   }
-
 
   void showMessage(String message, String title) {
     showDialog<String>(

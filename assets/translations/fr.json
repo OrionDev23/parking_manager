@@ -401,5 +401,7 @@
  "blue": "Bleu",
  "green": "Vert",
  "users": "Utilisateurs",
- "assignnow": "Assigner comme état actuel ?"
+ "assignnow": "Assigner comme état actuel ?",
+ "alreadyinvited": "Invitation pour devenir manager envoyée",
+ "enattente": "En attente"
 }

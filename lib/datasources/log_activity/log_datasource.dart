@@ -21,7 +21,9 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
   }
 
   @override
-  Future<void> addToActivity(Activity c) async {}
+  Future<void> addToActivity(Activity c) async {
+
+  }
 
   @override
   String deleteConfirmationMessage(Activity c) {

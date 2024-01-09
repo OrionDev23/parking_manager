@@ -257,6 +257,8 @@ class CDocumentFormState extends State<CDocumentForm> with AutomaticKeepAliveCli
             documentId: documentID!,
             data: dv.toJson()
         );
+        ClientDatabase().ajoutActivity(24, documentID!,docName: dv.chauffeurNom);
+
       }
       else{
         await ClientDatabase.database!.createDocument(
@@ -265,6 +267,8 @@ class CDocumentFormState extends State<CDocumentForm> with AutomaticKeepAliveCli
             documentId: documentID!,
             data: dv.toJson()
         );
+        ClientDatabase().ajoutActivity(23, documentID!,docName: dv.chauffeurNom);
+
       }
 
 

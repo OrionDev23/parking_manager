@@ -445,6 +445,8 @@ class _UserFormState extends State<UserForm> {
           email: email.text,
           password: password.text,
           phone: '$phoneDial${phone.text}');
+      ClientDatabase().ajoutActivity(32, userID!,docName: name.text);
+
     } else {
       if (widget.user!.name != name.text) {
         await Users(client)
@@ -454,6 +456,7 @@ class _UserFormState extends State<UserForm> {
         await Users(client).updatePhone(
             userId: widget.user!.$id, number: '$phoneDial${phone.text}');
       }
+      ClientDatabase().ajoutActivity(33, userID!,docName: name.text);
     }
   }
 }
