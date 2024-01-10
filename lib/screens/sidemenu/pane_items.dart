@@ -120,11 +120,11 @@ class PaneItemsAndFooters {
           ),
         ]);
     evenements = PaneItem(
-        icon: const Icon(FluentIcons.event),
+        icon: const Icon(FluentIcons.database_activity),
         title: const Text('journal').tr(),
         body: const LogActivityManagement());
     planner = PaneItem(
-        icon: const Icon(FluentIcons.reservation_orders),
+        icon: const Icon(FluentIcons.event),
         title: const Text('planifier').tr(),
         body: const PlanningManager());
     login = PaneItem(
@@ -156,8 +156,9 @@ class PaneItemsAndFooters {
         if (isAdmin || isManager) vehicles,
         if (isAdmin || isManager) reparations,
         if (isAdmin || isManager) chauffeurs,
-        if (isAdmin || isManager) evenements,
         if (isAdmin || isManager) planner,
+        if (isAdmin || isManager) evenements,
+
       ];
     } else {
       originalItems = [

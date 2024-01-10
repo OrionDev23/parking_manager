@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../widgets/button_container.dart';
 import '../../widgets/page_header.dart';
+import '../sidemenu/pane_items.dart';
 import '../vehicle/manager/vehicle_form.dart';
 import '../vehicle/manager/vehicle_tabs.dart';
 import 'transaction_chart.dart';
@@ -41,13 +42,13 @@ class Dashboard extends StatelessWidget {
                     text: 'vehicules'.tr(),
                     getCount: ClientDatabase().countVehicles,
                     action: (){
-                      PanesListState.index.value=2;
+                      PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.vehicles)+1;
                     },
                     actionList: (){
-                      PanesListState.index.value=2;
+                      PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.vehicles)+1;
                     },
                     actionNouveau: () {
-                      PanesListState.index.value=2;
+                      PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.vehicles)+1;
                       Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
                         late Tab tab;
                         tab = Tab(
@@ -78,13 +79,13 @@ class Dashboard extends StatelessWidget {
                       icon: FluentIcons.people, text: 'chauffeurs'.tr(),
                     getCount:  ClientDatabase().countChauffeur,
                     action: (){
-                      PanesListState.index.value=10;
+                      PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.chauffeurs)+1;
                     },
                     actionList: (){
-                      PanesListState.index.value=10;
+                      PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.chauffeurs)+1;
                     },
                     actionNouveau: () {
-                      PanesListState.index.value=10;
+                      PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.chauffeurs)+1;
                       Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
                         late Tab tab;
                         tab = Tab(

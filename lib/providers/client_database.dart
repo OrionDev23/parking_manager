@@ -15,12 +15,12 @@ const userid = "users";
 const chauffeurid = "6537d87b492c80f255e8";
 const genreid = "6537960246d5b0e1ab77";
 const vehiculeid = "6531ad22153b2a49ca2c";
-const etatId="etat";
+const etatId = "etat";
 const chaufDispID = "chauf_disponibilite";
 const chaufDoc = "doc_chauffeur";
 const vehicDoc = "doc_vehic";
 const entrepriseid = "entreprise";
-const planningID="planning";
+const planningID = "planning";
 const buckedId = "images";
 const reparationId = "reparation";
 const activityId = "activity";
@@ -33,7 +33,7 @@ class ClientDatabase {
   static Account? account;
   static User? user;
 
-  static List<Team> myTeams=List.empty(growable: true);
+  static List<Team> myTeams = List.empty(growable: true);
   static Storage? storage;
   static final DateTime ref = DateTime(2023, 11, 01, 12, 13, 15);
 
@@ -52,19 +52,18 @@ class ClientDatabase {
     getEntreprise();
   }
 
-
-
-  bool isManager({List<Team>? teams}){
-    for(var element in teams??myTeams){
-      if(element.name.toLowerCase()=='managers'){
+  bool isManager({List<Team>? teams}) {
+    for (var element in teams ?? myTeams) {
+      if (element.name.toLowerCase() == 'managers') {
         return true;
       }
     }
     return false;
   }
-  bool isAdmin({List<Team>? teams}){
-    for(var element in teams??myTeams){
-      if(element.name.toLowerCase()=='admins'){
+
+  bool isAdmin({List<Team>? teams}) {
+    for (var element in teams ?? myTeams) {
+      if (element.name.toLowerCase() == 'admins') {
         return true;
       }
     }
@@ -95,23 +94,22 @@ class ClientDatabase {
         user = null;
       });
     }
-    if(user!=null){
+    if (user != null) {
       await Teams(client!).list().then((t) {
-        myTeams=t.teams;
+        myTeams = t.teams;
       });
 
-      if(kDebugMode){
-        String roles='';
+      if (kDebugMode) {
+        String roles = '';
         for (var element in myTeams) {
-          if(roles.isNotEmpty){
-            roles+=', ';
+          if (roles.isNotEmpty) {
+            roles += ', ';
           }
-          roles+=element.name.tr();
+          roles += element.name.tr();
         }
         print('his teams are : $roles');
       }
     }
-
   }
 
   Future<void> getEntreprise() async {
@@ -148,13 +146,15 @@ class ClientDatabase {
         ]);
   }
 
-  Future<int> countVehicles() async {
+  Future<int> countVehicles({int etat = -1}) async {
     int result = 0;
 
     await database!.listDocuments(
         databaseId: databaseId,
         collectionId: vehiculeid,
         queries: [
+          if (etat != -1) Query.equal('etatactuel', etat),
+          if (etat == 0) Query.isNull('etatactuel'),
           Query.limit(1),
         ]).then((value) {
       result = value.total;
@@ -329,9 +329,12 @@ class ClientDatabase {
         return "modifentreprise";
       case 31:
         return "suprentreprise";
-      case 32:return "ajoututilisateur";
-      case 33:return "modifutilisateur";
-      case 34:return "suprutilisateur";
+      case 32:
+        return "ajoututilisateur";
+      case 33:
+        return "modifutilisateur";
+      case 34:
+        return "suprutilisateur";
     }
     return '';
   }

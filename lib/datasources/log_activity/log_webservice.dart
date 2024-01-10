@@ -45,13 +45,13 @@ class LogWebService extends ParcOtoWebService<Activity>{
   List<String> getFilterQueries(Map<String, String> filters, int count, int startingAt, int sortedBy, bool sortedAsc, {int? index}) {
     return [
       if(filters.containsKey('datemin'))
-        Query.greaterThanEqual('date_expiration', int.tryParse(filters['datemin']!)),
+        Query.greaterThanEqual(r'$updatedAt', int.tryParse(filters['datemin']!)),
       if(filters.containsKey('datemax'))
-        Query.lessThanEqual('date_expiration', int.tryParse(filters['datemax']!)),
+        Query.lessThanEqual(r'$updatedAt', int.tryParse(filters['datemax']!)),
       if(filters.containsKey('createdBy'))
         Query.equal('createdBy', filters['createdBy']),
       if(filters.containsKey('type'))
-        Query.equal('type', filters['type']),
+        Query.equal('type', int.tryParse(filters['type']!)),
     ];
   }
 
@@ -71,7 +71,7 @@ class LogWebService extends ParcOtoWebService<Activity>{
         } else {
           return Query.orderDesc('docName');
         }
-      case 3:
+      case 2:
         if (sortedAsc) {
           return Query.orderAsc('\$updatedAt');
         } else {

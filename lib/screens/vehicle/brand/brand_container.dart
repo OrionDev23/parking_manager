@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../theme.dart';
+import '../../sidemenu/pane_items.dart';
 import '../../sidemenu/sidemenu.dart';
 import '../manager/vehicles_table.dart';
 
@@ -76,7 +77,7 @@ class _BrandContainerState extends State<BrandContainer> {
         ),
       ),
       onTap: (){
-        PanesListState.index.value=2;
+        PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.vehicles)+1;
         VehicleTabsState.currentIndex.value=0;
 
         VehicleTableState.filterNow=true;

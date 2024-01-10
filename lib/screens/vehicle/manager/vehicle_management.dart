@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicle_form.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicles_table.dart';
@@ -10,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../theme.dart';
+import '../../dashboard/pie_chart/pie_chart.dart';
 
 class VehicleManagement extends StatefulWidget {
   const VehicleManagement({super.key});
@@ -60,58 +62,14 @@ class _VehicleManagementState extends State<VehicleManagement> with AutomaticKee
                     child: const VehicleTable()),
                 const SizedBox(width: 10,),
                 Flexible(
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height:20.h,
-                                                child: PieChart(
-                          PieChartData(
-                          sections: [
-                            PieChartSectionData(
-                              value: 120,
-                              color: appTheme.color.darkest,
-                            ),
-                            PieChartSectionData(
-                              value: 60,
-                              color: appTheme.color,
-                            ),
-                            PieChartSectionData(
-                              value: 180,
-                              color: appTheme.color.lightest,
-                            ),
-                          ]
-                          )
-                        ),
-                      ),
-                      const SizedBox(height: 10,),
-
+                  child: ParcOtoPie(
+                    labels: [
+                      MapEntry('gstate', ClientDatabase().countVehicles(etat: 0)),
+                      MapEntry('bstate', ClientDatabase().countVehicles(etat: 1)),
+                      MapEntry('rstate', ClientDatabase().countVehicles(etat: 2))
                     ],
-
                   ),
                 ),
-                const SizedBox(width: 10,),
-                Flexible(child: Column(
-                  children: [
-                    SizedBox(height: 10.h,),
-                    Row(children: [
-                      Container(color: appTheme.color.darkest,width: 2.w,height: 1.w,),
-                      const SizedBox(width: 5,),
-                      Text('Bon état',style: tstyle,),
-                    ],),
-                    const SizedBox(height: 5,),
-                    Row(children: [
-                      Container(color: appTheme.color,width: 2.w,height: 1.w,),
-                      const SizedBox(width: 5,),
-                      Text('En panne',style: tstyle,),
-                    ],),
-                    const SizedBox(height: 5,),
-                    Row(children: [
-                      Container(color: appTheme.color,width: 2.w,height: 1.w,),
-                      const SizedBox(width: 5,),
-                      Text('En réparation',style: tstyle,),
-                    ],),
-                  ],
-                )),
                 const SizedBox(width: 10,),
               ],
             ),

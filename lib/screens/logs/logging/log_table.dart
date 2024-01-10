@@ -10,8 +10,6 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../../theme.dart';
 import '../../../../widgets/empty_table_widget.dart';
 import '../../../../widgets/zone_box.dart';
-import '../../../serializables/vehicle/vehicle.dart';
-import '../../vehicle/manager/vehicles_table.dart';
 
 class LogTable extends StatefulWidget {
   final bool selectD;
@@ -32,6 +30,9 @@ class LogTableState extends State<LogTable> {
   void initState() {
     logDatasource = LogDatasource(current: context, collectionID: activityId,selectC: widget.selectD);
     initColumns();
+    Future.delayed(const Duration(milliseconds: 300)).then((value) {
+      logDatasource.sort(sortColumn, assending);
+    });
     super.initState();
   }
 
@@ -64,7 +65,7 @@ class LogTableState extends State<LogTable> {
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Text(
-            'nom',
+            'ID',
             style: tstyle,
           ).tr(),
         ),
@@ -111,9 +112,9 @@ class LogTableState extends State<LogTable> {
   bool filtered = false;
 
   FlyoutController filterFlyout = FlyoutController();
-  Vehicle? selectedVehicle;
   DateTime? dateMin;
   DateTime? dateMax;
+  int? type;
   Map<String,String> filters={};
   @override
   Widget build(BuildContext context) {
@@ -215,42 +216,32 @@ class LogTableState extends State<LogTable> {
                                           smallSpace,
                                           Flexible(
                                             child: ZoneBox(
-                                              label:'vehicule'.tr(),
+                                              label:'activity'.tr(),
                                               child: Padding(
                                                 padding: const EdgeInsets.all(10.0),
-                                                child: ListTile(
-                                                  title: Text(selectedVehicle?.matricule??'/'),
-                                                  onPressed: () async{
-                                                    selectedVehicle=await showDialog<Vehicle>(context: context,
-                                                        barrierDismissible: true,
-                                                        builder: (context){
-                                                          return  ContentDialog(
-                                                            constraints: BoxConstraints.tight(Size(
-                                                                60.w,60.h
-                                                            )),
-                                                            title: const Text('selectvehicle').tr(),
-                                                            style: ContentDialogThemeData(
-                                                                titleStyle: appTheme.writingStyle.copyWith(fontWeight: FontWeight.bold)
-                                                            ),
-                                                            content: Container(
-                                                                color: appTheme.backGroundColor,
-                                                                width: 60.w,
-                                                                height: 60.h,
-                                                                child: const VehicleTable(selectV: true,)
-                                                            ),
-                                                          );
-                                                        }
-                                                    );
+                                                child: DropDownButton(
+                                                  closeAfterClick:false,
+                                                  title:Text(type==null?'/':ClientDatabase().getActivityType(type!).tr()),
+                                                  trailing:type==null?const Icon(FluentIcons.caret_down8):IconButton(icon: Icon(FluentIcons.cancel,color: Colors.red,), onPressed: (){
                                                     setState(() {
-
+                                                      type=null;
                                                     });
                                                     setS((){});
+                                                  }),
+                                                    items: List.generate(35, (index) {
+                                                    return MenuFlyoutItem(text: Text(ClientDatabase().getActivityType(index)).tr(),
+                                                        onPressed: (){
+                                                      setState(() {
+                                                        type=index;
+                                                      });
+                                                      setS((){});
+                                                        });
+                                                  })
 
-                                                  },
+                                                  )
                                                 ),
                                               ),
                                             ),
-                                          ),
                                           smallSpace,
                                           smallSpace,
                                           Padding(
@@ -269,7 +260,7 @@ class LogTableState extends State<LogTable> {
                                                     Navigator.of(context).pop();                                                    setState(() {
                                                       dateMax=null;
                                                       dateMin=null;
-                                                      selectedVehicle=null;
+                                                      type=null;
                                                       filtered=false;
                                                       filters.clear();
                                                     });
@@ -310,11 +301,11 @@ class LogTableState extends State<LogTable> {
                                                       else{
                                                         filters.remove('datemax');
                                                       }
-                                                      if(selectedVehicle!=null){
-                                                        filters['vehicle']=selectedVehicle!.id;
+                                                      if(type!=null){
+                                                        filters['type']=type!.toString();
                                                       }
                                                       else{
-                                                        filters.remove('vehicle');
+                                                        filters.remove('type');
                                                       }
 
                                                       filtered=true;

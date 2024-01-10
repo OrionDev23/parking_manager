@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_table.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
+import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/serializables/conducteur/document_chauffeur.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../providers/client_database.dart';
@@ -21,7 +22,7 @@ class ChaufDocumentsDataSource extends ParcOtoDatasource<DocumentChauffeur> {
 
   void showMyChauffeur(String? chauffeur) {
     if (chauffeur != null) {
-      PanesListState.index.value = 10;
+      PanesListState.index.value = PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.chauffeurs)+1;
       ChauffeurTabsState.currentIndex.value = 0;
 
       ChauffeurTableState.filterNow = true;
