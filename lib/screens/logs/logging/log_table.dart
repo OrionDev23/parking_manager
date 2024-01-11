@@ -41,7 +41,7 @@ class LogTableState extends State<LogTable> {
 
   @override
   void initState() {
-    sortColumn=widget.fieldsToShow.length>=2?2:widget.fieldsToShow.length-1;
+    sortColumn=widget.fieldsToShow.indexOf('date');
     logDatasource = LogDatasource(
         current: context,
         collectionID: activityId,
