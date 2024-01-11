@@ -83,7 +83,7 @@ class VehicleDashboard extends StatelessWidget {
                   action: (){
                     PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.vehicles)+3;
                   },
-                  color:appTheme.color,icon: FluentIcons.sync_status, text: 'vstates'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
+                  color:appTheme.color,icon: FluentIcons.health, text: 'vstates'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
                 ButtonContainer(
                   action: () {
                     PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.vehicles)+3;
@@ -102,7 +102,7 @@ class VehicleDashboard extends StatelessWidget {
                           });
                   },);
                     },
-                  color:appTheme.color.light,icon: FluentIcons.update_restore, text: 'nouvetat'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
+                  color:appTheme.color.light,icon: FluentIcons.health_refresh, text: 'nouvetat'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
                 ButtonContainer(
                   action: (){
                     PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.vehicles)+4;
