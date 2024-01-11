@@ -93,7 +93,7 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
             ),
             smallSpace,
             SizedBox(
-              width: 85.px,
+              width: 110.px,
               height: 25.px*values.length,
               child: Column(
                   children: List.generate(values.length, (index) {

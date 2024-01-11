@@ -15,6 +15,8 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
       {required super.collectionID,
       required super.current,
       super.appTheme,
+        super.sortAscending,
+        super.sortColumn,
       super.filters,
       super.searchKey,
       this.fieldsToShow = const ['act', 'id', 'date', 'plus'],

@@ -50,7 +50,7 @@ class ChauffeurTabsState extends State<ChauffeurTabs> {
       currentIndex2.value=0;
       if(tabs2.isEmpty){
         tabs2.add(Tab(
-          text: Text('gchauffeurs'.tr()),
+          text: Text(widget.archive?'archive'.tr():'gchauffeurs'.tr()),
           closeIcon: null,
           icon: const Icon(FluentIcons.settings),
           body:  ChauffeurGestion(archive: widget.archive,),

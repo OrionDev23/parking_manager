@@ -1,6 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import '../../../providers/client_database.dart';
+import '../../dashboard/pie_chart/pie_chart.dart';
+import '../../logs/logging/log_table.dart';
 import 'chauffeur_form.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -22,6 +25,7 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
   final tstyle=TextStyle(
     fontSize: 10.sp,
   );
+  static ValueNotifier<int> stateChanges=ValueNotifier(0);
 
 
 
@@ -30,7 +34,7 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
     var appTheme=context.watch<AppTheme>();
     return ScaffoldPage(
       header: PageTitle(
-        text: 'gchauffeurs'.tr(),
+        text: widget.archive?'archive'.tr():'gchauffeurs'.tr(),
         trailing: widget.archive?null:SizedBox(
             width: 15.w,
             height: 10.h,
@@ -52,61 +56,46 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
           SizedBox(
               width:60.w,
               child: ChauffeurTable(archive: widget.archive,)),
-          const SizedBox(width: 10,),
+          smallSpace,
           Flexible(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height:20.h,
-                  child: PieChart(
-                      PieChartData(
-                          sections: [
-                            PieChartSectionData(
-                              value: 120,
-                              color: appTheme.color.darkest,
-                            ),
-                            PieChartSectionData(
-                              value: 60,
-                              color: appTheme.color,
-                            ),
-                            PieChartSectionData(
-                              value: 180,
-                              color: appTheme.color.lightest,
-                            ),
-                          ]
-                      )
+                ValueListenableBuilder(
+                    valueListenable: stateChanges,
+                    builder: (context,val,w) {
+
+                      return ParcOtoPie(
+                        title: 'disponibilite'.tr(),
+                        labels: [
+                          MapEntry('disponible', ClientDatabase().countChauffeur(etat: 0)),
+                          MapEntry('absent', ClientDatabase().countChauffeur(etat: 1)),
+                          MapEntry('mission', ClientDatabase().countChauffeur(etat: 2)),
+                          MapEntry('quitteentre', ClientDatabase().countChauffeur(etat: 3))
+                        ],
+                      );
+                    }
+                ),
+                smallSpace,
+                Text('lactivities',style:  TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: appTheme.writingStyle.color),).tr(),
+                smallSpace,
+                const Flexible(
+                  child: LogTable(
+                    statTable: true,
+                    numberOfRows: 3,
+                    filters: {
+                      'typemin':'16',
+                      'typemax':'25'
+                    },
+                    fieldsToShow: [
+                      'act','date'
+                    ],
                   ),
                 ),
-                const SizedBox(height: 10,),
-
               ],
-
             ),
           ),
-          const SizedBox(width: 10,),
-          Flexible(child: Column(
-            children: [
-              SizedBox(height: 10.h,),
-              Row(children: [
-                Container(color: appTheme.color.darkest,width: 2.w,height: 1.w,),
-                const SizedBox(width: 5,),
-                Text('Bon état',style: tstyle,),
-              ],),
-              const SizedBox(height: 5,),
-              Row(children: [
-                Container(color: appTheme.color,width: 2.w,height: 1.w,),
-                const SizedBox(width: 5,),
-                Text('En panne',style: tstyle,),
-              ],),
-              const SizedBox(height: 5,),
-              Row(children: [
-                Container(color: appTheme.color,width: 2.w,height: 1.w,),
-                const SizedBox(width: 5,),
-                Text('En réparation',style: tstyle,),
-              ],),
-            ],
-          )),
-          const SizedBox(width: 10,),
         ],
       ),
     );

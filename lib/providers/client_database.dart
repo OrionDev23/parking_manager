@@ -155,6 +155,7 @@ class ClientDatabase {
         queries: [
           if (etat != -1) Query.equal('etatactuel', etat),
           Query.limit(1),
+
         ]).then((value) {
           print('total for etat $etat : ${value.total}');
       result = value.total;
@@ -163,13 +164,14 @@ class ClientDatabase {
     return result;
   }
 
-  Future<int> countChauffeur() async {
+  Future<int> countChauffeur({int etat = -1}) async {
     int result = 0;
 
     await database!.listDocuments(
         databaseId: databaseId,
         collectionId: chauffeurid,
         queries: [
+          if(etat!=-1) Query.equal('etat', etat),
           Query.limit(1),
         ]).then((value) {
       result = value.total;

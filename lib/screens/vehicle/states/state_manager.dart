@@ -18,7 +18,13 @@ class EtatManagerState extends State<EtatManager> {
     fontSize: 10.sp,
   );
 
+static BuildContext? current;
 
+@override
+  void initState() {
+    current=context;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

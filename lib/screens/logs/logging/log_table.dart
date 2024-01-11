@@ -41,17 +41,16 @@ class LogTableState extends State<LogTable> {
 
   @override
   void initState() {
-    sortColumn=widget.fieldsToShow.length-1;
+    sortColumn=widget.fieldsToShow.length>=2?2:widget.fieldsToShow.length-1;
     logDatasource = LogDatasource(
         current: context,
         collectionID: activityId,
+        sortAscending: assending,
+        sortColumn: sortColumn,
         selectC: widget.selectD,
         fieldsToShow: widget.fieldsToShow,
         filters: widget.filters);
     initColumns();
-    Future.delayed(const Duration(milliseconds: 300)).then((value) {
-      logDatasource.sort(sortColumn, assending);
-    });
     super.initState();
   }
 

@@ -26,7 +26,7 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource{
 
   late final ParcOtoWebService repo;
 
-  ParcOtoDatasource({required this.collectionID,required this.current,this.selectC=false,this.appTheme,this.filters,this.searchKey});
+  ParcOtoDatasource({required this.collectionID,required this.current,this.selectC=false,this.appTheme,this.filters,this.searchKey,this.sortColumn=0,this.sortAscending=false});
 
   ParcOtoDatasource.empty({required this.collectionID,required this.current,this.selectC=false,this.appTheme,this.filters,this.searchKey}) {
     empty = true;
