@@ -6,9 +6,10 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class ParcOtoPie extends StatefulWidget {
+  final String? title;
 
   final List<MapEntry<String,Future<int>>> labels;
-  const ParcOtoPie({super.key,required this.labels});
+  const ParcOtoPie({super.key,required this.labels,this.title});
 
   @override
   State<ParcOtoPie> createState() => _ParcOtoPieState();
@@ -34,6 +35,7 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
         tasks.add(getValue(i));
     }
     await Future.wait(tasks);
+    sortAsIntended();
     setState(() {
       loading=false;
     });
@@ -42,53 +44,76 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
   Future<void> getValue(int index) async{
     values.add(MapEntry(widget.labels[index].key, await widget.labels[index].value));
   }
+
+
+  void sortAsIntended(){
+    List<MapEntry<String,int>> result=[];
+    for(int i=0;i<widget.labels.length;i++){
+        for(int j=0;j<values.length;j++){
+          if(widget.labels[i].key==values[j].key){
+            result.add(MapEntry(values[j].key, values[j].value));
+            values.removeAt(j);
+            break;
+          }
+        }
+    }
+    values.addAll(result);
+  }
   @override
   Widget build(BuildContext context) {
     var appTheme=context.watch<AppTheme>();
     if(loading){
-      return const ProgressRing();
+      return const Center(child: ProgressRing());
     }
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: 150.px,
-          height: 150.px,
-          child: PieChart(
-              PieChartData(
-                  sections: List.generate(values.length, (index) {
-                    return PieChartSectionData(
-                      value: double.parse(values[index].value.toDouble().toStringAsFixed(0)),
-                      color: getRandomColor(index,appTheme),
+        if(widget.title!=null)
+        Text(widget.title!,style:  TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: appTheme.writingStyle.color),),
+        smallSpace,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            SizedBox(
+              width: 140.px,
+              height: 140.px,
+              child: PieChart(
+                  PieChartData(
+                    sections: List.generate(values.length, (index) {
+                      return PieChartSectionData(
+                        value: double.parse(values[index].value.toDouble().toStringAsFixed(0)),
+                        color: getRandomColor(index,appTheme),
+                        title: values[index].value.toString(),
+                        showTitle: true,
+                      );
+                    }),
+                  ),
+              ),
+            ),
+            smallSpace,
+            SizedBox(
+              width: 85.px,
+              height: 25.px*values.length,
+              child: Column(
+                  children: List.generate(values.length, (index) {
+                    return Padding(padding: const EdgeInsets.all(5),
+                      child:Row(
+                        children: [
+                        Container(color: getRandomColor(index, appTheme),width: 20.px,height: 10.px,),
+                        const SizedBox(width: 2,),
+                        Text(values[index].key,style: tstyle.copyWith(fontSize: 8),).tr(),
+                      ],),
                     );
-                  }),
-              )
-          ),
+                  })
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 10,),
-        SizedBox(
-          width: 150.px,
-          height: 30.px*values.length,
-          child: Column(
-            children: List.generate(values.length, (index) {
-              return Padding(padding: const EdgeInsets.all(5),
-              child:Row(children: [
-                Container(color: getRandomColor(index, appTheme),width: 2.w,height: 1.w,),
-                const SizedBox(width: 5,),
-                Text(values[index].key,style: tstyle,).tr(),
-              ],),
-              );
-            })
-          ),
-        ),
+
       ],
     );
   }
-
-
-
   Color getRandomColor(int index,AppTheme appTheme){
     switch(index){
       case 0:return appTheme.color.lightest;

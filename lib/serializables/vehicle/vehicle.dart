@@ -68,7 +68,7 @@ class Vehicle extends ParcOtoDefault{
     this.carrosserie,this.charegeUtile,this.daira,
     this.energie,this.genre,this.marque,
     this.matriculePrec, this.pays,this.placesAssises,
-    this.poidsTotal, this.puissance, this.createdBy,this.etat,this.etatactuel
+    this.poidsTotal, this.puissance, this.createdBy,this.etat,this.etatactuel=0
   });
 
   @override

@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/screens/logs/logging/log_table.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicle_form.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicles_table.dart';
@@ -17,16 +17,18 @@ class VehicleManagement extends StatefulWidget {
   const VehicleManagement({super.key});
 
   @override
-  State<VehicleManagement> createState() => _VehicleManagementState();
+  State<VehicleManagement> createState() => VehicleManagementState();
 }
 
-class _VehicleManagementState extends State<VehicleManagement> with AutomaticKeepAliveClientMixin<VehicleManagement> {
+class VehicleManagementState extends State<VehicleManagement> with AutomaticKeepAliveClientMixin<VehicleManagement> {
 
 
   final tstyle=TextStyle(
     fontSize: 10.sp,
   );
 
+
+  static ValueNotifier<int> stateChanges=ValueNotifier(0);
 
 
   @override
@@ -56,21 +58,51 @@ class _VehicleManagementState extends State<VehicleManagement> with AutomaticKee
         children: [
           Flexible(
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
                     width:60.w,
                     child: const VehicleTable()),
-                const SizedBox(width: 10,),
+                smallSpace,
                 Flexible(
-                  child: ParcOtoPie(
-                    labels: [
-                      MapEntry('gstate', ClientDatabase().countVehicles(etat: 0)),
-                      MapEntry('bstate', ClientDatabase().countVehicles(etat: 1)),
-                      MapEntry('rstate', ClientDatabase().countVehicles(etat: 2))
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ValueListenableBuilder(
+                        valueListenable: stateChanges,
+                        builder: (context,val,w) {
+
+                          return ParcOtoPie(
+                            title: 'vstates'.tr(),
+                            labels: [
+                              MapEntry('gstate', ClientDatabase().countVehicles(etat: 0)),
+                              MapEntry('bstate', ClientDatabase().countVehicles(etat: 1)),
+                              MapEntry('rstate', ClientDatabase().countVehicles(etat: 2))
+                            ],
+                          );
+                        }
+                      ),
+                      smallSpace,
+                      Text('lactivities',style:  TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: appTheme.writingStyle.color),).tr(),
+                      smallSpace,
+                      const Flexible(
+                        child: LogTable(
+                          statTable: true,
+                          numberOfRows: 3,
+                          filters: {
+                            'typemin':'0',
+                            'typemax':'9'
+                          },
+                          fieldsToShow: [
+                            'act','date'
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 10,),
               ],
             ),
           ),

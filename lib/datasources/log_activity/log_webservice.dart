@@ -52,6 +52,10 @@ class LogWebService extends ParcOtoWebService<Activity>{
         Query.equal('createdBy', filters['createdBy']),
       if(filters.containsKey('type'))
         Query.equal('type', int.tryParse(filters['type']!)),
+      if(filters.containsKey('typemin'))
+        Query.greaterThanEqual('type', int.tryParse(filters['typemin']!)),
+      if(filters.containsKey('typemax'))
+        Query.lessThanEqual('type', int.tryParse(filters['typemax']!)),
     ];
   }
 

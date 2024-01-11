@@ -154,9 +154,9 @@ class ClientDatabase {
         collectionId: vehiculeid,
         queries: [
           if (etat != -1) Query.equal('etatactuel', etat),
-          if (etat == 0) Query.isNull('etatactuel'),
           Query.limit(1),
         ]).then((value) {
+          print('total for etat $etat : ${value.total}');
       result = value.total;
     }).onError((AppwriteException error, stackTrace) {});
 

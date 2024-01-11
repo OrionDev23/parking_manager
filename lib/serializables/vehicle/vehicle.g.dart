@@ -37,7 +37,7 @@ Vehicle _$VehicleFromJson(Map<String, dynamic> json) => Vehicle(
       puissance: json['puissance'] as int?,
       createdBy: json['user_creation'] as String?,
       etat: json['etat'] as String?,
-      etatactuel: json['etatactuel'] as int?,
+      etatactuel: json['etatactuel'] as int? ?? 0,
     );
 
 Map<String, dynamic> _$VehicleToJson(Vehicle instance) => <String, dynamic>{

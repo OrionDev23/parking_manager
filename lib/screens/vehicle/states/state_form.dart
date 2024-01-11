@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 
 import 'package:parc_oto/datasources/vehicle_states/vehicle_states_datasrouce.dart';
 import 'package:parc_oto/screens/reparation/reparation_table.dart';
+import 'package:parc_oto/screens/vehicle/manager/vehicle_management.dart';
 import 'package:parc_oto/serializables/reparation/reparation.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -27,7 +28,7 @@ class StateForm extends StatefulWidget {
   final int? type;
   final VStatesDatasource? datasource;
   final VehiculeDataSource? vehicleDatasource;
-  const StateForm({super.key,this.etat,this.vehicle,this.type,this.vehicleDatasource,this.datasource});
+  const StateForm({super.key,this.etat,this.vehicle,this.type,this.vehicleDatasource,this.datasource,});
 
   @override
   State<StateForm> createState() => StateFormState();
@@ -384,10 +385,14 @@ class StateFormState extends State<StateForm> {
               else if(affectNow){
                 widget.datasource?.refreshDatasource();
               }
+
         });
       }
       Navigator.pop(context);
+
       displayMessageDone();
+      VehicleManagementState.stateChanges.value++;
+
     }).onError((error, stackTrace) {
       setState(() {
         displayMessageError();
@@ -420,6 +425,7 @@ class StateFormState extends State<StateForm> {
       ClientDatabase().ajoutActivity(4, documentID!,docName: etat.vehicleMat);
 
     }
+
   }
 
   void showMessage(String message, String title) {
