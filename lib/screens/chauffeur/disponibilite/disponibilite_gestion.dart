@@ -28,68 +28,7 @@ class DisponibiliteGestionState extends State<DisponibiliteGestion> {
       header: PageTitle(
         text: 'disponibilite'.tr(),
       ),
-      content: Row(
-        children: [
-          SizedBox(
-              width:60.w,
-              child: const DisponibliteTable()),
-          const SizedBox(width: 10,),
-          Flexible(
-            child: Column(
-              children: [
-                SizedBox(
-                  height:20.h,
-                  child: PieChart(
-                      PieChartData(
-                          sections: [
-                            PieChartSectionData(
-                              value: 120,
-                              color: appTheme.color.darkest,
-                            ),
-                            PieChartSectionData(
-                              value: 60,
-                              color: appTheme.color,
-                            ),
-                            PieChartSectionData(
-                              value: 180,
-                              color: appTheme.color.lightest,
-                            ),
-                          ]
-                      )
-                  ),
-                ),
-                const SizedBox(height: 10,),
-
-              ],
-
-            ),
-          ),
-          const SizedBox(width: 10,),
-          Flexible(child: Column(
-            children: [
-              SizedBox(height: 10.h,),
-              Row(children: [
-                Container(color: appTheme.color.darkest,width: 2.w,height: 1.w,),
-                const SizedBox(width: 5,),
-                Text('Bon état',style: tstyle,),
-              ],),
-              const SizedBox(height: 5,),
-              Row(children: [
-                Container(color: appTheme.color,width: 2.w,height: 1.w,),
-                const SizedBox(width: 5,),
-                Text('En panne',style: tstyle,),
-              ],),
-              const SizedBox(height: 5,),
-              Row(children: [
-                Container(color: appTheme.color,width: 2.w,height: 1.w,),
-                const SizedBox(width: 5,),
-                Text('En réparation',style: tstyle,),
-              ],),
-            ],
-          )),
-          const SizedBox(width: 10,),
-        ],
-      ),
+      content: const DisponibliteTable(),
     );
   }
 }

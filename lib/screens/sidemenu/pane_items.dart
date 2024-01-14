@@ -4,6 +4,7 @@ import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../providers/client_database.dart';
+import '../chauffeur/conducteur_dashboard.dart';
 import '../chauffeur/disponibilite/disponibilite_tabs.dart';
 import '../chauffeur/document/chauf_document_tabs.dart';
 import '../chauffeur/manager/chauffeur_tabs.dart';
@@ -94,7 +95,7 @@ class PaneItemsAndFooters {
     chauffeurs = PaneItemExpander(
         icon: const Icon(FluentIcons.people),
         title: const Text("chauffeurs").tr(),
-        body: const Placeholder(),
+        body: const ConducteurDashboard(),
         items: [
           PaneItem(
             icon: const Icon(FluentIcons.list),
@@ -102,15 +103,16 @@ class PaneItemsAndFooters {
             title: const Text('gchauffeurs').tr(),
           ),
           PaneItem(
-            icon: const Icon(FluentIcons.document_set),
-            title: const Text('documents').tr(),
-            body: const CDocumentTabs(),
-          ),
-          PaneItem(
             icon: const Icon(FluentIcons.check_list_check),
             title: const Text('disponibilite').tr(),
             body: const DisponbiliteTabs(),
           ),
+          PaneItem(
+            icon: const Icon(FluentIcons.document_set),
+            title: const Text('documents').tr(),
+            body: const CDocumentTabs(),
+          ),
+
           PaneItem(
             icon: const Icon(FluentIcons.search_bookmark),
             title: const Text('archive').tr(),

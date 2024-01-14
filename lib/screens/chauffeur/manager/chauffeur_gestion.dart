@@ -108,7 +108,7 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
       text: Text('nouvchauf'.tr()),
       semanticLabel: 'nouvchauf'.tr(),
       icon: const Icon(FluentIcons.document),
-      body: ChauffeurForm(),
+      body: const ChauffeurForm(),
       onClosed: () {
         ChauffeurTabsState.tabs.remove(tab);
 
