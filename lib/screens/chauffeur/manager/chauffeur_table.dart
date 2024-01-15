@@ -58,9 +58,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
     super.initState();
   }
 
-  final tstyle = TextStyle(
-    fontSize: 10.sp,
-  );
+
 
   int sortColumn = 4;
 
@@ -69,7 +67,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'nom',
             style: tstyle,
           ).tr(),
@@ -86,7 +84,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'email',
             style: tstyle,
           ).tr(),
@@ -103,7 +101,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'telephone',
             style: tstyle,
           ).tr(),
@@ -120,7 +118,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'disponibilite',
             style: tstyle,
           ).tr(),
@@ -137,7 +135,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'dateModif',
             style: tstyle,
           ).tr(),
@@ -405,6 +403,14 @@ class ChauffeurTableState extends State<ChauffeurTable> {
         ),
       ),
       sortAscending: assending,
+      headingRowHeight: 25,
+      headingRowDecoration: BoxDecoration(
+          color: appTheme.color,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(5))
+      ),
+      dividerThickness: 0.5,
+      autoRowsToHeight: true,
+
       horizontalMargin: 8,
       columnSpacing: 0,
       dataRowHeight: rowHeight,

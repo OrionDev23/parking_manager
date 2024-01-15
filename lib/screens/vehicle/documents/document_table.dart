@@ -35,9 +35,6 @@ class DocumentTableState extends State<DocumentTable> {
     super.initState();
   }
 
-  final tstyle = TextStyle(
-    fontSize: 10.sp,
-  );
 
   int sortColumn = 3;
 
@@ -46,7 +43,7 @@ class DocumentTableState extends State<DocumentTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'nom',
             style: tstyle,
           ).tr(),
@@ -63,7 +60,7 @@ class DocumentTableState extends State<DocumentTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'vehicule',
             style: tstyle,
           ).tr(),
@@ -80,7 +77,7 @@ class DocumentTableState extends State<DocumentTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'dateexp',
             style: tstyle,
           ).tr(),
@@ -97,7 +94,7 @@ class DocumentTableState extends State<DocumentTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'dateModif',
             style: tstyle,
           ).tr(),
@@ -417,6 +414,14 @@ class DocumentTableState extends State<DocumentTable> {
         ),
       ),
       sortAscending: assending,
+      headingRowHeight: 25,
+      headingRowDecoration: BoxDecoration(
+          color: appTheme.color,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(5))
+      ),
+      dividerThickness: 0.5,
+      autoRowsToHeight: true,
+
       empty: NoDataWidget(datasource: documentsDataSource,),
       horizontalMargin: 8,
       columnSpacing: 0,

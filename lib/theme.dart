@@ -10,7 +10,7 @@ import 'package:flutter/material.dart' as m;
 enum NavigationIndicators { sticky, end }
 
 late final  double rowHeight;
-const tstyle = TextStyle(fontWeight: FontWeight.bold);
+const tstyle = TextStyle(fontSize:9,fontWeight: FontWeight.bold);
 final placeStyle = TextStyle(color: Colors.grey[100]);
 const smallSpace = SizedBox(
   width: 5,

@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import '../../../providers/client_database.dart';
 import '../../dashboard/pie_chart/pie_chart.dart';
@@ -83,6 +82,7 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
                 const Flexible(
                   child: LogTable(
                     statTable: true,
+                    pages: false,
                     numberOfRows: 3,
                     filters: {
                       'typemin':'16',

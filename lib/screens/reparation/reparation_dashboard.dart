@@ -120,6 +120,7 @@ class ReparationDashboard extends StatelessWidget {
                 const Flexible(
                   child: LogTable(
                     statTable: true,
+                    pages: false,
                     numberOfRows: 3,
                     filters: {
                       'typemin':'10',

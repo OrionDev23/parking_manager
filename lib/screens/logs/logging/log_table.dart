@@ -15,6 +15,8 @@ class LogTable extends StatefulWidget {
   final bool selectD;
   final bool? statTable;
 
+  final bool pages;
+
   final List<String> fieldsToShow;
 
   final int? numberOfRows;
@@ -23,6 +25,7 @@ class LogTable extends StatefulWidget {
   const LogTable(
       {super.key,
       this.selectD = false,
+        this.pages=true,
       this.statTable = false,
       this.filters,
         this.numberOfRows,
@@ -54,9 +57,6 @@ class LogTableState extends State<LogTable> {
     super.initState();
   }
 
-  final tstyle = TextStyle(
-    fontSize: 10.sp,
-  );
 
   int sortColumn = 2;
 
@@ -66,7 +66,7 @@ class LogTableState extends State<LogTable> {
         DataColumn2(
           label: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: Text(
+            child: const Text(
               'activity',
               style: tstyle,
             ).tr(),
@@ -83,7 +83,7 @@ class LogTableState extends State<LogTable> {
         DataColumn2(
           label: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: Text(
+            child: const Text(
               'ID',
               style: tstyle,
             ).tr(),
@@ -100,7 +100,7 @@ class LogTableState extends State<LogTable> {
         DataColumn2(
           label: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: Text(
+            child: const Text(
               'date',
               style: tstyle,
             ).tr(),
@@ -117,7 +117,7 @@ class LogTableState extends State<LogTable> {
         DataColumn2(
           label: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: Text(
+            child: const Text(
               'user',
               style: tstyle,
             ).tr(),
@@ -517,6 +517,14 @@ class LogTableState extends State<LogTable> {
             )
           : null,
       sortAscending: assending,
+      headingRowHeight: 25,
+      headingRowDecoration: BoxDecoration(
+        color: appTheme.color,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(5))
+      ),
+      dividerThickness: 0.5,
+      autoRowsToHeight: true,
+
       empty: NoDataWidget(
         datasource: logDatasource,
       ),
@@ -527,19 +535,19 @@ class LogTableState extends State<LogTable> {
       showCheckboxColumn: false,
       sortColumnIndex: sortColumn,
       rowsPerPage: widget.numberOfRows??rowPerPage,
-      onRowsPerPageChanged: (nbr) {
+      onRowsPerPageChanged: widget.pages?(nbr) {
         rowPerPage = nbr ?? 12;
-      },
+      }:null,
       availableRowsPerPage: widget.numberOfRows==null?const [12, 24, 50, 100, 200]:[
         widget.numberOfRows!
       ],
-      showFirstLastButtons: true,
+      showFirstLastButtons: widget.pages,
       renderEmptyRowsInTheEnd: false,
       fit: FlexFit.tight,
       columns: columns,
       source: logDatasource,
       sortArrowAlwaysVisible: true,
-      hidePaginator: false,
+      hidePaginator: !widget.pages,
     );
   }
 

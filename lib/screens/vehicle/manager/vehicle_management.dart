@@ -20,21 +20,18 @@ class VehicleManagement extends StatefulWidget {
   State<VehicleManagement> createState() => VehicleManagementState();
 }
 
-class VehicleManagementState extends State<VehicleManagement> with AutomaticKeepAliveClientMixin<VehicleManagement> {
-
-
-  final tstyle=TextStyle(
+class VehicleManagementState extends State<VehicleManagement>
+    with AutomaticKeepAliveClientMixin<VehicleManagement> {
+  final tstyle = TextStyle(
     fontSize: 10.sp,
   );
 
-
-  static ValueNotifier<int> stateChanges=ValueNotifier(0);
-
+  static ValueNotifier<int> stateChanges = ValueNotifier(0);
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var appTheme=context.watch<AppTheme>();
+    var appTheme = context.watch<AppTheme>();
     return ScaffoldPage(
       header: PageTitle(
         text: 'gestionvehicles'.tr(),
@@ -61,9 +58,7 @@ class VehicleManagementState extends State<VehicleManagement> with AutomaticKeep
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                    width:60.w,
-                    child: const VehicleTable()),
+                SizedBox(width: 60.w, child: const VehicleTable()),
                 smallSpace,
                 Flexible(
                   child: Column(
@@ -71,33 +66,36 @@ class VehicleManagementState extends State<VehicleManagement> with AutomaticKeep
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ValueListenableBuilder(
-                        valueListenable: stateChanges,
-                        builder: (context,val,w) {
-
-                          return ParcOtoPie(
-                            title: 'vstates'.tr(),
-                            labels: [
-                              MapEntry('gstate', ClientDatabase().countVehicles(etat: 0)),
-                              MapEntry('bstate', ClientDatabase().countVehicles(etat: 1)),
-                              MapEntry('rstate', ClientDatabase().countVehicles(etat: 2))
-                            ],
-                          );
-                        }
-                      ),
+                          valueListenable: stateChanges,
+                          builder: (context, val, w) {
+                            return ParcOtoPie(
+                              title: 'vstates'.tr(),
+                              labels: [
+                                MapEntry('gstate',
+                                    ClientDatabase().countVehicles(etat: 0)),
+                                MapEntry('bstate',
+                                    ClientDatabase().countVehicles(etat: 1)),
+                                MapEntry('rstate',
+                                    ClientDatabase().countVehicles(etat: 2))
+                              ],
+                            );
+                          }),
                       smallSpace,
-                      Text('lactivities',style:  TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: appTheme.writingStyle.color),).tr(),
+                      Text(
+                        'lactivities',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: appTheme.writingStyle.color),
+                      ).tr(),
                       smallSpace,
                       const Flexible(
                         child: LogTable(
                           statTable: true,
+                          pages: false,
                           numberOfRows: 3,
-                          filters: {
-                            'typemin':'0',
-                            'typemax':'9'
-                          },
-                          fieldsToShow: [
-                            'act','date'
-                          ],
+                          filters: {'typemin': '0', 'typemax': '9'},
+                          fieldsToShow: ['act', 'date'],
                         ),
                       ),
                     ],
@@ -129,8 +127,6 @@ class VehicleManagementState extends State<VehicleManagement> with AutomaticKeep
     );
     return tab;
   }
-
-
 
   @override
   bool get wantKeepAlive => true;

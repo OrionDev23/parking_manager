@@ -55,10 +55,6 @@ class PrestataireTableState extends State<PrestataireTable> {
     super.initState();
   }
 
-  final tstyle = TextStyle(
-    fontSize: 10.sp,
-  );
-
   int sortColumn = 5;
 
   void initColumns() {
@@ -66,7 +62,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'nom',
             style: tstyle,
           ).tr(),
@@ -83,7 +79,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'telephone',
             style: tstyle,
           ).tr(),
@@ -100,7 +96,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'email',
             style: tstyle,
           ).tr(),
@@ -117,7 +113,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'NIF',
             style: tstyle,
           ).tr(),
@@ -134,7 +130,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'RC',
             style: tstyle,
           ).tr(),
@@ -150,7 +146,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'dateModif',
             style: tstyle,
           ).tr(),
@@ -241,6 +237,14 @@ class PrestataireTableState extends State<PrestataireTable> {
               ),
             ),
             sortAscending: assending,
+            headingRowHeight: 25,
+            headingRowDecoration: BoxDecoration(
+                color: appTheme.color,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(5))
+            ),
+            dividerThickness: 0.5,
+            autoRowsToHeight: true,
+
             horizontalMargin: 8,
             columnSpacing: 0,
             dataRowHeight: rowHeight,

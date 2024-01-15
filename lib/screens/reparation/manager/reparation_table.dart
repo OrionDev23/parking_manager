@@ -239,6 +239,14 @@ class ReparationTableState extends State<ReparationTable> {
               ),
             ),
             sortAscending: assending,
+            headingRowHeight: 25,
+            headingRowDecoration: BoxDecoration(
+                color: appTheme.color,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(5))
+            ),
+            dividerThickness: 0.5,
+            autoRowsToHeight: true,
+
             horizontalMargin: 8,
             columnSpacing: 0,
             dataRowHeight: rowHeight,

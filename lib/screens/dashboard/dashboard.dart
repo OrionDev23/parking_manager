@@ -7,7 +7,6 @@ import 'package:parc_oto/screens/logs/logging/log_table.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import '../../theme.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../widgets/button_container.dart';
 import '../../widgets/page_header.dart';
 import '../chauffeur/document/chauf_document_form.dart';
@@ -21,7 +20,6 @@ import '../vehicle/documents/document_form.dart';
 import '../vehicle/documents/document_tabs.dart';
 import '../vehicle/manager/vehicle_form.dart';
 import '../vehicle/manager/vehicle_tabs.dart';
-import 'transaction_chart.dart';
 import 'table_stats.dart';
 
 class Dashboard extends StatelessWidget {
@@ -50,9 +48,10 @@ class Dashboard extends StatelessWidget {
           GridView.count(
             shrinkWrap: true,
             primary: false,
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(5),
             physics: const ClampingScrollPhysics(),
             crossAxisCount: 2,
+            childAspectRatio: 1.45,
             crossAxisSpacing: 5,
             mainAxisSpacing: 5,
             children: widgetList(appTheme)
@@ -359,15 +358,13 @@ class Dashboard extends StatelessWidget {
         },
       ),];
   }
-
-
   List<Widget> widgetList(AppTheme appTheme){
     return [
       TableStats(
         title: 'vehicules'.tr(),
-        height: 250.px,
-        icon: Icon(FluentIcons.car,color:appTheme.color,),
+        icon: Icon(FluentIcons.car,color:appTheme.color.darker,),
         content: const LogTable(
+          pages: false,
           fieldsToShow: [
             'act','id','date',
           ],
@@ -385,46 +382,44 @@ class Dashboard extends StatelessWidget {
 
       ),
       TableStats(
-        title: 'vehicules'.tr(),
-        height: 250.px,
-        icon: Icon(FluentIcons.car,color:appTheme.color,),
+        title: 'reparations'.tr(),
+        icon: Icon(FluentIcons.repair,color:appTheme.color.darker,),
         content: const LogTable(
+          pages: false,
           fieldsToShow: [
             'act','id','date',
           ],
           filters: {
-            'typemin':'0',
-            'typemax':'9'
+            'typemin':'10',
+            'typemax':'15'
           },
           statTable: true,
           numberOfRows: 5,
         ),
         onTap: (){
           PanesListState.index.value = PaneItemsAndFooters
-              .originalItems.indexOf(PaneItemsAndFooters.vehicles)+1;
+              .originalItems.indexOf(PaneItemsAndFooters.reparations)+5;
         },
-
       ),
       TableStats(
-        title: 'vehicules'.tr(),
-        height: 250.px,
-        icon: Icon(FluentIcons.car,color:appTheme.color,),
+        title: 'chauffeurs'.tr(),
+        icon: Icon(FluentIcons.people,color:appTheme.color.darker,),
         content: const LogTable(
+          pages: false,
           fieldsToShow: [
             'act','id','date',
           ],
           filters: {
-            'typemin':'0',
-            'typemax':'9'
+            'typemin':'16',
+            'typemax':'25'
           },
           statTable: true,
           numberOfRows: 5,
         ),
         onTap: (){
           PanesListState.index.value = PaneItemsAndFooters
-              .originalItems.indexOf(PaneItemsAndFooters.vehicles)+1;
+              .originalItems.indexOf(PaneItemsAndFooters.chauffeurs)+7;
         },
-
       ),
     ];
   }

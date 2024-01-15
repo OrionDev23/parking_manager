@@ -37,10 +37,6 @@ class StateTableState extends State<StateTable> {
     super.initState();
   }
 
-  final tstyle = TextStyle(
-    fontSize: 10.sp,
-  );
-
   int sortColumn = 5;
 
   void initColumns() {
@@ -48,7 +44,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'vehicule',
             style: tstyle,
           ).tr(),
@@ -65,7 +61,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'etat',
             style: tstyle,
           ).tr(),
@@ -82,7 +78,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'date',
             style: tstyle,
           ).tr(),
@@ -99,7 +95,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'notes',
             style: tstyle,
           ).tr(),
@@ -116,7 +112,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'reparation',
             style: tstyle,
           ).tr(),
@@ -133,7 +129,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'dateModif',
             style: tstyle,
           ).tr(),
@@ -278,6 +274,14 @@ class StateTableState extends State<StateTable> {
         ),
       ),
       sortAscending: assending,
+      headingRowHeight: 25,
+      headingRowDecoration: BoxDecoration(
+          color: appTheme.color,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(5))
+      ),
+      dividerThickness: 0.5,
+      autoRowsToHeight: true,
+
       empty: NoDataWidget(
         datasource: vehicleStateDatasource,
       ),

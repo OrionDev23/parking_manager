@@ -73,9 +73,6 @@ class VehicleTableState extends State<VehicleTable> {
     super.initState();
   }
 
-  final tstyle = TextStyle(
-    fontSize: 10.sp,
-  );
 
   int sortColumn = 4;
 
@@ -84,7 +81,7 @@ class VehicleTableState extends State<VehicleTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'nummat',
             style: tstyle,
           ).tr(),
@@ -101,7 +98,7 @@ class VehicleTableState extends State<VehicleTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'type',
             style: tstyle,
           ).tr(),
@@ -118,7 +115,7 @@ class VehicleTableState extends State<VehicleTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'year',
             style: tstyle,
           ).tr(),
@@ -135,7 +132,7 @@ class VehicleTableState extends State<VehicleTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'etat',
             style: tstyle,
           ).tr(),
@@ -152,7 +149,7 @@ class VehicleTableState extends State<VehicleTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
+          child: const Text(
             'dateModif',
             style: tstyle,
           ).tr(),
@@ -780,6 +777,14 @@ class VehicleTableState extends State<VehicleTable> {
                     ),
                   ),
                   sortAscending: assending,
+                  headingRowHeight: 25,
+                  headingRowDecoration: BoxDecoration(
+                      color: appTheme.color,
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(5))
+                  ),
+                  dividerThickness: 0.5,
+                  autoRowsToHeight: true,
+
                   empty: NoDataWidget(
                     datasource: vehicleDataSource,
                   ),

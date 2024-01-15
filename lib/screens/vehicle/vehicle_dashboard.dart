@@ -155,6 +155,7 @@ class VehicleDashboard extends StatelessWidget {
                           child: LogTable(
                             statTable: true,
                             numberOfRows: 3,
+                            pages: false,
                             filters: {
                               'typemin':'0',
                               'typemax':'9'
