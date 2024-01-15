@@ -1,17 +1,26 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:provider/provider.dart';
 import '../../theme.dart';
 
 class TableStats extends StatelessWidget {
-  const TableStats({super.key});
+  final String? title;
+  final Widget? icon;
+  final Widget? content;
+
+  final double? height;
+  final double? width;
+  final void Function()? onTap;
+  const TableStats({super.key,this.title,this.icon,this.content,this.onTap,this.width,this.height});
 
   @override
   Widget build(BuildContext context) {
     var appTheme=context.watch<AppTheme>();
     return Container(
-      height: 50.h,
-      padding: const EdgeInsets.all(20),
+      height: height??50.h,
+      width: width??double.infinity,
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
           boxShadow: kElevationToShadow[2],
           borderRadius: BorderRadius.circular(5),
@@ -28,124 +37,27 @@ class TableStats extends StatelessWidget {
               const SizedBox(
                 width: 38,
               ),
-              const Text(
-                'Alertes',
-                style: TextStyle(fontSize: 22),
+              Text(
+                title??'',
+                style: const TextStyle(fontSize: 22),
               ),
             ],
           ),
-          SizedBox(
-            height: 4.h,
+          smallSpace,
+          Container(
+            padding: const EdgeInsets.all(5),
+            width: width??double.infinity,
+            height: (height??50.h)-50,
+            child: content??const SizedBox(),
           ),
-          Table(
-            children: [
-              TableRow(
-                  decoration: BoxDecoration(
-                      color: appTheme.color,
-                      boxShadow: kElevationToShadow[2]),
-                  children: const [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text('No'),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text('Transaction'),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text('Date'),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text('Montant'),
-                    ),
-                  ]),
-              const TableRow(children: [
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('5'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Vidange'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('10/10/2019'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('10000.00 DA'),
-                ),
-              ]),
-              const TableRow(children: [
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('5'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Vidange'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('10/10/2019'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('10000.00 DA'),
-                ),
-              ]),
-              const TableRow(children: [
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('5'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Vidange'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('10/10/2019'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('10000.00 DA'),
-                ),
-              ]),
-              const TableRow(children: [
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('5'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Vidange'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('10/10/2019'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('10000.00 DA'),
-                ),
-              ]),
-            ],
-            border: TableBorder.all(
-                color: Colors.grey[150]
-            ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
+
+          smallSpace,
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               FilledButton(
-                  child: const Text('Voir plus'), onPressed: () {}),
+                  onPressed: onTap,
+                  child: const Text('voirplus').tr()),
             ],
           ),
         ],
@@ -170,7 +82,7 @@ class TableStats extends StatelessWidget {
                   width: 3,
               ),
           ),
-          child: Icon(FluentIcons.note_pinned,color: appTheme.color,),
+          child: icon??Icon(FluentIcons.note_pinned,color: appTheme.color,),
         ),
       ],
     );

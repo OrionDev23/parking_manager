@@ -159,7 +159,6 @@ class VehicleDashboard extends StatelessWidget {
                               'typemin':'0',
                               'typemax':'9'
                             },
-
                             fieldsToShow: [
                               'act','id','date'
                             ],
