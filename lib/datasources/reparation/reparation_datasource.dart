@@ -5,13 +5,13 @@ import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/datasources/reparation/reparation_webservice.dart';
 import 'package:parc_oto/pdf_generation/pdf_theming.dart';
 import 'package:parc_oto/pdf_generation/reparation_pdf.dart';
-import 'package:parc_oto/screens/reparation/reparation_form.dart';
+import 'package:parc_oto/screens/reparation/reparation_form/reparation_form.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/client_database.dart';
-import '../../screens/reparation/reparation_tabs.dart';
+import '../../screens/reparation/manager/reparation_tabs.dart';
 import '../../serializables/reparation/reparation.dart';
 import '../../widgets/on_tap_scale.dart';
 

@@ -6,8 +6,8 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-import '../../../theme.dart';
-import '../../../widgets/empty_table_widget.dart';
+import '../../../../theme.dart';
+import '../../../../widgets/empty_table_widget.dart';
 class ReparationTable extends StatefulWidget {
   final bool selectD;
   final bool archive;

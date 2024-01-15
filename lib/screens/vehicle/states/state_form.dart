@@ -3,7 +3,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 
 import 'package:parc_oto/datasources/vehicle_states/vehicle_states_datasrouce.dart';
-import 'package:parc_oto/screens/reparation/reparation_table.dart';
+import 'package:parc_oto/screens/reparation/manager/reparation_table.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicle_management.dart';
 import 'package:parc_oto/serializables/reparation/reparation.dart';
 import 'package:provider/provider.dart';

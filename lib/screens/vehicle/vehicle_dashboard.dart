@@ -32,15 +32,16 @@ class VehicleDashboard extends StatelessWidget {
       content: Column(
         children: [
           Flexible(
+            flex: 15,
             child: GridView.count(
               padding: const EdgeInsets.all(10),
-              childAspectRatio: 8.5,
-              crossAxisCount: 2,
+              childAspectRatio: 4,
+              crossAxisCount: 3,
               mainAxisSpacing: 5,
               crossAxisSpacing: 5,
               children: [
                 ButtonContainer(
-                  color:appTheme.color.darkest,
+                  color:appTheme.color,
                   action: (){
                     PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.vehicles)+1;
                   },
@@ -73,12 +74,12 @@ class VehicleDashboard extends StatelessWidget {
                       VehicleTabsState.currentIndex.value = index - 1;
                     });
                   },
-                  color:appTheme.color.darker,icon: FluentIcons.car, text: 'nouvvehicule'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
+                  color:appTheme.color,icon: FluentIcons.car, text: 'nouvvehicule'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
                 ButtonContainer(
                   action: (){
                     PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.vehicles)+2;
                   },
-                  color:appTheme.color.dark,icon: FluentIcons.verified_brand, text: 'brands'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
+                  color:appTheme.color,icon: FluentIcons.verified_brand, text: 'brands'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
                 ButtonContainer(
                   action: (){
                     PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.vehicles)+3;
@@ -102,12 +103,12 @@ class VehicleDashboard extends StatelessWidget {
                           });
                   },);
                     },
-                  color:appTheme.color.light,icon: FluentIcons.health_refresh, text: 'nouvetat'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
+                  color:appTheme.color,icon: FluentIcons.health_refresh, text: 'nouvetat'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
                 ButtonContainer(
                   action: (){
                     PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.vehicles)+4;
                   },
-                  color:appTheme.color.lighter,icon: FluentIcons.document_set, text: 'documents'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
+                  color:appTheme.color,icon: FluentIcons.document_set, text: 'documents'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
                 ButtonContainer(
                   action: () {
                     PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.vehicles)+4;
@@ -132,17 +133,18 @@ class VehicleDashboard extends StatelessWidget {
                       DocumentTabsState.currentIndex.value = index - 1;
                     });
                   },
-                  color:appTheme.color.lightest,icon: FluentIcons.document, text: 'nouvdocument'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
+                  color:appTheme.color,icon: FluentIcons.document, text: 'nouvdocument'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
               ],
             ),
           ),
           smallSpace,
           Flexible(
+            flex: 16,
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Flexible(
                     child: Column(

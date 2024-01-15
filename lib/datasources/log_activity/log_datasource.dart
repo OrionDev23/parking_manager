@@ -19,7 +19,7 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
         super.sortColumn,
       super.filters,
       super.searchKey,
-      this.fieldsToShow = const ['act', 'id', 'date', 'plus'],
+      this.fieldsToShow = const ['act', 'id', 'date', 'user','plus'],
       super.selectC}) {
     repo = LogWebService(data, collectionID, 1);
   }
@@ -56,6 +56,11 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
                 ? dateFormat.format(element.value.updatedAt!)
                 : '',
             style: tstyle)),
+      if (fieldsToShow.contains('user'))
+        DataCell(SelectableText(
+          element.value.personName??'',
+          style: tstyle,
+        )),
       if (fieldsToShow.contains('plus'))
         DataCell(
           ClientDatabase().isAdmin()
@@ -80,6 +85,8 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
         )
     ];
   }
+
+
 
   void showMyDoc(int type, String docID) {}
 }

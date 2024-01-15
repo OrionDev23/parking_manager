@@ -15,7 +15,8 @@ import '../logout.dart';
 import '../logs/logging/log_management.dart';
 import '../planning/planning_manager.dart';
 import '../prestataire/prestataire_tabs.dart';
-import '../reparation/reparation_tabs.dart';
+import '../reparation/manager/reparation_tabs.dart';
+import '../reparation/reparation_dashboard.dart';
 import '../settings.dart';
 import '../user_management/user_management.dart';
 import '../vehicle/brand/brand_list.dart';
@@ -91,7 +92,7 @@ class PaneItemsAndFooters {
             body: const PrestataireTabs(),
           ),
         ],
-        body: const SizedBox());
+        body: const ReparationDashboard());
     chauffeurs = PaneItemExpander(
         icon: const Icon(FluentIcons.people),
         title: const Text("chauffeurs").tr(),

@@ -34,6 +34,8 @@
  "prestupdate": "Prestataire mis à jour !",
 "nouvdocument": "Nouveau document",
 "gestiondocument": "Gestion des documents",
+ "vehicledocuments": "Documents véhicules",
+ "chaufdocuments": "Documents conducteurs",
  "ajoutvehicule": "Nouveau véhicule ajouté",
  "modifvehicule": "Un véhicule a été modifié",
  "suprvehicule": "Un véhicule a été supprimé",
@@ -402,6 +404,7 @@
  "blue": "Bleu",
  "green": "Vert",
  "users": "Utilisateurs",
+ "user": "Utilisateur",
  "assignnow": "Assigner comme état actuel ?",
  "alreadyinvited": "Invitation pour devenir manager envoyée",
  "enattente": "En attente"

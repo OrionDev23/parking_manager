@@ -26,7 +26,7 @@ class LogTable extends StatefulWidget {
       this.statTable = false,
       this.filters,
         this.numberOfRows,
-      this.fieldsToShow = const ['act', 'id', 'date', 'plus']});
+      this.fieldsToShow = const ['act', 'id', 'date', 'user','plus',]});
 
   @override
   State<LogTable> createState() => LogTableState();
@@ -90,7 +90,7 @@ class LogTableState extends State<LogTable> {
           ),
           size: ColumnSize.L,
           onSort: (s, c) {
-            sortColumn = widget.fieldsToShow.contains('act') ? 1 : 0;
+            sortColumn = widget.fieldsToShow.indexOf('id');
             assending = !assending;
             logDatasource.sort(1, assending);
             setState(() {});
@@ -101,21 +101,32 @@ class LogTableState extends State<LogTable> {
           label: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Text(
-              'dateModif',
+              'date',
               style: tstyle,
             ).tr(),
           ),
           size: ColumnSize.L,
           onSort: (s, c) {
-            sortColumn = widget.fieldsToShow.contains('act') &&
-                    widget.fieldsToShow.contains('id')
-                ? 2
-                : !widget.fieldsToShow.contains('act') &&
-                        !widget.fieldsToShow.contains('id')
-                    ? 0
-                    : 1;
+            sortColumn = widget.fieldsToShow.indexOf('date');
             assending = !assending;
             logDatasource.sort(2, assending);
+            setState(() {});
+          },
+        ),
+      if (widget.fieldsToShow.contains('user') && ClientDatabase().isAdmin())
+        DataColumn2(
+          label: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Text(
+              'user',
+              style: tstyle,
+            ).tr(),
+          ),
+          size: ColumnSize.L,
+          onSort: (s, c) {
+            sortColumn = widget.fieldsToShow.indexOf('user');
+            assending = !assending;
+            logDatasource.sort(3, assending);
             setState(() {});
           },
         ),

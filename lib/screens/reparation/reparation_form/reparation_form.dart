@@ -21,14 +21,14 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
-import '../../pdf_generation/pdf_theming.dart' as pdf_theme;
-import '../../pdf_generation/reparation_pdf.dart';
-import '../../serializables/reparation/designation.dart';
-import '../../serializables/reparation/entretien_vehicle.dart';
-import '../../serializables/reparation/reparation.dart';
-import '../../serializables/vehicle/vehicle.dart';
-import '../../utilities/vehicle_util.dart';
-import '../../widgets/empty_table_widget.dart';
+import '../../../pdf_generation/pdf_theming.dart' as pdf_theme;
+import '../../../pdf_generation/reparation_pdf.dart';
+import '../../../serializables/reparation/designation.dart';
+import '../../../serializables/reparation/entretien_vehicle.dart';
+import '../../../serializables/reparation/reparation.dart';
+import '../../../serializables/vehicle/vehicle.dart';
+import '../../../utilities/vehicle_util.dart';
+import '../../../widgets/empty_table_widget.dart';
 
 class ReparationForm extends StatefulWidget {
 

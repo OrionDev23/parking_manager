@@ -34,6 +34,10 @@ class LogWebService extends ParcOtoWebService<Activity>{
       case 2:
         return ( d1,  d2) =>
         coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
+      case 3:
+        return ( d1,  d2) =>
+        coef * (d1.value.personName??'').compareTo(d2.value.personName??'');
+
     }
 
     return null;
@@ -80,6 +84,12 @@ class LogWebService extends ParcOtoWebService<Activity>{
           return Query.orderAsc('\$updatedAt');
         } else {
           return Query.orderDesc('\$updatedAt');
+        }
+      case 3:
+        if (sortedAsc) {
+          return Query.orderAsc('\$personName');
+        } else {
+          return Query.orderDesc('\$personName');
         }
     }
     return Query.orderAsc('\$id');

@@ -30,15 +30,16 @@ class ConducteurDashboard extends StatelessWidget {
       content: Column(
         children: [
           Flexible(
+            flex: 3,
             child: GridView.count(
               padding: const EdgeInsets.all(10),
-              childAspectRatio: 8.5,
-              crossAxisCount: 2,
+              childAspectRatio: 4,
+              crossAxisCount: 3,
               mainAxisSpacing: 5,
               crossAxisSpacing: 5,
               children: [
                 ButtonContainer(
-                  color:appTheme.color.darkest,
+                  color:appTheme.color,
                   action: (){
                     PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.chauffeurs)+1+indexAdition;
                   },
@@ -71,7 +72,7 @@ class ConducteurDashboard extends StatelessWidget {
                       ChauffeurTabsState.currentIndex.value = index - 1;
                     });
                   },
-                  color:appTheme.color.darker,icon: FluentIcons.car, text: 'nouvchauf'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
+                  color:appTheme.color,icon: FluentIcons.car, text: 'nouvchauf'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
                 ButtonContainer(
                   action: (){
                     PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.chauffeurs)+2+indexAdition;
@@ -81,7 +82,7 @@ class ConducteurDashboard extends StatelessWidget {
                   action: (){
                     PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.chauffeurs)+3+indexAdition;
                   },
-                  color:appTheme.color.lighter,icon: FluentIcons.document_set, text: 'documents'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
+                  color:appTheme.color,icon: FluentIcons.document_set, text: 'documents'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
                 ButtonContainer(
                   action: () {
                     PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.chauffeurs)+3+indexAdition;
@@ -106,9 +107,9 @@ class ConducteurDashboard extends StatelessWidget {
                       CDocumentTabsState.currentIndex.value = index - 1;
                     });
                   },
-                  color:appTheme.color.lightest,icon: FluentIcons.document, text: 'nouvdocument'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
+                  color:appTheme.color,icon: FluentIcons.document, text: 'nouvdocument'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
                 ButtonContainer(
-                  color:appTheme.color.darkest,
+                  color:appTheme.color,
                   action: (){
                     PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.chauffeurs)+4+indexAdition;
                   },
@@ -123,11 +124,12 @@ class ConducteurDashboard extends StatelessWidget {
           ),
           smallSpace,
           Flexible(
+            flex: 5,
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Flexible(
                     child: Column(
