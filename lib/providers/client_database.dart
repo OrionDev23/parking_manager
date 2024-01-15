@@ -273,6 +273,31 @@ class ClientDatabase {
     return result;
   }
 
+  Future<int> countLog() async {
+    int result = 0;
+
+    bool cont = true;
+
+    while (cont) {
+      await database!.listDocuments(
+          databaseId: databaseId,
+          collectionId: activityId,
+          queries: [
+            Query.limit(1),
+            Query.offset(result),
+          ]).then((value) {
+        result += value.total;
+        if (value.total < 5000) {
+          cont = false;
+        }
+      }).onError((AppwriteException error, stackTrace) {
+        cont = false;
+      });
+    }
+
+    return result;
+  }
+
   Future<int> countReparation() async {
     int result = 0;
 

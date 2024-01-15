@@ -365,6 +365,8 @@
   "green": "أخضر",
   "users": "المستخدمين",
   "user": "المستخدم",
-  "chaufdocuments": "وثائق السائقين"
+  "chaufdocuments": "وثائق السائقين",
+  "vehicledocuments": "وثائق المركبات",
+  "activities": "أنشطة"
 
 }

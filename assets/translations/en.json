@@ -367,5 +367,7 @@
   "green": "Green",
   "users": "Users",
   "user": "User",
-  "chaufdocuments": "Drivers documents"
+  "chaufdocuments": "Drivers docs",
+  "vehicledocuments": "Vehicles docs",
+  "activities": "Activities"
 }

@@ -9,6 +9,8 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../widgets/button_container.dart';
 import '../../widgets/page_header.dart';
+import '../chauffeur/document/chauf_document_form.dart';
+import '../chauffeur/document/chauf_document_tabs.dart';
 import '../prestataire/prestataire_form.dart';
 import '../prestataire/prestataire_tabs.dart';
 import '../reparation/manager/reparation_tabs.dart';
@@ -34,7 +36,7 @@ class Dashboard extends StatelessWidget {
         padding: const EdgeInsets.all(5),
         children: [
           SizedBox(
-            height: 400.px,
+            height: 180.px,
             child: GridView.count(
               primary: false,
               shrinkWrap: true,
@@ -138,19 +140,19 @@ class Dashboard extends StatelessWidget {
                     PanesListState.index.value = PaneItemsAndFooters
                         .originalItems
                         .indexOf(PaneItemsAndFooters.reparations) +
-                        5;
+                        4;
                   },
                   actionList: () {
                     PanesListState.index.value = PaneItemsAndFooters
                         .originalItems
-                        .indexOf(PaneItemsAndFooters.vehicles) +
-                        6;
+                        .indexOf(PaneItemsAndFooters.reparations) +
+                        5;
                   },
                   actionNouveau: () {
                     PanesListState.index.value = PaneItemsAndFooters
                         .originalItems
-                        .indexOf(PaneItemsAndFooters.vehicles) +
-                        6;
+                        .indexOf(PaneItemsAndFooters.reparations) +
+                        5;
                     Future.delayed(const Duration(milliseconds: 300))
                         .whenComplete(() {
                       late Tab tab;
@@ -182,19 +184,19 @@ class Dashboard extends StatelessWidget {
                     PanesListState.index.value = PaneItemsAndFooters
                         .originalItems
                         .indexOf(PaneItemsAndFooters.reparations) +
-                        7;
+                        6;
                   },
                   actionList: () {
                     PanesListState.index.value = PaneItemsAndFooters
                         .originalItems
-                        .indexOf(PaneItemsAndFooters.vehicles) +
-                        7;
+                        .indexOf(PaneItemsAndFooters.reparations) +
+                        6;
                   },
                   actionNouveau: () {
                     PanesListState.index.value = PaneItemsAndFooters
                         .originalItems
-                        .indexOf(PaneItemsAndFooters.vehicles) +
-                        7;
+                        .indexOf(PaneItemsAndFooters.reparations) +
+                        6;
                     Future.delayed(const Duration(milliseconds: 300))
                         .whenComplete(() {
                       late Tab tab;
@@ -226,19 +228,19 @@ class Dashboard extends StatelessWidget {
                     PanesListState.index.value = PaneItemsAndFooters
                             .originalItems
                             .indexOf(PaneItemsAndFooters.chauffeurs) +
-                        1;
+                        6;
                   },
                   actionList: () {
                     PanesListState.index.value = PaneItemsAndFooters
                             .originalItems
                             .indexOf(PaneItemsAndFooters.chauffeurs) +
-                        1;
+                        7;
                   },
                   actionNouveau: () {
                     PanesListState.index.value = PaneItemsAndFooters
                             .originalItems
                             .indexOf(PaneItemsAndFooters.chauffeurs) +
-                        1;
+                        7;
                     Future.delayed(const Duration(milliseconds: 300))
                         .whenComplete(() {
                       late Tab tab;
@@ -263,46 +265,46 @@ class Dashboard extends StatelessWidget {
                   },
                 ),
                 ButtonContainer(
-                  icon: FluentIcons.people,
+                  icon: FluentIcons.document_set,
                   text: 'chaufdocuments'.tr(),
                   getCount: ClientDatabase().countCDocs,
                   action: () {
                     PanesListState.index.value = PaneItemsAndFooters
                             .originalItems
                             .indexOf(PaneItemsAndFooters.chauffeurs) +
-                        1;
+                        9;
                   },
                   actionList: () {
                     PanesListState.index.value = PaneItemsAndFooters
                             .originalItems
                             .indexOf(PaneItemsAndFooters.chauffeurs) +
-                        1;
+                        9;
                   },
                   actionNouveau: () {
                     PanesListState.index.value = PaneItemsAndFooters
                             .originalItems
                             .indexOf(PaneItemsAndFooters.chauffeurs) +
-                        1;
+                        9;
                     Future.delayed(const Duration(milliseconds: 300))
                         .whenComplete(() {
                       late Tab tab;
                       tab = Tab(
                         key: UniqueKey(),
-                        text: Text('nouvchauf'.tr()),
-                        semanticLabel: 'nouvchauf'.tr(),
-                        icon: const Icon(FluentIcons.people_add),
-                        body: const ChauffeurForm(),
+                        text: Text('nouvdocument'.tr()),
+                        semanticLabel: 'nouvdocument'.tr(),
+                        icon: const Icon(FluentIcons.new_folder),
+                        body: const CDocumentForm(),
                         onClosed: () {
-                          ChauffeurTabsState.tabs.remove(tab);
+                          CDocumentTabsState.tabs.remove(tab);
 
-                          if (ChauffeurTabsState.currentIndex.value > 0) {
-                            ChauffeurTabsState.currentIndex.value--;
+                          if (CDocumentTabsState.currentIndex.value > 0) {
+                            CDocumentTabsState.currentIndex.value--;
                           }
                         },
                       );
-                      final index = ChauffeurTabsState.tabs.length + 1;
-                      ChauffeurTabsState.tabs.add(tab);
-                      ChauffeurTabsState.currentIndex.value = index - 1;
+                      final index = CDocumentTabsState.tabs.length + 1;
+                      CDocumentTabsState.tabs.add(tab);
+                      CDocumentTabsState.currentIndex.value = index - 1;
                     });
                   },
                 ),
@@ -320,6 +322,22 @@ class Dashboard extends StatelessWidget {
                     PanesListState.index.value = PaneItemsAndFooters
                         .originalItems
                         .indexOf(PaneItemsAndFooters.planner) +10;
+                  },
+                ),
+                ButtonContainer(
+                  icon: FluentIcons.database_activity,
+                  text: 'activities'.tr(),
+                  getCount: ClientDatabase().countLog,
+                  action: () {
+                    PanesListState.index.value = PaneItemsAndFooters
+                        .originalItems
+                        .indexOf(PaneItemsAndFooters.evenements) +10;
+                  },
+                  showBothLN: false,
+                  actionList: () {
+                    PanesListState.index.value = PaneItemsAndFooters
+                        .originalItems
+                        .indexOf(PaneItemsAndFooters.evenements) +10;
                   },
                 ),
               ],
