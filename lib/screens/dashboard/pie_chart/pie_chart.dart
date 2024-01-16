@@ -5,11 +5,15 @@ import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import 'indicator.dart';
+
 class ParcOtoPie extends StatefulWidget {
   final String? title;
 
   final List<MapEntry<String,Future<int>>> labels;
-  const ParcOtoPie({super.key,required this.labels,this.title});
+
+  final double radius;
+  const ParcOtoPie({super.key,required this.labels,this.title,required this.radius});
 
   @override
   State<ParcOtoPie> createState() => _ParcOtoPieState();
@@ -36,6 +40,11 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
     }
     await Future.wait(tasks);
     sortAsIntended();
+    int temp=0;
+    for(int j=0;j<values.length;j++){
+      temp+=values[j].value;
+    }
+    totalNumber=temp;
     setState(() {
       loading=false;
     });
@@ -59,6 +68,10 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
     }
     values.addAll(result);
   }
+
+  late final int totalNumber;
+
+  int touchedIndex=-1;
   @override
   Widget build(BuildContext context) {
     var appTheme=context.watch<AppTheme>();
@@ -72,45 +85,64 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
         if(widget.title!=null)
         Text(widget.title!,style:  TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: appTheme.writingStyle.color),),
         smallSpace,
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            SizedBox(
-              width: 140.px,
-              height: 140.px,
-              child: PieChart(
-                  PieChartData(
-                    sections: List.generate(values.length, (index) {
-                      return PieChartSectionData(
-                        value: double.parse(values[index].value.toDouble().toStringAsFixed(0)),
-                        color: getRandomColor(index,appTheme),
-                        title: values[index].value.toString(),
-                        showTitle: true,
-                      );
-                    }),
+        Expanded(
+          child: AspectRatio(
+            aspectRatio: 1.3,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Flexible(
+                  child: PieChart(
+                      PieChartData(
+                        pieTouchData: PieTouchData(
+                          touchCallback: (FlTouchEvent event,pieTouchResponse){
+                            setState(() {
+                              if(!event.isInterestedForInteractions ||pieTouchResponse==null||pieTouchResponse.touchedSection==null){
+                                touchedIndex=-1;
+                                return;
+                              }
+                              touchedIndex=pieTouchResponse.touchedSection!.touchedSectionIndex;
+                            });
+                          }
+                        ),
+                        sectionsSpace: 0,
+                        centerSpaceRadius: 0,
+                        borderData: FlBorderData(
+                          show: false
+                        ),
+                        sections: List.generate(values.length, (index) {
+                          return PieChartSectionData(
+                            radius: touchedIndex==index?widget.radius+10:widget.radius,
+                            value: values[index].value.toDouble(),
+                            color: getRandomColor(index,appTheme),
+                            title: '${((values[index].value/totalNumber)*100).toStringAsFixed(0)} %',
+                            titleStyle: TextStyle(
+                              fontSize:  touchedIndex==index?16:14,
+                              color: Colors.white,
+                              shadows: const [Shadow(color:Colors.black,blurRadius: 2)]
+                            ),
+                            showTitle: true,
+                          );
+                        }),
+                      ),
                   ),
-              ),
+                ),
+                smallSpace,
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: List.generate(values.length, (index) {
+                      return Indicator(
+                        text: values[index].key.tr(),
+                        color: getRandomColor(index, appTheme),
+                        size: 10.px,
+                        isSquare: true,);
+                    })
+                ),
+              ],
             ),
-            smallSpace,
-            SizedBox(
-              width: 110.px,
-              height: 25.px*values.length,
-              child: Column(
-                  children: List.generate(values.length, (index) {
-                    return Padding(padding: const EdgeInsets.all(5),
-                      child:Row(
-                        children: [
-                        Container(color: getRandomColor(index, appTheme),width: 20.px,height: 10.px,),
-                        const SizedBox(width: 2,),
-                        Text(values[index].key,style: tstyle.copyWith(fontSize: 8),).tr(),
-                      ],),
-                    );
-                  })
-              ),
-            ),
-          ],
+          ),
         ),
-
       ],
     );
   }

@@ -9,6 +9,8 @@ import '../screens/entreprise.dart';
 import '../serializables/entreprise.dart';
 import '../serializables/parc_user.dart';
 import '../serializables/prestataire.dart';
+import '../serializables/reparation/reparation.dart';
+import '../utilities/profil_beautifier.dart';
 
 const databaseId = "6531ad112080ae3b14a7";
 const userid = "users";
@@ -146,207 +148,7 @@ class ClientDatabase {
         ]);
   }
 
-  Future<int> countVehicles({int etat = -1}) async {
-    int result = 0;
 
-    bool cont = true;
-
-    while (cont) {
-      await database!.listDocuments(
-          databaseId: databaseId,
-          collectionId: vehiculeid,
-          queries: [
-            if (etat != -1) Query.equal('etatactuel', etat),
-            Query.limit(1),
-            Query.offset(result),
-          ]).then((value) {
-        if (kDebugMode) {
-          print('total for etat $etat : ${value.total}');
-        }
-        result += value.total;
-        if (value.total < 5000) {
-          cont = false;
-        }
-      }).onError((AppwriteException error, stackTrace) {
-        cont = false;
-      });
-    }
-
-    return result;
-  }
-
-  Future<int> countChauffeur({int etat = -1}) async {
-    int result = 0;
-    bool cont = true;
-
-    while (cont) {
-      await database!.listDocuments(
-          databaseId: databaseId,
-          collectionId: chauffeurid,
-          queries: [
-            if (etat != -1) Query.equal('etat', etat),
-            if(etat==-1)
-              Query.notEqual('etat', 3),
-            Query.limit(1),
-          ]).then((value) {
-        result += value.total;
-        if (value.total < 5000) {
-          cont = false;
-        }
-      }).onError((AppwriteException error, stackTrace) {cont=false;});
-    }
-    return result;
-  }
-
-
-  Future<int> countVdocs() async {
-    int result = 0;
-
-    bool cont = true;
-
-    while (cont) {
-      await database!.listDocuments(
-          databaseId: databaseId,
-          collectionId: vehicDoc,
-          queries: [
-            Query.limit(1),
-            Query.offset(result),
-          ]).then((value) {
-        result += value.total;
-        if (value.total < 5000) {
-          cont = false;
-        }
-      }).onError((AppwriteException error, stackTrace) {
-        cont = false;
-      });
-    }
-
-    return result;
-  }
-
-  Future<int> countCDocs() async {
-    int result = 0;
-
-    bool cont = true;
-
-    while (cont) {
-      await database!.listDocuments(
-          databaseId: databaseId,
-          collectionId: chaufDoc,
-          queries: [
-            Query.limit(1),
-            Query.offset(result),
-          ]).then((value) {
-        result += value.total;
-        if (value.total < 5000) {
-          cont = false;
-        }
-      }).onError((AppwriteException error, stackTrace) {
-        cont = false;
-      });
-    }
-
-    return result;
-  }
-  Future<int> countReservation() async {
-    int result = 0;
-
-    bool cont = true;
-
-    while (cont) {
-      await database!.listDocuments(
-          databaseId: databaseId,
-          collectionId: planningID,
-          queries: [
-            Query.limit(1),
-            Query.offset(result),
-          ]).then((value) {
-        result += value.total;
-        if (value.total < 5000) {
-          cont = false;
-        }
-      }).onError((AppwriteException error, stackTrace) {
-        cont = false;
-      });
-    }
-
-    return result;
-  }
-
-  Future<int> countLog() async {
-    int result = 0;
-
-    bool cont = true;
-
-    while (cont) {
-      await database!.listDocuments(
-          databaseId: databaseId,
-          collectionId: activityId,
-          queries: [
-            Query.limit(1),
-            Query.offset(result),
-          ]).then((value) {
-        result += value.total;
-        if (value.total < 5000) {
-          cont = false;
-        }
-      }).onError((AppwriteException error, stackTrace) {
-        cont = false;
-      });
-    }
-
-    return result;
-  }
-
-  Future<int> countReparation() async {
-    int result = 0;
-
-    bool cont = true;
-
-    while (cont) {
-      await database!.listDocuments(
-          databaseId: databaseId,
-          collectionId: reparationId,
-          queries: [
-            Query.limit(1),
-            Query.offset(result),
-          ]).then((value) {
-        result += value.total;
-        if (value.total < 5000) {
-          cont = false;
-        }
-      }).onError((AppwriteException error, stackTrace) {
-        cont = false;
-      });
-    }
-
-    return result;
-  }
-
-  Future<int> countPrestataire() async {
-    int result = 0;
-
-    bool cont = true;
-
-    while (cont) {
-      await database!.listDocuments(
-          databaseId: databaseId,
-          collectionId: prestataireId,
-          queries: [
-            Query.limit(1),
-            Query.offset(result),
-          ]).then((value) {
-        result += value.total;
-        if (value.total < 5000) {
-          cont = false;
-        }
-      }).onError((AppwriteException error, stackTrace) {
-        cont = false;
-      });
-    }
-
-    return result;
-  }
 
   static String getEtat(int? etat) {
     switch (etat) {
@@ -507,5 +309,29 @@ class ClientDatabase {
         return "suprutilisateur";
     }
     return '';
+  }
+  Future<List<Reparation>> getReparationInMarge(DateTime start,DateTime end) async{
+
+    List<Reparation>result=[];
+
+    await database!.listDocuments(
+        databaseId: databaseId,
+        collectionId: reparationId,
+        queries: [
+              Query.greaterThanEqual('date', dateToIntJson(start)),
+              Query.lessThanEqual('date', dateToIntJson(end)),
+        ]
+    ).then((value) {
+
+      for(int i=0;i<value.documents.length;i++){
+        result.add(value.documents[i].convertTo((p0) => Reparation.fromJson(p0 as Map<String,dynamic>)));
+      }
+    }).onError((error, stackTrace) {
+      if (kDebugMode) {
+        print(stackTrace);
+      }
+    });
+
+    return result;
   }
 }

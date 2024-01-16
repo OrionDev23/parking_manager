@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import '../../providers/client_database.dart';
+import '../../providers/counters.dart';
 import '../dashboard/pie_chart/pie_chart.dart';
 import '../logs/logging/log_table.dart';
 import 'documents/document_form.dart';
@@ -171,11 +171,12 @@ class VehicleDashboard extends StatelessWidget {
 
                   smallSpace,
                   ParcOtoPie(
+                    radius: 120,
                     title: 'vstates'.tr(),
                     labels: [
-                      MapEntry('gstate', ClientDatabase().countVehicles(etat: 0)),
-                      MapEntry('bstate', ClientDatabase().countVehicles(etat: 1)),
-                      MapEntry('rstate', ClientDatabase().countVehicles(etat: 2))
+                      MapEntry('gstate', DatabaseCounters().countVehicles(etat: 0)),
+                      MapEntry('bstate', DatabaseCounters().countVehicles(etat: 1)),
+                      MapEntry('rstate', DatabaseCounters().countVehicles(etat: 2))
                     ],
                   ),
 

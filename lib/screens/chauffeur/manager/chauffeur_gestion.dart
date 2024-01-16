@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import '../../../providers/client_database.dart';
+import '../../../providers/counters.dart';
 import '../../dashboard/pie_chart/pie_chart.dart';
 import '../../logs/logging/log_table.dart';
 import 'chauffeur_form.dart';
@@ -61,20 +61,26 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ValueListenableBuilder(
-                    valueListenable: stateChanges,
-                    builder: (context,val,w) {
-
-                      return ParcOtoPie(
-                        title: 'disponibilite'.tr(),
-                        labels: [
-                          MapEntry('disponible', ClientDatabase().countChauffeur(etat: 0)),
-                          MapEntry('absent', ClientDatabase().countChauffeur(etat: 1)),
-                          MapEntry('mission', ClientDatabase().countChauffeur(etat: 2)),
-                          MapEntry('quitteentre', ClientDatabase().countChauffeur(etat: 3))
-                        ],
-                      );
-                    }
+                Flexible(
+                  child: ValueListenableBuilder(
+                      valueListenable: stateChanges,
+                      builder: (context,val,w) {
+                  
+                        return Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: ParcOtoPie(
+                            radius: 75,
+                            title: 'disponibilite'.tr(),
+                            labels: [
+                              MapEntry('disponible', DatabaseCounters().countChauffeur(etat: 0)),
+                              MapEntry('absent', DatabaseCounters().countChauffeur(etat: 1)),
+                              MapEntry('mission', DatabaseCounters().countChauffeur(etat: 2)),
+                              MapEntry('quitteentre', DatabaseCounters().countChauffeur(etat: 3))
+                            ],
+                          ),
+                        );
+                      }
+                  ),
                 ),
                 smallSpace,
                 Text('lactivities',style:  TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: appTheme.writingStyle.color),).tr(),

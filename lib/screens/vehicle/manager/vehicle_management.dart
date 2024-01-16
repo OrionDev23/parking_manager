@@ -1,15 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/screens/logs/logging/log_table.dart';
-import 'package:parc_oto/screens/vehicle/manager/vehicle_form.dart';
-import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
-import 'package:parc_oto/screens/vehicle/manager/vehicles_table.dart';
-import 'package:parc_oto/widgets/button_container.dart';
-import 'package:parc_oto/widgets/page_header.dart';
+import '../../logs/logging/log_table.dart';
+import 'vehicle_form.dart';
+import 'vehicle_tabs.dart';
+import 'vehicles_table.dart';
+import '../../../widgets/button_container.dart';
+import '../../../widgets/page_header.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../../providers/counters.dart';
 import '../../../theme.dart';
 import '../../dashboard/pie_chart/pie_chart.dart';
 
@@ -65,21 +65,27 @@ class VehicleManagementState extends State<VehicleManagement>
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ValueListenableBuilder(
-                          valueListenable: stateChanges,
-                          builder: (context, val, w) {
-                            return ParcOtoPie(
-                              title: 'vstates'.tr(),
-                              labels: [
-                                MapEntry('gstate',
-                                    ClientDatabase().countVehicles(etat: 0)),
-                                MapEntry('bstate',
-                                    ClientDatabase().countVehicles(etat: 1)),
-                                MapEntry('rstate',
-                                    ClientDatabase().countVehicles(etat: 2))
-                              ],
-                            );
-                          }),
+                      Flexible(
+                        child: ValueListenableBuilder(
+                            valueListenable: stateChanges,
+                            builder: (context, val, w) {
+                              return Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: ParcOtoPie(
+                                  radius: 80,
+                                  title: 'vstates'.tr(),
+                                  labels: [
+                                    MapEntry('gstate',
+                                        DatabaseCounters().countVehicles(etat: 0)),
+                                    MapEntry('bstate',
+                                        DatabaseCounters().countVehicles(etat: 1)),
+                                    MapEntry('rstate',
+                                        DatabaseCounters().countVehicles(etat: 2))
+                                  ],
+                                ),
+                              );
+                            }),
+                      ),
                       smallSpace,
                       Text(
                         'lactivities',

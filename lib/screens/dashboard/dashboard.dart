@@ -1,10 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
 import 'package:parc_oto/screens/logs/logging/log_table.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
+import '../../providers/counters.dart';
 import '../../theme.dart';
 import 'package:provider/provider.dart';
 import '../../widgets/button_container.dart';
@@ -20,6 +20,7 @@ import '../vehicle/documents/document_form.dart';
 import '../vehicle/documents/document_tabs.dart';
 import '../vehicle/manager/vehicle_form.dart';
 import '../vehicle/manager/vehicle_tabs.dart';
+import 'costs/costs_graph.dart';
 import 'table_stats.dart';
 
 class Dashboard extends StatelessWidget {
@@ -66,7 +67,7 @@ class Dashboard extends StatelessWidget {
     return [ ButtonContainer(
       icon: FluentIcons.car,
       text: 'vehicules'.tr(),
-      getCount: ClientDatabase().countVehicles,
+      getCount: DatabaseCounters().countVehicles,
       action: () {
         PanesListState.index.value = PaneItemsAndFooters
             .originalItems
@@ -109,7 +110,7 @@ class Dashboard extends StatelessWidget {
       ButtonContainer(
         icon: FluentIcons.document_set,
         text: 'vehicledocuments'.tr(),
-        getCount: ClientDatabase().countVdocs,
+        getCount: DatabaseCounters().countVdocs,
         action: () {
           PanesListState.index.value = PaneItemsAndFooters
               .originalItems
@@ -152,7 +153,7 @@ class Dashboard extends StatelessWidget {
       ButtonContainer(
         icon: FluentIcons.repair,
         text: 'reparations'.tr(),
-        getCount: ClientDatabase().countReparation,
+        getCount: DatabaseCounters().countReparation,
         action: () {
           PanesListState.index.value = PaneItemsAndFooters
               .originalItems
@@ -196,7 +197,7 @@ class Dashboard extends StatelessWidget {
       ButtonContainer(
         icon: FluentIcons.service_activity,
         text: 'Prestataires'.tr(),
-        getCount: ClientDatabase().countPrestataire,
+        getCount: DatabaseCounters().countPrestataire,
         action: () {
           PanesListState.index.value = PaneItemsAndFooters
               .originalItems
@@ -240,7 +241,7 @@ class Dashboard extends StatelessWidget {
       ButtonContainer(
         icon: FluentIcons.people,
         text: 'chauffeurs'.tr(),
-        getCount: ClientDatabase().countChauffeur,
+        getCount: DatabaseCounters().countChauffeur,
         action: () {
           PanesListState.index.value = PaneItemsAndFooters
               .originalItems
@@ -284,7 +285,7 @@ class Dashboard extends StatelessWidget {
       ButtonContainer(
         icon: FluentIcons.document_set,
         text: 'chaufdocuments'.tr(),
-        getCount: ClientDatabase().countCDocs,
+        getCount: DatabaseCounters().countCDocs,
         action: () {
           PanesListState.index.value = PaneItemsAndFooters
               .originalItems
@@ -328,7 +329,7 @@ class Dashboard extends StatelessWidget {
       ButtonContainer(
         icon: FluentIcons.edit_event,
         text: 'reservation'.tr(),
-        getCount: ClientDatabase().countReservation,
+        getCount: DatabaseCounters().countReservation,
         action: () {
           PanesListState.index.value = PaneItemsAndFooters
               .originalItems
@@ -344,7 +345,7 @@ class Dashboard extends StatelessWidget {
       ButtonContainer(
         icon: FluentIcons.database_activity,
         text: 'activities'.tr(),
-        getCount: ClientDatabase().countLog,
+        getCount: DatabaseCounters().countLog,
         action: () {
           PanesListState.index.value = PaneItemsAndFooters
               .originalItems
@@ -359,6 +360,10 @@ class Dashboard extends StatelessWidget {
       ),];
   }
   List<Widget> widgetList(AppTheme appTheme){
+
+    DateTime start=DateTime.now().subtract(const Duration(days: 30*6));
+    DateTime end=DateTime.now();
+
     return [
       TableStats(
         title: 'vehicules'.tr(),
@@ -380,6 +385,15 @@ class Dashboard extends StatelessWidget {
               .originalItems.indexOf(PaneItemsAndFooters.vehicles)+1;
         },
 
+      ),
+      TableStats(
+        title: 'depenses'.tr(),
+        icon: Icon(FluentIcons.cost_control,color: appTheme.color.darker,),
+        content:  CostGraph(start: start,end: end, appTheme: appTheme,),
+        onTap: (){
+          PanesListState.index.value = PaneItemsAndFooters
+              .originalItems.indexOf(PaneItemsAndFooters.reparations)+5;
+        },
       ),
       TableStats(
         title: 'reparations'.tr(),
