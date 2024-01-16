@@ -1,8 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/theme.dart';
+import 'package:parc_oto/utilities/profil_beautifier.dart';
 
 import '../../../serializables/reparation/reparation.dart';
 
@@ -24,6 +26,8 @@ class CostGraph extends StatefulWidget {
 class _CostGraphState extends State<CostGraph> {
   List<Reparation> reparations = [];
 
+  Map<int,double> values={};
+
   bool loading = true;
 
   @override
@@ -35,6 +39,15 @@ class _CostGraphState extends State<CostGraph> {
   void initValues() async {
     reparations =
         await ClientDatabase().getReparationInMarge(widget.start, widget.end);
+    if (kDebugMode) {
+      print('got them lenght :${reparations.length}');
+    }
+    fillValues();
+    if (kDebugMode) {
+
+      values.forEach((key, value) {
+      print('$key cost : $value');
+    });}
     gradiantColors = [
       widget.appTheme.color.darkest,
       widget.appTheme.color.light,
@@ -44,6 +57,36 @@ class _CostGraphState extends State<CostGraph> {
       loading = false;
     });
   }
+
+  void fillValues(){
+    for(var r in reparations){
+      values[getDate(r.date)]=r.getPrixTTC();
+    }
+  }
+
+  int getDate(DateTime date){
+    // start ===> -6
+    // end ===> 0
+    // a(start)+b=
+    // a(end)+b=0
+    // a=-b/end
+    //-start*b/end+b=-6 ==> -start*b/end+end*b/end=-6 ==> (-start*b+end*b)/end=-6
+    // -6*end=(-start+end)*b
+    //(-6*end)/(-start+end)=b
+    // a=(-6*end)/((start+end)*end)
+
+
+    int start=dateToIntJson(widget.start)!;
+    int end=dateToIntJson(widget.end)!;
+    int current=dateToIntJson(date)!;
+
+    double b=(-6*end)/(-start+end);
+    double a=-b/end;
+
+    return (a*current+b).toInt();
+  }
+
+
 
   List<Color> gradiantColors = [];
   bool showAvg = false;
@@ -96,18 +139,31 @@ class _CostGraphState extends State<CostGraph> {
   Widget bottomTitleWidget(double value, TitleMeta meta) {
     Widget text = Text(
       DateFormat('MMM', 'fr')
-          .format(DateTime(widget.start.year, value.toInt()+1)),
-      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          .format(DateTime(0, widget.end.month+value.toInt())),
+      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 9),
     );
 
     return SideTitleWidget(axisSide: meta.axisSide, child: text);
   }
 
   Widget leftTitleWidget(double value, TitleMeta meta) {
-    return Text(NumberFormat.compactCurrency(
-      symbol: 'DZ',
-      locale: 'fr',
-    ).format(value.toInt()));
+
+    String text="";
+    switch(value.toInt()){
+      case 20000:
+        text= '20.000 DA';
+        break;
+      case 40000:
+        text= '40.000 DA';
+        break;
+      case 60000:
+        text='60.000 DA';
+        break;
+      case 80000:
+        text='80.000 DA';
+        break;
+    }
+    return  Text(text,style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 9));
   }
 
   LineChartData mainData() {
@@ -115,18 +171,18 @@ class _CostGraphState extends State<CostGraph> {
         gridData: FlGridData(
           show: true,
           drawVerticalLine: true,
-          horizontalInterval: 1,
+          horizontalInterval: 5000,
           verticalInterval: 1,
           getDrawingHorizontalLine: (value) {
             return FlLine(
               color: widget.appTheme.color,
-              strokeWidth: 1,
+              strokeWidth: 0.1,
             );
           },
           getDrawingVerticalLine: (value) {
             return FlLine(
               color: widget.appTheme.color,
-              strokeWidth: 1,
+              strokeWidth: 0.1,
             );
           },
         ),
@@ -149,7 +205,7 @@ class _CostGraphState extends State<CostGraph> {
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              interval: 1,
+              interval: 5000,
               getTitlesWidget: leftTitleWidget,
               reservedSize: 42,
             ),
@@ -159,25 +215,22 @@ class _CostGraphState extends State<CostGraph> {
           show: true,
           border: Border.all(color: widget.appTheme.backGroundColor),
         ),
-        minX: 0,
-        maxX: 11,
-        minY: getMinValue(),
-        maxY: getMaxValue(),
+        minX: -6,
+        maxX: 0,
+        minY: 0,
+        maxY: 100000,
         lineBarsData: [
           LineChartBarData(
-            spots: List.generate(reparations.length, (index) {
-              return FlSpot(
-                  reparations[index].date.month +
-                      (reparations[index].date.day / 30),
-                  reparations[index].getPrixTTC());
-            }),
+            spots: values.entries.map((e) => FlSpot(
+              e.key.toDouble(),
+              e.value,)).toList(),
             isCurved: true,
             gradient: LinearGradient(
               colors: gradiantColors,
             ),
-            barWidth: 5,
+            barWidth: 2,
             isStrokeCapRound: true,
-            dotData: const FlDotData(show: false),
+            dotData: const FlDotData(show: true),
             belowBarData: BarAreaData(
                 show: true,
                 gradient: LinearGradient(
@@ -189,8 +242,6 @@ class _CostGraphState extends State<CostGraph> {
         ]);
   }
 
-
-
   LineChartData avgData(){
     double avg=getAverage();
     return LineChartData(
@@ -199,7 +250,7 @@ class _CostGraphState extends State<CostGraph> {
         show: true,
         drawVerticalLine: true,
         verticalInterval: 1,
-        horizontalInterval: 1,
+        horizontalInterval: 10000,
         getDrawingVerticalLine: (value){
           return FlLine(
             color: widget.appTheme.color,
@@ -225,7 +276,7 @@ class _CostGraphState extends State<CostGraph> {
           sideTitles: SideTitles(
             showTitles: true,
             reservedSize: 30,
-            interval: 1,
+            interval: 10000,
             getTitlesWidget: bottomTitleWidget,
           ),
         ),
@@ -242,10 +293,10 @@ class _CostGraphState extends State<CostGraph> {
         show: true,
         border: Border.all(color: widget.appTheme.backGroundColor),
       ),
-      minX: 0,
-      maxX: 11,
-      minY: getMinValue(),
-      maxY: getMaxValue(),
+      minX: 1,
+      maxX: 12,
+      minY: 0,
+      maxY: 100000,
         lineBarsData: [
           LineChartBarData(
             spots: List.generate(reparations.length, (index) {
@@ -263,7 +314,7 @@ class _CostGraphState extends State<CostGraph> {
             ),
             barWidth: 5,
             isStrokeCapRound: true,
-            dotData: const FlDotData(show: false),
+            dotData: const FlDotData(show: true),
             belowBarData: BarAreaData(
                 show: true,
                 gradient: LinearGradient(
