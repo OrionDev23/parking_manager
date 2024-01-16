@@ -46,7 +46,7 @@ class _CostGraphState extends State<CostGraph> {
     if (kDebugMode) {
 
       values.forEach((key, value) {
-      print('$key cost : $value');
+        print('$key cost : $value');
     });}
     gradiantColors = [
       widget.appTheme.color.darkest,
@@ -59,8 +59,16 @@ class _CostGraphState extends State<CostGraph> {
   }
 
   void fillValues(){
+    int date=0;
     for(var r in reparations){
-      values[getDate(r.date)]=r.getPrixTTC();
+      date=getDate(r.date);
+      if(values.containsKey(date)){
+        values[getDate(r.date)] =values[getDate(r.date)]!+r.getPrixTTC();
+      }
+      else{
+        values[getDate(r.date)]=r.getPrixTTC();
+
+      }
     }
   }
 
@@ -83,7 +91,9 @@ class _CostGraphState extends State<CostGraph> {
     double b=(-6*end)/(-start+end);
     double a=-b/end;
 
-    return (a*current+b).toInt();
+    double result=(a*current+b);
+
+    return result.round();
   }
 
 
@@ -97,6 +107,7 @@ class _CostGraphState extends State<CostGraph> {
       return const Center(child: ProgressRing());
     }
     return Stack(
+      alignment: Alignment.topRight,
       children: [
         AspectRatio(
           aspectRatio: 1.7,
@@ -113,9 +124,9 @@ class _CostGraphState extends State<CostGraph> {
           ),
         ),
         SizedBox(
-          width: 60,
+          width: 100,
           height: 34,
-          child: Button(
+          child: HyperlinkButton(
             onPressed: () {
               setState(() {
                 showAvg = !showAvg;
@@ -126,8 +137,8 @@ class _CostGraphState extends State<CostGraph> {
               style: TextStyle(
                 fontSize: 12,
                 color: showAvg
-                    ? widget.appTheme.writingStyle.color!.withOpacity(0.5)
-                    : widget.appTheme.writingStyle.color!,
+                    ? widget.appTheme.color.withOpacity(0.5)
+                    : widget.appTheme.color,
               ),
             ).tr(),
           ),
@@ -148,22 +159,8 @@ class _CostGraphState extends State<CostGraph> {
 
   Widget leftTitleWidget(double value, TitleMeta meta) {
 
-    String text="";
-    switch(value.toInt()){
-      case 20000:
-        text= '20.000 DA';
-        break;
-      case 40000:
-        text= '40.000 DA';
-        break;
-      case 60000:
-        text='60.000 DA';
-        break;
-      case 80000:
-        text='80.000 DA';
-        break;
-    }
-    return  Text(text,style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 9));
+    String text=NumberFormat.currency(locale: 'fr',symbol:'DA',decimalDigits:0).format(value);
+    return  Text(text,style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 8));
   }
 
   LineChartData mainData() {
@@ -205,7 +202,7 @@ class _CostGraphState extends State<CostGraph> {
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              interval: 5000,
+              interval: 20000,
               getTitlesWidget: leftTitleWidget,
               reservedSize: 42,
             ),
@@ -218,7 +215,7 @@ class _CostGraphState extends State<CostGraph> {
         minX: -6,
         maxX: 0,
         minY: 0,
-        maxY: 100000,
+        maxY: getMaxValue()+20000,
         lineBarsData: [
           LineChartBarData(
             spots: values.entries.map((e) => FlSpot(
@@ -254,13 +251,13 @@ class _CostGraphState extends State<CostGraph> {
         getDrawingVerticalLine: (value){
           return FlLine(
             color: widget.appTheme.color,
-            strokeWidth: 1,
+            strokeWidth: 0.1,
           );
         },
         getDrawingHorizontalLine: (value){
           return FlLine(
             color: widget.appTheme.color,
-            strokeWidth: 1,
+            strokeWidth: 0.1,
           );
         },
       ),
@@ -276,14 +273,14 @@ class _CostGraphState extends State<CostGraph> {
           sideTitles: SideTitles(
             showTitles: true,
             reservedSize: 30,
-            interval: 10000,
+            interval: 1,
             getTitlesWidget: bottomTitleWidget,
           ),
         ),
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            interval: 1,
+            interval: 20000,
             getTitlesWidget: leftTitleWidget,
             reservedSize: 42,
           ),
@@ -293,36 +290,29 @@ class _CostGraphState extends State<CostGraph> {
         show: true,
         border: Border.all(color: widget.appTheme.backGroundColor),
       ),
-      minX: 1,
-      maxX: 12,
+      minX: -6,
+      maxX: 0,
       minY: 0,
-      maxY: 100000,
+      maxY: getMaxValue()+20000,
         lineBarsData: [
           LineChartBarData(
-            spots: List.generate(reparations.length, (index) {
-              return FlSpot(
-                  reparations[index].date.month +
-                      (reparations[index].date.day / 30),
-                  avg);
-            }),
+            spots: values.entries.map((e) => FlSpot(
+              e.key.toDouble(),
+              avg,)).toList(),
             isCurved: true,
             gradient: LinearGradient(
-              colors: [
-                ColorTween(begin: gradiantColors[0],end: gradiantColors[1]).lerp(0.2)!,
-                ColorTween(begin: gradiantColors[0],end: gradiantColors[1]).lerp(0.2)!,
-              ],
+              colors: gradiantColors,
             ),
-            barWidth: 5,
+            barWidth: 2,
             isStrokeCapRound: true,
             dotData: const FlDotData(show: true),
             belowBarData: BarAreaData(
                 show: true,
                 gradient: LinearGradient(
-                  colors: [
-                    ColorTween(begin: gradiantColors[0],end: gradiantColors[1]).lerp(0.2)!.withOpacity(0.1),
-                    ColorTween(begin: gradiantColors[0],end: gradiantColors[1]).lerp(0.2)!.withOpacity(0.1),
-                  ],
-                ),),
+                  colors: gradiantColors
+                      .map((color) => color.withOpacity(0.3))
+                      .toList(),
+                )),
           )
         ]
     );
@@ -330,29 +320,30 @@ class _CostGraphState extends State<CostGraph> {
 
   double getMinValue() {
     double min = 0;
-    for (int i = 0; i < reparations.length; i++) {
-      if (min > reparations[i].getPrixTTC()) {
-        min = reparations[i].getPrixTTC();
+    values.forEach((key, value) {
+      if(value<min){
+        min=value;
       }
-    }
+    });
     return min;
   }
 
   double getMaxValue() {
     double max = 0;
-    for (int i = 0; i < reparations.length; i++) {
-      if (max < reparations[i].getPrixTTC()) {
-        max = reparations[i].getPrixTTC();
+    values.forEach((key, value) {
+      if(value>max){
+        max=value;
       }
-    }
+    });
+    max=((max/20000).ceil())*20000;
     return max;
   }
 
   double getAverage(){
     double avg = 0;
-    for (int i = 0; i < reparations.length; i++) {
-        avg += reparations[i].getPrixTTC();
-    }
+    values.forEach((key, value) {
+      avg+=value;
+    });
     return avg/reparations.length;
   }
 }

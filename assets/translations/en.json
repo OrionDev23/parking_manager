@@ -370,6 +370,7 @@
   "chaufdocuments": "Drivers docs",
   "vehicledocuments": "Vehicles docs",
   "activities": "Activities",
-  "voirplus": "See more"
-
+  "voirplus": "See more",
+  "depenses":"Expenses",
+  "avg": "Average"
 }

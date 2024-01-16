@@ -409,5 +409,7 @@
  "assignnow": "Assigner comme état actuel ?",
  "alreadyinvited": "Invitation pour devenir manager envoyée",
  "enattente": "En attente",
- "voirplus": "Voir plus"
+ "voirplus": "Voir plus",
+ "depenses":"Dépenses",
+ "avg": "Moyenne"
 }
