@@ -4,12 +4,17 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:parc_oto/serializables/activity.dart';
 import 'package:parc_oto/serializables/vehicle/vehicle.dart';
+import 'package:sembast/sembast.dart';
 
+import '../main.dart';
 import '../screens/entreprise.dart';
+import '../serializables/conducteur/document_chauffeur.dart';
 import '../serializables/entreprise.dart';
 import '../serializables/parc_user.dart';
+import '../serializables/planning.dart';
 import '../serializables/prestataire.dart';
 import '../serializables/reparation/reparation.dart';
+import '../serializables/vehicle/document_vehicle.dart';
 import '../utilities/profil_beautifier.dart';
 
 const databaseId = "6531ad112080ae3b14a7";
@@ -310,6 +315,8 @@ class ClientDatabase {
     }
     return '';
   }
+
+
   Future<List<Reparation>> getReparationInMarge(DateTime start,DateTime end) async{
 
     List<Reparation>result=[];
@@ -334,4 +341,86 @@ class ClientDatabase {
 
     return result;
   }
+
+  Future<List<DocumentVehicle>> getDocumentsBeforeTime(DateTime expiration) async{
+
+    var store =StoreRef.main();
+
+    var removed=await store.record('removedDocs').get(db) as List<String>;
+
+
+    List<DocumentVehicle>result=[];
+    await database!.listDocuments(
+        databaseId: databaseId,
+        collectionId: vehicDoc,
+        queries: [
+          Query.lessThanEqual('date_expiration', dateToIntJson(expiration)),
+          Query.notEqual(r'$id', removed),
+        ]
+    ).then((value) {
+
+      for(int i=0;i<value.documents.length;i++){
+        result.add(value.documents[i].convertTo((p0) => DocumentVehicle.fromJson(p0 as Map<String,dynamic>)));
+      }
+    }).onError((error, stackTrace) {
+      if (kDebugMode) {
+        print(stackTrace);
+      }
+    });
+    return result;
+  }
+
+  Future<List<DocumentChauffeur>> getConduDocumentsBeforeTime(DateTime expiration) async{
+    List<DocumentChauffeur>result=[];
+    var store =StoreRef.main();
+
+    var removed=await store.record('removedCondDocs').get(db) as List<String>;
+    await database!.listDocuments(
+        databaseId: databaseId,
+        collectionId: chaufDoc,
+        queries: [
+          Query.lessThanEqual('date_expiration', dateToIntJson(expiration)),
+          Query.notEqual(r'$id', removed),
+        ]
+    ).then((value) {
+
+      for(int i=0;i<value.documents.length;i++){
+        result.add(value.documents[i].convertTo((p0) => DocumentChauffeur.fromJson(p0 as Map<String,dynamic>)));
+      }
+    }).onError((error, stackTrace) {
+      if (kDebugMode) {
+        print(stackTrace);
+      }
+    });
+
+    return result;
+  }
+  Future<List<Planning>> getPlanningBeforeTime(DateTime expiration) async{
+    List<Planning>result=[];
+    var store =StoreRef.main();
+
+    var removed=await store.record('removedPlanning').get(db) as List<String>;
+    await database!.listDocuments(
+        databaseId: databaseId,
+        collectionId: planningID,
+        queries: [
+          Query.lessThanEqual('startTime', dateToIntJson(expiration)),
+          Query.notEqual(r'$id', removed),
+
+        ]
+    ).then((value) {
+
+      for(int i=0;i<value.documents.length;i++){
+        result.add(value.documents[i].convertTo((p0) => Planning.fromJson(p0 as Map<String,dynamic>)));
+      }
+    }).onError((error, stackTrace) {
+      if (kDebugMode) {
+        print(stackTrace);
+      }
+    });
+
+    return result;
+  }
+
+
 }

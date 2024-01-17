@@ -44,11 +44,9 @@ class CDocumentFormState extends State<CDocumentForm> with AutomaticKeepAliveCli
     if(widget.dc!=null){
       nom.text=widget.dc!.nom;
       documentID=widget.dc!.id;
+      selectedDate=widget.dc!.dateExpiration;
       if(widget.dc!.chauffeur!=null) {
         downloadChauffeur(widget.dc!.chauffeur!);
-      }
-      if(widget.dc!.dateExpiration!=null) {
-        selectedDate=ClientDatabase.ref.add(Duration(milliseconds: widget.dc!.dateExpiration??0));
       }
     }
     else if(widget.c!=null){
@@ -218,7 +216,7 @@ class CDocumentFormState extends State<CDocumentForm> with AutomaticKeepAliveCli
         }
         return;
       }
-      if(selectedDate!=null && (widget.dc!.dateExpiration==null || ClientDatabase.ref.add(Duration(milliseconds:widget.dc!.dateExpiration??0))==selectedDate))
+      if(selectedDate!=null && (widget.dc!.dateExpiration==null || widget.dc!.dateExpiration==selectedDate))
     {
       if(!changes){
         setState(() {
@@ -248,7 +246,7 @@ class CDocumentFormState extends State<CDocumentForm> with AutomaticKeepAliveCli
 
       DocumentChauffeur dv=DocumentChauffeur(id: documentID!, nom: nom.text,chauffeur: selectedConducteur?.id,
           chauffeurNom:'${selectedConducteur?.name} ${selectedConducteur?.prenom}',
-          dateExpiration: selectedDate?.difference(ClientDatabase.ref).inMilliseconds.abs(),
+          dateExpiration: selectedDate,
       createdBy: ClientDatabase.me.value?.id);
       if(widget.dc!=null){
         await ClientDatabase.database!.updateDocument(

@@ -12,7 +12,7 @@ DocumentChauffeur _$DocumentChauffeurFromJson(Map<String, dynamic> json) =>
       nom: json['nom'] as String,
       chauffeurNom: json['chauffeurNom'] as String?,
       chauffeur: json['chauffeur'] as String?,
-      dateExpiration: json['date_expiration'] as int?,
+      dateExpiration: dateFromIntJson(json['date_expiration'] as int?),
       createdBy: json['createdBy'] as String?,
       createdAt: createdAtJson(json[r'$createdAt'] as String),
       updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
@@ -20,7 +20,7 @@ DocumentChauffeur _$DocumentChauffeurFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$DocumentChauffeurToJson(DocumentChauffeur instance) =>
     <String, dynamic>{
-      'date_expiration': instance.dateExpiration,
+      'date_expiration': dateToIntJson(instance.dateExpiration),
       'nom': instance.nom,
       'chauffeur': instance.chauffeur,
       'chauffeurNom': instance.chauffeurNom,

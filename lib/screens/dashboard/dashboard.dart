@@ -196,7 +196,7 @@ class Dashboard extends StatelessWidget {
       ),
       ButtonContainer(
         icon: FluentIcons.service_activity,
-        text: 'Prestataires'.tr(),
+        text: 'prestataires'.tr(),
         getCount: DatabaseCounters().countPrestataire,
         action: () {
           PanesListState.index.value = PaneItemsAndFooters

@@ -1,7 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 
-import '../../theme.dart';
+import '../../../theme.dart';
 
 class NotifList extends StatefulWidget {
   const NotifList({super.key});

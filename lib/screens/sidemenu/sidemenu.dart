@@ -7,7 +7,7 @@ import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
 import 'package:parc_oto/widgets/on_tap_scale.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import '../dashboard/notif_list.dart';
+import '../dashboard/notifications/notif_list.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';

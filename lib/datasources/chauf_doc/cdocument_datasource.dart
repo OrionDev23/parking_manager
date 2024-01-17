@@ -49,8 +49,7 @@ class ChaufDocumentsDataSource extends ParcOtoDatasource<DocumentChauffeur> {
       }),
       DataCell(SelectableText(
           element.value.dateExpiration != null
-              ? dateFormat2.format(ClientDatabase.ref
-                  .add(Duration(milliseconds: element.value.dateExpiration!)))
+              ? dateFormat2.format(element.value.dateExpiration!)
               : '',
           style: tstyle)),
       DataCell(SelectableText(

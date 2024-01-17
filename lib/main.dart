@@ -25,6 +25,7 @@ import 'package:timezone/timezone.dart' as td;
 
 const appTitle="ParcOto";
 late Database db;
+late DatabaseFactory dbFactory;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
     tz.initializeTimeZones();
@@ -32,8 +33,6 @@ void main() async {
   usePathUrlStrategy();
   // File path to a file in the current directory
   String dbPath = 'personalData.db';
-  late DatabaseFactory dbFactory;
-
   if(kIsWeb){
     dbFactory=databaseFactoryWeb;
   }
@@ -41,7 +40,6 @@ void main() async {
     dbFactory= databaseFactoryIo;
   }
   db = await dbFactory.openDatabase(dbPath);
-
   if(!kIsWeb && (Platform.isMacOS || Platform.isLinux || Platform.isWindows)) {
     await initWindow();
   }
