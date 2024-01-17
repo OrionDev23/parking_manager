@@ -372,5 +372,7 @@
   "activities": "Activities",
   "voirplus": "See more",
   "depenses":"Expenses",
-  "avg": "Average"
+  "avg": "Average",
+  "deletenotif": "Do not show this notification again ?"
+
 }
