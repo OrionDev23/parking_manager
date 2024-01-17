@@ -56,7 +56,7 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
                 ? dateFormat.format(element.value.updatedAt!)
                 : '',
             style: tstyle)),
-      if (fieldsToShow.contains('user'))
+      if (fieldsToShow.contains('user') && ClientDatabase().isAdmin())
         DataCell(SelectableText(
           element.value.personName??'',
           style: tstyle,

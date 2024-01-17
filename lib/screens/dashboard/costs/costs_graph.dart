@@ -26,7 +26,7 @@ class CostGraph extends StatefulWidget {
 class _CostGraphState extends State<CostGraph> {
   List<Reparation> reparations = [];
 
-  Map<int,double> values={};
+  List<MapEntry<int,double>>values=[];
 
   bool loading = true;
 
@@ -43,11 +43,6 @@ class _CostGraphState extends State<CostGraph> {
       print('got them lenght :${reparations.length}');
     }
     fillValues();
-    if (kDebugMode) {
-
-      values.forEach((key, value) {
-        print('$key cost : $value');
-    });}
     gradiantColors = [
       widget.appTheme.color.darkest,
       widget.appTheme.color.light,
@@ -62,14 +57,33 @@ class _CostGraphState extends State<CostGraph> {
     int date=0;
     for(var r in reparations){
       date=getDate(r.date);
-      if(values.containsKey(date)){
-        values[getDate(r.date)] =values[getDate(r.date)]!+r.getPrixTTC();
+      if(datePresent(date)){
+        addToValue(date,r.getPrixTTC());
       }
       else{
-        values[getDate(r.date)]=r.getPrixTTC();
-
+        values.add(MapEntry(date,r.getPrixTTC()));
       }
     }
+
+    values.sort((a,b)=>a.key.compareTo(b.key));
+  }
+
+  void addToValue(int date,double value){
+    for(int j=0;j<values.length;j++){
+      if(values[j].key==date){
+        values[j]=MapEntry(values[j].key, values[j].value+value);
+        return;
+      }
+    }
+  }
+
+  bool datePresent(int date){
+    for(int j=0;j<values.length;j++){
+      if(values[j].key==date){
+        return true;
+      }
+    }
+    return false;
   }
 
   int getDate(DateTime date){
@@ -218,9 +232,9 @@ class _CostGraphState extends State<CostGraph> {
         maxY: getMaxValue()+20000,
         lineBarsData: [
           LineChartBarData(
-            spots: values.entries.map((e) => FlSpot(
-              e.key.toDouble(),
-              e.value,)).toList(),
+            spots: List.generate(values.length, (index) => FlSpot(
+      values[index].key.toDouble(),
+      values[index].value,),),
             isCurved: true,
             gradient: LinearGradient(
               colors: gradiantColors,
@@ -296,9 +310,9 @@ class _CostGraphState extends State<CostGraph> {
       maxY: getMaxValue()+20000,
         lineBarsData: [
           LineChartBarData(
-            spots: values.entries.map((e) => FlSpot(
-              e.key.toDouble(),
-              avg,)).toList(),
+            spots: List.generate(values.length, (index) => FlSpot(
+              values[index].key.toDouble(),
+              avg,),),
             isCurved: true,
             gradient: LinearGradient(
               colors: gradiantColors,
@@ -320,30 +334,30 @@ class _CostGraphState extends State<CostGraph> {
 
   double getMinValue() {
     double min = 0;
-    values.forEach((key, value) {
-      if(value<min){
-        min=value;
+    for(int i=0;i<values.length;i++){
+      if(values[i].value<min){
+        min=values[i].value;
       }
-    });
+    }
     return min;
   }
 
   double getMaxValue() {
     double max = 0;
-    values.forEach((key, value) {
-      if(value>max){
-        max=value;
+    for(int i=0;i<values.length;i++){
+      if(values[i].value>max){
+        max=values[i].value;
       }
-    });
+    }
     max=((max/20000).ceil())*20000;
     return max;
   }
 
   double getAverage(){
     double avg = 0;
-    values.forEach((key, value) {
-      avg+=value;
-    });
-    return avg/reparations.length;
+    for(int i=0;i<values.length;i++){
+      avg+=values[i].value;
+    }
+    return avg/values.length;
   }
 }
