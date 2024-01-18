@@ -1,8 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/screens/dashboard/notifications/notif_list.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
+import 'package:sembast/sembast.dart';
 
+import '../../../main.dart';
 import '../../sidemenu/pane_items.dart';
 import '../../sidemenu/sidemenu.dart';
 
@@ -33,7 +37,6 @@ class _NotificationTileState extends State<NotificationTile> {
           ? deleteNotifWidget()
           : Text(
               widget.title,
-              style: TextStyle(color: appTheme.color.lightest),
             ),
       trailing: toDelete
           ? null
@@ -61,11 +64,11 @@ class _NotificationTileState extends State<NotificationTile> {
         ).tr(),
         const Spacer(),
         Button(
+            onPressed: deleteThis,
             child: const Text(
               'oui',
               style: textStyle,
-            ).tr(),
-            onPressed: () {}),
+            ).tr()),
         bigSpace,
         FilledButton(
           child: const Text(
@@ -79,6 +82,35 @@ class _NotificationTileState extends State<NotificationTile> {
         ),
       ],
     );
+  }
+
+
+
+  void deleteThis() async{
+    var store=StoreRef<String,List<String>>.main();
+
+    String recordName=widget.type==0?'removedDocs':widget.type==1?'removedCondDocs':'removedPlanning';
+
+
+    await store.record(recordName).put(db, [widget.id],merge: true).then((value) {
+      Navigator.of(context).pop();
+      if(widget.type==0){
+        ClientDatabase.removedVehiDocs!.add(widget.id);
+      }
+      else if(widget.type==1){
+        ClientDatabase.removedCondDocs!.add(widget.id);
+      }
+      else{
+        ClientDatabase.removedPlanDocs!.add(widget.id);
+      }
+    }).onError((error, stackTrace) {
+      Navigator.of(context).pop();
+      print(stackTrace);
+    });
+
+    NotifListState.remove(widget.id);
+    NotifListState.changes.value++;
+
   }
 
   void goThere() {
@@ -101,4 +133,5 @@ class _NotificationTileState extends State<NotificationTile> {
     }
     Navigator.of(context).pop();
   }
+
 }

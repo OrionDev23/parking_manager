@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
-import 'package:parc_oto/widgets/on_tap_scale.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../dashboard/notifications/notif_list.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -13,7 +12,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 import '../../theme.dart';
-import 'package:flutter/material.dart' as m;
 
 const defaultUserPic =
     "https://upload.wikimedia.org/wikipedia/commons/7/72/Default-welcomer.png";
@@ -128,45 +126,7 @@ class PanesListState extends State<PanesList> with WindowListener {
                                 ),
                                 const Spacer(),
                                 if (!loading && signedIn.value)
-                                  FlyoutTarget(
-                                    controller: flyoutController,
-                                    child: OnTapScaleAndFade(
-                                        child: Row(
-                                          children: [
-                                            const Icon(FluentIcons.ringer),
-                                            const SizedBox(
-                                              width: 10,
-                                            ),
-                                            const Text('Alertes'),
-                                            const SizedBox(
-                                              width: 5,
-                                            ),
-                                            m.Badge(
-                                              backgroundColor:
-                                                  appTheme.color.darkest,
-                                              alignment: Alignment.topLeft,
-                                              label: const Text('10'),
-                                            ),
-                                          ],
-                                        ),
-                                        onTap: () {
-                                          flyoutController.showFlyout(
-                                              autoModeConfiguration:
-                                                  FlyoutAutoConfiguration(
-                                                      preferredMode:
-                                                          FlyoutPlacementMode
-                                                              .bottomLeft),
-                                              builder: (context) {
-                                                return FlyoutContent(
-                                                  child: SizedBox(
-                                                    height: 30.h,
-                                                    width: 30.w,
-                                                    child: const NotifList(),
-                                                  ),
-                                                );
-                                              });
-                                        }),
-                                  ),
+                                  const NotifList(),
                                 if (!loading && signedIn.value)
                                   const SizedBox(width: 10),
                                 if (!loading && signedIn.value)

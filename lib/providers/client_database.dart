@@ -346,7 +346,7 @@ class ClientDatabase {
 
     var store =StoreRef.main();
 
-    var removed=await store.record('removedDocs').get(db) as List<String>;
+    removedVehiDocs=await store.record('removedDocs').get(db) as List<String>? ??[];
 
 
     List<DocumentVehicle>result=[];
@@ -355,7 +355,8 @@ class ClientDatabase {
         collectionId: vehicDoc,
         queries: [
           Query.lessThanEqual('date_expiration', dateToIntJson(expiration)),
-          Query.notEqual(r'$id', removed),
+          if(removedVehiDocs!.isNotEmpty)
+          Query.notEqual(r'$id', removedVehiDocs),
         ]
     ).then((value) {
 
@@ -374,13 +375,15 @@ class ClientDatabase {
     List<DocumentChauffeur>result=[];
     var store =StoreRef.main();
 
-    var removed=await store.record('removedCondDocs').get(db) as List<String>;
+
+    removedCondDocs=await store.record('removedCondDocs').get(db) as List<String>? ??[];
     await database!.listDocuments(
         databaseId: databaseId,
         collectionId: chaufDoc,
         queries: [
           Query.lessThanEqual('date_expiration', dateToIntJson(expiration)),
-          Query.notEqual(r'$id', removed),
+          if(removedCondDocs!.isNotEmpty)
+          Query.notEqual(r'$id', removedCondDocs),
         ]
     ).then((value) {
 
@@ -399,13 +402,14 @@ class ClientDatabase {
     List<Planning>result=[];
     var store =StoreRef.main();
 
-    var removed=await store.record('removedPlanning').get(db) as List<String>;
+    removedPlanDocs=await store.record('removedPlanning').get(db) as List<String>? ??[];
     await database!.listDocuments(
         databaseId: databaseId,
         collectionId: planningID,
         queries: [
           Query.lessThanEqual('startTime', dateToIntJson(expiration)),
-          Query.notEqual(r'$id', removed),
+          if(removedPlanDocs!.isNotEmpty)
+          Query.notEqual(r'$id', removedPlanDocs),
 
         ]
     ).then((value) {
@@ -421,6 +425,11 @@ class ClientDatabase {
 
     return result;
   }
+
+
+  static List<String>? removedVehiDocs;
+  static List<String>? removedCondDocs;
+  static List<String>? removedPlanDocs;
 
 
 }
