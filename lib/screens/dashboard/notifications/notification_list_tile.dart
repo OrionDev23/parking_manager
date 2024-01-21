@@ -91,21 +91,21 @@ class _NotificationTileState extends State<NotificationTile> {
 
     List<String> storedData=prefs.getStringList(recordName)??[];
 
+    print('stored data : ${storedData.toString()}');
+
     storedData.add(widget.id);
 
     await prefs.setStringList(recordName, storedData).then((value) {
-      Navigator.of(context).pop();
       if(widget.type==0){
-        ClientDatabase.removedVehiDocs!.add(widget.id);
+        ClientDatabase.removedVehiDocs.add(widget.id);
       }
       else if(widget.type==1){
-        ClientDatabase.removedCondDocs!.add(widget.id);
+        ClientDatabase.removedCondDocs.add(widget.id);
       }
       else{
-        ClientDatabase.removedPlanDocs!.add(widget.id);
+        ClientDatabase.removedPlanDocs.add(widget.id);
       }
     }).onError((error, stackTrace) {
-      Navigator.of(context).pop();
       if (kDebugMode) {
         print(stackTrace);
       }

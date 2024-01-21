@@ -423,9 +423,9 @@ class ClientDatabase {
   }
 
 
-  static List<String>? removedVehiDocs;
-  static List<String>? removedCondDocs;
-  static List<String>? removedPlanDocs;
+  static List<String> removedVehiDocs=[];
+  static List<String> removedCondDocs=[];
+  static List<String> removedPlanDocs=[];
 
 
 }
