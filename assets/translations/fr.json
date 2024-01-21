@@ -414,5 +414,7 @@
  "avg": "Moyenne",
  "deletenotif": "Ne plus afficher cette notification ?",
  "backup": "Sauvegarde de données",
- "notifications": "Alertes"
+ "notifications": "Alertes",
+ "noconnection": "Pas de connexion internet",
+ "connectionback": "Connexion internet rétablie"
 }

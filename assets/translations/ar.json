@@ -373,6 +373,7 @@
   "avg": "المتوسط",
   "deletenotif": "لا تظهر هذا الإشعار مرة أخرى ؟",
   "backup": "النسخ الاحتياطي للبيانات",
-  "notifications": "تنبيهات"
-
+  "notifications": "تنبيهات",
+  "noconnection": "لا يوجد اتصال بالإنترنت",
+  "connectionback": "متصل"
 }

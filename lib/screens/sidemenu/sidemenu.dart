@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/sidemenu/pane_items.dart';
@@ -49,6 +51,7 @@ class PanesListState extends State<PanesList> with WindowListener {
   bool loading = false;
   @override
   void initState() {
+    listenToInternet();
     if (!kIsWeb &&
         (Platform.isMacOS || Platform.isLinux || Platform.isWindows)) {
       windowManager.setPreventClose(true);
@@ -76,6 +79,45 @@ class PanesListState extends State<PanesList> with WindowListener {
     if (mounted) {
       setState(() {});
     }
+  }
+
+
+  bool noConnection=false;
+  StreamSubscription<InternetStatus>? listener;
+  void listenToInternet(){
+     listener = InternetConnection().onStatusChange.listen((InternetStatus status) {
+      switch (status) {
+        case InternetStatus.connected:
+
+          if(noConnection){
+            displayInfoBar(context,
+                builder: (BuildContext context, void Function() close) {
+                  return InfoBar(
+                    title: const Text('connectionback').tr(),
+                    severity: InfoBarSeverity.success,
+                  );
+                },
+                duration: snackbarShortDuration);
+            setState(() {
+              noConnection=false;
+            });
+          }
+          break;
+        case InternetStatus.disconnected:
+          setState(() {
+            noConnection=true;
+          });
+          displayInfoBar(context,
+              builder: (BuildContext context, void Function() close) {
+                return InfoBar(
+                    title: const Text('noconnection').tr(),
+                    severity: InfoBarSeverity.warning,
+                );
+              },
+              duration: snackbarShortDuration*3);
+          break;
+      }
+    });
   }
 
   double pwidth = 20.w;
@@ -192,6 +234,11 @@ class PanesListState extends State<PanesList> with WindowListener {
         );
       }
     });
+  }
+  @override
+  void dispose() {
+    listener?.cancel();
+    super.dispose();
   }
 }
 
