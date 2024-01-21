@@ -4,7 +4,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:parc_oto/serializables/activity.dart';
 import 'package:parc_oto/serializables/vehicle/vehicle.dart';
-import 'package:sembast/sembast.dart';
 
 import '../main.dart';
 import '../screens/entreprise.dart';
@@ -344,9 +343,8 @@ class ClientDatabase {
 
   Future<List<DocumentVehicle>> getDocumentsBeforeTime(DateTime expiration) async{
 
-    var store =StoreRef.main();
 
-    removedVehiDocs=await store.record('removedDocs').get(db) as List<String>? ??[];
+    removedVehiDocs= prefs.getStringList('removedDocs')??[];
 
 
     List<DocumentVehicle>result=[];
@@ -373,10 +371,9 @@ class ClientDatabase {
 
   Future<List<DocumentChauffeur>> getConduDocumentsBeforeTime(DateTime expiration) async{
     List<DocumentChauffeur>result=[];
-    var store =StoreRef.main();
 
 
-    removedCondDocs=await store.record('removedCondDocs').get(db) as List<String>? ??[];
+    removedCondDocs=prefs.getStringList('removedCondDocs') ??[];
     await database!.listDocuments(
         databaseId: databaseId,
         collectionId: chaufDoc,
@@ -400,9 +397,8 @@ class ClientDatabase {
   }
   Future<List<Planning>> getPlanningBeforeTime(DateTime expiration) async{
     List<Planning>result=[];
-    var store =StoreRef.main();
 
-    removedPlanDocs=await store.record('removedPlanning').get(db) as List<String>? ??[];
+    removedPlanDocs=prefs.getStringList('removedPlanning')??[];
     await database!.listDocuments(
         databaseId: databaseId,
         collectionId: planningID,

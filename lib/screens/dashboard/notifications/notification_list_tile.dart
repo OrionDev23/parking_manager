@@ -1,10 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/dashboard/notifications/notif_list.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
-import 'package:sembast/sembast.dart';
 
 import '../../../main.dart';
 import '../../sidemenu/pane_items.dart';
@@ -87,12 +87,13 @@ class _NotificationTileState extends State<NotificationTile> {
 
 
   void deleteThis() async{
-    var store=StoreRef<String,List<String>>.main();
-
     String recordName=widget.type==0?'removedDocs':widget.type==1?'removedCondDocs':'removedPlanning';
 
+    List<String> storedData=prefs.getStringList(recordName)??[];
 
-    await store.record(recordName).put(db, [widget.id],merge: true).then((value) {
+    storedData.add(widget.id);
+
+    await prefs.setStringList(recordName, storedData).then((value) {
       Navigator.of(context).pop();
       if(widget.type==0){
         ClientDatabase.removedVehiDocs!.add(widget.id);
@@ -105,7 +106,9 @@ class _NotificationTileState extends State<NotificationTile> {
       }
     }).onError((error, stackTrace) {
       Navigator.of(context).pop();
-      print(stackTrace);
+      if (kDebugMode) {
+        print(stackTrace);
+      }
     });
 
     NotifListState.remove(widget.id);

@@ -7,9 +7,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:parc_oto/router.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
-import 'package:sembast/sembast.dart';
-import 'package:sembast/sembast_io.dart';
-import 'package:sembast_web/sembast_web.dart';
 import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 import 'providers/client_database.dart';
 import 'theme.dart';
@@ -24,22 +21,14 @@ import 'package:timezone/timezone.dart' as td;
 
 
 const appTitle="ParcOto";
-late Database db;
-late DatabaseFactory dbFactory;
+
+late final SharedPreferences prefs;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
     tz.initializeTimeZones();
     td.initializeDatabase([]);
   usePathUrlStrategy();
   // File path to a file in the current directory
-  String dbPath = 'personalData.db';
-  if(kIsWeb){
-    dbFactory=databaseFactoryWeb;
-  }
-  else{
-    dbFactory= databaseFactoryIo;
-  }
-  db = await dbFactory.openDatabase(dbPath);
   if(!kIsWeb && (Platform.isMacOS || Platform.isLinux || Platform.isWindows)) {
     await initWindow();
   }
@@ -49,7 +38,7 @@ void main() async {
 }
 
 void launchApp() async{
-  final prefs = await SharedPreferences.getInstance();
+  prefs = await SharedPreferences.getInstance();
   VehiclesUtilities();
   EasyLocalization.logger.enableBuildModes = [];
   await EasyLocalization.ensureInitialized();
@@ -58,8 +47,7 @@ void launchApp() async{
       path: 'assets/translations',
       fallbackLocale: const Locale('fr'),
       useOnlyLangCode: true,
-      child: MyApp(
-        savedSettings: prefs,
+      child: const MyApp(
       )));
 }
 
@@ -84,9 +72,8 @@ Future<void> initWindow() async {
 }
 
 class MyApp extends StatefulWidget {
-  final SharedPreferences savedSettings;
 
-  const MyApp({super.key, required this.savedSettings});
+  const MyApp({super.key,});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -110,7 +97,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
   return ResponsiveSizer(builder: (context, orientation, deviceType) {
       return ChangeNotifierProvider(
-          create: (_) => AppTheme(widget.savedSettings),
+          create: (_) => AppTheme(),
           builder: (context,_){
             final appTheme = context.watch<AppTheme>();
             return FluentApp.router(
@@ -156,7 +143,7 @@ class _MyAppState extends State<MyApp> {
                   child: child!,
                 );
               },
-              routerConfig: Routes(widget.savedSettings).router,
+              routerConfig: Routes().router,
 
             );
       },);

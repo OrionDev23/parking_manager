@@ -3,8 +3,8 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'main.dart';
 import 'utilities/theme_colors.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_theme/system_theme.dart';
 import 'package:flutter/material.dart' as m;
 enum NavigationIndicators { sticky, end }
@@ -178,7 +178,8 @@ class AppTheme extends ChangeNotifier {
     notifyListeners();
   }
 
-  AppTheme(SharedPreferences savedSettings) {
+  AppTheme() {
+    final savedSettings=prefs;
     mode = savedSettings.getInt('themeMode') == 0
         ? ThemeMode.system
         : savedSettings.getInt('themeMode') == 1
