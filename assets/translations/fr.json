@@ -412,5 +412,7 @@
  "voirplus": "Voir plus",
  "depenses":"Dépenses",
  "avg": "Moyenne",
- "deletenotif": "Ne plus afficher cette notification ?"
+ "deletenotif": "Ne plus afficher cette notification ?",
+ "backup": "Sauvegarde de données",
+ "notifications": "Alertes"
 }

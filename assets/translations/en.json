@@ -373,6 +373,9 @@
   "voirplus": "See more",
   "depenses":"Expenses",
   "avg": "Average",
-  "deletenotif": "Do not show this notification again ?"
+  "deletenotif": "Do not show this notification again ?",
+  "backup": "Data backup",
+  "notifications": "Alerts"
+
 
 }

@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:parc_oto/utilities/profil_beautifier.dart';
@@ -118,7 +119,9 @@ class _CostGraphState extends State<CostGraph> {
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return const Center(child: ProgressRing());
+      return const Center(
+          child: SizedBox(
+              width: 64, height: 16, child: LinearProgressIndicator()));
     }
     return Stack(
       alignment: Alignment.topRight,

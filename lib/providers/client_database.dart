@@ -353,8 +353,8 @@ class ClientDatabase {
         collectionId: vehicDoc,
         queries: [
           Query.lessThanEqual('date_expiration', dateToIntJson(expiration)),
-          if(removedVehiDocs!.isNotEmpty)
-          Query.notEqual(r'$id', removedVehiDocs),
+          if(removedVehiDocs.isNotEmpty)
+            ...removedVehiDocs.map((e) => Query.notEqual(r'$id', e))
         ]
     ).then((value) {
 
@@ -379,17 +379,18 @@ class ClientDatabase {
         collectionId: chaufDoc,
         queries: [
           Query.lessThanEqual('date_expiration', dateToIntJson(expiration)),
-          if(removedCondDocs!.isNotEmpty)
-          Query.notEqual(r'$id', removedCondDocs),
+          if(removedCondDocs.isNotEmpty)
+            ...removedCondDocs.map((e) => Query.notEqual(r'$id', e))
         ]
     ).then((value) {
 
       for(int i=0;i<value.documents.length;i++){
         result.add(value.documents[i].convertTo((p0) => DocumentChauffeur.fromJson(p0 as Map<String,dynamic>)));
       }
-    }).onError((error, stackTrace) {
+    }).onError((AppwriteException error, stackTrace) {
       if (kDebugMode) {
-        print(stackTrace);
+        print(error.message);
+        print(error.response);
       }
     });
 
@@ -404,8 +405,8 @@ class ClientDatabase {
         collectionId: planningID,
         queries: [
           Query.lessThanEqual('startTime', dateToIntJson(expiration)),
-          if(removedPlanDocs!.isNotEmpty)
-          Query.notEqual(r'$id', removedPlanDocs),
+          if(removedPlanDocs.isNotEmpty)
+            ...removedPlanDocs.map((e) => Query.notEqual(r'$id', e))
 
         ]
     ).then((value) {

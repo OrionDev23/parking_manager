@@ -1,10 +1,16 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/serializables/conducteur/document_chauffeur.dart';
+import 'package:parc_oto/serializables/planning.dart';
+import 'package:parc_oto/serializables/vehicle/document_vehicle.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import '../../../serializables/notification.dart';
 import '../../../theme.dart';
 import '../../../widgets/on_tap_scale.dart';
 import 'notification_list_tile.dart';
-import 'package:flutter/material.dart' show Badge;
+import 'package:flutter/material.dart' show Badge, LinearProgressIndicator;
 
 class NotifList extends StatefulWidget {
   const NotifList({super.key});
@@ -13,17 +19,16 @@ class NotifList extends StatefulWidget {
   State<NotifList> createState() => NotifListState();
 }
 
-class NotifListState extends State<NotifList> {
+class NotifListState extends State<NotifList> with AutomaticKeepAliveClientMixin{
   static ValueNotifier<int> changes = ValueNotifier(0);
 
-  static List<NotificationTile> tiles = [
-    NotificationTile(id: '1', type: 1, date: DateTime.now(), title: 'Test 1'),
-    NotificationTile(id: '2', type: 1, date: DateTime.now(), title: 'Test 1'),
-    NotificationTile(id: '3', type: 1, date: DateTime.now(), title: 'Test 1'),
-  ];
+  static List<PNotification> tiles = [];
+
+  static bool loaded=false;
 
   @override
   void initState() {
+    getNotifs();
     super.initState();
   }
   static void remove(String id) {
@@ -35,18 +40,85 @@ class NotifListState extends State<NotifList> {
     }
   }
 
+  bool loading=false;
+
+  List<Planning> plannings=[];
+  List<DocumentVehicle> docVehic=[];
+  List<DocumentChauffeur> docChauf=[];
+
+  Future<void> getNotifs() async{
+    if(!loaded){
+      loading=true;
+      tiles.clear();
+
+      if(mounted){
+        setState(() {
+
+        });
+      }
+      await Future.wait([getVehicDocs(),getPlanningDocs(),getChaufDocs()]);
+      createNotifListFromLists();
+      loading=false;
+      loaded=true;
+      if(mounted){
+        setState(() {
+
+        });
+      }
+    }
+
+  }
+
+  DateTime beforTime=DateTime.now().add(const Duration(days: 60));
+
+  Future<void> getVehicDocs() async{
+    docVehic=await ClientDatabase().getDocumentsBeforeTime(beforTime);
+  }
+  Future<void> getChaufDocs() async{
+    docChauf=await ClientDatabase().getConduDocumentsBeforeTime(beforTime);
+  }
+
+  Future<void> getPlanningDocs() async{
+    plannings=await ClientDatabase().getPlanningBeforeTime(beforTime);
+  }
+
+
+  void createNotifListFromLists(){
+    int i;
+    for(i=0;i<docVehic.length;i++){
+        tiles.add(PNotification(id: docVehic[i].id, title: docVehic[i].nom, type: 0, date: docVehic[i].dateExpiration!));
+    }
+    for(i=0;i<docChauf.length;i++){
+      tiles.add(PNotification(id: docChauf[i].id, title: docChauf[i].nom, type: 1, date: docChauf[i].dateExpiration!));
+    }
+    for(i=0;i<plannings.length;i++){
+      tiles.add(PNotification(id: plannings[i].id, title: plannings[i].subject, type: 2, date: plannings[i].startTime));
+    }
+
+    tiles.sort((a,b)=>a.date.compareTo(b.date));
+  }
+
   FlyoutController flyoutController = FlyoutController();
+
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     var appTheme = context.watch<AppTheme>();
-
+    if (loading) {
+      return const Center(
+          child: SizedBox(
+              width: 64, height: 16, child: LinearProgressIndicator()));
+    }
     return ValueListenableBuilder(
         valueListenable: changes,
         builder: (context, c, w) {
           return FlyoutTarget(
             controller: flyoutController,
             child: OnTapScaleAndFade(
+                onTap: loading?null:() {
+                  showNotifications();
+                },
                 child: Badge(
                   backgroundColor: appTheme.color.lightest,
                   alignment: Alignment.bottomRight,
@@ -64,24 +136,58 @@ class NotifListState extends State<NotifList> {
                           size: 24,
                           color: appTheme.color.darkest,
                         ),
-                ),
-                onTap: () {
-                  flyoutController.showFlyout(
-                      autoModeConfiguration: FlyoutAutoConfiguration(
-                          preferredMode: FlyoutPlacementMode.bottomLeft),
-                      builder: (context) {
-                        return FlyoutContent(
-                          child: SizedBox(
-                            height: 30.h,
-                            width: 30.w,
-                            child: ListView(
-                              children: tiles,
-                            ),
-                          ),
-                        );
-                      });
-                }),
+                )),
           );
         });
   }
+
+  void showNotifications(){
+    flyoutController.showFlyout(
+        autoModeConfiguration: FlyoutAutoConfiguration(
+            preferredMode: FlyoutPlacementMode.bottomLeft),
+        builder: (context) {
+          return StatefulBuilder(
+            builder: (context,setS) {
+              return FlyoutContent(
+                child: SizedBox(
+                  height: 270.px,
+                  width: 400.px,
+                  child: loading?const ProgressBar():Column(
+                    children: [
+                      SizedBox(
+                        width: 400.px,
+                        height: 40.px,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text( 'notifications'.tr().toUpperCase(),style: TextStyle(color: Colors.grey[100],fontSize: 20,fontWeight: FontWeight.bold),),
+                            smallSpace,
+                            IconButton(icon: const Icon(FluentIcons.refresh), onPressed: (){
+                              loaded=false;
+                              getNotifs().then((value) {
+                                setS((){});
+                              });
+                              setS((){});
+
+                            })
+                          ],
+                        ),
+                      ),
+                      Flexible(
+                        child: ListView(
+                          children: tiles.map((e) => NotificationTile(pNotification: e,)).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+          );
+        });
+  }
+
+  @override
+  bool get wantKeepAlive => true;
 }

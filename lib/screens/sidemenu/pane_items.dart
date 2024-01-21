@@ -42,6 +42,8 @@ class PaneItemsAndFooters {
   static late PaneItem parametres;
   static late PaneItem logout;
 
+  static late PaneItem backup;
+
   static late PaneItem entreprise;
   initPanes() {
     dashboard = PaneItem(
@@ -149,6 +151,11 @@ class PaneItemsAndFooters {
       body: const MyEntreprise(),
     );
 
+    backup=PaneItem(
+      icon: const Icon(FluentIcons.backlog),
+      title: const Text('backup').tr(),
+      body: const Center(child: Text('DEMO',style: TextStyle(fontSize: 20),),),
+    );
     bool isAdmin = ClientDatabase().isAdmin();
     bool isManager = ClientDatabase().isManager();
 
@@ -172,6 +179,8 @@ class PaneItemsAndFooters {
     footerItems = [
       PaneItemSeparator(),
       if (isAdmin) entreprise,
+      if (isAdmin) backup,
+
       if (PanesListState.signedIn.value) logout,
       parametres,
     ];

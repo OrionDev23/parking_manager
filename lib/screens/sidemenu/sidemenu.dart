@@ -16,6 +16,7 @@ import '../../theme.dart';
 const defaultUserPic =
     "https://upload.wikimedia.org/wikipedia/commons/7/72/Default-welcomer.png";
 
+const demo=true;
 class PanesList extends StatefulWidget {
   final PaneItemsAndFooters paneList;
   final Widget? widget;
@@ -124,6 +125,10 @@ class PanesListState extends State<PanesList> with WindowListener {
                                   width: 80,
                                   height: 80,
                                 ),
+                                if(demo)
+                                  bigSpace,
+                                if(demo)
+                                  Text('DEMO',style: TextStyle(color: Colors.red,fontSize: 16,fontWeight: FontWeight.bold),),
                                 const Spacer(),
                                 if (!loading && signedIn.value)
                                   const NotifList(),
@@ -131,6 +136,7 @@ class PanesListState extends State<PanesList> with WindowListener {
                                   const SizedBox(width: 10),
                                 if (!loading && signedIn.value)
                                   const ProfilNameTopBar(),
+
                                 smallSpace,
                                 const WindowButtons(),
                               ],
