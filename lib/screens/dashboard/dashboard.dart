@@ -29,7 +29,7 @@ class Dashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
-
+    bool portrait=MediaQuery.of(context).orientation==Orientation.portrait;
     return ScaffoldPage(
       header: const PageTitle(text: 'home'),
       content: ListView(
@@ -41,7 +41,7 @@ class Dashboard extends StatelessWidget {
             shrinkWrap: true,
             padding: const EdgeInsets.all(10),
             childAspectRatio: 3,
-            crossAxisCount: 4,
+            crossAxisCount: portrait?2:4,
             mainAxisSpacing: 5,
             crossAxisSpacing: 5,
             children: buttonList(appTheme),
@@ -51,7 +51,7 @@ class Dashboard extends StatelessWidget {
             primary: false,
             padding: const EdgeInsets.all(5),
             physics: const ClampingScrollPhysics(),
-            crossAxisCount: 2,
+            crossAxisCount: portrait?1:2,
             childAspectRatio: 1.45,
             crossAxisSpacing: 5,
             mainAxisSpacing: 5,

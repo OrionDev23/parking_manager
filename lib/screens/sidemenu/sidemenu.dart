@@ -57,8 +57,6 @@ class PanesListState extends State<PanesList> with WindowListener {
       windowManager.setPreventClose(true);
       windowManager.addListener(this);
     }
-    adjustSize();
-
     getProfil();
 
     super.initState();
@@ -120,18 +118,8 @@ class PanesListState extends State<PanesList> with WindowListener {
     });
   }
 
-  double pwidth = 20.w;
+  double pwidth = 250.px;
 
-  void adjustSize() {
-    if (kIsWeb) {
-    } else {
-      if (Platform.isAndroid || Platform.isIOS) {
-        pwidth = 60.w;
-      } else {
-        pwidth = 20.w;
-      }
-    }
-  }
 
   FlyoutController flyoutController = FlyoutController();
   @override
@@ -180,6 +168,8 @@ class PanesListState extends State<PanesList> with WindowListener {
                                   const ProfilNameTopBar(),
 
                                 smallSpace,
+                                if(!kIsWeb)
+                                if(Platform.isMacOS || Platform.isLinux || Platform.isWindows)
                                 const WindowButtons(),
                               ],
                             )),

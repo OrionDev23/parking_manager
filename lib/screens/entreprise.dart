@@ -1,9 +1,11 @@
 import 'dart:io' as io;
+import 'dart:typed_data';
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:parc_oto/serializables/entreprise.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:parc_oto/widgets/zone_box.dart';
@@ -171,6 +173,8 @@ class MyEntrepriseState extends State<MyEntreprise> {
   }
 
   bool downloadingLogo = false;
+
+   static Uint8List? logo;
   bool uploading=false;
   double progress=0;
   Future<void> downloadLogo() async {
@@ -192,20 +196,25 @@ class MyEntrepriseState extends State<MyEntreprise> {
     }
     await ClientDatabase.storage!
         .getFileDownload(bucketId: buckedId, fileId: link)
-        .then((value) {
-      io.File file = io.File(logoid);
-      file.writeAsBytes(value).then((value) {
-        downloadingLogo = false;
-        if (mounted) {
-          setState(() {});
-        }
-      }).onError((error, stackTrace) {
-        downloadingLogo = false;
-        if (mounted) {
-          setState(() {});
-        }
+        .then((value) async{
+      logo=value;
+      if(!kIsWeb){
+        io.File file = io.File(logoid);
+
+        await file.writeAsBytes(value).then((value) {
+          downloadingLogo = false;
+          if (mounted) {
+            setState(() {});
+          }
+        }).onError((error, stackTrace) {
       });
+      }
+        downloadingLogo = false;
+        if (mounted) {
+          setState(() {});
+        }
     }).onError((error, stackTrace) {
+      logo=null;
       downloadingLogo = false;
       if (mounted) {
         setState(() {});

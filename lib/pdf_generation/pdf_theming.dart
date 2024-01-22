@@ -1,7 +1,9 @@
 import 'dart:io';
-
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/screens/entreprise.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 import 'package:printing/printing.dart';
@@ -67,9 +69,22 @@ class PDFTheming{
   }
 
   Future<void> getEntrepriseLogo() async{
-    entrepriseLogo ??= MemoryImage(
-      await File('mylogo.png').readAsBytes(),
-    );
+    if(kIsWeb){
+      if(MyEntrepriseState.logo==null){
+        await ClientDatabase.downloadLogo();
+      }
+      if(MyEntrepriseState.logo!=null){
+        entrepriseLogo ??=MemoryImage(MyEntrepriseState.logo!);
+
+      }
+    }
+    else{
+      entrepriseLogo ??= MemoryImage(
+        await File('mylogo.png').readAsBytes(),
+      );
+    }
+
+
   }
 
   Future<void> getPoLogo() async{

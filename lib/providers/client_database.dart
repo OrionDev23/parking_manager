@@ -136,8 +136,19 @@ class ClientDatabase {
       }
       MyEntrepriseState.downloading = false;
     }
+    if(kIsWeb){
+      downloadLogo();
+    }
   }
 
+  static Future<void> downloadLogo() async {
+    await ClientDatabase.storage!
+        .getFileDownload(bucketId: buckedId, fileId: 'mylogo.png')
+        .then((value) async{
+      MyEntrepriseState.logo=value;
+    }).onError((error, stackTrace) {
+    });
+  }
   void uploadUser(ParcUser u) {
     database!.createDocument(
         databaseId: databaseId,
