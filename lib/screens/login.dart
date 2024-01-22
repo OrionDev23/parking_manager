@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
@@ -36,7 +35,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-    adjustSize();
     waitForFirstLoading();
     super.initState();
   }
@@ -63,34 +61,20 @@ class _LoginScreenState extends State<LoginScreen> {
 
   }
 
-  void adjustSize(){
-    if(kIsWeb){
-      pheight=50.h;
-    }
-    else{
-      if(Platform.isAndroid || Platform.isIOS){
-        pwidth=60.w;
-        pheight=50.h;
-      }
-      else{
-        pwidth=20.w;
-        pheight=35.h;
-      }
-    }
-  }
 
-  double pwidth=20.w;
-  double pheight=35.h;
+
+  double pwidth=300.px;
+  double pheight=250.px;
 
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
-    if(MediaQuery.of(context).orientation==Orientation.portrait){
+   /* if(MediaQuery.of(context).orientation==Orientation.portrait){
       pwidth=60.w;
     }
     else{
       pwidth=30.w;
-    }
+    }*/
     return ScaffoldPage(
       header: PageTitle(text: 'connexion'.tr(),),
       content: Center(
@@ -98,9 +82,11 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 5.h,),
-              Image.asset('assets/images/logo.webp',width: 30.w,),
-              SizedBox(height: 5.h,),
+              bigSpace,
+              bigSpace,
+              Image.asset('assets/images/logo.webp',width: 400.px,),
+              bigSpace,
+              bigSpace,
               Container(
                 padding: const EdgeInsets.all(10),
                 alignment: Alignment.center,
