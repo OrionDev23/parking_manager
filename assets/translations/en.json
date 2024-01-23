@@ -377,6 +377,11 @@
   "backup": "Data backup",
   "notifications": "Alerts",
   "noconnection": "No internet connection",
-  "connectionback": "Connected"
+  "connectionback": "Connected",
+  "reparationajout": "Repair order added!",
+  "reparationmodif": "Repair order modified!",
+  "echec": "Failure",
+  "demofor": "Demo for",
+  "daysremain": "{days} day(s) remaining"
 
 }

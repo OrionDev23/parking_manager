@@ -7,6 +7,7 @@ import 'package:parc_oto/serializables/vehicle/vehicle.dart';
 
 import '../main.dart';
 import '../screens/entreprise.dart';
+import '../screens/sidemenu/sidemenu.dart';
 import '../serializables/conducteur/document_chauffeur.dart';
 import '../serializables/entreprise.dart';
 import '../serializables/parc_user.dart';
@@ -18,6 +19,7 @@ import '../utilities/profil_beautifier.dart';
 
 const databaseId = "6531ad112080ae3b14a7";
 const userid = "users";
+const trialID="trialdate";
 const chauffeurid = "6537d87b492c80f255e8";
 const genreid = "6537960246d5b0e1ab77";
 const vehiculeid = "6531ad22153b2a49ca2c";
@@ -76,10 +78,22 @@ class ClientDatabase {
     return false;
   }
 
+  static bool gettingUser=false;
   Future<void> getUser() async {
-    if (user == null) {
+    if (user == null && !gettingUser) {
+      gettingUser=true;
       await account?.get().then((value) async {
         user = value;
+        if(demo){
+          await getTrialDate();
+          if(trialDate==null || trialDate!.difference(DateTime.now()).inMilliseconds<=0){
+            await account!.deleteSession(sessionId: 'current');
+            user = null;
+            PanesListState.signedIn.value = false;
+            PanesListState.index.value = 0;
+            return;
+          }
+        }
         await database!
             .getDocument(
                 databaseId: databaseId,
@@ -99,6 +113,7 @@ class ClientDatabase {
       }).catchError((error) {
         user = null;
       });
+      gettingUser=false;
     }
     if (user != null) {
       await Teams(client!).list().then((t) {
@@ -116,6 +131,21 @@ class ClientDatabase {
         print('his teams are : $roles');
       }
     }
+  }
+
+
+  static DateTime? trialDate;
+
+  Future<void> getTrialDate() async{
+    await database!.getDocument(
+        databaseId: databaseId,
+        collectionId: trialID,
+        documentId: user!.$id).then((value) {
+          trialDate=DateTime.tryParse(value.data['date']);
+    }).onError((AppwriteException error, stackTrace) {
+      print(stackTrace);
+      print(error.message);
+    });
   }
 
   Future<void> getEntreprise() async {
@@ -153,7 +183,7 @@ class ClientDatabase {
     database!.createDocument(
         databaseId: databaseId,
         collectionId: userid,
-        documentId: me.value!.id,
+        documentId: u.id,
         data: me.value!.toJson(),
         permissions: [
           Permission.read(Role.users()),

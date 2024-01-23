@@ -19,6 +19,7 @@ const defaultUserPic =
     "https://upload.wikimedia.org/wikipedia/commons/7/72/Default-welcomer.png";
 
 const demo=true;
+const brandt=true;
 class PanesList extends StatefulWidget {
   final PaneItemsAndFooters paneList;
   final Widget? widget;
@@ -152,13 +153,26 @@ class PanesListState extends State<PanesList> with WindowListener {
                               children: [
                                 Image.asset(
                                   'assets/images/logo.webp',
-                                  width: 80,
-                                  height: 80,
+                                  width: 80.px,
+                                  height: 80.px,
                                 ),
+                                if(demo && ClientDatabase.me.value!=null)
+                                  bigSpace,
+                                if(demo && ClientDatabase.trialDate!=null)
+                                  const Text('daysremain').tr(namedArgs: {'days':ClientDatabase.trialDate!.difference(DateTime.now()).inDays.toString()}),
                                 if(demo)
                                   bigSpace,
                                 if(demo)
-                                  Text('DEMO',style: TextStyle(color: Colors.red,fontSize: 16,fontWeight: FontWeight.bold),),
+                                  Text('demofor'.tr().toUpperCase(),style: TextStyle(fontStyle:FontStyle.italic,color: Colors.red,fontSize: 14,),),
+                                if(brandt)
+                                  smallSpace,
+                                if(brandt)
+                                  Image.asset(
+                                    'assets/images/brandt.png',
+                                    width: 60.px,
+                                    height: 60.px,
+                                  ),
+
                                 const Spacer(),
                                 if (!loading && signedIn.value)
                                   const NotifList(),

@@ -416,5 +416,10 @@
  "backup": "Sauvegarde de données",
  "notifications": "Alertes",
  "noconnection": "Pas de connexion internet",
- "connectionback": "Connexion internet rétablie"
+ "connectionback": "Connexion internet rétablie",
+ "reparationajout": "Ordre de réparation ajouté!",
+ "reparationmodif": "Ordre de réparation modifié!",
+ "echec": "Echec",
+ "demofor": "Demo pour",
+ "daysremain": "{days} jour(s) restants"
 }

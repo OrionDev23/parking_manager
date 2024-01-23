@@ -31,7 +31,6 @@ import '../../../utilities/vehicle_util.dart';
 import '../../../widgets/empty_table_widget.dart';
 
 class ReparationForm extends StatefulWidget {
-
   final Reparation? reparation;
   const ReparationForm({required super.key, this.reparation});
 
@@ -67,53 +66,58 @@ class ReparationFormState extends State<ReparationForm>
 
   @override
   void initState() {
-    if(widget.reparation!=null){
+    if (widget.reparation != null) {
       initValues();
-    }
-    else{
+    } else {
       assignOrderNumber();
-
     }
     super.initState();
   }
 
-  void initValues() async{
-    if(widget.reparation!=null){
-      documentID=widget.reparation!.id;
-        assigningOrederNumber=true;
-      etatVehicle=widget.reparation!.etatActuel??EtatVehicle();
-      entretienVehicle=widget.reparation!.entretien??EntretienVehicle();
-      remarqueEntretien.text=widget.reparation!.remarque??'';
-      numOrdre.text=widget.reparation!.numero.toString();
-      reservedOrders[widget.key!]=widget.reparation!.numero;
-      await Future.wait([getPrestatataire(),getVehicle()]);
-      matricule.text=widget.reparation!.vehiculemat??'';
-      couleur.text=widget.reparation!.couleur??'';
-      type.text=widget.reparation!.modele??'';
-      nchassi.text=widget.reparation!.nchassi??'';
-      nmoteur.text=widget.reparation!.nmoteur??'';
-      km.text=widget.reparation!.kilometrage?.toString()??'0';
-      carburant=widget.reparation!.gaz?.toDouble()??4;
-      selectedDate=widget.reparation!.date;
-      anneeUtil=DateTime(widget.reparation!.anneeUtil??selectedVehicle?.anneeUtil??DateTime.now().year);
-      designations=List.generate(widget.reparation!.designations?.length??0, (index) {
-        return DesignationReparation(key:UniqueKey(),designation: widget.reparation!.designations![index]);
+  void initValues() async {
+    if (widget.reparation != null) {
+      documentID = widget.reparation!.id;
+      assigningOrederNumber = true;
+      etatVehicle = widget.reparation!.etatActuel ?? EtatVehicle();
+      entretienVehicle = widget.reparation!.entretien ?? EntretienVehicle();
+      remarqueEntretien.text = widget.reparation!.remarque ?? '';
+      numOrdre.text = widget.reparation!.numero.toString();
+      reservedOrders[widget.key!] = widget.reparation!.numero;
+      await Future.wait([getPrestatataire(), getVehicle()]);
+      matricule.text = widget.reparation!.vehiculemat ?? '';
+      couleur.text = widget.reparation!.couleur ?? '';
+      type.text = widget.reparation!.modele ?? '';
+      nchassi.text = widget.reparation!.nchassi ?? '';
+      nmoteur.text = widget.reparation!.nmoteur ?? '';
+      km.text = widget.reparation!.kilometrage?.toString() ?? '0';
+      carburant = widget.reparation!.gaz?.toDouble() ?? 4;
+      selectedDate = widget.reparation!.date;
+      anneeUtil = DateTime(widget.reparation!.anneeUtil ??
+          selectedVehicle?.anneeUtil ??
+          DateTime.now().year);
+      designations =
+          List.generate(widget.reparation!.designations?.length ?? 0, (index) {
+        return DesignationReparation(
+            key: UniqueKey(),
+            designation: widget.reparation!.designations![index]);
       });
       setState(() {
-        assigningOrederNumber=false;
+        assigningOrederNumber = false;
       });
-
     }
   }
 
-  Future<void> getPrestatataire() async{
-    if(widget.reparation!=null && widget.reparation!.prestataire!=null){
-      selectedPrest=await ClientDatabase().getPrestataire(widget.reparation!.prestataire!);
+  Future<void> getPrestatataire() async {
+    if (widget.reparation != null && widget.reparation!.prestataire != null) {
+      selectedPrest = await ClientDatabase()
+          .getPrestataire(widget.reparation!.prestataire!);
     }
   }
-  Future<void> getVehicle() async{
-    if(widget.reparation!=null && widget.reparation!.vehicule!=null){
-      selectedVehicle=await ClientDatabase().getVehicle(widget.reparation!.vehicule!);
+
+  Future<void> getVehicle() async {
+    if (widget.reparation != null && widget.reparation!.vehicule != null) {
+      selectedVehicle =
+          await ClientDatabase().getVehicle(widget.reparation!.vehicule!);
     }
   }
 
@@ -134,8 +138,10 @@ class ReparationFormState extends State<ReparationForm>
         ]).then((value) {
       if (value.documents.length == 1) {
         numOrdre.text = (value.documents[0]
-            .convertTo((p0) => Reparation.fromJson(p0 as Map<String, dynamic>))
-            .numero+1)
+                    .convertTo(
+                        (p0) => Reparation.fromJson(p0 as Map<String, dynamic>))
+                    .numero +
+                1)
             .toString();
       } else {
         numOrdre.text = (reservedOrders.length + 1).toString();
@@ -154,17 +160,15 @@ class ReparationFormState extends State<ReparationForm>
   }
 
   Future<bool> testIfOrderNumberExists() async {
-
-    bool result=false;
+    bool result = false;
 
     if (testIfReservedContained(int.parse(numOrdre.text))) {
       setState(() {
         errorNumOrder = true;
       });
-      result=true;
-    }
-    else{
-      result= await ClientDatabase.database!.listDocuments(
+      result = true;
+    } else {
+      result = await ClientDatabase.database!.listDocuments(
           databaseId: databaseId,
           collectionId: reparationId,
           queries: [
@@ -179,15 +183,14 @@ class ReparationFormState extends State<ReparationForm>
           return true;
         } else {
           setState(() {
-            errorNumOrder=false;
-
+            errorNumOrder = false;
           });
-         return false;
+          return false;
         }
-      }).onError((error, stackTrace) {return Future.value(false);});
-
+      }).onError((error, stackTrace) {
+        return Future.value(false);
+      });
     }
-
 
     return result;
   }
@@ -275,7 +278,7 @@ class ReparationFormState extends State<ReparationForm>
                                     Flexible(
                                       child: TextBox(
                                         controller: numOrdre,
-                                        enabled: widget.reparation==null,
+                                        enabled: widget.reparation == null,
                                         placeholder: 'num'.tr(),
                                         placeholderStyle: placeStyle,
                                         style: appTheme.writingStyle,
@@ -291,9 +294,7 @@ class ReparationFormState extends State<ReparationForm>
                                             if (!await testIfOrderNumberExists()) {
                                               reservedOrders[widget.key!] =
                                                   int.parse(s);
-                                              setState(() {
-
-                                              });
+                                              setState(() {});
                                             }
                                           }
                                         },
@@ -969,12 +970,11 @@ class ReparationFormState extends State<ReparationForm>
     });
   }
 
-
   String? documentID;
 
   bool uploading = false;
 
-  void showPdf(){
+  void showPdf() {
     Reparation reparation = Reparation(
       id: '',
       numero: int.parse(numOrdre.text),
@@ -997,25 +997,28 @@ class ReparationFormState extends State<ReparationForm>
       remarque: remarqueEntretien.text,
     );
 
-    showDialog(context: context, builder: (context){
-
-      return PdfPreview(
-        pdfFileName: 'ordre${pdf_theme.numberFormat.format(reparation.numero)}',
-        initialPageFormat: pdf.PdfPageFormat.a4,
-        canChangePageFormat: false,
-        canChangeOrientation: false,
-        canDebug: false,
-        build: (pdf.PdfPageFormat format) {
-          return ReparationPdf(reparation: reparation).getDocument();
-        },
-      );
-    });
+    showDialog(
+        context: context,
+        builder: (context) {
+          return PdfPreview(
+            pdfFileName:
+                'ordre${pdf_theme.numberFormat.format(reparation.numero)}',
+            initialPageFormat: pdf.PdfPageFormat.a4,
+            canChangePageFormat: false,
+            canChangeOrientation: false,
+            canDebug: false,
+            build: (pdf.PdfPageFormat format) {
+              return ReparationPdf(reparation: reparation).getDocument();
+            },
+          );
+        });
   }
+
   void uploadForm() async {
     setState(() {
       uploading = true;
     });
-    bool modif=documentID!=null;
+    bool modif = documentID != null;
     documentID ??= DateTime.now()
         .difference(ClientDatabase.ref)
         .inMilliseconds
@@ -1043,19 +1046,47 @@ class ReparationFormState extends State<ReparationForm>
       remarque: remarqueEntretien.text,
     );
 
-    if (!modif)
-    {
+    if (!modif) {
       await Future.wait([
         createReparation(reparation),
         uploadActivity(modif, reparation),
-      ]);
-    }
-    else {
-      await Future.wait([
-        updateReparation(reparation),
-        uploadActivity(modif, reparation),
-      ]);
-
+      ]).then((value) {
+        displayInfoBar(context,
+            builder: (BuildContext context, void Function() close) {
+          return InfoBar(
+            title: const Text('reparationajout').tr(),
+            severity: InfoBarSeverity.success,
+          );
+        }, duration: snackbarShortDuration);
+      }).onError((error, stackTrace) {
+        displayInfoBar(context,
+            builder: (BuildContext context, void Function() close) {
+          return InfoBar(
+            title: const Text('echec').tr(),
+            severity: InfoBarSeverity.error,
+          );
+        }, duration: snackbarShortDuration);
+      });
+    } else {
+      await Future.wait(
+              [updateReparation(reparation), uploadActivity(modif, reparation)])
+          .then((value) {
+        displayInfoBar(context,
+            builder: (BuildContext context, void Function() close) {
+          return InfoBar(
+            title: const Text('reparationmodif').tr(),
+            severity: InfoBarSeverity.success,
+          );
+        }, duration: snackbarShortDuration);
+      }).onError((error, stackTrace) {
+        displayInfoBar(context,
+            builder: (BuildContext context, void Function() close) {
+          return InfoBar(
+            title: const Text('echec').tr(),
+            severity: InfoBarSeverity.error,
+          );
+        });
+      });
     }
 
     uploading = false;
@@ -1065,22 +1096,20 @@ class ReparationFormState extends State<ReparationForm>
     }
   }
 
-
-  Future<void> updateReparation(Reparation reparation) async{
-          await ClientDatabase.database!.updateDocument(
-        databaseId: databaseId,
-        collectionId: reparationId,
-        documentId: documentID!,
-        data: reparation.toJson()).then((value) {
-
-    }).onError((AppwriteException error, stackTrace) {
-      setState(() {
-
-      });
+  Future<void> updateReparation(Reparation reparation) async {
+    await ClientDatabase.database!
+        .updateDocument(
+            databaseId: databaseId,
+            collectionId: reparationId,
+            documentId: documentID!,
+            data: reparation.toJson())
+        .then((value) {})
+        .onError((AppwriteException error, stackTrace) {
+      setState(() {});
     });
   }
 
-  Future<void> createReparation(Reparation reparation) async{
+  Future<void> createReparation(Reparation reparation) async {
     await ClientDatabase.database!.createDocument(
         databaseId: databaseId,
         collectionId: reparationId,
@@ -1088,13 +1117,13 @@ class ReparationFormState extends State<ReparationForm>
         data: reparation.toJson());
   }
 
-  Future<void> uploadActivity(bool update,Reparation reparation) async{
-    if(update){
-      await ClientDatabase().ajoutActivity(11, reparation.id,docName: pdf_theme.numberFormat.format(reparation.numero));
-    }
-    else{
-      await ClientDatabase().ajoutActivity(10, reparation.id,docName: pdf_theme.numberFormat.format(reparation.numero));
-
+  Future<void> uploadActivity(bool update, Reparation reparation) async {
+    if (update) {
+      await ClientDatabase().ajoutActivity(11, reparation.id,
+          docName: pdf_theme.numberFormat.format(reparation.numero));
+    } else {
+      await ClientDatabase().ajoutActivity(10, reparation.id,
+          docName: pdf_theme.numberFormat.format(reparation.numero));
     }
   }
 }
