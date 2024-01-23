@@ -39,11 +39,11 @@ class MergeStream<T> extends Stream<T> {
         onListen: () {
           var completed = 0;
 
-          final onDone = () {
+          onDone() {
             completed++;
 
             if (completed == len) controller.close();
-          };
+          }
 
           subscriptions = streams.map((s) => s.listen(controller.add, onError: controller.addError, onDone: onDone)).toList(growable: false);
         },

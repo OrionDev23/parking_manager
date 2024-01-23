@@ -2,10 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/serializables/reparation/entretien_vehicle.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../theme.dart';
-import '../../../widgets/zone_box.dart';
 
 class EntretienWidget extends StatefulWidget {
   final EntretienVehicle entretienVehicle;

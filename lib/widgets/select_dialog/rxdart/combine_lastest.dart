@@ -334,12 +334,12 @@ class CombineLatestStream<T, R> extends StreamView<R> {
         final values = List<T?>.filled(len, null);
         var triggered = 0, completed = 0, index = 0;
 
-        final allHaveEvent = () => triggered == len;
+        allHaveEvent() => triggered == len;
 
-        final onDone = () {
+        onDone() {
           if (++completed == len) controller.close();
-        };
-        final onUpdate = (int index) => (T value) => values[index] = value;
+        }
+        onUpdate(int index) => (T value) => values[index] = value;
 
         subscriptions = streams.map((stream) {
           final onUpdateForStream = onUpdate(index++);

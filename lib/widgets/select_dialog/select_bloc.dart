@@ -19,7 +19,7 @@ class SelectOneBloc<T> {
     _list$ = BehaviorSubject.seeded(items);
 
     _filteredListOfflineOut = CombineLatestStream.combine2(_list$, _filter$, filter);
-    _filteredListOnlineOut = _filter$.where((_) => onFind != null).distinct().debounceTime(Duration(milliseconds: 500)).switchMap((val) => Stream.fromFuture(onFind!(val)).startWith(null));
+    _filteredListOnlineOut = _filter$.where((_) => onFind != null).distinct().debounceTime(const Duration(milliseconds: 500)).switchMap((val) => Stream.fromFuture(onFind!(val)).startWith(null));
     filteredListOut = MergeStream([
       _filteredListOfflineOut,
       _filteredListOnlineOut

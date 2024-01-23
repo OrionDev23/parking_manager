@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -47,7 +46,7 @@ class ChauffeurDocumentsState extends State<ChauffeurDocuments> {
               },
             )),
       ),
-      content: CDocumentTable(),
+      content: const CDocumentTable(),
     );
   }
 

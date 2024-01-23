@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/screens/prestataire/prestataire_form.dart';
 import 'package:parc_oto/screens/prestataire/prestataire_table.dart';

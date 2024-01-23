@@ -1,5 +1,4 @@
 import 'dart:io' as io;
-import 'dart:typed_data';
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
