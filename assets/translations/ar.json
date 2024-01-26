@@ -349,6 +349,9 @@
   "managers": "مدير",
   "newuser": "مستخدم جديد",
   "admins, managers": "مسؤول عام و مدير",
+  "importlist": "استيراد قائمة",
+
+  "managers, admins": "مسؤول عام و مدير",
   "invitmanager": "دعوة ليصبح مدير",
   "invitationsent": "الدعوة أرسلت!",
   "addtitle": "أضف عنوانا",

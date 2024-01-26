@@ -389,6 +389,8 @@
  "newuser": "Nouvel utilisateur",
  "invitmanager": "Inivter à devenir manager",
  "admins, managers": "Admin et gérant",
+ "managers, admins": "Admin et gérant",
+ "importlist": "Importer une liste",
  "invitationsent": "Invitation envoyée",
  "addtitle": "Ajoutez un titre",
  "allday": "Jour entier ?",

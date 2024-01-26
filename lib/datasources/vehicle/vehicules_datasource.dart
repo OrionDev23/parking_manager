@@ -38,7 +38,7 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
       DataCell(Row(
         children: [
           Image.asset(
-            'assets/images/marques/${element.value.marque ?? 'default'}.webp',
+            element.value.marque==null || element.value.marque!.isEmpty || element.value.marque!.contains('null')?'assets/images/marques/default.webp':'assets/images/marques/${element.value.marque ?? 'default'}.webp',
             width: 4.h,
             height: 4.h,
           ),

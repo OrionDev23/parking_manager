@@ -35,21 +35,41 @@ class VehicleManagementState extends State<VehicleManagement>
     return ScaffoldPage(
       header: PageTitle(
         text: 'gestionvehicles'.tr(),
-        trailing: SizedBox(
-            width: 15.w,
-            height: 10.h,
-            child: ButtonContainer(
-              icon: FluentIcons.add,
-              text: 'add'.tr(),
-              showBottom: false,
-              showCounter: false,
-              action: () {
-                final index = VehicleTabsState.tabs.length + 1;
-                final tab = generateTab(index);
-                VehicleTabsState.tabs.add(tab);
-                VehicleTabsState.currentIndex.value = index - 1;
-              },
-            )),
+        trailing: Row(
+          children: [
+            SizedBox(
+                width: 200.px,
+                height: 70.px,
+                child: ButtonContainer(
+                  icon: FluentIcons.add,
+                  text: 'importlist'.tr(),
+                  showBottom: false,
+                  showCounter: false,
+                  action: () {
+                    final index = VehicleTabsState.tabs.length + 1;
+                    final tab = generateTab(index);
+                    VehicleTabsState.tabs.add(tab);
+                    VehicleTabsState.currentIndex.value = index - 1;
+                  },
+                )),
+            smallSpace,
+            SizedBox(
+                width: 200.px,
+                height: 70.px,
+                child: ButtonContainer(
+                  icon: FluentIcons.add,
+                  text: 'add'.tr(),
+                  showBottom: false,
+                  showCounter: false,
+                  action: () {
+                    final index = VehicleTabsState.tabs.length + 1;
+                    final tab = generateTab(index);
+                    VehicleTabsState.tabs.add(tab);
+                    VehicleTabsState.currentIndex.value = index - 1;
+                  },
+                )),
+          ],
+        ),
       ),
       content: Column(
         children: [

@@ -1,3 +1,4 @@
+
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -30,13 +31,17 @@ const vehicDoc = "doc_vehic";
 const entrepriseid = "entreprise";
 const planningID = "planning";
 const buckedId = "images";
+const adminID="admin_keys";
 const reparationId = "reparation";
 const activityId = "activity";
 const prestataireId = "prestataire";
 const endpoint = "https://cloud.appwrite.io/v1";
 const project = "6531ace99382e496a904";
 
+late String secretKey;
+
 class ClientDatabase {
+  static bool secretKeySet=false;
   static Client? client;
   static Account? account;
   static User? user;
@@ -72,11 +77,29 @@ class ClientDatabase {
   bool isAdmin({List<Team>? teams}) {
     for (var element in teams ?? myTeams) {
       if (element.name.toLowerCase() == 'admins') {
+        if(teams==null && !secretKeySet){
+          setSecretKey();
+        }
         return true;
       }
     }
     return false;
   }
+  static bool settingSecretKey=false;
+  void setSecretKey() async{
+    if(!settingSecretKey && !secretKeySet){
+      settingSecretKey=true;
+      await database!.getDocument(
+          databaseId: databaseId,
+          collectionId: adminID,
+          documentId: 'admin').then((value) {
+            secretKey=value.data['key'];
+            secretKeySet=true;
+      });
+    }
+  }
+
+
 
   static bool gettingUser=false;
   Future<void> getUser() async {

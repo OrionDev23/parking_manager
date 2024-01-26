@@ -5,8 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:parc_oto/datasources/parcoto_webservice.dart';
 
 import '../../providers/client_database.dart';
-const secretKey =
-    "50715faccd768576e726c7f51394b1d092b4d492cb307a0b7b63a8ba3ff5c4c94b57560dff8b85133d355bb760cf3276db26c8cee3351e35cb33fec7ea5efc7d023a9a2ca4910fae20d112ee4898c292ec705f0e2a6eb8427675e374123a5cd51ef3e5ebf7836cd001c4829cbef2caf4d3dc35cf51958f88c88d14252276e494";
+
 
 class UsersWebservice extends ParcOtoWebServiceUsers <String,MapEntry<User,List<Membership>?>>{
 
@@ -18,7 +17,10 @@ class UsersWebservice extends ParcOtoWebServiceUsers <String,MapEntry<User,List<
   }
 
   
-  void initClient() {
+  void initClient() async{
+    while(!ClientDatabase.secretKeySet){
+      await Future.delayed(const Duration(milliseconds: 300));
+    }
     client.setProject(project)
       ..setKey(secretKey)
       ..setEndpoint(endpoint);

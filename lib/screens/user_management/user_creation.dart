@@ -4,7 +4,6 @@ import 'package:dart_appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
-import 'package:parc_oto/datasources/user_management/user_webservice.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -388,8 +387,35 @@ class _UserFormState extends State<UserForm> {
           avatar: null,
         );
         await uploadUserInDB(newme).then((value) {
+        }).then((value) {
+          displayInfoBar(context,
+              builder: (BuildContext context, void Function() close) {
+                return InfoBar(
+                  title: const Text('done').tr(),
+                  severity: InfoBarSeverity.success,
+                );
+              },
+              duration: snackbarShortDuration);
+        }).onError((error, stackTrace) {
+          displayInfoBar(context,
+              builder: (BuildContext context, void Function() close) {
+                return InfoBar(
+                  title: const Text('echec').tr(),
+                  severity: InfoBarSeverity.success,
+                );
+              },
+              duration: snackbarShortDuration);
         });
+
       }).onError((error, stackTrace) {
+       displayInfoBar(context,
+           builder: (BuildContext context, void Function() close) {
+             return InfoBar(
+               title: const Text('echec').tr(),
+               severity: InfoBarSeverity.success,
+             );
+           },
+           duration: snackbarShortDuration);
        setState(() {
          uploading = false;
        });

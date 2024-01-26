@@ -351,6 +351,9 @@
   "managers": "Manager",
   "newuser": "New user",
   "admins, managers": "Admin and gérant",
+  "managers, admins": "Admin and gérant",
+  "importlist": "Import a list",
+
   "invitmanager": "Invite to become a manager",
   "invitationsent": "Invitation sent",
   "addtitle": "Add title",

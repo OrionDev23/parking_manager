@@ -376,10 +376,26 @@ class _AppointmentFormState extends State<AppointmentForm> {
           Permission.update(Role.user(ClientDatabase.me.value!.id)),
         ]
     ).then((value) {
+      displayInfoBar(context,
+          builder: (BuildContext context, void Function() close) {
+            return InfoBar(
+              title: const Text('done').tr(),
+              severity: InfoBarSeverity.success,
+            );
+          },
+          duration: snackbarShortDuration);
       widget.datasource.appointments!.add(planning);
       widget.datasource.notifyListeners(CalendarDataSourceAction.add, [planning]);
       Navigator.pop(context);
     }).onError((error, stackTrace) {
+      displayInfoBar(context,
+          builder: (BuildContext context, void Function() close) {
+            return InfoBar(
+              title: const Text('echec').tr(),
+              severity: InfoBarSeverity.success,
+            );
+          },
+          duration: snackbarShortDuration);
       setState(() {
         showMessage('erreur','erreur');
         sumbmiting=false;

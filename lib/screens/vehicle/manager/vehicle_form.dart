@@ -1552,14 +1552,50 @@ class _VehicleFormState extends State<VehicleForm>
         await Future.wait([
         updateVehicle(vehicle),
           uploadActivity(true,vehicle),
-        ]);
+        ]).then((value) {
+          displayInfoBar(context,
+              builder: (BuildContext context, void Function() close) {
+                return InfoBar(
+                    title: const Text('done').tr(),
+                    severity: InfoBarSeverity.success,
+                );
+              },
+              duration: snackbarShortDuration);
+        }).onError((error, stackTrace) {
+          displayInfoBar(context,
+              builder: (BuildContext context, void Function() close) {
+                return InfoBar(
+                    title: const Text('echec').tr(),
+                    severity: InfoBarSeverity.success,
+                );
+              },
+              duration: snackbarShortDuration);
+        });
 
       }
       else{
         await Future.wait([
           createVehicle(vehicle),
           uploadActivity(false,vehicle),
-        ]);
+        ]).then((value) {
+          displayInfoBar(context,
+              builder: (BuildContext context, void Function() close) {
+                return InfoBar(
+                  title: const Text('done').tr(),
+                  severity: InfoBarSeverity.success,
+                );
+              },
+              duration: snackbarShortDuration);
+        }).onError((error, stackTrace) {
+          displayInfoBar(context,
+              builder: (BuildContext context, void Function() close) {
+                return InfoBar(
+                  title: const Text('echec').tr(),
+                  severity: InfoBarSeverity.success,
+                );
+              },
+              duration: snackbarShortDuration);
+        });
       }
 
     }
