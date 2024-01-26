@@ -1609,10 +1609,7 @@ class _VehicleFormState extends State<VehicleForm>
       data: vehicle.toJson(),
 
     ).then((value) {
-      if(widget.tab!=null){
-        VehicleTabsState.tabs.remove(widget.tab);
-      }
-      if(VehicleTabsState.currentIndex.value>0)VehicleTabsState.currentIndex.value--;
+
     }).onError((AppwriteException error, stackTrace) {
       setState(() {
         uploading=false;
@@ -1629,10 +1626,6 @@ class _VehicleFormState extends State<VehicleForm>
       data: vehicle.toJson(),
 
     ).then((value) {
-      if(widget.tab!=null){
-        VehicleTabsState.tabs.remove(widget.tab);
-      }
-      if(VehicleTabsState.currentIndex.value>0)VehicleTabsState.currentIndex.value--;
     }).onError((AppwriteException error, stackTrace) {
       setState(() {
         uploading=false;

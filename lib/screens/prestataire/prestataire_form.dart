@@ -431,8 +431,6 @@ class _PrestataireFormState extends State<PrestataireForm> {
     }
 
   }
-
-
   void showMessage(String message, String title) {
     showDialog<String>(
       context: context,
