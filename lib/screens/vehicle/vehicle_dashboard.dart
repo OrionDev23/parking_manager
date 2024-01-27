@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
 import '../../providers/counters.dart';
 import '../dashboard/pie_chart/pie_chart.dart';
 import '../logs/logging/log_table.dart';
@@ -35,8 +36,8 @@ class VehicleDashboard extends StatelessWidget {
             flex: 15,
             child: GridView.count(
               padding: const EdgeInsets.all(10),
-              childAspectRatio: 4,
-              crossAxisCount: 3,
+              childAspectRatio: kIsWeb?5:4,
+              crossAxisCount: Device.orientation==Orientation.portrait ?2:3,
               mainAxisSpacing: 5,
               crossAxisSpacing: 5,
               children: [
@@ -171,7 +172,7 @@ class VehicleDashboard extends StatelessWidget {
 
                   smallSpace,
                   ParcOtoPie(
-                    radius: 120,
+                    radius: kIsWeb?80:120,
                     title: 'vstates'.tr(),
                     labels: [
                       MapEntry('gstate', DatabaseCounters().countVehicles(etat: 0)),

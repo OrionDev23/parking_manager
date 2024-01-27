@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
 import '../../../providers/counters.dart';
 import '../../dashboard/pie_chart/pie_chart.dart';
 import '../../logs/logging/log_table.dart';
@@ -69,7 +70,7 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
                         return Padding(
                           padding: const EdgeInsets.all(5.0),
                           child: ParcOtoPie(
-                            radius: 75,
+                            radius: kIsWeb?45:75,
                             title: 'disponibilite'.tr(),
                             labels: [
                               MapEntry('disponible', DatabaseCounters().countChauffeur(etat: 0)),

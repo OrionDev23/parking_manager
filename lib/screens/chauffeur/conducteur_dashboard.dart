@@ -1,5 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../providers/counters.dart';
 import '../dashboard/pie_chart/pie_chart.dart';
 import '../logs/logging/log_table.dart';
@@ -33,8 +35,8 @@ class ConducteurDashboard extends StatelessWidget {
             flex: 3,
             child: GridView.count(
               padding: const EdgeInsets.all(10),
-              childAspectRatio: 4,
-              crossAxisCount: 3,
+              childAspectRatio: kIsWeb?5:4,
+              crossAxisCount: Device.orientation==Orientation.portrait ?2:3,
               mainAxisSpacing: 5,
               crossAxisSpacing: 5,
               children: [
@@ -156,7 +158,7 @@ class ConducteurDashboard extends StatelessWidget {
 
                   smallSpace,
                   ParcOtoPie(
-                    radius: 120,
+                    radius: kIsWeb?90:120,
                     title: 'disponibilite'.tr(),
                     labels: [
                       MapEntry('disponible', DatabaseCounters().countChauffeur(etat: 0)),

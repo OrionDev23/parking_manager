@@ -1,5 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
+import 'package:parc_oto/providers/client_database.dart';
+import '../../../batch_import/import_vehicles.dart';
 import '../../logs/logging/log_table.dart';
 import 'vehicle_form.dart';
 import 'vehicle_tabs.dart';
@@ -37,22 +41,20 @@ class VehicleManagementState extends State<VehicleManagement>
         text: 'gestionvehicles'.tr(),
         trailing: Row(
           children: [
+            if(ClientDatabase().isAdmin())
             SizedBox(
                 width: 200.px,
                 height: 70.px,
                 child: ButtonContainer(
+                  color: appTheme.color.darkest,
                   icon: FluentIcons.add,
                   text: 'importlist'.tr(),
                   showBottom: false,
                   showCounter: false,
-                  action: () {
-                    final index = VehicleTabsState.tabs.length + 1;
-                    final tab = generateTab(index);
-                    VehicleTabsState.tabs.add(tab);
-                    VehicleTabsState.currentIndex.value = index - 1;
-                  },
+                  action: importList,
                 )),
-            smallSpace,
+            if(ClientDatabase().isAdmin())
+              smallSpace,
             SizedBox(
                 width: 200.px,
                 height: 70.px,
@@ -92,7 +94,7 @@ class VehicleManagementState extends State<VehicleManagement>
                               return Padding(
                                 padding: const EdgeInsets.all(5.0),
                                 child: ParcOtoPie(
-                                  radius: 80,
+                                  radius: kIsWeb?60:80,
                                   title: 'vstates'.tr(),
                                   labels: [
                                     MapEntry('gstate',
@@ -153,6 +155,25 @@ class VehicleManagementState extends State<VehicleManagement>
     );
     return tab;
   }
+
+
+  void importList() async{
+    FilePickerResult? pickedFile =await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['xlsx'],
+      allowMultiple: false,
+    );
+    if(pickedFile!=null){
+      Future.delayed(const Duration(milliseconds: 50)).then((value) =>
+          showDialog(
+              context: context,
+              barrierDismissible: true,
+              builder: (c) {
+                return ImportVehicles(file: pickedFile,);
+              }));
+    }
+  }
+
 
   @override
   bool get wantKeepAlive => true;

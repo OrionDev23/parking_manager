@@ -84,7 +84,7 @@ class PanesListState extends State<PanesList> with WindowListener {
   bool noConnection=false;
   StreamSubscription<InternetStatus>? listener;
   void listenToInternet(){
-     listener = InternetConnection().onStatusChange.listen((InternetStatus status) {
+     listener = InternetConnection().onStatusChange.listen((status) {
       switch (status) {
         case InternetStatus.connected:
 
@@ -244,6 +244,7 @@ class PanesListState extends State<PanesList> with WindowListener {
     listener?.cancel();
     super.dispose();
   }
+
 }
 
 class WindowButtons extends StatelessWidget {

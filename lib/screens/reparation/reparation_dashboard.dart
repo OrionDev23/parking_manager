@@ -1,5 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'reparation_form/reparation_form.dart';
 import '../logs/logging/log_table.dart';
 import '../../widgets/button_container.dart';
@@ -31,7 +33,7 @@ class ReparationDashboard extends StatelessWidget {
             flex: 3,
             child: GridView.count(
               padding: const EdgeInsets.all(10),
-              childAspectRatio: 6,
+              childAspectRatio: kIsWeb?7:6,
               crossAxisCount: 2,
               mainAxisSpacing: 5,
               crossAxisSpacing: 5,

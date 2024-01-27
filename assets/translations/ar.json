@@ -350,6 +350,9 @@
   "newuser": "مستخدم جديد",
   "admins, managers": "مسؤول عام و مدير",
   "importlist": "استيراد قائمة",
+  "selectimport": "حدد البيانات التي تريد استيرادها",
+  "lselection": "{select} عنصر (عناصر)  محدد",
+  "invalidvehiclefile": "الملف المحدد غير صالح\nيجب تنسيق الملف بهذه الطريقة :\n   N    |  Immatriculation   | Model  |  Nom | Prenom\n  1     |    123456-123-12  |  ibiza   |  john  | doe\n  2     |    123456-123-12  |  polo   |  john  | doe",
 
   "managers, admins": "مسؤول عام و مدير",
   "invitmanager": "دعوة ليصبح مدير",

@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
 import 'package:parc_oto/screens/logs/logging/log_table.dart';
@@ -40,7 +41,7 @@ class Dashboard extends StatelessWidget {
             physics: const ClampingScrollPhysics(),
             shrinkWrap: true,
             padding: const EdgeInsets.all(10),
-            childAspectRatio: 3,
+            childAspectRatio: kIsWeb?4:3,
             crossAxisCount: portrait?2:4,
             mainAxisSpacing: 5,
             crossAxisSpacing: 5,

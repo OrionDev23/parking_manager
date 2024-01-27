@@ -353,6 +353,9 @@
   "admins, managers": "Admin and gérant",
   "managers, admins": "Admin and gérant",
   "importlist": "Import a list",
+  "selectimport": "Select the data you want to import",
+  "lselection": "{select} item(s) selected",
+  "invalidvehiclefile": "File selected not valid\nThe file must be formated in this manner :\n  N    |  Immatriculation   | Model  |  Nom | Prenom\n  1     |    123456-123-12  |  ibiza   |  john  | doe\n  2     |    123456-123-12  |  polo   |  john  | doe",
 
   "invitmanager": "Invite to become a manager",
   "invitationsent": "Invitation sent",

@@ -391,6 +391,10 @@
  "admins, managers": "Admin et gérant",
  "managers, admins": "Admin et gérant",
  "importlist": "Importer une liste",
+ "selectimport": "Selectionner les données à importer",
+ "invalidvehiclefile": "Le Fichier importé n'est pas formatté correctement\nLe fichier doit être formatté de cette maniere :\n  N    |  Immatriculation   | Model  |  Nom | Prenom\n  1     |    123456-123-12  |  ibiza   |  john  | doe\n  2     |    123456-123-12  |  polo   |  john  | doe",
+
+ "lselection": "{select} élement(s) selectionné(s)",
  "invitationsent": "Invitation envoyée",
  "addtitle": "Ajoutez un titre",
  "allday": "Jour entier ?",
