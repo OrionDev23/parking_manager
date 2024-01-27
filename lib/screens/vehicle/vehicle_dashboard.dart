@@ -177,7 +177,9 @@ class VehicleDashboard extends StatelessWidget {
                     labels: [
                       MapEntry('gstate', DatabaseCounters().countVehicles(etat: 0)),
                       MapEntry('bstate', DatabaseCounters().countVehicles(etat: 1)),
-                      MapEntry('rstate', DatabaseCounters().countVehicles(etat: 2))
+                      MapEntry('rstate', DatabaseCounters().countVehicles(etat: 2)),
+                      MapEntry('ostate', DatabaseCounters().countVehicles(etat: 3)),
+                      MapEntry('restate', DatabaseCounters().countVehicles(etat: 4)),
                     ],
                   ),
 

@@ -20,7 +20,9 @@ import '../manager/vehicles_table.dart';
 List<String> types=[
   "gstate",
   "bstate",
-  "rstate"
+  "rstate",
+  "ostate",
+  "restate"
 ];
 class StateForm extends StatefulWidget {
   final Etat? etat;

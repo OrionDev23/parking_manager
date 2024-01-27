@@ -115,7 +115,7 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                             radius: touchedIndex==index?widget.radius+10:widget.radius,
                             value: values[index].value.toDouble(),
                             color: getRandomColor(index,appTheme),
-                            title: '${((values[index].value/totalNumber)*100).toStringAsFixed(0)} %',
+                            title: touchedIndex==index?'${values[index].key.tr()} : ${values[index].value} / $totalNumber':'${((values[index].value/totalNumber)*100).toStringAsFixed(0)} %',
                             titleStyle: TextStyle(
                               fontSize:  touchedIndex==index?16:14,
                               color: Colors.white,
@@ -127,7 +127,7 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                       ),
                   ),
                 ),
-                smallSpace,
+                bigSpace,
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,

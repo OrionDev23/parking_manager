@@ -1,14 +1,18 @@
-import 'dart:io';
+import 'dart:io' as f;
 
-import 'package:dzair_data_usage/langs.dart';
+import 'package:dart_appwrite/dart_appwrite.dart';
+import 'package:dzair_data_usage/langs.dart' as l;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
+import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/theme.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../screens/vehicle/states/state_form.dart';
 import '../serializables/vehicle/vehicle.dart';
 import '../utilities/algeria_lists.dart';
 import '../utilities/vehicle_util.dart';
@@ -47,7 +51,7 @@ class _ImportVehiclesState extends State<ImportVehicles> {
       bytes= widget.file.files.first.bytes;
     }
     else{
-      bytes=await File(widget.file.files.single.path!).readAsBytes();
+      bytes=await f.File(widget.file.files.single.path!).readAsBytes();
     }
     if(bytes!=null){
       setState(() {
@@ -101,10 +105,10 @@ class _ImportVehiclesState extends State<ImportVehicles> {
       type: model,
       wilaya: etrang?null:wilaya,
       daira: etrang?null:AlgeriaList().getDairas(AlgeriaList().getWilayaByNum(wilaya.toString())??'').firstOrNull?.getDairaName(
-          Language
+          l.Language
           .FR)??'',
       commune:etrang?null: AlgeriaList().getCommune(AlgeriaList().getWilayaByNum(wilaya.toString())??'').firstOrNull?.getDairaName(
-        Language
+          l.Language
             .FR)??'',
       genre:(etrang?1:(int.tryParse(ms[1])??100)~/100).toString(),
       anneeUtil: VehiclesUtilities.getAnneeFromMatricule(matricule)
@@ -119,7 +123,7 @@ class _ImportVehiclesState extends State<ImportVehicles> {
 
   int getEtat(String etats){
     int etat=0;
-    switch(etats.toLowerCase()){
+    switch(etats.toLowerCase().trim()){
       case 'en marche':
         etat=3;
         break;
@@ -216,17 +220,21 @@ class _ImportVehiclesState extends State<ImportVehicles> {
 
     return foundMatric;
   }
+
+  bool doneUploading=false;
   @override
   Widget build(BuildContext context) {
+    var appTheme=context.watch<AppTheme>();
     return ContentDialog(
         title: const Text("importlist").tr(),
         constraints: BoxConstraints.loose(Size(600.px, 500.px)),
-        content: loading? Center(child: ProgressBar(value: progressLoadingFile,),):invalidFile?invalidFileWidget():getList(),
+        content: loading? Center(child: ProgressBar(value: progressLoadingFile,),):invalidFile?invalidFileWidget():uploading?uploadWidget(appTheme):getList(),
         actions: [
-          Button(child: const Text('annuler').tr(), onPressed: (){
+          Button(child: doneUploading?const Text('fermer').tr():const Text('annuler').tr(), onPressed: (){
             Navigator.of(context).pop();
           }),
-          FilledButton(onPressed: loading||invalidFile?null:(){}, child: const Text('confirmer').tr())
+          if(!doneUploading)
+          FilledButton(onPressed: loading||invalidFile||uploading?null:uploadVehicles, child: const Text('confirmer').tr())
         ],
     );
   }
@@ -269,13 +277,19 @@ class _ImportVehiclesState extends State<ImportVehicles> {
                       e.value.selected=s;
                     });
                   },
-                  trailing: Checkbox(
-                    checked: e.value.selected,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        e.value.selected=value??false;
-                      });
-                    },
+                  trailing: Row(
+                    children: [
+                      Text(types[e.value.etatactuel??0],style: TextStyle(color: Colors.grey[100]),).tr(),
+                      smallSpace,
+                      Checkbox(
+                        checked: e.value.selected,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            e.value.selected=value??false;
+                          });
+                        },
+                      ),
+                    ],
                   ),
                   title: Text(e.value.type??''),
                   leading: Text(e.value.matricule),
@@ -304,6 +318,98 @@ class _ImportVehiclesState extends State<ImportVehicles> {
       ),
     );
   }
+
+
+  void uploadVehicles() async{
+    if(!uploading){
+      setState(() {
+        uploading=true;
+      });
+      Client client=Client()
+        ..setEndpoint(endpoint)
+        ..setProject(project)
+        ..setKey(secretKey);
+      Databases databases=Databases(client);
+      List<Future> tasks=[];
+      importedVehicles.forEach((key, value) {
+        if(value.selected){
+          tasks.add(uploadVehicle(value,databases));
+        }
+      });
+
+      await Future.wait(tasks);
+      setState(() {
+        doneUploading=true;
+      });
+    }
+
+  }
+
+  Future<void> uploadVehicle(Vehicle v,Databases db) async{
+    await db.createDocument(
+        databaseId: databaseId,
+        collectionId: vehiculeid,
+        documentId: v.id,
+        data: v.toJson()).then((value) {
+          setState(() {
+            uploaded++;
+          });
+    }).onError((AppwriteException error, stackTrace) {
+      print('erreur vehicule ${v.matricule} : ${error.message}');
+      setState(() {
+        notUploaded++;
+      });
+    });
+  }
+
+
+  Widget uploadWidget(AppTheme appTheme){
+    int nSelected=getNumberOfSelected();
+    const double fSize=18;
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 450.px,
+                child: ProgressBar(
+                  value: (uploaded+notUploaded)*100/nSelected,
+                  strokeWidth: 25,
+                  activeColor: appTheme.color.darkest,
+                  backgroundColor: appTheme.fillColor,
+                ),
+              ),
+              const Spacer(),
+              Text('${((uploaded+notUploaded)*100/nSelected).toStringAsFixed(2)} %',style: const TextStyle(fontWeight: FontWeight.bold,fontSize: fSize),)
+            ],
+          ),
+          bigSpace,
+          Row(
+            children: [
+              Text( 'uploaded'.tr(),style: TextStyle(fontSize: fSize,fontWeight:FontWeight.bold,color: appTheme.color.darkest,)),
+              const Spacer(),
+              Text( '\t\t\t\t${uploaded.toInt()} / $nSelected',style: TextStyle(fontSize: fSize,color: appTheme.color.darkest)),
+            ],
+          ),
+          smallSpace,
+          Row(
+            children: [
+              Text( 'skipped'.tr(),style: TextStyle(fontSize: fSize,fontWeight:FontWeight.bold,color: appTheme.color.lightest,)),
+              const Spacer(),
+              Text( '\t\t\t\t${notUploaded.toInt()} / $nSelected',style: TextStyle(fontSize: fSize,color: appTheme.color.lightest)),
+            ],
+          ),
+        ])
+    );
+  }
+
+  bool uploading=false;
+  double uploaded=0;
+  double notUploaded=0;
 
 
 

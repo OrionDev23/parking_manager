@@ -113,6 +113,7 @@ class VehicleTableState extends State<VehicleTable> {
         },
       ),
       DataColumn2(
+        numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: const Text(
@@ -120,7 +121,7 @@ class VehicleTableState extends State<VehicleTable> {
             style: tstyle,
           ).tr(),
         ),
-        size: ColumnSize.M,
+        size: ColumnSize.S,
         onSort: (s, c) {
           sortColumn = 2;
           assending = !assending;
@@ -130,6 +131,8 @@ class VehicleTableState extends State<VehicleTable> {
         },
       ),
       DataColumn2(
+        numeric: true,
+
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: const Text(
@@ -137,7 +140,7 @@ class VehicleTableState extends State<VehicleTable> {
             style: tstyle,
           ).tr(),
         ),
-        size: ColumnSize.M,
+        size: ColumnSize.S,
         onSort: (s, c) {
           sortColumn = 3;
           assending = !assending;
@@ -147,6 +150,8 @@ class VehicleTableState extends State<VehicleTable> {
         },
       ),
       DataColumn2(
+        numeric: true,
+
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: const Text(
@@ -728,12 +733,10 @@ class VehicleTableState extends State<VehicleTable> {
                             ],
                           ),
                         ),
-                        const SizedBox(
-                          width: 10,
-                        ),
+                        smallSpace,
                         SizedBox(
-                          width: 30.w,
-                          height: 7.h,
+                          width: 350.px,
+                          height: 45.px,
                           child: TextBox(
                             controller: searchController,
                             placeholder: 'search'.tr(),
@@ -773,6 +776,8 @@ class VehicleTableState extends State<VehicleTable> {
                                 : null,
                           ),
                         ),
+                        bigSpace,
+                        IconButton(icon: const Icon(FluentIcons.refresh), onPressed: (){vehicleDataSource.refreshDatasource();}),
                       ],
                     ),
                   ),
@@ -788,7 +793,7 @@ class VehicleTableState extends State<VehicleTable> {
                   empty: NoDataWidget(
                     datasource: vehicleDataSource,
                   ),
-                  pageSyncApproach: PageSyncApproach.goToFirst,
+                  pageSyncApproach: PageSyncApproach.goToLast,
                   horizontalMargin: 8,
                   columnSpacing: 0,
                   dataRowHeight: rowHeight,

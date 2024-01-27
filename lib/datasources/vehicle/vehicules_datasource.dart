@@ -39,13 +39,13 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
         children: [
           Image.asset(
             element.value.marque==null || element.value.marque!.isEmpty || element.value.marque!.contains('null')?'assets/images/marques/default.webp':'assets/images/marques/${element.value.marque ?? 'default'}.webp',
-            width: 4.h,
-            height: 4.h,
+            width: 3.5.h,
+            height: 3.5.h,
           ),
           const SizedBox(
-            width: 5,
+            width: 2,
           ),
-          Text(element.value.type ?? '', style: tstyle),
+          Expanded(child: Text(element.value.type ?? '', style: tstyle,softWrap: true,overflow: TextOverflow.ellipsis,)),
         ],
       )),
       DataCell(Text(element.value.anneeUtil.toString(), style: tstyle)),
@@ -136,6 +136,20 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
                                           Navigator.of(context).pop();
 
                                           showStateForm(element.value, 2);
+                                        }),
+                                    f.MenuFlyoutItem(
+                                        text: const Text('ostate').tr(),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+
+                                          showStateForm(element.value, 3);
+                                        }),
+                                    f.MenuFlyoutItem(
+                                        text: const Text('restate').tr(),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+
+                                          showStateForm(element.value, 4);
                                         }),
                                   ];
                                 },

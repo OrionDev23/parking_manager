@@ -5,7 +5,6 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'main.dart';
 import 'utilities/theme_colors.dart';
-import 'package:system_theme/system_theme.dart';
 import 'package:flutter/material.dart' as m;
 enum NavigationIndicators { sticky, end }
 
@@ -265,14 +264,14 @@ AccentColor get systemAccentColor {
           defaultTargetPlatform == TargetPlatform.android) &&
       !kIsWeb) {
     return AccentColor.swatch({
-      'darkest': SystemTheme.accentColor.darkest,
-      'darker': SystemTheme.accentColor.darker,
-      'dark': SystemTheme.accentColor.dark,
-      'normal': SystemTheme.accentColor.accent,
-      'light': SystemTheme.accentColor.light,
-      'lighter': SystemTheme.accentColor.lighter,
-      'lightest': SystemTheme.accentColor.lightest,
+      'darkest': ThemeColors.orange.darkest,
+      'darker': ThemeColors.orange.darker,
+      'dark': ThemeColors.orange.dark,
+      'normal': ThemeColors.orange,
+      'light': ThemeColors.orange.light,
+      'lighter': ThemeColors.orange.lighter,
+      'lightest': ThemeColors.orange.lightest,
     });
   }
-  return Colors.blue;
+  return Colors.orange;
 }

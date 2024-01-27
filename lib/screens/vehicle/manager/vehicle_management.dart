@@ -17,6 +17,8 @@ import '../../../providers/counters.dart';
 import '../../../theme.dart';
 import '../../dashboard/pie_chart/pie_chart.dart';
 
+const showImportButton=false;
+
 class VehicleManagement extends StatefulWidget {
   const VehicleManagement({super.key});
 
@@ -41,7 +43,7 @@ class VehicleManagementState extends State<VehicleManagement>
         text: 'gestionvehicles'.tr(),
         trailing: Row(
           children: [
-            if(ClientDatabase().isAdmin())
+            if(showImportButton && ClientDatabase().isAdmin())
             SizedBox(
                 width: 200.px,
                 height: 70.px,
@@ -53,8 +55,8 @@ class VehicleManagementState extends State<VehicleManagement>
                   showCounter: false,
                   action: importList,
                 )),
-            if(ClientDatabase().isAdmin())
-              smallSpace,
+            if(showImportButton && ClientDatabase().isAdmin())
+            smallSpace,
             SizedBox(
                 width: 200.px,
                 height: 70.px,
@@ -97,12 +99,11 @@ class VehicleManagementState extends State<VehicleManagement>
                                   radius: kIsWeb?60:80,
                                   title: 'vstates'.tr(),
                                   labels: [
-                                    MapEntry('gstate',
-                                        DatabaseCounters().countVehicles(etat: 0)),
-                                    MapEntry('bstate',
-                                        DatabaseCounters().countVehicles(etat: 1)),
-                                    MapEntry('rstate',
-                                        DatabaseCounters().countVehicles(etat: 2))
+                                    MapEntry('gstate', DatabaseCounters().countVehicles(etat: 0)),
+                                    MapEntry('bstate', DatabaseCounters().countVehicles(etat: 1)),
+                                    MapEntry('rstate', DatabaseCounters().countVehicles(etat: 2)),
+                                    MapEntry('ostate', DatabaseCounters().countVehicles(etat: 3)),
+                                    MapEntry('restate', DatabaseCounters().countVehicles(etat: 4)),
                                   ],
                                 ),
                               );

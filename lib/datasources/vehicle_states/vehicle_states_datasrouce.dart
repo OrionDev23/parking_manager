@@ -99,6 +99,8 @@ class VStatesDatasource extends ParcOtoDatasource<Etat>{
       case 0: return 'gstate'.tr();
       case 1:return 'bstate'.tr();
       case 2:return 'rstate'.tr();
+      case 3:return 'ostate'.tr();
+      case 4:return 'restate'.tr();
       default:return 'gstate'.tr();
     }
   }
