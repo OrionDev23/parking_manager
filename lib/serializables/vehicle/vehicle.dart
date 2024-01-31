@@ -3,6 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:parc_oto/serializables/parc_oto_serializable.dart';
 
 import '../../utilities/profil_beautifier.dart';
+import '../../utilities/vehicle_util.dart';
 
 part 'vehicle.g.dart';
 @JsonSerializable()
@@ -21,6 +22,8 @@ class Vehicle extends ParcOtoDefault{
   DateTime? date;
   double? quittance;
   String? numero;
+
+  String? search;
   String? nom;
   String? prenom;
   String? profession;
@@ -60,7 +63,9 @@ class Vehicle extends ParcOtoDefault{
 
   int? etatactuel;
 
-  Vehicle({required super.id,super.createdAt,super.updatedAt,required this.matricule,required this.matriculeEtrang,this.wilaya,
+  Vehicle({required super.id,super.createdAt,
+    super.updatedAt,required this.matricule,
+    required this.matriculeEtrang,this.wilaya,
     this.commune,this.date,
     this.adresse,this.quittance,this.numero,
     this.nom,this.prenom,this.profession,
@@ -68,8 +73,14 @@ class Vehicle extends ParcOtoDefault{
     this.carrosserie,this.charegeUtile,this.daira,
     this.energie,this.genre,this.marque,
     this.matriculePrec, this.pays,this.placesAssises,
-    this.poidsTotal, this.puissance, this.createdBy,this.etat,this.etatactuel=0
-  });
+    this.poidsTotal, this.puissance, this.createdBy,this.etat,this.etatactuel=0,
+  }){
+    search='$matricule $wilaya $commune $anneeUtil '
+        '$adresse $numero $nom $prenom $profession '
+        '$numeroSerie $type $carrosserie $daira $energie'
+        ' ${VehiclesUtilities.getMarqueName(marque)} ${VehiclesUtilities.getAnneeFromMatricule(matricule)}'
+        '$pays $matriculePrec ${VehiclesUtilities.getTypeName(etatactuel??0)}';
+  }
 
   @override
   factory Vehicle.fromJson(Map<String, dynamic> json) => _$VehicleFromJson(json);

@@ -3,6 +3,7 @@ import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
 
 import '../../screens/vehicle/states/state_form.dart';
+import '../../utilities/vehicle_util.dart';
 import 'vehicle_webservice.dart';
 import '../../screens/vehicle/documents/document_form.dart';
 import '../../widgets/on_tap_scale.dart';
@@ -49,7 +50,7 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
         ],
       )),
       DataCell(Text(element.value.anneeUtil.toString(), style: tstyle)),
-      DataCell(Text(types[element.value.etatactuel ?? 0], style: tstyle).tr()),
+      DataCell(Text(VehiclesUtilities.getTypeName(element.value.etatactuel ?? 0), style: tstyle).tr()),
       DataCell(
           Text(dateFormat.format(element.value.updatedAt!), style: tstyle)),
       if (selectC != true)

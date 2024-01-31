@@ -279,7 +279,7 @@ class _ImportVehiclesState extends State<ImportVehicles> {
                   },
                   trailing: Row(
                     children: [
-                      Text(types[e.value.etatactuel??0],style: TextStyle(color: Colors.grey[100]),).tr(),
+                      Text(VehiclesUtilities.getTypeName(e.value.etatactuel??0),style: TextStyle(color: Colors.grey[100]),).tr(),
                       smallSpace,
                       Checkbox(
                         checked: e.value.selected,

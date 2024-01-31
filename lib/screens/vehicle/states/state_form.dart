@@ -14,16 +14,10 @@ import '../../../providers/client_database.dart';
 import '../../../serializables/vehicle/state.dart';
 import '../../../serializables/vehicle/vehicle.dart';
 import '../../../theme.dart';
+import '../../../utilities/vehicle_util.dart';
 import '../manager/vehicles_table.dart';
 
 
-List<String> types=[
-  "gstate",
-  "bstate",
-  "rstate",
-  "ostate",
-  "restate"
-];
 class StateForm extends StatefulWidget {
   final Etat? etat;
   final Vehicle? vehicle;
@@ -169,11 +163,11 @@ class StateFormState extends State<StateForm> {
                       ],
                     ),
                     title: ComboBox<int>(
-                      items:types.map((e) => ComboBoxItem<int>(
-                        value: types.indexOf(e),
-                        child: Text(e).tr(),
+                      items:List.generate(5, (index) =>  ComboBoxItem<int>(
+                        value: index,
+                        child: Text(VehiclesUtilities.getTypeName(index)).tr(),
                       )
-                      ).toList(),
+                      ),
                       value: type,
                       onChanged: (s){
                         setState(() {

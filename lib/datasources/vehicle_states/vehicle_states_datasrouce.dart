@@ -13,7 +13,7 @@ import '../../screens/vehicle/manager/vehicles_table.dart';
 import '../../screens/vehicle/states/state_form.dart';
 import '../../serializables/vehicle/state.dart';
 import '../../widgets/on_tap_scale.dart';
-
+import '../../utilities/vehicle_util.dart';
 class VStatesDatasource extends ParcOtoDatasource<Etat>{
   VStatesDatasource({required super.collectionID, required super.current,super.appTheme,super.filters,super.searchKey,super.selectC}){
     repo=VehicleStateWebservice(data, collectionID, 4);
@@ -44,7 +44,7 @@ class VStatesDatasource extends ParcOtoDatasource<Etat>{
           }
       ),
       DataCell(SelectableText(
-        getTypeName(element.value.type),
+        VehiclesUtilities.getTypeName(element.value.type).tr(),
         style: tstyle,
       )),
       DataCell(SelectableText(
@@ -94,16 +94,6 @@ class VStatesDatasource extends ParcOtoDatasource<Etat>{
   }
 
 
-  String getTypeName(int type){
-    switch(type){
-      case 0: return 'gstate'.tr();
-      case 1:return 'bstate'.tr();
-      case 2:return 'rstate'.tr();
-      case 3:return 'ostate'.tr();
-      case 4:return 'restate'.tr();
-      default:return 'gstate'.tr();
-    }
-  }
   void showMyVehicule(String? matricule){
     if(matricule!=null){
       PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.vehicles)+1;

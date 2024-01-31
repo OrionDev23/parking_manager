@@ -253,4 +253,16 @@ class VehiclesUtilities {
         return "nonind";
     }
   }
+
+
+  static String getTypeName(int type){
+    switch(type){
+      case 0: return 'gstate';
+      case 1:return 'bstate';
+      case 2:return 'rstate';
+      case 3:return 'ostate';
+      case 4:return 'restate';
+      default:return 'gstate';
+    }
+  }
 }
