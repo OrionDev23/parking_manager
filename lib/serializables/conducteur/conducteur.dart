@@ -19,10 +19,8 @@ class Conducteur extends ParcOtoDefault {
   DateTime? dateNaissance;
 
   String? createdBy;
-
   String? etatactuel;
   int? etat;
-
   String? filliale;
   String? filliateNom;
   String? direction;
