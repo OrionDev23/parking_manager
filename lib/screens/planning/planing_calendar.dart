@@ -42,14 +42,20 @@ class _PlanningCalendarState extends State<PlanningCalendar> {
       view: currentView,
       firstDayOfWeek: DateTime.saturday,
       controller: widget.controller,
-      onTap: widget.toDo,
+      onTap: (details){
+        if(details.targetElement==CalendarElement.appointment || details
+            .targetElement==CalendarElement.calendarCell || details
+            .targetElement==CalendarElement.agenda && widget.toDo!=null){
+          widget.toDo!(details);
+        }
+      },
       appointmentBuilder: (c, d) => AppointmentWidget(
         calendarController: widget.controller,
         details: d,
       ),
       showNavigationArrow: true,
       showTodayButton: true,
-      showDatePickerButton: false,
+      showDatePickerButton: true,
       allowViewNavigation: true,
       headerStyle: const CalendarHeaderStyle(
         textAlign: TextAlign.center,
@@ -59,9 +65,9 @@ class _PlanningCalendarState extends State<PlanningCalendar> {
         appointmentDisplayCount: 3,
         showTrailingAndLeadingDates: false,
         numberOfWeeksInView: 6,
-        agendaItemHeight: 50.px,
-        navigationDirection: MonthNavigationDirection.vertical,
-        appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
+        agendaItemHeight: 70.px,
+        navigationDirection: MonthNavigationDirection.horizontal,
+        appointmentDisplayMode: MonthAppointmentDisplayMode.indicator,
         monthCellStyle: MonthCellStyle(
           trailingDatesBackgroundColor: appTheme.fillColor,
           leadingDatesBackgroundColor: appTheme.fillColor,

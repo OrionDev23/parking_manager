@@ -390,6 +390,7 @@
   "reparationmodif": "تم تعديل أمر الإصلاح!",
   "demofor": "نسخة تجريبية ل",
   "daysremain": "باقي {days} يوم",
+  "dayV": "{day} أيام",
 
   "echec": "فشل"
 }

@@ -431,5 +431,6 @@
  "reparationmodif": "Ordre de réparation modifié!",
  "echec": "Echec",
  "demofor": "Demo pour",
- "daysremain": "{days} jour(s) restants"
+ "daysremain": "{days} jour(s) restants",
+ "dayV": "{day} jours"
 }

@@ -77,7 +77,7 @@ class _PlanningManagerState extends State<PlanningManager> {
                   children: <Widget>[
                     Container(
                       color: appTheme.backGroundColor,
-                      height: 1500.px,
+                      height: 500.px,
                       child: PlanningCalendar(
                         controller: controller,
                         datasource: datasource,

@@ -392,6 +392,7 @@
   "reparationmodif": "Repair order modified!",
   "echec": "Failure",
   "demofor": "Demo for",
-  "daysremain": "{days} day(s) remaining"
+  "daysremain": "{days} day(s) remaining",
+  "dayV": "{day} days"
 
 }
