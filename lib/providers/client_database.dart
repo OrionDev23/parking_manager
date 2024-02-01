@@ -6,7 +6,7 @@ import 'package:parc_oto/serializables/activity.dart';
 import 'package:parc_oto/serializables/vehicle/vehicle.dart';
 
 import '../main.dart';
-import '../screens/entreprise.dart';
+import '../screens/entreprise/entreprise.dart';
 import '../screens/sidemenu/sidemenu.dart';
 import '../serializables/conducteur/document_chauffeur.dart';
 import '../serializables/entreprise.dart';

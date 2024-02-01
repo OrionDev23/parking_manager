@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/screens/entreprise/directions.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,7 +10,8 @@ import '../chauffeur/disponibilite/disponibilite_tabs.dart';
 import '../chauffeur/document/chauf_document_tabs.dart';
 import '../chauffeur/manager/chauffeur_tabs.dart';
 import '../dashboard/dashboard.dart';
-import '../entreprise.dart';
+import '../entreprise/entreprise.dart';
+import '../entreprise/fililales.dart';
 import '../login.dart';
 import '../logout.dart';
 import '../logs/logging/log_management.dart';
@@ -146,10 +148,22 @@ class PaneItemsAndFooters {
       title: const Text('parametres').tr(),
       body: Settings(savedPrefs),
     );
-    entreprise = PaneItem(
+    entreprise = PaneItemExpander(
       icon: const Icon(FluentIcons.build_definition),
       title: const Text('monentreprise').tr(),
       body: const MyEntreprise(),
+      items:[
+        PaneItem(
+          icon: const Icon(FluentIcons.build_definition),
+          title: const Text('fililale').tr(),
+          body: const MesFilliales(),
+        ),
+        PaneItem(
+          icon: const Icon(FluentIcons.build_definition),
+          title: const Text('directions').tr(),
+          body: const MesDirections(),
+        ),
+      ]
     );
 
     backup = PaneItem(

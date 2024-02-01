@@ -6,7 +6,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../providers/client_database.dart';
 import '../../../theme.dart';
-import '../../entreprise.dart';
+import '../../entreprise/entreprise.dart';
 
 class EntreprisePlacement extends StatelessWidget {
   const EntreprisePlacement({

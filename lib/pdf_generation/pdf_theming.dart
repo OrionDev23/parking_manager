@@ -4,7 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/screens/entreprise.dart';
+import 'package:parc_oto/screens/entreprise/entreprise.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 import 'package:printing/printing.dart';

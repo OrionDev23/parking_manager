@@ -4,7 +4,7 @@ import 'package:parc_oto/pdf_generation/pdf_utilities.dart';
 import 'package:parc_oto/pdf_generation/reparation/vehicle_damage_pdf.dart';
 import 'package:parc_oto/pdf_generation/reparation/vehicle_entretien_pdf.dart';
 import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/screens/entreprise.dart';
+import 'package:parc_oto/screens/entreprise/entreprise.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 

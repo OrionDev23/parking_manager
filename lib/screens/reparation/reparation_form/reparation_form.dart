@@ -3,7 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/screens/entreprise.dart';
+import 'package:parc_oto/screens/entreprise/entreprise.dart';
 import 'package:parc_oto/screens/prestataire/prestataire_table.dart';
 import 'package:parc_oto/screens/reparation/reparation_form/designation_reparation.dart';
 import 'package:parc_oto/screens/reparation/reparation_form/entreprise_placement.dart';
