@@ -69,7 +69,10 @@ class BehaviorSubject<T> extends Subject<T> implements ValueStream<T> {
 
     final wrapper = _Wrapper<T>();
 
-    return BehaviorSubject<T>._(controller, Rx.defer<T>(_deferStream(wrapper, controller, sync), reusable: true), wrapper);
+    return BehaviorSubject<T>._(
+        controller,
+        Rx.defer<T>(_deferStream(wrapper, controller, sync), reusable: true),
+        wrapper);
   }
 
   /// Constructs a [BehaviorSubject], optionally pass handlers for
@@ -100,7 +103,9 @@ class BehaviorSubject<T> extends Subject<T> implements ValueStream<T> {
     );
   }
 
-  static Stream<T> Function() _deferStream<T>(_Wrapper<T> wrapper, StreamController<T> controller, bool sync) => () {
+  static Stream<T> Function() _deferStream<T>(
+          _Wrapper<T> wrapper, StreamController<T> controller, bool sync) =>
+      () {
         if (wrapper.latestErrorAndStackTrace != null) {
           final errorAndStackTrace = wrapper.latestErrorAndStackTrace!;
 
@@ -113,7 +118,8 @@ class BehaviorSubject<T> extends Subject<T> implements ValueStream<T> {
         }
 
         if (wrapper.latestValue != null) {
-          return controller.stream.transform(StartWithStreamTransformer(wrapper.latestValue!.value));
+          return controller.stream.transform(
+              StartWithStreamTransformer(wrapper.latestValue!.value));
         }
 
         return controller.stream;
@@ -123,7 +129,8 @@ class BehaviorSubject<T> extends Subject<T> implements ValueStream<T> {
   void onAdd(T event) => _wrapper.setValue(event);
 
   @override
-  void onAddError(Object error, [StackTrace? stackTrace]) => _wrapper.setError(error, stackTrace);
+  void onAddError(Object error, [StackTrace? stackTrace]) =>
+      _wrapper.setError(error, stackTrace);
 
   @override
   ValueStream<T> get stream => this;
@@ -132,7 +139,8 @@ class BehaviorSubject<T> extends Subject<T> implements ValueStream<T> {
   ValueWrapper<T>? get valueWrapper => _wrapper.latestValue;
 
   @override
-  ErrorAndStackTrace? get errorAndStackTrace => _wrapper.latestErrorAndStackTrace;
+  ErrorAndStackTrace? get errorAndStackTrace =>
+      _wrapper.latestErrorAndStackTrace;
 
   @override
   BehaviorSubject<R> createForwardingSubject<R>({
@@ -149,50 +157,65 @@ class BehaviorSubject<T> extends Subject<T> implements ValueStream<T> {
   // Override built-in operators.
 
   @override
-  ValueStream<T> where(bool Function(T event) test) => _forwardBehaviorSubject<T>((s) => s.where(test));
+  ValueStream<T> where(bool Function(T event) test) =>
+      _forwardBehaviorSubject<T>((s) => s.where(test));
 
   @override
-  ValueStream<S> map<S>(S Function(T event) convert) => _forwardBehaviorSubject<S>((s) => s.map(convert));
+  ValueStream<S> map<S>(S Function(T event) convert) =>
+      _forwardBehaviorSubject<S>((s) => s.map(convert));
 
   @override
-  ValueStream<E> asyncMap<E>(FutureOr<E> Function(T event) convert) => _forwardBehaviorSubject<E>((s) => s.asyncMap(convert));
+  ValueStream<E> asyncMap<E>(FutureOr<E> Function(T event) convert) =>
+      _forwardBehaviorSubject<E>((s) => s.asyncMap(convert));
 
   @override
-  ValueStream<E> asyncExpand<E>(Stream<E>? Function(T event) convert) => _forwardBehaviorSubject<E>((s) => s.asyncExpand(convert));
+  ValueStream<E> asyncExpand<E>(Stream<E>? Function(T event) convert) =>
+      _forwardBehaviorSubject<E>((s) => s.asyncExpand(convert));
 
   @override
-  ValueStream<T> handleError(Function onError, {bool Function(dynamic error)? test}) =>
+  ValueStream<T> handleError(Function onError,
+          {bool Function(dynamic error)? test}) =>
       _forwardBehaviorSubject<T>((s) => s.handleError(onError, test: test));
 
   @override
-  ValueStream<S> expand<S>(Iterable<S> Function(T element) convert) => _forwardBehaviorSubject<S>((s) => s.expand(convert));
+  ValueStream<S> expand<S>(Iterable<S> Function(T element) convert) =>
+      _forwardBehaviorSubject<S>((s) => s.expand(convert));
 
   @override
-  ValueStream<S> transform<S>(StreamTransformer<T, S> streamTransformer) => _forwardBehaviorSubject<S>((s) => s.transform(streamTransformer));
+  ValueStream<S> transform<S>(StreamTransformer<T, S> streamTransformer) =>
+      _forwardBehaviorSubject<S>((s) => s.transform(streamTransformer));
 
   @override
   ValueStream<R> cast<R>() => _forwardBehaviorSubject<R>((s) => s.cast<R>());
 
   @override
-  ValueStream<T> take(int count) => _forwardBehaviorSubject<T>((s) => s.take(count));
+  ValueStream<T> take(int count) =>
+      _forwardBehaviorSubject<T>((s) => s.take(count));
 
   @override
-  ValueStream<T> takeWhile(bool Function(T element) test) => _forwardBehaviorSubject<T>((s) => s.takeWhile(test));
+  ValueStream<T> takeWhile(bool Function(T element) test) =>
+      _forwardBehaviorSubject<T>((s) => s.takeWhile(test));
 
   @override
-  ValueStream<T> skip(int count) => _forwardBehaviorSubject<T>((s) => s.skip(count));
+  ValueStream<T> skip(int count) =>
+      _forwardBehaviorSubject<T>((s) => s.skip(count));
 
   @override
-  ValueStream<T> skipWhile(bool Function(T element) test) => _forwardBehaviorSubject<T>((s) => s.skipWhile(test));
+  ValueStream<T> skipWhile(bool Function(T element) test) =>
+      _forwardBehaviorSubject<T>((s) => s.skipWhile(test));
 
   @override
-  ValueStream<T> distinct([bool Function(T previous, T next)? equals]) => _forwardBehaviorSubject<T>((s) => s.distinct(equals));
+  ValueStream<T> distinct([bool Function(T previous, T next)? equals]) =>
+      _forwardBehaviorSubject<T>((s) => s.distinct(equals));
 
   @override
-  ValueStream<T> timeout(Duration timeLimit, {void Function(EventSink<T> sink)? onTimeout}) =>
-      _forwardBehaviorSubject<T>((s) => s.timeout(timeLimit, onTimeout: onTimeout));
+  ValueStream<T> timeout(Duration timeLimit,
+          {void Function(EventSink<T> sink)? onTimeout}) =>
+      _forwardBehaviorSubject<T>(
+          (s) => s.timeout(timeLimit, onTimeout: onTimeout));
 
-  ValueStream<R> _forwardBehaviorSubject<R>(Stream<R> Function(Stream<T> s) transformerStream) {
+  ValueStream<R> _forwardBehaviorSubject<R>(
+      Stream<R> Function(Stream<T> s) transformerStream) {
     late BehaviorSubject<R> subject;
     late StreamSubscription<R> subscription;
 

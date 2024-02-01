@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 import 'multiple_items_bloc.dart';
 import 'select_bloc.dart';
 
-typedef SelectOneItemBuilderType<T> = Widget Function(BuildContext context, T item, bool isSelected);
+typedef SelectOneItemBuilderType<T> = Widget Function(
+    BuildContext context, T item, bool isSelected);
 
-typedef ErrorBuilderType<T> = Widget Function(BuildContext context, dynamic exception);
-typedef ButtonBuilderType = Widget Function(BuildContext context, VoidCallback onPressed);
+typedef ErrorBuilderType<T> = Widget Function(
+    BuildContext context, dynamic exception);
+typedef ButtonBuilderType = Widget Function(
+    BuildContext context, VoidCallback onPressed);
 
 class SelectDialog<T> extends StatefulWidget {
   final T? selectedValue;
@@ -18,6 +21,7 @@ class SelectDialog<T> extends StatefulWidget {
   final int? numberOfGridCross;
   final TextStyle? searchTextStyle;
   final Color? searchCursorColor;
+
   ///![image](https://user-images.githubusercontent.com/16373553/80187339-db365f00-85e5-11ea-81ad-df17d7e7034e.png)
   final bool showSearchBox;
   final void Function(T)? onChange;
@@ -53,7 +57,7 @@ class SelectDialog<T> extends StatefulWidget {
     super.key,
     this.itemsList,
     this.showSearchBox = true,
-    this.gridView=false,
+    this.gridView = false,
     this.numberOfGridCross,
     this.searchCursorColor,
     this.searchTextStyle,
@@ -83,10 +87,10 @@ class SelectDialog<T> extends StatefulWidget {
     List<T>? items,
     String? label,
     T? selectedValue,
-        bool? gridView,
-        TextStyle? searchTextStyle,
-        Color? searchCursorColor,
-        int? numberOfGridCross,
+    bool? gridView,
+    TextStyle? searchTextStyle,
+    Color? searchCursorColor,
+    int? numberOfGridCross,
     List<T>? multipleSelectedValues,
     bool showSearchBox = true,
     Future<List<T>> Function(String text)? onFind,
@@ -94,7 +98,8 @@ class SelectDialog<T> extends StatefulWidget {
     void Function(T)? onChange,
     void Function(List<T>)? onMultipleItemsChange,
     InputDecoration? searchBoxDecoration,
-    @Deprecated("Use 'hintText' property from searchBoxDecoration") String? searchHint,
+    @Deprecated("Use 'hintText' property from searchBoxDecoration")
+    String? searchHint,
     Color? backgroundColor,
     TextStyle? titleStyle,
     WidgetBuilder? emptyBuilder,
@@ -164,9 +169,16 @@ class SelectDialogState<T> extends State<SelectDialog<T>> {
   late MultipleItemsBloc<T> multipleItemsBloc;
   void Function(T)? onChange;
 
-  SelectDialogState(List<T>? itemsList, this.onChange, void Function(List<T>)? onMultipleItemsChange, List<T>? multipleSelectedValues, Future<List<T>> Function(String text)? onFind, TextEditingController? findController) {
+  SelectDialogState(
+      List<T>? itemsList,
+      this.onChange,
+      void Function(List<T>)? onMultipleItemsChange,
+      List<T>? multipleSelectedValues,
+      Future<List<T>> Function(String text)? onFind,
+      TextEditingController? findController) {
     bloc = SelectOneBloc(itemsList, onFind, findController);
-    multipleItemsBloc = MultipleItemsBloc(multipleSelectedValues, onMultipleItemsChange);
+    multipleItemsBloc =
+        MultipleItemsBloc(multipleSelectedValues, onMultipleItemsChange);
   }
 
   @override
@@ -183,11 +195,13 @@ class SelectDialogState<T> extends State<SelectDialog<T>> {
     bloc.dispose();
   }
 
-  bool get isWeb => MediaQuery.of(context).size.width > MediaQuery.of(context).size.height;
+  bool get isWeb =>
+      MediaQuery.of(context).size.width > MediaQuery.of(context).size.height;
 
   bool get isMultipleItems => widget.onMultipleItemsChange != null;
 
-  BoxConstraints get webDefaultConstraints => const BoxConstraints(maxWidth: 250, maxHeight: 500);
+  BoxConstraints get webDefaultConstraints =>
+      const BoxConstraints(maxWidth: 250, maxHeight: 500);
 
   BoxConstraints get mobileDefaultConstraints => BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width * 0.9,
@@ -195,11 +209,15 @@ class SelectDialogState<T> extends State<SelectDialog<T>> {
       );
 
   SelectOneItemBuilderType<T> get itemBuilder {
-    return widget.itemBuilder ?? (context, item, isSelected) => ListTile(title: Text(item.toString()), selected: isSelected);
+    return widget.itemBuilder ??
+        (context, item, isSelected) =>
+            ListTile(title: Text(item.toString()), selected: isSelected);
   }
 
   ButtonBuilderType get okButtonBuilder {
-    return widget.okButtonBuilder ?? (context, onPressed) => ElevatedButton(onPressed: onPressed, child: const Text("Ok"));
+    return widget.okButtonBuilder ??
+        (context, onPressed) =>
+            ElevatedButton(onPressed: onPressed, child: const Text("Ok"));
   }
 
   @override
@@ -207,7 +225,8 @@ class SelectDialogState<T> extends State<SelectDialog<T>> {
     return Container(
       width: MediaQuery.of(context).size.width * 0.9,
       height: MediaQuery.of(context).size.height * 0.7,
-      constraints: widget.constraints ?? (isWeb ? webDefaultConstraints : mobileDefaultConstraints),
+      constraints: widget.constraints ??
+          (isWeb ? webDefaultConstraints : mobileDefaultConstraints),
       child: Column(
         children: <Widget>[
           if (widget.showSearchBox)
@@ -220,8 +239,13 @@ class SelectDialogState<T> extends State<SelectDialog<T>> {
                 cursorColor: widget.searchCursorColor,
                 maxLines: widget.searchBoxMaxLines,
                 minLines: widget.searchBoxMinLines,
-                decoration: widget.searchBoxDecoration?.copyWith(hintText: widget.searchBoxDecoration?.hintText ?? widget.searchBoxDecoration!.hintText) ?? //
-                    InputDecoration(hintText: widget.searchBoxDecoration?.hintText ?? "Find", contentPadding: const EdgeInsets.all(2.0)),
+                decoration: widget.searchBoxDecoration?.copyWith(
+                        hintText: widget.searchBoxDecoration?.hintText ??
+                            widget.searchBoxDecoration!.hintText) ?? //
+                    InputDecoration(
+                        hintText:
+                            widget.searchBoxDecoration?.hintText ?? "Find",
+                        contentPadding: const EdgeInsets.all(2.0)),
               ),
             ),
           Expanded(
@@ -229,60 +253,73 @@ class SelectDialogState<T> extends State<SelectDialog<T>> {
               stream: bloc.filteredListOut,
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return widget.errorBuilder?.call(context, snapshot.error) ?? Center(child: Text("Oops. \n${snapshot.error}"));
+                  return widget.errorBuilder?.call(context, snapshot.error) ??
+                      Center(child: Text("Oops. \n${snapshot.error}"));
                 } else if (!snapshot.hasData) {
-                  return widget.loadingBuilder?.call(context) ?? const Center(child: CircularProgressIndicator());
+                  return widget.loadingBuilder?.call(context) ??
+                      const Center(child: CircularProgressIndicator());
                 } else if (snapshot.data!.isEmpty) {
-                  return widget.emptyBuilder?.call(context) ?? const Center(child: Text("No data found"));
+                  return widget.emptyBuilder?.call(context) ??
+                      const Center(child: Text("No data found"));
                 }
                 return Scrollbar(
                   controller: bloc.scrollController,
                   thumbVisibility: widget.alwaysShowScrollBar,
-                  child:
-                  widget.gridView==true
-                  ?GridView.builder(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: widget.numberOfGridCross??2,
-                    crossAxisSpacing: 5,
-                    mainAxisSpacing: 5,
-                  ),
-                    controller: bloc.scrollController,
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      var item = snapshot.data![index];
-                      bool isSelected = multipleItemsBloc.selectedItems.contains(item);
-                      isSelected = isSelected || item == widget.selectedValue;
-                      return InkWell(
-                        child: itemBuilder(context, item, isSelected),
-                        onTap: () {
-                          if (isMultipleItems) {
-                            setState(() => (isSelected) ? multipleItemsBloc.unselectItem(item) : multipleItemsBloc.selectItem(item));
-                          } else {
-                            onChange?.call(item);
-                            Navigator.pop(context);
-                          }
-                        },
-                      );
-                    },)
-                  :ListView.builder(
-                    controller: bloc.scrollController,
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      var item = snapshot.data![index];
-                      bool isSelected = multipleItemsBloc.selectedItems.contains(item);
-                      isSelected = isSelected || item == widget.selectedValue;
-                      return InkWell(
-                        child: itemBuilder(context, item, isSelected),
-                        onTap: () {
-                          if (isMultipleItems) {
-                            setState(() => (isSelected) ? multipleItemsBloc.unselectItem(item) : multipleItemsBloc.selectItem(item));
-                          } else {
-                            onChange?.call(item);
-                            Navigator.pop(context);
-                          }
-                        },
-                      );
-                    },
-                  ),
+                  child: widget.gridView == true
+                      ? GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: widget.numberOfGridCross ?? 2,
+                            crossAxisSpacing: 5,
+                            mainAxisSpacing: 5,
+                          ),
+                          controller: bloc.scrollController,
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) {
+                            var item = snapshot.data![index];
+                            bool isSelected =
+                                multipleItemsBloc.selectedItems.contains(item);
+                            isSelected =
+                                isSelected || item == widget.selectedValue;
+                            return InkWell(
+                              child: itemBuilder(context, item, isSelected),
+                              onTap: () {
+                                if (isMultipleItems) {
+                                  setState(() => (isSelected)
+                                      ? multipleItemsBloc.unselectItem(item)
+                                      : multipleItemsBloc.selectItem(item));
+                                } else {
+                                  onChange?.call(item);
+                                  Navigator.pop(context);
+                                }
+                              },
+                            );
+                          },
+                        )
+                      : ListView.builder(
+                          controller: bloc.scrollController,
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) {
+                            var item = snapshot.data![index];
+                            bool isSelected =
+                                multipleItemsBloc.selectedItems.contains(item);
+                            isSelected =
+                                isSelected || item == widget.selectedValue;
+                            return InkWell(
+                              child: itemBuilder(context, item, isSelected),
+                              onTap: () {
+                                if (isMultipleItems) {
+                                  setState(() => (isSelected)
+                                      ? multipleItemsBloc.unselectItem(item)
+                                      : multipleItemsBloc.selectItem(item));
+                                } else {
+                                  onChange?.call(item);
+                                  Navigator.pop(context);
+                                }
+                              },
+                            );
+                          },
+                        ),
                 );
               },
             ),

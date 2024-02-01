@@ -27,6 +27,7 @@ import '../vehicle/vehicle_dashboard.dart';
 
 class PaneItemsAndFooters {
   SharedPreferences savedPrefs;
+
   PaneItemsAndFooters(this.savedPrefs) {
     initPanes();
   }
@@ -45,6 +46,7 @@ class PaneItemsAndFooters {
   static late PaneItem backup;
 
   static late PaneItem entreprise;
+
   initPanes() {
     dashboard = PaneItem(
         icon: const Icon(FluentIcons.home),
@@ -115,7 +117,6 @@ class PaneItemsAndFooters {
             title: const Text('documents').tr(),
             body: const CDocumentTabs(),
           ),
-
           PaneItem(
             icon: const Icon(FluentIcons.search_bookmark),
             title: const Text('archive').tr(),
@@ -151,10 +152,15 @@ class PaneItemsAndFooters {
       body: const MyEntreprise(),
     );
 
-    backup=PaneItem(
+    backup = PaneItem(
       icon: const Icon(FluentIcons.backlog),
       title: const Text('backup').tr(),
-      body: const Center(child: Text('DEMO',style: TextStyle(fontSize: 20),),),
+      body: const Center(
+        child: Text(
+          'DEMO',
+          style: TextStyle(fontSize: 20),
+        ),
+      ),
     );
     bool isAdmin = ClientDatabase().isAdmin();
     bool isManager = ClientDatabase().isManager();
@@ -168,7 +174,6 @@ class PaneItemsAndFooters {
         if (isAdmin || isManager) chauffeurs,
         if (isAdmin || isManager) planner,
         if (isAdmin || isManager) evenements,
-
       ];
     } else {
       originalItems = [
@@ -180,7 +185,6 @@ class PaneItemsAndFooters {
       PaneItemSeparator(),
       if (isAdmin) entreprise,
       if (isAdmin) backup,
-
       if (PanesListState.signedIn.value) logout,
       parametres,
     ];

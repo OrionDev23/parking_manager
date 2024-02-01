@@ -36,6 +36,7 @@ abstract class Page extends StatelessWidget {
   }
 
   final StreamController _controller = StreamController.broadcast();
+
   Stream get stateStream => _controller.stream;
 
   @override
@@ -77,6 +78,7 @@ abstract class ScrollablePage extends Page {
   ScrollablePage({super.key});
 
   final scrollController = ScrollController();
+
   Widget buildHeader(BuildContext context) => const SizedBox.shrink();
 
   Widget buildBottomBar(BuildContext context) => const SizedBox.shrink();

@@ -17,6 +17,7 @@ class LogoutScreen extends StatefulWidget {
 
 class _LogoutScreenState extends State<LogoutScreen> {
   bool loginOut = false;
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
@@ -51,7 +52,11 @@ class _LogoutScreenState extends State<LogoutScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('disconnectconfirm',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14.sp),).tr(),
+                  Text(
+                    'disconnectconfirm',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                  ).tr(),
                   const SizedBox(
                     height: 10,
                   ),
@@ -64,17 +69,20 @@ class _LogoutScreenState extends State<LogoutScreen> {
                             onPressed: loginOut ? null : logout,
                             child: loginOut
                                 ? const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 8.0),
-                                  child: ProgressRing(),
-                                )
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 8.0),
+                                    child: ProgressRing(),
+                                  )
                                 : Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                  child: const Text('oui').tr(),
-                                )),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0),
+                                    child: const Text('oui').tr(),
+                                  )),
                         FilledButton(
                           onPressed: loginOut ? null : cancel,
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
                             child: const Text('non').tr(),
                           ),
                         )

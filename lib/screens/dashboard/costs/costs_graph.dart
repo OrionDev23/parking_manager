@@ -14,6 +14,7 @@ class CostGraph extends StatefulWidget {
   final DateTime end;
 
   final AppTheme appTheme;
+
   const CostGraph(
       {super.key,
       required this.start,
@@ -27,7 +28,7 @@ class CostGraph extends StatefulWidget {
 class _CostGraphState extends State<CostGraph> {
   List<Reparation> reparations = [];
 
-  List<MapEntry<int,double>>values=[];
+  List<MapEntry<int, double>> values = [];
 
   bool loading = true;
 
@@ -54,40 +55,39 @@ class _CostGraphState extends State<CostGraph> {
     });
   }
 
-  void fillValues(){
-    int date=0;
-    for(var r in reparations){
-      date=getDate(r.date);
-      if(datePresent(date)){
-        addToValue(date,r.getPrixTTC());
-      }
-      else{
-        values.add(MapEntry(date,r.getPrixTTC()));
+  void fillValues() {
+    int date = 0;
+    for (var r in reparations) {
+      date = getDate(r.date);
+      if (datePresent(date)) {
+        addToValue(date, r.getPrixTTC());
+      } else {
+        values.add(MapEntry(date, r.getPrixTTC()));
       }
     }
 
-    values.sort((a,b)=>a.key.compareTo(b.key));
+    values.sort((a, b) => a.key.compareTo(b.key));
   }
 
-  void addToValue(int date,double value){
-    for(int j=0;j<values.length;j++){
-      if(values[j].key==date){
-        values[j]=MapEntry(values[j].key, values[j].value+value);
+  void addToValue(int date, double value) {
+    for (int j = 0; j < values.length; j++) {
+      if (values[j].key == date) {
+        values[j] = MapEntry(values[j].key, values[j].value + value);
         return;
       }
     }
   }
 
-  bool datePresent(int date){
-    for(int j=0;j<values.length;j++){
-      if(values[j].key==date){
+  bool datePresent(int date) {
+    for (int j = 0; j < values.length; j++) {
+      if (values[j].key == date) {
         return true;
       }
     }
     return false;
   }
 
-  int getDate(DateTime date){
+  int getDate(DateTime date) {
     // start ===> -6
     // end ===> 0
     // a(start)+b=
@@ -98,20 +98,17 @@ class _CostGraphState extends State<CostGraph> {
     //(-6*end)/(-start+end)=b
     // a=(-6*end)/((start+end)*end)
 
+    int start = dateToIntJson(widget.start)!;
+    int end = dateToIntJson(widget.end)!;
+    int current = dateToIntJson(date)!;
 
-    int start=dateToIntJson(widget.start)!;
-    int end=dateToIntJson(widget.end)!;
-    int current=dateToIntJson(date)!;
+    double b = (-6 * end) / (-start + end);
+    double a = -b / end;
 
-    double b=(-6*end)/(-start+end);
-    double a=-b/end;
-
-    double result=(a*current+b);
+    double result = (a * current + b);
 
     return result.round();
   }
-
-
 
   List<Color> gradiantColors = [];
   bool showAvg = false;
@@ -167,7 +164,7 @@ class _CostGraphState extends State<CostGraph> {
   Widget bottomTitleWidget(double value, TitleMeta meta) {
     Widget text = Text(
       DateFormat('MMM', 'fr')
-          .format(DateTime(0, widget.end.month+value.toInt())),
+          .format(DateTime(0, widget.end.month + value.toInt())),
       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 9),
     );
 
@@ -175,9 +172,11 @@ class _CostGraphState extends State<CostGraph> {
   }
 
   Widget leftTitleWidget(double value, TitleMeta meta) {
-
-    String text=NumberFormat.currency(locale: 'fr',symbol:'DA',decimalDigits:0).format(value);
-    return  Text(text,style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 8));
+    String text =
+        NumberFormat.currency(locale: 'fr', symbol: 'DA', decimalDigits: 0)
+            .format(value);
+    return Text(text,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 8));
   }
 
   LineChartData mainData() {
@@ -232,12 +231,16 @@ class _CostGraphState extends State<CostGraph> {
         minX: -6,
         maxX: 0,
         minY: 0,
-        maxY: getMaxValue()+20000,
+        maxY: getMaxValue() + 20000,
         lineBarsData: [
           LineChartBarData(
-            spots: List.generate(values.length, (index) => FlSpot(
-      values[index].key.toDouble(),
-      values[index].value,),),
+            spots: List.generate(
+              values.length,
+              (index) => FlSpot(
+                values[index].key.toDouble(),
+                values[index].value,
+              ),
+            ),
             isCurved: true,
             gradient: LinearGradient(
               colors: gradiantColors,
@@ -256,66 +259,70 @@ class _CostGraphState extends State<CostGraph> {
         ]);
   }
 
-  LineChartData avgData(){
-    double avg=getAverage();
+  LineChartData avgData() {
+    double avg = getAverage();
     return LineChartData(
-      lineTouchData: const LineTouchData(enabled: false),
-      gridData: FlGridData(
-        show: true,
-        drawVerticalLine: true,
-        verticalInterval: 1,
-        horizontalInterval: 10000,
-        getDrawingVerticalLine: (value){
-          return FlLine(
-            color: widget.appTheme.color,
-            strokeWidth: 0.1,
-          );
-        },
-        getDrawingHorizontalLine: (value){
-          return FlLine(
-            color: widget.appTheme.color,
-            strokeWidth: 0.1,
-          );
-        },
-      ),
-      titlesData: FlTitlesData(
-        show: true,
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
+        lineTouchData: const LineTouchData(enabled: false),
+        gridData: FlGridData(
+          show: true,
+          drawVerticalLine: true,
+          verticalInterval: 1,
+          horizontalInterval: 10000,
+          getDrawingVerticalLine: (value) {
+            return FlLine(
+              color: widget.appTheme.color,
+              strokeWidth: 0.1,
+            );
+          },
+          getDrawingHorizontalLine: (value) {
+            return FlLine(
+              color: widget.appTheme.color,
+              strokeWidth: 0.1,
+            );
+          },
         ),
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        bottomTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 30,
-            interval: 1,
-            getTitlesWidget: bottomTitleWidget,
+        titlesData: FlTitlesData(
+          show: true,
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 30,
+              interval: 1,
+              getTitlesWidget: bottomTitleWidget,
+            ),
+          ),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              interval: 20000,
+              getTitlesWidget: leftTitleWidget,
+              reservedSize: 42,
+            ),
           ),
         ),
-        leftTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            interval: 20000,
-            getTitlesWidget: leftTitleWidget,
-            reservedSize: 42,
-          ),
+        borderData: FlBorderData(
+          show: true,
+          border: Border.all(color: widget.appTheme.backGroundColor),
         ),
-      ),
-      borderData: FlBorderData(
-        show: true,
-        border: Border.all(color: widget.appTheme.backGroundColor),
-      ),
-      minX: -6,
-      maxX: 0,
-      minY: 0,
-      maxY: getMaxValue()+20000,
+        minX: -6,
+        maxX: 0,
+        minY: 0,
+        maxY: getMaxValue() + 20000,
         lineBarsData: [
           LineChartBarData(
-            spots: List.generate(values.length, (index) => FlSpot(
-              values[index].key.toDouble(),
-              avg,),),
+            spots: List.generate(
+              values.length,
+              (index) => FlSpot(
+                values[index].key.toDouble(),
+                avg,
+              ),
+            ),
             isCurved: true,
             gradient: LinearGradient(
               colors: gradiantColors,
@@ -331,15 +338,14 @@ class _CostGraphState extends State<CostGraph> {
                       .toList(),
                 )),
           )
-        ]
-    );
+        ]);
   }
 
   double getMinValue() {
     double min = 0;
-    for(int i=0;i<values.length;i++){
-      if(values[i].value<min){
-        min=values[i].value;
+    for (int i = 0; i < values.length; i++) {
+      if (values[i].value < min) {
+        min = values[i].value;
       }
     }
     return min;
@@ -347,20 +353,20 @@ class _CostGraphState extends State<CostGraph> {
 
   double getMaxValue() {
     double max = 0;
-    for(int i=0;i<values.length;i++){
-      if(values[i].value>max){
-        max=values[i].value;
+    for (int i = 0; i < values.length; i++) {
+      if (values[i].value > max) {
+        max = values[i].value;
       }
     }
-    max=((max/20000).ceil())*20000;
+    max = ((max / 20000).ceil()) * 20000;
     return max;
   }
 
-  double getAverage(){
+  double getAverage() {
     double avg = 0;
-    for(int i=0;i<values.length;i++){
-      avg+=values[i].value;
+    for (int i = 0; i < values.length; i++) {
+      avg += values[i].value;
     }
-    return avg/values.length;
+    return avg / values.length;
   }
 }

@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
+import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/serializables/conducteur/disponibilite_chauffeur.dart';
@@ -50,27 +50,25 @@ class DisponibiliteDataSource
         style: tstyle,
       )),
       DataCell(
-    ClientDatabase().isAdmin()
-          ?f.FlyoutTarget(
-        controller: element.value.controller,
-        child:  OnTapScaleAndFade(
-                onTap: () {
-                  element.value.controller.showFlyout(builder: (context) {
-                    return f.MenuFlyout(
-                      items: [
-                        f.MenuFlyoutItem(
-                            text: const Text('delete').tr(),
-                            onPressed: () {
-                              showDeleteConfirmation(element.value);
-                            }),
-                      ],
-                    );
-                  });
-                },
-                child: const Icon(Icons.more_vert_sharp))
-
-      )
-        : const Text(''),
+        ClientDatabase().isAdmin()
+            ? f.FlyoutTarget(
+                controller: element.value.controller,
+                child: OnTapScaleAndFade(
+                    onTap: () {
+                      element.value.controller.showFlyout(builder: (context) {
+                        return f.MenuFlyout(
+                          items: [
+                            f.MenuFlyoutItem(
+                                text: const Text('delete').tr(),
+                                onPressed: () {
+                                  showDeleteConfirmation(element.value);
+                                }),
+                          ],
+                        );
+                      });
+                    },
+                    child: const Icon(Icons.more_vert_sharp)))
+            : const Text(''),
       ),
     ];
   }

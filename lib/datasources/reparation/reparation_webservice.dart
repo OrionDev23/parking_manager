@@ -36,6 +36,7 @@ class ReparationWebService extends ParcOtoWebService<Reparation> {
         return Query.search(getAttributeForSearch(index), searchKey);
     }
   }
+
   @override
   List<String> getFilterQueries(Map<String, String> filters, int count,
       int startingAt, int sortedBy, bool sortedAsc,
@@ -91,45 +92,47 @@ class ReparationWebService extends ParcOtoWebService<Reparation> {
     return Query.orderAsc('\$id');
   }
 
-
   @override
-  int Function(MapEntry<String, Reparation> p1, MapEntry<String, Reparation> p2)?
-  getComparisonFunction(int column, bool ascending) {
+  int Function(
+          MapEntry<String, Reparation> p1, MapEntry<String, Reparation> p2)?
+      getComparisonFunction(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
-    //matricule
+      //matricule
       case 0:
-        return (d1, d2) =>
-        coef * d1.value.numero.compareTo(d2.value.numero);
-    //marque
+        return (d1, d2) => coef * d1.value.numero.compareTo(d2.value.numero);
+      //marque
       case 1:
         return (d1, d2) {
-          if(d1.value.vehiculemat==null && d2.value.vehiculemat==null){
+          if (d1.value.vehiculemat == null && d2.value.vehiculemat == null) {
             return 0;
           }
-          return coef * (d1.value.vehiculemat ?? '').compareTo((d2.value.vehiculemat ?? ''));
+          return coef *
+              (d1.value.vehiculemat ?? '')
+                  .compareTo((d2.value.vehiculemat ?? ''));
         };
       case 2:
         return (d1, d2) {
-          if(d1.value.prestatairenom==null && d2.value.prestatairenom==null){
+          if (d1.value.prestatairenom == null &&
+              d2.value.prestatairenom == null) {
             return 0;
           }
-          return coef * (d1.value.prestatairenom ?? '').compareTo((d2.value.prestatairenom ?? ''));
+          return coef *
+              (d1.value.prestatairenom ?? '')
+                  .compareTo((d2.value.prestatairenom ?? ''));
         };
       case 3:
         return (d1, d2) {
-
           return coef * d1.value.date.compareTo(d2.value.date);
         };
       case 4:
         return (d1, d2) {
-
           return coef * d1.value.getPrixTTC().compareTo(d2.value.getPrixTTC());
         };
-    //date modif
+      //date modif
       case 5:
         return (d1, d2) =>
-        coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
+            coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
       default:
         return (d1, d2) => coef * d1.value.numero.compareTo(d2.value.numero);
     }

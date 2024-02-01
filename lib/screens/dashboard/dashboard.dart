@@ -1,13 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
-import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
+import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
 import 'package:parc_oto/screens/logs/logging/log_table.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
+import 'package:provider/provider.dart';
+
 import '../../providers/counters.dart';
 import '../../theme.dart';
-import 'package:provider/provider.dart';
 import '../../widgets/button_container.dart';
 import '../../widgets/page_header.dart';
 import '../chauffeur/document/chauf_document_form.dart';
@@ -30,7 +31,7 @@ class Dashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
-    bool portrait=MediaQuery.of(context).orientation==Orientation.portrait;
+    bool portrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return ScaffoldPage(
       header: const PageTitle(text: 'home'),
       content: ListView(
@@ -41,102 +42,96 @@ class Dashboard extends StatelessWidget {
             physics: const ClampingScrollPhysics(),
             shrinkWrap: true,
             padding: const EdgeInsets.all(10),
-            childAspectRatio: kIsWeb?4:3,
-            crossAxisCount: portrait?2:4,
+            childAspectRatio: kIsWeb ? 4 : 3,
+            crossAxisCount: portrait ? 2 : 4,
             mainAxisSpacing: 5,
             crossAxisSpacing: 5,
             children: buttonList(appTheme),
           ),
           GridView.count(
-            shrinkWrap: true,
-            primary: false,
-            padding: const EdgeInsets.all(5),
-            physics: const ClampingScrollPhysics(),
-            crossAxisCount: portrait?1:2,
-            childAspectRatio: 1.45,
-            crossAxisSpacing: 5,
-            mainAxisSpacing: 5,
-            children: widgetList(appTheme)
-          ),
+              shrinkWrap: true,
+              primary: false,
+              padding: const EdgeInsets.all(5),
+              physics: const ClampingScrollPhysics(),
+              crossAxisCount: portrait ? 1 : 2,
+              childAspectRatio: 1.45,
+              crossAxisSpacing: 5,
+              mainAxisSpacing: 5,
+              children: widgetList(appTheme)),
         ],
       ),
     );
   }
 
+  List<Widget> buttonList(AppTheme appTheme) {
+    return [
+      ButtonContainer(
+        icon: FluentIcons.car,
+        text: 'vehicules'.tr(),
+        getCount: DatabaseCounters().countVehicles,
+        action: () {
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+              .indexOf(PaneItemsAndFooters.vehicles);
+        },
+        actionList: () {
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.vehicles) +
+              1;
+        },
+        actionNouveau: () {
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.vehicles) +
+              1;
+          Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
+            late Tab tab;
+            tab = Tab(
+              key: UniqueKey(),
+              text: Text('nouvvehicule'.tr()),
+              semanticLabel: 'nouvvehicule'.tr(),
+              icon: const Icon(FluentIcons.new_folder),
+              body: const VehicleForm(),
+              onClosed: () {
+                VehicleTabsState.tabs.remove(tab);
 
-  List<Widget> buttonList(AppTheme appTheme){
-    return [ ButtonContainer(
-      icon: FluentIcons.car,
-      text: 'vehicules'.tr(),
-      getCount: DatabaseCounters().countVehicles,
-      action: () {
-        PanesListState.index.value = PaneItemsAndFooters
-            .originalItems
-            .indexOf(PaneItemsAndFooters.vehicles);
-      },
-      actionList: () {
-        PanesListState.index.value = PaneItemsAndFooters
-            .originalItems
-            .indexOf(PaneItemsAndFooters.vehicles) +
-            1;
-      },
-      actionNouveau: () {
-        PanesListState.index.value = PaneItemsAndFooters
-            .originalItems
-            .indexOf(PaneItemsAndFooters.vehicles) +
-            1;
-        Future.delayed(const Duration(milliseconds: 300))
-            .whenComplete(() {
-          late Tab tab;
-          tab = Tab(
-            key: UniqueKey(),
-            text: Text('nouvvehicule'.tr()),
-            semanticLabel: 'nouvvehicule'.tr(),
-            icon: const Icon(FluentIcons.new_folder),
-            body: const VehicleForm(),
-            onClosed: () {
-              VehicleTabsState.tabs.remove(tab);
-
-              if (VehicleTabsState.currentIndex.value > 0) {
-                VehicleTabsState.currentIndex.value--;
-              }
-            },
-          );
-          final index = VehicleTabsState.tabs.length + 1;
-          VehicleTabsState.tabs.add(tab);
-          VehicleTabsState.currentIndex.value = index - 1;
-        });
-      },
-    ),
+                if (VehicleTabsState.currentIndex.value > 0) {
+                  VehicleTabsState.currentIndex.value--;
+                }
+              },
+            );
+            final index = VehicleTabsState.tabs.length + 1;
+            VehicleTabsState.tabs.add(tab);
+            VehicleTabsState.currentIndex.value = index - 1;
+          });
+        },
+      ),
       ButtonContainer(
         icon: FluentIcons.document_set,
         text: 'vehicledocuments'.tr(),
         getCount: DatabaseCounters().countVdocs,
         action: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.vehicles)+4;
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.vehicles) +
+              4;
         },
         actionList: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.vehicles) +
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.vehicles) +
               4;
         },
         actionNouveau: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.vehicles) +
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.vehicles) +
               4;
-          Future.delayed(const Duration(milliseconds: 300))
-              .whenComplete(() {
+          Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
             late Tab tab;
             tab = Tab(
               key: UniqueKey(),
               text: Text('nouvdocument'.tr()),
               semanticLabel: 'nouvdocument'.tr(),
               icon: const Icon(FluentIcons.new_folder),
-              body: const DocumentForm(),
+              body:  const ScaffoldPage(
+                content: DocumentForm(),
+              ),
               onClosed: () {
                 DocumentTabsState.tabs.remove(tab);
 
@@ -156,31 +151,29 @@ class Dashboard extends StatelessWidget {
         text: 'reparations'.tr(),
         getCount: DatabaseCounters().countReparation,
         action: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.reparations) +
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.reparations) +
               4;
         },
         actionList: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.reparations) +
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.reparations) +
               5;
         },
         actionNouveau: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.reparations) +
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.reparations) +
               5;
-          Future.delayed(const Duration(milliseconds: 300))
-              .whenComplete(() {
+          Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
             late Tab tab;
             tab = Tab(
               key: UniqueKey(),
               text: Text('nouvrepar'.tr()),
               semanticLabel: 'nouvrepar'.tr(),
               icon: const Icon(FluentIcons.document),
-              body: ReparationForm(key: UniqueKey(),),
+              body: ReparationForm(
+                key: UniqueKey(),
+              ),
               onClosed: () {
                 ReparationTabsState.tabs.remove(tab);
 
@@ -200,24 +193,20 @@ class Dashboard extends StatelessWidget {
         text: 'prestataires'.tr(),
         getCount: DatabaseCounters().countPrestataire,
         action: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.reparations) +
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.reparations) +
               6;
         },
         actionList: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.reparations) +
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.reparations) +
               6;
         },
         actionNouveau: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.reparations) +
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.reparations) +
               6;
-          Future.delayed(const Duration(milliseconds: 300))
-              .whenComplete(() {
+          Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
             late Tab tab;
             tab = Tab(
               key: UniqueKey(),
@@ -244,24 +233,20 @@ class Dashboard extends StatelessWidget {
         text: 'chauffeurs'.tr(),
         getCount: DatabaseCounters().countChauffeur,
         action: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.chauffeurs) +
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.chauffeurs) +
               6;
         },
         actionList: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.chauffeurs) +
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.chauffeurs) +
               7;
         },
         actionNouveau: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.chauffeurs) +
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.chauffeurs) +
               7;
-          Future.delayed(const Duration(milliseconds: 300))
-              .whenComplete(() {
+          Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
             late Tab tab;
             tab = Tab(
               key: UniqueKey(),
@@ -288,31 +273,28 @@ class Dashboard extends StatelessWidget {
         text: 'chaufdocuments'.tr(),
         getCount: DatabaseCounters().countCDocs,
         action: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.chauffeurs) +
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.chauffeurs) +
               9;
         },
         actionList: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.chauffeurs) +
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.chauffeurs) +
               9;
         },
         actionNouveau: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.chauffeurs) +
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.chauffeurs) +
               9;
-          Future.delayed(const Duration(milliseconds: 300))
-              .whenComplete(() {
+          Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
             late Tab tab;
             tab = Tab(
               key: UniqueKey(),
               text: Text('nouvdocument'.tr()),
               semanticLabel: 'nouvdocument'.tr(),
               icon: const Icon(FluentIcons.new_folder),
-              body: const CDocumentForm(),
+              body: const ScaffoldPage(content: CDocumentForm(
+              ),),
               onClosed: () {
                 CDocumentTabsState.tabs.remove(tab);
 
@@ -332,15 +314,15 @@ class Dashboard extends StatelessWidget {
         text: 'reservation'.tr(),
         getCount: DatabaseCounters().countReservation,
         action: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.planner) +10;
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.planner) +
+              10;
         },
         showBothLN: false,
         actionList: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.planner) +10;
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.planner) +
+              10;
         },
       ),
       ButtonContainer(
@@ -348,92 +330,109 @@ class Dashboard extends StatelessWidget {
         text: 'activities'.tr(),
         getCount: DatabaseCounters().countLog,
         action: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.evenements) +10;
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.evenements) +
+              10;
         },
         showBothLN: false,
         actionList: () {
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems
-              .indexOf(PaneItemsAndFooters.evenements) +10;
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.evenements) +
+              10;
         },
-      ),];
+      ),
+    ];
   }
-  List<Widget> widgetList(AppTheme appTheme){
 
-    DateTime start=DateTime.now().subtract(const Duration(days: 30*6));
-    DateTime end=DateTime.now();
+  List<Widget> widgetList(AppTheme appTheme) {
+    DateTime start = DateTime.now().subtract(const Duration(days: 30 * 6));
+    DateTime end = DateTime.now();
 
     return [
       TableStats(
         title: 'vehicules'.tr(),
-        icon: Icon(FluentIcons.car,color:appTheme.color.darker,),
+        icon: Icon(
+          FluentIcons.car,
+          color: appTheme.color.darker,
+        ),
         content: const LogTable(
           pages: false,
           fieldsToShow: [
-            'act','id','date',
+            'act',
+            'id',
+            'date',
           ],
-          filters: {
-            'typemin':'0',
-            'typemax':'9'
-          },
+          filters: {'typemin': '0', 'typemax': '9'},
           statTable: true,
           numberOfRows: 5,
         ),
-        onTap: (){
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems.indexOf(PaneItemsAndFooters.vehicles)+1;
+        onTap: () {
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.vehicles) +
+              1;
         },
-
       ),
       TableStats(
         title: 'depenses'.tr(),
-        icon: Icon(FluentIcons.cost_control,color: appTheme.color.darker,),
-        content:  CostGraph(start: start,end: end, appTheme: appTheme,),
-        onTap: (){
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems.indexOf(PaneItemsAndFooters.reparations)+5;
+        icon: Icon(
+          FluentIcons.cost_control,
+          color: appTheme.color.darker,
+        ),
+        content: CostGraph(
+          start: start,
+          end: end,
+          appTheme: appTheme,
+        ),
+        onTap: () {
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.reparations) +
+              5;
         },
       ),
       TableStats(
         title: 'reparations'.tr(),
-        icon: Icon(FluentIcons.repair,color:appTheme.color.darker,),
+        icon: Icon(
+          FluentIcons.repair,
+          color: appTheme.color.darker,
+        ),
         content: const LogTable(
           pages: false,
           fieldsToShow: [
-            'act','id','date',
+            'act',
+            'id',
+            'date',
           ],
-          filters: {
-            'typemin':'10',
-            'typemax':'15'
-          },
+          filters: {'typemin': '10', 'typemax': '15'},
           statTable: true,
           numberOfRows: 5,
         ),
-        onTap: (){
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems.indexOf(PaneItemsAndFooters.reparations)+5;
+        onTap: () {
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.reparations) +
+              5;
         },
       ),
       TableStats(
         title: 'chauffeurs'.tr(),
-        icon: Icon(FluentIcons.people,color:appTheme.color.darker,),
+        icon: Icon(
+          FluentIcons.people,
+          color: appTheme.color.darker,
+        ),
         content: const LogTable(
           pages: false,
           fieldsToShow: [
-            'act','id','date',
+            'act',
+            'id',
+            'date',
           ],
-          filters: {
-            'typemin':'16',
-            'typemax':'25'
-          },
+          filters: {'typemin': '16', 'typemax': '25'},
           statTable: true,
           numberOfRows: 5,
         ),
-        onTap: (){
-          PanesListState.index.value = PaneItemsAndFooters
-              .originalItems.indexOf(PaneItemsAndFooters.chauffeurs)+7;
+        onTap: () {
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.chauffeurs) +
+              7;
         },
       ),
     ];

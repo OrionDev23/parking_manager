@@ -1,15 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
+import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/datasources/reparation/reparation_webservice.dart';
-import 'package:parc_oto/pdf_generation/pdf_theming.dart';
-import 'package:parc_oto/pdf_generation/reparation_pdf.dart';
 import 'package:parc_oto/screens/reparation/reparation_form/reparation_form.dart';
-import 'package:pdf/pdf.dart';
-import 'package:printing/printing.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../pdf_generation/pdf_preview_custom.dart';
 import '../../providers/client_database.dart';
 import '../../screens/reparation/manager/reparation_tabs.dart';
 import '../../serializables/reparation/reparation.dart';
@@ -17,6 +14,7 @@ import '../../widgets/on_tap_scale.dart';
 
 class ReparationDataSource extends ParcOtoDatasource<Reparation> {
   final bool? archive;
+
   ReparationDataSource(
       {required super.collectionID,
       this.archive,
@@ -59,82 +57,75 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation> {
       )),
       DataCell(SelectableText(dateFormat.format(element.value.updatedAt!),
           style: tstyle)),
-      if(selectC!=true)
-        DataCell(
+      if (selectC != true)
+        DataCell(f.FlyoutTarget(
+          controller: element.value.controller,
+          child: OnTapScaleAndFade(
+              onTap: () {
+                element.value.controller.showFlyout(builder: (context) {
+                  return f.MenuFlyout(
+                    items: [
+                      if (ClientDatabase().isAdmin() ||
+                          ClientDatabase().isManager())
+                        f.MenuFlyoutItem(
+                            text: const Text('mod').tr(),
+                            onPressed: () {
+                              Navigator.of(current).pop();
+                              late f.Tab tab;
+                              tab = f.Tab(
+                                key: UniqueKey(),
+                                text: Text(
+                                    '${"mod".tr()} ${'reparation'.tr().toLowerCase()} ${element.value.numero}'),
+                                semanticLabel:
+                                    '${'mod'.tr()} ${element.value.numero}',
+                                icon: const Icon(f.FluentIcons.edit),
+                                body: ReparationForm(
+                                  reparation: element.value,
+                                  key: UniqueKey(),
+                                ),
+                                onClosed: () {
+                                  ReparationTabsState.tabs.remove(tab);
 
-          f.FlyoutTarget(
-        controller: element.value.controller,
-        child: OnTapScaleAndFade(
-            onTap: () {
-              element.value.controller.showFlyout(builder: (context) {
-                return f.MenuFlyout(
-                  items: [
-                    if(ClientDatabase().isAdmin() || ClientDatabase().isManager())
-                    f.MenuFlyoutItem(
-                        text: const Text('mod').tr(),
-                        onPressed: () {
-                          Navigator.of(current).pop();
-                          late f.Tab tab;
-                          tab = f.Tab(
-                            key: UniqueKey(),
-                            text: Text(
-                                '${"mod".tr()} ${'reparation'.tr().toLowerCase()} ${element.value.numero}'),
-                            semanticLabel:
-                                '${'mod'.tr()} ${element.value.numero}',
-                            icon: const Icon(f.FluentIcons.edit),
-                            body: ReparationForm(
-                              reparation: element.value,
-                              key: UniqueKey(),
-                            ),
-                            onClosed: () {
-                              ReparationTabsState.tabs.remove(tab);
-
-                              if (ReparationTabsState.currentIndex.value > 0) {
-                                ReparationTabsState.currentIndex.value--;
-                              }
-                            },
-                          );
-                          final index = ReparationTabsState.tabs.length + 1;
-                          ReparationTabsState.tabs.add(tab);
-                          ReparationTabsState.currentIndex.value = index - 1;
-                        }),
-                    if (ClientDatabase().isAdmin())
+                                  if (ReparationTabsState.currentIndex.value >
+                                      0) {
+                                    ReparationTabsState.currentIndex.value--;
+                                  }
+                                },
+                              );
+                              final index = ReparationTabsState.tabs.length + 1;
+                              ReparationTabsState.tabs.add(tab);
+                              ReparationTabsState.currentIndex.value =
+                                  index - 1;
+                            }),
+                      if (ClientDatabase().isAdmin())
+                        f.MenuFlyoutItem(
+                            text: const Text('delete').tr(),
+                            onPressed: () {
+                              showDeleteConfirmation(element.value);
+                            }),
+                      const f.MenuFlyoutSeparator(),
                       f.MenuFlyoutItem(
-                          text: const Text('delete').tr(),
+                          text: const Text('prevoir').tr(),
                           onPressed: () {
-                            showDeleteConfirmation(element.value);
+                            showPdf(element.value);
                           }),
-                    const f.MenuFlyoutSeparator(),
-                    f.MenuFlyoutItem(
-                        text: const Text('prevoir').tr(),
-                        onPressed: () {
-                          showPdf(element.value);
-                        }),
-                  ],
-                );
-              });
-            },
-            child: const Icon(Icons.more_vert_sharp)),
-      )),
+                    ],
+                  );
+                });
+              },
+              child: const Icon(Icons.more_vert_sharp)),
+        )),
     ];
   }
 
   void showPdf(Reparation reparation) {
-    Future.delayed(const Duration(milliseconds: 50)).then((value) =>
-        f.showDialog(
-        context: current,
-        builder: (context) {
-          return PdfPreview(
-            pdfFileName: 'ordre${numberFormat.format(reparation.numero)}',
-            initialPageFormat: PdfPageFormat.a4,
-            canDebug: false,
-            canChangeOrientation: false,
-            canChangePageFormat: false,
-            build: (PdfPageFormat format) {
-              return ReparationPdf(reparation: reparation).getDocument();
-            },
-          );
-        }));
+    Future.delayed(const Duration(milliseconds: 50))
+        .then((value) => f.showDialog(
+            context: current,
+            barrierDismissible: true,
+            builder: (context) {
+              return PdfPreviewPO(reparation:reparation);
+            }));
   }
 
   @override

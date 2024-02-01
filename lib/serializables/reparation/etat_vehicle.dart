@@ -1,11 +1,8 @@
-
 import 'package:json_annotation/json_annotation.dart';
-
-
 part 'etat_vehicle.g.dart';
-@JsonSerializable()
-class EtatVehicle{
 
+@JsonSerializable()
+class EtatVehicle {
   double avdp = 100;
   double avgp = 100;
   double ardp = 100;
@@ -42,29 +39,47 @@ class EtatVehicle{
   bool siegeARD = false;
   bool siegeARG = false;
 
-  bool showOnList=false;
+  bool showOnList = false;
 
+  EtatVehicle(
+      {this.feuARG = false,
+      this.avgp = 100,
+      this.avdp = 100,
+      this.phareG = false,
+      this.feuAVG = false,
+      this.feuAVD = false,
+      this.phareD = false,
+      this.aileARD = false,
+      this.aileARG = false,
+      this.aileAVD = false,
+      this.aileAVG = false,
+      this.ardp = 100,
+      this.argp = 100,
+      this.calandre = false,
+      this.capot = false,
+      this.coffre = false,
+      this.feuARD = false,
+      this.parBriseArc = false,
+      this.parBriseAre = false,
+      this.parBriseArf = false,
+      this.parBriseAvc = false,
+      this.parBriseAve = false,
+      this.parBriseAvf = false,
+      this.pareChocAR = false,
+      this.pareChocAV = false,
+      this.porteARD = false,
+      this.porteARG = false,
+      this.porteAVD = false,
+      this.porteAVG = false,
+      this.siegeARD = false,
+      this.siegeARG = false,
+      this.siegeAVD = false,
+      this.siegeAVG = false,
+      this.toit = false,
+      this.showOnList = false});
 
-  EtatVehicle( {
-    this.feuARG=false, this.avgp=100, this.avdp=100, this.phareG=false,
-    this.feuAVG=false, this.feuAVD=false, this.phareD=false, this.aileARD=false,
-    this.aileARG=false, this.aileAVD=false, this.aileAVG=false, this.ardp=100,
-    this.argp=100, this.calandre=false, this.capot=false, this.coffre=false,
-    this.feuARD=false, this.parBriseArc=false, this.parBriseAre=false,
-    this.parBriseArf=false, this.parBriseAvc=false, this.parBriseAve=false,
-    this.parBriseAvf=false, this.pareChocAR=false, this.pareChocAV=false,
-    this.porteARD=false, this.porteARG=false, this.porteAVD=false,
-    this.porteAVG=false, this.siegeARD=false, this.siegeARG=false,
-    this.siegeAVD=false, this.siegeAVG=false, this.toit=false,this.showOnList=false
-  });
-
-
-
-  factory EtatVehicle.fromJson(Map<String, dynamic> json) => _$EtatVehicleFromJson(json);
+  factory EtatVehicle.fromJson(Map<String, dynamic> json) =>
+      _$EtatVehicleFromJson(json);
 
   Map<String, dynamic> toJson() => _$EtatVehicleToJson(this);
-
-
-
-
 }

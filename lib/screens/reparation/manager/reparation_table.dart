@@ -8,10 +8,13 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../../theme.dart';
 import '../../../../widgets/empty_table_widget.dart';
+
 class ReparationTable extends StatefulWidget {
   final bool selectD;
   final bool archive;
-  const ReparationTable({super.key,this.selectD=false,this.archive=false});
+
+  const ReparationTable(
+      {super.key, this.selectD = false, this.archive = false});
 
   @override
   State<ReparationTable> createState() => ReparationTableState();
@@ -24,7 +27,6 @@ class ReparationTableState extends State<ReparationTable> {
 
   static ValueNotifier<String?> filterDocument = ValueNotifier(null);
 
-
   static bool filterNow = false;
 
   bool filteredAlready = false;
@@ -36,25 +38,27 @@ class ReparationTableState extends State<ReparationTable> {
 
   @override
   void initState() {
-    if (filterDocument.value != null){
+    if (filterDocument.value != null) {
       startedWithFiltersOn = true;
       searchController.text = filterDocument.value!;
       reparationDataSource = ReparationDataSource(
           current: context,
-          selectC: widget.selectD, collectionID:reparationId,
+          selectC: widget.selectD,
+          collectionID: reparationId,
           searchKey: filterDocument.value);
-      filterDocument.value=null;
-    }
-    else{
+      filterDocument.value = null;
+    } else {
       startedWithFiltersOn = false;
 
-      reparationDataSource = ReparationDataSource(current: context, collectionID: reparationId,selectC: widget.selectD,archive: widget.archive);
-
+      reparationDataSource = ReparationDataSource(
+          current: context,
+          collectionID: reparationId,
+          selectC: widget.selectD,
+          archive: widget.archive);
     }
     initColumns();
     super.initState();
   }
-
 
   int sortColumn = 0;
 
@@ -160,13 +164,13 @@ class ReparationTableState extends State<ReparationTable> {
           setState(() {});
         },
       ),
-      if(widget.selectD!=true)
-      DataColumn2(
-        label: const Text(''),
-        size: ColumnSize.S,
-        fixedWidth: 2.w,
-        onSort: null,
-      ),
+      if (widget.selectD != true)
+        DataColumn2(
+          label: const Text(''),
+          size: ColumnSize.S,
+          fixedWidth: 2.w,
+          onSort: null,
+        ),
     ];
   }
 
@@ -175,23 +179,25 @@ class ReparationTableState extends State<ReparationTable> {
   TextEditingController searchController = TextEditingController();
 
   bool notEmpty = false;
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
-    reparationDataSource.appTheme=appTheme;
+    reparationDataSource.appTheme = appTheme;
     return ValueListenableBuilder(
         valueListenable: filterDocument,
         builder: (context, v, _) {
           if (!startedWithFiltersOn && v != null && filterNow) {
             searchController.text = v;
             reparationDataSource.search(v);
-            notEmpty=true;
+            notEmpty = true;
             filtered = true;
             filterNow = false;
           }
           return AsyncPaginatedDataTable2(
             header: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -204,9 +210,7 @@ class ReparationTableState extends State<ReparationTable> {
                       style: appTheme.writingStyle,
                       cursorColor: appTheme.color.darker,
                       placeholderStyle: placeStyle,
-                      decoration: BoxDecoration(
-                          color: appTheme.fillColor
-                      ),
+                      decoration: BoxDecoration(color: appTheme.fillColor),
                       onSubmitted: (s) {
                         if (s.isNotEmpty) {
                           reparationDataSource.search(s);
@@ -225,13 +229,13 @@ class ReparationTableState extends State<ReparationTable> {
                       },
                       suffix: notEmpty
                           ? IconButton(
-                          icon: const Icon(FluentIcons.cancel),
-                          onPressed: () {
-                            searchController.text = "";
-                            notEmpty = false;
-                            setState(() {});
-                            reparationDataSource.search('');
-                          })
+                              icon: const Icon(FluentIcons.cancel),
+                              onPressed: () {
+                                searchController.text = "";
+                                notEmpty = false;
+                                setState(() {});
+                                reparationDataSource.search('');
+                              })
                           : null,
                     ),
                   ),
@@ -242,11 +246,10 @@ class ReparationTableState extends State<ReparationTable> {
             headingRowHeight: 25,
             headingRowDecoration: BoxDecoration(
                 color: appTheme.color,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(5))
-            ),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(5))),
             dividerThickness: 0.5,
             autoRowsToHeight: true,
-
             horizontalMargin: 8,
             columnSpacing: 0,
             dataRowHeight: rowHeight,
@@ -258,7 +261,9 @@ class ReparationTableState extends State<ReparationTable> {
               rowPerPage = nbr ?? 12;
             },
             availableRowsPerPage: const [12, 24, 50, 100, 200],
-            empty: NoDataWidget(datasource: reparationDataSource,),
+            empty: NoDataWidget(
+              datasource: reparationDataSource,
+            ),
             showFirstLastButtons: true,
             renderEmptyRowsInTheEnd: false,
             fit: FlexFit.tight,
@@ -266,7 +271,8 @@ class ReparationTableState extends State<ReparationTable> {
             source: reparationDataSource,
             sortArrowAlwaysVisible: true,
             hidePaginator: false,
-          );});
+          );
+        });
   }
 
   @override

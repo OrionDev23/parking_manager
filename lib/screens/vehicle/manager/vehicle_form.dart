@@ -19,6 +19,7 @@ import '../../../widgets/select_dialog/select_dialog.dart';
 class VehicleForm extends StatefulWidget {
   final Vehicle? vehicle;
   final Tab? tab;
+
   const VehicleForm({super.key, this.vehicle, this.tab});
 
   @override
@@ -27,15 +28,13 @@ class VehicleForm extends StatefulWidget {
 
 class _VehicleFormState extends State<VehicleForm>
     with AutomaticKeepAliveClientMixin<VehicleForm> {
-
-
   TextEditingController matriculeEtr = TextEditingController();
   TextEditingController matr1 = TextEditingController();
   TextEditingController matr2 = TextEditingController();
   TextEditingController matr3 = TextEditingController();
-  TextEditingController wilayaCont=TextEditingController();
-  TextEditingController dairaCont=TextEditingController();
-  TextEditingController communeCont=TextEditingController();
+  TextEditingController wilayaCont = TextEditingController();
+  TextEditingController dairaCont = TextEditingController();
+  TextEditingController communeCont = TextEditingController();
   TextEditingController quittance = TextEditingController(text: '800');
   TextEditingController numero = TextEditingController();
   TextEditingController lname = TextEditingController();
@@ -55,17 +54,14 @@ class _VehicleFormState extends State<VehicleForm>
   bool autreMat = false;
   int? marque;
 
-  bool erreurMatricule=false;
+  bool erreurMatricule = false;
 
   int? genre;
 
   String pays = 'DZ';
 
   final double height = 9.h;
-  final double heightFirst=17.h;
-
-
-
+  final double heightFirst = 17.h;
 
   String wilaya = "16";
 
@@ -76,58 +72,61 @@ class _VehicleFormState extends State<VehicleForm>
     initValues();
     super.initState();
   }
-  void initValues(){
+
+  void initValues() {
     AlgeriaList();
-    if(widget.vehicle!=null){
-      documentID=widget.vehicle!.id;
-      if(widget.vehicle!.matriculeEtrang){
-        autreMat=true;
-        matriculeEtr.text=widget.vehicle!.matricule;
-      }
-      else{
-        autreMat=false;
-        var mats=widget.vehicle!.matricule.split('-');
-        if(mats.length>=3){
-          matr1.text=mats[0];
-          matr2.text=mats[1];
-          matr3.text=mats[2];
+    if (widget.vehicle != null) {
+      documentID = widget.vehicle!.id;
+      if (widget.vehicle!.matriculeEtrang) {
+        autreMat = true;
+        matriculeEtr.text = widget.vehicle!.matricule;
+      } else {
+        autreMat = false;
+        var mats = widget.vehicle!.matricule.split('-');
+        if (mats.length >= 3) {
+          matr1.text = mats[0];
+          matr2.text = mats[1];
+          matr3.text = mats[2];
         }
-
       }
-      pays=widget.vehicle!.pays??'DZ';
-      wilayaCont.text=AlgeriaList().getWilayaByNum(widget.vehicle!.wilaya?.toString()??'16')??'';
-      wilaya=widget.vehicle!.wilaya?.toString()??'';
-      communeCont.text=widget.vehicle!.commune??'';
-      dairaCont.text=widget.vehicle!.daira??'';
-      selectedDate=widget.vehicle!.date??DateTime.now();
-      quittance.text=widget.vehicle!.quittance?.toString()??'';
-      numero.text=widget.vehicle!.numero??'';
-      lname.text=widget.vehicle!.nom??'';
-      fname.text=widget.vehicle!.prenom??'';
-      profession.text=widget.vehicle!.profession??'';
-      adresse.text=widget.vehicle!.adresse??'';
-      genre=int.tryParse(widget.vehicle!.genre??'-1');
-      marque=int.tryParse(widget.vehicle!.marque??'-1');
-      type.text=widget.vehicle!.type??'';
-      numSer.text=widget.vehicle!.numeroSerie??'';
-      caross.text=widget.vehicle!.carrosserie??'';
-      energie.text=widget.vehicle!.energie??'';
-      puissance.text=widget.vehicle!.puissance?.toString()??'';
-      places.text=widget.vehicle!.placesAssises?.toString()??'';
-      poidsT.text=widget.vehicle!.poidsTotal?.toString()??'';
-      charg.text=widget.vehicle!.charegeUtile?.toString()??'';
-      matrPrec.text=widget.vehicle!.matriculePrec??'';
-      selectedDate=DateTime(widget.vehicle!.anneeUtil??DateTime.now().year);
+      pays = widget.vehicle!.pays ?? 'DZ';
+      wilayaCont.text = AlgeriaList()
+              .getWilayaByNum(widget.vehicle!.wilaya?.toString() ?? '16') ??
+          '';
+      wilaya = widget.vehicle!.wilaya?.toString() ?? '';
+      communeCont.text = widget.vehicle!.commune ?? '';
+      dairaCont.text = widget.vehicle!.daira ?? '';
+      selectedDate = widget.vehicle!.date ?? DateTime.now();
+      quittance.text = widget.vehicle!.quittance?.toString() ?? '';
+      numero.text = widget.vehicle!.numero ?? '';
+      lname.text = widget.vehicle!.nom ?? '';
+      fname.text = widget.vehicle!.prenom ?? '';
+      profession.text = widget.vehicle!.profession ?? '';
+      adresse.text = widget.vehicle!.adresse ?? '';
+      genre = int.tryParse(widget.vehicle!.genre ?? '-1');
+      marque = int.tryParse(widget.vehicle!.marque ?? '-1');
+      type.text = widget.vehicle!.type ?? '';
+      numSer.text = widget.vehicle!.numeroSerie ?? '';
+      caross.text = widget.vehicle!.carrosserie ?? '';
+      energie.text = widget.vehicle!.energie ?? '';
+      puissance.text = widget.vehicle!.puissance?.toString() ?? '';
+      places.text = widget.vehicle!.placesAssises?.toString() ?? '';
+      poidsT.text = widget.vehicle!.poidsTotal?.toString() ?? '';
+      charg.text = widget.vehicle!.charegeUtile?.toString() ?? '';
+      matrPrec.text = widget.vehicle!.matriculePrec ?? '';
+      selectedDate = DateTime(widget.vehicle!.anneeUtil ?? DateTime.now().year);
     }
-    documentID ??= ClientDatabase.ref.difference(DateTime.now()).inMilliseconds.abs().toString();
-
+    documentID ??= ClientDatabase.ref
+        .difference(DateTime.now())
+        .inMilliseconds
+        .abs()
+        .toString();
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
     var appTheme = context.watch<AppTheme>();
-
 
     return ScaffoldPage(
         content: Padding(
@@ -152,8 +151,7 @@ class _VehicleFormState extends State<VehicleForm>
                                 ),
                                 width: 60.w,
                                 child: Padding(
-                                  padding: const EdgeInsets.all(
-                                       5.0),
+                                  padding: const EdgeInsets.all(5.0),
                                   child: StaggeredGrid.count(
                                       crossAxisCount:
                                           MediaQuery.of(context).orientation ==
@@ -179,16 +177,16 @@ class _VehicleFormState extends State<VehicleForm>
                                                     style: tstyle,
                                                   ).tr(),
                                                   CountryCodePicker(
-                                                    boxDecoration:
-                                                        BoxDecoration(
-                                                            color: appTheme.backGroundColor,
-                                                            boxShadow:
-                                                                kElevationToShadow[
-                                                                    2]),
+                                                    boxDecoration: BoxDecoration(
+                                                        color: appTheme
+                                                            .backGroundColor,
+                                                        boxShadow:
+                                                            kElevationToShadow[
+                                                                2]),
                                                     padding:
                                                         const EdgeInsets.all(3),
-                                                    searchDecoration:
-                                                    appTheme.inputDecoration,
+                                                    searchDecoration: appTheme
+                                                        .inputDecoration,
                                                     dialogSize:
                                                         Size(40.w, 60.h),
                                                     initialSelection: pays,
@@ -211,16 +209,18 @@ class _VehicleFormState extends State<VehicleForm>
                                                     height: 5.h,
                                                     child:
                                                         AutoSuggestBox<String>(
-                                                          controller: wilayaCont,
-                                                          placeholder:
+                                                      controller: wilayaCont,
+                                                      placeholder:
                                                           'wilaya'.tr(),
                                                       placeholderStyle:
                                                           placeStyle,
                                                       cursorColor:
                                                           appTheme.color.darker,
-                                                      style: appTheme.writingStyle,
+                                                      style:
+                                                          appTheme.writingStyle,
                                                       decoration: BoxDecoration(
-                                                        color: appTheme.fillColor,
+                                                        color:
+                                                            appTheme.fillColor,
                                                       ),
                                                       items: AlgeriaList.dzair!
                                                           .getWilayat()!
@@ -241,7 +241,8 @@ class _VehicleFormState extends State<VehicleForm>
                                                       onSelected: (item) {
                                                         setState(() {
                                                           wilaya = item.value!;
-                                                          wilayaCont.text = AlgeriaList
+                                                          wilayaCont
+                                                              .text = AlgeriaList
                                                                   .dzair!
                                                                   .searchWilayatByName(
                                                                       item
@@ -264,7 +265,8 @@ class _VehicleFormState extends State<VehicleForm>
                                                             TextChangedReason
                                                                 .userInput) {
                                                           setState(() =>
-                                                              wilayaCont.text = s);
+                                                              wilayaCont.text =
+                                                                  s);
                                                         }
                                                       },
                                                     ),
@@ -300,12 +302,18 @@ class _VehicleFormState extends State<VehicleForm>
                                                       style: tstyle,
                                                     ).tr(),
                                                   ),
-                                                  if(!erreurMatricule)
-                                                  const Spacer(),
-                                                  if(erreurMatricule)
+                                                  if (!erreurMatricule)
+                                                    const Spacer(),
+                                                  if (erreurMatricule)
                                                     Padding(
-                                                      padding: const EdgeInsets.all(8.0),
-                                                      child: Text('erreurmat',style:TextStyle(color:Colors.red)).tr(),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Text('erreurmat',
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red))
+                                                          .tr(),
                                                     ),
                                                   Padding(
                                                     padding: const EdgeInsets
@@ -319,7 +327,8 @@ class _VehicleFormState extends State<VehicleForm>
                                                             cursorColor:
                                                                 appTheme.color
                                                                     .darker,
-                                                            style: appTheme.writingStyle,
+                                                            style: appTheme
+                                                                .writingStyle,
                                                             placeholder:
                                                                 'XXXXXXXXXXXXXX',
                                                             textAlign: TextAlign
@@ -328,11 +337,14 @@ class _VehicleFormState extends State<VehicleForm>
                                                                 placeStyle,
                                                             decoration:
                                                                 BoxDecoration(
-                                                              color: appTheme.fillColor,
+                                                              color: appTheme
+                                                                  .fillColor,
                                                             ),
-                                                      inputFormatters: <TextInputFormatter>[
-                                                        FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z.-]")),
-                                                      ],
+                                                            inputFormatters: <TextInputFormatter>[
+                                                              FilteringTextInputFormatter
+                                                                  .allow(RegExp(
+                                                                      "[0-9a-zA-Z.-]")),
+                                                            ],
                                                           )
                                                         : Row(
                                                             mainAxisAlignment:
@@ -348,15 +360,16 @@ class _VehicleFormState extends State<VehicleForm>
                                                                       appTheme
                                                                           .color
                                                                           .darker,
-                                                                  style:
-                                                                  appTheme.writingStyle,
+                                                                  style: appTheme
+                                                                      .writingStyle,
                                                                   placeholder:
                                                                       '123456',
                                                                   placeholderStyle:
                                                                       placeStyle,
                                                                   decoration:
                                                                       BoxDecoration(
-                                                                    color: appTheme.fillColor,
+                                                                    color: appTheme
+                                                                        .fillColor,
                                                                   ),
                                                                   maxLength: 6,
                                                                   textAlign:
@@ -383,8 +396,8 @@ class _VehicleFormState extends State<VehicleForm>
                                                                       appTheme
                                                                           .color
                                                                           .darker,
-                                                                  style:
-                                                                  appTheme.writingStyle,
+                                                                  style: appTheme
+                                                                      .writingStyle,
                                                                   placeholder:
                                                                       '123',
                                                                   maxLength: 3,
@@ -392,7 +405,8 @@ class _VehicleFormState extends State<VehicleForm>
                                                                       placeStyle,
                                                                   decoration:
                                                                       BoxDecoration(
-                                                                    color: appTheme.fillColor,
+                                                                    color: appTheme
+                                                                        .fillColor,
                                                                   ),
                                                                   textAlign:
                                                                       TextAlign
@@ -401,8 +415,10 @@ class _VehicleFormState extends State<VehicleForm>
                                                                     FilteringTextInputFormatter
                                                                         .digitsOnly
                                                                   ],
-                                                                  onChanged: (s){
-                                                                    updateOverMatricule(appTheme);
+                                                                  onChanged:
+                                                                      (s) {
+                                                                    updateOverMatricule(
+                                                                        appTheme);
                                                                   },
                                                                 ),
                                                               ),
@@ -421,8 +437,8 @@ class _VehicleFormState extends State<VehicleForm>
                                                                       appTheme
                                                                           .color
                                                                           .darker,
-                                                                  style:
-                                                                  appTheme.writingStyle,
+                                                                  style: appTheme
+                                                                      .writingStyle,
                                                                   placeholder:
                                                                       '12',
                                                                   maxLength: 2,
@@ -430,7 +446,8 @@ class _VehicleFormState extends State<VehicleForm>
                                                                       placeStyle,
                                                                   decoration:
                                                                       BoxDecoration(
-                                                                    color: appTheme.fillColor,
+                                                                    color: appTheme
+                                                                        .fillColor,
                                                                   ),
                                                                   textAlign:
                                                                       TextAlign
@@ -439,8 +456,10 @@ class _VehicleFormState extends State<VehicleForm>
                                                                     FilteringTextInputFormatter
                                                                         .digitsOnly
                                                                   ],
-                                                                  onChanged: (s){
-                                                                    updateOverMatricule(appTheme);
+                                                                  onChanged:
+                                                                      (s) {
+                                                                    updateOverMatricule(
+                                                                        appTheme);
                                                                   },
                                                                 ),
                                                               ),
@@ -496,17 +515,20 @@ class _VehicleFormState extends State<VehicleForm>
                                                     child:
                                                         AutoSuggestBox<String>(
                                                       controller: dairaCont,
-                                                          placeholder: 'daira'.tr(),
+                                                      placeholder: 'daira'.tr(),
                                                       cursorColor:
                                                           appTheme.color.darker,
-                                                      style: appTheme.writingStyle,
+                                                      style:
+                                                          appTheme.writingStyle,
                                                       placeholderStyle:
                                                           placeStyle,
                                                       decoration: BoxDecoration(
-                                                        color: appTheme.fillColor,
+                                                        color:
+                                                            appTheme.fillColor,
                                                       ),
                                                       items: AlgeriaList()
-                                                          .getDairas(wilayaCont.text)
+                                                          .getDairas(
+                                                              wilayaCont.text)
                                                           .map((daira) {
                                                         return AutoSuggestBoxItem<
                                                             String>(
@@ -527,15 +549,17 @@ class _VehicleFormState extends State<VehicleForm>
                                                         );
                                                       }).toList(),
                                                       onSelected: (item) {
-                                                        setState(() => dairaCont.text =
+                                                        setState(() => dairaCont
+                                                                .text =
                                                             item.value ?? "");
                                                       },
                                                       onChanged: (s, r) {
                                                         if (r ==
                                                             TextChangedReason
                                                                 .userInput) {
-                                                          setState(
-                                                              () => dairaCont.text = s);
+                                                          setState(() =>
+                                                              dairaCont.text =
+                                                                  s);
                                                         }
                                                       },
                                                     ),
@@ -549,15 +573,17 @@ class _VehicleFormState extends State<VehicleForm>
                                                     child:
                                                         AutoSuggestBox<String>(
                                                       controller: communeCont,
-                                                          placeholder:
+                                                      placeholder:
                                                           'commune'.tr(),
                                                       placeholderStyle:
                                                           placeStyle,
                                                       cursorColor:
                                                           appTheme.color.darker,
-                                                      style: appTheme.writingStyle,
+                                                      style:
+                                                          appTheme.writingStyle,
                                                       decoration: BoxDecoration(
-                                                        color: appTheme.fillColor,
+                                                        color:
+                                                            appTheme.fillColor,
                                                       ),
                                                       items: AlgeriaList()
                                                           .getCommune(
@@ -586,15 +612,18 @@ class _VehicleFormState extends State<VehicleForm>
                                                         );
                                                       }).toList(),
                                                       onSelected: (item) {
-                                                        setState(() => communeCont.text =
-                                                            item.value ?? "");
+                                                        setState(() =>
+                                                            communeCont.text =
+                                                                item.value ??
+                                                                    "");
                                                       },
                                                       onChanged: (s, r) {
                                                         if (r ==
                                                             TextChangedReason
                                                                 .userInput) {
                                                           setState(() =>
-                                                              communeCont.text = s);
+                                                              communeCont.text =
+                                                                  s);
                                                         }
                                                       },
                                                     ),
@@ -620,11 +649,11 @@ class _VehicleFormState extends State<VehicleForm>
                                                     style: tstyle,
                                                   ).tr(),
                                                   DatePicker(
-                                                      selected: selectedDate,
-                                                    onChanged: (s){
-                                                        setState(() {
-                                                          selectedDate=s;
-                                                        });
+                                                    selected: selectedDate,
+                                                    onChanged: (s) {
+                                                      setState(() {
+                                                        selectedDate = s;
+                                                      });
                                                     },
                                                   ),
                                                 ],
@@ -670,9 +699,9 @@ class _VehicleFormState extends State<VehicleForm>
                                                     color: appTheme.fillColor,
                                                   ),
                                                   inputFormatters: [
-                                                    FilteringTextInputFormatter.allow(
-                                                        RegExp(r'^(\d+)?\.?\d{0,2}')
-                                                    )
+                                                    FilteringTextInputFormatter
+                                                        .allow(RegExp(
+                                                            r'^(\d+)?\.?\d{0,2}'))
                                                   ],
                                                 ),
                                               ],
@@ -737,9 +766,11 @@ class _VehicleFormState extends State<VehicleForm>
                                                           placeStyle,
                                                       cursorColor:
                                                           appTheme.color.darker,
-                                                      style: appTheme.writingStyle,
+                                                      style:
+                                                          appTheme.writingStyle,
                                                       decoration: BoxDecoration(
-                                                        color: appTheme.fillColor,
+                                                        color:
+                                                            appTheme.fillColor,
                                                       ),
                                                     )),
                                               ],
@@ -773,11 +804,12 @@ class _VehicleFormState extends State<VehicleForm>
                                                             placeStyle,
                                                         cursorColor: appTheme
                                                             .color.darker,
-                                                        style: appTheme.writingStyle,
+                                                        style: appTheme
+                                                            .writingStyle,
                                                         decoration:
                                                             BoxDecoration(
-                                                          color:
-                                                          appTheme.fillColor,
+                                                          color: appTheme
+                                                              .fillColor,
                                                         ),
                                                       )),
                                                 ]),
@@ -810,9 +842,11 @@ class _VehicleFormState extends State<VehicleForm>
                                                           placeStyle,
                                                       cursorColor:
                                                           appTheme.color.darker,
-                                                      style: appTheme.writingStyle,
+                                                      style:
+                                                          appTheme.writingStyle,
                                                       decoration: BoxDecoration(
-                                                        color: appTheme.fillColor,
+                                                        color:
+                                                            appTheme.fillColor,
                                                       ),
                                                     )),
                                               ],
@@ -846,9 +880,11 @@ class _VehicleFormState extends State<VehicleForm>
                                                           placeStyle,
                                                       cursorColor:
                                                           appTheme.color.darker,
-                                                      style: appTheme.writingStyle,
+                                                      style:
+                                                          appTheme.writingStyle,
                                                       decoration: BoxDecoration(
-                                                        color: appTheme.fillColor,
+                                                        color:
+                                                            appTheme.fillColor,
                                                       ),
                                                     )),
                                               ],
@@ -887,61 +923,99 @@ class _VehicleFormState extends State<VehicleForm>
                                                   Flexible(
                                                     child: ListTile(
                                                       title: AutoSizeText(
-                                                        (VehiclesUtilities.genres![genre??-1]??'nonind').tr(),
+                                                        (VehiclesUtilities
+                                                                        .genres![
+                                                                    genre ??
+                                                                        -1] ??
+                                                                'nonind')
+                                                            .tr(),
                                                         minFontSize: 5,
                                                         softWrap: true,
-                                                        maxLines:1,
+                                                        maxLines: 1,
                                                       ),
                                                       onPressed: () {
                                                         SelectDialog.showModal<
-                                                            int>(context,
+                                                            int>(
+                                                          context,
                                                           selectedValue: genre,
-                                                          backgroundColor: appTheme.backGroundColor,
+                                                          backgroundColor: appTheme
+                                                              .backGroundColor,
                                                           items:
-                                                          VehiclesUtilities
-                                                              .genres!.keys.toList(),
+                                                              VehiclesUtilities
+                                                                  .genres!.keys
+                                                                  .toList(),
                                                           itemBuilder:
                                                               (c, v, e) {
                                                             return Container(
-                                                              padding: const EdgeInsets.all(5.0),
-                                                              color: v%2==0?Colors.transparent:appTheme.color.lightest,
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(5.0),
+                                                              color: v % 2 == 0
+                                                                  ? Colors
+                                                                      .transparent
+                                                                  : appTheme
+                                                                      .color
+                                                                      .lightest,
                                                               child: Row(
-                                                                children:[
-                                                                  Text(v.toString()),
+                                                                children: [
+                                                                  Text(v
+                                                                      .toString()),
                                                                   smallSpace,
                                                                   smallSpace,
                                                                   smallSpace,
-                                                                  Text(VehiclesUtilities.genres?[v]??'').tr(),
+                                                                  Text(VehiclesUtilities
+                                                                              .genres?[v] ??
+                                                                          '')
+                                                                      .tr(),
                                                                 ],
                                                               ),
                                                             );
                                                           },
-                                                          onChange: (s){
+                                                          onChange: (s) {
                                                             setState(() {
-                                                              genre=s;
+                                                              genre = s;
                                                             });
                                                           },
-                                                          onFind: VehiclesUtilities.findGenres,
-                                                          emptyBuilder: (s){
+                                                          onFind:
+                                                              VehiclesUtilities
+                                                                  .findGenres,
+                                                          emptyBuilder: (s) {
                                                             return Center(
-                                                              child: Text('lvide',style: TextStyle(color:Colors.grey[100]),).tr(),
+                                                              child: Text(
+                                                                'lvide',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                            .grey[
+                                                                        100]),
+                                                              ).tr(),
                                                             );
                                                           },
-                                                          loadingBuilder: (s){
+                                                          loadingBuilder: (s) {
                                                             return Center(
-                                                              child: Text('telechargement',style:TextStyle(color:Colors.grey[100])).tr(),
+                                                              child: Text(
+                                                                      'telechargement',
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.grey[100]))
+                                                                  .tr(),
                                                             );
                                                           },
-                                                          searchBoxDecoration: appTheme.inputDecoration.copyWith(
-                                                            labelText: 'search'.tr(),
-                                                            labelStyle: placeStyle,
+                                                          searchBoxDecoration:
+                                                              appTheme
+                                                                  .inputDecoration
+                                                                  .copyWith(
+                                                            labelText:
+                                                                'search'.tr(),
+                                                            labelStyle:
+                                                                placeStyle,
                                                           ),
-                                                          searchTextStyle: appTheme.writingStyle,
-                                                          searchCursorColor: appTheme.color,
-
+                                                          searchTextStyle:
+                                                              appTheme
+                                                                  .writingStyle,
+                                                          searchCursorColor:
+                                                              appTheme.color,
                                                         );
                                                       },
-
                                                     ),
                                                   ),
                                                 ],
@@ -971,51 +1045,91 @@ class _VehicleFormState extends State<VehicleForm>
                                                   ).tr(),
                                                   Flexible(
                                                     child: ListTile(
-                                                      leading: Image.asset('assets/images/marques/${marque==null || marque!<=0 ?'default':marque!}.webp',width: 4.h,height: 4.h,),
-                                                      title: AutoSizeText(VehiclesUtilities.marques![marque==null || marque!<=0?0:marque!]??'nonind'.tr(),minFontSize: 5,maxLines: 1,),
+                                                      leading: Image.asset(
+                                                        'assets/images/marques/${marque == null || marque! <= 0 ? 'default' : marque!}.webp',
+                                                        width: 4.h,
+                                                        height: 4.h,
+                                                      ),
+                                                      title: AutoSizeText(
+                                                        VehiclesUtilities
+                                                                .marques![marque ==
+                                                                        null ||
+                                                                    marque! <= 0
+                                                                ? 0
+                                                                : marque!] ??
+                                                            'nonind'.tr(),
+                                                        minFontSize: 5,
+                                                        maxLines: 1,
+                                                      ),
                                                       onPressed: () {
                                                         SelectDialog.showModal<
-                                                                int?>(context,
-                                                            selectedValue: marque,
-                                                            backgroundColor: appTheme.backGroundColor,
-                                                            gridView: true,
-                                                            numberOfGridCross: 3,
-                                                            constraints: BoxConstraints.loose(Size(60.w,70.h)),
-                                                            items:
-                                                                VehiclesUtilities
-                                                                    .marques!.keys.toList(),
-                                                            itemBuilder:
-                                                                (c, v, e) {
-                                                          return Card(
-                                                              child: Image.asset(
-                                                                  'assets/images/marques/${v??'default'}.webp'));
-                                                        },
-                                                          onChange: (s){
-                                                                  setState(() {
-                                                                    marque=s;
-                                                                  });
+                                                            int?>(
+                                                          context,
+                                                          selectedValue: marque,
+                                                          backgroundColor: appTheme
+                                                              .backGroundColor,
+                                                          gridView: true,
+                                                          numberOfGridCross: 3,
+                                                          constraints:
+                                                              BoxConstraints
+                                                                  .loose(Size(
+                                                                      60.w,
+                                                                      70.h)),
+                                                          items:
+                                                              VehiclesUtilities
+                                                                  .marques!.keys
+                                                                  .toList(),
+                                                          itemBuilder:
+                                                              (c, v, e) {
+                                                            return Card(
+                                                                child: Image.asset(
+                                                                    'assets/images/marques/${v ?? 'default'}.webp'));
                                                           },
-                                                          onFind: VehiclesUtilities.findMarque,
-                                                          emptyBuilder: (s){
-                                                                  return Center(
-                                                                   child: Text('lvide',style: TextStyle(color:Colors.grey[100]),).tr(),
-                                                                  );
+                                                          onChange: (s) {
+                                                            setState(() {
+                                                              marque = s;
+                                                            });
                                                           },
-                                                          loadingBuilder: (s){
-                                                                  return Center(
-                                                                    child: Text('telechargement',style:TextStyle(color:Colors.grey[100])).tr(),
-                                                                  );
+                                                          onFind:
+                                                              VehiclesUtilities
+                                                                  .findMarque,
+                                                          emptyBuilder: (s) {
+                                                            return Center(
+                                                              child: Text(
+                                                                'lvide',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                            .grey[
+                                                                        100]),
+                                                              ).tr(),
+                                                            );
                                                           },
-                                                          searchBoxDecoration: appTheme.inputDecoration.copyWith(
-                                                            labelText: 'search'.tr(),
-                                                            labelStyle: placeStyle,
+                                                          loadingBuilder: (s) {
+                                                            return Center(
+                                                              child: Text(
+                                                                      'telechargement',
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              Colors.grey[100]))
+                                                                  .tr(),
+                                                            );
+                                                          },
+                                                          searchBoxDecoration:
+                                                              appTheme
+                                                                  .inputDecoration
+                                                                  .copyWith(
+                                                            labelText:
+                                                                'search'.tr(),
+                                                            labelStyle:
+                                                                placeStyle,
                                                           ),
-                                                          searchTextStyle: appTheme.writingStyle,
-                                                          searchCursorColor: appTheme.color,
-
+                                                          searchTextStyle:
+                                                              appTheme
+                                                                  .writingStyle,
+                                                          searchCursorColor:
+                                                              appTheme.color,
                                                         );
-                                                              },
-
+                                                      },
                                                     ),
                                                   ),
                                                 ],
@@ -1051,7 +1165,8 @@ class _VehicleFormState extends State<VehicleForm>
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: appTheme.writingStyle,
+                                                    style:
+                                                        appTheme.writingStyle,
                                                     decoration: BoxDecoration(
                                                       color: appTheme.fillColor,
                                                     ),
@@ -1084,13 +1199,13 @@ class _VehicleFormState extends State<VehicleForm>
                                                   TextBox(
                                                     controller: numSer,
                                                     maxLength: 30,
-                                                    placeholder:
-                                                        'nchassi'.tr(),
+                                                    placeholder: 'nchassi'.tr(),
                                                     placeholderStyle:
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: appTheme.writingStyle,
+                                                    style:
+                                                        appTheme.writingStyle,
                                                     decoration: BoxDecoration(
                                                       color: appTheme.fillColor,
                                                     ),
@@ -1128,7 +1243,8 @@ class _VehicleFormState extends State<VehicleForm>
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: appTheme.writingStyle,
+                                                    style:
+                                                        appTheme.writingStyle,
                                                     decoration: BoxDecoration(
                                                       color: appTheme.fillColor,
                                                     ),
@@ -1166,7 +1282,8 @@ class _VehicleFormState extends State<VehicleForm>
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: appTheme.writingStyle,
+                                                    style:
+                                                        appTheme.writingStyle,
                                                     decoration: BoxDecoration(
                                                       color: appTheme.fillColor,
                                                     ),
@@ -1204,11 +1321,15 @@ class _VehicleFormState extends State<VehicleForm>
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: appTheme.writingStyle,
+                                                    style:
+                                                        appTheme.writingStyle,
                                                     decoration: BoxDecoration(
                                                       color: appTheme.fillColor,
                                                     ),
-                                                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                                    inputFormatters: [
+                                                      FilteringTextInputFormatter
+                                                          .digitsOnly
+                                                    ],
                                                   ),
                                                 ],
                                               ),
@@ -1243,12 +1364,15 @@ class _VehicleFormState extends State<VehicleForm>
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: appTheme.writingStyle,
+                                                    style:
+                                                        appTheme.writingStyle,
                                                     decoration: BoxDecoration(
                                                       color: appTheme.fillColor,
                                                     ),
-                                                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-
+                                                    inputFormatters: [
+                                                      FilteringTextInputFormatter
+                                                          .digitsOnly
+                                                    ],
                                                   ),
                                                 ],
                                               ),
@@ -1279,12 +1403,16 @@ class _VehicleFormState extends State<VehicleForm>
                                                     placeholder: '000000',
                                                     controller: poidsT,
                                                     maxLength: 15,
-                                                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                                    inputFormatters: [
+                                                      FilteringTextInputFormatter
+                                                          .digitsOnly
+                                                    ],
                                                     placeholderStyle:
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: appTheme.writingStyle,
+                                                    style:
+                                                        appTheme.writingStyle,
                                                     decoration: BoxDecoration(
                                                       color: appTheme.fillColor,
                                                     ),
@@ -1318,13 +1446,16 @@ class _VehicleFormState extends State<VehicleForm>
                                                     placeholder: '000000',
                                                     controller: charg,
                                                     maxLength: 15,
-                                                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-
+                                                    inputFormatters: [
+                                                      FilteringTextInputFormatter
+                                                          .digitsOnly
+                                                    ],
                                                     placeholderStyle:
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: appTheme.writingStyle,
+                                                    style:
+                                                        appTheme.writingStyle,
                                                     decoration: BoxDecoration(
                                                       color: appTheme.fillColor,
                                                     ),
@@ -1356,20 +1487,23 @@ class _VehicleFormState extends State<VehicleForm>
                                                   ).tr(),
                                                   Flexible(
                                                       child: TextBox(
-                                                        controller: matrPrec,
+                                                    controller: matrPrec,
                                                     maxLength: 30,
                                                     placeholder: 'precmat'.tr(),
                                                     placeholderStyle:
                                                         placeStyle,
                                                     cursorColor:
                                                         appTheme.color.darker,
-                                                    style: appTheme.writingStyle,
+                                                    style:
+                                                        appTheme.writingStyle,
                                                     decoration: BoxDecoration(
                                                       color: appTheme.fillColor,
                                                     ),
-                                                        inputFormatters: <TextInputFormatter>[
-                                                          FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z.-]")),
-                                                        ],
+                                                    inputFormatters: <TextInputFormatter>[
+                                                      FilteringTextInputFormatter
+                                                          .allow(RegExp(
+                                                              "[0-9a-zA-Z.-]")),
+                                                    ],
                                                   )),
                                                 ],
                                               ),
@@ -1425,224 +1559,216 @@ class _VehicleFormState extends State<VehicleForm>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              if(errorUploading)
+              if (errorUploading)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Text('errupld',style:TextStyle(color:Colors.red)).tr(),
+                  child:
+                      Text('errupld', style: TextStyle(color: Colors.red)).tr(),
                 ),
               FilledButton(
-                  onPressed: uploading?null:confirmAndUpload,
-                  child: uploading?const ProgressRing():const Text('confirmer').tr()),
+                  onPressed: uploading ? null : confirmAndUpload,
+                  child: uploading
+                      ? const ProgressRing()
+                      : const Text('confirmer').tr()),
             ],
           ),
         ));
   }
 
   void updateOverMatricule(AppTheme appTheme) {
-    if(!autreMat){
-        if(matr3.text.isNotEmpty){
-          wilaya=matr3.text;
-          wilayaCont.text=AlgeriaList().getWilayaByNum(matr3.text)??'';
-          dairaCont.text=AlgeriaList().getDairas(wilayaCont.text).firstOrNull?.getDairaName(appTheme
-              .locale
-              ?.languageCode
-              .toUpperCase() ==
-              "AR"
-              ? Language.AR
-              : Language
-              .FR)??'';
-          communeCont.text=AlgeriaList().getCommune(wilayaCont.text).firstOrNull?.getDairaName(appTheme
-              .locale
-              ?.languageCode
-              .toUpperCase() ==
-              "AR"
-              ? Language.AR
-              : Language
-              .FR)??'';
-          setState(() {
-          });
-        }
-        if(matr2.text.isNotEmpty){
-          genre=(int.tryParse(matr2.text)??100)~/100;
-          selectedAnnee=DateTime(VehiclesUtilities.getAnneeFromMatricule('0000-${matr2.text}-00'));
-          setState(() {
-          });
-        }
+    if (!autreMat) {
+      if (matr3.text.isNotEmpty) {
+        wilaya = matr3.text;
+        wilayaCont.text = AlgeriaList().getWilayaByNum(matr3.text) ?? '';
+        dairaCont.text = AlgeriaList()
+                .getDairas(wilayaCont.text)
+                .firstOrNull
+                ?.getDairaName(
+                    appTheme.locale?.languageCode.toUpperCase() == "AR"
+                        ? Language.AR
+                        : Language.FR) ??
+            '';
+        communeCont.text = AlgeriaList()
+                .getCommune(wilayaCont.text)
+                .firstOrNull
+                ?.getDairaName(
+                    appTheme.locale?.languageCode.toUpperCase() == "AR"
+                        ? Language.AR
+                        : Language.FR) ??
+            '';
+        setState(() {});
+      }
+      if (matr2.text.isNotEmpty) {
+        genre = (int.tryParse(matr2.text) ?? 100) ~/ 100;
+        selectedAnnee = DateTime(
+            VehiclesUtilities.getAnneeFromMatricule('0000-${matr2.text}-00'));
+        setState(() {});
+      }
     }
   }
-   String? documentID;
-  bool uploading=false;
-  bool errorUploading=false;
-  void confirmAndUpload()async{
-    if(autreMat){
-      if(matriculeEtr.text.isEmpty || matriculeEtr.text.length<4){
-        if(!erreurMatricule){
+
+  String? documentID;
+  bool uploading = false;
+  bool errorUploading = false;
+
+  void confirmAndUpload() async {
+    if (autreMat) {
+      if (matriculeEtr.text.isEmpty || matriculeEtr.text.length < 4) {
+        if (!erreurMatricule) {
           setState(() {
-            erreurMatricule=true;
+            erreurMatricule = true;
+          });
+        }
+      } else {
+        if (erreurMatricule) {
+          setState(() {
+            erreurMatricule = false;
           });
         }
       }
-      else{
-        if(erreurMatricule){
+    } else {
+      if (matr1.text.isEmpty ||
+          matr2.text.length < 3 ||
+          matr3.text.length < 2) {
+        if (!erreurMatricule) {
           setState(() {
-            erreurMatricule=false;
+            erreurMatricule = true;
           });
         }
-
+      } else {
+        if (erreurMatricule) {
+          setState(() {
+            erreurMatricule = false;
+          });
+        }
       }
     }
-    else{
-      if(matr1.text.isEmpty || matr2.text.length<3 || matr3.text.length<2){
-        if(!erreurMatricule){
-          setState(() {
-            erreurMatricule=true;
-          });
-        }
-      }
-      else{
-        if(erreurMatricule){
-          setState(() {
-            erreurMatricule=false;
-          });
-        }
 
-      }
-    }
-
-
-    if(!erreurMatricule){
+    if (!erreurMatricule) {
       setState(() {
-        uploading=true;
-        errorUploading=false;
+        uploading = true;
+        errorUploading = false;
       });
-      Vehicle vehicle=Vehicle(
-          id: documentID!,
-          matricule: autreMat
-              ?matriculeEtr.text
-              :'${matr1.text}-${matr2.text}-${matr3.text}',
-          matriculeEtrang: autreMat,
-          wilaya: int.tryParse(wilaya),
-          commune: communeCont.text,
-          date: selectedDate,
-          adresse: adresse.text,
-          quittance: double.tryParse(quittance.text),
-          numero: numero.text,
-          numeroSerie: numSer.text,
-          anneeUtil: selectedAnnee?.year,
-          energie: energie.text,
-          pays: pays,
-          placesAssises: int.tryParse(places.text),
-          poidsTotal: int.tryParse(poidsT.text),
-          prenom: fname.text,
-          nom: lname.text,
-          type: type.text,
-          profession: profession.text,
-          puissance: int.tryParse(puissance.text),
-          daira: dairaCont.text,
-          genre: genre.toString(),
-          marque: marque.toString(),
-          matriculePrec: matrPrec.text,
-          carrosserie: caross.text,
-          charegeUtile: int.tryParse(charg.text),
-          createdBy: ClientDatabase.me.value?.id,
-
+      Vehicle vehicle = Vehicle(
+        id: documentID!,
+        matricule: autreMat
+            ? matriculeEtr.text
+            : '${matr1.text}-${matr2.text}-${matr3.text}',
+        matriculeEtrang: autreMat,
+        wilaya: int.tryParse(wilaya),
+        commune: communeCont.text,
+        date: selectedDate,
+        adresse: adresse.text,
+        quittance: double.tryParse(quittance.text),
+        numero: numero.text,
+        numeroSerie: numSer.text,
+        anneeUtil: selectedAnnee?.year,
+        energie: energie.text,
+        pays: pays,
+        placesAssises: int.tryParse(places.text),
+        poidsTotal: int.tryParse(poidsT.text),
+        prenom: fname.text,
+        nom: lname.text,
+        type: type.text,
+        profession: profession.text,
+        puissance: int.tryParse(puissance.text),
+        daira: dairaCont.text,
+        genre: genre.toString(),
+        marque: marque.toString(),
+        matriculePrec: matrPrec.text,
+        carrosserie: caross.text,
+        charegeUtile: int.tryParse(charg.text),
+        createdBy: ClientDatabase.me.value?.id,
       );
-      if(widget.vehicle!=null){
+      if (widget.vehicle != null) {
         await Future.wait([
-        updateVehicle(vehicle),
-          uploadActivity(true,vehicle),
+          updateVehicle(vehicle),
+          uploadActivity(true, vehicle),
         ]).then((value) {
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
-                return InfoBar(
-                    title: const Text('done').tr(),
-                    severity: InfoBarSeverity.success,
-                );
-              },
-              duration: snackbarShortDuration);
+            return InfoBar(
+              title: const Text('done').tr(),
+              severity: InfoBarSeverity.success,
+            );
+          }, duration: snackbarShortDuration);
         }).onError((error, stackTrace) {
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
-                return InfoBar(
-                    title: const Text('echec').tr(),
-                    severity: InfoBarSeverity.success,
-                );
-              },
-              duration: snackbarShortDuration);
+            return InfoBar(
+              title: const Text('echec').tr(),
+              severity: InfoBarSeverity.success,
+            );
+          }, duration: snackbarShortDuration);
         });
-
-      }
-      else{
+      } else {
         await Future.wait([
           createVehicle(vehicle),
-          uploadActivity(false,vehicle),
+          uploadActivity(false, vehicle),
         ]).then((value) {
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
-                return InfoBar(
-                  title: const Text('done').tr(),
-                  severity: InfoBarSeverity.success,
-                );
-              },
-              duration: snackbarShortDuration);
+            return InfoBar(
+              title: const Text('done').tr(),
+              severity: InfoBarSeverity.success,
+            );
+          }, duration: snackbarShortDuration);
         }).onError((error, stackTrace) {
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
-                return InfoBar(
-                  title: const Text('echec').tr(),
-                  severity: InfoBarSeverity.success,
-                );
-              },
-              duration: snackbarShortDuration);
+            return InfoBar(
+              title: const Text('echec').tr(),
+              severity: InfoBarSeverity.success,
+            );
+          }, duration: snackbarShortDuration);
         });
       }
-
     }
   }
 
-  Future<void> updateVehicle(Vehicle vehicle) async{
-    await ClientDatabase.database!.updateDocument(
-      databaseId: databaseId,
-      collectionId: vehiculeid,
-      documentId: documentID!,
-      data: vehicle.toJson(),
-
-    ).then((value) {
-
-    }).onError((AppwriteException error, stackTrace) {
+  Future<void> updateVehicle(Vehicle vehicle) async {
+    await ClientDatabase.database!
+        .updateDocument(
+          databaseId: databaseId,
+          collectionId: vehiculeid,
+          documentId: documentID!,
+          data: vehicle.toJson(),
+        )
+        .then((value) {})
+        .onError((AppwriteException error, stackTrace) {
       setState(() {
-        uploading=false;
-        errorUploading=true;
+        uploading = false;
+        errorUploading = true;
       });
     });
   }
 
-  Future<void> createVehicle(Vehicle vehicle) async{
-    await ClientDatabase.database!.createDocument(
-      databaseId: databaseId,
-      collectionId: vehiculeid,
-      documentId: documentID!,
-      data: vehicle.toJson(),
-
-    ).then((value) {
-    }).onError((AppwriteException error, stackTrace) {
+  Future<void> createVehicle(Vehicle vehicle) async {
+    await ClientDatabase.database!
+        .createDocument(
+          databaseId: databaseId,
+          collectionId: vehiculeid,
+          documentId: documentID!,
+          data: vehicle.toJson(),
+        )
+        .then((value) {})
+        .onError((AppwriteException error, stackTrace) {
       setState(() {
-        uploading=false;
-        errorUploading=true;
+        uploading = false;
+        errorUploading = true;
       });
     });
   }
 
-  Future<void> uploadActivity(bool update,Vehicle vehicle) async{
-    if(update){
-     await ClientDatabase().ajoutActivity(1, vehicle.id,docName: vehicle.matricule);
-    }
-    else{
-      await ClientDatabase().ajoutActivity(0, vehicle.id,docName: vehicle.matricule);
-
+  Future<void> uploadActivity(bool update, Vehicle vehicle) async {
+    if (update) {
+      await ClientDatabase()
+          .ajoutActivity(1, vehicle.id, docName: vehicle.matricule);
+    } else {
+      await ClientDatabase()
+          .ajoutActivity(0, vehicle.id, docName: vehicle.matricule);
     }
   }
-
 
   @override
   bool get wantKeepAlive => true;

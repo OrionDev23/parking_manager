@@ -8,31 +8,31 @@ import 'package:pdf/widgets.dart';
 import '../providers/client_database.dart';
 import '../serializables/reparation/reparation.dart';
 
-
 Widget dotsSpacer() {
   return Flexible(
       child: Row(children: [
-        SizedBox(width: PdfPageFormat.cm * 0.08),
-        Flexible(
-          child: Container(
-              height: 2,
-              decoration: const BoxDecoration(
-                border: Border(top: BorderSide(style: BorderStyle.dotted)),
-              )),
-        ),
-        SizedBox(width: PdfPageFormat.cm * 0.08),
-      ]));
+    SizedBox(width: PdfPageFormat.cm * 0.08),
+    Flexible(
+      child: Container(
+          height: 2,
+          decoration: const BoxDecoration(
+            border: Border(top: BorderSide(style: BorderStyle.dotted)),
+          )),
+    ),
+    SizedBox(width: PdfPageFormat.cm * 0.08),
+  ]));
 }
-class PdfUtilities{
 
+class PdfUtilities {
   Prestataire? p;
 
-  Future<void> initPrestataire(Reparation reparation) async{
-    p=await ClientDatabase().getPrestataire(reparation.prestataire);
-
+  Future<void> initPrestataire(Reparation reparation) async {
+    p = await ClientDatabase().getPrestataire(reparation.prestataire);
   }
+
   static List<Widget> getTextListFromMap(
-      Map<String, dynamic> map, int debut, int fin,{double width=3.7}) {
+      Map<String, dynamic> map, int debut, int fin,
+      {double width = 3.7}) {
     List<Widget> result = List.empty(growable: true);
     map.forEach((key, value) {
       if (key != 'showOnList') {
@@ -44,7 +44,9 @@ class PdfUtilities{
                 children: [
                   Text(
                     key.tr().uppercaseFirst(),
-                    style: smallText.copyWith(fontSize: 9,),
+                    style: smallText.copyWith(
+                      fontSize: 9,
+                    ),
                   ),
                   dotsSpacer(),
                   if (value is num)
@@ -59,10 +61,10 @@ class PdfUtilities{
                       ),
                       child: value
                           ? Icon(
-                        IconData(iconCodePoint, matchTextDirection: true),
-                        color: orangeDeep,
-                        size: 6,
-                      )
+                              IconData(iconCodePoint, matchTextDirection: true),
+                              color: orangeDeep,
+                              size: 6,
+                            )
                           : null,
                     ),
                 ])));
@@ -72,7 +74,4 @@ class PdfUtilities{
         .getRange(debut, fin < result.length ? fin : result.length)
         .toList();
   }
-
-
-
 }

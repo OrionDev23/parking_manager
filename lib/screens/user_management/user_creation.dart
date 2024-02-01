@@ -16,6 +16,7 @@ import '../../utilities/profil_beautifier.dart';
 
 class UserForm extends StatefulWidget {
   final User? user;
+
   const UserForm({super.key, this.user});
 
   @override
@@ -33,6 +34,7 @@ class _UserFormState extends State<UserForm> {
   String countrySelected = 'DZ';
   String phoneDial = "+213";
   String? userID;
+
   @override
   void initState() {
     initValues();
@@ -93,6 +95,7 @@ class _UserFormState extends State<UserForm> {
 
   bool somethingChanged = false;
   bool validEmail = false;
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
@@ -372,13 +375,18 @@ class _UserFormState extends State<UserForm> {
   }
 
   bool uploading = false;
+
   void onConfirm() async {
-    if (email.text.isNotEmpty && validEmail && somethingChanged && password.text.length>=8 && passwordConfirm.text==password.text) {
+    if (email.text.isNotEmpty &&
+        validEmail &&
+        somethingChanged &&
+        password.text.length >= 8 &&
+        passwordConfirm.text == password.text) {
       setState(() {
         uploading = true;
       });
 
-     await addUserToUsersList().then((value) async {
+      await addUserToUsersList().then((value) async {
         ParcUser newme = ParcUser(
           email: email.text,
           name: name.text,
@@ -386,45 +394,39 @@ class _UserFormState extends State<UserForm> {
           tel: '$phoneDial${phone.text}',
           avatar: null,
         );
-        await uploadUserInDB(newme).then((value) {
-        }).then((value) {
+        await uploadUserInDB(newme).then((value) {}).then((value) {
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
-                return InfoBar(
-                  title: const Text('done').tr(),
-                  severity: InfoBarSeverity.success,
-                );
-              },
-              duration: snackbarShortDuration);
+            return InfoBar(
+              title: const Text('done').tr(),
+              severity: InfoBarSeverity.success,
+            );
+          }, duration: snackbarShortDuration);
         }).onError((error, stackTrace) {
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
-                return InfoBar(
-                  title: const Text('echec').tr(),
-                  severity: InfoBarSeverity.success,
-                );
-              },
-              duration: snackbarShortDuration);
+            return InfoBar(
+              title: const Text('echec').tr(),
+              severity: InfoBarSeverity.success,
+            );
+          }, duration: snackbarShortDuration);
         });
-
       }).onError((error, stackTrace) {
-       displayInfoBar(context,
-           builder: (BuildContext context, void Function() close) {
-             return InfoBar(
-               title: const Text('echec').tr(),
-               severity: InfoBarSeverity.success,
-             );
-           },
-           duration: snackbarShortDuration);
-       setState(() {
-         uploading = false;
-       });
-     });
+        displayInfoBar(context,
+            builder: (BuildContext context, void Function() close) {
+          return InfoBar(
+            title: const Text('echec').tr(),
+            severity: InfoBarSeverity.success,
+          );
+        }, duration: snackbarShortDuration);
+        setState(() {
+          uploading = false;
+        });
+      });
 
       setState(() {
         uploading = false;
       });
-
     }
   }
 
@@ -459,6 +461,7 @@ class _UserFormState extends State<UserForm> {
   }
 
   bool alreadyAdded = false;
+
   Future<void> addUserToUsersList() async {
     Client client = Client()
       ..setEndpoint(endpoint)
@@ -471,8 +474,7 @@ class _UserFormState extends State<UserForm> {
           email: email.text,
           password: password.text,
           phone: '$phoneDial${phone.text}');
-      ClientDatabase().ajoutActivity(32, userID!,docName: name.text);
-
+      ClientDatabase().ajoutActivity(32, userID!, docName: name.text);
     } else {
       if (widget.user!.name != name.text) {
         await Users(client)
@@ -482,7 +484,7 @@ class _UserFormState extends State<UserForm> {
         await Users(client).updatePhone(
             userId: widget.user!.$id, number: '$phoneDial${phone.text}');
       }
-      ClientDatabase().ajoutActivity(33, userID!,docName: name.text);
+      ClientDatabase().ajoutActivity(33, userID!, docName: name.text);
     }
   }
 }

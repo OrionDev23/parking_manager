@@ -3,12 +3,11 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 class PageTitle extends StatefulWidget {
-
   final String text;
 
   final Widget? trailing;
 
-  const PageTitle({super.key, required this.text,this.trailing});
+  const PageTitle({super.key, required this.text, this.trailing});
 
   @override
   State<PageTitle> createState() => _PageTitleState();
@@ -28,11 +27,9 @@ class _PageTitleState extends State<PageTitle> {
               widget.text,
               style: TextStyle(color: Colors.grey[100], fontSize: 16.sp),
             ).tr(),
-            if(widget.trailing!=null)
-              const Spacer(),
-            if(widget.trailing!=null)
-              widget.trailing!,
-            if(widget.trailing!=null)
+            if (widget.trailing != null) const Spacer(),
+            if (widget.trailing != null) widget.trailing!,
+            if (widget.trailing != null)
               SizedBox(
                 width: 2.w,
               ),

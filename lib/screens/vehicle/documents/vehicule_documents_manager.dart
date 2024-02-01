@@ -1,11 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'document_form.dart';
-import 'document_table.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../widgets/button_container.dart';
 import '../../../widgets/page_header.dart';
+import 'document_form.dart';
+import 'document_table.dart';
 import 'document_tabs.dart';
 
 class VehiculeDocuments extends StatefulWidget {
@@ -16,11 +16,9 @@ class VehiculeDocuments extends StatefulWidget {
 }
 
 class VehiculeDocumentsState extends State<VehiculeDocuments> {
-  final tstyle=TextStyle(
+  final tstyle = TextStyle(
     fontSize: 10.sp,
   );
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +52,9 @@ class VehiculeDocumentsState extends State<VehiculeDocuments> {
       text: Text('nouvdocument'.tr()),
       semanticLabel: 'nouvdocument'.tr(),
       icon: const Icon(FluentIcons.document),
-      body: const DocumentForm(),
+      body:  const ScaffoldPage(
+        content: DocumentForm(),
+      ),
       onClosed: () {
         DocumentTabsState.tabs.remove(tab);
 

@@ -1,39 +1,43 @@
-
 const marqueMax = 70;
-const genreMax=10;
+const genreMax = 10;
+
 class VehiclesUtilities {
-  static Map<int,String>? marques;
-  static Map<int,String>? genres;
+  static Map<int, String>? marques;
+  static Map<int, String>? genres;
+
   VehiclesUtilities() {
     if (marques == null) {
       marques = {};
       for (int i = 0; i < marqueMax; i++) {
-        marques![i+1]= getMarqueName((i + 1).toString());
+        marques![i + 1] = getMarqueName((i + 1).toString());
       }
     }
-    if(genres==null){
-      genres={};
-      for(int j=0;j<genreMax;j++){
-        genres![j]=getGenreFromNumber(j);
+    if (genres == null) {
+      genres = {};
+      for (int j = 0; j < genreMax; j++) {
+        genres![j] = getGenreFromNumber(j);
       }
     }
   }
 
-  static Future<List<int>> findMarque(String s){
-    List<int> results=List.empty(growable: true);
+  static Future<List<int>> findMarque(String s) {
+    List<int> results = List.empty(growable: true);
     VehiclesUtilities();
     marques!.forEach((key, value) {
-      if(key==int.tryParse(s) || value.toUpperCase().contains(s.toUpperCase())){
+      if (key == int.tryParse(s) ||
+          value.toUpperCase().contains(s.toUpperCase())) {
         results.add(key);
       }
     });
     return Future.value(results);
   }
-  static Future<List<int>> findGenres(String s){
-    List<int> results=List.empty(growable: true);
+
+  static Future<List<int>> findGenres(String s) {
+    List<int> results = List.empty(growable: true);
     VehiclesUtilities();
     genres!.forEach((key, value) {
-      if(key==int.tryParse(s) || value.toUpperCase().contains(s.toUpperCase())){
+      if (key == int.tryParse(s) ||
+          value.toUpperCase().contains(s.toUpperCase())) {
         results.add(key);
       }
     });
@@ -62,9 +66,10 @@ class VehiclesUtilities {
   }
 
   static String getMarqueName(String? marque) {
-    int m = marque==null?0:int.tryParse(marque) ?? 0;
+    int m = marque == null ? 0 : int.tryParse(marque) ?? 0;
     switch (m) {
-      case 0: return 'nonind';
+      case 0:
+        return 'nonind';
       case 1:
         return "Toyota";
       case 2:
@@ -254,15 +259,20 @@ class VehiclesUtilities {
     }
   }
 
-
-  static String getTypeName(int type){
-    switch(type){
-      case 0: return 'gstate';
-      case 1:return 'bstate';
-      case 2:return 'rstate';
-      case 3:return 'ostate';
-      case 4:return 'restate';
-      default:return 'gstate';
+  static String getTypeName(int type) {
+    switch (type) {
+      case 0:
+        return 'gstate';
+      case 1:
+        return 'bstate';
+      case 2:
+        return 'rstate';
+      case 3:
+        return 'ostate';
+      case 4:
+        return 'restate';
+      default:
+        return 'gstate';
     }
   }
 }

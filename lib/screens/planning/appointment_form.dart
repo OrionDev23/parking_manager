@@ -2,7 +2,6 @@ import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as m;
-
 import 'package:parc_oto/datasources/planning/planning_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/serializables/planning.dart';
@@ -14,22 +13,20 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../../../utilities/theme_colors.dart';
 import '../../widgets/color_picker.dart';
 
-
 class AppointmentForm extends StatefulWidget {
-
   final DateTime? startDate;
   final PlanningDatasource datasource;
-  const AppointmentForm({super.key,this.startDate,required this.datasource});
 
+  const AppointmentForm({super.key, this.startDate, required this.datasource});
 
   @override
   State<AppointmentForm> createState() => _AppointmentFormState();
 }
 
 class _AppointmentFormState extends State<AppointmentForm> {
-  String _subject='';
-  bool _isAllDay=false;
-  String? _notes='';
+  String _subject = '';
+  bool _isAllDay = false;
+  String? _notes = '';
   late DateTime _startDate;
 
   late DateTime _endDate;
@@ -47,18 +44,17 @@ class _AppointmentFormState extends State<AppointmentForm> {
 
   @override
   void initState() {
-    if(widget.startDate!=null){
-      _startDate=DateTime(widget.startDate!.year,widget.startDate!.month,widget.startDate!.day,9,0,0);
+    if (widget.startDate != null) {
+      _startDate = DateTime(widget.startDate!.year, widget.startDate!.month,
+          widget.startDate!.day, 9, 0, 0);
+    } else {
+      _startDate = DateTime.now();
     }
-    else{
-      _startDate=DateTime.now();
-    }
-    _endDate=_startDate.add(const Duration(hours: 2));
+    _endDate = _startDate.add(const Duration(hours: 2));
     super.initState();
   }
 
-
-  List<String> categories=[
+  List<String> categories = [
     'vehicules',
     'prestataires',
     'users',
@@ -66,17 +62,16 @@ class _AppointmentFormState extends State<AppointmentForm> {
     'documents',
     'chauffeurs'
   ];
-  int _selectedCategorie=0;
+  int _selectedCategorie = 0;
 
   @override
   Widget build(BuildContext context) {
-    var appTheme=context.watch<AppTheme>();
+    var appTheme = context.watch<AppTheme>();
     return Container(
-      decoration: BoxDecoration(
-        color: appTheme.backGroundColor,
-        borderRadius: BorderRadius.circular(5),
-        boxShadow: kElevationToShadow[2]
-      ),
+        decoration: BoxDecoration(
+            color: appTheme.backGroundColor,
+            borderRadius: BorderRadius.circular(5),
+            boxShadow: kElevationToShadow[2]),
         padding: const EdgeInsets.all(5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -87,7 +82,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                 children: <Widget>[
                   ListTile(
                     contentPadding: const EdgeInsets.fromLTRB(5, 0, 5, 5),
-                    leading:Icon(
+                    leading: Icon(
                       FluentIcons.title,
                       color: appTheme.color.lightest,
                     ),
@@ -97,8 +92,8 @@ class _AppointmentFormState extends State<AppointmentForm> {
                         _subject = value;
                       },
                       placeholder: 'addtitle'.tr(),
-                      placeholderStyle:placeStyle,
-                      maxLength:40,
+                      placeholderStyle: placeStyle,
+                      maxLength: 40,
                       maxLines: 1,
                       style: TextStyle(
                           fontSize: 25,
@@ -117,20 +112,23 @@ class _AppointmentFormState extends State<AppointmentForm> {
                         Icon(FluentIcons.category_classification,
                             color: appTheme.color.lightest),
                         bigSpace,
-                        Text('category',style: placeStyle.copyWith(fontWeight: FontWeight.bold)).tr(),
+                        Text('category',
+                                style: placeStyle.copyWith(
+                                    fontWeight: FontWeight.bold))
+                            .tr(),
                       ],
                     ),
                     title: ComboBox<int>(
-                      items:categories.map((e) => ComboBoxItem<int>(
-                          value: categories.indexOf(e),
-                          child: Text(e).tr(),
-                      )
-                      ).toList(),
+                      items: categories
+                          .map((e) => ComboBoxItem<int>(
+                                value: categories.indexOf(e),
+                                child: Text(e).tr(),
+                              ))
+                          .toList(),
                       value: _selectedCategorie,
-                      onChanged: (s){
+                      onChanged: (s) {
                         setState(() {
-                          _selectedCategorie=s??0;
-
+                          _selectedCategorie = s ?? 0;
                         });
                       },
                     ),
@@ -139,11 +137,16 @@ class _AppointmentFormState extends State<AppointmentForm> {
                         context: context,
                         barrierDismissible: true,
                         builder: (BuildContext context) {
-                          return ColorPicker(listColors: _colorCollection,colorNames:_colorNames,selectedColorIndex: _selectedColorIndex,setColor: (s){
-                            setState(() {
-                              _selectedColorIndex=s;
-                            });
-                          },);
+                          return ColorPicker(
+                            listColors: _colorCollection,
+                            colorNames: _colorNames,
+                            selectedColorIndex: _selectedColorIndex,
+                            setColor: (s) {
+                              setState(() {
+                                _selectedColorIndex = s;
+                              });
+                            },
+                          );
                         },
                       ).then((dynamic value) => setState(() {}));
                     },
@@ -156,7 +159,11 @@ class _AppointmentFormState extends State<AppointmentForm> {
                         color: appTheme.color.lightest,
                       ),
                       title: Row(children: <Widget>[
-                         Text('allday',style: placeStyle.copyWith(fontWeight: FontWeight.bold),).tr(),
+                        Text(
+                          'allday',
+                          style:
+                              placeStyle.copyWith(fontWeight: FontWeight.bold),
+                        ).tr(),
                         bigSpace,
                         Align(
                             alignment: Alignment.centerRight,
@@ -171,10 +178,12 @@ class _AppointmentFormState extends State<AppointmentForm> {
                       ])),
                   ListTile(
                       contentPadding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
-              
                       leading: SizedBox(
                           width: 120.px,
-                          child: Text('starttime',style: placeStyle.copyWith(fontWeight: FontWeight.bold)).tr()),
+                          child: Text('starttime',
+                                  style: placeStyle.copyWith(
+                                      fontWeight: FontWeight.bold))
+                              .tr()),
                       title: Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: <Widget>[
@@ -183,46 +192,66 @@ class _AppointmentFormState extends State<AppointmentForm> {
                               child: DatePicker(
                                 locale: appTheme.locale,
                                 selected: _startDate,
-                                  startDate: DateTime(1900),
-                                  endDate: DateTime(2100),
-                                  onChanged: (s){
-                                        if(s!=_startDate){
-                                          _startDate=DateTime(s.year,s.month,s.day,_startDate.hour,_startDate.minute,_startDate.second);
+                                startDate: DateTime(1900),
+                                endDate: DateTime(2100),
+                                onChanged: (s) {
+                                  if (s != _startDate) {
+                                    _startDate = DateTime(
+                                        s.year,
+                                        s.month,
+                                        s.day,
+                                        _startDate.hour,
+                                        _startDate.minute,
+                                        _startDate.second);
 
-                                          if(s.difference(_endDate).inMilliseconds>0){
-                                            _endDate=_startDate.add(const Duration(hours: 2));
-                                            }
-                                            setState(() {
-                                            });}
-                                  },
-                            ),),
+                                    if (s.difference(_endDate).inMilliseconds >
+                                        0) {
+                                      _endDate = _startDate
+                                          .add(const Duration(hours: 2));
+                                    }
+                                    setState(() {});
+                                  }
+                                },
+                              ),
+                            ),
                             const m.VerticalDivider(),
                             Expanded(
                                 flex: 3,
                                 child: _isAllDay
                                     ? const Text('')
                                     : TimePicker(
-                                  hourFormat: HourFormat.HH,
-                                  locale: appTheme.locale,
-                                  selected: _startDate,
-                                  onChanged: (s){
-                                    if(_startDate!=s){
-                                      _startDate=DateTime(_startDate.year,_startDate.month,_startDate.day,s.hour,s.minute,s.second);
-                                      if(s.difference(_endDate).inMilliseconds>0){
-                                        _endDate=_startDate.add(const Duration(hours: 2));
-                                      }
-                                      setState(() {
-                                      });
-                                    }
-                                  },
-              
-                                )),
+                                        hourFormat: HourFormat.HH,
+                                        locale: appTheme.locale,
+                                        selected: _startDate,
+                                        onChanged: (s) {
+                                          if (_startDate != s) {
+                                            _startDate = DateTime(
+                                                _startDate.year,
+                                                _startDate.month,
+                                                _startDate.day,
+                                                s.hour,
+                                                s.minute,
+                                                s.second);
+                                            if (s
+                                                    .difference(_endDate)
+                                                    .inMilliseconds >
+                                                0) {
+                                              _endDate = _startDate.add(
+                                                  const Duration(hours: 2));
+                                            }
+                                            setState(() {});
+                                          }
+                                        },
+                                      )),
                           ])),
                   ListTile(
                       contentPadding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
                       leading: SizedBox(
                           width: 120.px,
-                          child: Text('endtime',style: placeStyle.copyWith(fontWeight: FontWeight.bold)).tr()),
+                          child: Text('endtime',
+                                  style: placeStyle.copyWith(
+                                      fontWeight: FontWeight.bold))
+                              .tr()),
                       title: Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: <Widget>[
@@ -233,52 +262,68 @@ class _AppointmentFormState extends State<AppointmentForm> {
                                 locale: appTheme.locale,
                                 startDate: DateTime(1900),
                                 endDate: DateTime(2100),
-                                onChanged: (s){
-                                  if(s!=_endDate){
-                                  _endDate=DateTime(s.year,s.month,s.day,_endDate.hour,_endDate.minute,_endDate.second);
-                                  if(_startDate.difference(_endDate).inMilliseconds>0){
-                                    _endDate=_startDate.add(const Duration(hours: 2));
+                                onChanged: (s) {
+                                  if (s != _endDate) {
+                                    _endDate = DateTime(
+                                        s.year,
+                                        s.month,
+                                        s.day,
+                                        _endDate.hour,
+                                        _endDate.minute,
+                                        _endDate.second);
+                                    if (_startDate
+                                            .difference(_endDate)
+                                            .inMilliseconds >
+                                        0) {
+                                      _endDate = _startDate
+                                          .add(const Duration(hours: 2));
+                                    }
+                                    setState(() {});
                                   }
-                                  setState(() {
-              
-                                  });
-                                }},
-                              ),),
+                                },
+                              ),
+                            ),
                             const m.VerticalDivider(),
                             Expanded(
                                 flex: 3,
                                 child: _isAllDay
                                     ? const Text('')
                                     : TimePicker(
-                                  locale: appTheme.locale,
-              
-                                  selected: _endDate,
-                                  hourFormat: HourFormat.HH,
-                                  onChanged: (s){
-                                    if(_endDate!=s){
-              
-                                        _endDate=DateTime(_endDate.year,_endDate.month,_endDate.day,s.hour,s.minute,s.second);
-                                      if(_startDate.difference(_endDate).inMilliseconds>0){
-                                        _endDate=_startDate.add(const Duration(hours: 2));
-                                      }
-                                    setState(() {
-                                    });
-              
-                                    }
-                                  },
-              
-                                )),
+                                        locale: appTheme.locale,
+                                        selected: _endDate,
+                                        hourFormat: HourFormat.HH,
+                                        onChanged: (s) {
+                                          if (_endDate != s) {
+                                            _endDate = DateTime(
+                                                _endDate.year,
+                                                _endDate.month,
+                                                _endDate.day,
+                                                s.hour,
+                                                s.minute,
+                                                s.second);
+                                            if (_startDate
+                                                    .difference(_endDate)
+                                                    .inMilliseconds >
+                                                0) {
+                                              _endDate = _startDate.add(
+                                                  const Duration(hours: 2));
+                                            }
+                                            setState(() {});
+                                          }
+                                        },
+                                      )),
                           ])),
-                  const Divider(
-                  ),
+                  const Divider(),
                   ListTile(
                     contentPadding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
                     leading: Row(
                       children: [
-                        Icon(FluentIcons.color,
-                            color: appTheme.color.lightest),
+                        Icon(FluentIcons.color, color: appTheme.color.lightest),
                         bigSpace,
-                        Text('color',style: placeStyle.copyWith(fontWeight: FontWeight.bold)).tr(),
+                        Text('color',
+                                style: placeStyle.copyWith(
+                                    fontWeight: FontWeight.bold))
+                            .tr(),
                       ],
                     ),
                     title: Text(
@@ -290,21 +335,24 @@ class _AppointmentFormState extends State<AppointmentForm> {
                         barrierDismissible: true,
                         builder: (BuildContext context) {
                           return ContentDialog(
-                            constraints: BoxConstraints.loose(Size(
-                              300.px,300.px
-                            )),
-                            content: ColorPicker(listColors: _colorCollection,colorNames:_colorNames,selectedColorIndex: _selectedColorIndex,setColor: (s){
-                              setState(() {
-                                _selectedColorIndex=s;
-                              });
-                            },),
+                            constraints:
+                                BoxConstraints.loose(Size(300.px, 300.px)),
+                            content: ColorPicker(
+                              listColors: _colorCollection,
+                              colorNames: _colorNames,
+                              selectedColorIndex: _selectedColorIndex,
+                              setColor: (s) {
+                                setState(() {
+                                  _selectedColorIndex = s;
+                                });
+                              },
+                            ),
                           );
                         },
                       ).then((dynamic value) => setState(() {}));
                     },
                   ),
-                  const Divider(
-                  ),
+                  const Divider(),
                   ListTile(
                     contentPadding: const EdgeInsets.all(5),
                     leading: Icon(
@@ -325,47 +373,60 @@ class _AppointmentFormState extends State<AppointmentForm> {
                           color: appTheme.writingStyle.color,
                           fontWeight: FontWeight.w400),
                       decoration: BoxDecoration(
-                       color: appTheme.fillColor,
+                        color: appTheme.fillColor,
                       ),
                     ),
                   ),
-                  const Divider(
-              
-                  ),
+                  const Divider(),
                 ],
               ),
             ),
             bigSpace,
-            FilledButton(onPressed: sumbmiting?null:submit, child: sumbmiting?const ProgressRing():const Text('confirmer').tr()),
-
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Button(child: const Text('annuler').tr(),onPressed: (){
+                  Navigator.of(context).pop();
+                },),
+                bigSpace,
+                FilledButton(
+                    onPressed: sumbmiting ? null : submit,
+                    child: sumbmiting
+                        ? const ProgressRing()
+                        : const Text('confirmer').tr()),
+              ],
+            ),
           ],
         ));
   }
 
-
-  bool sumbmiting=false;
+  bool sumbmiting = false;
 
   String? documentID;
 
-  void submit()async {
-    if(_subject.isEmpty){
+  void submit() async {
+    if (_subject.isEmpty) {
       showMessage('subjectrequired', 'erreur');
       return;
     }
     setState(() {
-      sumbmiting=true;
+      sumbmiting = true;
     });
-    documentID??=DateTime.now().difference(ClientDatabase.ref).inMilliseconds.abs().toString();
-    Planning planning=Planning(
+    documentID ??= DateTime.now()
+        .difference(ClientDatabase.ref)
+        .inMilliseconds
+        .abs()
+        .toString();
+    Planning planning = Planning(
         id: documentID!,
         subject: _subject,
-        startTime: _startDate, endTime: _endDate,
+        startTime: _startDate,
+        endTime: _endDate,
         notes: _notes,
         color: _colorCollection[_selectedColorIndex],
         createdBy: ClientDatabase.me.value?.id,
         isAllDay: _isAllDay,
-        type: _selectedCategorie
-    );
+        type: _selectedCategorie);
     await ClientDatabase.database!.createDocument(
         databaseId: databaseId,
         collectionId: planningID,
@@ -374,34 +435,31 @@ class _AppointmentFormState extends State<AppointmentForm> {
         permissions: [
           Permission.delete(Role.user(ClientDatabase.me.value!.id)),
           Permission.update(Role.user(ClientDatabase.me.value!.id)),
-        ]
-    ).then((value) {
+        ]).then((value) {
       displayInfoBar(context,
           builder: (BuildContext context, void Function() close) {
-            return InfoBar(
-              title: const Text('done').tr(),
-              severity: InfoBarSeverity.success,
-            );
-          },
-          duration: snackbarShortDuration);
+        return InfoBar(
+          title: const Text('done').tr(),
+          severity: InfoBarSeverity.success,
+        );
+      }, duration: snackbarShortDuration);
       widget.datasource.appointments!.add(planning);
-      widget.datasource.notifyListeners(CalendarDataSourceAction.add, [planning]);
+      widget.datasource
+          .notifyListeners(CalendarDataSourceAction.add, [planning]);
       Navigator.pop(context);
     }).onError((error, stackTrace) {
       displayInfoBar(context,
           builder: (BuildContext context, void Function() close) {
-            return InfoBar(
-              title: const Text('echec').tr(),
-              severity: InfoBarSeverity.success,
-            );
-          },
-          duration: snackbarShortDuration);
+        return InfoBar(
+          title: const Text('echec').tr(),
+          severity: InfoBarSeverity.success,
+        );
+      }, duration: snackbarShortDuration);
       setState(() {
-        showMessage('erreur','erreur');
-        sumbmiting=false;
+        showMessage('erreur', 'erreur');
+        sumbmiting = false;
       });
     });
-
   }
 
   void showMessage(String message, String title) {
@@ -423,5 +481,4 @@ class _AppointmentFormState extends State<AppointmentForm> {
       ),
     );
   }
-
 }

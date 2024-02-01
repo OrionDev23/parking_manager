@@ -8,10 +8,13 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../theme.dart';
 import '../../../widgets/empty_table_widget.dart';
+
 class PrestataireTable extends StatefulWidget {
   final bool selectD;
   final bool archive;
-  const PrestataireTable({super.key,this.selectD=false,this.archive=false});
+
+  const PrestataireTable(
+      {super.key, this.selectD = false, this.archive = false});
 
   @override
   State<PrestataireTable> createState() => PrestataireTableState();
@@ -24,7 +27,6 @@ class PrestataireTableState extends State<PrestataireTable> {
 
   static ValueNotifier<String?> filterDocument = ValueNotifier(null);
 
-
   static bool filterNow = false;
 
   bool filteredAlready = false;
@@ -36,20 +38,23 @@ class PrestataireTableState extends State<PrestataireTable> {
 
   @override
   void initState() {
-    if (filterDocument.value != null){
+    if (filterDocument.value != null) {
       startedWithFiltersOn = true;
       searchController.text = filterDocument.value!;
       prestataireDataSource = PrestataireDataSource(
           current: context,
-          selectC: widget.selectD, collectionID:prestataireId,
+          selectC: widget.selectD,
+          collectionID: prestataireId,
           searchKey: filterDocument.value);
-      filterDocument.value=null;
-    }
-    else{
+      filterDocument.value = null;
+    } else {
       startedWithFiltersOn = false;
 
-      prestataireDataSource = PrestataireDataSource(current: context, collectionID: prestataireId,selectC: widget.selectD,archive: widget.archive);
-
+      prestataireDataSource = PrestataireDataSource(
+          current: context,
+          collectionID: prestataireId,
+          selectC: widget.selectD,
+          archive: widget.archive);
     }
     initColumns();
     super.initState();
@@ -173,23 +178,25 @@ class PrestataireTableState extends State<PrestataireTable> {
   TextEditingController searchController = TextEditingController();
 
   bool notEmpty = false;
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
-    prestataireDataSource.appTheme=appTheme;
+    prestataireDataSource.appTheme = appTheme;
     return ValueListenableBuilder(
         valueListenable: filterDocument,
         builder: (context, v, _) {
           if (!startedWithFiltersOn && v != null && filterNow) {
             searchController.text = v;
             prestataireDataSource.search(v);
-            notEmpty=true;
+            notEmpty = true;
             filtered = true;
             filterNow = false;
           }
           return AsyncPaginatedDataTable2(
             header: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -202,9 +209,7 @@ class PrestataireTableState extends State<PrestataireTable> {
                       style: appTheme.writingStyle,
                       cursorColor: appTheme.color.darker,
                       placeholderStyle: placeStyle,
-                      decoration: BoxDecoration(
-                          color: appTheme.fillColor
-                      ),
+                      decoration: BoxDecoration(color: appTheme.fillColor),
                       onSubmitted: (s) {
                         if (s.isNotEmpty) {
                           prestataireDataSource.search(s);
@@ -223,13 +228,13 @@ class PrestataireTableState extends State<PrestataireTable> {
                       },
                       suffix: notEmpty
                           ? IconButton(
-                          icon: const Icon(FluentIcons.cancel),
-                          onPressed: () {
-                            searchController.text = "";
-                            notEmpty = false;
-                            setState(() {});
-                            prestataireDataSource.search('');
-                          })
+                              icon: const Icon(FluentIcons.cancel),
+                              onPressed: () {
+                                searchController.text = "";
+                                notEmpty = false;
+                                setState(() {});
+                                prestataireDataSource.search('');
+                              })
                           : null,
                     ),
                   ),
@@ -240,11 +245,10 @@ class PrestataireTableState extends State<PrestataireTable> {
             headingRowHeight: 25,
             headingRowDecoration: BoxDecoration(
                 color: appTheme.color,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(5))
-            ),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(5))),
             dividerThickness: 0.5,
             autoRowsToHeight: true,
-
             horizontalMargin: 8,
             columnSpacing: 0,
             dataRowHeight: rowHeight,
@@ -256,7 +260,9 @@ class PrestataireTableState extends State<PrestataireTable> {
               rowPerPage = nbr ?? 12;
             },
             availableRowsPerPage: const [12, 24, 50, 100, 200],
-            empty: NoDataWidget(datasource: prestataireDataSource,),
+            empty: NoDataWidget(
+              datasource: prestataireDataSource,
+            ),
             showFirstLastButtons: true,
             renderEmptyRowsInTheEnd: false,
             fit: FlexFit.tight,
@@ -264,7 +270,8 @@ class PrestataireTableState extends State<PrestataireTable> {
             source: prestataireDataSource,
             sortArrowAlwaysVisible: true,
             hidePaginator: false,
-          );});
+          );
+        });
   }
 
   @override

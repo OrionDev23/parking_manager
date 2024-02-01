@@ -1,4 +1,3 @@
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
@@ -18,8 +17,7 @@ class BigTitleForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    var appTheme=context.watch<AppTheme>();
+    var appTheme = context.watch<AppTheme>();
     return Container(
       height: 7.h,
       width: 80.w,
@@ -37,8 +35,10 @@ class BigTitleForm extends StatelessWidget {
             style: headerStyle,
           ).tr(),
           smallSpace,
-          if(littleTitle!=null)
-          Text(littleTitle!,).tr(),
+          if (littleTitle != null)
+            Text(
+              littleTitle!,
+            ).tr(),
         ],
       ),
     );

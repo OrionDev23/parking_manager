@@ -1,9 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-import '../../../theme.dart';
 import '../../../widgets/button_container.dart';
 import '../../../widgets/page_header.dart';
 import 'chauf_document_form.dart';
@@ -18,15 +16,12 @@ class ChauffeurDocuments extends StatefulWidget {
 }
 
 class ChauffeurDocumentsState extends State<ChauffeurDocuments> {
-  final tstyle=TextStyle(
+  final tstyle = TextStyle(
     fontSize: 10.sp,
   );
 
-
-
   @override
   Widget build(BuildContext context) {
-    var appTheme=context.watch<AppTheme>();
     return ScaffoldPage(
       header: PageTitle(
         text: 'gestiondocument'.tr(),
@@ -57,7 +52,7 @@ class ChauffeurDocumentsState extends State<ChauffeurDocuments> {
       text: Text('nouvdocument'.tr()),
       semanticLabel: 'nouvdocument'.tr(),
       icon: const Icon(FluentIcons.document),
-      body: const CDocumentForm(),
+      body: const ScaffoldPage(content: CDocumentForm()),
       onClosed: () {
         CDocumentTabsState.tabs.remove(tab);
 

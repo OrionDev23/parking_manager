@@ -13,9 +13,8 @@ import '../../sidemenu/sidemenu.dart';
 
 class NotificationTile extends StatefulWidget {
   final PNotification pNotification;
-  const NotificationTile(
-      {super.key,
-      required this.pNotification});
+
+  const NotificationTile({super.key, required this.pNotification});
 
   @override
   State<NotificationTile> createState() => _NotificationTileState();
@@ -24,42 +23,38 @@ class NotificationTile extends StatefulWidget {
 class _NotificationTileState extends State<NotificationTile> {
   bool toDelete = false;
 
-  String typedText='';
+  String typedText = '';
 
   @override
   void initState() {
-
     loadText();
     super.initState();
   }
 
-  void loadText(){
-    String day='';
-    int differenceInDays=widget.pNotification.date.difference(DateTime.now()).inDays;
+  void loadText() {
+    String day = '';
+    int differenceInDays =
+        widget.pNotification.date.difference(DateTime.now()).inDays;
 
-    if(differenceInDays<0){
-      day="a expiré";
-    }
-    else if(differenceInDays==0){
-      day="expire aujourd'hui";
-    }
-    else if(differenceInDays==1){
-      day="expire demain";
-    }
-    else{
-      day="expire dans $differenceInDays jours";
+    if (differenceInDays < 0) {
+      day = "a expiré";
+    } else if (differenceInDays == 0) {
+      day = "expire aujourd'hui";
+    } else if (differenceInDays == 1) {
+      day = "expire demain";
+    } else {
+      day = "expire dans $differenceInDays jours";
     }
 
-    if(widget.pNotification.type==0){
-      typedText="Le document '${widget.pNotification.title}' $day";
-    }
-    else if(widget.pNotification.type==1){
-      typedText="Le document '${widget.pNotification.title}' $day";
-    }
-    else{
-      typedText="Le planning '${widget.pNotification.title}' $day";
+    if (widget.pNotification.type == 0) {
+      typedText = "Le document '${widget.pNotification.title}' $day";
+    } else if (widget.pNotification.type == 1) {
+      typedText = "Le document '${widget.pNotification.title}' $day";
+    } else {
+      typedText = "Le planning '${widget.pNotification.title}' $day";
     }
   }
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
@@ -68,7 +63,8 @@ class _NotificationTileState extends State<NotificationTile> {
       title: toDelete
           ? deleteNotifWidget()
           : Text(
-        typedText,style: TextStyle(color: appTheme.color.lightest,fontSize: 14),
+              typedText,
+              style: TextStyle(color: appTheme.color.lightest, fontSize: 14),
             ),
       trailing: toDelete
           ? null
@@ -116,41 +112,36 @@ class _NotificationTileState extends State<NotificationTile> {
     );
   }
 
-
-
-  void deleteThis() async{
-    String recordName=widget.pNotification.type==0?'removedDocs':widget.pNotification.type==1?'removedCondDocs':'removedPlanning';
+  void deleteThis() async {
+    String recordName = widget.pNotification.type == 0
+        ? 'removedDocs'
+        : widget.pNotification.type == 1
+            ? 'removedCondDocs'
+            : 'removedPlanning';
 
     late List<String> storedData;
-    if(widget.pNotification.type==0){
-      ClientDatabase.removedVehiDocs=prefs.getStringList(recordName)??[];
-      storedData=ClientDatabase.removedVehiDocs;
+    if (widget.pNotification.type == 0) {
+      ClientDatabase.removedVehiDocs = prefs.getStringList(recordName) ?? [];
+      storedData = ClientDatabase.removedVehiDocs;
+    } else if (widget.pNotification.type == 1) {
+      ClientDatabase.removedCondDocs = prefs.getStringList(recordName) ?? [];
+      storedData = ClientDatabase.removedCondDocs;
+    } else {
+      ClientDatabase.removedPlanDocs = prefs.getStringList(recordName) ?? [];
+      storedData = ClientDatabase.removedPlanDocs;
     }
-    else if(widget.pNotification.type==1){
-      ClientDatabase.removedCondDocs=prefs.getStringList(recordName)??[];
-      storedData=ClientDatabase.removedCondDocs;
-
-    }
-    else{
-      ClientDatabase.removedPlanDocs=prefs.getStringList(recordName)??[];
-      storedData=ClientDatabase.removedPlanDocs;
-    }
-
 
     storedData.add(widget.pNotification.id);
 
     await prefs.setStringList(recordName, storedData).then((value) {
-      if(widget.pNotification.type==0){
+      if (widget.pNotification.type == 0) {
         ClientDatabase.removedVehiDocs.add(widget.pNotification.id);
-      }
-      else if(widget.pNotification.type==1){
+      } else if (widget.pNotification.type == 1) {
         ClientDatabase.removedCondDocs.add(widget.pNotification.id);
-      }
-      else{
+      } else {
         ClientDatabase.removedPlanDocs.add(widget.pNotification.id);
       }
       Navigator.pop(context);
-
     }).onError((error, stackTrace) {
       Navigator.pop(context);
 
@@ -161,7 +152,6 @@ class _NotificationTileState extends State<NotificationTile> {
 
     NotifListState.remove(widget.pNotification.id);
     NotifListState.changes.value++;
-
   }
 
   void goThere() {
@@ -184,5 +174,4 @@ class _NotificationTileState extends State<NotificationTile> {
     }
     Navigator.of(context).pop();
   }
-
 }

@@ -90,5 +90,7 @@ abstract class Rx {
   ///
   ///     Rx.defer(() => Stream.value(1))
   ///       .listen(print); //prints 1
-  static Stream<T> defer<T>(Stream<T> Function() streamFactory, {bool reusable = false}) => DeferStream<T>(streamFactory, reusable: reusable);
+  static Stream<T> defer<T>(Stream<T> Function() streamFactory,
+          {bool reusable = false}) =>
+      DeferStream<T>(streamFactory, reusable: reusable);
 }

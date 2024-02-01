@@ -5,8 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:parc_oto/serializables/reparation/designation.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
+
 class DesignationReparation extends StatefulWidget {
   final Designation designation;
+
   const DesignationReparation({super.key, required this.designation});
 
   @override
@@ -14,23 +16,23 @@ class DesignationReparation extends StatefulWidget {
 }
 
 class DesignationReparationState extends State<DesignationReparation> {
-
-  TextEditingController designation=TextEditingController();
-  int qte=1;
-  TextEditingController tva=TextEditingController();
-  TextEditingController prix=TextEditingController();
+  TextEditingController designation = TextEditingController();
+  int qte = 1;
+  TextEditingController tva = TextEditingController();
+  TextEditingController prix = TextEditingController();
 
   @override
   void initState() {
-    designation.text=widget.designation.designation;
-    qte=widget.designation.qte;
-    tva.text=widget.designation.tva.toString();
-    prix.text=widget.designation.prix.toString();
+    designation.text = widget.designation.designation;
+    qte = widget.designation.qte;
+    tva.text = widget.designation.tva.toString();
+    prix.text = widget.designation.prix.toString();
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-    var appTheme=context.watch<AppTheme>();
+    var appTheme = context.watch<AppTheme>();
     return Row(
       children: [
         bigSpace,
@@ -46,26 +48,26 @@ class DesignationReparationState extends State<DesignationReparation> {
             decoration: BoxDecoration(
               color: appTheme.fillColor,
             ),
-            onChanged: (s){
+            onChanged: (s) {
               setState(() {
-                widget.designation.designation=s;
+                widget.designation.designation = s;
               });
             },
           ),
         ),
         smallSpace,
-        VerticalDivider(color: placeStyle.color,),
+        VerticalDivider(
+          color: placeStyle.color,
+        ),
         smallSpace,
         Expanded(
           child: NumberBox<int>(
             value: qte,
             min: 1,
-            onChanged: (s)=>setState(() {
-              qte=s??1;
-              widget.designation.qte=s??1;
-              setState(() {
-
-              });
+            onChanged: (s) => setState(() {
+              qte = s ?? 1;
+              widget.designation.qte = s ?? 1;
+              setState(() {});
             }),
             max: 99,
             placeholderStyle: placeStyle,
@@ -75,32 +77,33 @@ class DesignationReparationState extends State<DesignationReparation> {
           ),
         ),
         smallSpace,
-        VerticalDivider(color: placeStyle.color,),
+        VerticalDivider(
+          color: placeStyle.color,
+        ),
         smallSpace,
         Expanded(
           child: TextBox(
             controller: tva,
-            suffix: Text('%',style: placeStyle,),
-            onChanged: (s)=>setState(() {
-              double value=double.tryParse(s)??0;
-              if(value<0){
-                value=0;
+            suffix: Text(
+              '%',
+              style: placeStyle,
+            ),
+            onChanged: (s) => setState(() {
+              double value = double.tryParse(s) ?? 0;
+              if (value < 0) {
+                value = 0;
+              } else if (value > 99) {
+                value = 99;
               }
-              else if(value>99){
-                value=99;
-              }
 
-              widget.designation.tva=value;
+              widget.designation.tva = value;
 
-              setState(() {
-
-              });
-
+              setState(() {});
             }),
             placeholderStyle: placeStyle,
-            inputFormatters: [FilteringTextInputFormatter.allow(
-                RegExp(r'^(\d+)?\.?\d{0,2}')
-            )],
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'^(\d+)?\.?\d{0,2}'))
+            ],
             placeholder: 'TVA'.tr(),
             style: appTheme.writingStyle,
             cursorColor: appTheme.color.darker,
@@ -110,27 +113,31 @@ class DesignationReparationState extends State<DesignationReparation> {
           ),
         ),
         smallSpace,
-        VerticalDivider(color: placeStyle.color,),
+        VerticalDivider(
+          color: placeStyle.color,
+        ),
         smallSpace,
         Expanded(
           flex: 1,
           child: TextBox(
             controller: prix,
             placeholderStyle: placeStyle,
-            suffix: Text('DA',style: placeStyle,),
-
+            suffix: Text(
+              'DA',
+              style: placeStyle,
+            ),
             placeholder: 'prix'.tr(),
             style: appTheme.writingStyle,
             cursorColor: appTheme.color.darker,
-            inputFormatters: [FilteringTextInputFormatter.allow(
-                RegExp(r'^(\d+)?\.?\d{0,2}')
-            )],
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'^(\d+)?\.?\d{0,2}'))
+            ],
             decoration: BoxDecoration(
               color: appTheme.fillColor,
             ),
-            onChanged: (s){
+            onChanged: (s) {
               setState(() {
-                widget.designation.prix=double.tryParse(s)??0;
+                widget.designation.prix = double.tryParse(s) ?? 0;
               });
             },
           ),

@@ -107,6 +107,7 @@ abstract class Subject<T> extends StreamView<T> implements StreamController<T> {
         completer.complete();
       }
     }
+
     _isAddingStreamItems = true;
 
     source.listen((T event) {

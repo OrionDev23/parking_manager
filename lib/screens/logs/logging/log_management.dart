@@ -4,7 +4,6 @@ import 'package:parc_oto/screens/logs/logging/log_table.dart';
 import 'package:parc_oto/widgets/page_header.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-
 class LogActivityManagement extends StatefulWidget {
   const LogActivityManagement({super.key});
 
@@ -12,14 +11,11 @@ class LogActivityManagement extends StatefulWidget {
   State<LogActivityManagement> createState() => _LogActivityManagementState();
 }
 
-class _LogActivityManagementState extends State<LogActivityManagement> with AutomaticKeepAliveClientMixin<LogActivityManagement> {
-
-
-  final tstyle=TextStyle(
+class _LogActivityManagementState extends State<LogActivityManagement>
+    with AutomaticKeepAliveClientMixin<LogActivityManagement> {
+  final tstyle = TextStyle(
     fontSize: 10.sp,
   );
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +24,9 @@ class _LogActivityManagementState extends State<LogActivityManagement> with Auto
       header: PageTitle(
         text: 'journal'.tr(),
       ),
-      content:const LogTable(),
+      content: const LogTable(),
     );
   }
-
-
 
   @override
   bool get wantKeepAlive => true;

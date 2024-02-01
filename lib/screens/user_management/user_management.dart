@@ -9,6 +9,7 @@ import '../../widgets/button_container.dart';
 
 class UserManagement extends StatefulWidget {
   final bool archive;
+
   const UserManagement({super.key, this.archive = false});
 
   @override
@@ -47,10 +48,11 @@ class _UserManagementState extends State<UserManagement> {
         ));
   }
 
-
-  void showUserForm(){
-    showDialog(context: context, builder: (c){
-      return const UserForm();
-    });
+  void showUserForm() {
+    showDialog(
+        context: context,
+        builder: (c) {
+          return const UserForm();
+        });
   }
 }

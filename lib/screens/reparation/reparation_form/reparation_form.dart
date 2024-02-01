@@ -9,20 +9,18 @@ import 'package:parc_oto/screens/reparation/reparation_form/designation_reparati
 import 'package:parc_oto/screens/reparation/reparation_form/entreprise_placement.dart';
 import 'package:parc_oto/screens/reparation/reparation_form/entretien_widget.dart';
 import 'package:parc_oto/screens/reparation/reparation_form/vehicle_damage.dart';
-import 'package:parc_oto/widgets/big_title_form.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicles_table.dart';
-import 'package:parc_oto/serializables/reparation/etat_vehicle.dart';
 import 'package:parc_oto/serializables/prestataire.dart';
+import 'package:parc_oto/serializables/reparation/etat_vehicle.dart';
 import 'package:parc_oto/theme.dart';
+import 'package:parc_oto/widgets/big_title_form.dart';
 import 'package:parc_oto/widgets/zone_box.dart';
-import 'package:pdf/pdf.dart' as pdf;
-import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
+import '../../../pdf_generation/pdf_preview_custom.dart';
 import '../../../pdf_generation/pdf_theming.dart' as pdf_theme;
-import '../../../pdf_generation/reparation_pdf.dart';
 import '../../../serializables/reparation/designation.dart';
 import '../../../serializables/reparation/entretien_vehicle.dart';
 import '../../../serializables/reparation/reparation.dart';
@@ -32,6 +30,7 @@ import '../../../widgets/empty_table_widget.dart';
 
 class ReparationForm extends StatefulWidget {
   final Reparation? reparation;
+
   const ReparationForm({required super.key, this.reparation});
 
   @override
@@ -124,6 +123,7 @@ class ReparationFormState extends State<ReparationForm>
   bool assigningOrederNumber = false;
 
   bool errorNumOrder = false;
+
   void assignOrderNumber() async {
     assigningOrederNumber = true;
     if (mounted) {
@@ -1000,17 +1000,7 @@ class ReparationFormState extends State<ReparationForm>
     showDialog(
         context: context,
         builder: (context) {
-          return PdfPreview(
-            pdfFileName:
-                'ordre${pdf_theme.numberFormat.format(reparation.numero)}',
-            initialPageFormat: pdf.PdfPageFormat.a4,
-            canChangePageFormat: false,
-            canChangeOrientation: false,
-            canDebug: false,
-            build: (pdf.PdfPageFormat format) {
-              return ReparationPdf(reparation: reparation).getDocument();
-            },
-          );
+          return PdfPreviewPO(reparation:reparation);
         });
   }
 

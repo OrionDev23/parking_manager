@@ -1,20 +1,16 @@
-
 import 'package:json_annotation/json_annotation.dart';
 import 'package:parc_oto/serializables/parc_oto_serializable.dart';
 
 import '../../utilities/profil_beautifier.dart';
-
-
 part 'marque.g.dart';
 
 @JsonSerializable()
-
-class Marque extends ParcOtoDefault{
+class Marque extends ParcOtoDefault {
   String? nom;
 
   String? createdBy;
 
-  Marque({required super.id,this.nom,super.createdAt,super.updatedAt});
+  Marque({required super.id, this.nom, super.createdAt, super.updatedAt});
 
   factory Marque.fromJson(Map<String, dynamic> json) => _$MarqueFromJson(json);
 

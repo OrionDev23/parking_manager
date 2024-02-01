@@ -16,6 +16,7 @@ class OnTapScaleAndFadeState extends State<OnTapScaleAndFade>
     with TickerProviderStateMixin {
   double squareScaleA = 1;
   late AnimationController _controllerA;
+
   @override
   void initState() {
     _controllerA = AnimationController(
@@ -37,24 +38,30 @@ class OnTapScaleAndFadeState extends State<OnTapScaleAndFade>
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
-      onTap:widget.onTap==null?null:() {
-        _controllerA.reverse();
-        if(widget.onTap!=null) {
-          widget.onTap!();
-        }
-      },
-      onTapDown:widget.onTap==null?null: (dp) {
-        _controllerA.reverse();
-      },
-      onTapUp:widget.onTap==null?null: (dp) {
-        Timer(const Duration(milliseconds: 150), () {
-          if(mounted) {
-            _controllerA.fling();
-          }
-        });
-      },
+      onTap: widget.onTap == null
+          ? null
+          : () {
+              _controllerA.reverse();
+              if (widget.onTap != null) {
+                widget.onTap!();
+              }
+            },
+      onTapDown: widget.onTap == null
+          ? null
+          : (dp) {
+              _controllerA.reverse();
+            },
+      onTapUp: widget.onTap == null
+          ? null
+          : (dp) {
+              Timer(const Duration(milliseconds: 150), () {
+                if (mounted) {
+                  _controllerA.fling();
+                }
+              });
+            },
       onTapCancel: () {
-        if(mounted) {
+        if (mounted) {
           _controllerA.fling();
         }
       },

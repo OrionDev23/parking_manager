@@ -1,9 +1,9 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import '../theme.dart';
-import '../utilities/color_manip.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../theme.dart';
+import '../utilities/color_manip.dart';
 import 'on_tap_scale.dart';
 
 class ButtonContainer extends StatefulWidget {
@@ -23,6 +23,7 @@ class ButtonContainer extends StatefulWidget {
   final Function()? action;
   final Function()? actionList;
   final Function()? actionNouveau;
+
   const ButtonContainer(
       {super.key,
       required this.icon,
@@ -96,9 +97,9 @@ class _ButtonContainerState extends State<ButtonContainer> {
               children: [
                 Text(
                   widget.showCounter == true
-                      ? loadingCount?
-                      '- ${widget.text}'
-                    :'$count ${widget.text}'
+                      ? loadingCount
+                          ? '- ${widget.text}'
+                          : '$count ${widget.text}'
                       : widget.text,
                   style: textStyle,
                 ),
@@ -146,8 +147,7 @@ class _ButtonContainerState extends State<ButtonContainer> {
     if (widget.getCount == null) {
       loadingCount = false;
       count = 0;
-    }
-    else {
+    } else {
       loadingCount = true;
       if (mounted) {
         setState(() {});
@@ -155,10 +155,10 @@ class _ButtonContainerState extends State<ButtonContainer> {
 
       count = await widget.getCount!();
 
-      if(mounted) {
+      if (mounted) {
         setState(() {
-        loadingCount = false;
-      });
+          loadingCount = false;
+        });
       }
     }
   }

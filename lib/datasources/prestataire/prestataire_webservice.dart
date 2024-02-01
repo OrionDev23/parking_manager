@@ -94,38 +94,33 @@ class PrestataireWebservice extends ParcOtoWebService<Prestataire> {
           return Query.orderDesc('telephone');
         }
       case 2:
-        if(sortedAsc){
+        if (sortedAsc) {
           return Query.orderAsc('email');
-        }
-        else{
+        } else {
           return Query.orderDesc('email');
         }
       case 3:
-        if(sortedAsc){
+        if (sortedAsc) {
           return Query.orderAsc('nif');
-        }
-        else{
+        } else {
           return Query.orderDesc('nif');
         }
       case 4:
-        if(sortedAsc){
+        if (sortedAsc) {
           return Query.orderAsc('rc');
-        }
-        else{
+        } else {
           return Query.orderDesc('rc');
         }
       case 5:
-        if(sortedAsc){
+        if (sortedAsc) {
           return Query.orderAsc(r'$updatedAt');
-        }
-        else{
+        } else {
           return Query.orderDesc(r'$updatedAt');
         }
       default:
-        if(sortedAsc){
+        if (sortedAsc) {
           return Query.orderAsc(r'$id');
-        }
-        else{
+        } else {
           return Query.orderDesc(r'$id');
         }
     }

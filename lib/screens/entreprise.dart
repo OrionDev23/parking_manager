@@ -1,4 +1,5 @@
 import 'dart:io' as io;
+
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -13,7 +14,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../providers/client_database.dart';
 
-const logoid="mylogo.png";
+const logoid = "mylogo.png";
 
 class MyEntreprise extends StatefulWidget {
   const MyEntreprise({super.key});
@@ -56,9 +57,9 @@ class MyEntrepriseState extends State<MyEntreprise> {
     super.initState();
   }
 
-  void checkLogoOrDownload() async{
+  void checkLogoOrDownload() async {
     await checkIfLogoExists();
-    if(!logoExists){
+    if (!logoExists) {
       downloadLogo();
     }
   }
@@ -138,18 +139,18 @@ class MyEntrepriseState extends State<MyEntreprise> {
           });
         }
       }
-    } else if(imageFile!=null){
+    } else if (imageFile != null) {
       setState(() {
-        changes=true;
-      });}
-      else{
-        if (!changes) {
-          setState(() {
-            changes = true;
-          });
-        }
+        changes = true;
+      });
+    } else {
+      if (!changes) {
+        setState(() {
+          changes = true;
+        });
       }
     }
+  }
 
   bool pickingFile = false;
 
@@ -173,31 +174,36 @@ class MyEntrepriseState extends State<MyEntreprise> {
 
   bool downloadingLogo = false;
 
-   static Uint8List? logo;
-  bool uploading=false;
-  double progress=0;
+  static Uint8List? logo;
+  bool uploading = false;
+  double progress = 0;
+
   Future<void> downloadLogo() async {
     downloadingLogo = true;
     if (mounted) {
       setState(() {});
     }
     String link = "";
-    if (p != null && p!.logo != null && p!.logo!.isNotEmpty) {
-      link = p!.logo!;
+
+    if (kIsWeb) {
     } else {
-      link = logoid;
+      if (p != null && p!.logo != null && p!.logo!.isNotEmpty) {
+        link = p!.logo!;
+      } else {
+        link = logoid;
+      }
+      try {
+        await FileImage(io.File('mylogo.png')).evict();
+      } catch (e) {
+        //
+      }
     }
-    try{
-      await FileImage(io.File('mylogo.png')).evict();
-    }
-    catch(e){
-      //
-    }
+
     await ClientDatabase.storage!
         .getFileDownload(bucketId: buckedId, fileId: link)
-        .then((value) async{
-      logo=value;
-      if(!kIsWeb){
+        .then((value) async {
+      logo = value;
+      if (!kIsWeb) {
         io.File file = io.File(logoid);
 
         await file.writeAsBytes(value).then((value) {
@@ -205,15 +211,16 @@ class MyEntrepriseState extends State<MyEntreprise> {
           if (mounted) {
             setState(() {});
           }
-        }).onError((error, stackTrace) {
-      });
+        }).onError((error, stackTrace) {});
+      } else {
+        MyEntrepriseState.logo = value;
       }
-        downloadingLogo = false;
-        if (mounted) {
-          setState(() {});
-        }
+      downloadingLogo = false;
+      if (mounted) {
+        setState(() {});
+      }
     }).onError((error, stackTrace) {
-      logo=null;
+      logo = null;
       downloadingLogo = false;
       if (mounted) {
         setState(() {});
@@ -225,16 +232,25 @@ class MyEntrepriseState extends State<MyEntreprise> {
   static bool logoExists = false;
 
   Future<void> checkIfLogoExists() async {
-    checkingFile = true;
-    if (mounted) {
-      setState(() {});
-    }
-    if (await io.File(logoid).exists()) {
-      logoExists = true;
+    if (kIsWeb) {
+      checkingFile = true;
+      if (MyEntrepriseState.logo != null) {
+        logoExists = true;
+      } else {
+        logoExists = false;
+      }
     } else {
-      logoExists = false;
+      checkingFile = true;
+      if (mounted) {
+        setState(() {});
+      }
+      if (await io.File(logoid).exists()) {
+        logoExists = true;
+      } else {
+        logoExists = false;
+      }
     }
-    checkingFile = false;
+    checkingFile=false;
     if (mounted) {
       setState(() {});
     }
@@ -274,18 +290,28 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                 ),
                                 clipBehavior: Clip.antiAlias,
                                 child: imageFile != null
-                                    ? Image.file(
-                                  imageFile!,
-                                  fit: BoxFit.fitWidth,
-                                ):
-                                logoExists?
-                                    Image.file(io.File(logoid),
-                                      fit: BoxFit.fitWidth,
-                                    )
-                                    : Image.asset(
-                                        'assets/images/logo.webp',
-                                  fit: BoxFit.fitWidth,
-                                ),
+                                        ? Image.memory(
+                                            imageFile!.readAsBytesSync(),
+                                            fit: BoxFit.fitWidth,
+                                          )
+                                        :
+                            kIsWeb
+                            ? MyEntrepriseState.logo != null
+                            ? Image.memory(MyEntrepriseState.logo!,
+                            fit: BoxFit.fitWidth)
+                        : Image.asset(
+                    'assets/images/logo.webp',
+                    fit: BoxFit.fitWidth,
+                  ):
+                            logoExists
+                                            ? Image.file(
+                                                io.File(logoid),
+                                                fit: BoxFit.fitWidth,
+                                              )
+                                            : Image.asset(
+                                                'assets/images/logo.webp',
+                                                fit: BoxFit.fitWidth,
+                                              ),
                               ),
                               smallSpace,
                               Column(
@@ -521,12 +547,17 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Button(
-                          onPressed: uploading|| downloading ? null : downloadData,
+                          onPressed:
+                              uploading || downloading ? null : downloadData,
                           child: const Text('refresh').tr()),
                       smallSpace,
                       FilledButton(
-                          onPressed:uploading||  downloading ? null : upload,
-                          child: uploading ? ProgressBar(value: progress,):const Text('save').tr()),
+                          onPressed: uploading || downloading ? null : upload,
+                          child: uploading
+                              ? ProgressBar(
+                                  value: progress,
+                                )
+                              : const Text('save').tr()),
                     ],
                   ),
                 ),
@@ -539,7 +570,6 @@ class MyEntrepriseState extends State<MyEntreprise> {
       ),
     );
   }
-
 
   void upload() async {
     if (nom.value.text.isEmpty || adresse.text.isEmpty) {
@@ -567,7 +597,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
         await Future.delayed(const Duration(milliseconds: 300));
         setState(() {
           progress = 100;
-          changes=false;
+          changes = false;
         });
         if (p == null) {
           showMessage('entrepsuccess', "ok");
@@ -577,8 +607,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
       } catch (e) {
         setState(() {
           uploading = false;
-          showMessage('errupld',
-              'erreur');
+          showMessage('errupld', 'erreur');
         });
       }
       setState(() {
@@ -589,75 +618,74 @@ class MyEntrepriseState extends State<MyEntreprise> {
   }
 
   Future<Document> uploadEntreprise() async {
-
     Entreprise prest = Entreprise(
-      id:p?.id??'1',
+      id: p?.id ?? '1',
       nom: nom.text,
-      email: email.text.isEmpty?null:email.text,
+      email: email.text.isEmpty ? null : email.text,
       telephone: telephone.text,
       adresse: adresse.text,
       art: art.text,
-      rc:rc.text,
+      rc: rc.text,
       nif: nif.text,
-      nis:nis.text,
+      nis: nis.text,
       logo: logoid,
       description: descr.text,
       search: '${nom.text} ${nif.text} ${nis.text} ${rc.text} ${email.text} '
           '${telephone.text} ${adresse.text} ${descr.text} 1 $logoid ${art.text}',
     );
-    if(p!=null){
-      return await ClientDatabase.database!.updateDocument(
-          databaseId: databaseId,
-          collectionId: entrepriseid,
-          documentId: p!.id,
-          data: prest.toJson()).then((value) {
-            p=prest;
-            return value;
-      });
-    }
-    else{
-      return await ClientDatabase.database!.createDocument(
-          databaseId: databaseId,
-          collectionId: entrepriseid,
-          documentId: '1',
-          data: prest.toJson()).then((value) {
-        p=prest;
+    if (p != null) {
+      return await ClientDatabase.database!
+          .updateDocument(
+              databaseId: databaseId,
+              collectionId: entrepriseid,
+              documentId: p!.id,
+              data: prest.toJson())
+          .then((value) {
+        p = prest;
         return value;
       });
-
-    }
-
-
-
-  }
-
-
-  Future<void> uploadLogo() async{
-    if(imageFile!=null){
-      var bytes=await imageFile!.readAsBytes();
-      try{
-        await ClientDatabase.storage!.deleteFile(bucketId: buckedId, fileId: logoid);
-      }
-      catch (e){
-        //
-      }
-      try{
-        await FileImage(io.File('mylogo.png')).evict();
-      }
-      catch(e){
-        //
-      }
-      await ClientDatabase.storage!.createFile(bucketId: buckedId, fileId:logoid, file: InputFile.fromBytes(
-          bytes: bytes,
-          filename: logoid,)).then((value) async{
-            io.File file=io.File(logoid);
-            await file.writeAsBytes(bytes,mode: io.FileMode.write);
-      }).onError((AppwriteException error, stackTrace) {
-
+    } else {
+      return await ClientDatabase.database!
+          .createDocument(
+              databaseId: databaseId,
+              collectionId: entrepriseid,
+              documentId: '1',
+              data: prest.toJson())
+          .then((value) {
+        p = prest;
+        return value;
       });
     }
   }
 
+  Future<void> uploadLogo() async {
+    if (imageFile != null) {
+      var bytes = await imageFile!.readAsBytes();
+      try {
+        await ClientDatabase.storage!
+            .deleteFile(bucketId: buckedId, fileId: logoid);
+      } catch (e) {
+        //
+      }
+      try {
+        await FileImage(io.File('mylogo.png')).evict();
+      } catch (e) {
+        //
+      }
+      await ClientDatabase.storage!
+          .createFile(
+              bucketId: buckedId,
+              fileId: logoid,
+              file: InputFile.fromBytes(
+                bytes: bytes,
+                filename: logoid,
+              ))
+          .then((value) async {
+        io.File file = io.File(logoid);
+        await file.writeAsBytes(bytes, mode: io.FileMode.write);
+      }).onError((AppwriteException error, stackTrace) {});
+    }
+  }
 
   void showMessage(String message, String title) {
     showDialog<String>(
@@ -682,7 +710,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
   @override
   void dispose() {
     downloading = false;
-    imageFile=null;
+    imageFile = null;
     super.dispose();
   }
 }

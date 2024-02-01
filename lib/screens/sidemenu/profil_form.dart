@@ -1,4 +1,3 @@
-
 import 'package:appwrite/appwrite.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -13,8 +12,10 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../theme.dart';
 import '../../utilities/profil_beautifier.dart';
+
 class ProfilForm extends StatefulWidget {
   final ParcUser? user;
+
   const ProfilForm({super.key, this.user});
 
   @override
@@ -41,14 +42,14 @@ class _ProfilFormState extends State<ProfilForm> {
     validEmail = FormValidators.isEmail(email.text);
     name = TextEditingController(text: widget.user?.name);
     countrySelected = Countries.getCountryCodeFromPhone(widget.user?.tel);
-    if(widget.user!=null && widget.user!.tel!=null && widget.user!.tel!.length>3){
+    if (widget.user != null &&
+        widget.user!.tel != null &&
+        widget.user!.tel!.length > 3) {
       phone = TextEditingController(
           text: widget.user?.tel?.substring(4, widget.user?.tel?.length));
+    } else {
+      phone = TextEditingController();
     }
-    else{
-      phone=TextEditingController();
-    }
-
   }
 
   bool somethingChanged = false;
@@ -75,8 +76,7 @@ class _ProfilFormState extends State<ProfilForm> {
       setState(() {
         somethingChanged = true;
       });
-    }
-    else if (somethingChanged) {
+    } else if (somethingChanged) {
       setState(() {
         somethingChanged = false;
       });
@@ -99,25 +99,24 @@ class _ProfilFormState extends State<ProfilForm> {
               Hero(
                 tag: 'myprofil',
                 child: Container(
-                  width: 15.h,
-                  height: 15.h,
-                  decoration: BoxDecoration(
-                    color: appTheme.color,
-                    shape: BoxShape.circle,
-                    boxShadow: kElevationToShadow[2],
-                  ),
-                  padding: const EdgeInsets.all(2),
-                  alignment: Alignment.center,
-                  clipBehavior: Clip.antiAlias,
-                  child:  Text(
-                              ParcOtoUtilities.getFirstLetters(widget.user)
-                                  .toUpperCase(),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontSize: 18.sp),
-                            )
-                ),
+                    width: 15.h,
+                    height: 15.h,
+                    decoration: BoxDecoration(
+                      color: appTheme.color,
+                      shape: BoxShape.circle,
+                      boxShadow: kElevationToShadow[2],
+                    ),
+                    padding: const EdgeInsets.all(2),
+                    alignment: Alignment.center,
+                    clipBehavior: Clip.antiAlias,
+                    child: Text(
+                      ParcOtoUtilities.getFirstLetters(widget.user)
+                          .toUpperCase(),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 18.sp),
+                    )),
               ),
             ],
           ),
@@ -151,10 +150,8 @@ class _ProfilFormState extends State<ProfilForm> {
                         testIfSomethingChanged();
                       }
                     },
-                    placeholderStyle:
-                    placeStyle,
-                    cursorColor:
-                    appTheme.color.darker,
+                    placeholderStyle: placeStyle,
+                    cursorColor: appTheme.color.darker,
                     style: appTheme.writingStyle,
                     decoration: BoxDecoration(
                       color: appTheme.fillColor,
@@ -183,10 +180,8 @@ class _ProfilFormState extends State<ProfilForm> {
                   onChanged: (s) {
                     testIfSomethingChanged();
                   },
-                  placeholderStyle:
-                  placeStyle,
-                  cursorColor:
-                  appTheme.color.darker,
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
                   decoration: BoxDecoration(
                     color: appTheme.fillColor,
@@ -235,14 +230,12 @@ class _ProfilFormState extends State<ProfilForm> {
                 onChanged: (s) {
                   testIfSomethingChanged();
                 },
-                    placeholderStyle:
-                    placeStyle,
-                    cursorColor:
-                    appTheme.color.darker,
-                    style: appTheme.writingStyle,
-                    decoration: BoxDecoration(
-                      color: appTheme.fillColor,
-                    ),
+                placeholderStyle: placeStyle,
+                cursorColor: appTheme.color.darker,
+                style: appTheme.writingStyle,
+                decoration: BoxDecoration(
+                  color: appTheme.fillColor,
+                ),
               )),
             ],
           ),
@@ -262,20 +255,20 @@ class _ProfilFormState extends State<ProfilForm> {
             onPressed: uploading || !validEmail || !somethingChanged
                 ? null
                 : onConfirm,
-            child: uploading
-                ? const ProgressBar()
-                : const Text('confirmer').tr()),
+            child:
+                uploading ? const ProgressBar() : const Text('confirmer').tr()),
       ],
     );
   }
 
   bool uploading = false;
+
   void onConfirm() async {
     if (email.text.isNotEmpty && validEmail && somethingChanged) {
       setState(() {
         uploading = true;
       });
-      ParcUser newme= ParcUser(
+      ParcUser newme = ParcUser(
         email: email.text,
         name: name.text,
         id: userID,
@@ -283,30 +276,32 @@ class _ProfilFormState extends State<ProfilForm> {
         avatar: null,
       );
       if (widget.user == null) {
-        await ClientDatabase.database!.createDocument(
-            databaseId: databaseId,
-            collectionId: userid,
-            documentId: userID,
-            data: newme.toJson()).then((value) {
-              ClientDatabase.me.value=newme;
-              Navigator.pop(
-                context,
-              );
-
+        await ClientDatabase.database!
+            .createDocument(
+                databaseId: databaseId,
+                collectionId: userid,
+                documentId: userID,
+                data: newme.toJson())
+            .then((value) {
+          ClientDatabase.me.value = newme;
+          Navigator.pop(
+            context,
+          );
         });
       } else {
-        await ClientDatabase.database!.updateDocument(
-            databaseId: databaseId,
-            collectionId: userid,
-            documentId: userID,
-            data: newme.toJson()).then((value) {
-          ClientDatabase.me.value=newme;
+        await ClientDatabase.database!
+            .updateDocument(
+                databaseId: databaseId,
+                collectionId: userid,
+                documentId: userID,
+                data: newme.toJson())
+            .then((value) {
+          ClientDatabase.me.value = newme;
           Navigator.pop(
             context,
           );
         });
       }
-
 
       setState(() {
         uploading = false;

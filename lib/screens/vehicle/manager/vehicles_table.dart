@@ -2,7 +2,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -16,6 +15,7 @@ import '../../../widgets/zone_box.dart';
 
 class VehicleTable extends StatefulWidget {
   final bool selectV;
+
   const VehicleTable({super.key, this.selectV = false});
 
   @override
@@ -72,7 +72,6 @@ class VehicleTableState extends State<VehicleTable> {
     initColumns();
     super.initState();
   }
-
 
   int sortColumn = 4;
 
@@ -132,7 +131,6 @@ class VehicleTableState extends State<VehicleTable> {
       ),
       DataColumn2(
         numeric: true,
-
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: const Text(
@@ -151,7 +149,6 @@ class VehicleTableState extends State<VehicleTable> {
       ),
       DataColumn2(
         numeric: true,
-
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: const Text(
@@ -167,13 +164,13 @@ class VehicleTableState extends State<VehicleTable> {
           setState(() {});
         },
       ),
-      if(widget.selectV!=true)
+      if (widget.selectV != true)
         DataColumn2(
-        label: const Text(''),
-        size: ColumnSize.S,
-        fixedWidth: 2.w,
-        onSort: null,
-      ),
+          label: const Text(''),
+          size: ColumnSize.S,
+          fixedWidth: 2.w,
+          onSort: null,
+        ),
     ];
   }
 
@@ -611,7 +608,8 @@ class VehicleTableState extends State<VehicleTable> {
                                                               onPressed:
                                                                   filtered
                                                                       ? () {
-                                                                    Navigator.of(context).pop();
+                                                                          Navigator.of(context)
+                                                                              .pop();
                                                                           setState(
                                                                               () {
                                                                             filtered =
@@ -753,10 +751,8 @@ class VehicleTableState extends State<VehicleTable> {
                                     notEmpty = true;
                                   });
                                 }
-                              }
-                              else {
+                              } else {
                                 if (notEmpty) {
-
                                   setState(() {
                                     notEmpty = false;
                                   });
@@ -777,7 +773,11 @@ class VehicleTableState extends State<VehicleTable> {
                           ),
                         ),
                         bigSpace,
-                        IconButton(icon: const Icon(FluentIcons.refresh), onPressed: (){vehicleDataSource.refreshDatasource();}),
+                        IconButton(
+                            icon: const Icon(FluentIcons.refresh),
+                            onPressed: () {
+                              vehicleDataSource.refreshDatasource();
+                            }),
                       ],
                     ),
                   ),
@@ -785,11 +785,10 @@ class VehicleTableState extends State<VehicleTable> {
                   headingRowHeight: 25,
                   headingRowDecoration: BoxDecoration(
                       color: appTheme.color,
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(5))
-                  ),
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(5))),
                   dividerThickness: 0.5,
                   autoRowsToHeight: true,
-
                   empty: NoDataWidget(
                     datasource: vehicleDataSource,
                   ),

@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
+
 import '../../theme.dart';
 
 class TableStats extends StatelessWidget {
@@ -11,6 +12,7 @@ class TableStats extends StatelessWidget {
   final double? height;
   final double? width;
   final void Function()? onTap;
+
   const TableStats(
       {super.key,
       this.title,

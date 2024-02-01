@@ -1,7 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-
 import 'package:parc_oto/datasources/log_activity/log_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
@@ -22,14 +21,21 @@ class LogTable extends StatefulWidget {
   final int? numberOfRows;
 
   final Map<String, String>? filters;
+
   const LogTable(
       {super.key,
       this.selectD = false,
-        this.pages=true,
+      this.pages = true,
       this.statTable = false,
       this.filters,
-        this.numberOfRows,
-      this.fieldsToShow = const ['act', 'id', 'date', 'user','plus',]});
+      this.numberOfRows,
+      this.fieldsToShow = const [
+        'act',
+        'id',
+        'date',
+        'user',
+        'plus',
+      ]});
 
   @override
   State<LogTable> createState() => LogTableState();
@@ -44,7 +50,7 @@ class LogTableState extends State<LogTable> {
 
   @override
   void initState() {
-    sortColumn=widget.fieldsToShow.indexOf('date');
+    sortColumn = widget.fieldsToShow.indexOf('date');
     logDatasource = LogDatasource(
         current: context,
         collectionID: activityId,
@@ -56,7 +62,6 @@ class LogTableState extends State<LogTable> {
     initColumns();
     super.initState();
   }
-
 
   int sortColumn = 2;
 
@@ -153,6 +158,7 @@ class LogTableState extends State<LogTable> {
   DateTime? dateMax;
   int? type;
   Map<String, String> filters = {};
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
@@ -519,28 +525,28 @@ class LogTableState extends State<LogTable> {
       sortAscending: assending,
       headingRowHeight: 25,
       headingRowDecoration: BoxDecoration(
-        color: appTheme.color,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(5))
-      ),
+          color: appTheme.color,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(5))),
       dividerThickness: 0.5,
       autoRowsToHeight: true,
-
       empty: NoDataWidget(
         datasource: logDatasource,
       ),
       horizontalMargin: 4,
       columnSpacing: 0,
-      dataRowHeight: widget.numberOfRows==null?rowHeight:rowHeight*2,
+      dataRowHeight: widget.numberOfRows == null ? rowHeight : rowHeight * 2,
       onPageChanged: (s) {},
       showCheckboxColumn: false,
       sortColumnIndex: sortColumn,
-      rowsPerPage: widget.numberOfRows??rowPerPage,
-      onRowsPerPageChanged: widget.pages?(nbr) {
-        rowPerPage = nbr ?? 12;
-      }:null,
-      availableRowsPerPage: widget.numberOfRows==null?const [12, 24, 50, 100, 200]:[
-        widget.numberOfRows!
-      ],
+      rowsPerPage: widget.numberOfRows ?? rowPerPage,
+      onRowsPerPageChanged: widget.pages
+          ? (nbr) {
+              rowPerPage = nbr ?? 12;
+            }
+          : null,
+      availableRowsPerPage: widget.numberOfRows == null
+          ? const [12, 24, 50, 100, 200]
+          : [widget.numberOfRows!],
       showFirstLastButtons: widget.pages,
       renderEmptyRowsInTheEnd: false,
       fit: FlexFit.tight,

@@ -3,54 +3,54 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/screens/prestataire/prestataire_form.dart';
 import 'package:parc_oto/screens/prestataire/prestataire_table.dart';
 import 'package:parc_oto/screens/prestataire/prestataire_tabs.dart';
-import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import '../../../../theme.dart';
+
 import '../../../../widgets/button_container.dart';
 import '../../../../widgets/page_header.dart';
 
 class PrestataireGestion extends StatefulWidget {
   final bool archive;
-  const PrestataireGestion({super.key,this.archive=false});
+
+  const PrestataireGestion({super.key, this.archive = false});
 
   @override
   PrestataireGestionState createState() => PrestataireGestionState();
 }
 
 class PrestataireGestionState extends State<PrestataireGestion> {
-  final tstyle=TextStyle(
+  final tstyle = TextStyle(
     fontSize: 10.sp,
   );
 
-
-
   @override
   Widget build(BuildContext context) {
-    var appTheme=context.watch<AppTheme>();
     return ScaffoldPage(
-      header: PageTitle(
-        text: 'prestataires'.tr(),
-        trailing: widget.archive?null:SizedBox(
-            width: 15.w,
-            height: 10.h,
-            child: ButtonContainer(
-              icon: FluentIcons.add,
-              text: 'add'.tr(),
-              showBottom: false,
-              showCounter: false,
-              action: () {
-                final index = PrestataireTabsState.tabs.length + 1;
-                final tab = generateTab(index);
-                PrestataireTabsState.tabs.add(tab);
-                PrestataireTabsState.currentIndex.value = index - 1;
-              },
-            )),
-      ),
-      content: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-        child: PrestataireTable(archive: widget.archive,),
-      )
-    );
+        header: PageTitle(
+          text: 'prestataires'.tr(),
+          trailing: widget.archive
+              ? null
+              : SizedBox(
+                  width: 15.w,
+                  height: 10.h,
+                  child: ButtonContainer(
+                    icon: FluentIcons.add,
+                    text: 'add'.tr(),
+                    showBottom: false,
+                    showCounter: false,
+                    action: () {
+                      final index = PrestataireTabsState.tabs.length + 1;
+                      final tab = generateTab(index);
+                      PrestataireTabsState.tabs.add(tab);
+                      PrestataireTabsState.currentIndex.value = index - 1;
+                    },
+                  )),
+        ),
+        content: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: PrestataireTable(
+            archive: widget.archive,
+          ),
+        ));
   }
 
   Tab generateTab(int index) {

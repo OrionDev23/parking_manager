@@ -1,7 +1,6 @@
 import 'package:appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-
 import 'package:parc_oto/serializables/prestataire.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -11,20 +10,18 @@ import '../../theme.dart';
 import '../../widgets/zone_box.dart';
 
 class PrestataireForm extends StatefulWidget {
-
   final Prestataire? prest;
-  const PrestataireForm({super.key,this.prest});
+
+  const PrestataireForm({super.key, this.prest});
 
   @override
   State<PrestataireForm> createState() => _PrestataireFormState();
 }
 
 class _PrestataireFormState extends State<PrestataireForm> {
-
   bool uploading = false;
   double progress = 0;
   String? prestID;
-
 
   TextEditingController nom = TextEditingController();
   TextEditingController email = TextEditingController();
@@ -44,13 +41,13 @@ class _PrestataireFormState extends State<PrestataireForm> {
 
   void initValues() {
     if (widget.prest != null) {
-      prestID=widget.prest!.id;
+      prestID = widget.prest!.id;
       nom.text = widget.prest!.nom;
-      nif.text = widget.prest!.nif??'';
-      nis.text = widget.prest!.nis??'';
-      art.text = widget.prest!.art??'';
-      rc.text = widget.prest!.rc??'';
-      descr.text=widget.prest!.description??'';
+      nif.text = widget.prest!.nif ?? '';
+      nis.text = widget.prest!.nis ?? '';
+      art.text = widget.prest!.art ?? '';
+      rc.text = widget.prest!.rc ?? '';
+      descr.text = widget.prest!.description ?? '';
       email.text = widget.prest!.email ?? '';
       telephone.text = widget.prest!.telephone ?? '';
       adresse.text = widget.prest!.adresse;
@@ -59,11 +56,9 @@ class _PrestataireFormState extends State<PrestataireForm> {
 
   bool? selected = false;
 
-
   @override
   Widget build(BuildContext context) {
-
-    var appTheme=context.watch<AppTheme>();
+    var appTheme = context.watch<AppTheme>();
     if (uploading) {
       return Center(
         child: Column(
@@ -93,7 +88,7 @@ class _PrestataireFormState extends State<PrestataireForm> {
                   child: Column(
                     children: [
                       Flexible(
-                        flex:2,
+                        flex: 2,
                         child: ZoneBox(
                           label: 'fullname'.tr(),
                           child: Padding(
@@ -107,7 +102,7 @@ class _PrestataireFormState extends State<PrestataireForm> {
                               decoration: BoxDecoration(
                                 color: appTheme.fillColor,
                               ),
-                              onChanged: (s){
+                              onChanged: (s) {
                                 checkChanges();
                               },
                             ),
@@ -130,7 +125,7 @@ class _PrestataireFormState extends State<PrestataireForm> {
                               decoration: BoxDecoration(
                                 color: appTheme.fillColor,
                               ),
-                              onChanged: (s){
+                              onChanged: (s) {
                                 checkChanges();
                               },
                             ),
@@ -141,7 +136,7 @@ class _PrestataireFormState extends State<PrestataireForm> {
                       Flexible(
                         flex: 4,
                         child: ZoneBox(
-                          label:'contact'.tr(),
+                          label: 'contact'.tr(),
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: Column(
@@ -159,7 +154,7 @@ class _PrestataireFormState extends State<PrestataireForm> {
                                         decoration: BoxDecoration(
                                           color: appTheme.fillColor,
                                         ),
-                                        onChanged: (s){
+                                        onChanged: (s) {
                                           checkChanges();
                                         },
                                       ),
@@ -176,14 +171,15 @@ class _PrestataireFormState extends State<PrestataireForm> {
                                           decoration: BoxDecoration(
                                             color: appTheme.fillColor,
                                           ),
-                                          onChanged: (s){
+                                          onChanged: (s) {
                                             checkChanges();
                                           },
                                         )),
                                   ],
                                 ),
                                 smallSpace,
-                                Flexible(child: TextBox(
+                                Flexible(
+                                    child: TextBox(
                                   controller: adresse,
                                   placeholder: 'adresse'.tr(),
                                   maxLines: 3,
@@ -193,7 +189,7 @@ class _PrestataireFormState extends State<PrestataireForm> {
                                   decoration: BoxDecoration(
                                     color: appTheme.fillColor,
                                   ),
-                                  onChanged: (s){
+                                  onChanged: (s) {
                                     checkChanges();
                                   },
                                 )),
@@ -217,33 +213,33 @@ class _PrestataireFormState extends State<PrestataireForm> {
                                     children: [
                                       Flexible(
                                           child: TextBox(
-                                            controller: nif,
-                                            placeholder: 'NIF',
-                                            style: appTheme.writingStyle,
-                                            placeholderStyle: placeStyle,
-                                            cursorColor: appTheme.color.darker,
-                                            decoration: BoxDecoration(
-                                              color: appTheme.fillColor,
-                                            ),
-                                            onChanged: (s){
-                                              checkChanges();
-                                            },
-                                          )),
+                                        controller: nif,
+                                        placeholder: 'NIF',
+                                        style: appTheme.writingStyle,
+                                        placeholderStyle: placeStyle,
+                                        cursorColor: appTheme.color.darker,
+                                        decoration: BoxDecoration(
+                                          color: appTheme.fillColor,
+                                        ),
+                                        onChanged: (s) {
+                                          checkChanges();
+                                        },
+                                      )),
                                       smallSpace,
                                       Flexible(
                                           child: TextBox(
-                                            controller: nis,
-                                            placeholder: 'NIS',
-                                            style: appTheme.writingStyle,
-                                            placeholderStyle: placeStyle,
-                                            cursorColor: appTheme.color.darker,
-                                            decoration: BoxDecoration(
-                                              color: appTheme.fillColor,
-                                            ),
-                                            onChanged: (s){
-                                              checkChanges();
-                                            },
-                                          )),
+                                        controller: nis,
+                                        placeholder: 'NIS',
+                                        style: appTheme.writingStyle,
+                                        placeholderStyle: placeStyle,
+                                        cursorColor: appTheme.color.darker,
+                                        decoration: BoxDecoration(
+                                          color: appTheme.fillColor,
+                                        ),
+                                        onChanged: (s) {
+                                          checkChanges();
+                                        },
+                                      )),
                                     ],
                                   ),
                                 ),
@@ -253,33 +249,33 @@ class _PrestataireFormState extends State<PrestataireForm> {
                                     children: [
                                       Flexible(
                                           child: TextBox(
-                                            controller: rc,
-                                            placeholder: 'RC',
-                                            style: appTheme.writingStyle,
-                                            placeholderStyle: placeStyle,
-                                            cursorColor: appTheme.color.darker,
-                                            decoration: BoxDecoration(
-                                              color: appTheme.fillColor,
-                                            ),
-                                            onChanged: (s){
-                                              checkChanges();
-                                            },
-                                          )),
+                                        controller: rc,
+                                        placeholder: 'RC',
+                                        style: appTheme.writingStyle,
+                                        placeholderStyle: placeStyle,
+                                        cursorColor: appTheme.color.darker,
+                                        decoration: BoxDecoration(
+                                          color: appTheme.fillColor,
+                                        ),
+                                        onChanged: (s) {
+                                          checkChanges();
+                                        },
+                                      )),
                                       smallSpace,
                                       Flexible(
                                           child: TextBox(
-                                            controller: art,
-                                            placeholder: 'ART',
-                                            style: appTheme.writingStyle,
-                                            placeholderStyle: placeStyle,
-                                            cursorColor: appTheme.color.darker,
-                                            decoration: BoxDecoration(
-                                              color: appTheme.fillColor,
-                                            ),
-                                            onChanged: (s){
-                                              checkChanges();
-                                            },
-                                          )),
+                                        controller: art,
+                                        placeholder: 'ART',
+                                        style: appTheme.writingStyle,
+                                        placeholderStyle: placeStyle,
+                                        cursorColor: appTheme.color.darker,
+                                        decoration: BoxDecoration(
+                                          color: appTheme.fillColor,
+                                        ),
+                                        onChanged: (s) {
+                                          checkChanges();
+                                        },
+                                      )),
                                     ],
                                   ),
                                 ),
@@ -297,7 +293,6 @@ class _PrestataireFormState extends State<PrestataireForm> {
           Container(
             padding: const EdgeInsets.all(10),
             width: 40.w,
-
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -315,34 +310,35 @@ class _PrestataireFormState extends State<PrestataireForm> {
     );
   }
 
-  bool changes=false;
+  bool changes = false;
 
-  void checkChanges(){
-    if(widget.prest!=null){
-      if(nom.text==widget.prest!.nom && adresse.text==widget.prest!.adresse
-          && telephone.text==widget.prest!.telephone && nif.text==widget.prest!.nif
-          && nis.text==widget.prest!.nis && art.text==widget.prest!.art
-          && rc.text==widget.prest!.rc && descr.text==widget.prest!.description
-          && email.text==widget.prest!.email
-      ){
-        if(changes){
+  void checkChanges() {
+    if (widget.prest != null) {
+      if (nom.text == widget.prest!.nom &&
+          adresse.text == widget.prest!.adresse &&
+          telephone.text == widget.prest!.telephone &&
+          nif.text == widget.prest!.nif &&
+          nis.text == widget.prest!.nis &&
+          art.text == widget.prest!.art &&
+          rc.text == widget.prest!.rc &&
+          descr.text == widget.prest!.description &&
+          email.text == widget.prest!.email) {
+        if (changes) {
           setState(() {
-            changes=false;
+            changes = false;
+          });
+        }
+      } else {
+        if (!changes) {
+          setState(() {
+            changes = true;
           });
         }
       }
-      else{
-        if(!changes){
-          setState(() {
-            changes=true;
-          });
-        }
-      }
-    }
-    else{
-      if(!changes){
+    } else {
+      if (!changes) {
         setState(() {
-          changes=true;
+          changes = true;
         });
       }
     }
@@ -370,7 +366,7 @@ class _PrestataireFormState extends State<PrestataireForm> {
 
         setState(() {
           progress = 90;
-          changes=false;
+          changes = false;
         });
         if (widget.prest == null) {
           showMessage('prestsuccess', "ok");
@@ -380,8 +376,7 @@ class _PrestataireFormState extends State<PrestataireForm> {
       } catch (e) {
         setState(() {
           uploading = false;
-          showMessage('errupld',
-              'erreur');
+          showMessage('errupld', 'erreur');
         });
       }
       setState(() {
@@ -392,45 +387,47 @@ class _PrestataireFormState extends State<PrestataireForm> {
   }
 
   Future<Document> uploadPrestataire() async {
-
     Prestataire prest = Prestataire(
-      id:prestID!,
+      id: prestID!,
       nom: nom.text,
-      email: email.text.isEmpty?null:email.text,
+      email: email.text.isEmpty ? null : email.text,
       telephone: telephone.text,
       adresse: adresse.text,
       art: art.text,
-      rc:rc.text,
+      rc: rc.text,
       nif: nif.text,
-      nis:nis.text,
+      nis: nis.text,
       description: descr.text,
       search: '${nom.text} ${nif.text} ${nis.text} ${rc.text} ${email.text} '
           '${telephone.text} ${adresse.text} ${descr.text} $prestID ${art.text}',
     );
-    if(widget.prest!=null){
-      return await ClientDatabase.database!.updateDocument(
-          databaseId: databaseId,
-          collectionId: prestataireId,
-          documentId: prestID!,
-          data: prest.toJson()).then((value) {
-        ClientDatabase().ajoutActivity(14, prestID!,docName: prest.nom);
+    if (widget.prest != null) {
+      return await ClientDatabase.database!
+          .updateDocument(
+              databaseId: databaseId,
+              collectionId: prestataireId,
+              documentId: prestID!,
+              data: prest.toJson())
+          .then((value) {
+        ClientDatabase().ajoutActivity(14, prestID!, docName: prest.nom);
+
+        return value;
+      });
+    } else {
+      return await ClientDatabase.database!
+          .createDocument(
+              databaseId: databaseId,
+              collectionId: prestataireId,
+              documentId: prestID!,
+              data: prest.toJson())
+          .then((value) {
+        ClientDatabase().ajoutActivity(13, prestID!, docName: prest.nom);
 
         return value;
       });
     }
-    else{
-      return await ClientDatabase.database!.createDocument(
-          databaseId: databaseId,
-          collectionId: prestataireId,
-          documentId: prestID!,
-          data: prest.toJson()).then((value) {
-        ClientDatabase().ajoutActivity(13, prestID!,docName: prest.nom);
-
-        return value;
-      });
-    }
-
   }
+
   void showMessage(String message, String title) {
     showDialog<String>(
       context: context,

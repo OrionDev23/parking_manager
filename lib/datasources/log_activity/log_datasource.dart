@@ -1,25 +1,26 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/log_activity/log_webservice.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/serializables/activity.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:fluent_ui/fluent_ui.dart' as f;
 
 import '../../widgets/on_tap_scale.dart';
 
 class LogDatasource extends ParcOtoDatasource<Activity> {
   final List<String> fieldsToShow;
+
   LogDatasource(
       {required super.collectionID,
       required super.current,
       super.appTheme,
-        super.sortAscending,
-        super.sortColumn,
+      super.sortAscending,
+      super.sortColumn,
       super.filters,
       super.searchKey,
-      this.fieldsToShow = const ['act', 'id', 'date', 'user','plus'],
+      this.fieldsToShow = const ['act', 'id', 'date', 'user', 'plus'],
       super.selectC}) {
     repo = LogWebService(data, collectionID, 1);
   }
@@ -58,7 +59,7 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
             style: tstyle)),
       if (fieldsToShow.contains('user') && ClientDatabase().isAdmin())
         DataCell(SelectableText(
-          element.value.personName??'',
+          element.value.personName ?? '',
           style: tstyle,
         )),
       if (fieldsToShow.contains('plus'))
@@ -85,8 +86,6 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
         )
     ];
   }
-
-
 
   void showMyDoc(int type, String docID) {}
 }

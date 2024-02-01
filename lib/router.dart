@@ -13,55 +13,56 @@ import 'package:parc_oto/screens/vehicle/vehicle_dashboard.dart';
 
 import 'main.dart';
 
-class Routes{
-
-
-  Routes(){
-    final savedSettings=prefs;
-    router= GoRouter(
+class Routes {
+  Routes() {
+    final savedSettings = prefs;
+    router = GoRouter(
       initialLocation: '/dashboard',
       routes: [
         ShellRoute(
-          builder: (context, state,widget) => PanesList(
-            paneList: PaneItemsAndFooters(savedSettings),
-          ),
-          routes: [
-            GoRoute(
-              name: 'login',
-              path: '/login',
-              builder: (context,state)=>const LoginScreen(),
-            ),
-            GoRoute(
-              name: 'dashboard',
-              path: '/dashboard',
-              builder: (context,state)=>const Dashboard(),
-            ),
-            GoRoute(
-                path: '/vehicles',
-                builder: (context,state)=>const VehicleDashboard(),
-                routes: [
-                  GoRoute(path: 'manager',builder: (context,state)=>const VehicleTabs()),
-                  GoRoute(path: 'brands',builder: (context,state)=>const BrandList()),
-                  GoRoute(path: 'states',builder: (context,state)=>const StateTabs()),
-                  GoRoute(path: 'documents',builder: (context,state)=>const DocumentTabs()),
-
-                ]
-            ),
-          ]
-        ),
+            builder: (context, state, widget) => PanesList(
+                  paneList: PaneItemsAndFooters(savedSettings),
+                ),
+            routes: [
+              GoRoute(
+                name: 'login',
+                path: '/login',
+                builder: (context, state) => const LoginScreen(),
+              ),
+              GoRoute(
+                name: 'dashboard',
+                path: '/dashboard',
+                builder: (context, state) => const Dashboard(),
+              ),
+              GoRoute(
+                  path: '/vehicles',
+                  builder: (context, state) => const VehicleDashboard(),
+                  routes: [
+                    GoRoute(
+                        path: 'manager',
+                        builder: (context, state) => const VehicleTabs()),
+                    GoRoute(
+                        path: 'brands',
+                        builder: (context, state) => const BrandList()),
+                    GoRoute(
+                        path: 'states',
+                        builder: (context, state) => const StateTabs()),
+                    GoRoute(
+                        path: 'documents',
+                        builder: (context, state) => const DocumentTabs()),
+                  ]),
+            ]),
         GoRoute(
             name: 'recoverpassword',
             path: '/recoverpassword',
-            builder: (context,state) =>const ResetScreen()
-        ),
+            builder: (context, state) => const ResetScreen()),
         GoRoute(
             name: 'acceptinvitation',
             path: '/acceptinvitation',
-            builder: (context,state) =>const AcceptInvitation()
-        ),
+            builder: (context, state) => const AcceptInvitation()),
       ],
     );
   }
+
   late final GoRouter router;
 }
-

@@ -9,25 +9,31 @@ class FutureImage extends StatelessWidget {
 
   final String bucketID;
   final ParcUser? user;
-  const FutureImage({super.key, this.user,required this.fileID, required this.bucketID});
+
+  const FutureImage(
+      {super.key, this.user, required this.fileID, required this.bucketID});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(future: ClientDatabase.storage!.getFileView(
-      bucketId: bucketID,
-      fileId: fileID,
-    ),
-        builder: (context,snapshot){
+    return FutureBuilder(
+        future: ClientDatabase.storage!.getFileView(
+          bucketId: bucketID,
+          fileId: fileID,
+        ),
+        builder: (context, snapshot) {
           return snapshot.hasData && snapshot.data != null
               ? Image.memory(
-            snapshot.data!,
-            fit: BoxFit.cover,
-          ):
-              !snapshot.hasData
-                  ?user==null?Image.asset('assets/images/logo.webp',fit: BoxFit.cover,)
-                  :Text(ParcOtoUtilities.getFirstLetters(user!))
+                  snapshot.data!,
+                  fit: BoxFit.cover,
+                )
+              : !snapshot.hasData
+                  ? user == null
+                      ? Image.asset(
+                          'assets/images/logo.webp',
+                          fit: BoxFit.cover,
+                        )
+                      : Text(ParcOtoUtilities.getFirstLetters(user!))
                   : const ProgressRing();
-    });
+        });
   }
-
 }

@@ -1,12 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/serializables/reparation/entretien_vehicle.dart';
-import 'package:provider/provider.dart';
 
 import '../../../theme.dart';
 
 class EntretienWidget extends StatefulWidget {
   final EntretienVehicle entretienVehicle;
+
   const EntretienWidget({super.key, required this.entretienVehicle});
 
   @override
@@ -16,7 +16,6 @@ class EntretienWidget extends StatefulWidget {
 class EntretienWidgetState extends State<EntretienWidget> {
   @override
   Widget build(BuildContext context) {
-    var appTheme=context.watch<AppTheme>();
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -261,7 +260,6 @@ class EntretienWidgetState extends State<EntretienWidget> {
             ),
           ],
         ),
-
       ],
     );
   }

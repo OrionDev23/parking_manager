@@ -1,18 +1,18 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
-
-import '../../screens/vehicle/states/state_form.dart';
-import '../../utilities/vehicle_util.dart';
-import 'vehicle_webservice.dart';
-import '../../screens/vehicle/documents/document_form.dart';
-import '../../widgets/on_tap_scale.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+
 import '../../providers/client_database.dart';
+import '../../screens/vehicle/documents/document_form.dart';
 import '../../screens/vehicle/manager/vehicle_form.dart';
 import '../../screens/vehicle/manager/vehicle_tabs.dart';
+import '../../screens/vehicle/states/state_form.dart';
 import '../../serializables/vehicle/vehicle.dart';
+import '../../utilities/vehicle_util.dart';
+import '../../widgets/on_tap_scale.dart';
 import '../parcoto_datasource.dart';
+import 'vehicle_webservice.dart';
 
 class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
   VehiculeDataSource(
@@ -22,7 +22,7 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
       super.searchKey,
       super.selectC,
       required super.collectionID}) {
-    repo = VehiculesWebService(data, collectionID, 8);
+    repo = VehiculesWebService(data, collectionID, 1);
   }
 
   @override
@@ -39,18 +39,31 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
       DataCell(Row(
         children: [
           Image.asset(
-            element.value.marque==null || element.value.marque!.isEmpty || element.value.marque!.contains('null')?'assets/images/marques/default.webp':'assets/images/marques/${element.value.marque ?? 'default'}.webp',
+            element.value.marque == null ||
+                    element.value.marque!.isEmpty ||
+                    element.value.marque!.contains('null')
+                ? 'assets/images/marques/default.webp'
+                : 'assets/images/marques/${element.value.marque ?? 'default'}.webp',
             width: 3.5.h,
             height: 3.5.h,
           ),
           const SizedBox(
             width: 2,
           ),
-          Expanded(child: Text(element.value.type ?? '', style: tstyle,softWrap: true,overflow: TextOverflow.ellipsis,)),
+          Expanded(
+              child: Text(
+            element.value.type ?? '',
+            style: tstyle,
+            softWrap: true,
+            overflow: TextOverflow.ellipsis,
+          )),
         ],
       )),
       DataCell(Text(element.value.anneeUtil.toString(), style: tstyle)),
-      DataCell(Text(VehiclesUtilities.getTypeName(element.value.etatactuel ?? 0), style: tstyle).tr()),
+      DataCell(Text(
+              VehiclesUtilities.getTypeName(element.value.etatactuel ?? 0),
+              style: tstyle)
+          .tr()),
       DataCell(
           Text(dateFormat.format(element.value.updatedAt!), style: tstyle)),
       if (selectC != true)
@@ -104,15 +117,38 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
                               f.MenuFlyoutItem(
                                   text: const Text('nouvdocument').tr(),
                                   onPressed: () {
-                                    Future.delayed(const Duration(milliseconds: 50)).then((value) =>
-                                        f.showDialog(
-                                        context: current,
-                                        barrierDismissible: true,
-                                        builder: (context) {
-                                          return DocumentForm(
-                                            vehicle: element.value,
-                                          );
-                                        }));
+                                    Future.delayed(
+                                            const Duration(milliseconds: 50))
+                                        .then((value) => f.showDialog(
+                                            context: current,
+                                            barrierDismissible: true,
+                                            builder: (context) {
+                                              return f.ContentDialog(
+                                                title: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    const Text('nouvdocument')
+                                                        .tr(),
+                                                    f.Button(
+                                                        child: const Icon(f
+                                                            .FluentIcons
+                                                            .cancel),
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        }),
+                                                  ],
+                                                ),
+                                                constraints:
+                                                    BoxConstraints.loose(
+                                                        Size(420.px, 450.px)),
+                                                content: DocumentForm(
+                                                  vehicle: element.value,
+                                                ),
+                                              );
+                                            }));
                                   }),
                               f.MenuFlyoutSubItem(
                                 text: const Text('chstates').tr(),
@@ -177,20 +213,20 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
   }
 
   void showStateForm(Vehicle v, int type) {
-    Future.delayed(const Duration(milliseconds: 50)).then((value) =>
-        f.showDialog(
-        context: current,
-        barrierDismissible: true,
-        builder: (c) {
-          return f.ContentDialog(
-            title: const Text("nouvetat").tr(),
-            constraints: BoxConstraints.loose(f.Size(800.px, 500.px)),
-            content: StateForm(
-              vehicle: v,
-              type: type,
-              vehicleDatasource: this,
-            ),
-          );
-        }));
+    Future.delayed(const Duration(milliseconds: 50))
+        .then((value) => f.showDialog(
+            context: current,
+            barrierDismissible: true,
+            builder: (c) {
+              return f.ContentDialog(
+                title: const Text("nouvetat").tr(),
+                constraints: BoxConstraints.loose(f.Size(800.px, 500.px)),
+                content: StateForm(
+                  vehicle: v,
+                  type: type,
+                  vehicleDatasource: this,
+                ),
+              );
+            }));
   }
 }

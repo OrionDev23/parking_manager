@@ -33,14 +33,11 @@ class ProfilNameTopBar extends StatelessWidget {
                         width: 4.w,
                         height: 4.w,
                         alignment: Alignment.center,
-                        child:
-                            Text(
-                                ParcOtoUtilities.getFirstLetters(me)
-                                    .toUpperCase(),
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                              ),
+                        child: Text(
+                          ParcOtoUtilities.getFirstLetters(me).toUpperCase(),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
                       ),
                     ),
                   ),

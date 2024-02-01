@@ -1,4 +1,3 @@
-
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 
@@ -10,6 +9,7 @@ class TileContainer extends StatefulWidget {
   final String title;
   final int index;
   final int? corner;
+
   const TileContainer({
     super.key,
     required this.image,
@@ -47,14 +47,16 @@ class _TileContainerState extends State<TileContainer> {
                   borderRadius: widget.corner == 0
                       ? BorderRadius.zero
                       : widget.corner == 1
-                      ? const BorderRadius.only(topLeft: Radius.circular(10))
-                      : widget.corner == 2
-                      ? const BorderRadius.only(topRight: Radius.circular(10))
-                      : widget.corner == 3
-                      ? const BorderRadius.only(
-                      bottomLeft: Radius.circular(10))
-                      : const BorderRadius.only(
-                      bottomRight: Radius.circular(10)),
+                          ? const BorderRadius.only(
+                              topLeft: Radius.circular(10))
+                          : widget.corner == 2
+                              ? const BorderRadius.only(
+                                  topRight: Radius.circular(10))
+                              : widget.corner == 3
+                                  ? const BorderRadius.only(
+                                      bottomLeft: Radius.circular(10))
+                                  : const BorderRadius.only(
+                                      bottomRight: Radius.circular(10)),
                 ),
               ),
             ),
@@ -66,10 +68,10 @@ class _TileContainerState extends State<TileContainer> {
                 widget.title.toUpperCase(),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                    fontSize: 8,
-                    letterSpacing: -0.12,
-                    fontWeight: FontWeight.bold,
-                    ),
+                  fontSize: 8,
+                  letterSpacing: -0.12,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],

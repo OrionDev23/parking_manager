@@ -2,7 +2,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:flutter/foundation.dart';
 import 'package:parc_oto/providers/client_database.dart';
 
-class DatabaseCounters{
+class DatabaseCounters {
   Future<int> countVehicles({int etat = -1}) async {
     int result = 0;
 
@@ -42,19 +42,19 @@ class DatabaseCounters{
           collectionId: chauffeurid,
           queries: [
             if (etat != -1) Query.equal('etat', etat),
-            if(etat==-1)
-              Query.notEqual('etat', 3),
+            if (etat == -1) Query.notEqual('etat', 3),
             Query.limit(1),
           ]).then((value) {
         result += value.total;
         if (value.total < 5000) {
           cont = false;
         }
-      }).onError((AppwriteException error, stackTrace) {cont=false;});
+      }).onError((AppwriteException error, stackTrace) {
+        cont = false;
+      });
     }
     return result;
   }
-
 
   Future<int> countVdocs() async {
     int result = 0;
@@ -105,6 +105,7 @@ class DatabaseCounters{
 
     return result;
   }
+
   Future<int> countReservation() async {
     int result = 0;
 

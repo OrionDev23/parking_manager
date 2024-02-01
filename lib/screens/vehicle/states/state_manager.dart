@@ -1,11 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'state_form.dart';
-import 'state_table.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../widgets/button_container.dart';
 import '../../../widgets/page_header.dart';
+import 'state_form.dart';
+import 'state_table.dart';
+
 class EtatManager extends StatefulWidget {
   const EtatManager({super.key});
 
@@ -14,15 +15,15 @@ class EtatManager extends StatefulWidget {
 }
 
 class EtatManagerState extends State<EtatManager> {
-  final tstyle=TextStyle(
+  final tstyle = TextStyle(
     fontSize: 10.sp,
   );
 
-static BuildContext? current;
+  static BuildContext? current;
 
-@override
+  @override
   void initState() {
-    current=context;
+    current = context;
     super.initState();
   }
 
@@ -35,27 +36,24 @@ static BuildContext? current;
             width: 15.w,
             height: 10.h,
             child: ButtonContainer(
-              icon: FluentIcons.add,
-              text: 'add'.tr(),
-              showBottom: false,
-              showCounter: false,
-              action: showStateForm
-            )),
+                icon: FluentIcons.add,
+                text: 'add'.tr(),
+                showBottom: false,
+                showCounter: false,
+                action: showStateForm)),
       ),
       content: const StateTable(),
     );
   }
 
-  void showStateForm(){
+  void showStateForm() {
     showDialog(
         context: context,
         barrierDismissible: true,
-        builder: (c){
+        builder: (c) {
           return ContentDialog(
             title: const Text("nouvetat").tr(),
-            constraints: BoxConstraints.loose(Size(
-                800.px,500.px
-            )),
+            constraints: BoxConstraints.loose(Size(800.px, 500.px)),
             content: const StateForm(),
           );
         });

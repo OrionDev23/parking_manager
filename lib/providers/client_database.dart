@@ -1,4 +1,3 @@
-
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -20,7 +19,7 @@ import '../utilities/profil_beautifier.dart';
 
 const databaseId = "6531ad112080ae3b14a7";
 const userid = "users";
-const trialID="trialdate";
+const trialID = "trialdate";
 const chauffeurid = "6537d87b492c80f255e8";
 const genreid = "6537960246d5b0e1ab77";
 const vehiculeid = "6531ad22153b2a49ca2c";
@@ -31,7 +30,7 @@ const vehicDoc = "doc_vehic";
 const entrepriseid = "entreprise";
 const planningID = "planning";
 const buckedId = "images";
-const adminID="admin_keys";
+const adminID = "admin_keys";
 const reparationId = "reparation";
 const activityId = "activity";
 const prestataireId = "prestataire";
@@ -41,7 +40,7 @@ const project = "6531ace99382e496a904";
 late String secretKey;
 
 class ClientDatabase {
-  static bool secretKeySet=false;
+  static bool secretKeySet = false;
   static Client? client;
   static Account? account;
   static User? user;
@@ -77,7 +76,7 @@ class ClientDatabase {
   bool isAdmin({List<Team>? teams}) {
     for (var element in teams ?? myTeams) {
       if (element.name.toLowerCase() == 'admins') {
-        if(teams==null && !secretKeySet){
+        if (teams == null && !secretKeySet) {
           setSecretKey();
         }
         return true;
@@ -85,31 +84,35 @@ class ClientDatabase {
     }
     return false;
   }
-  static bool settingSecretKey=false;
-  void setSecretKey() async{
-    if(!settingSecretKey && !secretKeySet){
-      settingSecretKey=true;
-      await database!.getDocument(
-          databaseId: databaseId,
-          collectionId: adminID,
-          documentId: 'admin').then((value) {
-            secretKey=value.data['key'];
-            secretKeySet=true;
+
+  static bool settingSecretKey = false;
+
+  void setSecretKey() async {
+    if (!settingSecretKey && !secretKeySet) {
+      settingSecretKey = true;
+      await database!
+          .getDocument(
+              databaseId: databaseId,
+              collectionId: adminID,
+              documentId: 'admin')
+          .then((value) {
+        secretKey = value.data['key'];
+        secretKeySet = true;
       });
     }
   }
 
+  static bool gettingUser = false;
 
-
-  static bool gettingUser=false;
   Future<void> getUser() async {
     if (user == null && !gettingUser) {
-      gettingUser=true;
+      gettingUser = true;
       await account?.get().then((value) async {
         user = value;
-        if(demo){
+        if (demo) {
           await getTrialDate();
-          if(trialDate==null || trialDate!.difference(DateTime.now()).inMilliseconds<=0){
+          if (trialDate == null ||
+              trialDate!.difference(DateTime.now()).inMilliseconds <= 0) {
             await account!.deleteSession(sessionId: 'current');
             user = null;
             PanesListState.signedIn.value = false;
@@ -136,7 +139,7 @@ class ClientDatabase {
       }).catchError((error) {
         user = null;
       });
-      gettingUser=false;
+      gettingUser = false;
     }
     if (user != null) {
       await Teams(client!).list().then((t) {
@@ -156,15 +159,16 @@ class ClientDatabase {
     }
   }
 
-
   static DateTime? trialDate;
 
-  Future<void> getTrialDate() async{
-    await database!.getDocument(
-        databaseId: databaseId,
-        collectionId: trialID,
-        documentId: user!.$id).then((value) {
-          trialDate=DateTime.tryParse(value.data['date']);
+  Future<void> getTrialDate() async {
+    await database!
+        .getDocument(
+            databaseId: databaseId,
+            collectionId: trialID,
+            documentId: user!.$id)
+        .then((value) {
+      trialDate = DateTime.tryParse(value.data['date']);
     }).onError((AppwriteException error, stackTrace) {
       print(stackTrace);
       print(error.message);
@@ -189,7 +193,7 @@ class ClientDatabase {
       }
       MyEntrepriseState.downloading = false;
     }
-    if(kIsWeb){
+    if (kIsWeb) {
       downloadLogo();
     }
   }
@@ -197,11 +201,11 @@ class ClientDatabase {
   static Future<void> downloadLogo() async {
     await ClientDatabase.storage!
         .getFileDownload(bucketId: buckedId, fileId: 'mylogo.png')
-        .then((value) async{
-      MyEntrepriseState.logo=value;
-    }).onError((error, stackTrace) {
-    });
+        .then((value) async {
+      MyEntrepriseState.logo = value;
+    }).onError((error, stackTrace) {});
   }
+
   void uploadUser(ParcUser u) {
     database!.createDocument(
         databaseId: databaseId,
@@ -215,8 +219,6 @@ class ClientDatabase {
           Permission.delete(Role.user(me.value!.id)),
         ]);
   }
-
-
 
   static String getEtat(int? etat) {
     switch (etat) {
@@ -379,22 +381,20 @@ class ClientDatabase {
     return '';
   }
 
-
-  Future<List<Reparation>> getReparationInMarge(DateTime start,DateTime end) async{
-
-    List<Reparation>result=[];
+  Future<List<Reparation>> getReparationInMarge(
+      DateTime start, DateTime end) async {
+    List<Reparation> result = [];
 
     await database!.listDocuments(
         databaseId: databaseId,
         collectionId: reparationId,
         queries: [
-              Query.greaterThanEqual('date', dateToIntJson(start)),
-              Query.lessThanEqual('date', dateToIntJson(end)),
-        ]
-    ).then((value) {
-
-      for(int i=0;i<value.documents.length;i++){
-        result.add(value.documents[i].convertTo((p0) => Reparation.fromJson(p0 as Map<String,dynamic>)));
+          Query.greaterThanEqual('date', dateToIntJson(start)),
+          Query.lessThanEqual('date', dateToIntJson(end)),
+        ]).then((value) {
+      for (int i = 0; i < value.documents.length; i++) {
+        result.add(value.documents[i].convertTo(
+            (p0) => Reparation.fromJson(p0 as Map<String, dynamic>)));
       }
     }).onError((error, stackTrace) {
       if (kDebugMode) {
@@ -405,25 +405,22 @@ class ClientDatabase {
     return result;
   }
 
-  Future<List<DocumentVehicle>> getDocumentsBeforeTime(DateTime expiration) async{
+  Future<List<DocumentVehicle>> getDocumentsBeforeTime(
+      DateTime expiration) async {
+    removedVehiDocs = prefs.getStringList('removedDocs') ?? [];
 
-
-    removedVehiDocs= prefs.getStringList('removedDocs')??[];
-
-
-    List<DocumentVehicle>result=[];
+    List<DocumentVehicle> result = [];
     await database!.listDocuments(
         databaseId: databaseId,
         collectionId: vehicDoc,
         queries: [
           Query.lessThanEqual('date_expiration', dateToIntJson(expiration)),
-          if(removedVehiDocs.isNotEmpty)
+          if (removedVehiDocs.isNotEmpty)
             ...removedVehiDocs.map((e) => Query.notEqual(r'$id', e))
-        ]
-    ).then((value) {
-
-      for(int i=0;i<value.documents.length;i++){
-        result.add(value.documents[i].convertTo((p0) => DocumentVehicle.fromJson(p0 as Map<String,dynamic>)));
+        ]).then((value) {
+      for (int i = 0; i < value.documents.length; i++) {
+        result.add(value.documents[i].convertTo(
+            (p0) => DocumentVehicle.fromJson(p0 as Map<String, dynamic>)));
       }
     }).onError((error, stackTrace) {
       if (kDebugMode) {
@@ -433,23 +430,22 @@ class ClientDatabase {
     return result;
   }
 
-  Future<List<DocumentChauffeur>> getConduDocumentsBeforeTime(DateTime expiration) async{
-    List<DocumentChauffeur>result=[];
+  Future<List<DocumentChauffeur>> getConduDocumentsBeforeTime(
+      DateTime expiration) async {
+    List<DocumentChauffeur> result = [];
 
-
-    removedCondDocs=prefs.getStringList('removedCondDocs') ??[];
+    removedCondDocs = prefs.getStringList('removedCondDocs') ?? [];
     await database!.listDocuments(
         databaseId: databaseId,
         collectionId: chaufDoc,
         queries: [
           Query.lessThanEqual('date_expiration', dateToIntJson(expiration)),
-          if(removedCondDocs.isNotEmpty)
+          if (removedCondDocs.isNotEmpty)
             ...removedCondDocs.map((e) => Query.notEqual(r'$id', e))
-        ]
-    ).then((value) {
-
-      for(int i=0;i<value.documents.length;i++){
-        result.add(value.documents[i].convertTo((p0) => DocumentChauffeur.fromJson(p0 as Map<String,dynamic>)));
+        ]).then((value) {
+      for (int i = 0; i < value.documents.length; i++) {
+        result.add(value.documents[i].convertTo(
+            (p0) => DocumentChauffeur.fromJson(p0 as Map<String, dynamic>)));
       }
     }).onError((AppwriteException error, stackTrace) {
       if (kDebugMode) {
@@ -460,23 +456,22 @@ class ClientDatabase {
 
     return result;
   }
-  Future<List<Planning>> getPlanningBeforeTime(DateTime expiration) async{
-    List<Planning>result=[];
 
-    removedPlanDocs=prefs.getStringList('removedPlanning')??[];
+  Future<List<Planning>> getPlanningBeforeTime(DateTime expiration) async {
+    List<Planning> result = [];
+
+    removedPlanDocs = prefs.getStringList('removedPlanning') ?? [];
     await database!.listDocuments(
         databaseId: databaseId,
         collectionId: planningID,
         queries: [
           Query.lessThanEqual('startTime', dateToIntJson(expiration)),
-          if(removedPlanDocs.isNotEmpty)
+          if (removedPlanDocs.isNotEmpty)
             ...removedPlanDocs.map((e) => Query.notEqual(r'$id', e))
-
-        ]
-    ).then((value) {
-
-      for(int i=0;i<value.documents.length;i++){
-        result.add(value.documents[i].convertTo((p0) => Planning.fromJson(p0 as Map<String,dynamic>)));
+        ]).then((value) {
+      for (int i = 0; i < value.documents.length; i++) {
+        result.add(value.documents[i]
+            .convertTo((p0) => Planning.fromJson(p0 as Map<String, dynamic>)));
       }
     }).onError((error, stackTrace) {
       if (kDebugMode) {
@@ -487,10 +482,7 @@ class ClientDatabase {
     return result;
   }
 
-
-  static List<String> removedVehiDocs=[];
-  static List<String> removedCondDocs=[];
-  static List<String> removedPlanDocs=[];
-
-
+  static List<String> removedVehiDocs = [];
+  static List<String> removedCondDocs = [];
+  static List<String> removedPlanDocs = [];
 }

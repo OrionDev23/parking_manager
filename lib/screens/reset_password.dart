@@ -21,15 +21,15 @@ class _ResetScreenState extends State<ResetScreen> {
   TextEditingController passwordConfirmation = TextEditingController();
   TextEditingController password = TextEditingController();
 
-  bool showPassword=false;
+  bool showPassword = false;
 
-  bool done=false;
+  bool done = false;
 
-  bool signedIn=false;
+  bool signedIn = false;
 
-  bool checking=false;
+  bool checking = false;
 
-  bool validPassword=false;
+  bool validPassword = false;
 
   @override
   void initState() {
@@ -37,45 +37,44 @@ class _ResetScreenState extends State<ResetScreen> {
     super.initState();
   }
 
-  void adjustSize(){
-    if(kIsWeb){
-      pheight=80.h;
-    }
-    else{
-      if(Platform.isAndroid || Platform.isIOS){
-        pwidth=80.w;
-        pheight=50.h;
-      }
-      else{
-        pwidth=20.w;
-        pheight=35.h;
+  void adjustSize() {
+    if (kIsWeb) {
+      pheight = 80.h;
+    } else {
+      if (Platform.isAndroid || Platform.isIOS) {
+        pwidth = 80.w;
+        pheight = 50.h;
+      } else {
+        pwidth = 20.w;
+        pheight = 35.h;
       }
     }
   }
 
-  double pwidth=20.w;
-  double pheight=35.h;
-
+  double pwidth = 20.w;
+  double pheight = 35.h;
 
   String get userId => Uri.base.queryParameters['userId'] ?? '';
+
   String get projectId => Uri.base.queryParameters['projectid'] ?? '';
+
   String get endpointU => Uri.base.queryParameters['endpoint'] ?? '';
 
   String get secret => Uri.base.queryParameters['secret'] ?? '';
 
   @override
   Widget build(BuildContext context) {
-    if(MediaQuery.of(context).orientation==Orientation.portrait){
-      pwidth=60.w;
-    }
-    else{
-      pwidth=30.w;
+    if (MediaQuery.of(context).orientation == Orientation.portrait) {
+      pwidth = 60.w;
+    } else {
+      pwidth = 30.w;
     }
     var appTheme = context.watch<AppTheme>();
-    if(done){
+    if (done) {
       return NoDataWidget(
-        icon:linknotvalid?FluentIcons.error:FluentIcons.check_mark,
-        text:linknotvalid?'linknotvalid':'donepassword',);
+        icon: linknotvalid ? FluentIcons.error : FluentIcons.check_mark,
+        text: linknotvalid ? 'linknotvalid' : 'donepassword',
+      );
     }
     return ScaffoldPage(
       content: Center(
@@ -83,9 +82,16 @@ class _ResetScreenState extends State<ResetScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 5.h,),
-            Image.asset('assets/images/favIcon.webp',width: 30.w,),
-            SizedBox(height: 5.h,),
+            SizedBox(
+              height: 5.h,
+            ),
+            Image.asset(
+              'assets/images/favIcon.webp',
+              width: 30.w,
+            ),
+            SizedBox(
+              height: 5.h,
+            ),
             Container(
               padding: const EdgeInsets.all(10),
               alignment: Alignment.center,
@@ -96,10 +102,10 @@ class _ResetScreenState extends State<ResetScreen> {
                 color: appTheme.mode == ThemeMode.dark
                     ? Colors.grey
                     : appTheme.mode == ThemeMode.light
-                    ? Colors.white
-                    : ThemeMode.system == ThemeMode.light
-                    ? Colors.white
-                    : Colors.grey,
+                        ? Colors.white
+                        : ThemeMode.system == ThemeMode.light
+                            ? Colors.white
+                            : Colors.grey,
                 boxShadow: kElevationToShadow[2],
               ),
               child: Column(
@@ -114,26 +120,28 @@ class _ResetScreenState extends State<ResetScreen> {
                       placeholder: 'motdepasse'.tr(),
                       suffix: IconButton(
                         icon: Icon(
-                          showPassword?FluentIcons.hide
-                              :FluentIcons.red_eye,
-                          color: !showPassword?
-                          appTheme.color
-                              :Colors.grey[100]
-                          ,size: 12.sp,), onPressed: (){
-                        setState(() {
-                          showPassword=!showPassword;
-                        });
-                      },),
-                      obscureText: !showPassword,
-                      onSubmitted: (s){
-                        if(password.text.length<8 || passwordConfirmation.text.length<8 || passwordConfirmation.text!=password.text){
+                          showPassword ? FluentIcons.hide : FluentIcons.red_eye,
+                          color:
+                              !showPassword ? appTheme.color : Colors.grey[100],
+                          size: 12.sp,
+                        ),
+                        onPressed: () {
                           setState(() {
-                            validPassword=false;
+                            showPassword = !showPassword;
                           });
-                        }
-                        else{
+                        },
+                      ),
+                      obscureText: !showPassword,
+                      onSubmitted: (s) {
+                        if (password.text.length < 8 ||
+                            passwordConfirmation.text.length < 8 ||
+                            passwordConfirmation.text != password.text) {
                           setState(() {
-                            validPassword=true;
+                            validPassword = false;
+                          });
+                        } else {
+                          setState(() {
+                            validPassword = true;
                           });
                         }
                         confirm();
@@ -150,26 +158,28 @@ class _ResetScreenState extends State<ResetScreen> {
                       placeholder: 'confirmation'.tr(),
                       suffix: IconButton(
                         icon: Icon(
-                          showPassword?FluentIcons.hide
-                              :FluentIcons.red_eye,
-                          color: !showPassword?
-                          appTheme.color
-                              :Colors.grey[100]
-                          ,size: 12.sp,), onPressed: (){
-                        setState(() {
-                          showPassword=!showPassword;
-                        });
-                      },),
-                      obscureText: !showPassword,
-                      onSubmitted: (s){
-                        if(password.text.length<8 || passwordConfirmation.text.length<8 || passwordConfirmation.text!=password.text){
+                          showPassword ? FluentIcons.hide : FluentIcons.red_eye,
+                          color:
+                              !showPassword ? appTheme.color : Colors.grey[100],
+                          size: 12.sp,
+                        ),
+                        onPressed: () {
                           setState(() {
-                            validPassword=false;
+                            showPassword = !showPassword;
                           });
-                        }
-                        else{
+                        },
+                      ),
+                      obscureText: !showPassword,
+                      onSubmitted: (s) {
+                        if (password.text.length < 8 ||
+                            passwordConfirmation.text.length < 8 ||
+                            passwordConfirmation.text != password.text) {
                           setState(() {
-                            validPassword=true;
+                            validPassword = false;
+                          });
+                        } else {
+                          setState(() {
+                            validPassword = true;
                           });
                         }
                         confirm();
@@ -182,15 +192,18 @@ class _ResetScreenState extends State<ResetScreen> {
                   SizedBox(
                     height: 2.h,
                   ),
-                  FilledButton(onPressed:checking?null:confirm,
-                      child:
-                      checking?const ProgressRing(strokeWidth:2.0):
-                      const Text('confirmer').tr()),
+                  FilledButton(
+                      onPressed: checking ? null : confirm,
+                      child: checking
+                          ? const ProgressRing(strokeWidth: 2.0)
+                          : const Text('confirmer').tr()),
                 ],
               ),
             ),
-            SizedBox(height: 2.h,),
-            if(!signedIn && error.isNotEmpty)
+            SizedBox(
+              height: 2.h,
+            ),
+            if (!signedIn && error.isNotEmpty)
               Text(
                 error,
                 style: TextStyle(color: Colors.red),
@@ -201,51 +214,57 @@ class _ResetScreenState extends State<ResetScreen> {
     );
   }
 
-  String error="";
-  void confirm() async{
-    if(validPassword && endpointU.isNotEmpty && projectId.isNotEmpty && userId.isNotEmpty && secret.isNotEmpty){
+  String error = "";
+
+  void confirm() async {
+    if (validPassword &&
+        endpointU.isNotEmpty &&
+        projectId.isNotEmpty &&
+        userId.isNotEmpty &&
+        secret.isNotEmpty) {
       setState(() {
-        checking=true;
+        checking = true;
       });
-      Client client=Client()
+      Client client = Client()
         ..setEndpoint(endpointU)
         ..setProject(projectId);
-      await Account(client).updateRecovery(userId: userId, secret: secret, password: password.text, passwordAgain: passwordConfirmation.text).then((value) async{
+      await Account(client)
+          .updateRecovery(
+              userId: userId,
+              secret: secret,
+              password: password.text,
+              passwordAgain: passwordConfirmation.text)
+          .then((value) async {
         setState(() {
-          done=true;
+          done = true;
         });
-      }).onError<AppwriteException>((e,s){
-
-        error=e.type!.tr();
+      }).onError<AppwriteException>((e, s) {
+        error = e.type!.tr();
         setState(() {
-          done=false;
+          done = false;
         });
       });
-    }
-    else if(password.text.length<8|| passwordConfirmation.text.length<8){
+    } else if (password.text.length < 8 ||
+        passwordConfirmation.text.length < 8) {
       setState(() {
-        error="general_argument_invalid".tr();
-        checking=false;
-
+        error = "general_argument_invalid".tr();
+        checking = false;
       });
-    }
-    else if(passwordConfirmation.text!=password.text){
+    } else if (passwordConfirmation.text != password.text) {
       setState(() {
-        error="passwordmatch".tr();
-        checking=false;
+        error = "passwordmatch".tr();
+        checking = false;
       });
+    } else if (endpointU.isNotEmpty ||
+        projectId.isNotEmpty ||
+        userId.isNotEmpty ||
+        secret.isNotEmpty) {
+      done = true;
+      linknotvalid = true;
+
+      setState(() {});
     }
-    else if(endpointU.isNotEmpty || projectId.isNotEmpty || userId.isNotEmpty || secret.isNotEmpty){
-      done=true;
-      linknotvalid=true;
-
-      setState(() {
-
-      });
-    }
-
   }
 
-  bool linknotvalid=false;
-
+  bool linknotvalid = false;
 }

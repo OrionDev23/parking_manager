@@ -1,7 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-
 import 'package:parc_oto/datasources/conducteurs/disponibilite_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +12,7 @@ import '../../../widgets/zone_box.dart';
 
 class DisponibliteTable extends StatefulWidget {
   final bool selectD;
+
   const DisponibliteTable({
     super.key,
     this.selectD = false,
@@ -114,6 +114,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
   DateTime? dateMin;
   DateTime? dateMax;
   Map<String, String> filters = {};
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();

@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+
+import 'package:parc_oto/utilities/car_svg.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -6,29 +9,27 @@ import '../../serializables/reparation/etat_vehicle.dart';
 import '../../serializables/reparation/reparation.dart';
 import '../pdf_theming.dart';
 import '../pdf_utilities.dart';
-import 'package:parc_oto/utilities/car_svg.dart';
-import 'dart:math' as math;
-class VehicleDamagePDF{
 
-
+class VehicleDamagePDF {
   final Reparation reparation;
   late final EtatVehicle etatVehicle;
 
-  VehicleDamagePDF(this.reparation){
-    etatVehicle=reparation.etatActuel??EtatVehicle();
+  VehicleDamagePDF(this.reparation) {
+    etatVehicle = reparation.etatActuel ?? EtatVehicle();
   }
+
   double lightHeight = 0;
   double lightWidth = 0;
 
   final dx = 7;
   final dy = 7;
 
-
   Widget vehicleDamage() {
     double width = 3.7;
-    Map<String, dynamic> etatJson =etatVehicle.toJson() ;
+    Map<String, dynamic> etatJson = etatVehicle.toJson();
 
-    List<Widget> etats = PdfUtilities.getTextListFromMap(etatJson, 0, etatJson.length);
+    List<Widget> etats =
+        PdfUtilities.getTextListFromMap(etatJson, 0, etatJson.length);
 
     return Container(
       width: 20 * PdfPageFormat.cm,
@@ -65,7 +66,7 @@ class VehicleDamagePDF{
                               children: [
                                 Container(
                                   padding:
-                                  const EdgeInsets.symmetric(horizontal: 2),
+                                      const EdgeInsets.symmetric(horizontal: 2),
                                   width: width * PdfPageFormat.cm + 4,
                                   decoration: BoxDecoration(
                                     border: Border.all(),
@@ -92,7 +93,7 @@ class VehicleDamagePDF{
                               children: [
                                 Container(
                                   padding:
-                                  const EdgeInsets.symmetric(horizontal: 2),
+                                      const EdgeInsets.symmetric(horizontal: 2),
                                   width: width * PdfPageFormat.cm + 4,
                                   decoration: BoxDecoration(
                                     border: Border.all(),
@@ -120,7 +121,7 @@ class VehicleDamagePDF{
                               children: [
                                 Container(
                                   padding:
-                                  const EdgeInsets.symmetric(horizontal: 2),
+                                      const EdgeInsets.symmetric(horizontal: 2),
                                   width: width * PdfPageFormat.cm + 4,
                                   decoration: BoxDecoration(
                                     border: Border.all(),
@@ -149,7 +150,7 @@ class VehicleDamagePDF{
                               children: [
                                 Container(
                                   padding:
-                                  const EdgeInsets.symmetric(horizontal: 2),
+                                      const EdgeInsets.symmetric(horizontal: 2),
                                   width: width * PdfPageFormat.cm + 4,
                                   decoration: BoxDecoration(
                                     border: Border.all(),
@@ -176,7 +177,7 @@ class VehicleDamagePDF{
                               children: [
                                 Container(
                                   padding:
-                                  const EdgeInsets.symmetric(horizontal: 2),
+                                      const EdgeInsets.symmetric(horizontal: 2),
                                   width: width * PdfPageFormat.cm + 4,
                                   decoration: BoxDecoration(
                                     border: Border.all(),
@@ -204,13 +205,13 @@ class VehicleDamagePDF{
                               children: [
                                 Container(
                                   padding:
-                                  const EdgeInsets.symmetric(horizontal: 2),
+                                      const EdgeInsets.symmetric(horizontal: 2),
                                   width: width * PdfPageFormat.cm + 4,
                                   decoration: BoxDecoration(
                                     border: Border.all(),
                                   ),
                                   child:
-                                  Text('Pare-choc', style: smallTextBold),
+                                      Text('Pare-choc', style: smallTextBold),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.all(2),
@@ -234,7 +235,7 @@ class VehicleDamagePDF{
                               children: [
                                 Container(
                                   padding:
-                                  const EdgeInsets.symmetric(horizontal: 2),
+                                      const EdgeInsets.symmetric(horizontal: 2),
                                   width: width * PdfPageFormat.cm + 4,
                                   decoration: BoxDecoration(
                                     border: Border.all(),
@@ -261,7 +262,7 @@ class VehicleDamagePDF{
                               children: [
                                 Container(
                                   padding:
-                                  const EdgeInsets.symmetric(horizontal: 2),
+                                      const EdgeInsets.symmetric(horizontal: 2),
                                   width: width * PdfPageFormat.cm + 4,
                                   decoration: BoxDecoration(
                                     border: Border.all(),
@@ -290,7 +291,7 @@ class VehicleDamagePDF{
                               children: [
                                 Container(
                                   padding:
-                                  const EdgeInsets.symmetric(horizontal: 2),
+                                      const EdgeInsets.symmetric(horizontal: 2),
                                   width: width * PdfPageFormat.cm + 4,
                                   decoration: BoxDecoration(
                                     border: Border.all(),
@@ -317,7 +318,7 @@ class VehicleDamagePDF{
                               children: [
                                 Container(
                                   padding:
-                                  const EdgeInsets.symmetric(horizontal: 2),
+                                      const EdgeInsets.symmetric(horizontal: 2),
                                   width: width * PdfPageFormat.cm + 4,
                                   decoration: BoxDecoration(
                                     border: Border.all(),
@@ -341,8 +342,6 @@ class VehicleDamagePDF{
       ]),
     );
   }
-
-
 
   Widget carDrawing() {
     double scale = 0.4;
@@ -783,11 +782,11 @@ class VehicleDamagePDF{
                   child: etatVehicle.parBriseAve
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : etatVehicle.parBriseAvc
-                      ? Icon(IconData(iconCodePoint), color: orange)
-                      : etatVehicle.parBriseAvf
-                      ? Icon(IconData(iconCodePoint),
-                      color: orangeLight)
-                      : null,
+                          ? Icon(IconData(iconCodePoint), color: orange)
+                          : etatVehicle.parBriseAvf
+                              ? Icon(IconData(iconCodePoint),
+                                  color: orangeLight)
+                              : null,
                 ),
               ],
             ),
@@ -807,11 +806,11 @@ class VehicleDamagePDF{
                   child: etatVehicle.parBriseAre
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : etatVehicle.parBriseArc
-                      ? Icon(IconData(iconCodePoint), color: orange)
-                      : etatVehicle.parBriseArf
-                      ? Icon(IconData(iconCodePoint),
-                      color: orangeLight)
-                      : null,
+                          ? Icon(IconData(iconCodePoint), color: orange)
+                          : etatVehicle.parBriseArf
+                              ? Icon(IconData(iconCodePoint),
+                                  color: orangeLight)
+                              : null,
                 ),
               ],
             ),
@@ -880,8 +879,8 @@ class VehicleDamagePDF{
   }
 
   Widget? getLightIntensityFromPourc(
-      double pourc,
-      ) {
+    double pourc,
+  ) {
     if (pourc <= 30) {
       return Icon(IconData(iconCodePoint), color: orangeDeep);
     } else if (pourc <= 60) {

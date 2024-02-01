@@ -1,20 +1,20 @@
 import 'package:appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
-
 import 'package:fluent_ui/fluent_ui.dart';
-
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/serializables/conducteur/conducteur.dart';
 import 'package:parc_oto/serializables/conducteur/disponibilite_chauffeur.dart';
 import 'package:parc_oto/widgets/zone_box.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+
 import '../../../theme.dart';
 
 int chaufCounter = 0;
 
 class ChauffeurForm extends StatefulWidget {
   final Conducteur? chauf;
+
   const ChauffeurForm({
     super.key,
     this.chauf,
@@ -37,6 +37,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   TextEditingController telephone = TextEditingController();
   TextEditingController adresse = TextEditingController();
   DateTime? birthDay;
+
   @override
   void initState() {
     initValues();
@@ -229,21 +230,21 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                 MenuFlyoutItem(
                                   text: const Text('disponible').tr(),
                                   onPressed: () {
-                                      etat = 0;
+                                    etat = 0;
                                   },
                                 ),
                                 const MenuFlyoutSeparator(),
                                 MenuFlyoutItem(
                                   text: const Text('mission').tr(),
                                   onPressed: () {
-                                      etat = 1;
+                                    etat = 1;
                                   },
                                 ),
                                 const MenuFlyoutSeparator(),
                                 MenuFlyoutItem(
                                   text: const Text('absent').tr(),
                                   onPressed: () {
-                                      etat = 2;
+                                    etat = 2;
                                   },
                                 ),
                                 if (ClientDatabase().isAdmin())
@@ -252,11 +253,11 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                   MenuFlyoutItem(
                                     text: const Text('quitteentre').tr(),
                                     onPressed: () {
-                                        etat = 3;
+                                      etat = 3;
                                     },
                                   ),
                               ],
-                              onClose: (){
+                              onClose: () {
                                 checkChanges();
                               },
                             ),
@@ -390,22 +391,28 @@ class ChauffeurFormState extends State<ChauffeurForm> {
           '${telephone.value.text} ${adresse.value.text} $chaufID ${ClientDatabase.getEtat(etat)}',
     );
     if (widget.chauf != null) {
-      return await ClientDatabase.database!.updateDocument(
-          databaseId: databaseId,
-          collectionId: chauffeurid,
-          documentId: chaufID!,
-          data: chauf.toJson()).then((value) {
-        ClientDatabase().ajoutActivity(17, chaufID!,docName: '${chauf.name} ${chauf.prenom}');
+      return await ClientDatabase.database!
+          .updateDocument(
+              databaseId: databaseId,
+              collectionId: chauffeurid,
+              documentId: chaufID!,
+              data: chauf.toJson())
+          .then((value) {
+        ClientDatabase().ajoutActivity(17, chaufID!,
+            docName: '${chauf.name} ${chauf.prenom}');
 
         return value;
       });
     } else {
-      return await ClientDatabase.database!.createDocument(
-          databaseId: databaseId,
-          collectionId: chauffeurid,
-          documentId: chaufID!,
-          data: chauf.toJson()).then((value) {
-        ClientDatabase().ajoutActivity(16, chaufID!,docName: '${chauf.name} ${chauf.prenom}');
+      return await ClientDatabase.database!
+          .createDocument(
+              databaseId: databaseId,
+              collectionId: chauffeurid,
+              documentId: chaufID!,
+              data: chauf.toJson())
+          .then((value) {
+        ClientDatabase().ajoutActivity(16, chaufID!,
+            docName: '${chauf.name} ${chauf.prenom}');
 
         return value;
       });
@@ -429,12 +436,15 @@ class ChauffeurFormState extends State<ChauffeurForm> {
           createdBy: ClientDatabase.me.value?.id,
           chauffeur: chaufID!,
           chauffeurNom: '${nom.text} ${prenom.text}');
-      return await ClientDatabase.database!.createDocument(
-          databaseId: databaseId,
-          collectionId: chaufDispID,
-          documentId: etatID!,
-          data: disp!.toJson()).then((value){
-        ClientDatabase().ajoutActivity(20, etatID!,docName: disp?.chauffeurNom);
+      return await ClientDatabase.database!
+          .createDocument(
+              databaseId: databaseId,
+              collectionId: chaufDispID,
+              documentId: etatID!,
+              data: disp!.toJson())
+          .then((value) {
+        ClientDatabase()
+            .ajoutActivity(20, etatID!, docName: disp?.chauffeurNom);
         return value;
       });
     } else {

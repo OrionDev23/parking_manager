@@ -3,8 +3,12 @@ import 'package:parc_oto/datasources/parcoto_webservice.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/serializables/activity.dart';
 
-class LogWebService extends ParcOtoWebService<Activity>{
-  LogWebService(super.data, super.collectionID, super.columnForSearch,);
+class LogWebService extends ParcOtoWebService<Activity> {
+  LogWebService(
+    super.data,
+    super.collectionID,
+    super.columnForSearch,
+  );
 
   @override
   Activity fromJsonFunction(Map<String, dynamic> json) {
@@ -17,52 +21,56 @@ class LogWebService extends ParcOtoWebService<Activity>{
   }
 
   @override
-  int Function(MapEntry<String, Activity> p1, MapEntry<String, Activity> p2)? getComparisonFunction(int column, bool ascending) {
+  int Function(MapEntry<String, Activity> p1, MapEntry<String, Activity> p2)?
+      getComparisonFunction(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
-    //type
+      //type
       case 0:
-        return ( d1, d2) =>
-        coef * ClientDatabase().getActivityType(d1.value.type).compareTo(ClientDatabase().getActivityType(d2.value.type));
-    //vehicle
+        return (d1, d2) =>
+            coef *
+            ClientDatabase()
+                .getActivityType(d1.value.type)
+                .compareTo(ClientDatabase().getActivityType(d2.value.type));
+      //vehicle
       case 1:
-        return ( d1, d2) {
-
-            return coef * (d1.value.docName??'').compareTo(d2.value.docName??'');
+        return (d1, d2) {
+          return coef *
+              (d1.value.docName ?? '').compareTo(d2.value.docName ?? '');
         };
-    //date modif
+      //date modif
       case 2:
-        return ( d1,  d2) =>
-        coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
+        return (d1, d2) =>
+            coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
       case 3:
-        return ( d1,  d2) =>
-        coef * (d1.value.personName??'').compareTo(d2.value.personName??'');
-
+        return (d1, d2) =>
+            coef *
+            (d1.value.personName ?? '').compareTo(d2.value.personName ?? '');
     }
 
     return null;
   }
 
-
-
   @override
-  List<String> getFilterQueries(Map<String, String> filters, int count, int startingAt, int sortedBy, bool sortedAsc, {int? index}) {
+  List<String> getFilterQueries(Map<String, String> filters, int count,
+      int startingAt, int sortedBy, bool sortedAsc,
+      {int? index}) {
     return [
-      if(filters.containsKey('datemin'))
-        Query.greaterThanEqual(r'$updatedAt', int.tryParse(filters['datemin']!)),
-      if(filters.containsKey('datemax'))
+      if (filters.containsKey('datemin'))
+        Query.greaterThanEqual(
+            r'$updatedAt', int.tryParse(filters['datemin']!)),
+      if (filters.containsKey('datemax'))
         Query.lessThanEqual(r'$updatedAt', int.tryParse(filters['datemax']!)),
-      if(filters.containsKey('createdBy'))
+      if (filters.containsKey('createdBy'))
         Query.equal('createdBy', filters['createdBy']),
-      if(filters.containsKey('type'))
+      if (filters.containsKey('type'))
         Query.equal('type', int.tryParse(filters['type']!)),
-      if(filters.containsKey('typemin'))
+      if (filters.containsKey('typemin'))
         Query.greaterThanEqual('type', int.tryParse(filters['typemin']!)),
-      if(filters.containsKey('typemax'))
+      if (filters.containsKey('typemax'))
         Query.lessThanEqual('type', int.tryParse(filters['typemax']!)),
     ];
   }
-
 
   @override
   String getSortingQuery(int sortedBy, bool sortedAsc) {
@@ -94,5 +102,4 @@ class LogWebService extends ParcOtoWebService<Activity>{
     }
     return Query.orderAsc('\$id');
   }
-
 }

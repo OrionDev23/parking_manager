@@ -401,7 +401,7 @@
  "lselection": "{select} élement(s) selectionné(s)",
  "invitationsent": "Invitation envoyée",
  "addtitle": "Ajoutez un titre",
- "allday": "Jour entier ?",
+ "allday": "Jour entier",
  "starttime": "Date de début",
  "endtime": "Date de fin",
  "adddescription": "Ajoutez des notes",

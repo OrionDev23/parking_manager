@@ -1,4 +1,3 @@
-
 import 'package:json_annotation/json_annotation.dart';
 import 'package:parc_oto/serializables/parc_oto_serializable.dart';
 
@@ -6,19 +5,17 @@ import '../../utilities/profil_beautifier.dart';
 import '../../utilities/vehicle_util.dart';
 
 part 'vehicle.g.dart';
+
 @JsonSerializable()
-class Vehicle extends ParcOtoDefault{
-
-
+class Vehicle extends ParcOtoDefault {
   String matricule;
   @JsonKey(name: 'martricule_etrang')
-
   bool matriculeEtrang;
   int? wilaya;
   String? commune;
   String? daira;
   String? adresse;
-  @JsonKey(toJson: dateToIntJson,fromJson: dateFromIntJson)
+  @JsonKey(toJson: dateToIntJson, fromJson: dateFromIntJson)
   DateTime? date;
   double? quittance;
   String? numero;
@@ -29,80 +26,92 @@ class Vehicle extends ParcOtoDefault{
   String? profession;
 
   @JsonKey(name: 'numero_serie')
-
   String? numeroSerie;
   String? type;
   String? marque;
 
   String? genre;
   @JsonKey(name: 'charge_utile')
-
   int? charegeUtile;
   @JsonKey(name: 'poids_total')
-
   int? poidsTotal;
   @JsonKey(name: 'place_assises')
-
   int? placesAssises;
   int? puissance;
   String? energie;
   String? carrosserie;
   @JsonKey(name: 'annee_util')
-
   int? anneeUtil;
   @JsonKey(name: 'matricule_prec')
-
   String? matriculePrec;
   @JsonKey(name: 'user_creation')
-
   String? createdBy;
   String? pays;
-
 
   String? etat;
 
   int? etatactuel;
 
-  Vehicle({required super.id,super.createdAt,
-    super.updatedAt,required this.matricule,
-    required this.matriculeEtrang,this.wilaya,
-    this.commune,this.date,
-    this.adresse,this.quittance,this.numero,
-    this.nom,this.prenom,this.profession,
-    this.numeroSerie,this.type,this.anneeUtil,
-    this.carrosserie,this.charegeUtile,this.daira,
-    this.energie,this.genre,this.marque,
-    this.matriculePrec, this.pays,this.placesAssises,
-    this.poidsTotal, this.puissance, this.createdBy,this.etat,this.etatactuel=0,
-  }){
-    search='$matricule $wilaya $commune $anneeUtil '
+  Vehicle({
+    required super.id,
+    super.createdAt,
+    super.updatedAt,
+    required this.matricule,
+    required this.matriculeEtrang,
+    this.wilaya,
+    this.commune,
+    this.date,
+    this.adresse,
+    this.quittance,
+    this.numero,
+    this.nom,
+    this.prenom,
+    this.profession,
+    this.numeroSerie,
+    this.type,
+    this.anneeUtil,
+    this.carrosserie,
+    this.charegeUtile,
+    this.daira,
+    this.energie,
+    this.genre,
+    this.marque,
+    this.matriculePrec,
+    this.pays,
+    this.placesAssises,
+    this.poidsTotal,
+    this.puissance,
+    this.createdBy,
+    this.etat,
+    this.etatactuel = 0,
+  }) {
+    search = '$matricule $wilaya $commune $anneeUtil '
         '$adresse $numero $nom $prenom $profession '
         '$numeroSerie $type $carrosserie $daira $energie'
         ' ${VehiclesUtilities.getMarqueName(marque)} ${VehiclesUtilities.getAnneeFromMatricule(matricule)}'
-        '$pays $matriculePrec ${VehiclesUtilities.getTypeName(etatactuel??0)}';
+        '$pays $matriculePrec ${VehiclesUtilities.getTypeName(etatactuel ?? 0)}';
   }
 
   @override
-  factory Vehicle.fromJson(Map<String, dynamic> json) => _$VehicleFromJson(json);
+  factory Vehicle.fromJson(Map<String, dynamic> json) =>
+      _$VehicleFromJson(json);
 
   /// Connect the generated [_$PersonToJson] function to the `toJson` method.
   @override
   Map<String, dynamic> toJson() => _$VehicleToJson(this);
 
   int compareTo(Vehicle vehicle) {
-
     return id.compareTo(vehicle.id);
   }
 
- Vehicle changeEtat(String etat){
-    this.etat=etat;
+  Vehicle changeEtat(String etat) {
+    this.etat = etat;
     return this;
- }
+  }
 }
 
-
 /*
-*///GENERATED CODE - DO NOT MODIFY BY HAND
+*/ //GENERATED CODE - DO NOT MODIFY BY HAND
 /*
 part of 'vehicle.dart';
 */

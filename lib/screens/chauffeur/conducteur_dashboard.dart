@@ -1,25 +1,26 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+
 import '../../providers/counters.dart';
+import '../../theme.dart';
+import '../../widgets/button_container.dart';
+import '../../widgets/page_header.dart';
 import '../dashboard/pie_chart/pie_chart.dart';
 import '../logs/logging/log_table.dart';
+import '../sidemenu/pane_items.dart';
+import '../sidemenu/sidemenu.dart';
 import 'document/chauf_document_form.dart';
 import 'document/chauf_document_tabs.dart';
 import 'manager/chauffeur_form.dart';
 import 'manager/chauffeur_tabs.dart';
-import '../../widgets/button_container.dart';
-import '../../widgets/page_header.dart';
-import 'package:provider/provider.dart';
-import '../../theme.dart';
-import '../sidemenu/pane_items.dart';
-import '../sidemenu/sidemenu.dart';
 
 class ConducteurDashboard extends StatelessWidget {
   const ConducteurDashboard({super.key});
 
-  final int indexAdition=6;
+  final int indexAdition = 6;
 
   @override
   Widget build(BuildContext context) {
@@ -35,25 +36,36 @@ class ConducteurDashboard extends StatelessWidget {
             flex: 3,
             child: GridView.count(
               padding: const EdgeInsets.all(10),
-              childAspectRatio: kIsWeb?5:4,
-              crossAxisCount: Device.orientation==Orientation.portrait ?2:3,
+              childAspectRatio: kIsWeb ? 5 : 4,
+              crossAxisCount:
+                  Device.orientation == Orientation.portrait ? 2 : 3,
               mainAxisSpacing: 5,
               crossAxisSpacing: 5,
               children: [
                 ButtonContainer(
-                  color:appTheme.color,
-                  action: (){
-                    PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.chauffeurs)+1+indexAdition;
+                  color: appTheme.color,
+                  action: () {
+                    PanesListState.index.value = PaneItemsAndFooters
+                            .originalItems
+                            .indexOf(PaneItemsAndFooters.chauffeurs) +
+                        1 +
+                        indexAdition;
                   },
                   icon: FluentIcons.list,
                   text: 'gchauffeurs'.tr(),
                   showBothLN: false,
                   showBottom: false,
-                  showCounter: false,),
+                  showCounter: false,
+                ),
                 ButtonContainer(
                   action: () {
-                    PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.chauffeurs)+1+indexAdition;
-                    Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
+                    PanesListState.index.value = PaneItemsAndFooters
+                            .originalItems
+                            .indexOf(PaneItemsAndFooters.chauffeurs) +
+                        1 +
+                        indexAdition;
+                    Future.delayed(const Duration(milliseconds: 300))
+                        .whenComplete(() {
                       late Tab tab;
                       tab = Tab(
                         key: UniqueKey(),
@@ -74,28 +86,60 @@ class ConducteurDashboard extends StatelessWidget {
                       ChauffeurTabsState.currentIndex.value = index - 1;
                     });
                   },
-                  color:appTheme.color,icon: FluentIcons.car, text: 'nouvchauf'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
-                ButtonContainer(
-                  action: (){
-                    PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.chauffeurs)+2+indexAdition;
-                  },
-                  color:appTheme.color,icon: FluentIcons.health, text: 'disponibilite'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
-                ButtonContainer(
-                  action: (){
-                    PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.chauffeurs)+3+indexAdition;
-                  },
-                  color:appTheme.color,icon: FluentIcons.document_set, text: 'documents'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
+                  color: appTheme.color,
+                  icon: FluentIcons.car,
+                  text: 'nouvchauf'.tr(),
+                  showBothLN: false,
+                  showBottom: false,
+                  showCounter: false,
+                ),
                 ButtonContainer(
                   action: () {
-                    PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.chauffeurs)+3+indexAdition;
-                    Future.delayed(const Duration(milliseconds: 400)).whenComplete(() {
+                    PanesListState.index.value = PaneItemsAndFooters
+                            .originalItems
+                            .indexOf(PaneItemsAndFooters.chauffeurs) +
+                        2 +
+                        indexAdition;
+                  },
+                  color: appTheme.color,
+                  icon: FluentIcons.health,
+                  text: 'disponibilite'.tr(),
+                  showBothLN: false,
+                  showBottom: false,
+                  showCounter: false,
+                ),
+                ButtonContainer(
+                  action: () {
+                    PanesListState.index.value = PaneItemsAndFooters
+                            .originalItems
+                            .indexOf(PaneItemsAndFooters.chauffeurs) +
+                        3 +
+                        indexAdition;
+                  },
+                  color: appTheme.color,
+                  icon: FluentIcons.document_set,
+                  text: 'documents'.tr(),
+                  showBothLN: false,
+                  showBottom: false,
+                  showCounter: false,
+                ),
+                ButtonContainer(
+                  action: () {
+                    PanesListState.index.value = PaneItemsAndFooters
+                            .originalItems
+                            .indexOf(PaneItemsAndFooters.chauffeurs) +
+                        3 +
+                        indexAdition;
+                    Future.delayed(const Duration(milliseconds: 400))
+                        .whenComplete(() {
                       late Tab tab;
                       tab = Tab(
                         key: UniqueKey(),
                         text: Text('nouvdocument'.tr()),
                         semanticLabel: 'nouvdocument'.tr(),
                         icon: const Icon(FluentIcons.new_folder),
-                        body: const CDocumentForm(),
+                        body: const ScaffoldPage(content: CDocumentForm(
+                        ),),
                         onClosed: () {
                           CDocumentTabsState.tabs.remove(tab);
 
@@ -109,18 +153,28 @@ class ConducteurDashboard extends StatelessWidget {
                       CDocumentTabsState.currentIndex.value = index - 1;
                     });
                   },
-                  color:appTheme.color,icon: FluentIcons.document, text: 'nouvdocument'.tr(),showBothLN: false,showBottom: false,showCounter: false,),
+                  color: appTheme.color,
+                  icon: FluentIcons.document,
+                  text: 'nouvdocument'.tr(),
+                  showBothLN: false,
+                  showBottom: false,
+                  showCounter: false,
+                ),
                 ButtonContainer(
-                  color:appTheme.color,
-                  action: (){
-                    PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.chauffeurs)+4+indexAdition;
+                  color: appTheme.color,
+                  action: () {
+                    PanesListState.index.value = PaneItemsAndFooters
+                            .originalItems
+                            .indexOf(PaneItemsAndFooters.chauffeurs) +
+                        4 +
+                        indexAdition;
                   },
                   icon: FluentIcons.list,
                   text: 'archive'.tr(),
                   showBothLN: false,
                   showBottom: false,
-                  showCounter: false,),
-
+                  showCounter: false,
+                ),
               ],
             ),
           ),
@@ -136,38 +190,41 @@ class ConducteurDashboard extends StatelessWidget {
                   Flexible(
                     child: Column(
                       children: [
-                        Text('lactivities',style:  TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: appTheme.writingStyle.color),).tr(),
+                        Text(
+                          'lactivities',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: appTheme.writingStyle.color),
+                        ).tr(),
                         smallSpace,
                         const Flexible(
                           child: LogTable(
                             statTable: true,
                             pages: false,
                             numberOfRows: 3,
-                            filters: {
-                              'typemin':'16',
-                              'typemax':'25'
-                            },
-                            fieldsToShow: [
-                              'act','date'
-                            ],
+                            filters: {'typemin': '16', 'typemax': '25'},
+                            fieldsToShow: ['act', 'date'],
                           ),
                         ),
                       ],
                     ),
                   ),
-
                   smallSpace,
                   ParcOtoPie(
-                    radius: kIsWeb?90:120,
+                    radius: kIsWeb ? 90 : 120,
                     title: 'disponibilite'.tr(),
                     labels: [
-                      MapEntry('disponible', DatabaseCounters().countChauffeur(etat: 0)),
-                      MapEntry('absent', DatabaseCounters().countChauffeur(etat: 1)),
-                      MapEntry('mission', DatabaseCounters().countChauffeur(etat: 2)),
-                      MapEntry('quitteentre', DatabaseCounters().countChauffeur(etat: 3))
+                      MapEntry('disponible',
+                          DatabaseCounters().countChauffeur(etat: 0)),
+                      MapEntry(
+                          'absent', DatabaseCounters().countChauffeur(etat: 1)),
+                      MapEntry('mission',
+                          DatabaseCounters().countChauffeur(etat: 2)),
+                      MapEntry('quitteentre',
+                          DatabaseCounters().countChauffeur(etat: 3))
                     ],
                   ),
-
                 ],
               ),
             ),

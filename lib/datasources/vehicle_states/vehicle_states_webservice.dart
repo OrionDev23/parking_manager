@@ -1,6 +1,7 @@
 import 'package:appwrite/appwrite.dart';
-import '../parcoto_webservice.dart';
+
 import '../../serializables/vehicle/state.dart';
+import '../parcoto_webservice.dart';
 
 class VehicleStateWebservice extends ParcOtoWebService<Etat> {
   VehicleStateWebservice(super.data, super.collectionID, super.columnForSearch);
@@ -31,10 +32,9 @@ class VehicleStateWebservice extends ParcOtoWebService<Etat> {
     switch (column) {
       case 0:
         return (d1, d2) =>
-        coef * (d1.value.vehicleMat).compareTo(d2.value.vehicleMat);
+            coef * (d1.value.vehicleMat).compareTo(d2.value.vehicleMat);
       case 1:
         return (d1, d2) => coef * d1.value.type.compareTo(d2.value.type);
-
 
       case 2:
         return (d1, d2) =>

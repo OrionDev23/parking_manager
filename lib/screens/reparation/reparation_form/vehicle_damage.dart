@@ -9,6 +9,7 @@ import '../../../widgets/on_tap_scale.dart';
 
 class VehicleDamage extends StatefulWidget {
   final EtatVehicle etatVehicle;
+
   const VehicleDamage({super.key, required this.etatVehicle});
 
   @override
@@ -18,7 +19,7 @@ class VehicleDamage extends StatefulWidget {
 class _VehicleDamageState extends State<VehicleDamage> {
   @override
   Widget build(BuildContext context) {
-    var appTheme=context.watch<AppTheme>();
+    var appTheme = context.watch<AppTheme>();
     return Container(
       decoration: BoxDecoration(
         border: Border.all(),
@@ -37,48 +38,50 @@ class _VehicleDamageState extends State<VehicleDamage> {
           bigSpace,
           bigSpace,
           Column(
-            mainAxisAlignment: MainAxisAlignment.center,crossAxisAlignment: CrossAxisAlignment.start, children: [
-            SizedBox(
-              width: 90.px,
-              height: 40.px,
-              child: Row(
-                children: [
-                  const Text(
-                    "repare",
-                  ).tr(),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.showOnList,
-                      onChanged: (s) {
-                        widget.etatVehicle.showOnList=s??false;
-                        setState(() {});
-                      })
-                ],
-              ),
-            ),
-            vehicleDamage(appTheme),
-            bigSpace,
-            Row(children: [
-              Button(
-                  onPressed:()=> selectAllVehicleDamage(false), child: const Text('clear').tr()),
-              smallSpace,
-              FilledButton(
-                  onPressed:()=> selectAllVehicleDamage(true),
-                  child: const Text('selectall').tr()),
-            ]),
-          ]),
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 90.px,
+                  height: 40.px,
+                  child: Row(
+                    children: [
+                      const Text(
+                        "repare",
+                      ).tr(),
+                      const Spacer(),
+                      Checkbox(
+                          checked: widget.etatVehicle.showOnList,
+                          onChanged: (s) {
+                            widget.etatVehicle.showOnList = s ?? false;
+                            setState(() {});
+                          })
+                    ],
+                  ),
+                ),
+                vehicleDamage(appTheme),
+                bigSpace,
+                Row(children: [
+                  Button(
+                      onPressed: () => selectAllVehicleDamage(false),
+                      child: const Text('clear').tr()),
+                  smallSpace,
+                  FilledButton(
+                      onPressed: () => selectAllVehicleDamage(true),
+                      child: const Text('selectall').tr()),
+                ]),
+              ]),
         ],
       ),
     );
   }
 
-
   void selectAllVehicleDamage(bool value) {
-    widget.etatVehicle.avdp = value?0:100;
-    widget.etatVehicle.avgp = value?0:100;
-    widget.etatVehicle.ardp = value?0:100;
-    widget.etatVehicle.argp = value?0:100;
-    if(!value){
+    widget.etatVehicle.avdp = value ? 0 : 100;
+    widget.etatVehicle.avgp = value ? 0 : 100;
+    widget.etatVehicle.ardp = value ? 0 : 100;
+    widget.etatVehicle.argp = value ? 0 : 100;
+    if (!value) {
       widget.etatVehicle.parBriseAvf = value;
       widget.etatVehicle.parBriseAvc = value;
       widget.etatVehicle.parBriseArf = value;
@@ -120,9 +123,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
       width: 40.w,
       height: 45.h,
       child: Table(
-        border: TableBorder.all(
-          borderRadius: BorderRadius.circular(5)
-        ),
+        border: TableBorder.all(borderRadius: BorderRadius.circular(5)),
         columnWidths: {
           0: FixedColumnWidth(6.w),
           1: FixedColumnWidth(6.w),
@@ -143,402 +144,402 @@ class _VehicleDamageState extends State<VehicleDamage> {
       TableRow(children: [
         TableCell(
             child: Container(
-              decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(5)),
-                color: appTheme.color.lightest,
-              ),
-              padding: const EdgeInsets.all(5.0),
-              child: Text('PARE-BRISE AV', style: littleStyle),
-            )),
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.only(topLeft: Radius.circular(5)),
+            color: appTheme.color.lightest,
+          ),
+          padding: const EdgeInsets.all(5.0),
+          child: Text('PARE-BRISE AV', style: littleStyle),
+        )),
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('PARE-BRISE AR', style: littleStyle),
-            )),
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('PARE-BRISE AR', style: littleStyle),
+        )),
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('PHARE', style: littleStyle),
-            )),
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('PHARE', style: littleStyle),
+        )),
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('FEUX', style: littleStyle),
-            )),
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('FEUX', style: littleStyle),
+        )),
         TableCell(
             child: Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(topRight: Radius.circular(5)),
-                color: appTheme.color.lightest,
-              ),
-              padding: const EdgeInsets.all(5.0),
-              child: Text('PNEUMATIQUE', style: littleStyle),
-            )),
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.only(topRight: Radius.circular(5)),
+            color: appTheme.color.lightest,
+          ),
+          padding: const EdgeInsets.all(5.0),
+          child: Text('PNEUMATIQUE', style: littleStyle),
+        )),
       ]),
       TableRow(children: [
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'FELURE',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.parBriseAvf,
-                      onChanged: (s) {
-                        if (s == true) {
-                          widget.etatVehicle.parBriseAvf = s!;
-                          widget.etatVehicle.parBriseAvc = false;
-                          widget.etatVehicle.parBriseAve = false;
-                        } else if (s == false) {
-                          widget.etatVehicle.parBriseAvf = false;
-                        }
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'FELURE',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.parBriseAvf,
+                  onChanged: (s) {
+                    if (s == true) {
+                      widget.etatVehicle.parBriseAvf = s!;
+                      widget.etatVehicle.parBriseAvc = false;
+                      widget.etatVehicle.parBriseAve = false;
+                    } else if (s == false) {
+                      widget.etatVehicle.parBriseAvf = false;
+                    }
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'FELURE',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.parBriseArf,
-                      onChanged: (s) {
-                        if (s == true) {
-                          widget.etatVehicle.parBriseArf = s!;
-                          widget.etatVehicle.parBriseArc = false;
-                          widget.etatVehicle.parBriseAre = false;
-                        } else if (s == false) {
-                          widget.etatVehicle.parBriseArf = false;
-                        }
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'FELURE',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.parBriseArf,
+                  onChanged: (s) {
+                    if (s == true) {
+                      widget.etatVehicle.parBriseArf = s!;
+                      widget.etatVehicle.parBriseArc = false;
+                      widget.etatVehicle.parBriseAre = false;
+                    } else if (s == false) {
+                      widget.etatVehicle.parBriseArf = false;
+                    }
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'D',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.phareD,
-                      onChanged: (s) {
-                        if (s == true) {
-                          widget.etatVehicle.phareD = s!;
-                        } else if (s == false) {
-                          widget.etatVehicle.phareD = false;
-                        }
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'D',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.phareD,
+                  onChanged: (s) {
+                    if (s == true) {
+                      widget.etatVehicle.phareD = s!;
+                    } else if (s == false) {
+                      widget.etatVehicle.phareD = false;
+                    }
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'AVD',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.feuAVD,
-                      onChanged: (s) {
-                        widget.etatVehicle.feuAVD = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVD',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.feuAVD,
+                  onChanged: (s) {
+                    widget.etatVehicle.feuAVD = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    'AVD',
-                    style: littleStyle,
-                  ),
-                  smallSpace,
-                  smallSpace,
-                  smallSpace,
-                  SizedBox(
-                    width: 5.w,
-                    child: Slider(
-                      value: widget.etatVehicle.avdp,
-                      onChanged: (s) {
-                        widget.etatVehicle.avdp = s;
-                        setState(() {});
-                      },
-                      divisions: 100,
-                    ),
-                  ),
-                  smallSpace,
-                  smallSpace,
-                  smallSpace,
-                  Text(
-                    '${widget.etatVehicle.avdp.ceil()} %',
-                    style: littleStyle,
-                  ),
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                'AVD',
+                style: littleStyle,
               ),
-            )),
+              smallSpace,
+              smallSpace,
+              smallSpace,
+              SizedBox(
+                width: 5.w,
+                child: Slider(
+                  value: widget.etatVehicle.avdp,
+                  onChanged: (s) {
+                    widget.etatVehicle.avdp = s;
+                    setState(() {});
+                  },
+                  divisions: 100,
+                ),
+              ),
+              smallSpace,
+              smallSpace,
+              smallSpace,
+              Text(
+                '${widget.etatVehicle.avdp.ceil()} %',
+                style: littleStyle,
+              ),
+            ],
+          ),
+        )),
       ]),
       TableRow(children: [
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'CASSURE',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.parBriseAvc,
-                      onChanged: (s) {
-                        if (s == true) {
-                          widget.etatVehicle.parBriseAvf = false;
-                          widget.etatVehicle.parBriseAvc = s!;
-                          widget.etatVehicle.parBriseAve = false;
-                        } else if (s == false) {
-                          widget.etatVehicle.parBriseAvc = false;
-                        }
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'CASSURE',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.parBriseAvc,
+                  onChanged: (s) {
+                    if (s == true) {
+                      widget.etatVehicle.parBriseAvf = false;
+                      widget.etatVehicle.parBriseAvc = s!;
+                      widget.etatVehicle.parBriseAve = false;
+                    } else if (s == false) {
+                      widget.etatVehicle.parBriseAvc = false;
+                    }
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'CASSURE',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.parBriseArc,
-                      onChanged: (s) {
-                        if (s == true) {
-                          widget.etatVehicle.parBriseArc = s!;
-                          widget.etatVehicle.parBriseArf = false;
-                          widget.etatVehicle.parBriseAre = false;
-                        } else if (s == false) {
-                          widget.etatVehicle.parBriseArc = false;
-                        }
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'CASSURE',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.parBriseArc,
+                  onChanged: (s) {
+                    if (s == true) {
+                      widget.etatVehicle.parBriseArc = s!;
+                      widget.etatVehicle.parBriseArf = false;
+                      widget.etatVehicle.parBriseAre = false;
+                    } else if (s == false) {
+                      widget.etatVehicle.parBriseArc = false;
+                    }
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'G',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.phareG,
-                      onChanged: (s) {
-                        if (s == true) {
-                          widget.etatVehicle.phareG = s!;
-                        } else if (s == false) {
-                          widget.etatVehicle.phareG = false;
-                        }
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'G',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.phareG,
+                  onChanged: (s) {
+                    if (s == true) {
+                      widget.etatVehicle.phareG = s!;
+                    } else if (s == false) {
+                      widget.etatVehicle.phareG = false;
+                    }
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'AVG',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.feuAVG,
-                      onChanged: (s) {
-                        widget.etatVehicle.feuAVG = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVG',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.feuAVG,
+                  onChanged: (s) {
+                    widget.etatVehicle.feuAVG = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'AVG',
-                    style: littleStyle,
-                  ),
-                  smallSpace,
-                  smallSpace,
-                  smallSpace,
-                  SizedBox(
-                    width: 5.w,
-                    child: Slider(
-                      value: widget.etatVehicle.avgp,
-                      onChanged: (s) {
-                        widget.etatVehicle.avgp = s;
-                        setState(() {});
-                      },
-                      divisions: 100,
-                    ),
-                  ),
-                  smallSpace,
-                  smallSpace,
-                  smallSpace,
-                  Text(
-                    '${widget.etatVehicle.avgp.ceil()} %',
-                    style: littleStyle,
-                  ),
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVG',
+                style: littleStyle,
               ),
-            )),
+              smallSpace,
+              smallSpace,
+              smallSpace,
+              SizedBox(
+                width: 5.w,
+                child: Slider(
+                  value: widget.etatVehicle.avgp,
+                  onChanged: (s) {
+                    widget.etatVehicle.avgp = s;
+                    setState(() {});
+                  },
+                  divisions: 100,
+                ),
+              ),
+              smallSpace,
+              smallSpace,
+              smallSpace,
+              Text(
+                '${widget.etatVehicle.avgp.ceil()} %',
+                style: littleStyle,
+              ),
+            ],
+          ),
+        )),
       ]),
       TableRow(children: [
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ECLAT',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.parBriseAve,
-                      onChanged: (s) {
-                        if (s == true) {
-                          widget.etatVehicle.parBriseAve = s!;
-                          widget.etatVehicle.parBriseAvc = false;
-                          widget.etatVehicle.parBriseAvf = false;
-                        } else if (s == false) {
-                          widget.etatVehicle.parBriseAve = false;
-                        }
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ECLAT',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.parBriseAve,
+                  onChanged: (s) {
+                    if (s == true) {
+                      widget.etatVehicle.parBriseAve = s!;
+                      widget.etatVehicle.parBriseAvc = false;
+                      widget.etatVehicle.parBriseAvf = false;
+                    } else if (s == false) {
+                      widget.etatVehicle.parBriseAve = false;
+                    }
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ECLAT',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.parBriseAre,
-                      onChanged: (s) {
-                        if (s == true) {
-                          widget.etatVehicle.parBriseAre = s!;
-                          widget.etatVehicle.parBriseArf = false;
-                          widget.etatVehicle.parBriseArc = false;
-                        } else if (s == false) {
-                          widget.etatVehicle.parBriseAre = false;
-                        }
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ECLAT',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.parBriseAre,
+                  onChanged: (s) {
+                    if (s == true) {
+                      widget.etatVehicle.parBriseAre = s!;
+                      widget.etatVehicle.parBriseArf = false;
+                      widget.etatVehicle.parBriseArc = false;
+                    } else if (s == false) {
+                      widget.etatVehicle.parBriseAre = false;
+                    }
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         const TableCell(
           child: SizedBox(),
         ),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ARD',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.feuARD,
-                      onChanged: (s) {
-                        widget.etatVehicle.feuARD = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARD',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.feuARD,
+                  onChanged: (s) {
+                    widget.etatVehicle.feuARD = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ARD',
-                    style: littleStyle,
-                  ),
-                  smallSpace,
-                  smallSpace,
-                  smallSpace,
-                  SizedBox(
-                    width: 5.w,
-                    child: Slider(
-                      value: widget.etatVehicle.ardp,
-                      onChanged: (s) {
-                        widget.etatVehicle.ardp = s;
-                        setState(() {});
-                      },
-                      divisions: 100,
-                    ),
-                  ),
-                  smallSpace,
-                  smallSpace,
-                  smallSpace,
-                  Text(
-                    '${widget.etatVehicle.ardp.ceil()} %',
-                    style: littleStyle,
-                  ),
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARD',
+                style: littleStyle,
               ),
-            )),
+              smallSpace,
+              smallSpace,
+              smallSpace,
+              SizedBox(
+                width: 5.w,
+                child: Slider(
+                  value: widget.etatVehicle.ardp,
+                  onChanged: (s) {
+                    widget.etatVehicle.ardp = s;
+                    setState(() {});
+                  },
+                  divisions: 100,
+                ),
+              ),
+              smallSpace,
+              smallSpace,
+              smallSpace,
+              Text(
+                '${widget.etatVehicle.ardp.ceil()} %',
+                style: littleStyle,
+              ),
+            ],
+          ),
+        )),
       ]),
       TableRow(children: [
         const TableCell(child: SizedBox()),
@@ -548,56 +549,56 @@ class _VehicleDamageState extends State<VehicleDamage> {
         ),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ARG',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.feuARG,
-                      onChanged: (s) {
-                        widget.etatVehicle.feuARG = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARG',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.feuARG,
+                  onChanged: (s) {
+                    widget.etatVehicle.feuARG = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ARG',
-                    style: littleStyle,
-                  ),
-                  smallSpace,
-                  smallSpace,
-                  smallSpace,
-                  SizedBox(
-                    width: 5.w,
-                    child: Slider(
-                      value: widget.etatVehicle.argp,
-                      onChanged: (s) {
-                        widget.etatVehicle.argp = s;
-                        setState(() {});
-                      },
-                      divisions: 100,
-                    ),
-                  ),
-                  smallSpace,
-                  smallSpace,
-                  smallSpace,
-                  Text(
-                    '${widget.etatVehicle.ardp.ceil()} %',
-                    style: littleStyle,
-                  ),
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARG',
+                style: littleStyle,
               ),
-            )),
+              smallSpace,
+              smallSpace,
+              smallSpace,
+              SizedBox(
+                width: 5.w,
+                child: Slider(
+                  value: widget.etatVehicle.argp,
+                  onChanged: (s) {
+                    widget.etatVehicle.argp = s;
+                    setState(() {});
+                  },
+                  divisions: 100,
+                ),
+              ),
+              smallSpace,
+              smallSpace,
+              smallSpace,
+              Text(
+                '${widget.etatVehicle.ardp.ceil()} %',
+                style: littleStyle,
+              ),
+            ],
+          ),
+        )),
       ]),
     ];
   }
@@ -607,390 +608,391 @@ class _VehicleDamageState extends State<VehicleDamage> {
       TableRow(children: [
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('AILE', style: littleStyle),
-            )),
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('AILE', style: littleStyle),
+        )),
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('PARE-CHOC', style: littleStyle),
-            )),
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('PARE-CHOC', style: littleStyle),
+        )),
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('PORTE', style: littleStyle),
-            )),
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('PORTE', style: littleStyle),
+        )),
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('SIEGE', style: littleStyle),
-            )),
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('SIEGE', style: littleStyle),
+        )),
         TableCell(
             child: Container(
-              color: appTheme.color.lightest,
-              padding: const EdgeInsets.all(5.0),
-              child: Text('AUTRE', style: littleStyle),
-            )),
+          color: appTheme.color.lightest,
+          padding: const EdgeInsets.all(5.0),
+          child: Text('AUTRE', style: littleStyle),
+        )),
       ]),
       TableRow(children: [
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'AVD',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.aileAVD,
-                      onChanged: (s) {
-                        widget.etatVehicle.aileAVD = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVD',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.aileAVD,
+                  onChanged: (s) {
+                    widget.etatVehicle.aileAVD = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: Row(
-                children: [
-                  Text('AV', style: littleStyle),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.pareChocAV,
-                      onChanged: (s) {
-                        setState(() {
-                          widget.etatVehicle.pareChocAV = s ?? false;
-                        });
-                      })
-                ],
-              ),
-            )),
+          padding: const EdgeInsets.all(5),
+          child: Row(
+            children: [
+              Text('AV', style: littleStyle),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.pareChocAV,
+                  onChanged: (s) {
+                    setState(() {
+                      widget.etatVehicle.pareChocAV = s ?? false;
+                    });
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'AVD',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.porteAVD,
-                      onChanged: (s) {
-                        widget.etatVehicle.porteAVD = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVD',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.porteAVD,
+                  onChanged: (s) {
+                    widget.etatVehicle.porteAVD = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'AVD',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.siegeAVD,
-                      onChanged: (s) {
-                        widget.etatVehicle.siegeAVD = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVD',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.siegeAVD,
+                  onChanged: (s) {
+                    widget.etatVehicle.siegeAVD = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'CALANDRE',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.calandre,
-                      onChanged: (s) {
-                        widget.etatVehicle.calandre = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'CALANDRE',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.calandre,
+                  onChanged: (s) {
+                    widget.etatVehicle.calandre = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
       ]),
       TableRow(children: [
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'AVG',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.aileAVG,
-                      onChanged: (s) {
-                        widget.etatVehicle.aileAVG = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVG',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.aileAVG,
+                  onChanged: (s) {
+                    widget.etatVehicle.aileAVG = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: Row(
-                children: [
-                  Text('AR', style: littleStyle),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.pareChocAR,
-                      onChanged: (s) {
-                        setState(() {
-                          widget.etatVehicle.pareChocAR = s ?? false;
-                        });
-                      })
-                ],
-              ),
-            )),
+          padding: const EdgeInsets.all(5),
+          child: Row(
+            children: [
+              Text('AR', style: littleStyle),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.pareChocAR,
+                  onChanged: (s) {
+                    setState(() {
+                      widget.etatVehicle.pareChocAR = s ?? false;
+                    });
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'AVG',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.porteAVG,
-                      onChanged: (s) {
-                        widget.etatVehicle.porteAVG = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVG',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.porteAVG,
+                  onChanged: (s) {
+                    widget.etatVehicle.porteAVG = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'AVG',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.siegeAVG,
-                      onChanged: (s) {
-                        widget.etatVehicle.siegeAVG = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'AVG',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.siegeAVG,
+                  onChanged: (s) {
+                    widget.etatVehicle.siegeAVG = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'CAPOT',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.capot,
-                      onChanged: (s) {
-                        widget.etatVehicle.capot = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'CAPOT',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.capot,
+                  onChanged: (s) {
+                    widget.etatVehicle.capot = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
       ]),
       TableRow(children: [
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ARD',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.aileARD,
-                      onChanged: (s) {
-                        setState(() {
-                          widget.etatVehicle.aileARD = s ?? false;
-                        });
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARD',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.aileARD,
+                  onChanged: (s) {
+                    setState(() {
+                      widget.etatVehicle.aileARD = s ?? false;
+                    });
+                  })
+            ],
+          ),
+        )),
         const TableCell(child: SizedBox()),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ARD',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.porteARD,
-                      onChanged: (s) {
-                        widget.etatVehicle.porteARD = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARD',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.porteARD,
+                  onChanged: (s) {
+                    widget.etatVehicle.porteARD = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ARD',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.siegeARD,
-                      onChanged: (s) {
-                        widget.etatVehicle.siegeARD = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARD',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.siegeARD,
+                  onChanged: (s) {
+                    widget.etatVehicle.siegeARD = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'TOIT',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.toit,
-                      onChanged: (s) {
-                        widget.etatVehicle.toit = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'TOIT',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.toit,
+                  onChanged: (s) {
+                    widget.etatVehicle.toit = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
       ]),
       TableRow(children: [
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ARG',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.aileARG,
-                      onChanged: (s) {
-                        setState(() {
-                          widget.etatVehicle.aileARG = s ?? false;
-                        });
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARG',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.aileARG,
+                  onChanged: (s) {
+                    setState(() {
+                      widget.etatVehicle.aileARG = s ?? false;
+                    });
+                  })
+            ],
+          ),
+        )),
         const TableCell(child: SizedBox()),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ARG',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.porteARG,
-                      onChanged: (s) {
-                        widget.etatVehicle.porteARG = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARG',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.porteARG,
+                  onChanged: (s) {
+                    widget.etatVehicle.porteARG = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'ARG',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.siegeARG,
-                      onChanged: (s) {
-                        widget.etatVehicle.siegeARG = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'ARG',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.siegeARG,
+                  onChanged: (s) {
+                    widget.etatVehicle.siegeARG = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
         TableCell(
             child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  Text(
-                    'COFFRE',
-                    style: littleStyle,
-                  ),
-                  const Spacer(),
-                  Checkbox(
-                      checked: widget.etatVehicle.coffre,
-                      onChanged: (s) {
-                        widget.etatVehicle.coffre = s ?? false;
-                        setState(() {});
-                      })
-                ],
+          padding: const EdgeInsets.all(5.0),
+          child: Row(
+            children: [
+              Text(
+                'COFFRE',
+                style: littleStyle,
               ),
-            )),
+              const Spacer(),
+              Checkbox(
+                  checked: widget.etatVehicle.coffre,
+                  onChanged: (s) {
+                    widget.etatVehicle.coffre = s ?? false;
+                    setState(() {});
+                  })
+            ],
+          ),
+        )),
       ]),
     ];
   }
 
   double lightHeight = 25.px;
   double lightWidth = 25.px;
+
   Widget vehicleDamage(AppTheme appTheme) {
     return SizedBox(
       width: 317.px,
@@ -1031,12 +1033,15 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: widget.etatVehicle.calandre ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.calandre
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      widget.etatVehicle.calandre = !widget.etatVehicle.calandre;
+                      widget.etatVehicle.calandre =
+                          !widget.etatVehicle.calandre;
                     });
                   },
                 ),
@@ -1057,7 +1062,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: widget.etatVehicle.capot ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.capot
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
@@ -1083,7 +1090,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: widget.etatVehicle.toit ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.toit
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
@@ -1109,7 +1118,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: widget.etatVehicle.coffre ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.coffre
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
@@ -1139,8 +1150,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient:
-                      widget.etatVehicle.aileAVD == true ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.aileAVD == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
@@ -1156,8 +1168,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient:
-                      widget.etatVehicle.aileAVG == true ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.aileAVG == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
@@ -1183,8 +1196,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient:
-                      widget.etatVehicle.aileARD == true ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.aileARD == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
@@ -1200,8 +1214,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient:
-                      widget.etatVehicle.aileARG == true ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.aileARG == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
@@ -1231,12 +1246,15 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: widget.etatVehicle.pareChocAV ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.pareChocAV
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      widget.etatVehicle.pareChocAV = !widget.etatVehicle.pareChocAV;
+                      widget.etatVehicle.pareChocAV =
+                          !widget.etatVehicle.pareChocAV;
                     });
                   },
                 ),
@@ -1257,13 +1275,15 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient:
-                      widget.etatVehicle.pareChocAR == true ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.pareChocAR == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      widget.etatVehicle.pareChocAR = !widget.etatVehicle.pareChocAR;
+                      widget.etatVehicle.pareChocAR =
+                          !widget.etatVehicle.pareChocAR;
                     });
                   },
                 ),
@@ -1288,12 +1308,15 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: widget.etatVehicle.porteAVD ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.porteAVD
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      widget.etatVehicle.porteAVD = !widget.etatVehicle.porteAVD;
+                      widget.etatVehicle.porteAVD =
+                          !widget.etatVehicle.porteAVD;
                     });
                   },
                 ),
@@ -1304,12 +1327,15 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: widget.etatVehicle.porteAVG ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.porteAVG
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      widget.etatVehicle.porteAVG = !widget.etatVehicle.porteAVG;
+                      widget.etatVehicle.porteAVG =
+                          !widget.etatVehicle.porteAVG;
                     });
                   },
                 ),
@@ -1330,12 +1356,15 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: widget.etatVehicle.siegeAVD ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.siegeAVD
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      widget.etatVehicle.siegeAVD = !widget.etatVehicle.siegeAVD;
+                      widget.etatVehicle.siegeAVD =
+                          !widget.etatVehicle.siegeAVD;
                     });
                   },
                 ),
@@ -1346,12 +1375,15 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: widget.etatVehicle.siegeAVG ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.siegeAVG
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      widget.etatVehicle.siegeAVG = !widget.etatVehicle.siegeAVG;
+                      widget.etatVehicle.siegeAVG =
+                          !widget.etatVehicle.siegeAVG;
                     });
                   },
                 ),
@@ -1372,12 +1404,15 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: widget.etatVehicle.siegeARD ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.siegeARD
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      widget.etatVehicle.siegeARD = !widget.etatVehicle.siegeARD;
+                      widget.etatVehicle.siegeARD =
+                          !widget.etatVehicle.siegeARD;
                     });
                   },
                 ),
@@ -1388,12 +1423,15 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: widget.etatVehicle.siegeARG ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.siegeARG
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      widget.etatVehicle.siegeARG = !widget.etatVehicle.siegeARG;
+                      widget.etatVehicle.siegeARG =
+                          !widget.etatVehicle.siegeARG;
                     });
                   },
                 ),
@@ -1414,12 +1452,15 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: widget.etatVehicle.porteARD ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.porteARD
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      widget.etatVehicle.porteARD = !widget.etatVehicle.porteARD;
+                      widget.etatVehicle.porteARD =
+                          !widget.etatVehicle.porteARD;
                     });
                   },
                 ),
@@ -1430,12 +1471,15 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: widget.etatVehicle.porteARG ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.porteARG
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
                     setState(() {
-                      widget.etatVehicle.porteARG = !widget.etatVehicle.porteARG;
+                      widget.etatVehicle.porteARG =
+                          !widget.etatVehicle.porteARG;
                     });
                   },
                 ),
@@ -1460,8 +1504,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient:
-                      widget.etatVehicle.feuAVD == true ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.feuAVD == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
@@ -1477,8 +1522,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient:
-                      widget.etatVehicle.feuAVG == true ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.feuAVG == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
@@ -1504,8 +1550,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient:
-                      widget.etatVehicle.phareD == true ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.phareD == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
@@ -1521,8 +1568,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient:
-                      widget.etatVehicle.phareG == true ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.phareG == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
@@ -1548,8 +1596,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient:
-                      widget.etatVehicle.feuARD == true ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.feuARD == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
@@ -1565,8 +1614,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient:
-                      widget.etatVehicle.feuARG == true ? appTheme.getRadiantDarkest() : null,
+                      gradient: widget.etatVehicle.feuARG == true
+                          ? appTheme.getRadiantDarkest()
+                          : null,
                     ),
                   ),
                   onTap: () {
@@ -1599,10 +1649,10 @@ class _VehicleDamageState extends State<VehicleDamage> {
                       gradient: widget.etatVehicle.parBriseAve
                           ? appTheme.getRadiantDarkest()
                           : widget.etatVehicle.parBriseAvc
-                          ? appTheme.getRadiantStandard()
-                          : widget.etatVehicle.parBriseAvf
-                          ? appTheme.getRadiantLight()
-                          : null,
+                              ? appTheme.getRadiantStandard()
+                              : widget.etatVehicle.parBriseAvf
+                                  ? appTheme.getRadiantLight()
+                                  : null,
                     ),
                   ),
                   onTap: () {
@@ -1647,10 +1697,10 @@ class _VehicleDamageState extends State<VehicleDamage> {
                       gradient: widget.etatVehicle.parBriseAre
                           ? appTheme.getRadiantDarkest()
                           : widget.etatVehicle.parBriseArc
-                          ? appTheme.getRadiantStandard()
-                          : widget.etatVehicle.parBriseArf
-                          ? appTheme.getRadiantLight()
-                          : null,
+                              ? appTheme.getRadiantStandard()
+                              : widget.etatVehicle.parBriseArf
+                                  ? appTheme.getRadiantLight()
+                                  : null,
                     ),
                   ),
                   onTap: () {
@@ -1696,7 +1746,8 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: getLightIntensityFromPourc(widget.etatVehicle.avdp, appTheme),
+                      gradient: getLightIntensityFromPourc(
+                          widget.etatVehicle.avdp, appTheme),
                     ),
                   ),
                   onTap: () {
@@ -1726,7 +1777,8 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: getLightIntensityFromPourc(widget.etatVehicle.avgp, appTheme),
+                      gradient: getLightIntensityFromPourc(
+                          widget.etatVehicle.avgp, appTheme),
                     ),
                   ),
                   onTap: () {
@@ -1766,7 +1818,8 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: getLightIntensityFromPourc(widget.etatVehicle.ardp, appTheme),
+                      gradient: getLightIntensityFromPourc(
+                          widget.etatVehicle.ardp, appTheme),
                     ),
                   ),
                   onTap: () {
@@ -1778,7 +1831,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
                       } else if (widget.etatVehicle.ardp <= 50) {
                         widget.etatVehicle.ardp = 60;
                       } else if (widget.etatVehicle.ardp <= 60) {
-                        widget.etatVehicle. ardp = 80;
+                        widget.etatVehicle.ardp = 80;
                       } else if (widget.etatVehicle.ardp <= 80) {
                         widget.etatVehicle.ardp = 90;
                       } else if (widget.etatVehicle.ardp <= 90) {
@@ -1796,7 +1849,8 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   child: Container(
                     height: lightHeight,
                     decoration: BoxDecoration(
-                      gradient: getLightIntensityFromPourc(widget.etatVehicle.argp, appTheme),
+                      gradient: getLightIntensityFromPourc(
+                          widget.etatVehicle.argp, appTheme),
                     ),
                   ),
                   onTap: () {
@@ -1844,5 +1898,4 @@ class _VehicleDamageState extends State<VehicleDamage> {
       return null;
     }
   }
-
 }

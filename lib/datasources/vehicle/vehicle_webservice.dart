@@ -4,55 +4,35 @@ import 'package:parc_oto/datasources/parcoto_webservice.dart';
 import '../../serializables/vehicle/vehicle.dart';
 import '../../utilities/vehicle_util.dart';
 
-
 class VehiculesWebService extends ParcOtoWebService<Vehicle> {
   VehiculesWebService(super.data, super.collectionID, super.columnForSearch);
 
-
-
   @override
   String getAttributeForSearch(int att) {
-    switch (att) {
-      case 0:
-        return 'matricule';
-      case 1:
-        return 'type';
-      case 3:
-        return 'nom';
-      case 4:
-        return 'prenom';
-      case 5:
-        return 'numero_serie';
-      case 6:
-        return 'numero';
-      case 7:
-        return 'matricule_prec';
+    return 'search';
+  }
+
+  @override
+  String getSearchQueryPerIndex(int index, String searchKey) {
+    switch (index) {
+      case 2:
+        return Query.equal('annee_util', int.tryParse(searchKey) ?? 9999);
       default:
-        return 'matricule';
+        return Query.search(getAttributeForSearch(index), searchKey);
     }
   }
 
   @override
-  String getSearchQueryPerIndex(int index,String searchKey){
-    switch(index){
-      case 2: return Query.equal('annee_util', int.tryParse(searchKey)??9999);
-      default: return Query.search(getAttributeForSearch(index), searchKey);
-    }
-  }
-
-  @override
-  List<String> getFilterQueries(Map<String,String>filters,
-      int count,int startingAt,int sortedBy,bool sortedAsc,{int? index}){
+  List<String> getFilterQueries(Map<String, String> filters, int count,
+      int startingAt, int sortedBy, bool sortedAsc,
+      {int? index}) {
     return [
-      if(filters.containsKey('yearmin'))
-        Query.greaterThanEqual(
-            'annee_util', int.tryParse(filters['yearmin']!)),
-      if(filters.containsKey('yearmax'))
-        Query.lessThanEqual(
-            'annee_util', int.tryParse(filters['yearmax']!)),
-      if(filters.containsKey('genre'))
-        Query.equal('genre', filters['genre']),
-      if(filters.containsKey('marque'))
+      if (filters.containsKey('yearmin'))
+        Query.greaterThanEqual('annee_util', int.tryParse(filters['yearmin']!)),
+      if (filters.containsKey('yearmax'))
+        Query.lessThanEqual('annee_util', int.tryParse(filters['yearmax']!)),
+      if (filters.containsKey('genre')) Query.equal('genre', filters['genre']),
+      if (filters.containsKey('marque'))
         Query.equal('marque', filters['marque']),
     ];
   }
@@ -94,22 +74,21 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
     return Query.orderAsc('\$id');
   }
 
-
   @override
-  int Function(MapEntry<String, Vehicle> p1, MapEntry<String,
-      Vehicle> p2)? getComparisonFunction(int column, bool ascending) {
+  int Function(MapEntry<String, Vehicle> p1, MapEntry<String, Vehicle> p2)?
+      getComparisonFunction(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
-    //matricule
+      //matricule
       case 0:
         return (d1, d2) =>
-        coef * d1.value.matricule.compareTo(d2.value.matricule);
-    //marque
+            coef * d1.value.matricule.compareTo(d2.value.matricule);
+      //marque
       case 1:
         return (d1, d2) {
           return coef * (d1.value.type ?? '').compareTo((d2.value.type ?? ''));
         };
-    //annee
+      //annee
       case 2:
         return (d1, d2) {
           int annee1 = d1.value.anneeUtil ??
@@ -121,11 +100,12 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
         };
       case 3:
         return (d1, d2) =>
-        coef * (d1.value.etatactuel??0).compareTo(d2.value.etatactuel??0);
-    //date modif
+            coef *
+            (d1.value.etatactuel ?? 0).compareTo(d2.value.etatactuel ?? 0);
+      //date modif
       case 4:
         return (d1, d2) =>
-        coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
+            coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
       default:
         return (d1, d2) => coef * d1.key.compareTo(d2.key);
     }

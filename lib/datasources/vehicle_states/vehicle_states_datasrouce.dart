@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
-import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:parc_oto/datasources/vehicle_states/vehicle_states_webservice.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -12,22 +12,29 @@ import '../../screens/vehicle/manager/vehicle_tabs.dart';
 import '../../screens/vehicle/manager/vehicles_table.dart';
 import '../../screens/vehicle/states/state_form.dart';
 import '../../serializables/vehicle/state.dart';
-import '../../widgets/on_tap_scale.dart';
 import '../../utilities/vehicle_util.dart';
-class VStatesDatasource extends ParcOtoDatasource<Etat>{
-  VStatesDatasource({required super.collectionID, required super.current,super.appTheme,super.filters,super.searchKey,super.selectC}){
-    repo=VehicleStateWebservice(data, collectionID, 4);
+import '../../widgets/on_tap_scale.dart';
+
+class VStatesDatasource extends ParcOtoDatasource<Etat> {
+  VStatesDatasource(
+      {required super.collectionID,
+      required super.current,
+      super.appTheme,
+      super.filters,
+      super.searchKey,
+      super.selectC}) {
+    repo = VehicleStateWebservice(data, collectionID, 4);
   }
 
   @override
-  Future<void> addToActivity(Etat c) async{
-    await ClientDatabase().ajoutActivity(6, c.id,docName: c.vehicleMat);
+  Future<void> addToActivity(Etat c) async {
+    await ClientDatabase().ajoutActivity(6, c.id, docName: c.vehicleMat);
   }
 
   @override
   String deleteConfirmationMessage(Etat c) {
     return '${'supretat'.tr()} ${c.vehicleMat}';
-    }
+  }
 
   @override
   List<DataCell> getCellsToShow(MapEntry<String, Etat> element) {
@@ -37,87 +44,85 @@ class VStatesDatasource extends ParcOtoDatasource<Etat>{
     );
 
     return [
-      DataCell(Text(element.value.vehicleMat,
-          style: tstyle),
-          onTap: (){
-            showMyVehicule(element.value.vehicleMat);
-          }
-      ),
+      DataCell(Text(element.value.vehicleMat, style: tstyle), onTap: () {
+        showMyVehicule(element.value.vehicleMat);
+      }),
       DataCell(SelectableText(
         VehiclesUtilities.getTypeName(element.value.type).tr(),
         style: tstyle,
       )),
       DataCell(SelectableText(
-          element.value.date!=null?
-          dateFormat.format(element.value.date!):'',
+          element.value.date != null
+              ? dateFormat.format(element.value.date!)
+              : '',
+          style: tstyle)),
+      DataCell(SelectableText(element.value.remarque ?? '', style: tstyle)),
+      DataCell(SelectableText(
+          element.value.ordreNum != null
+              ? NumberFormat('000000000', 'fr_FR')
+                  .format(element.value.ordreNum)
+              : '',
           style: tstyle)),
       DataCell(SelectableText(
-          element.value.remarque??'',
+          element.value.updatedAt != null
+              ? dateFormat.format(element.value.updatedAt!)
+              : '',
           style: tstyle)),
-      DataCell(SelectableText(
-          element.value.ordreNum!=null?NumberFormat('000000000','fr_FR').format(element.value.ordreNum):'',
-          style: tstyle)),
-      DataCell(SelectableText(
-          element.value.updatedAt!=null?
-          dateFormat.format(element.value.updatedAt!):'',
-          style: tstyle)),
-      DataCell(
-          ClientDatabase().isAdmin() || ClientDatabase().isManager()
-              ? f.FlyoutTarget(
-            controller: element.value.controller,
-            child: OnTapScaleAndFade(
-                onTap: () {
-                  element.value.controller.showFlyout(builder: (context) {
-                    return f.MenuFlyout(
-                      items: [
-                        f.MenuFlyoutItem(
-                            text: const Text('mod').tr(),
-                            onPressed: () {
-                              Navigator.of(current).pop();
-                              showStateForm(element.value);
-                            }),
-                        if(ClientDatabase().isAdmin())
+      DataCell(ClientDatabase().isAdmin() || ClientDatabase().isManager()
+          ? f.FlyoutTarget(
+              controller: element.value.controller,
+              child: OnTapScaleAndFade(
+                  onTap: () {
+                    element.value.controller.showFlyout(builder: (context) {
+                      return f.MenuFlyout(
+                        items: [
                           f.MenuFlyoutItem(
-                              text: const Text('delete').tr(),
+                              text: const Text('mod').tr(),
                               onPressed: () {
-                                showDeleteConfirmation(element.value);
+                                Navigator.of(current).pop();
+                                showStateForm(element.value);
                               }),
-                      ],
-                    );
-                  });
-                },
-                child: const Icon(Icons.more_vert_sharp)),
-          )
-              :const Text('')
-      ),
+                          if (ClientDatabase().isAdmin())
+                            f.MenuFlyoutItem(
+                                text: const Text('delete').tr(),
+                                onPressed: () {
+                                  showDeleteConfirmation(element.value);
+                                }),
+                        ],
+                      );
+                    });
+                  },
+                  child: const Icon(Icons.more_vert_sharp)),
+            )
+          : const Text('')),
     ];
   }
 
-
-  void showMyVehicule(String? matricule){
-    if(matricule!=null){
-      PanesListState.index.value=PaneItemsAndFooters.originalItems.indexOf(PaneItemsAndFooters.vehicles)+1;
-      VehicleTabsState.currentIndex.value=0;
-      VehicleTableState.filterNow=true;
-      VehicleTableState.filterVehicule.value=matricule;
+  void showMyVehicule(String? matricule) {
+    if (matricule != null) {
+      PanesListState.index.value = PaneItemsAndFooters.originalItems
+              .indexOf(PaneItemsAndFooters.vehicles) +
+          1;
+      VehicleTabsState.currentIndex.value = 0;
+      VehicleTableState.filterNow = true;
+      VehicleTableState.filterVehicule.value = matricule;
     }
   }
 
-
-
-  void showStateForm(Etat e){
-    Future.delayed(const Duration(milliseconds: 50)).then((value) =>
-        f.showDialog(
-        context: current,
-        barrierDismissible: true,
-        builder: (c){
-          return f.ContentDialog(
-            title: const Text("nouvetat").tr(),
-            constraints: BoxConstraints.loose(f.Size(
-                800.px,500.px
-            )),
-            content: StateForm(etat: e,datasource: this,),
-          );
-        }));
+  void showStateForm(Etat e) {
+    Future.delayed(const Duration(milliseconds: 50))
+        .then((value) => f.showDialog(
+            context: current,
+            barrierDismissible: true,
+            builder: (c) {
+              return f.ContentDialog(
+                title: const Text("nouvetat").tr(),
+                constraints: BoxConstraints.loose(f.Size(800.px, 500.px)),
+                content: StateForm(
+                  etat: e,
+                  datasource: this,
+                ),
+              );
+            }));
   }
 }

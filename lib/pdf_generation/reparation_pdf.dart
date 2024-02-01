@@ -5,11 +5,11 @@ import 'package:parc_oto/pdf_generation/reparation/vehicle_damage_pdf.dart';
 import 'package:parc_oto/pdf_generation/reparation/vehicle_entretien_pdf.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/entreprise.dart';
-import '../serializables/prestataire.dart';
-import '../serializables/reparation/reparation.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
+import '../serializables/prestataire.dart';
+import '../serializables/reparation/reparation.dart';
 import '../utilities/num_to_word.dart';
 
 class ReparationPdf {
@@ -404,8 +404,11 @@ class ReparationPdf {
   }
 
   Widget getPrixInLetter() {
-    int getCentimes = (double.parse(prixFormat.format(
-                reparation.getPrixTTC() - reparation.getPrixTTC().toInt()).replaceAll('DA', '').replaceAll(',', '.')) *
+    int getCentimes = (double.parse(prixFormat
+                .format(
+                    reparation.getPrixTTC() - reparation.getPrixTTC().toInt())
+                .replaceAll('DA', '')
+                .replaceAll(',', '.')) *
             100)
         .toInt();
     return Container(

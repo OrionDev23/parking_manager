@@ -300,14 +300,13 @@ class Countries {
     {"name": "Zimbabwe", "dial_code": "+263", "code": "ZW"}
   ];
 
-
   static String getCountryCodeFromPhone(String? phone) {
-    if(phone !=null && phone.length<4){
+    if (phone != null && phone.length < 4) {
       return '+213';
     }
-    String? code=phone?.substring(0,4)??'+213';
-    for(int i=0;i<allCountries.length;i++){
-      if(code==allCountries[i]['dial_code']){
+    String? code = phone?.substring(0, 4) ?? '+213';
+    for (int i = 0; i < allCountries.length; i++) {
+      if (code == allCountries[i]['dial_code']) {
         return allCountries[i]['code']!;
       }
     }

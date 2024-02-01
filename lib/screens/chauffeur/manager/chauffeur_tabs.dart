@@ -1,22 +1,21 @@
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
 
 import 'chauffeur_gestion.dart';
 
-
 class ChauffeurTabs extends StatefulWidget {
   final bool archive;
-  const ChauffeurTabs({super.key,this.archive=false});
+
+  const ChauffeurTabs({super.key, this.archive = false});
 
   @override
   ChauffeurTabsState createState() => ChauffeurTabsState();
 }
 
 class ChauffeurTabsState extends State<ChauffeurTabs> {
-  static ValueNotifier<int> currentIndex=ValueNotifier(0);
-  static ValueNotifier<int> currentIndex2=ValueNotifier(0);
+  static ValueNotifier<int> currentIndex = ValueNotifier(0);
+  static ValueNotifier<int> currentIndex2 = ValueNotifier(0);
   static List<Tab> tabs = [];
   static List<Tab> tabs2 = [];
 
@@ -29,16 +28,14 @@ class ChauffeurTabsState extends State<ChauffeurTabs> {
       icon: const Icon(FluentIcons.new_folder),
       body: const ChauffeurForm(),
       onClosed: () {
-        if(widget.archive){
+        if (widget.archive) {
           tabs2.remove(tab);
           if (currentIndex2.value > 0) currentIndex2.value--;
-        }
-        else{
+        } else {
           tabs.remove(tab);
 
           if (currentIndex.value > 0) currentIndex.value--;
         }
-
       },
     );
     return tab;
@@ -46,59 +43,66 @@ class ChauffeurTabsState extends State<ChauffeurTabs> {
 
   @override
   void initState() {
-    if(widget.archive){
-      currentIndex2.value=0;
-      if(tabs2.isEmpty){
+    if (widget.archive) {
+      currentIndex2.value = 0;
+      if (tabs2.isEmpty) {
         tabs2.add(Tab(
-          text: Text(widget.archive?'archive'.tr():'gchauffeurs'.tr()),
+          text: Text(widget.archive ? 'archive'.tr() : 'gchauffeurs'.tr()),
           closeIcon: null,
           icon: const Icon(FluentIcons.settings),
-          body:  ChauffeurGestion(archive: widget.archive,),
+          body: ChauffeurGestion(
+            archive: widget.archive,
+          ),
           onClosed: null,
         ));
       }
-    }
-    else{
-      currentIndex.value=0;
-      if(tabs.isEmpty){
+    } else {
+      currentIndex.value = 0;
+      if (tabs.isEmpty) {
         tabs.add(Tab(
           text: Text('gchauffeurs'.tr()),
           closeIcon: null,
           icon: const Icon(FluentIcons.settings),
-          body:  ChauffeurGestion(archive: widget.archive,),
+          body: ChauffeurGestion(
+            archive: widget.archive,
+          ),
           onClosed: null,
         ));
       }
     }
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-
     return ValueListenableBuilder(
-        valueListenable: widget.archive?currentIndex2:currentIndex,
-        builder: (context,value,_) {
+        valueListenable: widget.archive ? currentIndex2 : currentIndex,
+        builder: (context, value, _) {
           return TabView(
-            tabs:  widget.archive?tabs2:tabs,
+            tabs: widget.archive ? tabs2 : tabs,
             currentIndex: value,
-            onChanged: (index) =>   widget.archive?currentIndex2.value=index:currentIndex.value = index,
+            onChanged: (index) => widget.archive
+                ? currentIndex2.value = index
+                : currentIndex.value = index,
             tabWidthBehavior: TabWidthBehavior.equal,
             closeButtonVisibility: CloseButtonVisibilityMode.always,
             showScrollButtons: true,
-            onNewPressed:widget.archive?null: () {
-              setState(() {
-                final index = tabs.length + 1;
-                final tab = generateTab(index);
-                tabs.add(tab);
-                currentIndex.value=index-1;
-              });
-            },
+            onNewPressed: widget.archive
+                ? null
+                : () {
+                    setState(() {
+                      final index = tabs.length + 1;
+                      final tab = generateTab(index);
+                      tabs.add(tab);
+                      currentIndex.value = index - 1;
+                    });
+                  },
             onReorder: (oldIndex, newIndex) {
               setState(() {
                 if (oldIndex < newIndex) {
                   newIndex -= 1;
                 }
-                if(widget.archive){
+                if (widget.archive) {
                   final item = tabs2.removeAt(oldIndex);
                   tabs2.insert(newIndex, item);
 
@@ -107,8 +111,7 @@ class ChauffeurTabsState extends State<ChauffeurTabs> {
                   } else if (currentIndex2.value == oldIndex) {
                     currentIndex2.value = newIndex;
                   }
-                }
-                else{
+                } else {
                   final item = tabs.removeAt(oldIndex);
                   tabs.insert(newIndex, item);
 
@@ -118,11 +121,9 @@ class ChauffeurTabsState extends State<ChauffeurTabs> {
                     currentIndex.value = newIndex;
                   }
                 }
-
               });
             },
           );
-        }
-    );
+        });
   }
 }

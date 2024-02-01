@@ -3,21 +3,21 @@ import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:provider/provider.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
+
 import '../../../batch_import/import_vehicles.dart';
+import '../../../providers/counters.dart';
+import '../../../theme.dart';
+import '../../../widgets/button_container.dart';
+import '../../../widgets/page_header.dart';
+import '../../dashboard/pie_chart/pie_chart.dart';
 import '../../logs/logging/log_table.dart';
 import 'vehicle_form.dart';
 import 'vehicle_tabs.dart';
 import 'vehicles_table.dart';
-import '../../../widgets/button_container.dart';
-import '../../../widgets/page_header.dart';
-import 'package:provider/provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
-import '../../../providers/counters.dart';
-import '../../../theme.dart';
-import '../../dashboard/pie_chart/pie_chart.dart';
-
-const showImportButton=false;
+const showImportButton = true;
 
 class VehicleManagement extends StatefulWidget {
   const VehicleManagement({super.key});
@@ -43,20 +43,19 @@ class VehicleManagementState extends State<VehicleManagement>
         text: 'gestionvehicles'.tr(),
         trailing: Row(
           children: [
-            if(showImportButton && ClientDatabase().isAdmin())
-            SizedBox(
-                width: 200.px,
-                height: 70.px,
-                child: ButtonContainer(
-                  color: appTheme.color.darkest,
-                  icon: FluentIcons.add,
-                  text: 'importlist'.tr(),
-                  showBottom: false,
-                  showCounter: false,
-                  action: importList,
-                )),
-            if(showImportButton && ClientDatabase().isAdmin())
-            smallSpace,
+            if (showImportButton && ClientDatabase().isAdmin())
+              SizedBox(
+                  width: 200.px,
+                  height: 70.px,
+                  child: ButtonContainer(
+                    color: appTheme.color.darkest,
+                    icon: FluentIcons.add,
+                    text: 'importlist'.tr(),
+                    showBottom: false,
+                    showCounter: false,
+                    action: importList,
+                  )),
+            if (showImportButton && ClientDatabase().isAdmin()) smallSpace,
             SizedBox(
                 width: 200.px,
                 height: 70.px,
@@ -96,14 +95,29 @@ class VehicleManagementState extends State<VehicleManagement>
                               return Padding(
                                 padding: const EdgeInsets.all(5.0),
                                 child: ParcOtoPie(
-                                  radius: kIsWeb?60:80,
+                                  radius: kIsWeb ? 60 : 80,
                                   title: 'vstates'.tr(),
                                   labels: [
-                                    MapEntry('gstate', DatabaseCounters().countVehicles(etat: 0)),
-                                    MapEntry('bstate', DatabaseCounters().countVehicles(etat: 1)),
-                                    MapEntry('rstate', DatabaseCounters().countVehicles(etat: 2)),
-                                    MapEntry('ostate', DatabaseCounters().countVehicles(etat: 3)),
-                                    MapEntry('restate', DatabaseCounters().countVehicles(etat: 4)),
+                                    MapEntry(
+                                        'gstate',
+                                        DatabaseCounters()
+                                            .countVehicles(etat: 0)),
+                                    MapEntry(
+                                        'bstate',
+                                        DatabaseCounters()
+                                            .countVehicles(etat: 1)),
+                                    MapEntry(
+                                        'rstate',
+                                        DatabaseCounters()
+                                            .countVehicles(etat: 2)),
+                                    MapEntry(
+                                        'ostate',
+                                        DatabaseCounters()
+                                            .countVehicles(etat: 3)),
+                                    MapEntry(
+                                        'restate',
+                                        DatabaseCounters()
+                                            .countVehicles(etat: 4)),
                                   ],
                                 ),
                               );
@@ -157,24 +171,24 @@ class VehicleManagementState extends State<VehicleManagement>
     return tab;
   }
 
-
-  void importList() async{
-    FilePickerResult? pickedFile =await FilePicker.platform.pickFiles(
+  void importList() async {
+    FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
       allowMultiple: false,
     );
-    if(pickedFile!=null){
-      Future.delayed(const Duration(milliseconds: 50)).then((value) =>
-          showDialog(
+    if (pickedFile != null) {
+      Future.delayed(const Duration(milliseconds: 50))
+          .then((value) => showDialog(
               context: context,
               barrierDismissible: true,
               builder: (c) {
-                return ImportVehicles(file: pickedFile,);
+                return ImportVehicles(
+                  file: pickedFile,
+                );
               }));
     }
   }
-
 
   @override
   bool get wantKeepAlive => true;

@@ -1,8 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
-class ThemeColors{
-
-  static List<AccentColor> accentColors=[
+class ThemeColors {
+  static List<AccentColor> accentColors = [
     orange,
     red,
     magenta,
@@ -65,5 +64,4 @@ class ThemeColors{
     'lighter': Color(0xff4b9c4b),
     'lightest': Color(0xff6aad6a),
   });
-
 }

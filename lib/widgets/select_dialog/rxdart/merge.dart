@@ -20,10 +20,14 @@ class MergeStream<T> extends Stream<T> {
 
   /// Constructs a [Stream] which flattens all events in [streams] and emits
   /// them in a single sequence.
-  MergeStream(Iterable<Stream<T>> streams) : _controller = _buildController(streams);
+  MergeStream(Iterable<Stream<T>> streams)
+      : _controller = _buildController(streams);
 
   @override
-  StreamSubscription<T> listen(void Function(T event)? onData, {Function? onError, void Function()? onDone, bool? cancelOnError}) => _controller.stream.listen(onData, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+  StreamSubscription<T> listen(void Function(T event)? onData,
+          {Function? onError, void Function()? onDone, bool? cancelOnError}) =>
+      _controller.stream.listen(onData,
+          onError: onError, onDone: onDone, cancelOnError: cancelOnError);
 
   static StreamController<T> _buildController<T>(Iterable<Stream<T>> streams) {
     if (streams.isEmpty) {
@@ -45,11 +49,17 @@ class MergeStream<T> extends Stream<T> {
             if (completed == len) controller.close();
           }
 
-          subscriptions = streams.map((s) => s.listen(controller.add, onError: controller.addError, onDone: onDone)).toList(growable: false);
+          subscriptions = streams
+              .map((s) => s.listen(controller.add,
+                  onError: controller.addError, onDone: onDone))
+              .toList(growable: false);
         },
-        onPause: () => subscriptions.forEach((subscription) => subscription.pause()),
-        onResume: () => subscriptions.forEach((subscription) => subscription.resume()),
-        onCancel: () => Future.wait(subscriptions.map((subscription) => subscription.cancel())));
+        onPause: () =>
+            subscriptions.forEach((subscription) => subscription.pause()),
+        onResume: () =>
+            subscriptions.forEach((subscription) => subscription.resume()),
+        onCancel: () => Future.wait(
+            subscriptions.map((subscription) => subscription.cancel())));
 
     return controller;
   }
@@ -67,11 +77,10 @@ extension MergeExtension<T> on Stream<T> {
   ///         .mergeWith([Stream.fromIterable([2])])
   ///         .listen(print); // prints 2, 1
   Stream<T> mergeWith(Iterable<Stream<T>> streams) {
-    final stream = MergeStream<T>([
-      this,
-      ...streams
-    ]);
+    final stream = MergeStream<T>([this, ...streams]);
 
-    return isBroadcast ? stream.asBroadcastStream(onCancel: (s) => s.cancel()) : stream;
+    return isBroadcast
+        ? stream.asBroadcastStream(onCancel: (s) => s.cancel())
+        : stream;
   }
 }

@@ -1,10 +1,9 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-
 import 'package:parc_oto/datasources/vehicle_states/vehicle_states_datasrouce.dart';
 import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/screens/vehicle/states/state_form.dart';
+import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -16,6 +15,7 @@ import '../manager/vehicles_table.dart';
 
 class StateTable extends StatefulWidget {
   final bool selectD;
+
   const StateTable({super.key, this.selectD = false});
 
   @override
@@ -166,6 +166,7 @@ class StateTableState extends State<StateTable> {
   int? type;
 
   Map<String, String> filters = {};
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
@@ -277,11 +278,9 @@ class StateTableState extends State<StateTable> {
       headingRowHeight: 25,
       headingRowDecoration: BoxDecoration(
           color: appTheme.color,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(5))
-      ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(5))),
       dividerThickness: 0.5,
       autoRowsToHeight: true,
-
       empty: NoDataWidget(
         datasource: vehicleStateDatasource,
       ),
@@ -327,12 +326,13 @@ class StateTableState extends State<StateTable> {
                 ],
               ),
               title: ComboBox<int>(
-                items: types
-                    .map((e) => ComboBoxItem<int>(
-                          value: types.indexOf(e),
-                          child: Text(e).tr(),
-                        ))
-                    .toList(),
+                items: List.generate(
+                    5,
+                    (index) => ComboBoxItem<int>(
+                          value: index,
+                          child:
+                              Text(VehiclesUtilities.getTypeName(index)).tr(),
+                        )),
                 value: type,
                 onChanged: (s) {
                   setState(() {
@@ -452,7 +452,7 @@ class StateTableState extends State<StateTable> {
                     ),
                     onPressed: filtered
                         ? () {
-                      Navigator.of(context).pop();
+                            Navigator.of(context).pop();
                             setState(() {
                               type = null;
                               dateMax = null;

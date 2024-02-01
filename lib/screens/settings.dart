@@ -1,8 +1,6 @@
-
 import 'package:easy_localization/easy_localization.dart' as eas;
-import 'package:flutter/foundation.dart';
-
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,7 +18,6 @@ const List<String> accentColorNames = [
   'Green',
 ];
 
-
 bool get kIsWindowEffectsSupported {
   return !kIsWeb &&
       [
@@ -37,8 +34,7 @@ class Settings extends ScrollablePage {
 
   @override
   Widget buildHeader(BuildContext context) {
-    return const PageTitle(
-        text:'Paramètres');
+    return const PageTitle(text: 'Paramètres');
   }
 
   @override
@@ -53,10 +49,7 @@ class Settings extends ScrollablePage {
         appTheme.locale ?? Localizations.maybeLocaleOf(context);
 
     return [
-      Text('Theme', style: FluentTheme
-          .of(context)
-          .typography
-          .subtitle),
+      Text('Theme', style: FluentTheme.of(context).typography.subtitle),
       spacer,
       ...List.generate(ThemeMode.values.length, (index) {
         final mode = ThemeMode.values[index];
@@ -77,10 +70,7 @@ class Settings extends ScrollablePage {
       biggerSpacer,
       Text(
         'Disposition du paneau de navigation',
-        style: FluentTheme
-            .of(context)
-            .typography
-            .subtitle,
+        style: FluentTheme.of(context).typography.subtitle,
       ),
       spacer,
       ...List.generate(PaneDisplayMode.values.length, (index) {
@@ -103,32 +93,26 @@ class Settings extends ScrollablePage {
       }),
       biggerSpacer,
       Text('Couleur des bouttons',
-          style: FluentTheme
-              .of(context)
-              .typography
-              .subtitle),
+          style: FluentTheme.of(context).typography.subtitle),
       spacer,
       Wrap(children: [
         ...List.generate(ThemeColors.accentColors.length, (index) {
           final color = ThemeColors.accentColors[index];
           return Tooltip(
-            message: accentColorNames[index ],
-            child: _buildColorBlock(appTheme, color,index),
+            message: accentColorNames[index],
+            child: _buildColorBlock(appTheme, color, index),
           );
         }),
       ]),
       biggerSpacer,
       biggerSpacer,
-      Text('Langue', style: FluentTheme
-          .of(context)
-          .typography
-          .subtitle),
+      Text('Langue', style: FluentTheme.of(context).typography.subtitle),
       Wrap(
         spacing: 15.0,
         runSpacing: 10.0,
         children: List.generate(
           supportedLocales.length,
-              (index) {
+          (index) {
             if (supportedLocales[index].languageCode.toUpperCase() == 'AR' ||
                 supportedLocales[index].languageCode.toUpperCase() == 'FR' ||
                 supportedLocales[index].languageCode.toUpperCase() == 'EN') {
@@ -150,11 +134,11 @@ class Settings extends ScrollablePage {
                       supportedLocales[index].languageCode.toUpperCase() == 'FR'
                           ? "Français"
                           : supportedLocales[index]
-                          .languageCode
-                          .toUpperCase() ==
-                          'AR'
-                          ? "عربية"
-                          : "English"),
+                                      .languageCode
+                                      .toUpperCase() ==
+                                  'AR'
+                              ? "عربية"
+                              : "English"),
                 ),
               );
             }
@@ -165,12 +149,12 @@ class Settings extends ScrollablePage {
     ];
   }
 
-  Widget _buildColorBlock(AppTheme appTheme, AccentColor color,int index) {
+  Widget _buildColorBlock(AppTheme appTheme, AccentColor color, int index) {
     return Padding(
       padding: const EdgeInsets.all(2.0),
       child: Button(
         onPressed: () {
-          prefs.setInt('color',index);
+          prefs.setInt('color', index);
           appTheme.color = color;
         },
         style: ButtonStyle(
@@ -190,17 +174,13 @@ class Settings extends ScrollablePage {
           alignment: AlignmentDirectional.center,
           child: appTheme.color == color
               ? Icon(
-            FluentIcons.check_mark,
-            color: color.basedOnLuminance(),
-            size: 22.0,
-          )
+                  FluentIcons.check_mark,
+                  color: color.basedOnLuminance(),
+                  size: 22.0,
+                )
               : null,
         ),
       ),
     );
   }
-
-
-
-
 }

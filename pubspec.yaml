@@ -61,6 +61,8 @@ dependencies:
   go_router: ^13.1.0
   excel: ^4.0.2
   internet_connection_checker_plus: ^2.2.0
+  share_plus: ^7.2.2
+  file_saver: ^0.1.1
 
 dev_dependencies:
   flutter_test:

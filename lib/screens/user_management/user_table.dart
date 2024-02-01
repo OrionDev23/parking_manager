@@ -9,23 +9,21 @@ import '../../theme.dart';
 import '../../widgets/empty_table_widget.dart';
 
 class UsersTable extends StatefulWidget {
-
   final bool selectD;
   final bool archive;
-  const UsersTable({super.key,this.selectD=false,this.archive=false});
+
+  const UsersTable({super.key, this.selectD = false, this.archive = false});
 
   @override
   State<UsersTable> createState() => _UsersTableState();
 }
 
 class _UsersTableState extends State<UsersTable> {
-
   late UsersManagementDatasource userDataSource;
 
   late final bool startedWithFiltersOn;
 
   static ValueNotifier<String?> filterDocument = ValueNotifier(null);
-
 
   static bool filterNow = false;
 
@@ -41,30 +39,26 @@ class _UsersTableState extends State<UsersTable> {
   TextEditingController searchController = TextEditingController();
 
   bool notEmpty = false;
+
   @override
   void initState() {
-    if (filterDocument.value != null){
+    if (filterDocument.value != null) {
       startedWithFiltersOn = true;
       searchController.text = filterDocument.value!;
       userDataSource = UsersManagementDatasource(
           current: context,
           selectC: widget.selectD,
           searchKey: filterDocument.value);
-      filterDocument.value=null;
-    }
-    else{
+      filterDocument.value = null;
+    } else {
       startedWithFiltersOn = false;
 
       userDataSource = UsersManagementDatasource(
-          current: context, selectC: widget.selectD,
-          archive: widget.archive
-      );
-
+          current: context, selectC: widget.selectD, archive: widget.archive);
     }
     initColumns();
     super.initState();
   }
-
 
   void initColumns() {
     columns = [
@@ -160,23 +154,25 @@ class _UsersTableState extends State<UsersTable> {
       ),
     ];
   }
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
-    userDataSource.appTheme=appTheme;
+    userDataSource.appTheme = appTheme;
     return ValueListenableBuilder(
         valueListenable: filterDocument,
         builder: (context, v, _) {
           if (!startedWithFiltersOn && v != null && filterNow) {
             searchController.text = v;
             userDataSource.search(v);
-            notEmpty=true;
+            notEmpty = true;
             filtered = true;
             filterNow = false;
           }
           return AsyncPaginatedDataTable2(
             header: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -189,9 +185,7 @@ class _UsersTableState extends State<UsersTable> {
                       style: appTheme.writingStyle,
                       cursorColor: appTheme.color.darker,
                       placeholderStyle: placeStyle,
-                      decoration: BoxDecoration(
-                          color: appTheme.fillColor
-                      ),
+                      decoration: BoxDecoration(color: appTheme.fillColor),
                       onSubmitted: (s) {
                         if (s.isNotEmpty) {
                           userDataSource.search(s);
@@ -210,13 +204,13 @@ class _UsersTableState extends State<UsersTable> {
                       },
                       suffix: notEmpty
                           ? IconButton(
-                          icon: const Icon(FluentIcons.cancel),
-                          onPressed: () {
-                            searchController.text = "";
-                            notEmpty = false;
-                            setState(() {});
-                            userDataSource.search('');
-                          })
+                              icon: const Icon(FluentIcons.cancel),
+                              onPressed: () {
+                                searchController.text = "";
+                                notEmpty = false;
+                                setState(() {});
+                                userDataSource.search('');
+                              })
                           : null,
                     ),
                   ),
@@ -227,11 +221,10 @@ class _UsersTableState extends State<UsersTable> {
             headingRowHeight: 25,
             headingRowDecoration: BoxDecoration(
                 color: appTheme.color,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(5))
-            ),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(5))),
             dividerThickness: 0.5,
             autoRowsToHeight: true,
-
             horizontalMargin: 8,
             columnSpacing: 0,
             dataRowHeight: rowHeight,
@@ -243,7 +236,9 @@ class _UsersTableState extends State<UsersTable> {
               rowPerPage = nbr ?? 12;
             },
             availableRowsPerPage: const [12, 24, 50, 100, 200],
-            empty: NoDataWidget(datasource: userDataSource,),
+            empty: NoDataWidget(
+              datasource: userDataSource,
+            ),
             showFirstLastButtons: true,
             renderEmptyRowsInTheEnd: false,
             fit: FlexFit.tight,
@@ -251,6 +246,7 @@ class _UsersTableState extends State<UsersTable> {
             source: userDataSource,
             sortArrowAlwaysVisible: true,
             hidePaginator: false,
-          );});
+          );
+        });
   }
 }

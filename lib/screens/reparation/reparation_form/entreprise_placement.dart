@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../../providers/client_database.dart';
 import '../../../theme.dart';
 import '../../entreprise.dart';
 
@@ -16,11 +18,27 @@ class EntreprisePlacement extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Image.file(
-          File('mylogo.png'),
-          width: 80.px,
-          height: 80.px,
-        ),
+        if (kIsWeb)
+          FutureBuilder(
+              future: MyEntrepriseState.logo == null
+                  ? ClientDatabase.downloadLogo()
+                  : null,
+              builder: (c, snapshot) {
+                if (MyEntrepriseState.logo != null) {
+                  return Image.memory(
+                    MyEntrepriseState.logo!,
+                    width: 80.px,
+                    height: 80.px,
+                  );
+                }
+                return const ProgressRing();
+              }),
+        if (!kIsWeb)
+          Image.file(
+            File('mylogo.png'),
+            width: 80.px,
+            height: 80.px,
+          ),
         bigSpace,
         Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -36,7 +54,6 @@ class EntreprisePlacement extends StatelessWidget {
             ),
           ],
         ),
-
       ],
     );
   }

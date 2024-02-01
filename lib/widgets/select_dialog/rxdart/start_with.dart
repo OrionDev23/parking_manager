@@ -72,7 +72,8 @@ class StartWithStreamTransformer<S> extends StreamTransformerBase<S, S> {
   StartWithStreamTransformer(this.startValue);
 
   @override
-  Stream<S> bind(Stream<S> stream) => forwardStream(stream, _StartWithStreamSink(startValue));
+  Stream<S> bind(Stream<S> stream) =>
+      forwardStream(stream, _StartWithStreamSink(startValue));
 }
 
 /// Extends the [Stream] class with the ability to emit the given value as the
@@ -83,5 +84,6 @@ extension StartWithExtension<T> on Stream<T> {
   /// ### Example
   ///
   ///     Stream.fromIterable([2]).startWith(1).listen(print); // prints 1, 2
-  Stream<T> startWith(T startValue) => transform(StartWithStreamTransformer<T>(startValue));
+  Stream<T> startWith(T startValue) =>
+      transform(StartWithStreamTransformer<T>(startValue));
 }

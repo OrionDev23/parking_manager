@@ -1,7 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -15,7 +14,8 @@ import '../manager/vehicles_table.dart';
 
 class DocumentTable extends StatefulWidget {
   final bool selectD;
-  const DocumentTable({super.key,this.selectD=false});
+
+  const DocumentTable({super.key, this.selectD = false});
 
   @override
   State<DocumentTable> createState() => DocumentTableState();
@@ -30,11 +30,11 @@ class DocumentTableState extends State<DocumentTable> {
 
   @override
   void initState() {
-    documentsDataSource = DocumentsDataSource(current: context, collectionID: vehicDoc,selectC: widget.selectD);
+    documentsDataSource = DocumentsDataSource(
+        current: context, collectionID: vehicDoc, selectC: widget.selectD);
     initColumns();
     super.initState();
   }
-
 
   int sortColumn = 3;
 
@@ -127,11 +127,12 @@ class DocumentTableState extends State<DocumentTable> {
   Vehicle? selectedVehicle;
   DateTime? dateMin;
   DateTime? dateMax;
-  Map<String,String> filters={};
+  Map<String, String> filters = {};
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
-    documentsDataSource.appTheme=appTheme;
+    documentsDataSource.appTheme = appTheme;
     return AsyncPaginatedDataTable2(
       header: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
@@ -148,13 +149,18 @@ class DocumentTableState extends State<DocumentTable> {
                       child: IconButton(
                           icon: Row(
                             children: [
-                              Text('filter',style: TextStyle(fontSize: 12.sp),).tr(),
-                              const SizedBox(width: 5,),
+                              Text(
+                                'filter',
+                                style: TextStyle(fontSize: 12.sp),
+                              ).tr(),
+                              const SizedBox(
+                                width: 5,
+                              ),
                               filtered
                                   ? Icon(
-                                FluentIcons.filter_solid,
-                                color: appTheme.color,
-                              )
+                                      FluentIcons.filter_solid,
+                                      color: appTheme.color,
+                                    )
                                   : const Icon(FluentIcons.filter),
                             ],
                           ),
@@ -163,7 +169,7 @@ class DocumentTableState extends State<DocumentTable> {
                               return FlyoutContent(
                                   color: appTheme.backGroundColor,
                                   child:
-                                  StatefulBuilder(builder: (context, setS) {
+                                      StatefulBuilder(builder: (context, setS) {
                                     return SizedBox(
                                       width: 30.w,
                                       height: 42.h,
@@ -173,25 +179,27 @@ class DocumentTableState extends State<DocumentTable> {
                                             child: ZoneBox(
                                               label: 'dateexp'.tr(),
                                               child: Padding(
-                                                padding: const EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: Column(
                                                   children: [
                                                     Row(
                                                       children: [
                                                         SizedBox(
-                                                            width:5.w,
-                                                            child: const Text('min').tr()),
+                                                            width: 5.w,
+                                                            child: const Text(
+                                                                    'min')
+                                                                .tr()),
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
                                                           child: DatePicker(
                                                             selected: dateMin,
                                                             endDate: dateMax,
-                                                            onChanged: (d){
-                                                              dateMin=d;
-                                                              setState(() {
-                                                              });
-                                                              setS((){});
+                                                            onChanged: (d) {
+                                                              dateMin = d;
+                                                              setState(() {});
+                                                              setS(() {});
                                                             },
                                                           ),
                                                         ),
@@ -201,20 +209,20 @@ class DocumentTableState extends State<DocumentTable> {
                                                     Row(
                                                       children: [
                                                         SizedBox(
-                                                            width:5.w,
-                                                            child: const Text('max').tr()),
+                                                            width: 5.w,
+                                                            child: const Text(
+                                                                    'max')
+                                                                .tr()),
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
                                                           child: DatePicker(
                                                             selected: dateMax,
                                                             startDate: dateMin,
-                                                            onChanged: (d){
-                                                              dateMax=d;
-                                                              setState(() {
-                                                              });
-                                                              setS((){});
-
+                                                            onChanged: (d) {
+                                                              dateMax = d;
+                                                              setState(() {});
+                                                              setS(() {});
                                                             },
                                                           ),
                                                         ),
@@ -228,37 +236,49 @@ class DocumentTableState extends State<DocumentTable> {
                                           smallSpace,
                                           Flexible(
                                             child: ZoneBox(
-                                              label:'vehicule'.tr(),
+                                              label: 'vehicule'.tr(),
                                               child: Padding(
-                                                padding: const EdgeInsets.all(10.0),
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
                                                 child: ListTile(
-                                                  title: Text(selectedVehicle?.matricule??'/'),
-                                                  onPressed: () async{
-                                                    selectedVehicle=await showDialog<Vehicle>(context: context,
-                                                        barrierDismissible: true,
-                                                        builder: (context){
-                                                          return  ContentDialog(
-                                                            constraints: BoxConstraints.tight(Size(
-                                                                60.w,60.h
-                                                            )),
-                                                            title: const Text('selectvehicle').tr(),
-                                                            style: ContentDialogThemeData(
-                                                                titleStyle: appTheme.writingStyle.copyWith(fontWeight: FontWeight.bold)
-                                                            ),
-                                                            content: Container(
-                                                                color: appTheme.backGroundColor,
-                                                                width: 60.w,
-                                                                height: 60.h,
-                                                                child: const VehicleTable(selectV: true,)
-                                                            ),
-                                                          );
-                                                        }
-                                                    );
-                                                    setState(() {
-
-                                                    });
-                                                    setS((){});
-
+                                                  title: Text(selectedVehicle
+                                                          ?.matricule ??
+                                                      '/'),
+                                                  onPressed: () async {
+                                                    selectedVehicle =
+                                                        await showDialog<
+                                                                Vehicle>(
+                                                            context: context,
+                                                            barrierDismissible:
+                                                                true,
+                                                            builder: (context) {
+                                                              return ContentDialog(
+                                                                constraints:
+                                                                    BoxConstraints
+                                                                        .tight(Size(
+                                                                            60.w,
+                                                                            60.h)),
+                                                                title: const Text(
+                                                                        'selectvehicle')
+                                                                    .tr(),
+                                                                style: ContentDialogThemeData(
+                                                                    titleStyle: appTheme
+                                                                        .writingStyle
+                                                                        .copyWith(
+                                                                            fontWeight:
+                                                                                FontWeight.bold)),
+                                                                content: Container(
+                                                                    color: appTheme.backGroundColor,
+                                                                    width: 60.w,
+                                                                    height: 60.h,
+                                                                    child: const VehicleTable(
+                                                                      selectV:
+                                                                          true,
+                                                                    )),
+                                                              );
+                                                            });
+                                                    setState(() {});
+                                                    setS(() {});
                                                   },
                                                 ),
                                               ),
@@ -269,73 +289,97 @@ class DocumentTableState extends State<DocumentTable> {
                                           Padding(
                                             padding: const EdgeInsets.all(8.0),
                                             child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
                                               children: [
                                                 FilledButton(
-                                                  style:ButtonStyle(
-                                                    backgroundColor: ButtonState.all<Color>(
-                                                        appTheme.color.lightest
-                                                    ),
+                                                  style: ButtonStyle(
+                                                    backgroundColor:
+                                                        ButtonState.all<Color>(
+                                                            appTheme.color
+                                                                .lightest),
                                                   ),
-                                                  onPressed: filtered?(){
-
-                                                    Navigator.of(context).pop();
-                                                    setState(() {
-                                                      dateMax=null;
-                                                      dateMin=null;
-                                                      selectedVehicle=null;
-                                                      filtered=false;
-                                                      filters.clear();
-                                                    });
-                                                    documentsDataSource.filter(filters);
-
-                                                  }
-                                                      :null,child: const Text('clear').tr(),
+                                                  onPressed: filtered
+                                                      ? () {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                          setState(() {
+                                                            dateMax = null;
+                                                            dateMin = null;
+                                                            selectedVehicle =
+                                                                null;
+                                                            filtered = false;
+                                                            filters.clear();
+                                                          });
+                                                          documentsDataSource
+                                                              .filter(filters);
+                                                        }
+                                                      : null,
+                                                  child:
+                                                      const Text('clear').tr(),
                                                 ),
                                                 const Spacer(),
                                                 Button(
-                                                    onPressed:(){
-                                                      Navigator.of(context).pop();
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
                                                     },
-                                                    child: const Text('annuler').tr()),
+                                                    child: const Text('annuler')
+                                                        .tr()),
                                                 smallSpace,
-
-
                                                 smallSpace,
-
                                                 FilledButton(
-                                                    style:ButtonStyle(
-                                                      backgroundColor: ButtonState.all<Color>(
-                                                          appTheme.color.lighter
-                                                      ),
+                                                    style: ButtonStyle(
+                                                      backgroundColor:
+                                                          ButtonState.all<
+                                                                  Color>(
+                                                              appTheme.color
+                                                                  .lighter),
                                                     ),
-                                                    child: const Text('confirmer').tr(),
-                                                    onPressed: (){
-                                                      Navigator.of(context).pop();
+                                                    child:
+                                                        const Text('confirmer')
+                                                            .tr(),
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
 
-                                                      if(dateMin!=null){
-                                                        filters['datemin']=dateMin!.difference(ClientDatabase.ref).inMilliseconds.toString();
+                                                      if (dateMin != null) {
+                                                        filters['datemin'] =
+                                                            dateMin!
+                                                                .difference(
+                                                                    ClientDatabase
+                                                                        .ref)
+                                                                .inMilliseconds
+                                                                .toString();
+                                                      } else {
+                                                        filters
+                                                            .remove('datemin');
                                                       }
-                                                      else{
-                                                        filters.remove('datemin');
+                                                      if (dateMax != null) {
+                                                        filters['datemax'] =
+                                                            dateMax!
+                                                                .difference(
+                                                                    ClientDatabase
+                                                                        .ref)
+                                                                .inMilliseconds
+                                                                .toString();
+                                                      } else {
+                                                        filters
+                                                            .remove('datemax');
                                                       }
-                                                      if(dateMax!=null){
-                                                        filters['datemax']=dateMax!.difference(ClientDatabase.ref).inMilliseconds.toString();
-                                                      }
-                                                      else{
-                                                        filters.remove('datemax');
-                                                      }
-                                                      if(selectedVehicle!=null){
-                                                        filters['vehicle']=selectedVehicle!.id;
-                                                      }
-                                                      else{
-                                                        filters.remove('vehicle');
+                                                      if (selectedVehicle !=
+                                                          null) {
+                                                        filters['vehicle'] =
+                                                            selectedVehicle!.id;
+                                                      } else {
+                                                        filters
+                                                            .remove('vehicle');
                                                       }
 
-                                                      filtered=true;
-                                                      setState((){});
-                                                      documentsDataSource.filter(filters);
-
+                                                      filtered = true;
+                                                      setState(() {});
+                                                      documentsDataSource
+                                                          .filter(filters);
                                                     }),
                                               ],
                                             ),
@@ -379,9 +423,7 @@ class DocumentTableState extends State<DocumentTable> {
                 style: appTheme.writingStyle,
                 cursorColor: appTheme.color.darker,
                 placeholderStyle: placeStyle,
-                decoration: BoxDecoration(
-                    color: appTheme.fillColor
-                ),
+                decoration: BoxDecoration(color: appTheme.fillColor),
                 onSubmitted: (s) {
                   if (s.isNotEmpty) {
                     documentsDataSource.search(s);
@@ -400,13 +442,13 @@ class DocumentTableState extends State<DocumentTable> {
                 },
                 suffix: notEmpty
                     ? IconButton(
-                    icon: const Icon(FluentIcons.cancel),
-                    onPressed: () {
-                      searchController.text = "";
-                      notEmpty = false;
-                      setState(() {});
-                      documentsDataSource.search('');
-                    })
+                        icon: const Icon(FluentIcons.cancel),
+                        onPressed: () {
+                          searchController.text = "";
+                          notEmpty = false;
+                          setState(() {});
+                          documentsDataSource.search('');
+                        })
                     : null,
               ),
             ),
@@ -417,12 +459,12 @@ class DocumentTableState extends State<DocumentTable> {
       headingRowHeight: 25,
       headingRowDecoration: BoxDecoration(
           color: appTheme.color,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(5))
-      ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(5))),
       dividerThickness: 0.5,
       autoRowsToHeight: true,
-
-      empty: NoDataWidget(datasource: documentsDataSource,),
+      empty: NoDataWidget(
+        datasource: documentsDataSource,
+      ),
       horizontalMargin: 8,
       columnSpacing: 0,
       dataRowHeight: rowHeight,

@@ -1,4 +1,3 @@
-
 import 'dart:ui';
 
 import 'package:appwrite/appwrite.dart';
@@ -8,10 +7,7 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../../providers/client_database.dart';
 
-class PlanningDatasource extends CalendarDataSource<Planning>{
-
-
-
+class PlanningDatasource extends CalendarDataSource<Planning> {
   @override
   DateTime getStartTime(int index) {
     return appointments![index].startTime;
@@ -38,69 +34,65 @@ class PlanningDatasource extends CalendarDataSource<Planning>{
   }
 
   @override
-  String? getRecurrenceRule(int index){
+  String? getRecurrenceRule(int index) {
     return appointments![index].recurrenceRule;
   }
+
   @override
-  String? getNotes(int index){
+  String? getNotes(int index) {
     return appointments![index].notes;
   }
+
   @override
-  String? getLocation(int index){
+  String? getLocation(int index) {
     return appointments![index].location;
   }
+
   @override
-  List<String>?getResourceIds(int index){
+  List<String>? getResourceIds(int index) {
     return appointments![index].resourceIds;
   }
 
   @override
-  String getId(int index){
+  String getId(int index) {
     return appointments![index].id;
   }
 
-
-  PlanningDatasource(){
-    appointments=<Planning>[];
+  PlanningDatasource() {
+    appointments = <Planning>[];
   }
 
-  Map<String,Planning> data={};
+  Map<String, Planning> data = {};
 
-
-
-  List<Planning> addAppointements(){
-
-    List<Planning> plans=[];
+  List<Planning> addAppointements() {
+    List<Planning> plans = [];
     data.forEach((key, value) {
-      if(!alreadyContained(key)){
+      if (!alreadyContained(key)) {
         plans.add(value);
       }
     });
 
     return plans;
-
-
   }
 
-  bool alreadyContained(String id){
-    if(appointments==null){
+  bool alreadyContained(String id) {
+    if (appointments == null) {
       return false;
-    }
-    else{
-      for(Planning p in appointments!){
-          if(p.id==id){
-            return true;
-          }
+    } else {
+      for (Planning p in appointments!) {
+        if (p.id == id) {
+          return true;
+        }
       }
     }
 
     return false;
   }
 
-  void resetAppointements(){
-    List<Planning> plans=[];
+  void resetAppointements() {
+    List<Planning> plans = [];
     data.forEach((key, value) {
-      if(!alreadyContained(key)){
+      if (!alreadyContained(key)) {
         plans.add(value);
       }
     });
@@ -109,39 +101,35 @@ class PlanningDatasource extends CalendarDataSource<Planning>{
   }
 
   @override
-  Future<void> handleLoadMore(DateTime startDate, DateTime endDate) async{
-
-      await ClientDatabase.database!.listDocuments(
-          databaseId: databaseId,
-          collectionId: planningID,
-          queries:[
-            Query.orderAsc('startTime'),
-            Query.greaterThanEqual('startTime', startDate.difference(ClientDatabase.ref).inMilliseconds),
-            Query.lessThanEqual('endTime', endDate.difference(ClientDatabase.ref).inMilliseconds),
-          ]).then((value) {
-        for (var element in value.documents) {
-          data[element.$id]=element.convertTo((p0) =>Planning.fromJson(p0 as Map<String,dynamic>));
-        }
-        if(value.documents.isNotEmpty){
-          var newOnes=addAppointements();
-          appointments!.addAll(newOnes);
-          notifyListeners(CalendarDataSourceAction.reset, newOnes);
-        }
-        else{
-          notifyListeners(CalendarDataSourceAction.add, []);
-        }
-      }).onError((AppwriteException error, stackTrace) {
+  Future<void> handleLoadMore(DateTime startDate, DateTime endDate) async {
+    await ClientDatabase.database!.listDocuments(
+        databaseId: databaseId,
+        collectionId: planningID,
+        queries: [
+          Query.orderAsc('startTime'),
+          Query.greaterThanEqual('startTime',
+              startDate.difference(ClientDatabase.ref).inMilliseconds),
+          Query.lessThanEqual(
+              'endTime', endDate.difference(ClientDatabase.ref).inMilliseconds),
+        ]).then((value) {
+      for (var element in value.documents) {
+        data[element.$id] = element
+            .convertTo((p0) => Planning.fromJson(p0 as Map<String, dynamic>));
+      }
+      if (value.documents.isNotEmpty) {
+        var newOnes = addAppointements();
+        appointments!.addAll(newOnes);
+        notifyListeners(CalendarDataSourceAction.reset, newOnes);
+      } else {
         notifyListeners(CalendarDataSourceAction.add, []);
-        if (kDebugMode) {
-          print('error.message : ${error.message}');
-          print('error.response : ${error.response} ');
-          print(stackTrace);
-        }
-      });
-
+      }
+    }).onError((AppwriteException error, stackTrace) {
+      notifyListeners(CalendarDataSourceAction.add, []);
+      if (kDebugMode) {
+        print('error.message : ${error.message}');
+        print('error.response : ${error.response} ');
+        print(stackTrace);
+      }
+    });
   }
-
 }
-
-
-
