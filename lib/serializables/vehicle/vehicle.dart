@@ -52,10 +52,24 @@ class Vehicle extends ParcOtoDefault {
 
   int? etatactuel;
 
+  String? filliale;
+  String? filliateNom;
+  String? direction;
+  String? directionNom;
+
+  bool lourd;
+
+  int perimetre;
+
+
   Vehicle({
     required super.id,
     super.createdAt,
     super.updatedAt,
+    this.perimetre=0,
+    this.lourd=false,
+    this.direction,this.directionNom,
+    this.filliale,this.filliateNom,
     required this.matricule,
     required this.matriculeEtrang,
     this.wilaya,

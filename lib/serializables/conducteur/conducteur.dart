@@ -23,9 +23,18 @@ class Conducteur extends ParcOtoDefault {
   String? etatactuel;
   int? etat;
 
+  String? filliale;
+  String? filliateNom;
+  String? direction;
+  String? directionNom;
+
   Conducteur(
       {required this.name,
       required this.prenom,
+      this.filliateNom,
+      this.filliale,
+      this.directionNom,
+      this.direction,
       this.etat = 0,
       this.etatactuel,
       required super.id,

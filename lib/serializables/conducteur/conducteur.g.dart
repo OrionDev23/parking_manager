@@ -9,6 +9,10 @@ part of 'conducteur.dart';
 Conducteur _$ConducteurFromJson(Map<String, dynamic> json) => Conducteur(
       name: json['name'] as String,
       prenom: json['prenom'] as String,
+      filliateNom: json['filliateNom'] as String?,
+      filliale: json['filliale'] as String?,
+      directionNom: json['directionNom'] as String?,
+      direction: json['direction'] as String?,
       etat: json['etat'] as int? ?? 0,
       etatactuel: json['etatactuel'] as String?,
       id: json[r'$id'] as String,
@@ -34,4 +38,8 @@ Map<String, dynamic> _$ConducteurToJson(Conducteur instance) =>
       'createdBy': instance.createdBy,
       'etatactuel': instance.etatactuel,
       'etat': instance.etat,
+      'filliale': instance.filliale,
+      'filliateNom': instance.filliateNom,
+      'direction': instance.direction,
+      'directionNom': instance.directionNom,
     };
