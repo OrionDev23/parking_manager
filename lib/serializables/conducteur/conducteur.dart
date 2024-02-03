@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/serializables/parc_oto_serializable.dart';
 
 import '../../utilities/profil_beautifier.dart';
@@ -25,10 +27,15 @@ class Conducteur extends ParcOtoDefault {
   String? filliateNom;
   String? direction;
   String? directionNom;
+  List<String>? vehicules;
+
+  String matricule;
 
   Conducteur(
       {required this.name,
+        required this.matricule,
       required this.prenom,
+        this.vehicules,
       this.filliateNom,
       this.filliale,
       this.directionNom,
@@ -39,11 +46,14 @@ class Conducteur extends ParcOtoDefault {
       this.createdBy,
       super.createdAt,
       super.updatedAt,
-      this.search,
       this.adresse,
       this.email,
+        this.search,
       this.dateNaissance,
-      this.telephone});
+      this.telephone}){
+      search='$name $prenom $directionNom $filliateNom ${ClientDatabase
+          .getEtat(etat).tr()} $matricule $adresse $email ${dateNaissance?.toIso8601String()??''} $telephone';
+  }
 
   factory Conducteur.fromJson(Map<String, dynamic> json) =>
       _$ConducteurFromJson(json);

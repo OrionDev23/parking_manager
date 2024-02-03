@@ -64,6 +64,14 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
               VehiclesUtilities.getTypeName(element.value.etatactuel ?? 0),
               style: tstyle)
           .tr()),
+      DataCell(Text(
+          VehiclesUtilities.getPerimetre(element.value.etatactuel ?? 0),
+          style: tstyle)
+          .tr()),
+      DataCell(Text(
+          element.value.appartenanceNom??'',
+          style: tstyle)
+          .tr()),
       DataCell(
           Text(dateFormat.format(element.value.updatedAt!), style: tstyle)),
       if (selectC != true)

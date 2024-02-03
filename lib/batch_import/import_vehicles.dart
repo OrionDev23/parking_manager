@@ -40,6 +40,8 @@ class _ImportVehiclesState extends State<ImportVehicles> {
 
   bool invalidFile = false;
 
+  int invalidTables=0;
+
   void loadFile() async {
     if (!loading) {
       setState(() {
@@ -58,17 +60,22 @@ class _ImportVehiclesState extends State<ImportVehicles> {
       });
       var excel = Excel.decodeBytes(bytes);
       for (var table in excel.tables.keys) {
+        print('trying table $table');
         setState(() {
           progressLoadingFile += 80 / (excel.tables.length);
         });
         if (isFileValid(excel, table)) {
+          print('table $table is valid');
           for (var row in excel.tables[table]!.rows) {
             addVehicle(row);
           }
         } else {
-          invalidFile = true;
+          invalidTables ++;
           break;
         }
+      }
+      if(invalidTables==excel.tables.length){
+        invalidFile=true;
       }
     }
 
@@ -86,22 +93,40 @@ class _ImportVehiclesState extends State<ImportVehicles> {
       return;
     }
     bool etrang = matricule.split('-').length != 3;
-    String id = data[columnToRead['numero']!]!.value.toString();
-    int etat = getEtat(data[columnToRead['etat']!]!.value.toString());
-    String model = data[columnToRead['model']!]!.value.toString();
-    String nom = data[columnToRead['nom']!]!.value.toString();
-    String prenom = data[columnToRead['prenom']!]!.value.toString();
-
+    String id = columnToRead.containsKey('numero')
+        ?data[columnToRead['numero']!]!.value.toString():matricule;
+    int etat = getEtat(columnToRead.containsKey('etat')
+        ?data[columnToRead['etat']!]!.value
+        .toString():"0");
+    int perimetre=getPerimetre(columnToRead.containsKey('perimetre')
+        ?data[columnToRead['perimetre']!]!.value
+        .toString():null);
+    String model = columnToRead.containsKey('model')?
+    data[columnToRead['model']!]!
+        .value.toString():'';
+    String nom = columnToRead.containsKey('nom')?data[columnToRead['nom']!]!
+        .value.toString():"";
+    String prenom = columnToRead.containsKey('prenom')
+        ?data[columnToRead['prenom']!]!.value.toString():"";
+    String filliale=columnToRead.containsKey('filliale')
+        ?data[columnToRead['filliale']!]!.value.toString():"";
+    String apartenance=columnToRead.containsKey('appartenance')
+        ?data[columnToRead['appartenance']!]!.value.toString():"";
     List<String> ms = matricule.split('-');
     int? wilaya = etrang ? null : int.tryParse(ms[2]) ?? 16;
+
+    ///toDo get filliale ids
     Vehicle vehicle = Vehicle(
         id: id,
         matricule: matricule,
+        perimetre: perimetre,
         matriculeEtrang: etrang,
         etatactuel: etat,
         nom: nom,
         prenom: prenom,
         type: model,
+        filliateNom: filliale,
+        appartenanceNom: apartenance,
         wilaya: etrang ? null : wilaya,
         daira: etrang
             ? null
@@ -125,9 +150,9 @@ class _ImportVehiclesState extends State<ImportVehicles> {
     importedVehicles[vehicle.matricule] = vehicle;
   }
 
-  int getEtat(String etats) {
+  int getEtat(String? etats) {
     int etat = 0;
-    switch (etats.toLowerCase().trim()) {
+    switch (etats?.toLowerCase().trim()) {
       case 'en marche':
         etat = 3;
         break;
@@ -162,6 +187,15 @@ class _ImportVehiclesState extends State<ImportVehicles> {
     return etat;
   }
 
+  int getPerimetre(String? perimetre){
+    switch(perimetre?.toUpperCase()){
+      case 'BUSINESS':return 0;
+      case 'HORS PERIMETRE':return 1;
+      case 'INDUSTRIE' :return 2;
+      default: return 0;
+    }
+  }
+
   bool isFileValid(Excel excel, String table) {
     bool foundMatric = false;
 
@@ -190,7 +224,8 @@ class _ImportVehiclesState extends State<ImportVehicles> {
                 foundMatric = true;
               }
 
-              if (value.value.toLowerCase() == 'model') {
+              if (value.value.toLowerCase().contains('model')|| value.value
+                  .toLowerCase().contains('modèl')) {
                 columnToRead['model'] = cell.columnIndex;
               }
               if (value.value.toLowerCase() == 'n') {
@@ -217,6 +252,17 @@ class _ImportVehiclesState extends State<ImportVehicles> {
                       .contains('firstname')) {
                 columnToRead['prenom'] = cell.columnIndex;
               }
+              if(value.value.toLowerCase().contains('appartenance  vehicule')){
+                columnToRead['appartenance']=cell.columnIndex;
+              }
+              if(value.value.toLowerCase().contains('filiale')){
+                columnToRead['filliale']=cell.columnIndex;
+              }
+              if(value.value.toLowerCase().contains('périmetre') || value
+                  .value.toLowerCase().contains('perimetre')){
+                columnToRead['perimetre']=cell.columnIndex;
+              }
+              break;
             case BoolCellValue():
               break;
 

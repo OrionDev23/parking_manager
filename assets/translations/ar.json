@@ -391,6 +391,11 @@
   "demofor": "نسخة تجريبية ل",
   "daysremain": "باقي {days} يوم",
   "dayV": "{day} أيام",
-
+  "matriculerequis": "رقم التسجيل مطلوب",
+  "appartenance": "الانتماء إلى",
+  "perimetre": "النطاق",
+  "buisiness": "الأعمال",
+  "hors perimetre": "خارج النطاق",
+  "industrie": "داخل النطاق",
   "echec": "فشل"
 }

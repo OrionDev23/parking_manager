@@ -393,6 +393,11 @@
   "echec": "Failure",
   "demofor": "Demo for",
   "daysremain": "{days} day(s) remaining",
-  "dayV": "{day} days"
-
+  "dayV": "{day} days",
+  "matriculerequis": "Registration number is required",
+  "appartenance": "Belonging",
+  "perimetre": "Perimeter",
+  "buisiness": "Buisiness",
+  "hors perimetre": "Outside the scope",
+  "industrie": "Industry"
 }

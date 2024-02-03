@@ -152,18 +152,55 @@ class VehicleTableState extends State<VehicleTable> {
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: const Text(
+            'perimetre',
+            style: tstyle,
+          ).tr(),
+        ),
+        size: ColumnSize.S,
+        onSort: (s, c) {
+          sortColumn = 4;
+          assending = !assending;
+
+          vehicleDataSource.sort(5, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        numeric: true,
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: const Text(
+            'appartenance',
+            style: tstyle,
+          ).tr(),
+        ),
+        size: ColumnSize.M,
+        onSort: (s, c) {
+          sortColumn = 5;
+          assending = !assending;
+
+          vehicleDataSource.sort(6, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        numeric: true,
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: const Text(
             'dateModif',
             style: tstyle,
           ).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
-          sortColumn = 4;
+          sortColumn = 6;
           assending = !assending;
-          vehicleDataSource.sort(sortColumn, assending);
+          vehicleDataSource.sort(4, assending);
           setState(() {});
         },
       ),
+
       if (widget.selectV != true)
         DataColumn2(
           label: const Text(''),

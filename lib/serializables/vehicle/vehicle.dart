@@ -56,6 +56,8 @@ class Vehicle extends ParcOtoDefault {
   String? filliateNom;
   String? direction;
   String? directionNom;
+  String? appartenance;
+  String? appartenanceNom;
 
   bool lourd;
 
@@ -66,6 +68,7 @@ class Vehicle extends ParcOtoDefault {
     required super.id,
     super.createdAt,
     super.updatedAt,
+    this.appartenance,this.appartenanceNom,
     this.perimetre=0,
     this.lourd=false,
     this.direction,this.directionNom,
@@ -103,7 +106,9 @@ class Vehicle extends ParcOtoDefault {
         '$adresse $numero $nom $prenom $profession '
         '$numeroSerie $type $carrosserie $daira $energie'
         ' ${VehiclesUtilities.getMarqueName(marque)} ${VehiclesUtilities.getAnneeFromMatricule(matricule)}'
-        '$pays $matriculePrec ${VehiclesUtilities.getTypeName(etatactuel ?? 0)}';
+        '$pays $matriculePrec ${VehiclesUtilities.getTypeName(etatactuel ??
+        0)} ${VehiclesUtilities.getPerimetre(perimetre)} $appartenanceNom '
+        '$filliateNom $directionNom';
   }
 
   @override

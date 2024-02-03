@@ -275,4 +275,13 @@ class VehiclesUtilities {
         return 'gstate';
     }
   }
+
+  static String getPerimetre (int perimetre){
+    switch(perimetre){
+      case 0:return 'buisiness';
+      case 1:return 'hors perimetre';
+      case 2:return 'industrie';
+      default:return 'buisiness';
+    }
+  }
 }

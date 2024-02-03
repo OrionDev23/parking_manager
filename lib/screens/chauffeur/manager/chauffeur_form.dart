@@ -31,6 +31,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
 
   int? etat;
 
+  TextEditingController matricule=TextEditingController();
   TextEditingController nom = TextEditingController();
   TextEditingController prenom = TextEditingController();
   TextEditingController email = TextEditingController();
@@ -46,6 +47,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
 
   void initValues() {
     if (widget.chauf != null) {
+      matricule.text=widget.chauf!.matricule;
       chaufID = widget.chauf!.id;
       etat = widget.chauf!.etat;
       etatID = widget.chauf!.etatactuel;
@@ -84,105 +86,114 @@ class ChauffeurFormState extends State<ChauffeurForm> {
         children: [
           Container(
             color: appTheme.backGroundColor,
-            child: Column(
+            child: SizedBox(
+              height: 450.px,
+              width: 500.px,
+              child:ListView(
               children: [
                 SizedBox(
-                  height: 55.h,
-                  width: 40.w,
+              height: 450.px,
+                width: 500.px,
                   child: Column(
-                    children: [
-                      Flexible(
-                        child: ZoneBox(
-                          label: 'fullname'.tr(),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Row(
-                              children: [
-                                Flexible(
-                                    child: TextBox(
-                                  controller: nom,
-                                  placeholder: 'Nom',
-                                  style: appTheme.writingStyle,
-                                  placeholderStyle: placeStyle,
-                                  cursorColor: appTheme.color.darker,
-                                  decoration: BoxDecoration(
-                                    color: appTheme.fillColor,
-                                  ),
-                                  onChanged: (s) {
-                                    checkChanges();
-                                  },
-                                )),
-                                smallSpace,
-                                Flexible(
-                                    child: TextBox(
-                                  controller: prenom,
-                                  placeholder: 'Prénom',
-                                  style: appTheme.writingStyle,
-                                  placeholderStyle: placeStyle,
-                                  cursorColor: appTheme.color.darker,
-                                  decoration: BoxDecoration(
-                                    color: appTheme.fillColor,
-                                  ),
-                                  onChanged: (s) {
-                                    checkChanges();
-                                  },
-                                )),
-                              ],
+                      children: [
+                        Flexible(
+                          child: ZoneBox(
+                            label: 'matricule'.tr(),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Flexible(
+                                  child: TextBox(
+                                    controller: matricule,
+                                    placeholder: 'matricule'.tr(),
+                                    style: appTheme.writingStyle,
+                                    placeholderStyle: placeStyle,
+                                    cursorColor: appTheme.color.darker,
+                                    decoration: BoxDecoration(
+                                      color: appTheme.fillColor,
+                                    ),
+                                    onChanged: (s) {
+                                      checkChanges();
+                                    },
+                                  )),
                             ),
                           ),
                         ),
-                      ),
-                      smallSpace,
-                      Flexible(
-                        child: ZoneBox(
-                            label: 'birthday'.tr(),
-                            child: Container(
-                              height: 5.h,
-                              padding: const EdgeInsets.all(10),
-                              child: DatePicker(
-                                selected: birthDay,
-                                onChanged: (d) {
-                                  setState(() {
-                                    birthDay = d;
-                                  });
-                                  checkChanges();
-                                },
-                              ),
-                            )),
-                      ),
-                      smallSpace,
-                      Flexible(
-                        flex: 2,
-                        child: ZoneBox(
-                          label: 'contact'.tr(),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 250,
+                        smallSpace,
+                        Flexible(
+                          child: ZoneBox(
+                            label: 'fullname'.tr(),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Row(
+                                children: [
+                                  Flexible(
                                       child: TextBox(
-                                        controller: email,
-                                        placeholder: 'email'.tr(),
-                                        style: appTheme.writingStyle,
-                                        placeholderStyle: placeStyle,
-                                        cursorColor: appTheme.color.darker,
-                                        decoration: BoxDecoration(
-                                          color: appTheme.fillColor,
-                                        ),
-                                        onChanged: (s) {
-                                          checkChanges();
-                                        },
-                                      ),
+                                    controller: nom,
+                                    placeholder: 'Nom',
+                                    style: appTheme.writingStyle,
+                                    placeholderStyle: placeStyle,
+                                    cursorColor: appTheme.color.darker,
+                                    decoration: BoxDecoration(
+                                      color: appTheme.fillColor,
                                     ),
-                                    smallSpace,
-                                    SizedBox(
-                                        width: 187,
+                                    onChanged: (s) {
+                                      checkChanges();
+                                    },
+                                  )),
+                                  smallSpace,
+                                  Flexible(
+                                      child: TextBox(
+                                    controller: prenom,
+                                    placeholder: 'Prénom',
+                                    style: appTheme.writingStyle,
+                                    placeholderStyle: placeStyle,
+                                    cursorColor: appTheme.color.darker,
+                                    decoration: BoxDecoration(
+                                      color: appTheme.fillColor,
+                                    ),
+                                    onChanged: (s) {
+                                      checkChanges();
+                                    },
+                                  )),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        smallSpace,
+                        Flexible(
+                          child: ZoneBox(
+                              label: 'birthday'.tr(),
+                              child: Container(
+                                height: 5.h,
+                                padding: const EdgeInsets.all(10),
+                                child: DatePicker(
+                                  selected: birthDay,
+                                  onChanged: (d) {
+                                    setState(() {
+                                      birthDay = d;
+                                    });
+                                    checkChanges();
+                                  },
+                                ),
+                              )),
+                        ),
+                        smallSpace,
+                        Flexible(
+                          flex: 2,
+                          child: ZoneBox(
+                            label: 'contact'.tr(),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 250,
                                         child: TextBox(
-                                          controller: telephone,
-                                          placeholder: 'telephone'.tr(),
+                                          controller: email,
+                                          placeholder: 'email'.tr(),
                                           style: appTheme.writingStyle,
                                           placeholderStyle: placeStyle,
                                           cursorColor: appTheme.color.darker,
@@ -192,87 +203,115 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                           onChanged: (s) {
                                             checkChanges();
                                           },
-                                        )),
-                                  ],
-                                ),
-                                smallSpace,
-                                Flexible(
-                                    child: TextBox(
-                                  controller: adresse,
-                                  placeholder: 'adresse'.tr(),
-                                  maxLines: 3,
-                                  style: appTheme.writingStyle,
-                                  placeholderStyle: placeStyle,
-                                  cursorColor: appTheme.color.darker,
-                                  decoration: BoxDecoration(
-                                    color: appTheme.fillColor,
+                                        ),
+                                      ),
+                                      smallSpace,
+                                      SizedBox(
+                                          width: 187,
+                                          child: TextBox(
+                                            controller: telephone,
+                                            placeholder: 'telephone'.tr(),
+                                            style: appTheme.writingStyle,
+                                            placeholderStyle: placeStyle,
+                                            cursorColor: appTheme.color.darker,
+                                            decoration: BoxDecoration(
+                                              color: appTheme.fillColor,
+                                            ),
+                                            onChanged: (s) {
+                                              checkChanges();
+                                            },
+                                          )),
+                                    ],
                                   ),
-                                  onChanged: (s) {
-                                    checkChanges();
-                                  },
-                                )),
-                              ],
+                                  smallSpace,
+                                  Flexible(
+                                      child: TextBox(
+                                    controller: adresse,
+                                    placeholder: 'adresse'.tr(),
+                                    maxLines: 3,
+                                    style: appTheme.writingStyle,
+                                    placeholderStyle: placeStyle,
+                                    cursorColor: appTheme.color.darker,
+                                    decoration: BoxDecoration(
+                                      color: appTheme.fillColor,
+                                    ),
+                                    onChanged: (s) {
+                                      checkChanges();
+                                    },
+                                  )),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      smallSpace,
-                      Flexible(
-                        child: ZoneBox(
-                          label: 'disponibilite'.tr(),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: DropDownButton(
-                              title: Text(ClientDatabase.getEtat(etat)).tr(),
-                              placement: FlyoutPlacementMode.bottomLeft,
-                              closeAfterClick: false,
-                              items: [
-                                MenuFlyoutItem(
-                                  text: const Text('disponible').tr(),
-                                  onPressed: () {
-                                    etat = 0;
-                                  },
-                                ),
-                                const MenuFlyoutSeparator(),
-                                MenuFlyoutItem(
-                                  text: const Text('mission').tr(),
-                                  onPressed: () {
-                                    etat = 1;
-                                  },
-                                ),
-                                const MenuFlyoutSeparator(),
-                                MenuFlyoutItem(
-                                  text: const Text('absent').tr(),
-                                  onPressed: () {
-                                    etat = 2;
-                                  },
-                                ),
-                                if (ClientDatabase().isAdmin())
-                                  const MenuFlyoutSeparator(),
-                                if (ClientDatabase().isAdmin())
+                        smallSpace,
+                        Flexible(
+                          child: ZoneBox(
+                            label: 'disponibilite'.tr(),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: DropDownButton(
+                                title: Text(ClientDatabase.getEtat(etat)).tr(),
+                                placement: FlyoutPlacementMode.bottomLeft,
+                                closeAfterClick: false,
+                                items: [
                                   MenuFlyoutItem(
-                                    text: const Text('quitteentre').tr(),
+                                    text: const Text('disponible').tr(),
                                     onPressed: () {
-                                      etat = 3;
+                                      setState(() {
+                                        etat = 0;
+                                      });
                                     },
                                   ),
-                              ],
-                              onClose: () {
-                                checkChanges();
-                              },
+                                  const MenuFlyoutSeparator(),
+                                  MenuFlyoutItem(
+                                    text: const Text('mission').tr(),
+                                    onPressed: () {
+                                      etat = 1;
+                                      setState(() {
+
+                                      });
+                                    },
+                                  ),
+                                  const MenuFlyoutSeparator(),
+                                  MenuFlyoutItem(
+                                    text: const Text('absent').tr(),
+                                    onPressed: () {
+                                      etat = 2;
+                                      setState(() {
+
+                                      });
+                                    },
+                                  ),
+                                  if (ClientDatabase().isAdmin())
+                                    const MenuFlyoutSeparator(),
+                                  if (ClientDatabase().isAdmin())
+                                    MenuFlyoutItem(
+                                      text: const Text('quitteentre').tr(),
+                                      onPressed: () {
+                                        etat = 3;
+                                        setState(() {
+
+                                        });
+                                      },
+                                    ),
+                                ],
+                                onClose: () {
+                                  checkChanges();
+                                },
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
                 ),
               ],
             ),
-          ),
+          ),),
           Container(
             padding: const EdgeInsets.all(10),
-            width: 40.w,
+            width: 500.px,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -294,7 +333,8 @@ class ChauffeurFormState extends State<ChauffeurForm> {
 
   void checkChanges() {
     if (widget.chauf != null) {
-      if (nom.text == widget.chauf!.name &&
+      if (matricule.text==widget.chauf!.matricule&&nom.text == widget.chauf!
+          .name &&
           prenom.text == widget.chauf!.prenom &&
           birthDay == widget.chauf!.dateNaissance &&
           ((disp == null && etat == widget.chauf!.etat) ||
@@ -324,10 +364,15 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   }
 
   void upload() async {
-    if (nom.value.text.isEmpty || prenom.text.isEmpty) {
+    if (matricule.value.text.isEmpty ) {
+      showMessage('matriculerequis', 'erreur');
+      return;
+    }
+    if (nom.value.text.isEmpty || prenom.text.isEmpty  ) {
       showMessage('nomprenreq', 'erreur');
       return;
     }
+
     if (!uploading) {
       setState(() {
         uploading = true;
@@ -386,9 +431,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
       dateNaissance: birthDay,
       etat: etat,
       etatactuel: etatID,
-      search: '${dateFormat.format(birthDay ?? DateTime.now())} '
-          '${nom.value.text} ${prenom.value.text} ${email.value.text} '
-          '${telephone.value.text} ${adresse.value.text} $chaufID ${ClientDatabase.getEtat(etat)}',
+          matricule: '',
     );
     if (widget.chauf != null) {
       return await ClientDatabase.database!

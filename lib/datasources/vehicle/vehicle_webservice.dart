@@ -70,6 +70,18 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
         } else {
           return Query.orderDesc('\$updatedAt');
         }
+      case 5:
+        if (sortedAsc) {
+          return Query.orderAsc('perimetre');
+        } else {
+          return Query.orderDesc('perimetre');
+        }
+      case 6:
+        if (sortedAsc) {
+          return Query.orderAsc('appartenanceNom');
+        } else {
+          return Query.orderDesc('appartenanceNom');
+        }
     }
     return Query.orderAsc('\$id');
   }
@@ -106,6 +118,15 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
       case 4:
         return (d1, d2) =>
             coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
+      case 5:
+        return (d1, d2) =>
+        coef *
+            (d1.value.perimetre ?? 0).compareTo(d2.value.perimetre ?? 0);
+      case 6:
+        return (d1, d2) {
+          return coef * (d1.value.appartenanceNom ?? '').compareTo((d2.value.appartenanceNom ?? ''));
+        };
+
       default:
         return (d1, d2) => coef * d1.key.compareTo(d2.key);
     }

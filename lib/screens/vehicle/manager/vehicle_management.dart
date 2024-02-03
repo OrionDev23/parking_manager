@@ -1,18 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/foundation.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../batch_import/import_vehicles.dart';
-import '../../../providers/counters.dart';
 import '../../../theme.dart';
 import '../../../widgets/button_container.dart';
 import '../../../widgets/page_header.dart';
-import '../../dashboard/pie_chart/pie_chart.dart';
-import '../../logs/logging/log_table.dart';
 import 'vehicle_form.dart';
 import 'vehicle_tabs.dart';
 import 'vehicles_table.dart';
@@ -74,81 +70,7 @@ class VehicleManagementState extends State<VehicleManagement>
           ],
         ),
       ),
-      content: Column(
-        children: [
-          Flexible(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(width: 60.w, child: const VehicleTable()),
-                smallSpace,
-                Flexible(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Flexible(
-                        child: ValueListenableBuilder(
-                            valueListenable: stateChanges,
-                            builder: (context, val, w) {
-                              return Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: ParcOtoPie(
-                                  radius: kIsWeb ? 60 : 80,
-                                  title: 'vstates'.tr(),
-                                  labels: [
-                                    MapEntry(
-                                        'gstate',
-                                        DatabaseCounters()
-                                            .countVehicles(etat: 0)),
-                                    MapEntry(
-                                        'bstate',
-                                        DatabaseCounters()
-                                            .countVehicles(etat: 1)),
-                                    MapEntry(
-                                        'rstate',
-                                        DatabaseCounters()
-                                            .countVehicles(etat: 2)),
-                                    MapEntry(
-                                        'ostate',
-                                        DatabaseCounters()
-                                            .countVehicles(etat: 3)),
-                                    MapEntry(
-                                        'restate',
-                                        DatabaseCounters()
-                                            .countVehicles(etat: 4)),
-                                  ],
-                                ),
-                              );
-                            }),
-                      ),
-                      smallSpace,
-                      Text(
-                        'lactivities',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: appTheme.writingStyle.color),
-                      ).tr(),
-                      smallSpace,
-                      const Flexible(
-                        child: LogTable(
-                          statTable: true,
-                          pages: false,
-                          numberOfRows: 3,
-                          filters: {'typemin': '0', 'typemax': '9'},
-                          fieldsToShow: ['act', 'date'],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      content: const VehicleTable()
     );
   }
 

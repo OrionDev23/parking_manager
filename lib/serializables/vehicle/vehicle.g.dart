@@ -10,6 +10,8 @@ Vehicle _$VehicleFromJson(Map<String, dynamic> json) => Vehicle(
       id: json[r'$id'] as String,
       createdAt: createdAtJson(json[r'$createdAt'] as String),
       updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
+      appartenance: json['appartenance'] as String?,
+      appartenanceNom: json['appartenanceNom'] as String?,
       perimetre: json['perimetre'] as int? ?? 0,
       lourd: json['lourd'] as bool? ?? false,
       direction: json['direction'] as String?,
@@ -80,6 +82,8 @@ Map<String, dynamic> _$VehicleToJson(Vehicle instance) => <String, dynamic>{
       'filliateNom': instance.filliateNom,
       'direction': instance.direction,
       'directionNom': instance.directionNom,
+      'appartenance': instance.appartenance,
+      'appartenanceNom': instance.appartenanceNom,
       'lourd': instance.lourd,
       'perimetre': instance.perimetre,
     };
