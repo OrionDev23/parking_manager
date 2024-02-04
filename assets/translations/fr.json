@@ -438,5 +438,7 @@
  "echec": "Echec",
  "demofor": "Demo pour",
  "daysremain": "{days} jour(s) restants",
- "dayV": "{day} jours"
+ "dayV": "{day} jours",
+ "fililales": "Filiales",
+ "directions": "Directions"
 }

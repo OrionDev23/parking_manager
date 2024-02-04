@@ -154,12 +154,12 @@ class PaneItemsAndFooters {
       body: const MyEntreprise(),
       items:[
         PaneItem(
-          icon: const Icon(FluentIcons.build_definition),
-          title: const Text('fililale').tr(),
+          icon: const Icon(FluentIcons.sections),
+          title: const Text('fililales').tr(),
           body: const MesFilliales(),
         ),
         PaneItem(
-          icon: const Icon(FluentIcons.build_definition),
+          icon: const Icon(FluentIcons.company_directory),
           title: const Text('directions').tr(),
           body: const MesDirections(),
         ),
