@@ -69,7 +69,7 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
           style: tstyle)
           .tr()),
       DataCell(Text(
-          element.value.appartenanceNom??'',
+          element.value.appartenance??'',
           style: tstyle)
           .tr()),
       DataCell(

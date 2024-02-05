@@ -24,9 +24,7 @@ class Conducteur extends ParcOtoDefault {
   String? etatactuel;
   int? etat;
   String? filliale;
-  String? filliateNom;
   String? direction;
-  String? directionNom;
   List<String>? vehicules;
 
   String matricule;
@@ -36,9 +34,7 @@ class Conducteur extends ParcOtoDefault {
         required this.matricule,
       required this.prenom,
         this.vehicules,
-      this.filliateNom,
       this.filliale,
-      this.directionNom,
       this.direction,
       this.etat = 0,
       this.etatactuel,
@@ -51,7 +47,7 @@ class Conducteur extends ParcOtoDefault {
         this.search,
       this.dateNaissance,
       this.telephone}){
-      search='$name $prenom $directionNom $filliateNom ${ClientDatabase
+      search='$name $prenom $direction $filliale ${ClientDatabase
           .getEtat(etat).tr()} $matricule $adresse $email ${dateNaissance?.toIso8601String()??''} $telephone';
   }
 

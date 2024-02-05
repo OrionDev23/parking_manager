@@ -124,7 +124,7 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
             (d1.value.perimetre ?? 0).compareTo(d2.value.perimetre ?? 0);
       case 6:
         return (d1, d2) {
-          return coef * (d1.value.appartenanceNom ?? '').compareTo((d2.value.appartenanceNom ?? ''));
+          return coef * (d1.value.appartenance ?? '').compareTo((d2.value.appartenance ?? ''));
         };
 
       default:

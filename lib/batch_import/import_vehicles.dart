@@ -125,8 +125,8 @@ class _ImportVehiclesState extends State<ImportVehicles> {
         nom: nom,
         prenom: prenom,
         type: model,
-        filliateNom: filliale,
-        appartenanceNom: apartenance,
+        filliale: filliale,
+        appartenance: apartenance,
         wilaya: etrang ? null : wilaya,
         daira: etrang
             ? null

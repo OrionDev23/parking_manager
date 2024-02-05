@@ -8,6 +8,8 @@ part 'entreprise.g.dart';
 @JsonSerializable()
 class Entreprise extends Prestataire {
   String? logo;
+  List<String>? filiales;
+  List<String>? directions;
 
   Entreprise(
       {required super.id,
@@ -23,6 +25,8 @@ class Entreprise extends Prestataire {
       super.search,
       super.telephone,
       super.updatedAt,
+      this.directions,
+      this.filiales,
       this.logo});
 
   factory Entreprise.fromJson(Map<String, dynamic> json) =>

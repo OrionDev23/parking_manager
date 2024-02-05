@@ -8,6 +8,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:simple_tags/simple_tags.dart';
 
 import '../../providers/client_database.dart';
 import '../../serializables/entreprise.dart';
@@ -178,6 +179,9 @@ class MyEntrepriseState extends State<MyEntreprise> {
   bool uploading = false;
   double progress = 0;
 
+  List<String> directions=[];
+  List<String> filliales=[];
+
   Future<void> downloadLogo() async {
     downloadingLogo = true;
     if (mounted) {
@@ -256,6 +260,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
@@ -263,13 +268,14 @@ class MyEntrepriseState extends State<MyEntreprise> {
     return Container(
       color: appTheme.backGroundColor,
       child: Stack(
+        alignment: Alignment.center,
         children: [
-          Positioned.fill(
-            child: Column(
+          SizedBox(
+            width: 600.px,
+            child: ListView(
               children: [
                 SizedBox(
-                  height: 80.h,
-                  width: 40.w,
+                  height: 550.px,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -340,6 +346,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                           ),
                         ),
                       ),
+                      smallSpace,
                       Flexible(
                         flex: 2,
                         child: ZoneBox(
@@ -537,35 +544,107 @@ class MyEntrepriseState extends State<MyEntreprise> {
                           ),
                         ),
                       ),
+
                     ],
                   ),
                 ),
+                smallSpace,
+                ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: 20.px,maxHeight: 200.px),
+                  child: ZoneBox(
+                  label: 'fililales'.tr(),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: ListView(
+                      children: [
+                        TextBox(
+                          controller: nom,
+                          placeholder: 'fullname'.tr(),
+                          style: appTheme.writingStyle,
+                          placeholderStyle: placeStyle,
+                          cursorColor: appTheme.color.darker,
+                          decoration: BoxDecoration(
+                            color: appTheme.fillColor,
+                          ),
+                          onChanged: (s) {
+                            checkChanges();
+                          },
+                        ),
+                        smallSpace,
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: SimpleTags(
+                                content: filliales,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),),
+                ),
+                smallSpace,
+                ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: 20.px,maxHeight: 200.px),
+                  child: ZoneBox(
+                    label: 'directions'.tr(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: ListView(
+                        children: [
+                          TextBox(
+                            controller: nom,
+                            placeholder: 'directions'.tr(),
+                            style: appTheme.writingStyle,
+                            placeholderStyle: placeStyle,
+                            cursorColor: appTheme.color.darker,
+                            decoration: BoxDecoration(
+                              color: appTheme.fillColor,
+                            ),
+                            onChanged: (s) {
+                              checkChanges();
+                            },
+                          ),
+                          smallSpace,
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Flexible(
+                                child: SimpleTags(
+                                  content: directions,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),),
+                ),
                 bigSpace,
-                SizedBox(
-                  width: 40.w,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Button(
-                          onPressed:
-                              uploading || downloading ? null : downloadData,
-                          child: const Text('refresh').tr()),
-                      smallSpace,
-                      FilledButton(
-                          onPressed: uploading || downloading ? null : upload,
-                          child: uploading
-                              ? ProgressBar(
-                                  value: progress,
-                                )
-                              : const Text('save').tr()),
-                    ],
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Button(
+                        onPressed:
+                        uploading || downloading ? null : downloadData,
+                        child: const Text('refresh').tr()),
+                    smallSpace,
+                    FilledButton(
+                        onPressed: uploading || downloading ? null : upload,
+                        child: uploading
+                            ? ProgressBar(
+                          value: progress,
+                        )
+                            : const Text('save').tr()),
+                  ],
                 ),
               ],
             ),
           ),
           if (downloading)
-            Positioned(top: 40.h, left: 35.w, child: const ProgressBar()),
+            Positioned(top: 40.h, left: 35.w, child: const ProgressBar(strokeWidth: 10,)),
         ],
       ),
     );
@@ -629,6 +708,8 @@ class MyEntrepriseState extends State<MyEntreprise> {
       nif: nif.text,
       nis: nis.text,
       logo: logoid,
+      filiales: filliales,
+      directions: directions,
       description: descr.text,
       search: '${nom.text} ${nif.text} ${nis.text} ${rc.text} ${email.text} '
           '${telephone.text} ${adresse.text} ${descr.text} 1 $logoid ${art.text}',

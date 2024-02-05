@@ -20,6 +20,12 @@ Entreprise _$EntrepriseFromJson(Map<String, dynamic> json) => Entreprise(
       search: json['search'] as String?,
       telephone: json['telephone'] as String?,
       updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
+      directions: (json['directions'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
+      filiales: (json['filiales'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
       logo: json['logo'] as String?,
     );
 
@@ -36,4 +42,6 @@ Map<String, dynamic> _$EntrepriseToJson(Entreprise instance) =>
       'email': instance.email,
       'search': instance.search,
       'logo': instance.logo,
+      'filiales': instance.filiales,
+      'directions': instance.directions,
     };

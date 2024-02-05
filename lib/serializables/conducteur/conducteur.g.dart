@@ -13,9 +13,7 @@ Conducteur _$ConducteurFromJson(Map<String, dynamic> json) => Conducteur(
       vehicules: (json['vehicules'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
-      filliateNom: json['filliateNom'] as String?,
       filliale: json['filliale'] as String?,
-      directionNom: json['directionNom'] as String?,
       direction: json['direction'] as String?,
       etat: json['etat'] as int? ?? 0,
       etatactuel: json['etatactuel'] as String?,
@@ -25,6 +23,7 @@ Conducteur _$ConducteurFromJson(Map<String, dynamic> json) => Conducteur(
       updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
       adresse: json['adresse'] as String?,
       email: json['email'] as String?,
+      search: json['search'] as String?,
       dateNaissance: dateFromIntJson(json['dateNaissance'] as int?),
       telephone: json['telephone'] as String?,
     );
@@ -42,9 +41,7 @@ Map<String, dynamic> _$ConducteurToJson(Conducteur instance) =>
       'etatactuel': instance.etatactuel,
       'etat': instance.etat,
       'filliale': instance.filliale,
-      'filliateNom': instance.filliateNom,
       'direction': instance.direction,
-      'directionNom': instance.directionNom,
       'vehicules': instance.vehicules,
       'matricule': instance.matricule,
     };
