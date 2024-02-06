@@ -398,6 +398,14 @@
   "hors perimetre": "خارج النطاق",
   "industrie": "داخل النطاق",
   "echec": "فشل",
-  "fililales": "الشركات التابعة",
-  "directions": "الإدارات"
+  "fililales": "الفرعيات",
+  "directions": "الأقسام",
+  "writefiliale": "إضافة فرعية...",
+  "writedirection": "إضافة قسم...",
+  "fillialesempty": "لم تقم بإضافة أي شركات تابعة بعد",
+  "directionssempty": "لم تقم بإضافة أي أقسام بعد",
+  "filialeexploit": "الشركة التابعة التي تقوم بتشغيل السيارة",
+  "direction": "القسم",
+  "lourd?": "المركبة ثقيلة؟"
+
 }

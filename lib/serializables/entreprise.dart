@@ -8,8 +8,8 @@ part 'entreprise.g.dart';
 @JsonSerializable()
 class Entreprise extends Prestataire {
   String? logo;
-  List<String>? filiales;
-  List<String>? directions;
+  List<String>? filiales=[];
+  List<String>? directions=[];
 
   Entreprise(
       {required super.id,

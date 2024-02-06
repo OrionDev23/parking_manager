@@ -78,9 +78,9 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
         }
       case 6:
         if (sortedAsc) {
-          return Query.orderAsc('appartenanceNom');
+          return Query.orderAsc('appartenance');
         } else {
-          return Query.orderDesc('appartenanceNom');
+          return Query.orderDesc('appartenance');
         }
     }
     return Query.orderAsc('\$id');
@@ -121,7 +121,7 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
       case 5:
         return (d1, d2) =>
         coef *
-            (d1.value.perimetre ?? 0).compareTo(d2.value.perimetre ?? 0);
+            d1.value.perimetre .compareTo(d2.value.perimetre );
       case 6:
         return (d1, d2) {
           return coef * (d1.value.appartenance ?? '').compareTo((d2.value.appartenance ?? ''));

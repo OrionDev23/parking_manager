@@ -440,5 +440,12 @@
  "daysremain": "{days} jour(s) restants",
  "dayV": "{day} jours",
  "fililales": "Filiales",
- "directions": "Directions"
+ "directions": "Départements",
+ "writefiliale": "Ajouter une filiale...",
+ "writedirection": "Ajouter un département...",
+"fillialesempty": "Vous n'avez pas encore ajouté de filiales",
+ "directionssempty": "Vous n'avez pas encore ajouté de départements",
+ "filialeexploit": "Filiale qui exploite le véhicule",
+ "direction": "Département",
+ "lourd?": "Véhicule lourd ?"
 }

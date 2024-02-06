@@ -22,6 +22,7 @@ import '../vehicle/documents/document_form.dart';
 import '../vehicle/documents/document_tabs.dart';
 import '../vehicle/manager/vehicle_form.dart';
 import '../vehicle/manager/vehicle_tabs.dart';
+import 'charts/state_bars.dart';
 import 'costs/costs_graph.dart';
 import 'table_stats.dart';
 
@@ -365,6 +366,32 @@ class Dashboard extends StatelessWidget {
           filters: {'typemin': '0', 'typemax': '9'},
           statTable: true,
           numberOfRows: 5,
+        ),
+        onTap: () {
+          PanesListState.index.value = PaneItemsAndFooters.originalItems
+                  .indexOf(PaneItemsAndFooters.vehicles) +
+              1;
+        },
+      ),
+      TableStats(
+        title: 'vstates'.tr(),
+        icon: Icon(
+          FluentIcons.car,
+          color: appTheme.color.darker,
+        ),
+        content: StateBars(
+          labels: [
+            MapEntry(
+                'gstate', DatabaseCounters().countVehicles(etat: 0)),
+            MapEntry(
+                'bstate', DatabaseCounters().countVehicles(etat: 1)),
+            MapEntry(
+                'rstate', DatabaseCounters().countVehicles(etat: 2)),
+            MapEntry(
+                'ostate', DatabaseCounters().countVehicles(etat: 3)),
+            MapEntry(
+                'restate', DatabaseCounters().countVehicles(etat: 4)),
+          ],
         ),
         onTap: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems

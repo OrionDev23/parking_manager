@@ -23,6 +23,7 @@ class ZoneBox extends StatelessWidget {
     var appTheme = context.watch<AppTheme>();
     return SizedBox(
       width: width ?? double.infinity,
+      height: height??double.infinity,
       child: Stack(
         children: [
           Positioned.fill(

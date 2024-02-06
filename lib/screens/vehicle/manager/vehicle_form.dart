@@ -7,6 +7,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/screens/entreprise/entreprise.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -67,6 +68,12 @@ class _VehicleFormState extends State<VehicleForm>
 
   DateTime selectedDate = DateTime.now();
 
+  bool lourd = false;
+
+  TextEditingController selectedAppartenance =  TextEditingController();
+  TextEditingController selectedDirection = TextEditingController();
+  TextEditingController selectedFiliale = TextEditingController();
+
   @override
   void initState() {
     initValues();
@@ -114,7 +121,12 @@ class _VehicleFormState extends State<VehicleForm>
       poidsT.text = widget.vehicle!.poidsTotal?.toString() ?? '';
       charg.text = widget.vehicle!.charegeUtile?.toString() ?? '';
       matrPrec.text = widget.vehicle!.matriculePrec ?? '';
-      selectedDate = DateTime(widget.vehicle!.anneeUtil ?? DateTime.now().year);
+      selectedDate = widget.vehicle!.date ?? DateTime.now();
+      lourd=widget.vehicle!.lourd;
+      selectedFiliale.text=widget.vehicle!.filliale??'';
+      selectedAppartenance.text=widget.vehicle!.appartenance??'';
+      selectedDirection.text=widget.vehicle!.direction??'';
+      selectedAnnee=DateTime(widget.vehicle!.anneeUtil??DateTime.now().year);
     }
     documentID ??= ClientDatabase.ref
         .difference(DateTime.now())
@@ -149,7 +161,7 @@ class _VehicleFormState extends State<VehicleForm>
                                 decoration: BoxDecoration(
                                   border: Border.all(),
                                 ),
-                                width: 60.w,
+                                width: 500.px,
                                 child: Padding(
                                   padding: const EdgeInsets.all(5.0),
                                   child: StaggeredGrid.count(
@@ -160,1393 +172,7 @@ class _VehicleFormState extends State<VehicleForm>
                                               : 6,
                                       mainAxisSpacing: 0,
                                       crossAxisSpacing: 0,
-                                      children: [
-                                        StaggeredGridTile.fit(
-                                            crossAxisCellCount: 2,
-                                            child: Container(
-                                              height: heightFirst,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 10),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  const Text(
-                                                    'pays',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  CountryCodePicker(
-                                                    boxDecoration: BoxDecoration(
-                                                        color: appTheme
-                                                            .backGroundColor,
-                                                        boxShadow:
-                                                            kElevationToShadow[
-                                                                2]),
-                                                    padding:
-                                                        const EdgeInsets.all(3),
-                                                    searchDecoration: appTheme
-                                                        .inputDecoration,
-                                                    dialogSize:
-                                                        Size(40.w, 60.h),
-                                                    initialSelection: pays,
-                                                    showCountryOnly: true,
-                                                    showDropDownButton: true,
-                                                    showFlagDialog: true,
-                                                    showOnlyCountryWhenClosed:
-                                                        true,
-                                                    onChanged: (c) {
-                                                      setState(() {
-                                                        pays = c.code ?? 'DZ';
-                                                      });
-                                                    },
-                                                  ),
-                                                  const Text(
-                                                    'wilaya',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  SizedBox(
-                                                    height: 5.h,
-                                                    child:
-                                                        AutoSuggestBox<String>(
-                                                      controller: wilayaCont,
-                                                      placeholder:
-                                                          'wilaya'.tr(),
-                                                      placeholderStyle:
-                                                          placeStyle,
-                                                      cursorColor:
-                                                          appTheme.color.darker,
-                                                      style:
-                                                          appTheme.writingStyle,
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            appTheme.fillColor,
-                                                      ),
-                                                      items: AlgeriaList.dzair!
-                                                          .getWilayat()!
-                                                          .map((wilaya) {
-                                                        return AutoSuggestBoxItem<
-                                                            String>(
-                                                          value: wilaya!
-                                                              .getWilayaCode()!,
-                                                          label: wilaya.getWilayaName(appTheme
-                                                                      .locale!
-                                                                      .languageCode
-                                                                      .toUpperCase() ==
-                                                                  "AR"
-                                                              ? Language.AR
-                                                              : Language.FR)!,
-                                                        );
-                                                      }).toList(),
-                                                      onSelected: (item) {
-                                                        setState(() {
-                                                          wilaya = item.value!;
-                                                          wilayaCont
-                                                              .text = AlgeriaList
-                                                                  .dzair!
-                                                                  .searchWilayatByName(
-                                                                      item
-                                                                          .label,
-                                                                      appTheme.locale!.languageCode.toUpperCase() ==
-                                                                              "AR"
-                                                                          ? Language
-                                                                              .AR
-                                                                          : Language
-                                                                              .FR)
-                                                                  ?.first
-                                                                  ?.getWilayaName(
-                                                                      Language
-                                                                          .FR) ??
-                                                              '';
-                                                        });
-                                                      },
-                                                      onChanged: (s, r) {
-                                                        if (r ==
-                                                            TextChangedReason
-                                                                .userInput) {
-                                                          setState(() =>
-                                                              wilayaCont.text =
-                                                                  s);
-                                                        }
-                                                      },
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            )),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 2,
-                                          child: Container(
-                                            height: heightFirst,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            child: Container(
-                                              padding: EdgeInsets.zero,
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: appTheme.color,
-                                                ),
-                                              ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 8.0),
-                                                    child: const Text(
-                                                      'nummat',
-                                                      style: tstyle,
-                                                    ).tr(),
-                                                  ),
-                                                  if (!erreurMatricule)
-                                                    const Spacer(),
-                                                  if (erreurMatricule)
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      child: Text('erreurmat',
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .red))
-                                                          .tr(),
-                                                    ),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 5.0),
-                                                    child: autreMat
-                                                        ? TextBox(
-                                                            controller:
-                                                                matriculeEtr,
-                                                            maxLength: 30,
-                                                            cursorColor:
-                                                                appTheme.color
-                                                                    .darker,
-                                                            style: appTheme
-                                                                .writingStyle,
-                                                            placeholder:
-                                                                'XXXXXXXXXXXXXX',
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            placeholderStyle:
-                                                                placeStyle,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: appTheme
-                                                                  .fillColor,
-                                                            ),
-                                                            inputFormatters: <TextInputFormatter>[
-                                                              FilteringTextInputFormatter
-                                                                  .allow(RegExp(
-                                                                      "[0-9a-zA-Z.-]")),
-                                                            ],
-                                                          )
-                                                        : Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Flexible(
-                                                                flex: 6,
-                                                                child: TextBox(
-                                                                  controller:
-                                                                      matr1,
-                                                                  cursorColor:
-                                                                      appTheme
-                                                                          .color
-                                                                          .darker,
-                                                                  style: appTheme
-                                                                      .writingStyle,
-                                                                  placeholder:
-                                                                      '123456',
-                                                                  placeholderStyle:
-                                                                      placeStyle,
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: appTheme
-                                                                        .fillColor,
-                                                                  ),
-                                                                  maxLength: 6,
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  inputFormatters: [
-                                                                    FilteringTextInputFormatter
-                                                                        .digitsOnly
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                              smallSpace,
-                                                              const Text(
-                                                                '-',
-                                                                style: tstyle,
-                                                              ),
-                                                              smallSpace,
-                                                              Flexible(
-                                                                flex: 3,
-                                                                child: TextBox(
-                                                                  controller:
-                                                                      matr2,
-                                                                  cursorColor:
-                                                                      appTheme
-                                                                          .color
-                                                                          .darker,
-                                                                  style: appTheme
-                                                                      .writingStyle,
-                                                                  placeholder:
-                                                                      '123',
-                                                                  maxLength: 3,
-                                                                  placeholderStyle:
-                                                                      placeStyle,
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: appTheme
-                                                                        .fillColor,
-                                                                  ),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  inputFormatters: [
-                                                                    FilteringTextInputFormatter
-                                                                        .digitsOnly
-                                                                  ],
-                                                                  onChanged:
-                                                                      (s) {
-                                                                    updateOverMatricule(
-                                                                        appTheme);
-                                                                  },
-                                                                ),
-                                                              ),
-                                                              smallSpace,
-                                                              const Text(
-                                                                '-',
-                                                                style: tstyle,
-                                                              ),
-                                                              smallSpace,
-                                                              Flexible(
-                                                                flex: 2,
-                                                                child: TextBox(
-                                                                  controller:
-                                                                      matr3,
-                                                                  cursorColor:
-                                                                      appTheme
-                                                                          .color
-                                                                          .darker,
-                                                                  style: appTheme
-                                                                      .writingStyle,
-                                                                  placeholder:
-                                                                      '12',
-                                                                  maxLength: 2,
-                                                                  placeholderStyle:
-                                                                      placeStyle,
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    color: appTheme
-                                                                        .fillColor,
-                                                                  ),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  inputFormatters: [
-                                                                    FilteringTextInputFormatter
-                                                                        .digitsOnly
-                                                                  ],
-                                                                  onChanged:
-                                                                      (s) {
-                                                                    updateOverMatricule(
-                                                                        appTheme);
-                                                                  },
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                  ),
-                                                  const Spacer(),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.end,
-                                                    children: [
-                                                      Checkbox(
-                                                        checked: autreMat,
-                                                        content: Text(
-                                                          'autremat',
-                                                          style: placeStyle,
-                                                        ).tr(),
-                                                        onChanged: (s) {
-                                                          if (s != null) {
-                                                            setState(() {
-                                                              autreMat = s;
-                                                            });
-                                                          }
-                                                        },
-                                                      ),
-                                                      smallSpace,
-                                                    ],
-                                                  ),
-                                                  smallSpace,
-                                                  smallSpace,
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                            crossAxisCellCount: 2,
-                                            child: Container(
-                                              height: heightFirst,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 10),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  const Text(
-                                                    'daira',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  SizedBox(
-                                                    height: 5.h,
-                                                    child:
-                                                        AutoSuggestBox<String>(
-                                                      controller: dairaCont,
-                                                      placeholder: 'daira'.tr(),
-                                                      cursorColor:
-                                                          appTheme.color.darker,
-                                                      style:
-                                                          appTheme.writingStyle,
-                                                      placeholderStyle:
-                                                          placeStyle,
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            appTheme.fillColor,
-                                                      ),
-                                                      items: AlgeriaList()
-                                                          .getDairas(
-                                                              wilayaCont.text)
-                                                          .map((daira) {
-                                                        return AutoSuggestBoxItem<
-                                                            String>(
-                                                          value: daira
-                                                                  ?.getDairaName(
-                                                                      Language
-                                                                          .FR) ??
-                                                              '',
-                                                          label: daira?.getDairaName(appTheme
-                                                                          .locale
-                                                                          ?.languageCode
-                                                                          .toUpperCase() ==
-                                                                      "AR"
-                                                                  ? Language.AR
-                                                                  : Language
-                                                                      .FR) ??
-                                                              '',
-                                                        );
-                                                      }).toList(),
-                                                      onSelected: (item) {
-                                                        setState(() => dairaCont
-                                                                .text =
-                                                            item.value ?? "");
-                                                      },
-                                                      onChanged: (s, r) {
-                                                        if (r ==
-                                                            TextChangedReason
-                                                                .userInput) {
-                                                          setState(() =>
-                                                              dairaCont.text =
-                                                                  s);
-                                                        }
-                                                      },
-                                                    ),
-                                                  ),
-                                                  const Text(
-                                                    'commune',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  SizedBox(
-                                                    height: 5.h,
-                                                    child:
-                                                        AutoSuggestBox<String>(
-                                                      controller: communeCont,
-                                                      placeholder:
-                                                          'commune'.tr(),
-                                                      placeholderStyle:
-                                                          placeStyle,
-                                                      cursorColor:
-                                                          appTheme.color.darker,
-                                                      style:
-                                                          appTheme.writingStyle,
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            appTheme.fillColor,
-                                                      ),
-                                                      items: AlgeriaList()
-                                                          .getCommune(
-                                                              wilayaCont.text)
-                                                          .map((commune) {
-                                                        return AutoSuggestBoxItem<
-                                                            String>(
-                                                          value: commune == null
-                                                              ? ''
-                                                              : commune.getCommuneName(
-                                                                      Language
-                                                                          .FR) ??
-                                                                  '',
-                                                          label: commune == null
-                                                              ? ''
-                                                              : commune.getCommuneName(appTheme
-                                                                              .locale
-                                                                              ?.languageCode
-                                                                              .toUpperCase() ==
-                                                                          "AR"
-                                                                      ? Language
-                                                                          .AR
-                                                                      : Language
-                                                                          .FR) ??
-                                                                  '',
-                                                        );
-                                                      }).toList(),
-                                                      onSelected: (item) {
-                                                        setState(() =>
-                                                            communeCont.text =
-                                                                item.value ??
-                                                                    "");
-                                                      },
-                                                      onChanged: (s, r) {
-                                                        if (r ==
-                                                            TextChangedReason
-                                                                .userInput) {
-                                                          setState(() =>
-                                                              communeCont.text =
-                                                                  s);
-                                                        }
-                                                      },
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            )),
-                                        StaggeredGridTile.fit(
-                                            crossAxisCellCount: 2,
-                                            child: Container(
-                                              height: height,
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 10),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  const Text(
-                                                    'date',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  DatePicker(
-                                                    selected: selectedDate,
-                                                    onChanged: (s) {
-                                                      setState(() {
-                                                        selectedDate = s;
-                                                      });
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            )),
-                                        if (MediaQuery.of(context)
-                                                .orientation ==
-                                            Orientation.landscape)
-                                          StaggeredGridTile.fit(
-                                            crossAxisCellCount: 1,
-                                            child: SizedBox(
-                                              height: height,
-                                            ),
-                                          ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 1,
-                                          child: Container(
-                                            height: height,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                if (MediaQuery.of(context)
-                                                        .orientation ==
-                                                    Orientation.landscape)
-                                                  const SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                const Text(
-                                                  'quittance',
-                                                  style: tstyle,
-                                                ).tr(),
-                                                TextBox(
-                                                  controller: quittance,
-                                                  placeholder: 'quittance'.tr(),
-                                                  cursorColor:
-                                                      appTheme.color.darker,
-                                                  style: appTheme.writingStyle,
-                                                  placeholderStyle: placeStyle,
-                                                  decoration: BoxDecoration(
-                                                    color: appTheme.fillColor,
-                                                  ),
-                                                  inputFormatters: [
-                                                    FilteringTextInputFormatter
-                                                        .allow(RegExp(
-                                                            r'^(\d+)?\.?\d{0,2}'))
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 2,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            height: height,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                const Text(
-                                                  'num',
-                                                  style: tstyle,
-                                                ).tr(),
-                                                TextBox(
-                                                  controller: numero,
-                                                  placeholder: 'num'.tr(),
-                                                  maxLength: 30,
-                                                  placeholderStyle: placeStyle,
-                                                  cursorColor:
-                                                      appTheme.color.darker,
-                                                  style: appTheme.writingStyle,
-                                                  decoration: BoxDecoration(
-                                                    color: appTheme.fillColor,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 2,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            height: height,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                const Text(
-                                                  'nomf',
-                                                  style: tstyle,
-                                                ).tr(),
-                                                SizedBox(
-                                                    height: 5.h,
-                                                    child: TextBox(
-                                                      controller: lname,
-                                                      maxLength: 30,
-                                                      placeholder: 'nomf'.tr(),
-                                                      placeholderStyle:
-                                                          placeStyle,
-                                                      cursorColor:
-                                                          appTheme.color.darker,
-                                                      style:
-                                                          appTheme.writingStyle,
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            appTheme.fillColor,
-                                                      ),
-                                                    )),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 2,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            height: height,
-                                            child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  const Text(
-                                                    'prenom',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  SizedBox(
-                                                      height: 5.h,
-                                                      child: TextBox(
-                                                        controller: fname,
-                                                        maxLength: 30,
-                                                        placeholder:
-                                                            'prenom'.tr(),
-                                                        placeholderStyle:
-                                                            placeStyle,
-                                                        cursorColor: appTheme
-                                                            .color.darker,
-                                                        style: appTheme
-                                                            .writingStyle,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color: appTheme
-                                                              .fillColor,
-                                                        ),
-                                                      )),
-                                                ]),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 2,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            height: height,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                const Text(
-                                                  'profession',
-                                                  style: tstyle,
-                                                ).tr(),
-                                                SizedBox(
-                                                    height: 5.h,
-                                                    child: TextBox(
-                                                      controller: profession,
-                                                      maxLength: 40,
-                                                      placeholder:
-                                                          'profession'.tr(),
-                                                      placeholderStyle:
-                                                          placeStyle,
-                                                      cursorColor:
-                                                          appTheme.color.darker,
-                                                      style:
-                                                          appTheme.writingStyle,
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            appTheme.fillColor,
-                                                      ),
-                                                    )),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 4,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            height: height,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                const Text(
-                                                  'adresse',
-                                                  style: tstyle,
-                                                ).tr(),
-                                                SizedBox(
-                                                    height: 5.h,
-                                                    child: TextBox(
-                                                      controller: adresse,
-                                                      placeholder:
-                                                          'adresse'.tr(),
-                                                      maxLength: 100,
-                                                      placeholderStyle:
-                                                          placeStyle,
-                                                      cursorColor:
-                                                          appTheme.color.darker,
-                                                      style:
-                                                          appTheme.writingStyle,
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            appTheme.fillColor,
-                                                      ),
-                                                    )),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        if (MediaQuery.of(context)
-                                                .orientation ==
-                                            Orientation.landscape)
-                                          StaggeredGridTile.fit(
-                                            crossAxisCellCount: 2,
-                                            child: SizedBox(
-                                              height: height,
-                                            ),
-                                          ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 1,
-                                          child: Container(
-                                            height: height,
-                                            padding: EdgeInsets.zero,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: appTheme.color,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5.0),
-                                              child: Column(
-                                                children: [
-                                                  const Text(
-                                                    'genre',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  Flexible(
-                                                    child: ListTile(
-                                                      title: AutoSizeText(
-                                                        (VehiclesUtilities
-                                                                        .genres![
-                                                                    genre ??
-                                                                        -1] ??
-                                                                'nonind')
-                                                            .tr(),
-                                                        minFontSize: 5,
-                                                        softWrap: true,
-                                                        maxLines: 1,
-                                                      ),
-                                                      onPressed: () {
-                                                        SelectDialog.showModal<
-                                                            int>(
-                                                          context,
-                                                          selectedValue: genre,
-                                                          backgroundColor: appTheme
-                                                              .backGroundColor,
-                                                          items:
-                                                              VehiclesUtilities
-                                                                  .genres!.keys
-                                                                  .toList(),
-                                                          itemBuilder:
-                                                              (c, v, e) {
-                                                            return Container(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(5.0),
-                                                              color: v % 2 == 0
-                                                                  ? Colors
-                                                                      .transparent
-                                                                  : appTheme
-                                                                      .color
-                                                                      .lightest,
-                                                              child: Row(
-                                                                children: [
-                                                                  Text(v
-                                                                      .toString()),
-                                                                  smallSpace,
-                                                                  smallSpace,
-                                                                  smallSpace,
-                                                                  Text(VehiclesUtilities
-                                                                              .genres?[v] ??
-                                                                          '')
-                                                                      .tr(),
-                                                                ],
-                                                              ),
-                                                            );
-                                                          },
-                                                          onChange: (s) {
-                                                            setState(() {
-                                                              genre = s;
-                                                            });
-                                                          },
-                                                          onFind:
-                                                              VehiclesUtilities
-                                                                  .findGenres,
-                                                          emptyBuilder: (s) {
-                                                            return Center(
-                                                              child: Text(
-                                                                'lvide',
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                            .grey[
-                                                                        100]),
-                                                              ).tr(),
-                                                            );
-                                                          },
-                                                          loadingBuilder: (s) {
-                                                            return Center(
-                                                              child: Text(
-                                                                      'telechargement',
-                                                                      style: TextStyle(
-                                                                          color:
-                                                                              Colors.grey[100]))
-                                                                  .tr(),
-                                                            );
-                                                          },
-                                                          searchBoxDecoration:
-                                                              appTheme
-                                                                  .inputDecoration
-                                                                  .copyWith(
-                                                            labelText:
-                                                                'search'.tr(),
-                                                            labelStyle:
-                                                                placeStyle,
-                                                          ),
-                                                          searchTextStyle:
-                                                              appTheme
-                                                                  .writingStyle,
-                                                          searchCursorColor:
-                                                              appTheme.color,
-                                                        );
-                                                      },
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 1,
-                                          child: Container(
-                                            height: height,
-                                            padding: EdgeInsets.zero,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: appTheme.color,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5.0),
-                                              child: Column(
-                                                children: [
-                                                  const Text(
-                                                    'marque',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  Flexible(
-                                                    child: ListTile(
-                                                      leading: Image.asset(
-                                                        'assets/images/marques/${marque == null || marque! <= 0 ? 'default' : marque!}.webp',
-                                                        width: 4.h,
-                                                        height: 4.h,
-                                                      ),
-                                                      title: AutoSizeText(
-                                                        VehiclesUtilities
-                                                                .marques![marque ==
-                                                                        null ||
-                                                                    marque! <= 0
-                                                                ? 0
-                                                                : marque!] ??
-                                                            'nonind'.tr(),
-                                                        minFontSize: 5,
-                                                        maxLines: 1,
-                                                      ),
-                                                      onPressed: () {
-                                                        SelectDialog.showModal<
-                                                            int?>(
-                                                          context,
-                                                          selectedValue: marque,
-                                                          backgroundColor: appTheme
-                                                              .backGroundColor,
-                                                          gridView: true,
-                                                          numberOfGridCross: 3,
-                                                          constraints:
-                                                              BoxConstraints
-                                                                  .loose(Size(
-                                                                      60.w,
-                                                                      70.h)),
-                                                          items:
-                                                              VehiclesUtilities
-                                                                  .marques!.keys
-                                                                  .toList(),
-                                                          itemBuilder:
-                                                              (c, v, e) {
-                                                            return Card(
-                                                                child: Image.asset(
-                                                                    'assets/images/marques/${v ?? 'default'}.webp'));
-                                                          },
-                                                          onChange: (s) {
-                                                            setState(() {
-                                                              marque = s;
-                                                            });
-                                                          },
-                                                          onFind:
-                                                              VehiclesUtilities
-                                                                  .findMarque,
-                                                          emptyBuilder: (s) {
-                                                            return Center(
-                                                              child: Text(
-                                                                'lvide',
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                            .grey[
-                                                                        100]),
-                                                              ).tr(),
-                                                            );
-                                                          },
-                                                          loadingBuilder: (s) {
-                                                            return Center(
-                                                              child: Text(
-                                                                      'telechargement',
-                                                                      style: TextStyle(
-                                                                          color:
-                                                                              Colors.grey[100]))
-                                                                  .tr(),
-                                                            );
-                                                          },
-                                                          searchBoxDecoration:
-                                                              appTheme
-                                                                  .inputDecoration
-                                                                  .copyWith(
-                                                            labelText:
-                                                                'search'.tr(),
-                                                            labelStyle:
-                                                                placeStyle,
-                                                          ),
-                                                          searchTextStyle:
-                                                              appTheme
-                                                                  .writingStyle,
-                                                          searchCursorColor:
-                                                              appTheme.color,
-                                                        );
-                                                      },
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 1,
-                                          child: Container(
-                                            height: height,
-                                            padding: EdgeInsets.zero,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: appTheme.color,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5.0),
-                                              child: Column(
-                                                children: [
-                                                  const Text(
-                                                    'type',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  TextBox(
-                                                    controller: type,
-                                                    placeholder: 'type'.tr(),
-                                                    maxLength: 30,
-                                                    placeholderStyle:
-                                                        placeStyle,
-                                                    cursorColor:
-                                                        appTheme.color.darker,
-                                                    style:
-                                                        appTheme.writingStyle,
-                                                    decoration: BoxDecoration(
-                                                      color: appTheme.fillColor,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 3,
-                                          child: Container(
-                                            height: height,
-                                            padding: EdgeInsets.zero,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: appTheme.color,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5.0),
-                                              child: Column(
-                                                children: [
-                                                  const Text(
-                                                    'nchassi',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  TextBox(
-                                                    controller: numSer,
-                                                    maxLength: 30,
-                                                    placeholder: 'nchassi'.tr(),
-                                                    placeholderStyle:
-                                                        placeStyle,
-                                                    cursorColor:
-                                                        appTheme.color.darker,
-                                                    style:
-                                                        appTheme.writingStyle,
-                                                    decoration: BoxDecoration(
-                                                      color: appTheme.fillColor,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 1,
-                                          child: Container(
-                                            height: height,
-                                            padding: EdgeInsets.zero,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: appTheme.color,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5.0),
-                                              child: Column(
-                                                children: [
-                                                  const Text(
-                                                    'caross',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  TextBox(
-                                                    controller: caross,
-                                                    maxLength: 30,
-                                                    placeholder: 'caross'.tr(),
-                                                    placeholderStyle:
-                                                        placeStyle,
-                                                    cursorColor:
-                                                        appTheme.color.darker,
-                                                    style:
-                                                        appTheme.writingStyle,
-                                                    decoration: BoxDecoration(
-                                                      color: appTheme.fillColor,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 1,
-                                          child: Container(
-                                            height: height,
-                                            padding: EdgeInsets.zero,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: appTheme.color,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5.0),
-                                              child: Column(
-                                                children: [
-                                                  const Text(
-                                                    'energie',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  TextBox(
-                                                    controller: energie,
-                                                    maxLength: 20,
-                                                    placeholder: 'energie'.tr(),
-                                                    placeholderStyle:
-                                                        placeStyle,
-                                                    cursorColor:
-                                                        appTheme.color.darker,
-                                                    style:
-                                                        appTheme.writingStyle,
-                                                    decoration: BoxDecoration(
-                                                      color: appTheme.fillColor,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 1,
-                                          child: Container(
-                                            height: height,
-                                            padding: EdgeInsets.zero,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: appTheme.color,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5.0),
-                                              child: Column(
-                                                children: [
-                                                  const Text(
-                                                    'puissance',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  TextBox(
-                                                    placeholder: '0000',
-                                                    controller: puissance,
-                                                    maxLength: 4,
-                                                    placeholderStyle:
-                                                        placeStyle,
-                                                    cursorColor:
-                                                        appTheme.color.darker,
-                                                    style:
-                                                        appTheme.writingStyle,
-                                                    decoration: BoxDecoration(
-                                                      color: appTheme.fillColor,
-                                                    ),
-                                                    inputFormatters: [
-                                                      FilteringTextInputFormatter
-                                                          .digitsOnly
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 1,
-                                          child: Container(
-                                            height: height,
-                                            padding: EdgeInsets.zero,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: appTheme.color,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5.0),
-                                              child: Column(
-                                                children: [
-                                                  const Text(
-                                                    'placeassise',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  TextBox(
-                                                    placeholder: '000',
-                                                    controller: places,
-                                                    maxLength: 3,
-                                                    placeholderStyle:
-                                                        placeStyle,
-                                                    cursorColor:
-                                                        appTheme.color.darker,
-                                                    style:
-                                                        appTheme.writingStyle,
-                                                    decoration: BoxDecoration(
-                                                      color: appTheme.fillColor,
-                                                    ),
-                                                    inputFormatters: [
-                                                      FilteringTextInputFormatter
-                                                          .digitsOnly
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 1,
-                                          child: Container(
-                                            height: height,
-                                            padding: EdgeInsets.zero,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: appTheme.color,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5.0),
-                                              child: Column(
-                                                children: [
-                                                  const Text(
-                                                    'poidstotal',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  TextBox(
-                                                    placeholder: '000000',
-                                                    controller: poidsT,
-                                                    maxLength: 15,
-                                                    inputFormatters: [
-                                                      FilteringTextInputFormatter
-                                                          .digitsOnly
-                                                    ],
-                                                    placeholderStyle:
-                                                        placeStyle,
-                                                    cursorColor:
-                                                        appTheme.color.darker,
-                                                    style:
-                                                        appTheme.writingStyle,
-                                                    decoration: BoxDecoration(
-                                                      color: appTheme.fillColor,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 1,
-                                          child: Container(
-                                            height: height,
-                                            padding: EdgeInsets.zero,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: appTheme.color,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5.0),
-                                              child: Column(
-                                                children: [
-                                                  const Text(
-                                                    'chargeutil',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  TextBox(
-                                                    placeholder: '000000',
-                                                    controller: charg,
-                                                    maxLength: 15,
-                                                    inputFormatters: [
-                                                      FilteringTextInputFormatter
-                                                          .digitsOnly
-                                                    ],
-                                                    placeholderStyle:
-                                                        placeStyle,
-                                                    cursorColor:
-                                                        appTheme.color.darker,
-                                                    style:
-                                                        appTheme.writingStyle,
-                                                    decoration: BoxDecoration(
-                                                      color: appTheme.fillColor,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 4,
-                                          child: Container(
-                                            height: height,
-                                            padding: EdgeInsets.zero,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: appTheme.color,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5.0),
-                                              child: Column(
-                                                children: [
-                                                  const Text(
-                                                    'precmat',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  Flexible(
-                                                      child: TextBox(
-                                                    controller: matrPrec,
-                                                    maxLength: 30,
-                                                    placeholder: 'precmat'.tr(),
-                                                    placeholderStyle:
-                                                        placeStyle,
-                                                    cursorColor:
-                                                        appTheme.color.darker,
-                                                    style:
-                                                        appTheme.writingStyle,
-                                                    decoration: BoxDecoration(
-                                                      color: appTheme.fillColor,
-                                                    ),
-                                                    inputFormatters: <TextInputFormatter>[
-                                                      FilteringTextInputFormatter
-                                                          .allow(RegExp(
-                                                              "[0-9a-zA-Z.-]")),
-                                                    ],
-                                                  )),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        StaggeredGridTile.fit(
-                                          crossAxisCellCount: 2,
-                                          child: Container(
-                                            height: height,
-                                            padding: EdgeInsets.zero,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: appTheme.color,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 5.0),
-                                              child: Column(
-                                                children: [
-                                                  const Text(
-                                                    'anneeutil',
-                                                    style: tstyle,
-                                                  ).tr(),
-                                                  Flexible(
-                                                      child: DatePicker(
-                                                    showDay: false,
-                                                    showMonth: false,
-                                                    selected: selectedAnnee,
-                                                    onChanged: (s) {
-                                                      setState(() {
-                                                        selectedAnnee = s;
-                                                      });
-                                                    },
-                                                  )),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ]),
+                                      children: gridChildren(appTheme)),
                                 ),
                               )),
                         ],
@@ -1573,6 +199,1260 @@ class _VehicleFormState extends State<VehicleForm>
             ],
           ),
         ));
+  }
+
+  List<Widget> gridChildren(AppTheme appTheme) {
+    return [
+      ...firstLine(appTheme),
+      ...secondLine(appTheme),
+      ...thirdLine(appTheme),
+      ...forthLine(appTheme),
+      ...eightLine(appTheme),
+      ...fifthLine(appTheme),
+      ...sixthLine(appTheme),
+      ...seventhLine(appTheme),
+    ];
+  }
+
+  List<Widget> firstLine(AppTheme appTheme) {
+    return [
+      StaggeredGridTile.fit(
+          crossAxisCellCount: 2,
+          child: Container(
+            height: heightFirst,
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'pays',
+                  style: tstyle,
+                ).tr(),
+                CountryCodePicker(
+                  boxDecoration: BoxDecoration(
+                      color: appTheme.backGroundColor,
+                      boxShadow: kElevationToShadow[2]),
+                  padding: const EdgeInsets.all(3),
+                  searchDecoration: appTheme.inputDecoration,
+                  dialogSize: Size(40.w, 60.h),
+                  initialSelection: pays,
+                  showCountryOnly: true,
+                  showDropDownButton: true,
+                  showFlagDialog: true,
+                  showOnlyCountryWhenClosed: true,
+                  onChanged: (c) {
+                    setState(() {
+                      pays = c.code ?? 'DZ';
+                    });
+                  },
+                ),
+                const Text(
+                  'wilaya',
+                  style: tstyle,
+                ).tr(),
+                SizedBox(
+                  height: 5.h,
+                  child: AutoSuggestBox<String>(
+                    controller: wilayaCont,
+                    placeholder: 'wilaya'.tr(),
+                    placeholderStyle: placeStyle,
+                    cursorColor: appTheme.color.darker,
+                    style: appTheme.writingStyle,
+                    decoration: BoxDecoration(
+                      color: appTheme.fillColor,
+                    ),
+                    items: AlgeriaList.dzair!.getWilayat()!.map((wilaya) {
+                      return AutoSuggestBoxItem<String>(
+                        value: wilaya!.getWilayaCode()!,
+                        label: wilaya.getWilayaName(
+                            appTheme.locale!.languageCode.toUpperCase() == "AR"
+                                ? Language.AR
+                                : Language.FR)!,
+                      );
+                    }).toList(),
+                    onSelected: (item) {
+                      setState(() {
+                        wilaya = item.value!;
+                        wilayaCont.text = AlgeriaList.dzair!
+                                .searchWilayatByName(
+                                    item.label,
+                                    appTheme.locale!.languageCode
+                                                .toUpperCase() ==
+                                            "AR"
+                                        ? Language.AR
+                                        : Language.FR)
+                                ?.first
+                                ?.getWilayaName(Language.FR) ??
+                            '';
+                      });
+                    },
+                    onChanged: (s, r) {
+                      if (r == TextChangedReason.userInput) {
+                        setState(() => wilayaCont.text = s);
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          )),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 2,
+        child: Container(
+          height: heightFirst,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Container(
+            padding: EdgeInsets.zero,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: appTheme.color,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: const Text(
+                    'nummat',
+                    style: tstyle,
+                  ).tr(),
+                ),
+                if (!erreurMatricule) const Spacer(),
+                if (erreurMatricule)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child:
+                        Text('erreurmat', style: TextStyle(color: Colors.red))
+                            .tr(),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  child: autreMat
+                      ? TextBox(
+                          controller: matriculeEtr,
+                          maxLength: 30,
+                          cursorColor: appTheme.color.darker,
+                          style: appTheme.writingStyle,
+                          placeholder: 'XXXXXXXXXXXXXX',
+                          textAlign: TextAlign.center,
+                          placeholderStyle: placeStyle,
+                          decoration: BoxDecoration(
+                            color: appTheme.fillColor,
+                          ),
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.allow(
+                                RegExp("[0-9a-zA-Z.-]")),
+                          ],
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              flex: 6,
+                              child: TextBox(
+                                controller: matr1,
+                                cursorColor: appTheme.color.darker,
+                                style: appTheme.writingStyle,
+                                placeholder: '123456',
+                                placeholderStyle: placeStyle,
+                                decoration: BoxDecoration(
+                                  color: appTheme.fillColor,
+                                ),
+                                maxLength: 6,
+                                textAlign: TextAlign.center,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly
+                                ],
+                              ),
+                            ),
+                            smallSpace,
+                            const Text(
+                              '-',
+                              style: tstyle,
+                            ),
+                            smallSpace,
+                            Flexible(
+                              flex: 3,
+                              child: TextBox(
+                                controller: matr2,
+                                cursorColor: appTheme.color.darker,
+                                style: appTheme.writingStyle,
+                                placeholder: '123',
+                                maxLength: 3,
+                                placeholderStyle: placeStyle,
+                                decoration: BoxDecoration(
+                                  color: appTheme.fillColor,
+                                ),
+                                textAlign: TextAlign.center,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly
+                                ],
+                                onChanged: (s) {
+                                  updateOverMatricule(appTheme);
+                                },
+                              ),
+                            ),
+                            smallSpace,
+                            const Text(
+                              '-',
+                              style: tstyle,
+                            ),
+                            smallSpace,
+                            Flexible(
+                              flex: 2,
+                              child: TextBox(
+                                controller: matr3,
+                                cursorColor: appTheme.color.darker,
+                                style: appTheme.writingStyle,
+                                placeholder: '12',
+                                maxLength: 2,
+                                placeholderStyle: placeStyle,
+                                decoration: BoxDecoration(
+                                  color: appTheme.fillColor,
+                                ),
+                                textAlign: TextAlign.center,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly
+                                ],
+                                onChanged: (s) {
+                                  updateOverMatricule(appTheme);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+                const Spacer(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Checkbox(
+                      checked: autreMat,
+                      content: Text(
+                        'autremat',
+                        style: placeStyle,
+                      ).tr(),
+                      onChanged: (s) {
+                        if (s != null) {
+                          setState(() {
+                            autreMat = s;
+                          });
+                        }
+                      },
+                    ),
+                    smallSpace,
+                  ],
+                ),
+                smallSpace,
+                smallSpace,
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+          crossAxisCellCount: 2,
+          child: Container(
+            height: heightFirst,
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'daira',
+                  style: tstyle,
+                ).tr(),
+                SizedBox(
+                  height: 5.h,
+                  child: AutoSuggestBox<String>(
+                    controller: dairaCont,
+                    placeholder: 'daira'.tr(),
+                    cursorColor: appTheme.color.darker,
+                    style: appTheme.writingStyle,
+                    placeholderStyle: placeStyle,
+                    decoration: BoxDecoration(
+                      color: appTheme.fillColor,
+                    ),
+                    items:
+                        AlgeriaList().getDairas(wilayaCont.text).map((daira) {
+                      return AutoSuggestBoxItem<String>(
+                        value: daira?.getDairaName(Language.FR) ?? '',
+                        label: daira?.getDairaName(
+                                appTheme.locale?.languageCode.toUpperCase() ==
+                                        "AR"
+                                    ? Language.AR
+                                    : Language.FR) ??
+                            '',
+                      );
+                    }).toList(),
+                    onSelected: (item) {
+                      setState(() => dairaCont.text = item.value ?? "");
+                    },
+                    onChanged: (s, r) {
+                      if (r == TextChangedReason.userInput) {
+                        setState(() => dairaCont.text = s);
+                      }
+                    },
+                  ),
+                ),
+                const Text(
+                  'commune',
+                  style: tstyle,
+                ).tr(),
+                SizedBox(
+                  height: 5.h,
+                  child: AutoSuggestBox<String>(
+                    controller: communeCont,
+                    placeholder: 'commune'.tr(),
+                    placeholderStyle: placeStyle,
+                    cursorColor: appTheme.color.darker,
+                    style: appTheme.writingStyle,
+                    decoration: BoxDecoration(
+                      color: appTheme.fillColor,
+                    ),
+                    items: AlgeriaList()
+                        .getCommune(wilayaCont.text)
+                        .map((commune) {
+                      return AutoSuggestBoxItem<String>(
+                        value: commune == null
+                            ? ''
+                            : commune.getCommuneName(Language.FR) ?? '',
+                        label: commune == null
+                            ? ''
+                            : commune.getCommuneName(appTheme
+                                            .locale?.languageCode
+                                            .toUpperCase() ==
+                                        "AR"
+                                    ? Language.AR
+                                    : Language.FR) ??
+                                '',
+                      );
+                    }).toList(),
+                    onSelected: (item) {
+                      setState(() => communeCont.text = item.value ?? "");
+                    },
+                    onChanged: (s, r) {
+                      if (r == TextChangedReason.userInput) {
+                        setState(() => communeCont.text = s);
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          )),
+    ];
+  }
+
+  List<Widget> secondLine(AppTheme appTheme) {
+    return [
+      StaggeredGridTile.fit(
+          crossAxisCellCount: 2,
+          child: Container(
+            height: height,
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'date',
+                  style: tstyle,
+                ).tr(),
+                DatePicker(
+                  selected: selectedDate,
+                  onChanged: (s) {
+                    setState(() {
+                      selectedDate = s;
+                    });
+                  },
+                ),
+              ],
+            ),
+          )),
+      if (MediaQuery.of(context).orientation == Orientation.landscape)
+        StaggeredGridTile.fit(
+          crossAxisCellCount: 1,
+          child: SizedBox(
+            height: height,
+          ),
+        ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: Container(
+          height: height,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (MediaQuery.of(context).orientation == Orientation.landscape)
+                const SizedBox(
+                  height: 5,
+                ),
+              const Text(
+                'quittance',
+                style: tstyle,
+              ).tr(),
+              TextBox(
+                controller: quittance,
+                placeholder: 'quittance'.tr(),
+                cursorColor: appTheme.color.darker,
+                style: appTheme.writingStyle,
+                placeholderStyle: placeStyle,
+                decoration: BoxDecoration(
+                  color: appTheme.fillColor,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(
+                      RegExp(r'^(\d+)?\.?\d{0,2}'))
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 2,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          height: height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'num',
+                style: tstyle,
+              ).tr(),
+              TextBox(
+                controller: numero,
+                placeholder: 'num'.tr(),
+                maxLength: 30,
+                placeholderStyle: placeStyle,
+                cursorColor: appTheme.color.darker,
+                style: appTheme.writingStyle,
+                decoration: BoxDecoration(
+                  color: appTheme.fillColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> thirdLine(AppTheme appTheme) {
+    return [
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 2,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          height: height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'nomf',
+                style: tstyle,
+              ).tr(),
+              SizedBox(
+                  height: 5.h,
+                  child: TextBox(
+                    controller: lname,
+                    maxLength: 30,
+                    placeholder: 'nomf'.tr(),
+                    placeholderStyle: placeStyle,
+                    cursorColor: appTheme.color.darker,
+                    style: appTheme.writingStyle,
+                    decoration: BoxDecoration(
+                      color: appTheme.fillColor,
+                    ),
+                  )),
+            ],
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 2,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          height: height,
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'prenom',
+                  style: tstyle,
+                ).tr(),
+                SizedBox(
+                    height: 5.h,
+                    child: TextBox(
+                      controller: fname,
+                      maxLength: 30,
+                      placeholder: 'prenom'.tr(),
+                      placeholderStyle: placeStyle,
+                      cursorColor: appTheme.color.darker,
+                      style: appTheme.writingStyle,
+                      decoration: BoxDecoration(
+                        color: appTheme.fillColor,
+                      ),
+                    )),
+              ]),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 2,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          height: height,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'profession',
+                style: tstyle,
+              ).tr(),
+              SizedBox(
+                  height: 5.h,
+                  child: TextBox(
+                    controller: profession,
+                    maxLength: 40,
+                    placeholder: 'profession'.tr(),
+                    placeholderStyle: placeStyle,
+                    cursorColor: appTheme.color.darker,
+                    style: appTheme.writingStyle,
+                    decoration: BoxDecoration(
+                      color: appTheme.fillColor,
+                    ),
+                  )),
+            ],
+          ),
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> forthLine(AppTheme appTheme) {
+    return [
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 4,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          height: height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'adresse',
+                style: tstyle,
+              ).tr(),
+              SizedBox(
+                  height: 5.h,
+                  child: TextBox(
+                    controller: adresse,
+                    placeholder: 'adresse'.tr(),
+                    maxLength: 100,
+                    placeholderStyle: placeStyle,
+                    cursorColor: appTheme.color.darker,
+                    style: appTheme.writingStyle,
+                    decoration: BoxDecoration(
+                      color: appTheme.fillColor,
+                    ),
+                  )),
+            ],
+          ),
+        ),
+      ),
+      if (MediaQuery.of(context).orientation == Orientation.landscape)
+        StaggeredGridTile.fit(
+          crossAxisCellCount: 2,
+          child: SizedBox(
+            height: height,
+          ),
+        ),
+    ];
+  }
+
+  List<Widget> fifthLine(AppTheme appTheme) {
+    return [
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: appTheme.color,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text(
+                  'genre',
+                  style: tstyle,
+                ).tr(),
+                Flexible(
+                  child: ListTile(
+                    title: AutoSizeText(
+                      (VehiclesUtilities.genres![genre ?? -1] ?? 'nonind').tr(),
+                      minFontSize: 5,
+                      softWrap: true,
+                      maxLines: 1,
+                    ),
+                    onPressed: () {
+                      SelectDialog.showModal<int>(context,
+                          selectedValue: genre,
+                          backgroundColor: appTheme.backGroundColor,
+                          items: VehiclesUtilities.genres!.keys.toList(),
+                          itemBuilder: (c, v, e) {
+                            return Container(
+                              padding: const EdgeInsets.all(5.0),
+                              color: v % 2 == 0
+                                  ? Colors.transparent
+                                  : appTheme.color.lightest,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(v.toString()),
+                                  smallSpace,
+                                  smallSpace,
+                                  smallSpace,
+                                  Text(VehiclesUtilities.genres?[v] ?? '').tr(),
+                                ],
+                              ),
+                            );
+                          },
+                          onChange: (s) {
+                            setState(() {
+                              genre = s;
+                            });
+                          },
+                          onFind: VehiclesUtilities.findGenres,
+                          emptyBuilder: (s) {
+                            return Center(
+                              child: Text(
+                                'lvide',
+                                style: TextStyle(color: Colors.grey[100]),
+                              ).tr(),
+                            );
+                          },
+                          loadingBuilder: (s) {
+                            return Center(
+                              child: Text('telechargement',
+                                      style: TextStyle(color: Colors.grey[100]))
+                                  .tr(),
+                            );
+                          },
+                          searchBoxDecoration:
+                              appTheme.inputDecoration.copyWith(
+                            labelText: 'search'.tr(),
+                            labelStyle: placeStyle,
+                          ),
+                          searchTextStyle: appTheme.writingStyle,
+                          searchCursorColor: appTheme.color,
+                          constraints: BoxConstraints.loose(Size(
+                            400.px,
+                            400.px,
+                          )));
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: appTheme.color,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text(
+                  'marque',
+                  style: tstyle,
+                ).tr(),
+                Flexible(
+                  child: ListTile(
+                    leading: Image.asset(
+                      'assets/images/marques/${marque == null || marque! <= 0 ? 'default' : marque!}.webp',
+                      width: 4.h,
+                      height: 4.h,
+                    ),
+                    title: AutoSizeText(
+                      VehiclesUtilities.marques![
+                              marque == null || marque! <= 0 ? 0 : marque!] ??
+                          'nonind'.tr(),
+                      minFontSize: 5,
+                      maxLines: 1,
+                    ),
+                    onPressed: () {
+                      SelectDialog.showModal<int?>(
+                        context,
+                        selectedValue: marque,
+                        backgroundColor: appTheme.backGroundColor,
+                        gridView: true,
+                        numberOfGridCross: 3,
+                        constraints: BoxConstraints.loose(Size(60.w, 70.h)),
+                        items: VehiclesUtilities.marques!.keys.toList(),
+                        itemBuilder: (c, v, e) {
+                          return Card(
+                              child: Image.asset(
+                                  'assets/images/marques/${v ?? 'default'}.webp'));
+                        },
+                        onChange: (s) {
+                          setState(() {
+                            marque = s;
+                          });
+                        },
+                        onFind: VehiclesUtilities.findMarque,
+                        emptyBuilder: (s) {
+                          return Center(
+                            child: Text(
+                              'lvide',
+                              style: TextStyle(color: Colors.grey[100]),
+                            ).tr(),
+                          );
+                        },
+                        loadingBuilder: (s) {
+                          return Center(
+                            child: Text('telechargement',
+                                    style: TextStyle(color: Colors.grey[100]))
+                                .tr(),
+                          );
+                        },
+                        searchBoxDecoration: appTheme.inputDecoration.copyWith(
+                          labelText: 'search'.tr(),
+                          labelStyle: placeStyle,
+                        ),
+                        searchTextStyle: appTheme.writingStyle,
+                        searchCursorColor: appTheme.color,
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: appTheme.color,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text(
+                  'type',
+                  style: tstyle,
+                ).tr(),
+                TextBox(
+                  controller: type,
+                  placeholder: 'type'.tr(),
+                  maxLength: 30,
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: BoxDecoration(
+                    color: appTheme.fillColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 3,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: appTheme.color,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text(
+                  'nchassi',
+                  style: tstyle,
+                ).tr(),
+                TextBox(
+                  controller: numSer,
+                  maxLength: 30,
+                  placeholder: 'nchassi'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: BoxDecoration(
+                    color: appTheme.fillColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> sixthLine(AppTheme appTheme) {
+    return [
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: appTheme.color,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text(
+                  'caross',
+                  style: tstyle,
+                ).tr(),
+                TextBox(
+                  controller: caross,
+                  maxLength: 30,
+                  placeholder: 'caross'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: BoxDecoration(
+                    color: appTheme.fillColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: appTheme.color,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text(
+                  'energie',
+                  style: tstyle,
+                ).tr(),
+                TextBox(
+                  controller: energie,
+                  maxLength: 20,
+                  placeholder: 'energie'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: BoxDecoration(
+                    color: appTheme.fillColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: appTheme.color,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text(
+                  'puissance',
+                  style: tstyle,
+                ).tr(),
+                TextBox(
+                  placeholder: '0000',
+                  controller: puissance,
+                  maxLength: 4,
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: BoxDecoration(
+                    color: appTheme.fillColor,
+                  ),
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: appTheme.color,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text(
+                  'placeassise',
+                  style: tstyle,
+                ).tr(),
+                TextBox(
+                  placeholder: '000',
+                  controller: places,
+                  maxLength: 3,
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: BoxDecoration(
+                    color: appTheme.fillColor,
+                  ),
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: appTheme.color,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text(
+                  'poidstotal',
+                  style: tstyle,
+                ).tr(),
+                TextBox(
+                  placeholder: '000000',
+                  controller: poidsT,
+                  maxLength: 15,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: BoxDecoration(
+                    color: appTheme.fillColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: appTheme.color,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Row(
+              children: [
+                const Text(
+                  'lourd?',
+                  style: tstyle,
+                ).tr(),
+                const Spacer(),
+                Checkbox(
+                  checked: lourd,
+                  onChanged: (s) {
+                    setState(() {
+                      lourd = s ?? false;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
+
+  List<Widget> seventhLine(AppTheme appTheme) {
+    return [
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: appTheme.color,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text(
+                  'chargeutil',
+                  style: tstyle,
+                ).tr(),
+                TextBox(
+                  placeholder: '000000',
+                  controller: charg,
+                  maxLength: 15,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: BoxDecoration(
+                    color: appTheme.fillColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 3,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: appTheme.color,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text(
+                  'precmat',
+                  style: tstyle,
+                ).tr(),
+                TextBox(
+                  controller: matrPrec,
+                  maxLength: 30,
+                  placeholder: 'precmat'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: BoxDecoration(
+                    color: appTheme.fillColor,
+                  ),
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z.-]")),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: appTheme.color,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text(
+                  'anneeutil',
+                  style: tstyle,
+                ).tr(),
+                Flexible(
+                    child: DatePicker(
+                  showDay: false,
+                  showMonth: false,
+                  selected: selectedAnnee,
+                  onChanged: (s) {
+                    setState(() {
+                      selectedAnnee = s;
+                    });
+                  },
+                )),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
+
+
+  List<Widget> eightLine(AppTheme appTheme) {
+    return [
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: appTheme.color,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text(
+                  'appartenance',
+                  style: tstyle,
+                ).tr(),
+                AutoSuggestBox<String>(
+                  placeholder: 'appartenance'.tr(),
+                  placeholderStyle: placeStyle,
+
+                  controller: selectedAppartenance,
+                  items: List.generate(
+                      MyEntrepriseState.p!.filiales!.length,
+                      (index) => AutoSuggestBoxItem(
+                          value: MyEntrepriseState.p!.filiales![index],
+                          label: MyEntrepriseState.p!.filiales![index]
+                              .toUpperCase())),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: appTheme.color,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text(
+                  'filialeexploit',
+                  style: tstyle,
+                ).tr(),
+                AutoSuggestBox<String>(
+                  placeholder: 'filialeexploit'.tr(),
+                  placeholderStyle: placeStyle,
+                  controller: selectedFiliale,
+                  items: List.generate(
+                      MyEntrepriseState.p!.filiales!.length,
+                      (index) => AutoSuggestBoxItem(
+                          value: MyEntrepriseState.p!.filiales![index],
+                          label: MyEntrepriseState.p!.filiales![index]
+                              .toUpperCase())),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: appTheme.color,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                const Text(
+                  'direction',
+                  style: tstyle,
+                ).tr(),
+                AutoSuggestBox<String>(
+                  placeholder: 'direction'.tr(),
+                  placeholderStyle: placeStyle,
+                  controller:selectedDirection,
+                  items: List.generate(
+                      MyEntrepriseState.p!.directions!.length,
+                      (index) => AutoSuggestBoxItem(
+                          value: MyEntrepriseState.p!.directions![index],
+                          label: MyEntrepriseState.p!.directions![index]
+                              .toUpperCase())),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+
+    ];
   }
 
   void updateOverMatricule(AppTheme appTheme) {
@@ -1679,6 +1559,10 @@ class _VehicleFormState extends State<VehicleForm>
         carrosserie: caross.text,
         charegeUtile: int.tryParse(charg.text),
         createdBy: ClientDatabase.me.value?.id,
+        lourd: lourd,
+        direction: selectedDirection.text.toUpperCase(),
+        appartenance: selectedAppartenance.text.toUpperCase(),
+        filliale: selectedFiliale.text.toUpperCase(),
       );
       if (widget.vehicle != null) {
         await Future.wait([

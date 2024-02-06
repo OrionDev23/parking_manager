@@ -73,7 +73,7 @@ class VehicleTableState extends State<VehicleTable> {
     super.initState();
   }
 
-  int sortColumn = 4;
+  int sortColumn = 6;
 
   void initColumns() {
     columns = [

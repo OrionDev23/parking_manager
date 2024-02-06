@@ -8,8 +8,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:simple_tags/simple_tags.dart';
-
 import '../../providers/client_database.dart';
 import '../../serializables/entreprise.dart';
 import '../../theme.dart';
@@ -21,9 +19,7 @@ class MyEntreprise extends StatefulWidget {
   const MyEntreprise({super.key});
 
   @override
-  State<MyEntreprise> createState() => MyEntre
-
-  priseState();
+  State<MyEntreprise> createState() => MyEntrepriseState();
 }
 
 class MyEntrepriseState extends State<MyEntreprise> {
@@ -116,6 +112,8 @@ class MyEntrepriseState extends State<MyEntreprise> {
       email.text = p!.email ?? '';
       telephone.text = p!.telephone ?? '';
       adresse.text = p!.adresse;
+      directions=p!.directions??[];
+      filliales=p!.filiales??[];
     }
   }
 
@@ -129,7 +127,8 @@ class MyEntrepriseState extends State<MyEntreprise> {
           art.text == p!.art &&
           rc.text == p!.rc &&
           descr.text == p!.description &&
-          email.text == p!.email) {
+          email.text == p!.email && p!.filiales==filliales && p!
+          .directions==directions) {
         if (changes) {
           setState(() {
             changes = false;
@@ -181,8 +180,8 @@ class MyEntrepriseState extends State<MyEntreprise> {
   bool uploading = false;
   double progress = 0;
 
-  List<String> directions=[];
-  List<String> filliales=[];
+  List<String> directions = [];
+  List<String> filliales = [];
 
   Future<void> downloadLogo() async {
     downloadingLogo = true;
@@ -256,12 +255,11 @@ class MyEntrepriseState extends State<MyEntreprise> {
         logoExists = false;
       }
     }
-    checkingFile=false;
+    checkingFile = false;
     if (mounted) {
       setState(() {});
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -274,380 +272,541 @@ class MyEntrepriseState extends State<MyEntreprise> {
         children: [
           SizedBox(
             width: 600.px,
-            child: ListView(
+            height: 90.h,
+            child: Column(
               children: [
-                SizedBox(
-                  height: 550.px,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                Flexible(
+                  child: ListView(
+                    primary: false,
+                    physics: const ClampingScrollPhysics(),
+                    shrinkWrap: true,
                     children: [
-                      Flexible(
-                        flex: 4,
-                        child: ZoneBox(
-                          label: 'logo'.tr(),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 8.w,
-                                height: 8.w,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.rectangle,
-                                  color: appTheme.color.lighter,
-                                  boxShadow: kElevationToShadow[2],
-                                ),
-                                clipBehavior: Clip.antiAlias,
-                                child: imageFile != null
-                                        ? Image.memory(
-                                            imageFile!.readAsBytesSync(),
-                                            fit: BoxFit.fitWidth,
-                                          )
-                                        :
-                            kIsWeb
-                            ? MyEntrepriseState.logo != null
-                            ? Image.memory(MyEntrepriseState.logo!,
-                            fit: BoxFit.fitWidth)
-                        : Image.asset(
-                    'assets/images/logo.webp',
-                    fit: BoxFit.fitWidth,
-                  ):
-                            logoExists
-                                            ? Image.file(
-                                                io.File(logoid),
-                                                fit: BoxFit.fitWidth,
-                                              )
-                                            : Image.asset(
-                                                'assets/images/logo.webp',
-                                                fit: BoxFit.fitWidth,
-                                              ),
-                              ),
-                              smallSpace,
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                      icon: const Icon(FluentIcons.file_image),
-                                      onPressed: checkingFile ||
-                                              downloadingLogo ||
-                                              downloading ||
-                                              pickingFile
-                                          ? null
-                                          : pickImage),
-                                  smallSpace,
-                                  IconButton(
-                                      icon: const Icon(FluentIcons.refresh),
-                                      onPressed: checkingFile ||
-                                              downloadingLogo ||
-                                              downloading ||
-                                              pickingFile
-                                          ? null
-                                          : downloadLogo),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      smallSpace,
-                      Flexible(
-                        flex: 2,
-                        child: ZoneBox(
-                          label: 'fullname'.tr(),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: TextBox(
-                              controller: nom,
-                              placeholder: 'fullname'.tr(),
-                              style: appTheme.writingStyle,
-                              placeholderStyle: placeStyle,
-                              cursorColor: appTheme.color.darker,
-                              decoration: BoxDecoration(
-                                color: appTheme.fillColor,
-                              ),
-                              onChanged: (s) {
-                                checkChanges();
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      smallSpace,
-                      Flexible(
-                        flex: 2,
-                        child: ZoneBox(
-                          label: 'descr'.tr(),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: TextBox(
-                              controller: descr,
-                              placeholder: 'descr'.tr(),
-                              style: appTheme.writingStyle,
-                              placeholderStyle: placeStyle,
-                              cursorColor: appTheme.color.darker,
-                              decoration: BoxDecoration(
-                                color: appTheme.fillColor,
-                              ),
-                              onChanged: (s) {
-                                checkChanges();
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      smallSpace,
-                      Flexible(
-                        flex: 4,
-                        child: ZoneBox(
-                          label: 'contact'.tr(),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 250,
-                                      child: TextBox(
-                                        controller: email,
-                                        placeholder: 'email'.tr(),
-                                        style: appTheme.writingStyle,
-                                        placeholderStyle: placeStyle,
-                                        cursorColor: appTheme.color.darker,
-                                        decoration: BoxDecoration(
-                                          color: appTheme.fillColor,
-                                        ),
-                                        onChanged: (s) {
-                                          checkChanges();
-                                        },
-                                      ),
-                                    ),
-                                    smallSpace,
-                                    SizedBox(
-                                        width: 187,
-                                        child: TextBox(
-                                          controller: telephone,
-                                          placeholder: 'telephone'.tr(),
-                                          style: appTheme.writingStyle,
-                                          placeholderStyle: placeStyle,
-                                          cursorColor: appTheme.color.darker,
-                                          decoration: BoxDecoration(
-                                            color: appTheme.fillColor,
-                                          ),
-                                          onChanged: (s) {
-                                            checkChanges();
-                                          },
-                                        )),
-                                  ],
-                                ),
-                                smallSpace,
-                                Flexible(
-                                    child: TextBox(
-                                  controller: adresse,
-                                  placeholder: 'adresse'.tr(),
-                                  maxLines: 3,
-                                  style: appTheme.writingStyle,
-                                  placeholderStyle: placeStyle,
-                                  cursorColor: appTheme.color.darker,
-                                  decoration: BoxDecoration(
-                                    color: appTheme.fillColor,
-                                  ),
-                                  onChanged: (s) {
-                                    checkChanges();
-                                  },
-                                )),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      smallSpace,
-                      Flexible(
-                        flex: 3,
-                        child: ZoneBox(
-                          label: 'legalinfo'.tr(),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Flexible(
-                                  child: Row(
-                                    children: [
-                                      Flexible(
-                                          child: TextBox(
-                                        controller: nif,
-                                        placeholder: 'NIF',
-                                        style: appTheme.writingStyle,
-                                        placeholderStyle: placeStyle,
-                                        cursorColor: appTheme.color.darker,
-                                        decoration: BoxDecoration(
-                                          color: appTheme.fillColor,
-                                        ),
-                                        onChanged: (s) {
-                                          checkChanges();
-                                        },
-                                      )),
-                                      smallSpace,
-                                      Flexible(
-                                          child: TextBox(
-                                        controller: nis,
-                                        placeholder: 'NIS',
-                                        style: appTheme.writingStyle,
-                                        placeholderStyle: placeStyle,
-                                        cursorColor: appTheme.color.darker,
-                                        decoration: BoxDecoration(
-                                          color: appTheme.fillColor,
-                                        ),
-                                        onChanged: (s) {
-                                          checkChanges();
-                                        },
-                                      )),
-                                    ],
-                                  ),
-                                ),
-                                smallSpace,
-                                Flexible(
-                                  child: Row(
-                                    children: [
-                                      Flexible(
-                                          child: TextBox(
-                                        controller: rc,
-                                        placeholder: 'RC',
-                                        style: appTheme.writingStyle,
-                                        placeholderStyle: placeStyle,
-                                        cursorColor: appTheme.color.darker,
-                                        decoration: BoxDecoration(
-                                          color: appTheme.fillColor,
-                                        ),
-                                        onChanged: (s) {
-                                          checkChanges();
-                                        },
-                                      )),
-                                      smallSpace,
-                                      Flexible(
-                                          child: TextBox(
-                                        controller: art,
-                                        placeholder: 'ART',
-                                        style: appTheme.writingStyle,
-                                        placeholderStyle: placeStyle,
-                                        cursorColor: appTheme.color.darker,
-                                        decoration: BoxDecoration(
-                                          color: appTheme.fillColor,
-                                        ),
-                                        onChanged: (s) {
-                                          checkChanges();
-                                        },
-                                      )),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-
-                    ],
-                  ),
-                ),
-                smallSpace,
-                ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: 20.px,maxHeight: 200.px),
-                  child: ZoneBox(
-                  label: 'fililales'.tr(),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: ListView(
-                      children: [
-                        TextBox(
-                          controller: nom,
-                          placeholder: 'fullname'.tr(),
-                          style: appTheme.writingStyle,
-                          placeholderStyle: placeStyle,
-                          cursorColor: appTheme.color.darker,
-                          decoration: BoxDecoration(
-                            color: appTheme.fillColor,
-                          ),
-                          onChanged: (s) {
-                            checkChanges();
-                          },
-                        ),
-                        smallSpace,
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
+                      SizedBox(
+                        height: 550.px,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Flexible(
-                              child: SimpleTags(
-                                content: filliales,
+                              flex: 4,
+                              child: ZoneBox(
+                                label: 'logo'.tr(),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 8.w,
+                                      height: 8.w,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        color: appTheme.color.lighter,
+                                        boxShadow: kElevationToShadow[2],
+                                      ),
+                                      clipBehavior: Clip.antiAlias,
+                                      child: imageFile != null
+                                          ? Image.memory(
+                                              imageFile!.readAsBytesSync(),
+                                              fit: BoxFit.fitWidth,
+                                            )
+                                          : kIsWeb
+                                              ? MyEntrepriseState.logo != null
+                                                  ? Image.memory(
+                                                      MyEntrepriseState.logo!,
+                                                      fit: BoxFit.fitWidth)
+                                                  : Image.asset(
+                                                      'assets/images/logo.webp',
+                                                      fit: BoxFit.fitWidth,
+                                                    )
+                                              : logoExists
+                                                  ? Image.file(
+                                                      io.File(logoid),
+                                                      fit: BoxFit.fitWidth,
+                                                    )
+                                                  : Image.asset(
+                                                      'assets/images/logo.webp',
+                                                      fit: BoxFit.fitWidth,
+                                                    ),
+                                    ),
+                                    smallSpace,
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        IconButton(
+                                            icon: const Icon(
+                                                FluentIcons.file_image),
+                                            onPressed: checkingFile ||
+                                                    downloadingLogo ||
+                                                    downloading ||
+                                                    pickingFile
+                                                ? null
+                                                : pickImage),
+                                        smallSpace,
+                                        IconButton(
+                                            icon:
+                                                const Icon(FluentIcons.refresh),
+                                            onPressed: checkingFile ||
+                                                    downloadingLogo ||
+                                                    downloading ||
+                                                    pickingFile
+                                                ? null
+                                                : downloadLogo),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            smallSpace,
+                            Flexible(
+                              flex: 2,
+                              child: ZoneBox(
+                                label: 'fullname'.tr(),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: TextBox(
+                                    controller: nom,
+                                    placeholder: 'fullname'.tr(),
+                                    style: appTheme.writingStyle,
+                                    placeholderStyle: placeStyle,
+                                    cursorColor: appTheme.color.darker,
+                                    decoration: BoxDecoration(
+                                      color: appTheme.fillColor,
+                                    ),
+                                    onChanged: (s) {
+                                      checkChanges();
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                            smallSpace,
+                            Flexible(
+                              flex: 2,
+                              child: ZoneBox(
+                                label: 'descr'.tr(),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: TextBox(
+                                    controller: descr,
+                                    placeholder: 'descr'.tr(),
+                                    style: appTheme.writingStyle,
+                                    placeholderStyle: placeStyle,
+                                    cursorColor: appTheme.color.darker,
+                                    decoration: BoxDecoration(
+                                      color: appTheme.fillColor,
+                                    ),
+                                    onChanged: (s) {
+                                      checkChanges();
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                            smallSpace,
+                            Flexible(
+                              flex: 4,
+                              child: ZoneBox(
+                                label: 'contact'.tr(),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 250,
+                                            child: TextBox(
+                                              controller: email,
+                                              placeholder: 'email'.tr(),
+                                              style: appTheme.writingStyle,
+                                              placeholderStyle: placeStyle,
+                                              cursorColor:
+                                                  appTheme.color.darker,
+                                              decoration: BoxDecoration(
+                                                color: appTheme.fillColor,
+                                              ),
+                                              onChanged: (s) {
+                                                checkChanges();
+                                              },
+                                            ),
+                                          ),
+                                          smallSpace,
+                                          SizedBox(
+                                              width: 187,
+                                              child: TextBox(
+                                                controller: telephone,
+                                                placeholder: 'telephone'.tr(),
+                                                style: appTheme.writingStyle,
+                                                placeholderStyle: placeStyle,
+                                                cursorColor:
+                                                    appTheme.color.darker,
+                                                decoration: BoxDecoration(
+                                                  color: appTheme.fillColor,
+                                                ),
+                                                onChanged: (s) {
+                                                  checkChanges();
+                                                },
+                                              )),
+                                        ],
+                                      ),
+                                      smallSpace,
+                                      Flexible(
+                                          child: TextBox(
+                                        controller: adresse,
+                                        placeholder: 'adresse'.tr(),
+                                        maxLines: 3,
+                                        style: appTheme.writingStyle,
+                                        placeholderStyle: placeStyle,
+                                        cursorColor: appTheme.color.darker,
+                                        decoration: BoxDecoration(
+                                          color: appTheme.fillColor,
+                                        ),
+                                        onChanged: (s) {
+                                          checkChanges();
+                                        },
+                                      )),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            smallSpace,
+                            Flexible(
+                              flex: 3,
+                              child: ZoneBox(
+                                label: 'legalinfo'.tr(),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Flexible(
+                                        child: Row(
+                                          children: [
+                                            Flexible(
+                                                child: TextBox(
+                                              controller: nif,
+                                              placeholder: 'NIF',
+                                              style: appTheme.writingStyle,
+                                              placeholderStyle: placeStyle,
+                                              cursorColor:
+                                                  appTheme.color.darker,
+                                              decoration: BoxDecoration(
+                                                color: appTheme.fillColor,
+                                              ),
+                                              onChanged: (s) {
+                                                checkChanges();
+                                              },
+                                            )),
+                                            smallSpace,
+                                            Flexible(
+                                                child: TextBox(
+                                              controller: nis,
+                                              placeholder: 'NIS',
+                                              style: appTheme.writingStyle,
+                                              placeholderStyle: placeStyle,
+                                              cursorColor:
+                                                  appTheme.color.darker,
+                                              decoration: BoxDecoration(
+                                                color: appTheme.fillColor,
+                                              ),
+                                              onChanged: (s) {
+                                                checkChanges();
+                                              },
+                                            )),
+                                          ],
+                                        ),
+                                      ),
+                                      smallSpace,
+                                      Flexible(
+                                        child: Row(
+                                          children: [
+                                            Flexible(
+                                                child: TextBox(
+                                              controller: rc,
+                                              placeholder: 'RC',
+                                              style: appTheme.writingStyle,
+                                              placeholderStyle: placeStyle,
+                                              cursorColor:
+                                                  appTheme.color.darker,
+                                              decoration: BoxDecoration(
+                                                color: appTheme.fillColor,
+                                              ),
+                                              onChanged: (s) {
+                                                checkChanges();
+                                              },
+                                            )),
+                                            smallSpace,
+                                            Flexible(
+                                                child: TextBox(
+                                              controller: art,
+                                              placeholder: 'ART',
+                                              style: appTheme.writingStyle,
+                                              placeholderStyle: placeStyle,
+                                              cursorColor:
+                                                  appTheme.color.darker,
+                                              decoration: BoxDecoration(
+                                                color: appTheme.fillColor,
+                                              ),
+                                              onChanged: (s) {
+                                                checkChanges();
+                                              },
+                                            )),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),),
+                      ),
+                      smallSpace,
+                      fillialeWidget(appTheme),
+                      smallSpace,
+                      directionsWidget(appTheme),
+                    ],
+                  ),
                 ),
                 smallSpace,
-                ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: 20.px,maxHeight: 200.px),
-                  child: ZoneBox(
-                    label: 'directions'.tr(),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: ListView(
-                        children: [
-                          TextBox(
-                            controller: nom,
-                            placeholder: 'directions'.tr(),
-                            style: appTheme.writingStyle,
-                            placeholderStyle: placeStyle,
-                            cursorColor: appTheme.color.darker,
-                            decoration: BoxDecoration(
-                              color: appTheme.fillColor,
-                            ),
-                            onChanged: (s) {
-                              checkChanges();
-                            },
-                          ),
-                          smallSpace,
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Flexible(
-                                child: SimpleTags(
-                                  content: directions,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),),
-                ),
-                bigSpace,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Button(
-                        onPressed:
-                        uploading || downloading ? null : downloadData,
-                        child: const Text('refresh').tr()),
-                    smallSpace,
-                    FilledButton(
-                        onPressed: uploading || downloading ? null : upload,
-                        child: uploading
-                            ? ProgressBar(
-                          value: progress,
-                        )
-                            : const Text('save').tr()),
-                  ],
+                SizedBox(
+                  height: 60.px,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Button(
+                          onPressed:
+                              uploading || downloading ? null : downloadData,
+                          child: const Text('refresh').tr()),
+                      smallSpace,
+                      FilledButton(
+                          onPressed: uploading || downloading ? null : upload,
+                          child: uploading
+                              ? ProgressBar(
+                                  value: progress,
+                                )
+                              : const Text('save').tr()),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
           if (downloading)
-            Positioned(top: 40.h, left: 35.w, child: const ProgressBar(strokeWidth: 10,)),
+            Positioned(
+                top: 40.h,
+                left: 35.w,
+                child: const ProgressBar(
+                  strokeWidth: 10,
+                )),
         ],
+      ),
+    );
+  }
+
+  TextEditingController fillialeToAdd = TextEditingController();
+  TextEditingController directionToAdd = TextEditingController();
+
+  Widget fillialeWidget(AppTheme appTheme) {
+    return SizedBox(
+      height: filliales.isEmpty?100.px:filliales.length * 40.px + 80.px,
+      child: ZoneBox(
+        label: 'fililales'.tr(),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: 35.px,
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 4,
+                      child: TextBox(
+                        controller: fillialeToAdd,
+                        placeholder: 'writefiliale'.tr(),
+                        style: appTheme.writingStyle,
+                        placeholderStyle: placeStyle,
+                        cursorColor: appTheme.color.darker,
+                        decoration: BoxDecoration(
+                          color: appTheme.fillColor,
+                        ),
+                        onChanged: (s) {
+                          setState(() {});
+                        },
+                        onSubmitted: (s) {
+                          if (s.isNotEmpty) {
+                            filliales.add(s.trim());
+                            setState(() {
+                              fillialeToAdd.clear();
+                            });
+                          }
+                          checkChanges();
+                        },
+                      ),
+                    ),
+                    smallSpace,
+                    FilledButton(
+                        onPressed: fillialeToAdd.text.trim().isEmpty
+                            ? null
+                            : () {
+                                if (fillialeToAdd.text.trim().isNotEmpty) {
+                                  filliales.add(fillialeToAdd.text.trim());
+                                  setState(() {
+                                    fillialeToAdd.clear();
+                                  });
+                                }
+                                checkChanges();
+                              },
+                        child: const Text('add').tr())
+                  ],
+                ),
+              ),
+              smallSpace,
+              ListView.builder(
+                itemCount: filliales.isEmpty?1:filliales.length,
+                shrinkWrap: true,
+                itemBuilder: (BuildContext context, int index) {
+                  if(filliales.isEmpty){
+                    return Center(
+                        child: SizedBox(
+                          height: 20.px,
+                          child: Text('fillialesempty',
+                              style:TextStyle(color:Colors.grey[100],
+                                  fontStyle: FontStyle.italic))
+                              .tr(),
+                        )
+                    );
+                  }
+                  return SizedBox(
+                    height: 40.px,
+                    child: ListTile(
+                      tileColor:
+                      ButtonState.all<Color>(appTheme.fillColor),
+                      title: Text(
+                        filliales[index],
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(FluentIcons.cancel),
+                        onPressed: () {
+                          setState(() {
+                            filliales.removeAt(index);
+                          });
+                        },
+                      ),
+                    ),
+                  );
+                },
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget directionsWidget(AppTheme appTheme) {
+    return SizedBox(
+      height: directions.isEmpty?100.px:directions.length * 40.px + 80.px,
+      child: ZoneBox(
+        label: 'directions'.tr(),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: 35.px,
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 4,
+                      child: TextBox(
+                        controller: directionToAdd,
+                        placeholder: 'writedirection'.tr(),
+                        style: appTheme.writingStyle,
+                        placeholderStyle: placeStyle,
+                        cursorColor: appTheme.color.darker,
+                        decoration: BoxDecoration(
+                          color: appTheme.fillColor,
+                        ),
+                        onChanged: (s) {
+                          setState(() {});
+                        },
+                        onSubmitted: (s) {
+                          if (s.isNotEmpty) {
+                            directions.add(s.trim());
+                            setState(() {
+                              directionToAdd.clear();
+                            });
+                          }
+                          checkChanges();
+                        },
+                      ),
+                    ),
+                    smallSpace,
+                    FilledButton(
+                        onPressed: directionToAdd.text.trim().isEmpty
+                            ? null
+                            : () {
+                                if (directionToAdd.text.trim().isNotEmpty) {
+                                  directions.add(directionToAdd.text.trim());
+                                  setState(() {
+                                    directionToAdd.clear();
+                                  });
+                                }
+                                checkChanges();
+                              },
+                        child: const Text('add').tr())
+                  ],
+                ),
+              ),
+              smallSpace,
+              ListView.builder(
+                itemCount: directions.isEmpty?1:directions.length,
+                shrinkWrap: true,
+                itemBuilder: (BuildContext context, int index) {
+                  if(directions.isEmpty){
+                    return Center(
+                      child: SizedBox(
+                        height: 20.px,
+                        child: Text('directionssempty',
+                            style:TextStyle(color:Colors.grey[100],
+                            fontStyle: FontStyle.italic))
+                            .tr(),
+                      )
+                    );
+                  }
+                  return SizedBox(
+                    height: 40.px,
+                    child: ListTile(
+                      tileColor:
+                          ButtonState.all<Color>(appTheme.fillColor),
+                      title: Text(
+                        directions[index],
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(FluentIcons.cancel),
+                        onPressed: () {
+                          setState(() {
+                            directions.removeAt(index);
+                          });
+                        },
+                      ),
+                    ),
+                  );
+                },
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -698,7 +857,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
     }
   }
 
-  Future<Document> uploadEntreprise() async {
+  Future<void> uploadEntreprise() async {
     Entreprise prest = Entreprise(
       id: p?.id ?? '1',
       nom: nom.text,
@@ -717,7 +876,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
           '${telephone.text} ${adresse.text} ${descr.text} 1 $logoid ${art.text}',
     );
     if (p != null) {
-      return await ClientDatabase.database!
+      await ClientDatabase.database!
           .updateDocument(
               databaseId: databaseId,
               collectionId: entrepriseid,
@@ -725,10 +884,12 @@ class MyEntrepriseState extends State<MyEntreprise> {
               data: prest.toJson())
           .then((value) {
         p = prest;
-        return value;
+          }).onError((AppwriteException error, stackTrace) {
+        print(error.message);
       });
-    } else {
-      return await ClientDatabase.database!
+    }
+    else {
+      await ClientDatabase.database!
           .createDocument(
               databaseId: databaseId,
               collectionId: entrepriseid,
@@ -736,7 +897,6 @@ class MyEntrepriseState extends State<MyEntreprise> {
               data: prest.toJson())
           .then((value) {
         p = prest;
-        return value;
       });
     }
   }

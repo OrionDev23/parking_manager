@@ -101,21 +101,21 @@ class _ImportVehiclesState extends State<ImportVehicles> {
     int perimetre=getPerimetre(columnToRead.containsKey('perimetre')
         ?data[columnToRead['perimetre']!]!.value
         .toString():null);
-    String model = columnToRead.containsKey('model')?
-    data[columnToRead['model']!]!
-        .value.toString():'';
+    String model = columnToRead.containsKey('model')? data[columnToRead['model']!]!.value.toString():'';
     String nom = columnToRead.containsKey('nom')?data[columnToRead['nom']!]!
         .value.toString():"";
     String prenom = columnToRead.containsKey('prenom')
         ?data[columnToRead['prenom']!]!.value.toString():"";
     String filliale=columnToRead.containsKey('filliale')
-        ?data[columnToRead['filliale']!]!.value.toString():"";
+        ?data[columnToRead['filliale']!]!.value.toString().toUpperCase():"";
     String apartenance=columnToRead.containsKey('appartenance')
-        ?data[columnToRead['appartenance']!]!.value.toString():"";
+        ?data[columnToRead['appartenance']!]!.value.toString().toUpperCase():"";
     List<String> ms = matricule.split('-');
     int? wilaya = etrang ? null : int.tryParse(ms[2]) ?? 16;
-
-    ///toDo get filliale ids
+    int genre=etrang ? 1 : (int.tryParse(ms[1]) ?? 100) ~/ 100;
+    bool lourd=columnToRead.containsKey('poids')
+        ?data[columnToRead['poids']!]!.value.toString().toUpperCase()
+        .contains('lou'):genre==2||genre==4;
     Vehicle vehicle = Vehicle(
         id: id,
         matricule: matricule,
@@ -144,10 +144,46 @@ class _ImportVehiclesState extends State<ImportVehicles> {
                     .firstOrNull
                     ?.getDairaName(l.Language.FR) ??
                 '',
-        genre: (etrang ? 1 : (int.tryParse(ms[1]) ?? 100) ~/ 100).toString(),
+        genre: (genre).toString(),
+        lourd: lourd,
         anneeUtil: VehiclesUtilities.getAnneeFromMatricule(matricule));
 
-    importedVehicles[vehicle.matricule] = vehicle;
+    if(importedVehicles.containsKey(vehicle.matricule)){
+      replaceVehicleEmptiness(vehicle);
+    }
+    else{
+      importedVehicles[vehicle.matricule] = vehicle;
+    }
+  }
+
+  void replaceVehicleEmptiness(Vehicle v){
+    if(importedVehicles[v.matricule]!.etatactuel==null || importedVehicles[v
+        .matricule]!.etatactuel==0){
+      importedVehicles[v.matricule]!.etatactuel=v.etatactuel;
+    }
+    if(importedVehicles[v.matricule]!.perimetre==0){
+      importedVehicles[v.matricule]!.perimetre=v.perimetre;
+    }
+    if(importedVehicles[v.matricule]!.nom==null || importedVehicles[v
+        .matricule]!.nom!.isEmpty){
+      importedVehicles[v.matricule]!.nom=v.nom;
+    }
+    if(importedVehicles[v.matricule]!.prenom==null || importedVehicles[v
+        .matricule]!.prenom!.isEmpty){
+      importedVehicles[v.matricule]!.prenom=v.prenom;
+    }
+    if(importedVehicles[v.matricule]!.type==null || importedVehicles[v
+        .matricule]!.type!.isEmpty){
+      importedVehicles[v.matricule]!.type=v.type;
+    }
+    if(importedVehicles[v.matricule]!.appartenance==null || importedVehicles[v
+        .matricule]!.appartenance!.isEmpty){
+      importedVehicles[v.matricule]!.appartenance=v.appartenance;
+    }
+    if(importedVehicles[v.matricule]!.filliale==null || importedVehicles[v
+        .matricule]!.filliale!.isEmpty){
+      importedVehicles[v.matricule]!.filliale=v.filliale;
+    }
   }
 
   int getEtat(String? etats) {
@@ -261,6 +297,10 @@ class _ImportVehiclesState extends State<ImportVehicles> {
               if(value.value.toLowerCase().contains('périmetre') || value
                   .value.toLowerCase().contains('perimetre')){
                 columnToRead['perimetre']=cell.columnIndex;
+              }
+              if(value.value.toLowerCase().contains('poids') || value
+                  .value.toLowerCase().contains('Lourd/Leger')){
+                columnToRead['poids']=cell.columnIndex;
               }
               break;
             case BoolCellValue():

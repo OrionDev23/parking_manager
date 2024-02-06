@@ -401,5 +401,13 @@
   "hors perimetre": "Outside the scope",
   "industrie": "Industry",
   "fililales": "Subsidiaries",
-  "directions": "Departments"
+  "directions": "Departments",
+  "writefiliale": "Add a subsidiary...",
+  "writedirection": "Add a departement...",
+  "fillialesempty": "You have not yet added any subsidiaries",
+  "directionssempty": "You have not yet added any departements",
+  "filialeexploit": "Subsidiary that operates the vehicle",
+  "direction": "Departement",
+  "lourd?": "Heavy vehicle?"
+
 }
