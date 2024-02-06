@@ -10,7 +10,7 @@ import 'common.dart';
 class StateCategoryBars extends StatefulWidget {
   final String? title;
 
-  final List<MapEntry<String,List<MapEntry<String,Future<int>>>>>labels;
+  final List<MapEntry<String, List<MapEntry<String, Future<int>>>>> labels;
 
   const StateCategoryBars({super.key, required this.labels, this.title});
 
@@ -21,12 +21,13 @@ class StateCategoryBars extends StatefulWidget {
 class _StateBarsState extends State<StateCategoryBars> {
   bool loading = false;
 
-  List<MapEntry<String,List<ChartData>>> values = [];
+  List<ChartDataCategory> values = [];
   @override
   void initState() {
     initValues();
     super.initState();
   }
+
   void initValues() async {
     loading = true;
     List<Future> tasks = [];
@@ -34,47 +35,35 @@ class _StateBarsState extends State<StateCategoryBars> {
       tasks.add(getValue(i));
     }
     await Future.wait(tasks);
-      sortAsIntended();
-
+    sortAsIntended();
     setState(() {
       loading = false;
     });
   }
+
   void sortAsIntended() {
-    List<MapEntry<String,List<ChartData>>> result = [];
-
-    List<ChartData> res2=[];
-    for(int i=0;i<widget.labels.length;i++){
-      res2.clear();
-      for(int k=0;k<values.length;k++){
-          if(values[k].key==widget.labels[i].key){
-            for(int j=0;j<values[k].value.length;j++){
-                res2.add(ChartData(values[k].value[j].x, values[k].value[j].y, values[k].value[j].label));
-            }
-            break;
-          }
+    List<ChartDataCategory> result = [];
+    for (int i = 0; i < widget.labels.length; i++) {
+      for (int j = 0; j < values.length; j++) {
+        if (widget.labels[i].key == values[j].category) {
+          result.add(ChartDataCategory(widget.labels[i].key, values[j].values));
+          values.removeAt(j);
+          break;
+        }
       }
-      result.add(MapEntry(widget.labels[i].key, res2));
     }
-    values.clear();
     values.addAll(result);
-
-
   }
 
   Future<void> getValue(int index) async {
-
-    List<ChartData> s=[];
-    for(int j=0;j<widget.labels[index].value.length;j++){
-      s.add(ChartData(j, await widget.labels[index].value[j].value, widget
-          .labels[index].value[j].key));
+    List<ChartData> s = [];
+    for (int j = 0; j < widget.labels[index].value.length; j++) {
+      s.add(ChartData(j, await widget.labels[index].value[j].value,
+          widget.labels[index].value[j].key));
     }
-    values.add(
-        MapEntry(widget.labels[index].key,
-            s)
-    );
-
+    values.add(ChartDataCategory(widget.labels[index].key, s));
   }
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
@@ -96,36 +85,65 @@ class _StateBarsState extends State<StateCategoryBars> {
         smallSpace,
         Expanded(
           child: SfCartesianChart(
-
-            enableAxisAnimation: true,
+            margin: const EdgeInsets.all(5),
             primaryXAxis: const CategoryAxis(
-              arrangeByIndex: true,
-            ),
-            series: List<CartesianSeries<ChartData, String>>.generate(values.length, (index) => ColumnSeries(
-                name: values[index].key.tr(),
-                dataSource: values[index].value,
-                xValueMapper: ( s,r){
-                  return s.label.tr();
-                },
-                dataLabelSettings: const DataLabelSettings(
-                  isVisible: true,
-                  useSeriesColor: true,
+                //arrangeByIndex: true,
                 ),
-                dataLabelMapper: (s,t){
-                  return s.y.toString();
-                },
-                pointColorMapper: (s,t){
-                  return getRandomColor(t, appTheme);
-                },
-                yValueMapper: ( s,r){
-                  return s.y;
-                })),
+            series: List<ColumnSeries<ChartDataCategory, String>>.generate(
+                values.first.values.length, (index) {
+              return ColumnSeries(
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(5)),
+                  dataSource: values,
+                  width: 1,
+                  spacing: 0.1,
+                  xValueMapper: (s, r) {
+                    return s.category.tr();
+                  },
+                  dataLabelSettings: DataLabelSettings(
+                    isVisible: true,
+                    builder: (data, point, series, pointIndex, seriesIndex) {
+                      ChartDataCategory d = data;
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            d.values[seriesIndex].y.toString(),
+                            style: const TextStyle(fontSize: 10),
+                          ),
+                          smallSpace,
+
+                          SizedBox(
+                            height: (point.y??0).toDouble()*0.65,
+                          ),
+                          Text(
+                            d.values[seriesIndex].label.tr(),
+                            style: const TextStyle(fontSize: 10),
+                          ),
+                          smallSpace,
+                        ],
+                      );
+                    },
+                    labelPosition: ChartDataLabelPosition.inside,
+                    labelAlignment: ChartDataLabelAlignment.auto,
+                    margin: EdgeInsets.zero,
+                  ),
+                  dataLabelMapper: (s, t) {
+                    return '${s.values[index].y.toString()} \n ${s.values[index].label.tr()}';
+                  },
+                  pointColorMapper: (s, t) {
+                    return getRandomColor(t, appTheme);
+                  },
+                  yValueMapper: (s, r) {
+                    return s.values[index].y;
+                  });
+            }),
           ),
         ),
       ],
     );
   }
-
 
   Color getRandomColor(int index, AppTheme appTheme) {
     switch (index) {

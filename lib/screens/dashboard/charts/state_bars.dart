@@ -79,12 +79,13 @@ class _StateBarsState extends State<StateBars> {
         Expanded(
           child: SfCartesianChart(
 
-                enableAxisAnimation: true,
                 primaryXAxis: const CategoryAxis(
                   arrangeByIndex: true,
                 ),
                 series: <CartesianSeries<ChartData, String>>[
                   ColumnSeries(
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(5)),
+
                       dataSource: values,
                       xValueMapper: ( s,r){
                         return s.label.tr();

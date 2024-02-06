@@ -4,3 +4,10 @@ class ChartData {
   final int x;
   final int y;
 }
+
+class ChartDataCategory {
+  ChartDataCategory(this.category,this.values);
+
+  final String category;
+  final List<ChartData> values;
+}
