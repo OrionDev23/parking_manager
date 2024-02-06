@@ -50,8 +50,6 @@ class _StateBarsState extends State<StateBars> {
       }
     }
     values.addAll(result);
-
-
   }
 
   Future<void> getValue(int index) async {

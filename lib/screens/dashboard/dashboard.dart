@@ -1,11 +1,13 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
+import 'package:parc_oto/screens/dashboard/charts/state_category_bar.dart';
 import 'package:parc_oto/screens/logs/logging/log_table.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
+import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -353,7 +355,7 @@ class Dashboard extends StatelessWidget {
 
     return [
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: 1,
         child: TableStats(
           height: height,
           title: 'vstates'.tr(),
@@ -373,6 +375,46 @@ class Dashboard extends StatelessWidget {
           onTap: () {
             PanesListState.index.value = PaneItemsAndFooters.originalItems
                     .indexOf(PaneItemsAndFooters.vehicles) +
+                1;
+          },
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 2,
+        child: TableStats(
+          height: height,
+          title: 'vstates'.tr(),
+          icon: Icon(
+            FluentIcons.car,
+            color: appTheme.color.darker,
+          ),
+          content: StateCategoryBars(
+            labels: List.generate(3, (index) => MapEntry(VehiclesUtilities.getPerimetre(index),[
+              MapEntry('gstate', DatabaseCounters().countVehiclesWithCondition([
+                Query.equal('etatactuel', 0),
+                Query.equal('perimetre', index)
+              ])),
+              MapEntry('bstate', DatabaseCounters().countVehiclesWithCondition([
+                Query.equal('etatactuel', 1),
+                Query.equal('perimetre', index)
+              ])),
+              MapEntry('rstate', DatabaseCounters().countVehiclesWithCondition([
+                Query.equal('etatactuel', 2),
+                Query.equal('perimetre', index)
+              ])),
+              MapEntry('ostate', DatabaseCounters().countVehiclesWithCondition([
+                Query.equal('etatactuel', 3),
+                Query.equal('perimetre', index)
+              ])),
+              MapEntry('restate', DatabaseCounters().countVehiclesWithCondition([
+                Query.equal('etatactuel', 4),
+                Query.equal('perimetre', index)
+              ])),
+            ],)),
+          ),
+          onTap: () {
+            PanesListState.index.value = PaneItemsAndFooters.originalItems
+                .indexOf(PaneItemsAndFooters.vehicles) +
                 1;
           },
         ),

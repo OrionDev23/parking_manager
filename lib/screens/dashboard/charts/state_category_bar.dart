@@ -34,24 +34,29 @@ class _StateBarsState extends State<StateCategoryBars> {
       tasks.add(getValue(i));
     }
     await Future.wait(tasks);
-    sortAsIntended();
+      sortAsIntended();
 
     setState(() {
       loading = false;
     });
   }
-  void sortAsIntended(int index) {
-    List<ChartData> result = [];
-    for (int i = 0; i < widget.labels[index].value.length; i++) {
-      for (int j = 0; j < values[index].value.length; j++) {
-        if (widget.labels[index].value[i].key == values[index].value[j]
-            .label) {
-          result.add(ChartData(values[j].x, values[j].y,values[j].label));
-          values.removeAt(j);
-          break;
-        }
+  void sortAsIntended() {
+    List<MapEntry<String,List<ChartData>>> result = [];
+
+    List<ChartData> res2=[];
+    for(int i=0;i<widget.labels.length;i++){
+      res2.clear();
+      for(int k=0;k<values.length;k++){
+          if(values[k].key==widget.labels[i].key){
+            for(int j=0;j<values[k].value.length;j++){
+                res2.add(ChartData(values[k].value[j].x, values[k].value[j].y, values[k].value[j].label));
+            }
+            break;
+          }
       }
+      result.add(MapEntry(widget.labels[i].key, res2));
     }
+    values.clear();
     values.addAll(result);
 
 
@@ -96,26 +101,25 @@ class _StateBarsState extends State<StateCategoryBars> {
             primaryXAxis: const CategoryAxis(
               arrangeByIndex: true,
             ),
-            series: <CartesianSeries<ChartData, String>>[
-              ColumnSeries(
-                  dataSource: values,
-                  xValueMapper: ( s,r){
-                    return s.label.tr();
-                  },
-                  dataLabelSettings: const DataLabelSettings(
-                    isVisible: true,
-                    useSeriesColor: true,
-                  ),
-                  dataLabelMapper: (s,t){
-                    return s.y.toString();
-                  },
-                  pointColorMapper: (s,t){
-                    return getRandomColor(t, appTheme);
-                  },
-                  yValueMapper: ( s,r){
-                    return s.y;
-                  })
-            ],
+            series: List.generate(values.length, (index) => ColumnSeries(
+                name: values[index].key.tr(),
+                dataSource: values[index].value,
+                xValueMapper: ( s,r){
+                  return s.label.tr();
+                },
+                dataLabelSettings: const DataLabelSettings(
+                  isVisible: true,
+                  useSeriesColor: true,
+                ),
+                dataLabelMapper: (s,t){
+                  return s.y.toString();
+                },
+                pointColorMapper: (s,t){
+                  return getRandomColor(t, appTheme);
+                },
+                yValueMapper: ( s,r){
+                  return s.y;
+                })),
           ),
         ),
       ],
