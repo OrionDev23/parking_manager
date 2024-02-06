@@ -1,11 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
 import 'package:parc_oto/screens/logs/logging/log_table.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/counters.dart';
 import '../../theme.dart';
@@ -38,27 +40,24 @@ class Dashboard extends StatelessWidget {
       content: ListView(
         padding: const EdgeInsets.all(5),
         children: [
-          GridView.count(
-            primary: false,
-            physics: const ClampingScrollPhysics(),
-            shrinkWrap: true,
-            padding: const EdgeInsets.all(10),
-            childAspectRatio: kIsWeb ? 4 : 3,
-            crossAxisCount: portrait ? 2 : 4,
+          StaggeredGrid.count(
+            crossAxisCount:
+                MediaQuery.of(context).orientation == Orientation.portrait
+                    ? 2
+                    : 4,
             mainAxisSpacing: 5,
             crossAxisSpacing: 5,
             children: buttonList(appTheme),
           ),
-          GridView.count(
-              shrinkWrap: true,
-              primary: false,
-              padding: const EdgeInsets.all(5),
-              physics: const ClampingScrollPhysics(),
-              crossAxisCount: portrait ? 1 : 2,
-              childAspectRatio: 1.45,
-              crossAxisSpacing: 5,
-              mainAxisSpacing: 5,
-              children: widgetList(appTheme)),
+          StaggeredGrid.count(
+            crossAxisCount:
+                MediaQuery.of(context).orientation == Orientation.portrait
+                    ? 1
+                    : 2,
+            mainAxisSpacing: 5,
+            crossAxisSpacing: 5,
+            children: widgetList(appTheme),
+          ),
         ],
       ),
     );
@@ -130,7 +129,7 @@ class Dashboard extends StatelessWidget {
               text: Text('nouvdocument'.tr()),
               semanticLabel: 'nouvdocument'.tr(),
               icon: const Icon(FluentIcons.new_folder),
-              body:  const ScaffoldPage(
+              body: const ScaffoldPage(
                 content: DocumentForm(),
               ),
               onClosed: () {
@@ -294,8 +293,9 @@ class Dashboard extends StatelessWidget {
               text: Text('nouvdocument'.tr()),
               semanticLabel: 'nouvdocument'.tr(),
               icon: const Icon(FluentIcons.new_folder),
-              body: const ScaffoldPage(content: CDocumentForm(
-              ),),
+              body: const ScaffoldPage(
+                content: CDocumentForm(),
+              ),
               onClosed: () {
                 CDocumentTabsState.tabs.remove(tab);
 
@@ -349,118 +349,135 @@ class Dashboard extends StatelessWidget {
     DateTime start = DateTime.now().subtract(const Duration(days: 30 * 6));
     DateTime end = DateTime.now();
 
+    double height = 400.px;
+
     return [
-      TableStats(
-        title: 'vehicules'.tr(),
-        icon: Icon(
-          FluentIcons.car,
-          color: appTheme.color.darker,
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 2,
+        child: TableStats(
+          height: height,
+          title: 'vstates'.tr(),
+          icon: Icon(
+            FluentIcons.car,
+            color: appTheme.color.darker,
+          ),
+          content: StateBars(
+            labels: [
+              MapEntry('gstate', DatabaseCounters().countVehicles(etat: 0)),
+              MapEntry('bstate', DatabaseCounters().countVehicles(etat: 1)),
+              MapEntry('rstate', DatabaseCounters().countVehicles(etat: 2)),
+              MapEntry('ostate', DatabaseCounters().countVehicles(etat: 3)),
+              MapEntry('restate', DatabaseCounters().countVehicles(etat: 4)),
+            ],
+          ),
+          onTap: () {
+            PanesListState.index.value = PaneItemsAndFooters.originalItems
+                    .indexOf(PaneItemsAndFooters.vehicles) +
+                1;
+          },
         ),
-        content: const LogTable(
-          pages: false,
-          fieldsToShow: [
-            'act',
-            'id',
-            'date',
-          ],
-          filters: {'typemin': '0', 'typemax': '9'},
-          statTable: true,
-          numberOfRows: 5,
-        ),
-        onTap: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.vehicles) +
-              1;
-        },
       ),
-      TableStats(
-        title: 'vstates'.tr(),
-        icon: Icon(
-          FluentIcons.car,
-          color: appTheme.color.darker,
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: TableStats(
+          height: height,
+          title: 'vehicules'.tr(),
+          icon: Icon(
+            FluentIcons.car,
+            color: appTheme.color.darker,
+          ),
+          content: const LogTable(
+            pages: false,
+            fieldsToShow: [
+              'act',
+              'id',
+              'date',
+            ],
+            filters: {'typemin': '0', 'typemax': '9'},
+            statTable: true,
+            numberOfRows: 5,
+          ),
+          onTap: () {
+            PanesListState.index.value = PaneItemsAndFooters.originalItems
+                    .indexOf(PaneItemsAndFooters.vehicles) +
+                1;
+          },
         ),
-        content: StateBars(
-          labels: [
-            MapEntry(
-                'gstate', DatabaseCounters().countVehicles(etat: 0)),
-            MapEntry(
-                'bstate', DatabaseCounters().countVehicles(etat: 1)),
-            MapEntry(
-                'rstate', DatabaseCounters().countVehicles(etat: 2)),
-            MapEntry(
-                'ostate', DatabaseCounters().countVehicles(etat: 3)),
-            MapEntry(
-                'restate', DatabaseCounters().countVehicles(etat: 4)),
-          ],
-        ),
-        onTap: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.vehicles) +
-              1;
-        },
       ),
-      TableStats(
-        title: 'depenses'.tr(),
-        icon: Icon(
-          FluentIcons.cost_control,
-          color: appTheme.color.darker,
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: TableStats(
+          height: height,
+          title: 'depenses'.tr(),
+          icon: Icon(
+            FluentIcons.cost_control,
+            color: appTheme.color.darker,
+          ),
+          content: CostGraph(
+            start: start,
+            end: end,
+            appTheme: appTheme,
+          ),
+          onTap: () {
+            PanesListState.index.value = PaneItemsAndFooters.originalItems
+                    .indexOf(PaneItemsAndFooters.reparations) +
+                5;
+          },
         ),
-        content: CostGraph(
-          start: start,
-          end: end,
-          appTheme: appTheme,
-        ),
-        onTap: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.reparations) +
-              5;
-        },
       ),
-      TableStats(
-        title: 'reparations'.tr(),
-        icon: Icon(
-          FluentIcons.repair,
-          color: appTheme.color.darker,
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: TableStats(
+          height: height,
+          title: 'reparations'.tr(),
+          icon: Icon(
+            FluentIcons.repair,
+            color: appTheme.color.darker,
+          ),
+          content: const LogTable(
+            pages: false,
+            fieldsToShow: [
+              'act',
+              'id',
+              'date',
+            ],
+            filters: {'typemin': '10', 'typemax': '15'},
+            statTable: true,
+            numberOfRows: 5,
+          ),
+          onTap: () {
+            PanesListState.index.value = PaneItemsAndFooters.originalItems
+                    .indexOf(PaneItemsAndFooters.reparations) +
+                5;
+          },
         ),
-        content: const LogTable(
-          pages: false,
-          fieldsToShow: [
-            'act',
-            'id',
-            'date',
-          ],
-          filters: {'typemin': '10', 'typemax': '15'},
-          statTable: true,
-          numberOfRows: 5,
-        ),
-        onTap: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.reparations) +
-              5;
-        },
       ),
-      TableStats(
-        title: 'chauffeurs'.tr(),
-        icon: Icon(
-          FluentIcons.people,
-          color: appTheme.color.darker,
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: TableStats(
+          height: height,
+          title: 'chauffeurs'.tr(),
+          icon: Icon(
+            FluentIcons.people,
+            color: appTheme.color.darker,
+          ),
+          content: const LogTable(
+            pages: false,
+            fieldsToShow: [
+              'act',
+              'id',
+              'date',
+            ],
+            filters: {'typemin': '16', 'typemax': '25'},
+            statTable: true,
+            numberOfRows: 5,
+          ),
+          onTap: () {
+            PanesListState.index.value = PaneItemsAndFooters.originalItems
+                    .indexOf(PaneItemsAndFooters.chauffeurs) +
+                7;
+          },
         ),
-        content: const LogTable(
-          pages: false,
-          fieldsToShow: [
-            'act',
-            'id',
-            'date',
-          ],
-          filters: {'typemin': '16', 'typemax': '25'},
-          statTable: true,
-          numberOfRows: 5,
-        ),
-        onTap: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.chauffeurs) +
-              7;
-        },
       ),
     ];
   }
