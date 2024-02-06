@@ -101,7 +101,7 @@ class _StateBarsState extends State<StateCategoryBars> {
             primaryXAxis: const CategoryAxis(
               arrangeByIndex: true,
             ),
-            series: List.generate(values.length, (index) => ColumnSeries(
+            series: List<CartesianSeries<ChartData, String>>.generate(values.length, (index) => ColumnSeries(
                 name: values[index].key.tr(),
                 dataSource: values[index].value,
                 xValueMapper: ( s,r){
