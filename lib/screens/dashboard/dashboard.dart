@@ -395,8 +395,8 @@ class Dashboard extends StatelessWidget {
             labels: List.generate(MyEntrepriseState.p!.filiales?.length??0,
                     (index) => MapEntry(MyEntrepriseState.p!
                     .filiales![index], DatabaseCounters().countVehiclesWithCondition([
-                  Query.search('appartenance', '"${MyEntrepriseState.p!
-                      .filiales![index].trim()}"')
+                  Query.equal('appartenance', MyEntrepriseState.p!
+                      .filiales![index].trim())
                 ]))),
             radius: 100,
           ),
