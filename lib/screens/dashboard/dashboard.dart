@@ -4,7 +4,9 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
+import 'package:parc_oto/screens/dashboard/charts/state_bars_vertical.dart';
 import 'package:parc_oto/screens/dashboard/charts/state_category_bar.dart';
+import 'package:parc_oto/screens/entreprise/entreprise.dart';
 import 'package:parc_oto/screens/logs/logging/log_table.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
@@ -411,6 +413,30 @@ class Dashboard extends StatelessWidget {
                 Query.equal('perimetre', index)
               ])),
             ],)),
+          ),
+          onTap: () {
+            PanesListState.index.value = PaneItemsAndFooters.originalItems
+                .indexOf(PaneItemsAndFooters.vehicles) +
+                1;
+          },
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: TableStats(
+          height: height*2,
+          title: 'appartenance'.tr(),
+          icon: Icon(
+            FluentIcons.car,
+            color: appTheme.color.darker,
+          ),
+          content: StateBarsVertical(
+            labels: List.generate(MyEntrepriseState.p!.filiales?.length??0,
+                    (index) => MapEntry(MyEntrepriseState.p!
+                        .filiales![index], DatabaseCounters().countVehiclesWithCondition([
+                      Query.search('appartenance', MyEntrepriseState.p!
+                          .filiales![index])
+                    ]))),
           ),
           onTap: () {
             PanesListState.index.value = PaneItemsAndFooters.originalItems
