@@ -54,7 +54,6 @@ class DatabaseCounters {
         cont = false;
       });
     }
-
     return result;
   }
 

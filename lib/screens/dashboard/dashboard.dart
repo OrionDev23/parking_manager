@@ -12,6 +12,7 @@ import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'pie_chart/pie_chart.dart';
 
 import '../../providers/counters.dart';
 import '../../theme.dart';
@@ -377,6 +378,31 @@ class Dashboard extends StatelessWidget {
           onTap: () {
             PanesListState.index.value = PaneItemsAndFooters.originalItems
                     .indexOf(PaneItemsAndFooters.vehicles) +
+                1;
+          },
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: TableStats(
+          height: height,
+          title: 'appartenance'.tr(),
+          icon: Icon(
+            FluentIcons.car,
+            color: appTheme.color.darker,
+          ),
+          content: ParcOtoPie(
+            labels: List.generate(MyEntrepriseState.p!.filiales?.length??0,
+                    (index) => MapEntry(MyEntrepriseState.p!
+                    .filiales![index], DatabaseCounters().countVehiclesWithCondition([
+                  Query.search('appartenance', '"${MyEntrepriseState.p!
+                      .filiales![index].trim()}"')
+                ]))),
+            radius: 100,
+          ),
+          onTap: () {
+            PanesListState.index.value = PaneItemsAndFooters.originalItems
+                .indexOf(PaneItemsAndFooters.vehicles) +
                 1;
           },
         ),
