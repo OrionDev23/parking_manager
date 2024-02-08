@@ -103,7 +103,7 @@ class MyApp extends StatelessWidget {
           else{
             tstyle=tstyle.copyWith(fontSize: 10.sp);
           }
-          return FluentApp.router(
+          return FluentApp(
             key: navigatorKey,
             title: appTitle,
             themeMode: appTheme.mode,
@@ -150,7 +150,8 @@ class MyApp extends StatelessWidget {
                 child: child!,
               );
             },
-            routerConfig: Routes(appTheme).router,
+            routes: Routes(appTheme).routes,
+            initialRoute: '/',
           );
         },
       );
