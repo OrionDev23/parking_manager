@@ -1,6 +1,5 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:parc_oto/serializables/activity.dart';
 import 'package:parc_oto/serializables/vehicle/vehicle.dart';
@@ -146,16 +145,6 @@ class ClientDatabase {
         myTeams = t.teams;
       });
 
-      if (kDebugMode) {
-        String roles = '';
-        for (var element in myTeams) {
-          if (roles.isNotEmpty) {
-            roles += ', ';
-          }
-          roles += element.name.tr();
-        }
-        print('his teams are : $roles');
-      }
     }
   }
 

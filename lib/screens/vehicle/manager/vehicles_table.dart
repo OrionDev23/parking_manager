@@ -9,9 +9,9 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../datasources/vehicle/vehicules_datasource.dart';
 import '../../../theme.dart';
 import '../../../utilities/vehicle_util.dart';
-import '../../../widgets/empty_table_widget.dart';
 import '../../../widgets/select_dialog/select_dialog.dart';
 import '../../../widgets/zone_box.dart';
+import '../../data_table_parcoto.dart';
 
 class VehicleTable extends StatefulWidget {
   final bool selectV;
@@ -200,7 +200,6 @@ class VehicleTableState extends State<VehicleTable> {
           setState(() {});
         },
       ),
-
       if (widget.selectV != true)
         DataColumn2(
           label: const Text(''),
@@ -249,7 +248,7 @@ class VehicleTableState extends State<VehicleTable> {
                   filtered = true;
                   filterNow = false;
                 }
-                return AsyncPaginatedDataTable2(
+                return DataTableParc(
                   header: Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 5.0, horizontal: 10),
@@ -819,41 +818,9 @@ class VehicleTableState extends State<VehicleTable> {
                     ),
                   ),
                   sortAscending: assending,
-                  headingRowHeight: 25,
-                  headingRowDecoration: BoxDecoration(
-                      color: appTheme.color,
-                      borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(5))),
-                  dividerThickness: 0.5,
-                  autoRowsToHeight: true,
-                  empty: NoDataWidget(
-                    datasource: vehicleDataSource,
-                  ),
-                  pageSyncApproach: PageSyncApproach.goToLast,
-                  horizontalMargin: 8,
-                  columnSpacing: 0,
-                  dataRowHeight: rowHeight,
-                  onPageChanged: (s) {},
-                  showCheckboxColumn: false,
                   sortColumnIndex: sortColumn,
-                  rowsPerPage: rowPerPage,
-                  onRowsPerPageChanged: (nbr) {
-                    rowPerPage = nbr ?? rowPerPageC;
-                  },
-                  availableRowsPerPage: [
-                    rowPerPageC,
-                    rowPerPageC * 2,
-                    rowPerPageC * 4,
-                    rowPerPageC * 10,
-                    rowPerPageC * 20
-                  ],
-                  showFirstLastButtons: true,
-                  renderEmptyRowsInTheEnd: false,
-                  fit: FlexFit.loose,
                   columns: columns,
                   source: vehicleDataSource,
-                  sortArrowAlwaysVisible: true,
-                  hidePaginator: false,
                 );
               });
         });

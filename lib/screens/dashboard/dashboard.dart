@@ -1,10 +1,10 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart' show Icons;
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
-import 'package:parc_oto/screens/dashboard/charts/state_bars_vertical.dart';
 import 'package:parc_oto/screens/dashboard/charts/state_category_bar.dart';
 import 'package:parc_oto/screens/entreprise/entreprise.dart';
 import 'package:parc_oto/screens/logs/logging/log_table.dart';
@@ -12,7 +12,7 @@ import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'pie_chart/pie_chart.dart';
+import 'charts/pie_chart.dart';
 
 import '../../providers/counters.dart';
 import '../../theme.dart';
@@ -30,14 +30,21 @@ import '../vehicle/documents/document_tabs.dart';
 import '../vehicle/manager/vehicle_form.dart';
 import '../vehicle/manager/vehicle_tabs.dart';
 import 'charts/state_bars.dart';
-import 'costs/costs_graph.dart';
+import 'charts/costs_graph.dart';
 import 'table_stats.dart';
 
-class Dashboard extends StatelessWidget {
+class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
 
   @override
+  State<Dashboard> createState() => _DashboardState();
+}
+
+class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixin {
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     var appTheme = context.watch<AppTheme>();
     bool portrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return ScaffoldPage(
@@ -47,7 +54,7 @@ class Dashboard extends StatelessWidget {
         children: [
           StaggeredGrid.count(
             crossAxisCount:
-                MediaQuery.of(context).orientation == Orientation.portrait
+            portrait
                     ? 2
                     : 4,
             mainAxisSpacing: 5,
@@ -56,7 +63,7 @@ class Dashboard extends StatelessWidget {
           ),
           StaggeredGrid.count(
             crossAxisCount:
-                MediaQuery.of(context).orientation == Orientation.portrait
+            portrait
                     ? 1
                     : 2,
             mainAxisSpacing: 5,
@@ -363,7 +370,7 @@ class Dashboard extends StatelessWidget {
           height: height,
           title: 'vstates'.tr(),
           icon: Icon(
-            FluentIcons.car,
+            FluentIcons.health,
             color: appTheme.color.darker,
           ),
           content: StateBars(
@@ -388,7 +395,7 @@ class Dashboard extends StatelessWidget {
           height: height,
           title: 'appartenance'.tr(),
           icon: Icon(
-            FluentIcons.car,
+            Icons.emoji_transportation,
             color: appTheme.color.darker,
           ),
           content: ParcOtoPie(
@@ -396,7 +403,8 @@ class Dashboard extends StatelessWidget {
                     (index) => MapEntry(MyEntrepriseState.p!
                     .filiales![index], DatabaseCounters().countVehiclesWithCondition([
                   Query.equal('appartenance', MyEntrepriseState.p!
-                      .filiales![index].trim())
+                      .filiales![index]
+                      .replaceAll(' ', '').trim())
                 ]))),
             radius: 100,
           ),
@@ -411,32 +419,31 @@ class Dashboard extends StatelessWidget {
         crossAxisCellCount: 2,
         child: TableStats(
           height: height,
-          title: 'vstates'.tr(),
+          title: 'perimetre'.tr(),
           icon: Icon(
-            FluentIcons.car,
+            FluentIcons.map_directions,
             color: appTheme.color.darker,
           ),
           content: StateCategoryBars(
-            labels: List.generate(3, (index) => MapEntry(VehiclesUtilities.getPerimetre(index),[
-              MapEntry('gstate', DatabaseCounters().countVehiclesWithCondition([
-                Query.equal('etatactuel', 0),
-                Query.equal('perimetre', index)
+            labels: List.generate(5, (index) => MapEntry(VehiclesUtilities
+                .getEtatName(index),[
+              MapEntry(VehiclesUtilities
+                  .getPerimetre(0), DatabaseCounters()
+                  .countVehiclesWithCondition([
+                Query.equal('etatactuel', index),
+                Query.equal('perimetre', 0)
               ])),
-              MapEntry('bstate', DatabaseCounters().countVehiclesWithCondition([
-                Query.equal('etatactuel', 1),
-                Query.equal('perimetre', index)
+              MapEntry(VehiclesUtilities
+                  .getPerimetre(1), DatabaseCounters()
+                  .countVehiclesWithCondition([
+                Query.equal('etatactuel', index),
+                Query.equal('perimetre', 1)
               ])),
-              MapEntry('rstate', DatabaseCounters().countVehiclesWithCondition([
-                Query.equal('etatactuel', 2),
-                Query.equal('perimetre', index)
-              ])),
-              MapEntry('ostate', DatabaseCounters().countVehiclesWithCondition([
-                Query.equal('etatactuel', 3),
-                Query.equal('perimetre', index)
-              ])),
-              MapEntry('restate', DatabaseCounters().countVehiclesWithCondition([
-                Query.equal('etatactuel', 4),
-                Query.equal('perimetre', index)
+              MapEntry(VehiclesUtilities
+                  .getPerimetre(2), DatabaseCounters()
+                  .countVehiclesWithCondition([
+                Query.equal('etatactuel', index),
+                Query.equal('perimetre', 2)
               ])),
             ],)),
           ),
@@ -451,18 +458,48 @@ class Dashboard extends StatelessWidget {
         crossAxisCellCount: 1,
         child: TableStats(
           height: height*2,
-          title: 'appartenance'.tr(),
+          title: 'fililales'.tr(),
           icon: Icon(
-            FluentIcons.car,
+            Icons.hub,
             color: appTheme.color.darker,
           ),
-          content: StateBarsVertical(
+          content: StateBars(
+            hideEmpty: true,
+            vertical: true,
             labels: List.generate(MyEntrepriseState.p!.filiales?.length??0,
                     (index) => MapEntry(MyEntrepriseState.p!
-                        .filiales![index], DatabaseCounters().countVehiclesWithCondition([
-                      Query.search('appartenance', MyEntrepriseState.p!
-                          .filiales![index])
-                    ]))),
+                    .filiales![index], DatabaseCounters().countVehiclesWithCondition([
+                  Query.search('filliale', MyEntrepriseState.p!
+                      .filiales![index]
+                      .replaceAll(' ', '').trim())
+                ]))),
+          ),
+          onTap: () {
+            PanesListState.index.value = PaneItemsAndFooters.originalItems
+                .indexOf(PaneItemsAndFooters.vehicles) +
+                1;
+          },
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: TableStats(
+          height: height*2,
+          title: 'directions'.tr(),
+          icon: Icon(
+            Icons.apartment,
+            color: appTheme.color.darker,
+          ),
+          content: StateBars(
+            hideEmpty: true,
+            vertical: true,
+            labels: List.generate(MyEntrepriseState.p!.directions?.length??0,
+                    (index) => MapEntry(MyEntrepriseState.p!
+                    .directions![index], DatabaseCounters().countVehiclesWithCondition([
+                  Query.search('direction', MyEntrepriseState.p!
+                      .directions![index]
+                      .replaceAll(' ', '').trim())
+                ]))),
           ),
           onTap: () {
             PanesListState.index.value = PaneItemsAndFooters.originalItems
@@ -499,7 +536,7 @@ class Dashboard extends StatelessWidget {
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
+        crossAxisCellCount: 2,
         child: TableStats(
           height: height,
           title: 'depenses'.tr(),
@@ -575,4 +612,7 @@ class Dashboard extends StatelessWidget {
       ),
     ];
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

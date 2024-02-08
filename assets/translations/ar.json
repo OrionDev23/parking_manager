@@ -379,7 +379,8 @@
   "vehicledocuments": "وثائق المركبات",
   "activities": "أنشطة",
   "voirplus": "المزيد",
-  "depenses":"النفقات",
+  "depenses":"تكلفة الإصلاحات",
+  "costs":"النفقات",
   "avg": "المتوسط",
   "deletenotif": "لا تظهر هذا الإشعار مرة أخرى ؟",
   "backup": "النسخ الاحتياطي للبيانات",
@@ -399,13 +400,17 @@
   "industrie": "داخل النطاق",
   "echec": "فشل",
   "fililales": "الفرعيات",
-  "directions": "الأقسام",
+  "directions": "الإدارات",
   "writefiliale": "إضافة فرعية...",
   "writedirection": "إضافة قسم...",
   "fillialesempty": "لم تقم بإضافة أي شركات تابعة بعد",
-  "directionssempty": "لم تقم بإضافة أي أقسام بعد",
+  "directionssempty": "لم تقم بإضافة أي إدارة بعد",
   "filialeexploit": "الشركة التابعة التي تقوم بتشغيل السيارة",
-  "direction": "القسم",
-  "lourd?": "المركبة ثقيلة؟"
+  "direction": "الإدارة",
+  "lourd?": "المركبة ثقيلة؟",
+  "nodatayet": "لا توجد بيانات حتى الآن",
+  "groupvalues": "جمع القيم الأقل من",
+  "hideempty": "لا تظهر التسميات الفارغة",
+  "months": "الأشهر"
 
 }

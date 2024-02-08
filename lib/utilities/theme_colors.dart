@@ -1,4 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter_randomcolor/flutter_randomcolor.dart';
+
+import '../theme.dart';
 
 class ThemeColors {
   static List<AccentColor> accentColors = [
@@ -64,4 +67,13 @@ class ThemeColors {
     'lighter': Color(0xff4b9c4b),
     'lightest': Color(0xff6aad6a),
   });
+
+}
+Color getRandomColorFromTheme(AppTheme appTheme,int index){
+var options = Options(
+    format: Format.hex,
+    colorType: appTheme.color
+
+);
+return RandomColor.getColor(options);
 }

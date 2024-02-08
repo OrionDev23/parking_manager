@@ -47,7 +47,7 @@ void launchApp() async {
       path: 'assets/translations',
       fallbackLocale: const Locale('fr'),
       useOnlyLangCode: true,
-      child: const MyApp()));
+      child: MyApp(navigatorKey: GlobalKey<NavigatorState>(),)));
 }
 
 Future<void> initWindow() async {
@@ -70,16 +70,10 @@ Future<void> initWindow() async {
   });
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({
-    super.key,
-  });
+class MyApp extends StatelessWidget {
+  const MyApp({super.key,required this.navigatorKey});
 
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
 
-class _MyAppState extends State<MyApp> {
   List<LocalizationsDelegate<dynamic>> getDelegates(BuildContext context) {
     List<LocalizationsDelegate> results =
         List.from(context.localizationDelegates);
@@ -92,7 +86,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   // This widget is the root of your application.
-  GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> navigatorKey;
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +128,11 @@ class _MyAppState extends State<MyApp> {
                 glowFactor: is10footScreen(context) ? 2.0 : 0.0,
               ),
             ),
-            supportedLocales: context.supportedLocales,
+            supportedLocales: const [
+              Locale('fr'),
+              Locale('en'),
+              Locale('ar'),
+            ],
             locale: appTheme.locale,
             builder: (context, child) {
               return NavigationPaneTheme(
@@ -144,7 +142,7 @@ class _MyAppState extends State<MyApp> {
                 child: child!,
               );
             },
-            routerConfig: Routes().router,
+            routerConfig: Routes(appTheme).router,
           );
         },
       );

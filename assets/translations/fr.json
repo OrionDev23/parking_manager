@@ -426,7 +426,8 @@
  "alreadyinvited": "Invitation pour devenir manager envoyée",
  "enattente": "En attente",
  "voirplus": "Voir plus",
- "depenses":"Dépenses",
+ "depenses":"Cout des réparation",
+ "costs":"Dépenses",
  "avg": "Moyenne",
  "deletenotif": "Ne plus afficher cette notification ?",
  "backup": "Sauvegarde de données",
@@ -443,9 +444,13 @@
  "directions": "Départements",
  "writefiliale": "Ajouter une filiale...",
  "writedirection": "Ajouter un département...",
-"fillialesempty": "Vous n'avez pas encore ajouté de filiales",
+ "fillialesempty": "Vous n'avez pas encore ajouté de filiales",
  "directionssempty": "Vous n'avez pas encore ajouté de départements",
  "filialeexploit": "Filiale qui exploite le véhicule",
- "direction": "Département",
- "lourd?": "Véhicule lourd ?"
+ "direction": "Directions",
+ "lourd?": "Véhicule lourd ?",
+ "nodatayet": "Pas encore de données",
+ "groupvalues": "Grouper les valeurs inferieures à",
+ "hideempty": "Ne pas afficher les étiquettes vides",
+ "months": "Mois"
 }

@@ -10,32 +10,36 @@ import 'package:parc_oto/screens/vehicle/documents/document_tabs.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
 import 'package:parc_oto/screens/vehicle/states/state_tabs.dart';
 import 'package:parc_oto/screens/vehicle/vehicle_dashboard.dart';
+import 'package:parc_oto/theme.dart';
 
 import 'main.dart';
 
 class Routes {
-  Routes() {
+  Routes(AppTheme appTheme) {
     final savedSettings = prefs;
     router = GoRouter(
-      initialLocation: '/dashboard',
+
+      initialLocation: '/',
       routes: [
-        ShellRoute(
-            builder: (context, state, widget) => PanesList(
-                  paneList: PaneItemsAndFooters(savedSettings),
+        GoRoute(
+            name: 'home',
+            path: '/',
+            builder: (context, state, ) => PanesList(
+                  paneList: PaneItemsAndFooters(savedSettings), appTheme: appTheme,
                 ),
             routes: [
               GoRoute(
                 name: 'login',
-                path: '/login',
+                path: 'login',
                 builder: (context, state) => const LoginScreen(),
               ),
               GoRoute(
                 name: 'dashboard',
-                path: '/dashboard',
+                path: 'dashboard',
                 builder: (context, state) => const Dashboard(),
               ),
               GoRoute(
-                  path: '/vehicles',
+                  path: 'vehicles',
                   builder: (context, state) => const VehicleDashboard(),
                   routes: [
                     GoRoute(

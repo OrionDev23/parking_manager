@@ -8,7 +8,7 @@ import '../../providers/counters.dart';
 import '../../theme.dart';
 import '../../widgets/button_container.dart';
 import '../../widgets/page_header.dart';
-import '../dashboard/pie_chart/pie_chart.dart';
+import '../dashboard/charts/pie_chart.dart';
 import '../logs/logging/log_table.dart';
 import '../sidemenu/pane_items.dart';
 import '../sidemenu/sidemenu.dart';

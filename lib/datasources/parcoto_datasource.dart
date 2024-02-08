@@ -91,7 +91,7 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
 
     // List returned will be empty is there're fewer items than startingAt
     var x = empty
-        ? await Future.delayed(const Duration(milliseconds: 500),
+        ? await Future.delayed(const Duration(milliseconds: 1000),
             () => ParcOtoWebServiceResponse<T>(0, []))
         : await repo.getData(startIndex, count, sortColumn, sortAscending,
             searchKey: searchKey, filters: filters);

@@ -123,8 +123,10 @@ class _VehicleFormState extends State<VehicleForm>
       matrPrec.text = widget.vehicle!.matriculePrec ?? '';
       selectedDate = widget.vehicle!.date ?? DateTime.now();
       lourd=widget.vehicle!.lourd;
-      selectedFiliale.text=widget.vehicle!.filliale??'';
-      selectedAppartenance.text=widget.vehicle!.appartenance??'';
+      selectedFiliale.text=VehiclesUtilities.getAppartenance(widget.vehicle!
+          .filliale);
+      selectedAppartenance.text=VehiclesUtilities.getAppartenance(widget
+          .vehicle!.appartenance);
       selectedDirection.text=widget.vehicle!.direction??'';
       selectedAnnee=DateTime(widget.vehicle!.anneeUtil??DateTime.now().year);
     }

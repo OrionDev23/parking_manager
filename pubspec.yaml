@@ -64,6 +64,7 @@ dependencies:
   share_plus: ^7.2.2
   file_saver: ^0.1.1
   syncfusion_flutter_charts: ^24.2.3+1
+  flutter_randomcolor: ^1.0.14
 
 dev_dependencies:
   flutter_test:

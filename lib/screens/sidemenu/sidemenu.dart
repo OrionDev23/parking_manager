@@ -8,7 +8,6 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
-import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -24,11 +23,12 @@ const brandt = true;
 class PanesList extends StatefulWidget {
   final PaneItemsAndFooters paneList;
   final Widget? widget;
+  final AppTheme appTheme;
 
   const PanesList({
     super.key,
     required this.paneList,
-    this.widget,
+    this.widget, required this.appTheme,
   });
 
   @override
@@ -128,9 +128,7 @@ class PanesListState extends State<PanesList> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.watch<AppTheme>();
-
-    if (loading) {
+    if (firstLoading) {
       return const Center(child: ProgressRing());
     }
     return ValueListenableBuilder(
@@ -212,7 +210,7 @@ class PanesListState extends State<PanesList> with WindowListener {
                     size: NavigationPaneSize(
                       openMaxWidth: pwidth,
                     ),
-                    displayMode: appTheme.displayMode,
+                    displayMode: widget.appTheme.displayMode,
                     items: PaneItemsAndFooters.originalItems,
                     footerItems: PaneItemsAndFooters.footerItems,
                   ),
@@ -258,6 +256,7 @@ class PanesListState extends State<PanesList> with WindowListener {
     listener?.cancel();
     super.dispose();
   }
+
 }
 
 class WindowButtons extends StatelessWidget {

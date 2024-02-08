@@ -61,6 +61,7 @@ class Vehicle extends ParcOtoDefault {
 
 
   Vehicle({
+
     required super.id,
     super.createdAt,
     super.updatedAt,
@@ -102,7 +103,7 @@ class Vehicle extends ParcOtoDefault {
         '$adresse $numero $nom $prenom $profession '
         '$numeroSerie $type $carrosserie $daira $energie'
         ' ${VehiclesUtilities.getMarqueName(marque)} ${VehiclesUtilities.getAnneeFromMatricule(matricule)}'
-        '$pays $matriculePrec ${VehiclesUtilities.getTypeName(etatactuel ??
+        '$pays $matriculePrec ${VehiclesUtilities.getEtatName(etatactuel ??
         0)} ${VehiclesUtilities.getPerimetre(perimetre)} $appartenance '
         '$filliale $direction';
   }

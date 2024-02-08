@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../../theme.dart';
-import '../../../../widgets/empty_table_widget.dart';
 import '../../../../widgets/zone_box.dart';
+import '../../data_table_parcoto.dart';
 
 class LogTable extends StatefulWidget {
   final bool selectD;
@@ -163,7 +163,7 @@ class LogTableState extends State<LogTable> {
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
     logDatasource.appTheme = appTheme;
-    return AsyncPaginatedDataTable2(
+    return DataTableParc(
       header: widget.statTable == false
           ? Padding(
               padding:
@@ -522,37 +522,12 @@ class LogTableState extends State<LogTable> {
               ),
             )
           : null,
+      numberOfRows: widget.numberOfRows,
+      pages: widget.pages,
       sortAscending: assending,
-      headingRowHeight: 25,
-      headingRowDecoration: BoxDecoration(
-          color: appTheme.color,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(5))),
-      dividerThickness: 0.5,
-      autoRowsToHeight: true,
-      empty: NoDataWidget(
-        datasource: logDatasource,
-      ),
-      horizontalMargin: 4,
-      columnSpacing: 0,
-      dataRowHeight: widget.numberOfRows == null ? rowHeight : rowHeight * 2,
-      onPageChanged: (s) {},
-      showCheckboxColumn: false,
       sortColumnIndex: sortColumn,
-      rowsPerPage: widget.numberOfRows ?? rowPerPage,
-      onRowsPerPageChanged: widget.pages
-          ? (nbr) {
-              rowPerPage = nbr ?? 12;
-            }
-          : null,
-      availableRowsPerPage: widget.numberOfRows == null
-          ? const [12, 24, 50, 100, 200]
-          : [widget.numberOfRows!],
-      showFirstLastButtons: widget.pages,
-      renderEmptyRowsInTheEnd: false,
-      fit: FlexFit.tight,
       columns: columns,
       source: logDatasource,
-      sortArrowAlwaysVisible: true,
       hidePaginator: !widget.pages,
     );
   }

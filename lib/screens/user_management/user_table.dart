@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../theme.dart';
-import '../../widgets/empty_table_widget.dart';
+import '../data_table_parcoto.dart';
 
 class UsersTable extends StatefulWidget {
   final bool selectD;
@@ -169,7 +169,7 @@ class _UsersTableState extends State<UsersTable> {
             filtered = true;
             filterNow = false;
           }
-          return AsyncPaginatedDataTable2(
+          return DataTableParc(
             header: Padding(
               padding:
                   const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
@@ -218,33 +218,9 @@ class _UsersTableState extends State<UsersTable> {
               ),
             ),
             sortAscending: assending,
-            headingRowHeight: 25,
-            headingRowDecoration: BoxDecoration(
-                color: appTheme.color,
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(5))),
-            dividerThickness: 0.5,
-            autoRowsToHeight: true,
-            horizontalMargin: 8,
-            columnSpacing: 0,
-            dataRowHeight: rowHeight,
-            onPageChanged: (s) {},
-            showCheckboxColumn: false,
             sortColumnIndex: sortColumn,
-            rowsPerPage: rowPerPage,
-            onRowsPerPageChanged: (nbr) {
-              rowPerPage = nbr ?? 12;
-            },
-            availableRowsPerPage: const [12, 24, 50, 100, 200],
-            empty: NoDataWidget(
-              datasource: userDataSource,
-            ),
-            showFirstLastButtons: true,
-            renderEmptyRowsInTheEnd: false,
-            fit: FlexFit.tight,
             columns: columns,
             source: userDataSource,
-            sortArrowAlwaysVisible: true,
             hidePaginator: false,
           );
         });

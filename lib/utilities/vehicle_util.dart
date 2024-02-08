@@ -1,3 +1,5 @@
+import '../screens/entreprise/entreprise.dart';
+
 const marqueMax = 70;
 const genreMax = 10;
 
@@ -259,7 +261,7 @@ class VehiclesUtilities {
     }
   }
 
-  static String getTypeName(int type) {
+  static String getEtatName(int type) {
     switch (type) {
       case 0:
         return 'gstate';
@@ -283,5 +285,32 @@ class VehiclesUtilities {
       case 2:return 'industrie';
       default:return 'buisiness';
     }
+  }
+
+  static String getAppartenance(String? appartenance){
+    if(MyEntrepriseState.p!=null && appartenance!=null){
+      for(int i=0;i<MyEntrepriseState.p!.filiales!.length;i++){
+        if(MyEntrepriseState.p!.filiales![i].replaceAll(' ', '').toUpperCase
+          ().contains(appartenance.replaceAll(' ', '').toUpperCase())){
+          return MyEntrepriseState.p!.filiales![i];
+        }
+      }
+    }
+
+
+    return '';
+  }
+  static String getDirection(String? direction){
+    if(MyEntrepriseState.p!=null && direction!=null){
+      for(int i=0;i<MyEntrepriseState.p!.directions!.length;i++){
+        if(MyEntrepriseState.p!.directions![i].replaceAll(' ', '').toUpperCase
+          ().contains(direction.replaceAll(' ', '').toUpperCase())){
+          return MyEntrepriseState.p!.directions![i];
+        }
+      }
+    }
+
+
+    return '';
   }
 }

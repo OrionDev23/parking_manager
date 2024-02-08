@@ -11,3 +11,10 @@ class ChartDataCategory {
   final String category;
   final List<ChartData> values;
 }
+
+
+class ChartDataTimeSpan{
+  final DateTime x;
+  final double y;
+  ChartDataTimeSpan(this.x,this.y);
+}

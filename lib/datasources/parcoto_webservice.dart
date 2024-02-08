@@ -42,7 +42,8 @@ abstract class ParcOtoWebService<T> {
       result.sort(getComparisonFunction(sortedBy, sortedAsc));
 
       return ParcOtoWebServiceResponse<T>(
-          value.total, result.skip(startingAt).take(count).toList());
+          value.total, result.skip(startingAt).take(value.documents.length)
+          .toList());
     }).onError((error, stackTrace) {
       if (kDebugMode) {
         if (error is AppwriteException) {

@@ -48,7 +48,7 @@ class VStatesDatasource extends ParcOtoDatasource<Etat> {
         showMyVehicule(element.value.vehicleMat);
       }),
       DataCell(SelectableText(
-        VehiclesUtilities.getTypeName(element.value.type).tr(),
+        VehiclesUtilities.getEtatName(element.value.type).tr(),
         style: tstyle,
       )),
       DataCell(SelectableText(

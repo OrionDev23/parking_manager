@@ -183,7 +183,7 @@ class StateFormState extends State<StateForm> {
                           (index) => ComboBoxItem<int>(
                                 value: index,
                                 child:
-                                    Text(VehiclesUtilities.getTypeName(index))
+                                    Text(VehiclesUtilities.getEtatName(index))
                                         .tr(),
                               )),
                       value: type,

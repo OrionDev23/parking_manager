@@ -9,6 +9,9 @@ class TableStats extends StatelessWidget {
   final Widget? icon;
   final Widget? content;
 
+  ///to add beside showMore button
+  final Widget? additionalWidget;
+
   final double? height;
   final double? width;
   final void Function()? onTap;
@@ -20,6 +23,7 @@ class TableStats extends StatelessWidget {
       this.content,
       this.onTap,
       this.width,
+      this.additionalWidget,
       this.height});
 
   @override
@@ -67,6 +71,8 @@ class TableStats extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              if (additionalWidget != null) additionalWidget!,
+              if (additionalWidget != null) smallSpace,
               FilledButton(
                   onPressed: onTap, child: const Text('voirplus').tr()),
             ],

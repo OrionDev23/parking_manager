@@ -19,7 +19,7 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen>{
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
@@ -42,7 +42,10 @@ class _LoginScreenState extends State<LoginScreen> {
     while (PanesListState.firstLoading) {
       await Future.delayed(const Duration(milliseconds: 100));
     }
-    checkUser();
+    if(ClientDatabase.user == null){
+      checkUser();
+    }
+
   }
 
   void checkUser() async {
@@ -62,13 +65,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var appTheme = context.watch<AppTheme>();
-    /* if(MediaQuery.of(context).orientation==Orientation.portrait){
-      pwidth=60.w;
-    }
-    else{
-      pwidth=30.w;
-    }*/
+    if (PanesListState.firstLoading) {
+      return const Center(child: ProgressRing());
+    }    var appTheme = context.watch<AppTheme>();
     return ScaffoldPage(
       header: PageTitle(
         text: 'connexion'.tr(),
@@ -77,8 +76,6 @@ class _LoginScreenState extends State<LoginScreen> {
         child: PanesListState.firstLoading
             ? const ProgressRing()
             : Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   bigSpace,
                   bigSpace,

@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../../theme.dart';
-import '../../../../widgets/empty_table_widget.dart';
+import '../../data_table_parcoto.dart';
 
 class ReparationTable extends StatefulWidget {
   final bool selectD;
@@ -194,7 +194,7 @@ class ReparationTableState extends State<ReparationTable> {
             filtered = true;
             filterNow = false;
           }
-          return AsyncPaginatedDataTable2(
+          return DataTableParc(
             header: Padding(
               padding:
                   const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
@@ -243,34 +243,9 @@ class ReparationTableState extends State<ReparationTable> {
               ),
             ),
             sortAscending: assending,
-            headingRowHeight: 25,
-            headingRowDecoration: BoxDecoration(
-                color: appTheme.color,
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(5))),
-            dividerThickness: 0.5,
-            autoRowsToHeight: true,
-            horizontalMargin: 8,
-            columnSpacing: 0,
-            dataRowHeight: rowHeight,
-            onPageChanged: (s) {},
-            showCheckboxColumn: false,
             sortColumnIndex: sortColumn,
-            rowsPerPage: rowPerPage,
-            onRowsPerPageChanged: (nbr) {
-              rowPerPage = nbr ?? 12;
-            },
-            availableRowsPerPage: const [12, 24, 50, 100, 200],
-            empty: NoDataWidget(
-              datasource: reparationDataSource,
-            ),
-            showFirstLastButtons: true,
-            renderEmptyRowsInTheEnd: false,
-            fit: FlexFit.tight,
             columns: columns,
             source: reparationDataSource,
-            sortArrowAlwaysVisible: true,
-            hidePaginator: false,
           );
         });
   }

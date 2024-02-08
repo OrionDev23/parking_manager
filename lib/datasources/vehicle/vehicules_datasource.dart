@@ -61,15 +61,15 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
       )),
       DataCell(Text(element.value.anneeUtil.toString(), style: tstyle)),
       DataCell(Text(
-              VehiclesUtilities.getTypeName(element.value.etatactuel ?? 0),
+              VehiclesUtilities.getEtatName(element.value.etatactuel ?? 0),
               style: tstyle)
           .tr()),
       DataCell(Text(
-          VehiclesUtilities.getPerimetre(element.value.etatactuel ?? 0),
+          VehiclesUtilities.getPerimetre(element.value.perimetre),
           style: tstyle)
           .tr()),
       DataCell(Text(
-          element.value.appartenance??'',
+          VehiclesUtilities.getAppartenance(element.value.appartenance),
           style: tstyle)
           .tr()),
       DataCell(

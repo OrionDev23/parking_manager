@@ -381,7 +381,8 @@
   "vehicledocuments": "Vehicles docs",
   "activities": "Activities",
   "voirplus": "See more",
-  "depenses":"Expenses",
+  "depenses":"Cost of repairs",
+  "costs":"Expenses",
   "avg": "Average",
   "deletenotif": "Do not show this notification again ?",
   "backup": "Data backup",
@@ -408,6 +409,12 @@
   "directionssempty": "You have not yet added any departements",
   "filialeexploit": "Subsidiary that operates the vehicle",
   "direction": "Departement",
-  "lourd?": "Heavy vehicle?"
+  "lourd?": "Heavy vehicle?",
+  "nodatayet": "No data yet",
+  "groupvalues": "Group values less than",
+  "hideempty": "Do not show empty labels",
+  "months": "Months"
+
+
 
 }

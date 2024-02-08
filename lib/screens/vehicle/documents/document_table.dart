@@ -8,8 +8,8 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../datasources/vehic_doc/document_datasource.dart';
 import '../../../serializables/vehicle/vehicle.dart';
 import '../../../theme.dart';
-import '../../../widgets/empty_table_widget.dart';
 import '../../../widgets/zone_box.dart';
+import '../../data_table_parcoto.dart';
 import '../manager/vehicles_table.dart';
 
 class DocumentTable extends StatefulWidget {
@@ -133,7 +133,7 @@ class DocumentTableState extends State<DocumentTable> {
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
     documentsDataSource.appTheme = appTheme;
-    return AsyncPaginatedDataTable2(
+    return DataTableParc(
       header: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
         child: Row(
@@ -456,32 +456,9 @@ class DocumentTableState extends State<DocumentTable> {
         ),
       ),
       sortAscending: assending,
-      headingRowHeight: 25,
-      headingRowDecoration: BoxDecoration(
-          color: appTheme.color,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(5))),
-      dividerThickness: 0.5,
-      autoRowsToHeight: true,
-      empty: NoDataWidget(
-        datasource: documentsDataSource,
-      ),
-      horizontalMargin: 8,
-      columnSpacing: 0,
-      dataRowHeight: rowHeight,
-      onPageChanged: (s) {},
-      showCheckboxColumn: false,
       sortColumnIndex: sortColumn,
-      rowsPerPage: rowPerPage,
-      onRowsPerPageChanged: (nbr) {
-        rowPerPage = nbr ?? 12;
-      },
-      availableRowsPerPage: const [12, 24, 50, 100, 200],
-      showFirstLastButtons: true,
-      renderEmptyRowsInTheEnd: false,
-      fit: FlexFit.tight,
       columns: columns,
       source: documentsDataSource,
-      sortArrowAlwaysVisible: true,
       hidePaginator: false,
     );
   }

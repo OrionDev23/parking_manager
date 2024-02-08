@@ -20,10 +20,11 @@ class StateCategoryBars extends StatefulWidget {
 
 class _StateBarsState extends State<StateCategoryBars> {
   bool loading = false;
-
+  late TooltipBehavior tooltip;
   List<ChartDataCategory> values = [];
   @override
   void initState() {
+    tooltip = TooltipBehavior(enable: true);
     initValues();
     super.initState();
   }
@@ -36,9 +37,13 @@ class _StateBarsState extends State<StateCategoryBars> {
     }
     await Future.wait(tasks);
     sortAsIntended();
-    setState(() {
-      loading = false;
-    });
+    loading = false;
+
+    if(mounted){
+      setState(() {
+      });
+    }
+
   }
 
   void sortAsIntended() {
@@ -85,58 +90,38 @@ class _StateBarsState extends State<StateCategoryBars> {
         smallSpace,
         Expanded(
           child: SfCartesianChart(
+            plotAreaBorderWidth: 0,
+            legend: const Legend(
+              isVisible: true,
+            ),
             margin: const EdgeInsets.all(5),
+            tooltipBehavior: tooltip,
+            primaryYAxis: const NumericAxis(
+                interval: 10,
+                axisLine: AxisLine(width: 0),
+                majorTickLines: MajorTickLines(size: 0)),
             primaryXAxis: const CategoryAxis(
-                //arrangeByIndex: true,
+                labelIntersectAction: AxisLabelIntersectAction.multipleRows,
+                majorGridLines: MajorGridLines(width: 0)
                 ),
-            series: List<ColumnSeries<ChartDataCategory, String>>.generate(
-                values.first.values.length, (index) {
+            series: List<ColumnSeries<ChartData, String>>.generate(
+                values.length, (index) {
               return ColumnSeries(
+                  name: values[index].category.tr(),
                   borderRadius:
                       const BorderRadius.vertical(top: Radius.circular(5)),
-                  dataSource: values,
+                  dataSource: values[index].values,
                   width: 1,
                   spacing: 0.1,
                   xValueMapper: (s, r) {
-                    return s.category.tr();
+                    return s.label.tr();
                   },
-                  dataLabelSettings: DataLabelSettings(
-                    isVisible: true,
-                    builder: (data, point, series, pointIndex, seriesIndex) {
-                      ChartDataCategory d = data;
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            d.values[seriesIndex].y.toString(),
-                            style: const TextStyle(fontSize: 10),
-                          ),
-                          smallSpace,
-
-                          SizedBox(
-                            height: (point.y??0).toDouble()*0.65,
-                          ),
-                          Text(
-                            d.values[seriesIndex].label.tr(),
-                            style: const TextStyle(fontSize: 10),
-                          ),
-                          smallSpace,
-                        ],
-                      );
-                    },
-                    labelPosition: ChartDataLabelPosition.inside,
-                    labelAlignment: ChartDataLabelAlignment.auto,
-                    margin: EdgeInsets.zero,
-                  ),
                   dataLabelMapper: (s, t) {
-                    return '${s.values[index].y.toString()} \n ${s.values[index].label.tr()}';
-                  },
-                  pointColorMapper: (s, t) {
-                    return getRandomColor(t, appTheme);
+                    return '${s.y.toString()} \n ${s
+                        .label.tr()}';
                   },
                   yValueMapper: (s, r) {
-                    return s.values[index].y;
+                    return s.y;
                   });
             }),
           ),
@@ -144,25 +129,9 @@ class _StateBarsState extends State<StateCategoryBars> {
       ],
     );
   }
-
-  Color getRandomColor(int index, AppTheme appTheme) {
-    switch (index) {
-      case 0:
-        return appTheme.color.lightest;
-      case 1:
-        return appTheme.color;
-      case 2:
-        return appTheme.color.darker;
-      case 3:
-        return appTheme.color.light;
-      case 4:
-        return appTheme.color.darkest;
-      case 5:
-        return appTheme.color.lighter;
-      case 6:
-        return appTheme.color.dark;
-      default:
-        return appTheme.color;
-    }
+  @override
+  void dispose() {
+    values.clear();
+    super.dispose();
   }
 }

@@ -608,9 +608,10 @@ class MyEntrepriseState extends State<MyEntreprise> {
   TextEditingController fillialeToAdd = TextEditingController();
   TextEditingController directionToAdd = TextEditingController();
 
+  double tilesHeight=50.px;
   Widget fillialeWidget(AppTheme appTheme) {
     return SizedBox(
-      height: filliales.isEmpty?100.px:filliales.length * 40.px + 80.px,
+      height: filliales.isEmpty?100.px:filliales.length * tilesHeight + 80.px,
       child: ZoneBox(
         label: 'fililales'.tr(),
         child: Padding(
@@ -681,7 +682,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     );
                   }
                   return SizedBox(
-                    height: 40.px,
+                    height: tilesHeight,
                     child: ListTile(
                       tileColor:
                       ButtonState.all<Color>(appTheme.fillColor),
@@ -691,7 +692,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       trailing: IconButton(
-                        icon: const Icon(FluentIcons.cancel),
+                        icon: const Icon(FluentIcons.cancel,size: 15,),
                         onPressed: () {
                           setState(() {
                             filliales.removeAt(index);
@@ -711,7 +712,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
 
   Widget directionsWidget(AppTheme appTheme) {
     return SizedBox(
-      height: directions.isEmpty?100.px:directions.length * 40.px + 80.px,
+      height: directions.isEmpty?100.px:directions.length * tilesHeight + 80.px,
       child: ZoneBox(
         label: 'directions'.tr(),
         child: Padding(
@@ -782,7 +783,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     );
                   }
                   return SizedBox(
-                    height: 40.px,
+                    height: tilesHeight,
                     child: ListTile(
                       tileColor:
                           ButtonState.all<Color>(appTheme.fillColor),

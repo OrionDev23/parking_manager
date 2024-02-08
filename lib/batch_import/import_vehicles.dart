@@ -107,15 +107,27 @@ class _ImportVehiclesState extends State<ImportVehicles> {
     String prenom = columnToRead.containsKey('prenom')
         ?data[columnToRead['prenom']!]!.value.toString():"";
     String filliale=columnToRead.containsKey('filliale')
-        ?data[columnToRead['filliale']!]!.value.toString().toUpperCase():"";
+        ?VehiclesUtilities.getAppartenance
+      (data[columnToRead['filliale']!]!.value.toString()).replaceAll(' ', ''
+    ).trim().toUpperCase():"";
     String apartenance=columnToRead.containsKey('appartenance')
-        ?data[columnToRead['appartenance']!]!.value.toString().toUpperCase():"";
+        ?VehiclesUtilities.getAppartenance
+      (data[columnToRead['appartenance']!]!.value
+        .toString())
+      .replaceAll(' ', '').trim().toUpperCase()
+        :"";
+    String direction=columnToRead.containsKey('direction')
+        ?VehiclesUtilities.getDirection
+      (data[columnToRead['direction']!]!.value
+        .toString())
+      .replaceAll(' ', '').trim().toUpperCase()
+        :"";
     List<String> ms = matricule.split('-');
     int? wilaya = etrang ? null : int.tryParse(ms[2]) ?? 16;
     int genre=etrang ? 1 : (int.tryParse(ms[1]) ?? 100) ~/ 100;
     bool lourd=columnToRead.containsKey('poids')
         ?data[columnToRead['poids']!]!.value.toString().toUpperCase()
-        .contains('lou'):genre==2||genre==4;
+        .contains('LOU'):genre==2||genre==4|| genre==5 || genre==6||genre==8 ;
     Vehicle vehicle = Vehicle(
         id: id,
         matricule: matricule,
@@ -127,6 +139,7 @@ class _ImportVehiclesState extends State<ImportVehicles> {
         type: model,
         filliale: filliale,
         appartenance: apartenance,
+        direction: direction,
         wilaya: etrang ? null : wilaya,
         daira: etrang
             ? null
@@ -147,7 +160,6 @@ class _ImportVehiclesState extends State<ImportVehicles> {
         genre: (genre).toString(),
         lourd: lourd,
         anneeUtil: VehiclesUtilities.getAnneeFromMatricule(matricule));
-
     if(importedVehicles.containsKey(vehicle.matricule)){
       replaceVehicleEmptiness(vehicle);
     }
@@ -224,10 +236,13 @@ class _ImportVehiclesState extends State<ImportVehicles> {
   }
 
   int getPerimetre(String? perimetre){
-    switch(perimetre?.toUpperCase()){
-      case 'BUSINESS':return 0;
-      case 'HORS PERIMETRE':return 1;
-      case 'INDUSTRIE' :return 2;
+    switch(perimetre?.toUpperCase().trim()){
+      case 'BUSINESS' || 'buisiness':
+        return 0;
+      case 'HORS PERIMETRE' || 'hors perimetre':
+        return 1;
+      case 'INDUSTRIE' || 'industrie' :
+        return 2;
       default: return 0;
     }
   }
@@ -288,18 +303,24 @@ class _ImportVehiclesState extends State<ImportVehicles> {
                       .contains('firstname')) {
                 columnToRead['prenom'] = cell.columnIndex;
               }
-              if(value.value.toLowerCase().contains('appartenance  vehicule')){
+              if(value.value.toLowerCase().contains('appartenance') && value
+                  .value.toLowerCase().contains('vehicule')){
                 columnToRead['appartenance']=cell.columnIndex;
               }
-              if(value.value.toLowerCase().contains('filiale')){
+              if(value.value.toLowerCase().contains('filiale') && value
+                  .value.toLowerCase().contains('vehicule')){
                 columnToRead['filliale']=cell.columnIndex;
               }
-              if(value.value.toLowerCase().contains('périmetre') || value
-                  .value.toLowerCase().contains('perimetre')){
+              if(value.value.toLowerCase().contains('direction') ){
+                columnToRead['direction']=cell.columnIndex;
+              }
+              if(value.value.toLowerCase().trim().contains('périmetre') || value
+                  .value.toLowerCase().trim().contains('perimetre')){
                 columnToRead['perimetre']=cell.columnIndex;
               }
-              if(value.value.toLowerCase().contains('poids') || value
-                  .value.toLowerCase().contains('Lourd/Leger')){
+              if(value.value.toLowerCase().trim().contains('poids') || value
+                  .value.toLowerCase().trim().replaceAll(' ', '').contains
+                ('Lourd/Leger')){
                 columnToRead['poids']=cell.columnIndex;
               }
               break;
@@ -403,7 +424,7 @@ class _ImportVehiclesState extends State<ImportVehicles> {
                       trailing: Row(
                         children: [
                           Text(
-                            VehiclesUtilities.getTypeName(
+                            VehiclesUtilities.getEtatName(
                                 e.value.etatactuel ?? 0),
                             style: TextStyle(color: Colors.grey[100]),
                           ).tr(),

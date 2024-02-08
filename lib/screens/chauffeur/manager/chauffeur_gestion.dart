@@ -8,7 +8,7 @@ import '../../../../theme.dart';
 import '../../../../widgets/button_container.dart';
 import '../../../../widgets/page_header.dart';
 import '../../../providers/counters.dart';
-import '../../dashboard/pie_chart/pie_chart.dart';
+import '../../dashboard/charts/pie_chart.dart';
 import '../../logs/logging/log_table.dart';
 import 'chauffeur_form.dart';
 import 'chauffeur_table.dart';
