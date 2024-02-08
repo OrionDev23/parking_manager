@@ -13,10 +13,8 @@ class ParcOtoPie extends StatefulWidget {
 
   final List<MapEntry<String, Future<int>>> labels;
 
-  final double radius;
-
   const ParcOtoPie(
-      {super.key, required this.labels, this.title, required this.radius});
+      {super.key, required this.labels, this.title,});
 
   @override
   State<ParcOtoPie> createState() => _ParcOtoPieState();
@@ -62,7 +60,9 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
         MapEntry(widget.labels[index].key, await widget.labels[index].value));
   }
 
+  bool notOnlyOne=false;
   void sortAsIntended() {
+    int noo=0;
     List<MapEntry<String, int>> result = [];
     for (int i = 0; i < widget.labels.length; i++) {
       for (int j = 0; j < values.length; j++) {
@@ -71,6 +71,9 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
             valueOfBiggest = values[j].value;
             indexOfBiggest = i;
           }
+          if(values[j].value>0){
+              noo++;
+          }
           result.add(MapEntry(values[j].key, values[j].value));
 
           values.removeAt(j);
@@ -78,12 +81,17 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
         }
       }
     }
+    if(noo>1){
+      notOnlyOne=true;
+    }
+    else{
+      notOnlyOne=false;
+    }
     values.addAll(result);
+
   }
 
   late final int totalNumber;
-
-  int touchedIndex = -1;
 
   int minValue = 10;
   @override
@@ -116,7 +124,7 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
-                      packageImage: PackageImage.Image_3,
+                      image: PackageImage.Image_3.encode(),
                     ),
                   ),
                 )
@@ -135,7 +143,8 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                         legendIconType: LegendIconType.circle,
                         explode: true,
                         explodeIndex: indexOfBiggest,
-                        groupMode: group?CircularChartGroupMode.value:null,
+                        groupMode: notOnlyOne&&group?CircularChartGroupMode
+                            .value:null,
                         groupTo: minValue.toDouble(),
                         dataSource: values,
                         xValueMapper: (s, t) {
@@ -157,7 +166,7 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                     ],
                   ),
                 ),
-          if (valueOfBiggest != 0)
+          if (valueOfBiggest != 0 && notOnlyOne)
             SizedBox(
               height: 30.px,
               child: Row(

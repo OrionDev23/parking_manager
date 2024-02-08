@@ -44,7 +44,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'nom',
             style: tstyle,
           ).tr(),
@@ -61,7 +61,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'disponibilite',
             style: tstyle,
           ).tr(),
@@ -78,7 +78,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child:  Text(
             'dateajout',
             style: tstyle,
           ).tr(),

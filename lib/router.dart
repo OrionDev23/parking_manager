@@ -19,27 +19,26 @@ class Routes {
     final savedSettings = prefs;
     router = GoRouter(
 
-      initialLocation: '/',
+      initialLocation: '/dashboard',
       routes: [
-        GoRoute(
-            name: 'home',
-            path: '/',
-            builder: (context, state, ) => PanesList(
+        ShellRoute(
+
+            builder: (context, state,s ) => PanesList(
                   paneList: PaneItemsAndFooters(savedSettings), appTheme: appTheme,
                 ),
             routes: [
               GoRoute(
                 name: 'login',
-                path: 'login',
+                path: '/login',
                 builder: (context, state) => const LoginScreen(),
               ),
               GoRoute(
                 name: 'dashboard',
-                path: 'dashboard',
+                path: '/dashboard',
                 builder: (context, state) => const Dashboard(),
               ),
               GoRoute(
-                  path: 'vehicles',
+                  path: '/vehicles',
                   builder: (context, state) => const VehicleDashboard(),
                   routes: [
                     GoRoute(

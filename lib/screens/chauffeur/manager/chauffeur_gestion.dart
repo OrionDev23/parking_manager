@@ -1,19 +1,19 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/foundation.dart';
+import 'package:parc_oto/batch_import/import_conducteurs.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../../theme.dart';
 import '../../../../widgets/button_container.dart';
 import '../../../../widgets/page_header.dart';
-import '../../../providers/counters.dart';
-import '../../dashboard/charts/pie_chart.dart';
-import '../../logs/logging/log_table.dart';
+import '../../../providers/client_database.dart';
 import 'chauffeur_form.dart';
 import 'chauffeur_table.dart';
 import 'chauffeur_tabs.dart';
 
+bool showImportConducteur=false;
 class ChauffeurGestion extends StatefulWidget {
   final bool archive;
 
@@ -37,84 +37,64 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
         text: widget.archive ? 'archive'.tr() : 'gchauffeurs'.tr(),
         trailing: widget.archive
             ? null
-            : SizedBox(
-                width: 15.w,
-                height: 10.h,
-                child: ButtonContainer(
-                  icon: FluentIcons.add,
-                  text: 'add'.tr(),
-                  showBottom: false,
-                  showCounter: false,
-                  action: () {
-                    final index = ChauffeurTabsState.tabs.length + 1;
-                    final tab = generateTab(index);
-                    ChauffeurTabsState.tabs.add(tab);
-                    ChauffeurTabsState.currentIndex.value = index - 1;
-                  },
-                )),
-      ),
-      content: Row(
-        children: [
-          SizedBox(
-              width: 60.w,
-              child: ChauffeurTable(
-                archive: widget.archive,
-              )),
-          smallSpace,
-          Flexible(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+            : Row(
               children: [
-                Flexible(
-                  child: ValueListenableBuilder(
-                      valueListenable: stateChanges,
-                      builder: (context, val, w) {
-                        return Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: ParcOtoPie(
-                            radius: kIsWeb ? 45 : 75,
-                            title: 'disponibilite'.tr(),
-                            labels: [
-                              MapEntry('disponible',
-                                  DatabaseCounters().countChauffeur(etat: 0)),
-                              MapEntry('absent',
-                                  DatabaseCounters().countChauffeur(etat: 1)),
-                              MapEntry('mission',
-                                  DatabaseCounters().countChauffeur(etat: 2)),
-                              MapEntry('quitteentre',
-                                  DatabaseCounters().countChauffeur(etat: 3))
-                            ],
-                          ),
-                        );
-                      }),
-                ),
-                smallSpace,
-                Text(
-                  'lactivities',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: appTheme.writingStyle.color),
-                ).tr(),
-                smallSpace,
-                const Flexible(
-                  child: LogTable(
-                    statTable: true,
-                    pages: false,
-                    numberOfRows: 3,
-                    filters: {'typemin': '16', 'typemax': '25'},
-                    fieldsToShow: ['act', 'date'],
-                  ),
-                ),
+                if (showImportConducteur && ClientDatabase().isAdmin())
+                  SizedBox(
+                      width: 200.px,
+                      height: 70.px,
+                      child: ButtonContainer(
+                        color: appTheme.color.darkest,
+                        icon: FluentIcons.add,
+                        text: 'importlist'.tr(),
+                        showBottom: false,
+                        showCounter: false,
+                        action: importList,
+                      )),
+                if (showImportConducteur && ClientDatabase().isAdmin()) smallSpace,
+                SizedBox(
+                    width: 15.w,
+                    height: 10.h,
+                    child: ButtonContainer(
+                      icon: FluentIcons.add,
+                      text: 'add'.tr(),
+                      showBottom: false,
+                      showCounter: false,
+                      action: () {
+                        final index = ChauffeurTabsState.tabs.length + 1;
+                        final tab = generateTab(index);
+                        ChauffeurTabsState.tabs.add(tab);
+                        ChauffeurTabsState.currentIndex.value = index - 1;
+                      },
+                    )),
               ],
             ),
-          ),
-        ],
       ),
+      content: ChauffeurTable(
+        archive: widget.archive,
+      )
     );
   }
 
+
+  void importList() async {
+    FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['xlsx'],
+      allowMultiple: false,
+    );
+    if (pickedFile != null) {
+      Future.delayed(const Duration(milliseconds: 50))
+          .then((value) => showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (c) {
+            return ImportConducteurs(
+              file: pickedFile,
+            );
+          }));
+    }
+  }
   Tab generateTab(int index) {
     late Tab tab;
     tab = Tab(

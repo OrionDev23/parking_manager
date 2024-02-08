@@ -38,25 +38,22 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation> {
     final numberFormat = NumberFormat('00000000', 'fr');
     final numberFormat2 =
         NumberFormat.currency(locale: 'fr', symbol: 'DA', decimalDigits: 2);
-    final tstyle = TextStyle(
-      fontSize: 10.sp,
-    );
     return [
       DataCell(SelectableText(
         numberFormat.format(element.value.numero),
-        style: tstyle,
+        style: rowTextStyle,
       )),
-      DataCell(SelectableText(element.value.vehiculemat ?? '', style: tstyle)),
+      DataCell(SelectableText(element.value.vehiculemat ?? '', style: rowTextStyle)),
       DataCell(
-          SelectableText(element.value.prestatairenom ?? '', style: tstyle)),
+          SelectableText(element.value.prestatairenom ?? '', style: rowTextStyle)),
       DataCell(SelectableText(dateFormat2.format(element.value.date),
-          style: tstyle)),
+          style: rowTextStyle)),
       DataCell(SelectableText(
         numberFormat2.format(element.value.getPrixTTC()),
-        style: tstyle,
+        style: rowTextStyle,
       )),
       DataCell(SelectableText(dateFormat.format(element.value.updatedAt!),
-          style: tstyle)),
+          style: rowTextStyle)),
       if (selectC != true)
         DataCell(f.FlyoutTarget(
           controller: element.value.controller,

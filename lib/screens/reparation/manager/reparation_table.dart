@@ -67,7 +67,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'num',
             style: tstyle,
           ).tr(),
@@ -84,7 +84,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'matricule',
             style: tstyle,
           ).tr(),
@@ -101,7 +101,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'prestataire',
             style: tstyle,
           ).tr(),
@@ -118,7 +118,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'date',
             style: tstyle,
           ).tr(),
@@ -135,7 +135,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'montantt',
             style: tstyle,
           ).tr(),
@@ -151,7 +151,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'dateModif',
             style: tstyle,
           ).tr(),

@@ -1,5 +1,7 @@
 library select_dialog;
 
+import 'package:easy_localization/easy_localization.dart';
+import 'package:fluent_ui/fluent_ui.dart' show Button;
 import 'package:flutter/material.dart';
 
 import 'multiple_items_bloc.dart';
@@ -148,6 +150,11 @@ class SelectDialog<T> extends StatefulWidget {
             searchBoxMinLines: searchBoxMinLines,
             findController: findController,
           ),
+          actions: [
+            Button(child: const Text('fermer').tr(),onPressed: (){
+              Navigator.of(context).pop();
+            },),
+          ],
         );
       },
     );

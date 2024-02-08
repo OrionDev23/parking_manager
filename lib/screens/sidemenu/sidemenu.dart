@@ -131,6 +131,7 @@ class PanesListState extends State<PanesList> with WindowListener {
     if (firstLoading) {
       return const Center(child: ProgressRing());
     }
+    bool portrait=MediaQuery.of(context).orientation==Orientation.portrait;
     return ValueListenableBuilder(
         valueListenable: signedIn,
         builder: (BuildContext context, bool value, Widget? child) {
@@ -166,8 +167,8 @@ class PanesListState extends State<PanesList> with WindowListener {
                                         .inDays
                                         .toString()
                                   }),
-                                if (demo) bigSpace,
-                                if (demo)
+                                if (demo && !portrait) bigSpace,
+                                if (demo && !portrait)
                                   Text(
                                     'demofor'.tr().toUpperCase(),
                                     style: TextStyle(
@@ -176,8 +177,8 @@ class PanesListState extends State<PanesList> with WindowListener {
                                       fontSize: 14,
                                     ),
                                   ),
-                                if (brandt) smallSpace,
-                                if (brandt)
+                                if (brandt && !portrait) smallSpace,
+                                if (brandt && !portrait)
                                   Image.asset(
                                     'assets/images/brandt.png',
                                     width: 60.px,

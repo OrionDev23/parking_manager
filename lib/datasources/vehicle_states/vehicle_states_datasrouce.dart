@@ -39,35 +39,32 @@ class VStatesDatasource extends ParcOtoDatasource<Etat> {
   @override
   List<DataCell> getCellsToShow(MapEntry<String, Etat> element) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
-    final tstyle = TextStyle(
-      fontSize: 10.sp,
-    );
 
     return [
-      DataCell(Text(element.value.vehicleMat, style: tstyle), onTap: () {
+      DataCell(Text(element.value.vehicleMat, style: rowTextStyle), onTap: () {
         showMyVehicule(element.value.vehicleMat);
       }),
       DataCell(SelectableText(
         VehiclesUtilities.getEtatName(element.value.type).tr(),
-        style: tstyle,
+        style: rowTextStyle,
       )),
       DataCell(SelectableText(
           element.value.date != null
               ? dateFormat.format(element.value.date!)
               : '',
-          style: tstyle)),
-      DataCell(SelectableText(element.value.remarque ?? '', style: tstyle)),
+          style: rowTextStyle)),
+      DataCell(SelectableText(element.value.remarque ?? '', style: rowTextStyle)),
       DataCell(SelectableText(
           element.value.ordreNum != null
               ? NumberFormat('000000000', 'fr_FR')
                   .format(element.value.ordreNum)
               : '',
-          style: tstyle)),
+          style: rowTextStyle)),
       DataCell(SelectableText(
           element.value.updatedAt != null
               ? dateFormat.format(element.value.updatedAt!)
               : '',
-          style: tstyle)),
+          style: rowTextStyle)),
       DataCell(ClientDatabase().isAdmin() || ClientDatabase().isManager()
           ? f.FlyoutTarget(
               controller: element.value.controller,

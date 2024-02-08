@@ -44,7 +44,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'vehicule',
             style: tstyle,
           ).tr(),
@@ -61,7 +61,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'etat',
             style: tstyle,
           ).tr(),
@@ -78,7 +78,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'date',
             style: tstyle,
           ).tr(),
@@ -95,7 +95,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'notes',
             style: tstyle,
           ).tr(),
@@ -112,7 +112,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'reparation',
             style: tstyle,
           ).tr(),
@@ -129,7 +129,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'dateModif',
             style: tstyle,
           ).tr(),

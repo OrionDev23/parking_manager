@@ -447,10 +447,15 @@
  "fillialesempty": "Vous n'avez pas encore ajouté de filiales",
  "directionssempty": "Vous n'avez pas encore ajouté de départements",
  "filialeexploit": "Filiale qui exploite le véhicule",
- "direction": "Directions",
+ "direction": "Direction",
  "lourd?": "Véhicule lourd ?",
  "nodatayet": "Pas encore de données",
  "groupvalues": "Grouper les valeurs inferieures à",
  "hideempty": "Ne pas afficher les étiquettes vides",
- "months": "Mois"
+ "months": "Mois",
+ "appartenancevehicule": "Appartenance des véhicules",
+ "appartenanceconducteur": "Appartenance des conducteurs",
+ "majvehicules": "Dernières maj des véhicules",
+ "majreparation": "Dernières maj des réparations",
+ "majconducteurs": "Dernières maj des conducteurs"
 }

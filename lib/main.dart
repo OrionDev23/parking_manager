@@ -95,6 +95,14 @@ class MyApp extends StatelessWidget {
         create: (_) => AppTheme(),
         builder: (context, _) {
           final appTheme = context.watch<AppTheme>();
+          bool portrait=MediaQuery.of(context).orientation==Orientation
+              .portrait;
+          if(portrait){
+            tstyle=tstyle.copyWith(fontSize: 13.sp);
+          }
+          else{
+            tstyle=tstyle.copyWith(fontSize: 10.sp);
+          }
           return FluentApp.router(
             key: navigatorKey,
             title: appTitle,

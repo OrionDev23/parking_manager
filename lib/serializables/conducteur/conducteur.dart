@@ -25,7 +25,7 @@ class Conducteur extends ParcOtoDefault {
   int? etat;
   String? filliale;
   String? direction;
-  List<String>? vehicules;
+  List<String>? vehicules=[];
 
   String matricule;
 

@@ -4,10 +4,14 @@ import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/parcoto_webservice.dart';
 import 'package:parc_oto/datasources/parcoto_webservice_response.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../providers/client_database.dart';
 import '../serializables/parc_oto_serializable.dart';
 import '../theme.dart';
+TextStyle rowTextStyle=TextStyle(
+  fontSize: 10.sp,
+);
 
 abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
   BuildContext current;
@@ -76,8 +80,15 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
         const Duration(milliseconds: 0), () => empty ? 0 : data.length);
   }
 
+  static bool lastPortrait=false;
   @override
   Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
+    bool portrait=MediaQuery.of(current).orientation==Orientation.portrait;
+    if(portrait!=lastPortrait){
+      rowTextStyle = TextStyle(
+        fontSize: portrait?13.sp:10.sp,
+      );
+    }
     if (errorCounter != null) {
       errorCounter = errorCounter! + 1;
 
@@ -107,6 +118,7 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
 
   DataRow rowDisplay(
       int startIndex, int count, MapEntry<String, dynamic> element) {
+
     return DataRow(
       key: ValueKey<String>(element.value.id),
       onSelectChanged: selectC == true

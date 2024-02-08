@@ -31,7 +31,7 @@ class NoDataWidget extends StatelessWidget {
               fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
-            packageImage: PackageImage.Image_3,
+            image: PackageImage.Image_3.encode(),
           ),
         ),
         if (datasource != null) bigSpace,

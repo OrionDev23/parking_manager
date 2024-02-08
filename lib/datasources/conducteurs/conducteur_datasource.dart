@@ -35,31 +35,28 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
   @override
   List<DataCell> getCellsToShow(MapEntry<String, Conducteur> element) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
-    final tstyle = TextStyle(
-      fontSize: 10.sp,
-    );
     return [
       DataCell(SelectableText(
         '${element.value.name} ${element.value.prenom}',
-        style: tstyle,
+        style: rowTextStyle,
       )),
       DataCell(SelectableText(
         element.value.email ?? '',
-        style: tstyle,
+        style: rowTextStyle,
       )),
       DataCell(SelectableText(
         element.value.telephone ?? '',
-        style: tstyle,
+        style: rowTextStyle,
       )),
       DataCell(SelectableText(
         ClientDatabase.getEtat(element.value.etat).tr(),
-        style: tstyle,
+        style: rowTextStyle,
       )),
       DataCell(SelectableText(
         element.value.updatedAt == null
             ? ''
             : dateFormat.format(element.value.updatedAt!),
-        style: tstyle,
+        style: rowTextStyle,
       )),
       DataCell(ClientDatabase().isAdmin() || ClientDatabase().isManager()
           ? f.FlyoutTarget(

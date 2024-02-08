@@ -65,7 +65,7 @@ class _UsersTableState extends State<UsersTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'nom',
             style: tstyle,
           ).tr(),
@@ -82,7 +82,7 @@ class _UsersTableState extends State<UsersTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'email',
             style: tstyle,
           ).tr(),
@@ -99,7 +99,7 @@ class _UsersTableState extends State<UsersTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'ID',
             style: tstyle,
           ).tr(),
@@ -116,7 +116,7 @@ class _UsersTableState extends State<UsersTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'role',
             style: tstyle,
           ).tr(),
@@ -133,7 +133,7 @@ class _UsersTableState extends State<UsersTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'dateajout',
             style: tstyle,
           ).tr(),

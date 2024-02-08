@@ -10,7 +10,8 @@ import 'utilities/theme_colors.dart';
 enum NavigationIndicators { sticky, end }
 
 late final double rowHeight;
-const tstyle = TextStyle(fontSize: 9, fontWeight: FontWeight.bold);
+TextStyle tstyle = const TextStyle(fontSize:9, fontWeight:
+FontWeight.bold);
 final placeStyle = TextStyle(color: Colors.grey[100]);
 const smallSpace = SizedBox(
   width: 5,

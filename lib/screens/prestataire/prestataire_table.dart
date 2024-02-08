@@ -67,7 +67,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'nom',
             style: tstyle,
           ).tr(),
@@ -84,7 +84,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'telephone',
             style: tstyle,
           ).tr(),
@@ -101,7 +101,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'email',
             style: tstyle,
           ).tr(),
@@ -118,7 +118,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'NIF',
             style: tstyle,
           ).tr(),
@@ -135,7 +135,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'RC',
             style: tstyle,
           ).tr(),
@@ -151,7 +151,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'dateModif',
             style: tstyle,
           ).tr(),

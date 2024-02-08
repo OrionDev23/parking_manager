@@ -28,13 +28,10 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
   @override
   List<DataCell> getCellsToShow(MapEntry<String, Vehicle> element) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
-    final tstyle = TextStyle(
-      fontSize: 10.sp,
-    );
     return [
       DataCell(SelectableText(
         element.value.matricule,
-        style: tstyle,
+        style: rowTextStyle,
       )),
       DataCell(Row(
         children: [
@@ -53,27 +50,27 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
           Expanded(
               child: Text(
             element.value.type ?? '',
-            style: tstyle,
+            style: rowTextStyle,
             softWrap: true,
             overflow: TextOverflow.ellipsis,
           )),
         ],
       )),
-      DataCell(Text(element.value.anneeUtil.toString(), style: tstyle)),
+      DataCell(Text(element.value.anneeUtil.toString(), style: rowTextStyle)),
       DataCell(Text(
               VehiclesUtilities.getEtatName(element.value.etatactuel ?? 0),
-              style: tstyle)
+              style: rowTextStyle)
           .tr()),
       DataCell(Text(
           VehiclesUtilities.getPerimetre(element.value.perimetre),
-          style: tstyle)
+          style: rowTextStyle)
           .tr()),
       DataCell(Text(
           VehiclesUtilities.getAppartenance(element.value.appartenance),
-          style: tstyle)
+          style: rowTextStyle)
           .tr()),
       DataCell(
-          Text(dateFormat.format(element.value.updatedAt!), style: tstyle)),
+          Text(dateFormat.format(element.value.updatedAt!), style: rowTextStyle)),
       if (selectC != true)
         DataCell(
           ClientDatabase().isAdmin() || ClientDatabase().isManager()

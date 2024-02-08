@@ -4,11 +4,13 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/serializables/conducteur/conducteur.dart';
 import 'package:parc_oto/serializables/conducteur/disponibilite_chauffeur.dart';
+import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:parc_oto/widgets/zone_box.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../theme.dart';
+import '../../entreprise/entreprise.dart';
 
 int chaufCounter = 0;
 
@@ -37,6 +39,9 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   TextEditingController email = TextEditingController();
   TextEditingController telephone = TextEditingController();
   TextEditingController adresse = TextEditingController();
+
+  TextEditingController selectedAppartenance =  TextEditingController();
+  TextEditingController selectedDirection = TextEditingController();
   DateTime? birthDay;
 
   @override
@@ -57,6 +62,9 @@ class ChauffeurFormState extends State<ChauffeurForm> {
       telephone.text = widget.chauf!.telephone ?? '';
       adresse.text = widget.chauf!.adresse ?? '';
       birthDay = widget.chauf!.dateNaissance;
+      selectedDirection.text=VehiclesUtilities.getDirection(widget.chauf!
+        .direction);
+      selectedAppartenance.text=VehiclesUtilities.getAppartenance(widget.chauf!.filliale);
     }
   }
 
@@ -92,11 +100,12 @@ class ChauffeurFormState extends State<ChauffeurForm> {
               child:ListView(
               children: [
                 SizedBox(
-              height: 450.px,
+              height: 600.px,
                 width: 500.px,
                   child: Column(
                       children: [
                         Flexible(
+                          flex: 2,
                           child: ZoneBox(
                             label: 'matricule'.tr(),
                             child: Padding(
@@ -120,6 +129,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                         ),
                         smallSpace,
                         Flexible(
+                          flex: 2,
                           child: ZoneBox(
                             label: 'fullname'.tr(),
                             child: Padding(
@@ -162,6 +172,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                         ),
                         smallSpace,
                         Flexible(
+                          flex: 2,
                           child: ZoneBox(
                               label: 'birthday'.tr(),
                               child: Container(
@@ -180,7 +191,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                         ),
                         smallSpace,
                         Flexible(
-                          flex: 2,
+                          flex: 4,
                           child: ZoneBox(
                             label: 'contact'.tr(),
                             child: Padding(
@@ -246,6 +257,49 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                         ),
                         smallSpace,
                         Flexible(
+                          flex: 3,
+                          child: ZoneBox(
+                            label: 'affectation'.tr(),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                children: [
+                                  Flexible(
+                                    child: AutoSuggestBox<String>(
+                                      placeholder: 'appartenance'.tr(),
+                                      placeholderStyle: placeStyle,
+
+                                      controller: selectedAppartenance,
+                                      items: List.generate(
+                                          MyEntrepriseState.p!.filiales!.length,
+                                              (index) => AutoSuggestBoxItem(
+                                              value: MyEntrepriseState.p!.filiales![index],
+                                              label: MyEntrepriseState.p!.filiales![index]
+                                                  .toUpperCase())),
+                                    ),
+                                  ),
+                                  smallSpace,
+                                  Flexible(
+                                    child: AutoSuggestBox<String>(
+                                      placeholder: 'direction'.tr(),
+                                      placeholderStyle: placeStyle,
+                                      controller:selectedDirection,
+                                      items: List.generate(
+                                          MyEntrepriseState.p!.directions!.length,
+                                              (index) => AutoSuggestBoxItem(
+                                              value: MyEntrepriseState.p!.directions![index],
+                                              label: MyEntrepriseState.p!.directions![index]
+                                                  .toUpperCase())),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        smallSpace,
+                        Flexible(
+                          flex: 2,
                           child: ZoneBox(
                             label: 'disponibilite'.tr(),
                             child: Padding(
@@ -420,18 +474,19 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   String? etatID;
 
   Future<Document> uploadChauffeur() async {
-    var dateFormat = DateFormat('y/MM/dd', 'fr');
     Conducteur chauf = Conducteur(
       id: chaufID!,
+      matricule: matricule.text,
       name: nom.value.text,
       prenom: prenom.value.text,
       email: email.value.text,
       telephone: telephone.value.text,
+      filliale: selectedAppartenance.text.replaceAll(' ', '').trim(),
+      direction: selectedDirection.text.replaceAll(' ', '').trim(),
       adresse: adresse.value.text,
       dateNaissance: birthDay,
       etat: etat,
       etatactuel: etatID,
-          matricule: '',
     );
     if (widget.chauf != null) {
       return await ClientDatabase.database!

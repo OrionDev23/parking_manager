@@ -80,7 +80,7 @@ class VehicleTableState extends State<VehicleTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'nummat',
             style: tstyle,
           ).tr(),
@@ -97,7 +97,7 @@ class VehicleTableState extends State<VehicleTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'type',
             style: tstyle,
           ).tr(),
@@ -115,7 +115,7 @@ class VehicleTableState extends State<VehicleTable> {
         numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'year',
             style: tstyle,
           ).tr(),
@@ -133,7 +133,7 @@ class VehicleTableState extends State<VehicleTable> {
         numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'etat',
             style: tstyle,
           ).tr(),
@@ -151,7 +151,7 @@ class VehicleTableState extends State<VehicleTable> {
         numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'perimetre',
             style: tstyle,
           ).tr(),
@@ -169,7 +169,7 @@ class VehicleTableState extends State<VehicleTable> {
         numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'appartenance',
             style: tstyle,
           ).tr(),
@@ -187,7 +187,7 @@ class VehicleTableState extends State<VehicleTable> {
         numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'dateModif',
             style: tstyle,
           ).tr(),

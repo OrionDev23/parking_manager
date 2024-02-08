@@ -55,12 +55,17 @@ class _ButtonContainerState extends State<ButtonContainer> {
     super.initState();
   }
 
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
-    var textStyle = TextStyle(
-        fontSize: 12.sp, fontWeight: FontWeight.bold, color: Colors.white);
-    var textStyleButton = TextStyle(fontSize: 10.sp, color: Colors.white);
+    bool portrait=MediaQuery.of(context).orientation==Orientation.portrait;
+    TextStyle textStyle = TextStyle(
+        fontSize: portrait?16.sp:12.sp, fontWeight: FontWeight.bold, color:
+    Colors.white);
+    TextStyle textStyleButton = TextStyle(fontSize: portrait?14.sp:10.sp,
+        color: Colors.white);
+
     return OnTapScaleAndFade(
       onTap: widget.action,
       child: Container(

@@ -413,8 +413,11 @@
   "nodatayet": "No data yet",
   "groupvalues": "Group values less than",
   "hideempty": "Do not show empty labels",
-  "months": "Months"
-
-
+  "months": "Months",
+  "appartenancevehicule": "Vehicle ownership",
+  "appartenanceconducteur": "Drivers belonging",
+  "majvehicules": "Latest vehicles updates",
+  "majreparation": "Latest repairs updates",
+  "majconducteurs": "Latest drivers updates"
 
 }

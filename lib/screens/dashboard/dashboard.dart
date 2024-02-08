@@ -61,6 +61,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
             crossAxisSpacing: 5,
             children: buttonList(appTheme),
           ),
+          smallSpace,
           StaggeredGrid.count(
             crossAxisCount:
             portrait
@@ -393,7 +394,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         crossAxisCellCount: 1,
         child: TableStats(
           height: height,
-          title: 'appartenance'.tr(),
+          title: 'appartenancevehicule'.tr(),
           icon: Icon(
             Icons.emoji_transportation,
             color: appTheme.color.darker,
@@ -406,7 +407,6 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                       .filiales![index]
                       .replaceAll(' ', '').trim())
                 ]))),
-            radius: 100,
           ),
           onTap: () {
             PanesListState.index.value = PaneItemsAndFooters.originalItems
@@ -512,7 +512,32 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         crossAxisCellCount: 1,
         child: TableStats(
           height: height,
-          title: 'vehicules'.tr(),
+          title: 'appartenanceconducteur'.tr(),
+          icon: Icon(
+            Icons.home_work_outlined,
+            color: appTheme.color.darker,
+          ),
+          content: ParcOtoPie(
+            labels: List.generate(MyEntrepriseState.p!.filiales?.length??0,
+                    (index) => MapEntry(MyEntrepriseState.p!
+                    .filiales![index], DatabaseCounters().countChauffeurWithCondition([
+                  Query.equal('filliale', MyEntrepriseState.p!
+                      .filiales![index]
+                      .replaceAll(' ', '').trim())
+                ]))),
+          ),
+          onTap: () {
+            PanesListState.index.value = PaneItemsAndFooters.originalItems
+                .indexOf(PaneItemsAndFooters.vehicles) +
+                1;
+          },
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 1,
+        child: TableStats(
+          height: height,
+          title: 'majvehicules'.tr(),
           icon: Icon(
             FluentIcons.car,
             color: appTheme.color.darker,
@@ -560,7 +585,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         crossAxisCellCount: 1,
         child: TableStats(
           height: height,
-          title: 'reparations'.tr(),
+          title: 'majreparation'.tr(),
           icon: Icon(
             FluentIcons.repair,
             color: appTheme.color.darker,
@@ -587,7 +612,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         crossAxisCellCount: 1,
         child: TableStats(
           height: height,
-          title: 'chauffeurs'.tr(),
+          title: 'majconducteurs'.tr(),
           icon: Icon(
             FluentIcons.people,
             color: appTheme.color.darker,

@@ -30,24 +30,21 @@ class DisponibiliteDataSource
   List<DataCell> getCellsToShow(
       MapEntry<String, DisponibiliteChauffeur> element) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
-    final tstyle = TextStyle(
-      fontSize: 10.sp,
-    );
     return [
       DataCell(SelectableText(
         element.value.chauffeurNom,
-        style: tstyle,
+        style: rowTextStyle,
         onTap: () {
           goToChauffeur(element.value.chauffeurNom);
         },
       )),
       DataCell(SelectableText(
         ClientDatabase.getEtat(element.value.type).tr(),
-        style: tstyle,
+        style: rowTextStyle,
       )),
       DataCell(SelectableText(
         dateFormat.format(element.value.createdAt!),
-        style: tstyle,
+        style: rowTextStyle,
       )),
       DataCell(
         ClientDatabase().isAdmin()

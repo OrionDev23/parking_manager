@@ -33,33 +33,30 @@ class PrestataireDataSource extends ParcOtoDatasource<Prestataire> {
   @override
   List<DataCell> getCellsToShow(MapEntry<String, Prestataire> element) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
-    final tstyle = TextStyle(
-      fontSize: 10.sp,
-    );
     return [
       DataCell(SelectableText(
         element.value.nom,
-        style: tstyle,
+        style: rowTextStyle,
       )),
       DataCell(SelectableText(
         element.value.telephone ?? '',
-        style: tstyle,
+        style: rowTextStyle,
       )),
       DataCell(SelectableText(
         element.value.email ?? '',
-        style: tstyle,
+        style: rowTextStyle,
       )),
       DataCell(SelectableText(
         element.value.nif ?? '',
-        style: tstyle,
+        style: rowTextStyle,
       )),
       DataCell(SelectableText(
         element.value.rc ?? '',
-        style: tstyle,
+        style: rowTextStyle,
       )),
       DataCell(SelectableText(
         dateFormat.format(element.value.updatedAt!),
-        style: tstyle,
+        style: rowTextStyle,
       )),
       DataCell(
         ClientDatabase().isAdmin() || ClientDatabase().isManager()

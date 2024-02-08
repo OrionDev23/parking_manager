@@ -56,7 +56,30 @@ class DatabaseCounters {
     }
     return result;
   }
+  Future<int> countChauffeurWithCondition(List<String> queries) async {
+    int result = 0;
 
+    bool cont = true;
+
+    while (cont) {
+      await ClientDatabase.database!.listDocuments(
+          databaseId: databaseId,
+          collectionId: chauffeurid,
+          queries: [
+            ...queries,
+            Query.limit(1),
+            Query.offset(result),
+          ]).then((value) {
+        result += value.total;
+        if (value.total < 5000) {
+          cont = false;
+        }
+      }).onError((AppwriteException error, stackTrace) {
+        cont = false;
+      });
+    }
+    return result;
+  }
   Future<int> countChauffeur({int etat = -1}) async {
     int result = 0;
     bool cont = true;

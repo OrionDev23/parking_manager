@@ -72,9 +72,6 @@ class UsersManagementDatasource
   List<DataCell> getCellsToShow(
       MapEntry<String, MapEntry<User, List<Membership>?>> element) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
-    final tstyle = TextStyle(
-      fontSize: 10.sp,
-    );
     String roles = '';
     if (isInvitedButNotJoined(element.value.value)) {
       roles = "enattente".tr();

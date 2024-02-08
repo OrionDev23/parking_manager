@@ -36,18 +36,15 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
   @override
   List<DataCell> getCellsToShow(MapEntry<String, Activity> element) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
-    final tstyle = TextStyle(
-      fontSize: 10.sp,
-    );
 
     return [
       if (fieldsToShow.contains('act'))
         DataCell(SelectableText(
           ClientDatabase().getActivityType(element.value.type).tr(),
-          style: tstyle,
+          style: rowTextStyle,
         )),
       if (fieldsToShow.contains('id'))
-        DataCell(SelectableText(element.value.docName ?? '', style: tstyle),
+        DataCell(SelectableText(element.value.docName ?? '', style: rowTextStyle),
             onTap: () {
           showMyDoc(element.value.type, element.value.docID);
         }),
@@ -56,11 +53,11 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
             element.value.updatedAt != null
                 ? dateFormat.format(element.value.updatedAt!)
                 : '',
-            style: tstyle)),
+            style: rowTextStyle)),
       if (fieldsToShow.contains('user') && ClientDatabase().isAdmin())
         DataCell(SelectableText(
           element.value.personName ?? '',
-          style: tstyle,
+          style: rowTextStyle,
         )),
       if (fieldsToShow.contains('plus'))
         DataCell(

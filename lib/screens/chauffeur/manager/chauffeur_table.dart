@@ -68,7 +68,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'nom',
             style: tstyle,
           ).tr(),
@@ -85,7 +85,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'email',
             style: tstyle,
           ).tr(),
@@ -102,7 +102,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'telephone',
             style: tstyle,
           ).tr(),
@@ -119,7 +119,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'disponibilite',
             style: tstyle,
           ).tr(),
@@ -136,7 +136,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'dateModif',
             style: tstyle,
           ).tr(),

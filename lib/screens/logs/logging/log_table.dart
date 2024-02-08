@@ -71,7 +71,7 @@ class LogTableState extends State<LogTable> {
         DataColumn2(
           label: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: const Text(
+            child: Text(
               'activity',
               style: tstyle,
             ).tr(),
@@ -88,7 +88,7 @@ class LogTableState extends State<LogTable> {
         DataColumn2(
           label: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: const Text(
+            child: Text(
               'ID',
               style: tstyle,
             ).tr(),
@@ -105,7 +105,7 @@ class LogTableState extends State<LogTable> {
         DataColumn2(
           label: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: const Text(
+            child: Text(
               'date',
               style: tstyle,
             ).tr(),
@@ -122,7 +122,7 @@ class LogTableState extends State<LogTable> {
         DataColumn2(
           label: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: const Text(
+            child: Text(
               'user',
               style: tstyle,
             ).tr(),

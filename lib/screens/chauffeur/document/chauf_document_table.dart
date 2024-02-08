@@ -43,7 +43,7 @@ class CDocumentTableState extends State<CDocumentTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'nom',
             style: tstyle,
           ).tr(),
@@ -60,7 +60,7 @@ class CDocumentTableState extends State<CDocumentTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'vehicule',
             style: tstyle,
           ).tr(),
@@ -77,7 +77,7 @@ class CDocumentTableState extends State<CDocumentTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'dateexp',
             style: tstyle,
           ).tr(),
@@ -94,7 +94,7 @@ class CDocumentTableState extends State<CDocumentTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: const Text(
+          child: Text(
             'dateModif',
             style: tstyle,
           ).tr(),

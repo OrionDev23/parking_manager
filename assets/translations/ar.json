@@ -411,6 +411,10 @@
   "nodatayet": "لا توجد بيانات حتى الآن",
   "groupvalues": "جمع القيم الأقل من",
   "hideempty": "لا تظهر التسميات الفارغة",
-  "months": "الأشهر"
-
+  "months": "الأشهر",
+  "appartenancevehicule": "ملكية المركبة",
+  "appartenanceconducteur": "إنتماء للسائقين",
+  "majvehicules": "آخر تحديثات المركبات",
+  "majreparation": "آخر تحديثات الإصلاحات",
+  "majconducteurs": "آخر تحديثات السائقين"
 }

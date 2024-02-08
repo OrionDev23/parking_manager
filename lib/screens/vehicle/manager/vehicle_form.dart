@@ -127,7 +127,8 @@ class _VehicleFormState extends State<VehicleForm>
           .filliale);
       selectedAppartenance.text=VehiclesUtilities.getAppartenance(widget
           .vehicle!.appartenance);
-      selectedDirection.text=widget.vehicle!.direction??'';
+      selectedDirection.text=VehiclesUtilities.getDirection(widget.vehicle!
+          .direction);
       selectedAnnee=DateTime(widget.vehicle!.anneeUtil??DateTime.now().year);
     }
     documentID ??= ClientDatabase.ref
@@ -226,7 +227,7 @@ class _VehicleFormState extends State<VehicleForm>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'pays',
                   style: tstyle,
                 ).tr(),
@@ -248,7 +249,7 @@ class _VehicleFormState extends State<VehicleForm>
                     });
                   },
                 ),
-                const Text(
+                Text(
                   'wilaya',
                   style: tstyle,
                 ).tr(),
@@ -316,7 +317,7 @@ class _VehicleFormState extends State<VehicleForm>
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: const Text(
+                  child: Text(
                     'nummat',
                     style: tstyle,
                   ).tr(),
@@ -370,7 +371,7 @@ class _VehicleFormState extends State<VehicleForm>
                               ),
                             ),
                             smallSpace,
-                            const Text(
+                            Text(
                               '-',
                               style: tstyle,
                             ),
@@ -397,7 +398,7 @@ class _VehicleFormState extends State<VehicleForm>
                               ),
                             ),
                             smallSpace,
-                            const Text(
+                            Text(
                               '-',
                               style: tstyle,
                             ),
@@ -462,7 +463,7 @@ class _VehicleFormState extends State<VehicleForm>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'daira',
                   style: tstyle,
                 ).tr(),
@@ -499,7 +500,7 @@ class _VehicleFormState extends State<VehicleForm>
                     },
                   ),
                 ),
-                const Text(
+                Text(
                   'commune',
                   style: tstyle,
                 ).tr(),
@@ -559,7 +560,7 @@ class _VehicleFormState extends State<VehicleForm>
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   'date',
                   style: tstyle,
                 ).tr(),
@@ -593,7 +594,7 @@ class _VehicleFormState extends State<VehicleForm>
                 const SizedBox(
                   height: 5,
                 ),
-              const Text(
+              Text(
                 'quittance',
                 style: tstyle,
               ).tr(),
@@ -624,7 +625,7 @@ class _VehicleFormState extends State<VehicleForm>
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 'num',
                 style: tstyle,
               ).tr(),
@@ -657,7 +658,7 @@ class _VehicleFormState extends State<VehicleForm>
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 'nomf',
                 style: tstyle,
               ).tr(),
@@ -687,7 +688,7 @@ class _VehicleFormState extends State<VehicleForm>
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'prenom',
                   style: tstyle,
                 ).tr(),
@@ -716,7 +717,7 @@ class _VehicleFormState extends State<VehicleForm>
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'profession',
                 style: tstyle,
               ).tr(),
@@ -751,7 +752,7 @@ class _VehicleFormState extends State<VehicleForm>
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
+              Text(
                 'adresse',
                 style: tstyle,
               ).tr(),
@@ -798,7 +799,7 @@ class _VehicleFormState extends State<VehicleForm>
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'genre',
                   style: tstyle,
                 ).tr(),
@@ -887,7 +888,7 @@ class _VehicleFormState extends State<VehicleForm>
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'marque',
                   style: tstyle,
                 ).tr(),
@@ -969,7 +970,7 @@ class _VehicleFormState extends State<VehicleForm>
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'type',
                   style: tstyle,
                 ).tr(),
@@ -1003,7 +1004,7 @@ class _VehicleFormState extends State<VehicleForm>
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'nchassi',
                   style: tstyle,
                 ).tr(),
@@ -1042,7 +1043,7 @@ class _VehicleFormState extends State<VehicleForm>
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'caross',
                   style: tstyle,
                 ).tr(),
@@ -1076,7 +1077,7 @@ class _VehicleFormState extends State<VehicleForm>
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'energie',
                   style: tstyle,
                 ).tr(),
@@ -1110,7 +1111,7 @@ class _VehicleFormState extends State<VehicleForm>
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'puissance',
                   style: tstyle,
                 ).tr(),
@@ -1145,7 +1146,7 @@ class _VehicleFormState extends State<VehicleForm>
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'placeassise',
                   style: tstyle,
                 ).tr(),
@@ -1180,7 +1181,7 @@ class _VehicleFormState extends State<VehicleForm>
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'poidstotal',
                   style: tstyle,
                 ).tr(),
@@ -1215,7 +1216,7 @@ class _VehicleFormState extends State<VehicleForm>
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Row(
               children: [
-                const Text(
+                Text(
                   'lourd?',
                   style: tstyle,
                 ).tr(),
@@ -1252,7 +1253,7 @@ class _VehicleFormState extends State<VehicleForm>
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'chargeutil',
                   style: tstyle,
                 ).tr(),
@@ -1287,7 +1288,7 @@ class _VehicleFormState extends State<VehicleForm>
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'precmat',
                   style: tstyle,
                 ).tr(),
@@ -1324,7 +1325,7 @@ class _VehicleFormState extends State<VehicleForm>
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'anneeutil',
                   style: tstyle,
                 ).tr(),
@@ -1364,7 +1365,7 @@ class _VehicleFormState extends State<VehicleForm>
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'appartenance',
                   style: tstyle,
                 ).tr(),
@@ -1399,7 +1400,7 @@ class _VehicleFormState extends State<VehicleForm>
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'filialeexploit',
                   style: tstyle,
                 ).tr(),
@@ -1433,7 +1434,7 @@ class _VehicleFormState extends State<VehicleForm>
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                const Text(
+                Text(
                   'direction',
                   style: tstyle,
                 ).tr(),
@@ -1562,9 +1563,12 @@ class _VehicleFormState extends State<VehicleForm>
         charegeUtile: int.tryParse(charg.text),
         createdBy: ClientDatabase.me.value?.id,
         lourd: lourd,
-        direction: selectedDirection.text.toUpperCase(),
-        appartenance: selectedAppartenance.text.toUpperCase(),
-        filliale: selectedFiliale.text.toUpperCase(),
+        direction: selectedDirection.text.toUpperCase().replaceAll(' ', '')
+            .trim(),
+        appartenance: selectedAppartenance.text.toUpperCase().replaceAll(' ', '')
+            .trim(),
+        filliale: selectedFiliale.text.toUpperCase().replaceAll(' ', '')
+            .trim(),
       );
       if (widget.vehicle != null) {
         await Future.wait([

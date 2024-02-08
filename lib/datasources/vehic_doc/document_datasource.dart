@@ -36,16 +36,13 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
   List<DataCell> getCellsToShow(MapEntry<String, DocumentVehicle> element) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
     final dateFormat2 = DateFormat('y/M/d', 'fr');
-    final tstyle = TextStyle(
-      fontSize: 10.sp,
-    );
 
     return [
       DataCell(SelectableText(
         element.value.nom,
-        style: tstyle,
+        style: rowTextStyle,
       )),
-      DataCell(SelectableText(element.value.vehiclemat ?? '', style: tstyle),
+      DataCell(SelectableText(element.value.vehiclemat ?? '', style: rowTextStyle),
           onTap: () {
         showMyVehicule(element.value.vehiclemat);
       }),
@@ -53,12 +50,12 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
           element.value.dateExpiration != null
               ? dateFormat2.format(element.value.dateExpiration!)
               : '',
-          style: tstyle)),
+          style: rowTextStyle)),
       DataCell(SelectableText(
           element.value.updatedAt != null
               ? dateFormat.format(element.value.updatedAt!)
               : '',
-          style: tstyle)),
+          style: rowTextStyle)),
       DataCell(ClientDatabase().isAdmin() || ClientDatabase().isManager()
           ? f.FlyoutTarget(
               controller: element.value.controller,
