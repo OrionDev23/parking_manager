@@ -1,5 +1,4 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:flutter/foundation.dart';
 import 'package:parc_oto/providers/client_database.dart';
 
 class DatabaseCounters {
@@ -17,9 +16,6 @@ class DatabaseCounters {
             Query.limit(1),
             Query.offset(result),
           ]).then((value) {
-        if (kDebugMode) {
-          print('total for etat $etat : ${value.total}');
-        }
         result += value.total;
         if (value.total < 5000) {
           cont = false;
