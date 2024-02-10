@@ -418,6 +418,9 @@
   "appartenanceconducteur": "Drivers belonging",
   "majvehicules": "Latest vehicles updates",
   "majreparation": "Latest repairs updates",
-  "majconducteurs": "Latest drivers updates"
+  "majconducteurs": "Latest drivers updates",
+  "affectation": "Belonging",
+  "vehiculesempty": "Vehicle list is empty",
+  "selectprestataire": "Select a service provider"
 
 }

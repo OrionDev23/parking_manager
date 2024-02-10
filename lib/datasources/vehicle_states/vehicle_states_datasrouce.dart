@@ -97,12 +97,15 @@ class VStatesDatasource extends ParcOtoDatasource<Etat> {
 
   void showMyVehicule(String? matricule) {
     if (matricule != null) {
+
       PanesListState.index.value = PaneItemsAndFooters.originalItems
               .indexOf(PaneItemsAndFooters.vehicles) +
           1;
       VehicleTabsState.currentIndex.value = 0;
+      VehicleTableState.filterVehicule.value = '"$matricule"';
+
       VehicleTableState.filterNow = true;
-      VehicleTableState.filterVehicule.value = matricule;
+
     }
   }
 

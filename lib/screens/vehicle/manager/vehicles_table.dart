@@ -40,7 +40,16 @@ class VehicleTableState extends State<VehicleTable> {
 
   @override
   void initState() {
-    if (filterMarque.value != null || filterVehicule.value != null) {
+    if (filterMarque.value == null && filterVehicule.value == null)
+    {
+      startedWithFiltersOn = false;
+      vehicleDataSource = VehiculeDataSource(
+        current: context,
+        selectC: widget.selectV,
+        collectionID: vehiculeid,
+      );
+    }
+    else {
       startedWithFiltersOn = true;
       if (filterMarque.value != null) {
         marque = filterMarque.value;
@@ -61,13 +70,6 @@ class VehicleTableState extends State<VehicleTable> {
       }
       filterMarque.value = null;
       filterVehicule.value = null;
-    } else {
-      startedWithFiltersOn = false;
-      vehicleDataSource = VehiculeDataSource(
-        current: context,
-        selectC: widget.selectV,
-        collectionID: vehiculeid,
-      );
     }
     initColumns();
     super.initState();
@@ -231,7 +233,7 @@ class VehicleTableState extends State<VehicleTable> {
     return ValueListenableBuilder(
         valueListenable: filterMarque,
         builder: (context, v, _) {
-          if (!startedWithFiltersOn && v != null && filterNow) {
+          if (!startedWithFiltersOn &&  filterNow && v != null) {
             marque = v;
             filters['marque'] = v.toString();
             filtered = true;
@@ -241,7 +243,7 @@ class VehicleTableState extends State<VehicleTable> {
           return ValueListenableBuilder(
               valueListenable: filterVehicule,
               builder: (context, v, _) {
-                if (!startedWithFiltersOn && v != null && filterNow) {
+                if (!startedWithFiltersOn &&  filterNow && v != null ) {
                   searchController.text = v;
                   vehicleDataSource.search(v);
                   notEmpty = true;

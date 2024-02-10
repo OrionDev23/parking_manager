@@ -4,7 +4,7 @@ Application de gestion de parking
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+Application de gestion de parking
 
 A few resources to get you started if this is your first Flutter project:
 

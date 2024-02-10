@@ -1,4 +1,4 @@
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:go_router/go_router.dart';
 import 'package:parc_oto/screens/accept_invitation.dart';
 import 'package:parc_oto/screens/dashboard/dashboard.dart';
 import 'package:parc_oto/screens/login.dart';
@@ -17,24 +17,55 @@ import 'main.dart';
 class Routes {
   Routes(AppTheme appTheme) {
     final savedSettings = prefs;
-    routes=
-    {
-     '/' : (context) =>
-              PanesList(
-                paneList: PaneItemsAndFooters(savedSettings),
-                appTheme: appTheme,
+    router = GoRouter(
+
+      initialLocation: '/dashboard',
+      routes: [
+        ShellRoute(
+
+            builder: (context, state,s ) => PanesList(
+                  paneList: PaneItemsAndFooters(savedSettings), appTheme: appTheme,
+                ),
+            routes: [
+              GoRoute(
+                name: 'login',
+                path: '/login',
+                builder: (context, state) => const LoginScreen(),
               ),
-    '/login': (context) => const LoginScreen(),
-    '/dashboard' : (context) => const Dashboard(),
-    '/vehicles':(context) => const VehicleDashboard(),
-    '/vehicles/manager': (context ) => const VehicleTabs(),
-    '/vehicles/brands': (context ) => const BrandList(),
-     '/vehicles/states':(context) => const StateTabs(),
-     '/vehicles/documents': (context) => const DocumentTabs(),
-    '/recoverpassword': (context) => const ResetScreen(),
-    '/acceptinvitation': (context) => const AcceptInvitation()
-  };
+              GoRoute(
+                name: 'dashboard',
+                path: '/dashboard',
+                builder: (context, state) => const Dashboard(),
+              ),
+              GoRoute(
+                  path: '/vehicles',
+                  builder: (context, state) => const VehicleDashboard(),
+                  routes: [
+                    GoRoute(
+                        path: 'manager',
+                        builder: (context, state) => const VehicleTabs()),
+                    GoRoute(
+                        path: 'brands',
+                        builder: (context, state) => const BrandList()),
+                    GoRoute(
+                        path: 'states',
+                        builder: (context, state) => const StateTabs()),
+                    GoRoute(
+                        path: 'documents',
+                        builder: (context, state) => const DocumentTabs()),
+                  ]),
+            ]),
+        GoRoute(
+            name: 'recoverpassword',
+            path: '/recoverpassword',
+            builder: (context, state) => const ResetScreen()),
+        GoRoute(
+            name: 'acceptinvitation',
+            path: '/acceptinvitation',
+            builder: (context, state) => const AcceptInvitation()),
+      ],
+    );
   }
 
-  late final Map<String,Widget Function(BuildContext)> routes;
+  late final GoRouter router;
 }

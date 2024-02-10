@@ -38,7 +38,7 @@ class _ImportConducteursState extends State<ImportConducteurs> {
 
   bool invalidFile = false;
 
-  int invalidTables=0;
+  int invalidTables = 0;
 
   void loadFile() async {
     if (!loading) {
@@ -68,12 +68,12 @@ class _ImportConducteursState extends State<ImportConducteurs> {
             addConducteur(row);
           }
         } else {
-          invalidTables ++;
+          invalidTables++;
           break;
         }
       }
-      if(invalidTables==excel.tables.length){
-        invalidFile=true;
+      if (invalidTables == excel.tables.length) {
+        invalidFile = true;
       }
     }
 
@@ -85,52 +85,54 @@ class _ImportConducteursState extends State<ImportConducteurs> {
 
   void addConducteur(List<Data?> data) {
     String matricule =
-    data[columnToRead['mat']!]!.value.toString().replaceAll(' ', '').trim();
+        data[columnToRead['mat']!]!.value.toString().replaceAll(' ', '').trim();
     if (matricule.contains('matricul') ||
         (!matricule.contains('-') && int.tryParse(matricule) == null)) {
       return;
     }
     String id = matricule.replaceAll('-', '').trim();
-    String nom = columnToRead.containsKey('nom')?data[columnToRead['nom']!]!
-        .value.toString():"";
-    String vehicule=columnToRead.containsKey('vehiclule')
-        ?data[columnToRead['vehicule']!]!
-        .value.toString().replaceAll(' ', ''):"";
+    String nom = columnToRead.containsKey('nom')
+        ? data[columnToRead['nom']!]!.value.toString()
+        : "";
+    String vehicule = columnToRead.containsKey('vehicule')
+        ? data[columnToRead['vehicule']!]!.value.toString().replaceAll(' ', '')
+        : "";
     String prenom = columnToRead.containsKey('prenom')
-        ?data[columnToRead['prenom']!]!.value.toString():"";
-    String apartenance=columnToRead.containsKey('appartenance')
-        ?VehiclesUtilities.getAppartenance
-      (data[columnToRead['appartenance']!]!.value
-        .toString())
-        .replaceAll(' ', '').trim().toUpperCase()
-        :"";
-    String direction=columnToRead.containsKey('direction')
-        ?VehiclesUtilities.getDirection
-      (data[columnToRead['direction']!]!.value
-        .toString())
-        .replaceAll(' ', '').trim().toUpperCase()
-        :"";
+        ? data[columnToRead['prenom']!]!.value.toString()
+        : "";
+    String apartenance = columnToRead.containsKey('appartenance')
+        ? VehiclesUtilities.getAppartenance(
+                data[columnToRead['appartenance']!]!.value.toString())
+            .replaceAll(' ', '')
+            .trim()
+            .toUpperCase()
+        : "";
+    String direction = columnToRead.containsKey('direction')
+        ? VehiclesUtilities.getDirection(
+                data[columnToRead['direction']!]!.value.toString())
+            .replaceAll(' ', '')
+            .trim()
+            .toUpperCase()
+        : "";
     Conducteur conducteur = Conducteur(
-        id: id,
-        matricule: matricule,
-        name: nom,
-        prenom: prenom,
-        vehicules: [vehicule],
-        filliale: apartenance,
-        direction: direction,
+      id: id,
+      matricule: matricule,
+      name: nom,
+      prenom: prenom,
+      vehicules: [vehicule],
+      filliale: apartenance,
+      direction: direction,
     );
-    if(importedConducteurs.containsKey(conducteur.matricule)){
+    if (importedConducteurs.containsKey(conducteur.matricule)) {
       addVehiclesToConducteur(conducteur);
-    }
-    else{
+    } else {
       importedConducteurs[conducteur.matricule] = conducteur;
     }
   }
 
-  void addVehiclesToConducteur(Conducteur v){
+  void addVehiclesToConducteur(Conducteur v) {
     importedConducteurs[v.matricule]!.vehicules!.addAll(v.vehicules!);
   }
-
 
   bool isFileValid(Excel excel, String table) {
     bool foundMatric = false;
@@ -154,14 +156,21 @@ class _ImportConducteursState extends State<ImportConducteurs> {
 
             case TextCellValue():
               final value = cell!.value as TextCellValue;
-              if ((value.value.toLowerCase().contains('matricule employe')||
-                  value.value.toLowerCase().contains('matricule employé') ||
-                  value.value.toLowerCase().contains('matricule conducteur')) &&
+              if ((value.value.toLowerCase().contains('matricule employe') ||
+                      value.value.toLowerCase().contains('matricule employé') ||
+                      value.value
+                          .toLowerCase()
+                          .contains('matricule conducteur')) &&
                   !foundMatric) {
                 columnToRead['mat'] = cell.columnIndex;
                 foundMatric = true;
               }
-              if (value.value.toLowerCase().contains('nom') ||
+              if (value.value.toLowerCase().contains('immatriculation')||
+                  value.value.toLowerCase().contains('matricule vehicule'))
+              {
+                columnToRead['vehicule']=cell.columnIndex;
+              }
+              if (value.value.toLowerCase().replaceAll(' ','').trim()=='nom' ||
                   value.value.toLowerCase().contains('familyname') ||
                   value.value
                       .toLowerCase()
@@ -177,15 +186,14 @@ class _ImportConducteursState extends State<ImportConducteurs> {
                       .contains('firstname')) {
                 columnToRead['prenom'] = cell.columnIndex;
               }
-              if(value.value.toLowerCase().contains('appartenance')
-                  && (value
-                  .value.toLowerCase().contains('salarié')||value
-                      .value.toLowerCase().contains('employe')|| value
-                      .value.toLowerCase().contains('employé'))){
-                columnToRead['appartenance']=cell.columnIndex;
+              if (value.value.toLowerCase().contains('appartenance') &&
+                  (value.value.toLowerCase().contains('salarié') ||
+                      value.value.toLowerCase().contains('employe') ||
+                      value.value.toLowerCase().contains('employé'))) {
+                columnToRead['appartenance'] = cell.columnIndex;
               }
-              if(value.value.toLowerCase().contains('direction') ){
-                columnToRead['direction']=cell.columnIndex;
+              if (value.value.toLowerCase().contains('direction')) {
+                columnToRead['direction'] = cell.columnIndex;
               }
               break;
             case BoolCellValue():
@@ -217,15 +225,15 @@ class _ImportConducteursState extends State<ImportConducteurs> {
       constraints: BoxConstraints.loose(Size(600.px, 500.px)),
       content: loading
           ? Center(
-        child: ProgressBar(
-          value: progressLoadingFile,
-        ),
-      )
+              child: ProgressBar(
+                value: progressLoadingFile,
+              ),
+            )
           : invalidFile
-          ? invalidFileWidget()
-          : uploading
-          ? uploadWidget(appTheme)
-          : getList(),
+              ? invalidFileWidget()
+              : uploading
+                  ? uploadWidget(appTheme)
+                  : getList(),
       actions: [
         Button(
             child: doneUploading
@@ -237,7 +245,7 @@ class _ImportConducteursState extends State<ImportConducteurs> {
         if (!doneUploading)
           FilledButton(
               onPressed:
-              loading || invalidFile || uploading ? null : uploadVehicles,
+                  loading || invalidFile || uploading ? null : uploadVehicles,
               child: const Text('confirmer').tr())
       ],
     );
@@ -279,23 +287,23 @@ class _ImportConducteursState extends State<ImportConducteurs> {
           child: ListView(
             children: importedConducteurs.entries
                 .map((e) => ListTile.selectable(
-              selected: e.value.selected,
-              onSelectionChange: (s) {
-                setState(() {
-                  e.value.selected = s;
-                });
-              },
-              trailing: Checkbox(
-                checked: e.value.selected,
-                onChanged: (bool? value) {
-                  setState(() {
-                    e.value.selected = value ?? false;
-                  });
-                },
-              ),
-              title: Text('${e.value.name} ${e.value.prenom}'),
-              leading: Text(e.value.matricule),
-            ))
+                      selected: e.value.selected,
+                      onSelectionChange: (s) {
+                        setState(() {
+                          e.value.selected = s;
+                        });
+                      },
+                      trailing: Checkbox(
+                        checked: e.value.selected,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            e.value.selected = value ?? false;
+                          });
+                        },
+                      ),
+                      title: Text('${e.value.name} ${e.value.prenom}'),
+                      leading: Text(e.value.matricule),
+                    ))
                 .toList(),
           ),
         ),
@@ -353,10 +361,10 @@ class _ImportConducteursState extends State<ImportConducteurs> {
   Future<void> uploadConducteur(Conducteur c, Databases db) async {
     await db
         .createDocument(
-        databaseId: databaseId,
-        collectionId: chauffeurid,
-        documentId: c.id,
-        data: c.toJson())
+            databaseId: databaseId,
+            collectionId: chauffeurid,
+            documentId: c.id,
+            data: c.toJson())
         .then((value) {
       setState(() {
         uploaded++;
@@ -377,57 +385,57 @@ class _ImportConducteursState extends State<ImportConducteurs> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 450.px,
-                    child: ProgressBar(
-                      value: (uploaded + notUploaded) * 100 / nSelected,
-                      strokeWidth: 25,
-                      activeColor: appTheme.color.darkest,
-                      backgroundColor: appTheme.fillColor,
-                    ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    '${((uploaded + notUploaded) * 100 / nSelected).toStringAsFixed(2)} %',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: fSize),
-                  )
-                ],
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 450.px,
+                child: ProgressBar(
+                  value: (uploaded + notUploaded) * 100 / nSelected,
+                  strokeWidth: 25,
+                  activeColor: appTheme.color.darkest,
+                  backgroundColor: appTheme.fillColor,
+                ),
               ),
-              bigSpace,
-              Row(
-                children: [
-                  Text('uploaded'.tr(),
-                      style: TextStyle(
-                        fontSize: fSize,
-                        fontWeight: FontWeight.bold,
-                        color: appTheme.color.darkest,
-                      )),
-                  const Spacer(),
-                  Text('\t\t\t\t${uploaded.toInt()} / $nSelected',
-                      style: TextStyle(
-                          fontSize: fSize, color: appTheme.color.darkest)),
-                ],
-              ),
-              smallSpace,
-              Row(
-                children: [
-                  Text('skipped'.tr(),
-                      style: TextStyle(
-                        fontSize: fSize,
-                        fontWeight: FontWeight.bold,
-                        color: appTheme.color.lightest,
-                      )),
-                  const Spacer(),
-                  Text('\t\t\t\t${notUploaded.toInt()} / $nSelected',
-                      style: TextStyle(
-                          fontSize: fSize, color: appTheme.color.lightest)),
-                ],
-              ),
-            ]));
+              const Spacer(),
+              Text(
+                '${((uploaded + notUploaded) * 100 / nSelected).toStringAsFixed(2)} %',
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, fontSize: fSize),
+              )
+            ],
+          ),
+          bigSpace,
+          Row(
+            children: [
+              Text('uploaded'.tr(),
+                  style: TextStyle(
+                    fontSize: fSize,
+                    fontWeight: FontWeight.bold,
+                    color: appTheme.color.darkest,
+                  )),
+              const Spacer(),
+              Text('\t\t\t\t${uploaded.toInt()} / $nSelected',
+                  style: TextStyle(
+                      fontSize: fSize, color: appTheme.color.darkest)),
+            ],
+          ),
+          smallSpace,
+          Row(
+            children: [
+              Text('skipped'.tr(),
+                  style: TextStyle(
+                    fontSize: fSize,
+                    fontWeight: FontWeight.bold,
+                    color: appTheme.color.lightest,
+                  )),
+              const Spacer(),
+              Text('\t\t\t\t${notUploaded.toInt()} / $nSelected',
+                  style: TextStyle(
+                      fontSize: fSize, color: appTheme.color.lightest)),
+            ],
+          ),
+        ]));
   }
 
   bool uploading = false;

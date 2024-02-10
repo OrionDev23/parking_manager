@@ -2,6 +2,7 @@ import 'package:appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/screens/vehicle/manager/vehicles_table.dart';
 import 'package:parc_oto/serializables/conducteur/conducteur.dart';
 import 'package:parc_oto/serializables/conducteur/disponibilite_chauffeur.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
@@ -9,8 +10,12 @@ import 'package:parc_oto/widgets/zone_box.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../../serializables/vehicle/vehicle.dart';
 import '../../../theme.dart';
 import '../../entreprise/entreprise.dart';
+import '../../sidemenu/pane_items.dart';
+import '../../sidemenu/sidemenu.dart';
+import '../../vehicle/manager/vehicle_tabs.dart';
 
 int chaufCounter = 0;
 
@@ -33,14 +38,14 @@ class ChauffeurFormState extends State<ChauffeurForm> {
 
   int? etat;
 
-  TextEditingController matricule=TextEditingController();
+  TextEditingController matricule = TextEditingController();
   TextEditingController nom = TextEditingController();
   TextEditingController prenom = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController telephone = TextEditingController();
   TextEditingController adresse = TextEditingController();
 
-  TextEditingController selectedAppartenance =  TextEditingController();
+  TextEditingController selectedAppartenance = TextEditingController();
   TextEditingController selectedDirection = TextEditingController();
   DateTime? birthDay;
 
@@ -50,9 +55,11 @@ class ChauffeurFormState extends State<ChauffeurForm> {
     super.initState();
   }
 
+  List<String> vehicules = [];
+
   void initValues() {
     if (widget.chauf != null) {
-      matricule.text=widget.chauf!.matricule;
+      matricule.text = widget.chauf!.matricule;
       chaufID = widget.chauf!.id;
       etat = widget.chauf!.etat;
       etatID = widget.chauf!.etatactuel;
@@ -62,9 +69,11 @@ class ChauffeurFormState extends State<ChauffeurForm> {
       telephone.text = widget.chauf!.telephone ?? '';
       adresse.text = widget.chauf!.adresse ?? '';
       birthDay = widget.chauf!.dateNaissance;
-      selectedDirection.text=VehiclesUtilities.getDirection(widget.chauf!
-        .direction);
-      selectedAppartenance.text=VehiclesUtilities.getAppartenance(widget.chauf!.filliale);
+      vehicules.addAll(widget.chauf!.vehicules ?? []);
+      selectedDirection.text =
+          VehiclesUtilities.getDirection(widget.chauf!.direction);
+      selectedAppartenance.text =
+          VehiclesUtilities.getAppartenance(widget.chauf!.filliale);
     }
   }
 
@@ -88,21 +97,23 @@ class ChauffeurFormState extends State<ChauffeurForm> {
         ),
       );
     }
+    bool portrait = Device.orientation == Orientation.portrait;
     return Container(
       color: appTheme.backGroundColor,
       child: Column(
         children: [
-          Container(
-            color: appTheme.backGroundColor,
-            child: SizedBox(
-              height: 450.px,
-              width: 500.px,
-              child:ListView(
-              children: [
-                SizedBox(
-              height: 600.px,
-                width: 500.px,
-                  child: Column(
+          Flexible(
+            child: Container(
+              color: appTheme.backGroundColor,
+              child: ListView(
+                padding:
+                    portrait ? null : EdgeInsets.symmetric(horizontal: 200.px),
+                shrinkWrap: true,
+                children: [
+                  SizedBox(
+                    height: 550.px,
+                    width: 500.px,
+                    child: Column(
                       children: [
                         Flexible(
                           flex: 2,
@@ -110,20 +121,19 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                             label: 'matricule'.tr(),
                             child: Padding(
                               padding: const EdgeInsets.all(10.0),
-                              child: Flexible(
-                                  child: TextBox(
-                                    controller: matricule,
-                                    placeholder: 'matricule'.tr(),
-                                    style: appTheme.writingStyle,
-                                    placeholderStyle: placeStyle,
-                                    cursorColor: appTheme.color.darker,
-                                    decoration: BoxDecoration(
-                                      color: appTheme.fillColor,
-                                    ),
-                                    onChanged: (s) {
-                                      checkChanges();
-                                    },
-                                  )),
+                              child: TextBox(
+                                controller: matricule,
+                                placeholder: 'matricule'.tr(),
+                                style: appTheme.writingStyle,
+                                placeholderStyle: placeStyle,
+                                cursorColor: appTheme.color.darker,
+                                decoration: BoxDecoration(
+                                  color: appTheme.fillColor,
+                                ),
+                                onChanged: (s) {
+                                  checkChanges();
+                                },
+                              ),
                             ),
                           ),
                         ),
@@ -268,13 +278,14 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                     child: AutoSuggestBox<String>(
                                       placeholder: 'appartenance'.tr(),
                                       placeholderStyle: placeStyle,
-
                                       controller: selectedAppartenance,
                                       items: List.generate(
                                           MyEntrepriseState.p!.filiales!.length,
-                                              (index) => AutoSuggestBoxItem(
-                                              value: MyEntrepriseState.p!.filiales![index],
-                                              label: MyEntrepriseState.p!.filiales![index]
+                                          (index) => AutoSuggestBoxItem(
+                                              value: MyEntrepriseState
+                                                  .p!.filiales![index],
+                                              label: MyEntrepriseState
+                                                  .p!.filiales![index]
                                                   .toUpperCase())),
                                     ),
                                   ),
@@ -283,12 +294,15 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                     child: AutoSuggestBox<String>(
                                       placeholder: 'direction'.tr(),
                                       placeholderStyle: placeStyle,
-                                      controller:selectedDirection,
+                                      controller: selectedDirection,
                                       items: List.generate(
-                                          MyEntrepriseState.p!.directions!.length,
-                                              (index) => AutoSuggestBoxItem(
-                                              value: MyEntrepriseState.p!.directions![index],
-                                              label: MyEntrepriseState.p!.directions![index]
+                                          MyEntrepriseState
+                                              .p!.directions!.length,
+                                          (index) => AutoSuggestBoxItem(
+                                              value: MyEntrepriseState
+                                                  .p!.directions![index],
+                                              label: MyEntrepriseState
+                                                  .p!.directions![index]
                                                   .toUpperCase())),
                                     ),
                                   ),
@@ -322,9 +336,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                     text: const Text('mission').tr(),
                                     onPressed: () {
                                       etat = 1;
-                                      setState(() {
-
-                                      });
+                                      setState(() {});
                                     },
                                   ),
                                   const MenuFlyoutSeparator(),
@@ -332,9 +344,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                     text: const Text('absent').tr(),
                                     onPressed: () {
                                       etat = 2;
-                                      setState(() {
-
-                                      });
+                                      setState(() {});
                                     },
                                   ),
                                   if (ClientDatabase().isAdmin())
@@ -344,9 +354,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                       text: const Text('quitteentre').tr(),
                                       onPressed: () {
                                         etat = 3;
-                                        setState(() {
-
-                                        });
+                                        setState(() {});
                                       },
                                     ),
                                 ],
@@ -359,36 +367,159 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                         ),
                       ],
                     ),
-                ),
-              ],
+                  ),
+                  smallSpace,
+                  vehiclesWidget(appTheme),
+                ],
+              ),
             ),
-          ),),
-          Container(
-            padding: const EdgeInsets.all(10),
-            width: 500.px,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                FilledButton(
-                  onPressed: changes && !uploading ? upload : null,
-                  child: const Text('confirmer').tr(),
-                ),
-                const SizedBox(width: 10),
-              ],
-            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              FilledButton(
+                onPressed: changes && !uploading ? upload : null,
+                child: const Text('confirmer').tr(),
+              ),
+              const SizedBox(width: 10),
+            ],
           ),
         ],
       ),
     );
   }
 
+  double tilesHeight = 50.px;
+  Widget vehiclesWidget(AppTheme appTheme) {
+    return SizedBox(
+      height:
+          vehicules.isEmpty ? 100.px : vehicules.length * tilesHeight + 80.px,
+      child: ZoneBox(
+        label: 'vehicules'.tr(),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: 35.px,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    FilledButton(
+                        onPressed: () async {
+                          Vehicle? vehicle = await showDialog<Vehicle>(
+                              context: context,
+                              barrierDismissible: true,
+                              builder: (context) {
+                                return ContentDialog(
+                                  constraints: BoxConstraints.tight(
+                                      Size(700.px, 550.px)),
+                                  title: const Text('selectvehicle').tr(),
+                                  style: ContentDialogThemeData(
+                                      titleStyle: appTheme.writingStyle
+                                          .copyWith(
+                                          fontWeight:
+                                          FontWeight.bold)),
+                                  content: const VehicleTable(
+                                    selectV: true,
+                                  ),
+                                  actions: [Button(child: const Text('fermer').tr(),
+                                      onPressed: (){
+                                    Navigator.of(context).pop();
+                                      })],
+                                );
+                              });
+                          if (vehicle != null &&
+                              !vehicules.contains(vehicle.matricule)) {
+                            vehicules.add(vehicle.matricule);
+                            setState(() {});
+                          }
+                        },
+                        child: const Text('add').tr())
+                  ],
+                ),
+              ),
+              smallSpace,
+              ListView.builder(
+                itemCount: vehicules.isEmpty ? 1 : vehicules.length,
+                shrinkWrap: true,
+                itemBuilder: (BuildContext context, int index) {
+                  if (vehicules.isEmpty) {
+                    return Center(
+                        child: SizedBox(
+                      height: 20.px,
+                      child: Text('vehiculesempty',
+                              style: TextStyle(
+                                  color: Colors.grey[100],
+                                  fontStyle: FontStyle.italic))
+                          .tr(),
+                    ));
+                  }
+                  return SizedBox(
+                    height: tilesHeight,
+                    child: ListTile(
+                      tileColor: ButtonState.all<Color>(appTheme.fillColor),
+                      title: Text(
+                        vehicules[index],
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: Row(
+                        children: [
+                          Button(
+                            child: const Text('voir').tr(),
+                            onPressed: () {
+                              String v=vehicules[index];
+                              showMyVehicule(v);
+                            },
+                          ),
+                          smallSpace,
+                          IconButton(
+                            icon: const Icon(
+                              FluentIcons.cancel,
+                              size: 15,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                vehicules.removeAt(index);
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void showMyVehicule(String? matricule) {
+    if (matricule != null) {
+
+      PanesListState.index.value = PaneItemsAndFooters.originalItems
+              .indexOf(PaneItemsAndFooters.vehicles) +
+          1;
+      VehicleTabsState.currentIndex.value = 0;
+      VehicleTableState.filterVehicule.value = '"$matricule"';
+
+      VehicleTableState.filterNow = true;
+
+    }
+  }
+
   bool changes = false;
 
   void checkChanges() {
     if (widget.chauf != null) {
-      if (matricule.text==widget.chauf!.matricule&&nom.text == widget.chauf!
-          .name &&
+      if (matricule.text == widget.chauf!.matricule &&
+          nom.text == widget.chauf!.name &&
           prenom.text == widget.chauf!.prenom &&
           birthDay == widget.chauf!.dateNaissance &&
           ((disp == null && etat == widget.chauf!.etat) ||
@@ -418,11 +549,11 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   }
 
   void upload() async {
-    if (matricule.value.text.isEmpty ) {
+    if (matricule.value.text.isEmpty) {
       showMessage('matriculerequis', 'erreur');
       return;
     }
-    if (nom.value.text.isEmpty || prenom.text.isEmpty  ) {
+    if (nom.value.text.isEmpty || prenom.text.isEmpty) {
       showMessage('nomprenreq', 'erreur');
       return;
     }

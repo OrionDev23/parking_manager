@@ -469,7 +469,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
             labels: List.generate(MyEntrepriseState.p!.filiales?.length??0,
                     (index) => MapEntry(MyEntrepriseState.p!
                     .filiales![index], DatabaseCounters().countVehiclesWithCondition([
-                  Query.search('filliale', MyEntrepriseState.p!
+                  Query.equal('filliale', MyEntrepriseState.p!
                       .filiales![index]
                       .replaceAll(' ', '').trim())
                 ]))),
@@ -496,7 +496,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
             labels: List.generate(MyEntrepriseState.p!.directions?.length??0,
                     (index) => MapEntry(MyEntrepriseState.p!
                     .directions![index], DatabaseCounters().countVehiclesWithCondition([
-                  Query.search('direction', MyEntrepriseState.p!
+                  Query.equal('direction', MyEntrepriseState.p!
                       .directions![index]
                       .replaceAll(' ', '').trim())
                 ]))),

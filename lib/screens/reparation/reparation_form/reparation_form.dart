@@ -346,21 +346,28 @@ class ReparationFormState extends State<ReparationForm>
                         title:
                             Text(selectedVehicle?.matricule ?? 'nonind'.tr()),
                         onPressed: () async {
-                          selectedVehicle = await showDialog<Vehicle?>(
+                          selectedVehicle = await showDialog<Vehicle>(
                               context: context,
-                              builder: (
-                                c,
-                              ) =>
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: appTheme.backGroundColor,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    clipBehavior: Clip.antiAlias,
-                                    child: const VehicleTable(
-                                      selectV: true,
-                                    ),
-                                  ));
+                              barrierDismissible: true,
+                              builder: (context) {
+                                return ContentDialog(
+                                  constraints: BoxConstraints.tight(
+                                      Size(700.px, 550.px)),
+                                  title: const Text('selectvehicle').tr(),
+                                  style: ContentDialogThemeData(
+                                      titleStyle: appTheme.writingStyle
+                                          .copyWith(
+                                          fontWeight:
+                                          FontWeight.bold)),
+                                  content: const VehicleTable(
+                                    selectV: true,
+                                  ),
+                                  actions: [Button(child: const Text('fermer').tr(),
+                                      onPressed: (){
+                                        Navigator.of(context).pop();
+                                      })],
+                                );
+                              });
                           setVehicleValues();
                         },
                       ),
@@ -384,21 +391,28 @@ class ReparationFormState extends State<ReparationForm>
                         ).tr(),
                         title: Text(selectedPrest?.nom ?? 'nonind'.tr()),
                         onPressed: () async {
-                          selectedPrest = await showDialog<Prestataire?>(
+                          selectedPrest = await showDialog<Prestataire>(
                               context: context,
-                              builder: (
-                                c,
-                              ) =>
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      color: appTheme.backGroundColor,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    clipBehavior: Clip.antiAlias,
-                                    child: const PrestataireTable(
-                                      selectD: true,
-                                    ),
-                                  ));
+                              barrierDismissible: true,
+                              builder: (context) {
+                                return ContentDialog(
+                                  constraints: BoxConstraints.tight(
+                                      Size(700.px, 550.px)),
+                                  title: const Text('selectprestataire').tr(),
+                                  style: ContentDialogThemeData(
+                                      titleStyle: appTheme.writingStyle
+                                          .copyWith(
+                                          fontWeight:
+                                          FontWeight.bold)),
+                                  content: const PrestataireTable(
+                                    selectD: true,
+                                  ),
+                                  actions: [Button(child: const Text('fermer').tr(),
+                                      onPressed: (){
+                                        Navigator.of(context).pop();
+                                      })],
+                                );
+                              });
                           setState(() {});
                         },
                       ),

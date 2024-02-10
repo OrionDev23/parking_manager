@@ -287,7 +287,7 @@ class _ImportVehiclesState extends State<ImportVehicles> {
                   value.value.toLowerCase().contains('state')) {
                 columnToRead['etat'] = cell.columnIndex;
               }
-              if (value.value.toLowerCase().contains('nom') ||
+              if (value.value.toLowerCase().replaceAll(' ','').trim()=='nom' ||
                   value.value.toLowerCase().contains('familyname') ||
                   value.value
                       .toLowerCase()

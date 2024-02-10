@@ -426,7 +426,7 @@
  "alreadyinvited": "Invitation pour devenir manager envoyée",
  "enattente": "En attente",
  "voirplus": "Voir plus",
- "depenses":"Cout des réparation",
+ "depenses":"Cout des réparations",
  "costs":"Dépenses",
  "avg": "Moyenne",
  "deletenotif": "Ne plus afficher cette notification ?",
@@ -457,5 +457,8 @@
  "appartenanceconducteur": "Appartenance des conducteurs",
  "majvehicules": "Dernières maj des véhicules",
  "majreparation": "Dernières maj des réparations",
- "majconducteurs": "Dernières maj des conducteurs"
+ "majconducteurs": "Dernières maj des conducteurs",
+ "affectation": "Appartenance",
+ "vehiculesempty": "La liste des véhicules est vide",
+ "selectprestataire": "Selectionner un prestataire"
 }

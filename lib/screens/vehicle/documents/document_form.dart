@@ -112,20 +112,20 @@ class DocumentFormState extends State<DocumentForm>
                                       builder: (context) {
                                         return ContentDialog(
                                           constraints: BoxConstraints.tight(
-                                              Size(60.w, 60.h)),
+                                              Size(700.px, 550.px)),
                                           title: const Text('selectvehicle').tr(),
                                           style: ContentDialogThemeData(
                                               titleStyle: appTheme.writingStyle
                                                   .copyWith(
-                                                      fontWeight:
-                                                          FontWeight.bold)),
-                                          content: Container(
-                                              color: appTheme.backGroundColor,
-                                              width: 60.w,
-                                              height: 60.h,
-                                              child: const VehicleTable(
-                                                selectV: true,
-                                              )),
+                                                  fontWeight:
+                                                  FontWeight.bold)),
+                                          content: const VehicleTable(
+                                            selectV: true,
+                                          ),
+                                          actions: [Button(child: const Text('fermer').tr(),
+                                              onPressed: (){
+                                                Navigator.of(context).pop();
+                                              })],
                                         );
                                       });
                                   setState(() {});

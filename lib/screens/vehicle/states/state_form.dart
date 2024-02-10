@@ -144,20 +144,21 @@ class StateFormState extends State<StateForm> {
                                 barrierDismissible: true,
                                 builder: (context) {
                                   return ContentDialog(
-                                    constraints:
-                                        BoxConstraints.tight(Size(60.w, 60.h)),
+                                    constraints: BoxConstraints.tight(
+                                        Size(700.px, 550.px)),
                                     title: const Text('selectvehicle').tr(),
                                     style: ContentDialogThemeData(
                                         titleStyle: appTheme.writingStyle
                                             .copyWith(
-                                                fontWeight: FontWeight.bold)),
-                                    content: Container(
-                                        color: appTheme.backGroundColor,
-                                        width: 60.w,
-                                        height: 60.h,
-                                        child: const VehicleTable(
-                                          selectV: true,
-                                        )),
+                                            fontWeight:
+                                            FontWeight.bold)),
+                                    content: const VehicleTable(
+                                      selectV: true,
+                                    ),
+                                    actions: [Button(child: const Text('fermer').tr(),
+                                        onPressed: (){
+                                          Navigator.of(context).pop();
+                                        })],
                                   );
                                 });
                             setState(() {});
@@ -279,28 +280,30 @@ class StateFormState extends State<StateForm> {
                               widget.etat?.ordreID != null
                           ? null
                           : () async {
-                              selectedReparation = await showDialog<Reparation>(
+                              selectedReparation =    await showDialog<Reparation>(
                                   context: context,
                                   barrierDismissible: true,
                                   builder: (context) {
                                     return ContentDialog(
                                       constraints: BoxConstraints.tight(
-                                          Size(60.w, 60.h)),
-                                      title:
-                                          const Text('selectreparation').tr(),
+                                          Size(700.px, 550.px)),
+                                      title: const Text('selectreparation').tr(),
                                       style: ContentDialogThemeData(
                                           titleStyle: appTheme.writingStyle
                                               .copyWith(
-                                                  fontWeight: FontWeight.bold)),
-                                      content: Container(
-                                          color: appTheme.backGroundColor,
-                                          width: 60.w,
-                                          height: 60.h,
-                                          child: const ReparationTable(
-                                            selectD: true,
-                                          )),
+                                              fontWeight:
+                                              FontWeight.bold)),
+                                      content: const ReparationTable(
+                                        selectD: true,
+                                      ),
+                                      actions: [Button(child: const Text('fermer').tr(),
+                                          onPressed: (){
+                                            Navigator.of(context).pop();
+                                          })],
                                     );
                                   });
+
+
                               setState(() {
                                 valeur =
                                     selectedReparation?.getPrixTTC() ?? valeur;
