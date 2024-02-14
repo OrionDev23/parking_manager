@@ -29,21 +29,18 @@ class ReparationGestionState extends State<ReparationGestion> {
           text: 'reparations'.tr(),
           trailing: widget.archive
               ? null
-              : SizedBox(
-                  width: 15.w,
-                  height: 10.h,
-                  child: ButtonContainer(
-                    icon: FluentIcons.add,
-                    text: 'add'.tr(),
-                    showBottom: false,
-                    showCounter: false,
-                    action: () {
-                      final index = ReparationTabsState.tabs.length + 1;
-                      final tab = generateTab(index);
-                      ReparationTabsState.tabs.add(tab);
-                      ReparationTabsState.currentIndex.value = index - 1;
-                    },
-                  )),
+              : ButtonContainer(
+                icon: FluentIcons.add,
+                text: 'add'.tr(),
+                showBottom: false,
+                showCounter: false,
+                action: () {
+                  final index = ReparationTabsState.tabs.length + 1;
+                  final tab = generateTab(index);
+                  ReparationTabsState.tabs.add(tab);
+                  ReparationTabsState.currentIndex.value = index - 1;
+                },
+              ),
         ),
         content: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),

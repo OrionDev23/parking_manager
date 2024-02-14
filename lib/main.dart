@@ -56,10 +56,11 @@ Future<void> initWindow() async {
 
   WindowOptions windowOptions = WindowOptions(
     title: "ParcOto",
-    minimumSize: Size(pr.size.width - 50, pr.size.height - 50),
+    minimumSize: Size(pr.size.width/2,pr.size.height-50),
     size: Size(pr.size.width - 50, pr.size.height - 50),
     center: true,
     backgroundColor: Colors.grey,
+    fullScreen: false,
     skipTaskbar: false,
     titleBarStyle: TitleBarStyle.hidden,
   );

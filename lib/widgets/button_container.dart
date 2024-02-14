@@ -61,28 +61,33 @@ class _ButtonContainerState extends State<ButtonContainer> {
     var appTheme = context.watch<AppTheme>();
     bool portrait=MediaQuery.of(context).orientation==Orientation.portrait;
     TextStyle textStyle = TextStyle(
-        fontSize: portrait?16.sp:12.sp, fontWeight: FontWeight.bold, color:
-    Colors.white);
+        fontSize: portrait?16.sp:12.sp, color:
+        appTheme.writingStyle.color,
+    );
     TextStyle textStyleButton = TextStyle(fontSize: portrait?14.sp:10.sp,
-        color: Colors.white);
+        color: appTheme.writingStyle.color);
 
     return OnTapScaleAndFade(
       onTap: widget.action,
       child: Container(
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: widget.color ?? appTheme.color,
+          color: appTheme.backGroundColor,
           borderRadius: BorderRadius.circular(5),
+          border: Border.all(
+            color: appTheme.color.lightest,
+            width: 0.5,
+          ),
           boxShadow: kElevationToShadow[2],
         ),
-        width: 18.w,
-        height: 12.h,
+        width: 220.px,
+        height: 80.px,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              height: 11.8.h,
+              height: 80.px,
               color: ColorManipulation.darken(widget.color ?? appTheme.color),
               child: Padding(
                 padding: const EdgeInsets.all(15),

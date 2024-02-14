@@ -24,7 +24,8 @@ class Routes {
         ShellRoute(
 
             builder: (context, state,s ) => PanesList(
-                  paneList: PaneItemsAndFooters(savedSettings), appTheme: appTheme,
+                  paneList: PaneItemsAndFooters(savedSettings,appTheme), appTheme:
+            appTheme,
                 ),
             routes: [
               GoRoute(

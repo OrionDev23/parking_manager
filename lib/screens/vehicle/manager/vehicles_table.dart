@@ -205,8 +205,8 @@ class VehicleTableState extends State<VehicleTable> {
       if (widget.selectV != true)
         DataColumn2(
           label: const Text(''),
-          size: ColumnSize.S,
-          fixedWidth: 2.w,
+          size: ColumnSize.M,
+          fixedWidth: 80.px,
           onSort: null,
         ),
     ];

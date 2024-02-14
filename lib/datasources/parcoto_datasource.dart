@@ -119,6 +119,7 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
   DataRow rowDisplay(
       int startIndex, int count, MapEntry<String, dynamic> element) {
 
+
     return DataRow(
       key: ValueKey<String>(element.value.id),
       onSelectChanged: selectC == true
@@ -127,7 +128,11 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
                 selectRow(element.value);
               }
             }
-          : null,
+          : (value){
+        deselectAll();
+        element.value.selected=true;
+      },
+      selected: element.value.selected,
       cells: getCellsToShow(element as MapEntry<String, T>),
     );
   }

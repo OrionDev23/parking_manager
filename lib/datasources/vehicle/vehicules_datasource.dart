@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
+import 'package:parc_oto/theme.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/client_database.dart';
@@ -76,133 +77,165 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
           ClientDatabase().isAdmin() || ClientDatabase().isManager()
               ? f.FlyoutTarget(
                   controller: element.value.controller,
-                  child: OnTapScaleAndFade(
-                      onTap: () {
-                        element.value.controller.showFlyout(builder: (context) {
-                          return f.MenuFlyout(
-                            items: [
-                              f.MenuFlyoutItem(
-                                  text: const Text('mod').tr(),
-                                  onPressed: () {
-                                    Navigator.of(current).pop();
-                                    late f.Tab tab;
-                                    tab = f.Tab(
-                                      key: UniqueKey(),
-                                      text: Text(
-                                          '${"mod".tr()} ${'vehicule'.tr().toLowerCase()} ${element.value.matricule}'),
-                                      semanticLabel:
-                                          '${'mod'.tr()} ${element.value.matricule}',
-                                      icon: const Icon(f.FluentIcons.edit),
-                                      body: VehicleForm(
-                                        vehicle: element.value,
-                                      ),
-                                      onClosed: () {
-                                        VehicleTabsState.tabs.remove(tab);
-
-                                        if (VehicleTabsState
-                                                .currentIndex.value >
-                                            0) {
-                                          VehicleTabsState.currentIndex.value--;
-                                        }
-                                      },
-                                    );
-                                    final index =
-                                        VehicleTabsState.tabs.length + 1;
-                                    VehicleTabsState.tabs.add(tab);
-                                    VehicleTabsState.currentIndex.value =
-                                        index - 1;
-                                  }),
-                              if (ClientDatabase().isAdmin())
-                                f.MenuFlyoutItem(
-                                    text: const Text('delete').tr(),
-                                    onPressed: () {
-                                      showDeleteConfirmation(element.value);
-                                    }),
-                              const f.MenuFlyoutSeparator(),
-                              f.MenuFlyoutItem(
-                                  text: const Text('nouvdocument').tr(),
-                                  onPressed: () {
-                                    Future.delayed(
-                                            const Duration(milliseconds: 50))
-                                        .then((value) => f.showDialog(
-                                            context: current,
-                                            barrierDismissible: true,
-                                            builder: (context) {
-                                              return f.ContentDialog(
-                                                title: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    const Text('nouvdocument')
-                                                        .tr(),
-                                                    f.Button(
-                                                        child: const Icon(f
-                                                            .FluentIcons
-                                                            .cancel),
-                                                        onPressed: () {
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        }),
-                                                  ],
-                                                ),
-                                                constraints:
-                                                    BoxConstraints.loose(
-                                                        Size(420.px, 450.px)),
-                                                content: DocumentForm(
-                                                  vehicle: element.value,
-                                                ),
-                                              );
-                                            }));
-                                  }),
-                              f.MenuFlyoutSubItem(
-                                text: const Text('chstates').tr(),
-                                items: (BuildContext context) {
-                                  return [
-                                    f.MenuFlyoutItem(
-                                        text: const Text('gstate').tr(),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                          showStateForm(element.value, 0);
-                                        }),
-                                    f.MenuFlyoutItem(
-                                        text: const Text('bstate').tr(),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-
-                                          showStateForm(element.value, 1);
-                                        }),
-                                    f.MenuFlyoutItem(
-                                        text: const Text('rstate').tr(),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-
-                                          showStateForm(element.value, 2);
-                                        }),
-                                    f.MenuFlyoutItem(
-                                        text: const Text('ostate').tr(),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-
-                                          showStateForm(element.value, 3);
-                                        }),
-                                    f.MenuFlyoutItem(
-                                        text: const Text('restate').tr(),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-
-                                          showStateForm(element.value, 4);
-                                        }),
-                                  ];
-                                },
+                  child: f.Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      OnTapScaleAndFade(
+                          onTap: (){},
+                          child: f.Container(
+                              decoration: BoxDecoration(
+                                color: appTheme?.color.lightest,
+                                boxShadow: kElevationToShadow[2],
                               ),
-                            ],
-                          );
-                        });
-                      },
-                      child: const Icon(Icons.more_vert_sharp)),
+                              child: Icon(Icons
+                                  .remove_red_eye_outlined,color: appTheme!
+                                  .color.darkest,
+                              ))),
+                      smallSpace,
+                      OnTapScaleAndFade(
+                          onTap: () {
+                            element.value.controller.showFlyout(builder: (context) {
+                              return f.MenuFlyout(
+                                items: [
+                                  f.MenuFlyoutItem(
+                                      text: const Text('mod').tr(),
+                                      onPressed: () {
+                                        Navigator.of(current).pop();
+                                        late f.Tab tab;
+                                        tab = f.Tab(
+                                          key: UniqueKey(),
+                                          text: Text(
+                                              '${"mod".tr()} ${'vehicule'.tr().toLowerCase()} ${element.value.matricule}'),
+                                          semanticLabel:
+                                              '${'mod'.tr()} ${element.value.matricule}',
+                                          icon: const Icon(f.FluentIcons.edit),
+                                          body: VehicleForm(
+                                            vehicle: element.value,
+                                          ),
+                                          onClosed: () {
+                                            VehicleTabsState.tabs.remove(tab);
+
+                                            if (VehicleTabsState
+                                                    .currentIndex.value >
+                                                0) {
+                                              VehicleTabsState.currentIndex.value--;
+                                            }
+                                          },
+                                        );
+                                        final index =
+                                            VehicleTabsState.tabs.length + 1;
+                                        VehicleTabsState.tabs.add(tab);
+                                        VehicleTabsState.currentIndex.value =
+                                            index - 1;
+                                      }),
+                                  if (ClientDatabase().isAdmin())
+                                    f.MenuFlyoutItem(
+                                        text: const Text('delete').tr(),
+                                        onPressed: () {
+                                          showDeleteConfirmation(element.value);
+                                        }),
+                                  const f.MenuFlyoutSeparator(),
+                                  f.MenuFlyoutItem(
+                                      text: const Text('nouvdocument').tr(),
+                                      onPressed: () {
+                                        Future.delayed(
+                                                const Duration(milliseconds: 50))
+                                            .then((value) => f.showDialog(
+                                                context: current,
+                                                barrierDismissible: true,
+                                                builder: (context) {
+                                                  return f.ContentDialog(
+                                                    title: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        const Text('nouvdocument')
+                                                            .tr(),
+                                                        f.Button(
+                                                            child: const Icon(f
+                                                                .FluentIcons
+                                                                .cancel),
+                                                            onPressed: () {
+                                                              Navigator.of(context)
+                                                                  .pop();
+                                                            }),
+                                                      ],
+                                                    ),
+                                                    constraints:
+                                                        BoxConstraints.loose(
+                                                            Size(420.px, 450.px)),
+                                                    content: DocumentForm(
+                                                      vehicle: element.value,
+                                                    ),
+                                                  );
+                                                }));
+                                      }),
+                                  f.MenuFlyoutSubItem(
+                                    text: const Text('chstates').tr(),
+                                    items: (BuildContext context) {
+                                      return [
+                                        f.MenuFlyoutItem(
+                                            text: const Text('gstate').tr(),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                              showStateForm(element.value, 0);
+                                            }),
+                                        f.MenuFlyoutItem(
+                                            text: const Text('bstate').tr(),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+
+                                              showStateForm(element.value, 1);
+                                            }),
+                                        f.MenuFlyoutItem(
+                                            text: const Text('rstate').tr(),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+
+                                              showStateForm(element.value, 2);
+                                            }),
+                                        f.MenuFlyoutItem(
+                                            text: const Text('ostate').tr(),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+
+                                              showStateForm(element.value, 3);
+                                            }),
+                                        f.MenuFlyoutItem(
+                                            text: const Text('restate').tr(),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+
+                                              showStateForm(element.value, 4);
+                                            }),
+                                      ];
+                                    },
+                                  ),
+                                ],
+                              );
+                            });
+                          },
+                          child: f.Container(
+                              decoration: BoxDecoration(
+                                color: appTheme?.color.lightest,
+                                boxShadow: kElevationToShadow[2],
+                              ),
+                              child: Icon(Icons.edit,color: appTheme!
+                                  .color.darkest,))),
+                    ],
+                  ),
                 )
-              : const Text(''),
+              : OnTapScaleAndFade(
+              onTap: (){},
+              child: f.Container(
+                  decoration: BoxDecoration(
+                    color: appTheme?.color.lightest,
+                    boxShadow: kElevationToShadow[2],
+                  ),
+                  child: Icon(Icons.remove_red_eye_outlined,color:
+                  appTheme!
+                      .color.darkest,))),
         ),
     ];
   }
