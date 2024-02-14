@@ -131,6 +131,7 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
           : (value){
         deselectAll();
         element.value.selected=true;
+        notifyListeners();
       },
       selected: element.value.selected,
       cells: getCellsToShow(element as MapEntry<String, T>),
