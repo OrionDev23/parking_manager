@@ -57,7 +57,6 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
           )),
         ],
       )),
-      DataCell(Text(element.value.anneeUtil.toString(), style: rowTextStyle)),
       DataCell(Text(
               VehiclesUtilities.getEtatName(element.value.etatactuel ?? 0),
               style: rowTextStyle)

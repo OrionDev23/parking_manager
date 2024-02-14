@@ -40,33 +40,27 @@ class VehicleManagementState extends State<VehicleManagement>
         trailing: Row(
           children: [
             if (showImportButton && ClientDatabase().isAdmin())
-              SizedBox(
-                  width: 200.px,
-                  height: 70.px,
-                  child: ButtonContainer(
-                    color: appTheme.color.darkest,
-                    icon: FluentIcons.add,
-                    text: 'importlist'.tr(),
-                    showBottom: false,
-                    showCounter: false,
-                    action: importList,
-                  )),
+              ButtonContainer(
+                color: appTheme.color.darkest,
+                icon: FluentIcons.add,
+                text: 'importlist'.tr(),
+                showBottom: false,
+                showCounter: false,
+                action: importList,
+              ),
             if (showImportButton && ClientDatabase().isAdmin()) smallSpace,
-            SizedBox(
-                width: 200.px,
-                height: 70.px,
-                child: ButtonContainer(
-                  icon: FluentIcons.add,
-                  text: 'add'.tr(),
-                  showBottom: false,
-                  showCounter: false,
-                  action: () {
-                    final index = VehicleTabsState.tabs.length + 1;
-                    final tab = generateTab(index);
-                    VehicleTabsState.tabs.add(tab);
-                    VehicleTabsState.currentIndex.value = index - 1;
-                  },
-                )),
+            ButtonContainer(
+              icon: FluentIcons.add,
+              text: 'add'.tr(),
+              showBottom: false,
+              showCounter: false,
+              action: () {
+                final index = VehicleTabsState.tabs.length + 1;
+                final tab = generateTab(index);
+                VehicleTabsState.tabs.add(tab);
+                VehicleTabsState.currentIndex.value = index - 1;
+              },
+            ),
           ],
         ),
       ),

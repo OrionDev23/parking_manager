@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../theme.dart';
 
@@ -36,13 +37,7 @@ class TableStats extends StatelessWidget {
       decoration: BoxDecoration(
           boxShadow: kElevationToShadow[2],
           borderRadius: BorderRadius.circular(5),
-          color: appTheme.mode == ThemeMode.dark
-              ? Colors.grey
-              : appTheme.mode == ThemeMode.light
-                  ? Colors.white
-                  : ThemeMode.system == ThemeMode.light
-                      ? Colors.white
-                      : Colors.grey),
+          color: appTheme.backGroundColor),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,12 +46,10 @@ class TableStats extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               makeTransactionsIcon(context),
-              const SizedBox(
-                width: 38,
-              ),
+              bigSpace,
               Text(
                 title ?? '',
-                style: const TextStyle(fontSize: 22),
+                style: const TextStyle(fontSize: 20),
               ),
             ],
           ),
@@ -83,7 +76,7 @@ class TableStats extends StatelessWidget {
   }
 
   Widget makeTransactionsIcon(BuildContext context) {
-    const width = 40.0;
+    final width = 40.0.px;
     var appTheme = context.watch<AppTheme>();
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -95,7 +88,7 @@ class TableStats extends StatelessWidget {
             color: Colors.transparent,
             shape: BoxShape.circle,
             border: Border.all(
-              color: appTheme.color.withOpacity(0.6),
+              color: appTheme.color.light,
               width: 3,
             ),
           ),

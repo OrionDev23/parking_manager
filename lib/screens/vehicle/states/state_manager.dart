@@ -32,15 +32,12 @@ class EtatManagerState extends State<EtatManager> {
     return ScaffoldPage(
       header: PageTitle(
         text: 'vstates'.tr(),
-        trailing: SizedBox(
-            width: 15.w,
-            height: 10.h,
-            child: ButtonContainer(
-                icon: FluentIcons.add,
-                text: 'add'.tr(),
-                showBottom: false,
-                showCounter: false,
-                action: showStateForm)),
+        trailing: ButtonContainer(
+            icon: FluentIcons.add,
+            text: 'add'.tr(),
+            showBottom: false,
+            showCounter: false,
+            action: showStateForm),
       ),
       content: const StateTable(),
     );

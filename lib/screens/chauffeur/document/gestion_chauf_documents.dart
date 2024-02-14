@@ -25,21 +25,18 @@ class ChauffeurDocumentsState extends State<ChauffeurDocuments> {
     return ScaffoldPage(
       header: PageTitle(
         text: 'gestiondocument'.tr(),
-        trailing: SizedBox(
-            width: 15.w,
-            height: 10.h,
-            child: ButtonContainer(
-              icon: FluentIcons.add,
-              text: 'add'.tr(),
-              showBottom: false,
-              showCounter: false,
-              action: () {
-                final index = CDocumentTabsState.tabs.length + 1;
-                final tab = generateTab(index);
-                CDocumentTabsState.tabs.add(tab);
-                CDocumentTabsState.currentIndex.value = index - 1;
-              },
-            )),
+        trailing: ButtonContainer(
+          icon: FluentIcons.add,
+          text: 'add'.tr(),
+          showBottom: false,
+          showCounter: false,
+          action: () {
+            final index = CDocumentTabsState.tabs.length + 1;
+            final tab = generateTab(index);
+            CDocumentTabsState.tabs.add(tab);
+            CDocumentTabsState.currentIndex.value = index - 1;
+          },
+        ),
       ),
       content: const CDocumentTable(),
     );

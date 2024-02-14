@@ -38,32 +38,26 @@ class _PlanningManagerState extends State<PlanningManager> {
         text: 'planifier'.tr(),
         trailing: f.Row(
           children: [
-            SizedBox(
-                width: 15.w,
-                height: 10.h,
-                child: ButtonContainer(
-                  color: Colors.grey,
-                  icon: f.FluentIcons.add,
-                  text: 'delete'.tr(),
-                  showBottom: false,
-                  showCounter: false,
-                  action: selectedPlanning != null &&
-                          (selectedPlanning!.createdBy ==
-                                  ClientDatabase.me.value!.id ||
-                              ClientDatabase().isAdmin())
-                      ? deleteAppointement
-                      : null,
-                )),
+            ButtonContainer(
+              color: Colors.grey,
+              icon: f.FluentIcons.add,
+              text: 'delete'.tr(),
+              showBottom: false,
+              showCounter: false,
+              action: selectedPlanning != null &&
+                      (selectedPlanning!.createdBy ==
+                              ClientDatabase.me.value!.id ||
+                          ClientDatabase().isAdmin())
+                  ? deleteAppointement
+                  : null,
+            ),
             smallSpace,
-            SizedBox(
-                width: 15.w,
-                height: 10.h,
-                child: ButtonContainer(
-                    icon: f.FluentIcons.add,
-                    text: 'add'.tr(),
-                    showBottom: false,
-                    showCounter: false,
-                    action: showPlanningCreation)),
+            ButtonContainer(
+                icon: f.FluentIcons.add,
+                text: 'add'.tr(),
+                showBottom: false,
+                showCounter: false,
+                action: showPlanningCreation),
           ],
         ),
       ),

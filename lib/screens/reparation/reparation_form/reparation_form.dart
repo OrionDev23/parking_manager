@@ -915,15 +915,19 @@ class ReparationFormState extends State<ReparationForm>
               ],
             ),
           ),
-          Container(
+          designations.isEmpty
+              ? Container(
+              padding: const EdgeInsets.all(10),
+              width: 300.px,
+              height: 320.px,
+              child: const NoDataWidget())
+              :Container(
             decoration: BoxDecoration(
               border: Border.all(color: appTheme.fillColor),
               borderRadius:
                   const BorderRadius.vertical(bottom: Radius.circular(5)),
             ),
-            child: designations.isEmpty
-                ? const NoDataWidget()
-                : Column(children: getDesignationList(appTheme)),
+            child:  Column(children: getDesignationList(appTheme)),
           ),
         ],
       ),

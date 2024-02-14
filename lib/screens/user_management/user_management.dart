@@ -3,7 +3,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/screens/user_management/user_creation.dart';
 import 'package:parc_oto/screens/user_management/user_table.dart';
 import 'package:parc_oto/widgets/page_header.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../widgets/button_container.dart';
 
@@ -29,16 +28,13 @@ class _UserManagementState extends State<UserManagement> {
     return ScaffoldPage(
         header: PageTitle(
           text: 'usermanagement'.tr(),
-          trailing: SizedBox(
-              width: 15.w,
-              height: 10.h,
-              child: ButtonContainer(
-                icon: FluentIcons.add,
-                text: 'add'.tr(),
-                showBottom: false,
-                showCounter: false,
-                action: showUserForm,
-              )),
+          trailing: ButtonContainer(
+            icon: FluentIcons.add,
+            text: 'add'.tr(),
+            showBottom: false,
+            showCounter: false,
+            action: showUserForm,
+          ),
         ),
         content: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),

@@ -70,13 +70,13 @@ class _ButtonContainerState extends State<ButtonContainer> {
     return OnTapScaleAndFade(
       onTap: widget.action,
       child: Container(
-        clipBehavior: Clip.antiAlias,
+        clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
           color: appTheme.backGroundColor,
           borderRadius: BorderRadius.circular(5),
           border: Border.all(
             color: appTheme.color.lightest,
-            width: 0.5,
+            width: 1,
           ),
           boxShadow: kElevationToShadow[2],
         ),
@@ -88,7 +88,8 @@ class _ButtonContainerState extends State<ButtonContainer> {
           children: [
             Container(
               height: 80.px,
-              color: ColorManipulation.darken(widget.color ?? appTheme.color),
+              color: ColorManipulation.darken(widget.color ?? appTheme.color
+                  .dark),
               child: Padding(
                 padding: const EdgeInsets.all(15),
                 child: Icon(
@@ -98,9 +99,7 @@ class _ButtonContainerState extends State<ButtonContainer> {
                 ),
               ),
             ),
-            const SizedBox(
-              width: 5,
-            ),
+            smallSpace,
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,9 +112,7 @@ class _ButtonContainerState extends State<ButtonContainer> {
                       : widget.text,
                   style: textStyle,
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+                bigSpace,
                 if (widget.showBottom)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -127,14 +124,14 @@ class _ButtonContainerState extends State<ButtonContainer> {
                           style: textStyleButton,
                         ),
                       ),
-                      const SizedBox(width: 5),
+                      smallSpace,
                       if (widget.showBothLN)
                         Container(
                           color: Colors.grey[100],
                           width: 0.05.w,
                           height: 30,
                         ),
-                      if (widget.showBothLN) const SizedBox(width: 5),
+                      if (widget.showBothLN) smallSpace,
                       if (widget.showBothLN)
                         FilledButton(
                           onPressed: widget.actionNouveau,

@@ -40,33 +40,27 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
             : Row(
               children: [
                 if (showImportConducteur && ClientDatabase().isAdmin())
-                  SizedBox(
-                      width: 200.px,
-                      height: 70.px,
-                      child: ButtonContainer(
-                        color: appTheme.color.darkest,
-                        icon: FluentIcons.add,
-                        text: 'importlist'.tr(),
-                        showBottom: false,
-                        showCounter: false,
-                        action: importList,
-                      )),
+                  ButtonContainer(
+                    color: appTheme.color.darkest,
+                    icon: FluentIcons.add,
+                    text: 'importlist'.tr(),
+                    showBottom: false,
+                    showCounter: false,
+                    action: importList,
+                  ),
                 if (showImportConducteur && ClientDatabase().isAdmin()) smallSpace,
-                SizedBox(
-                    width: 15.w,
-                    height: 10.h,
-                    child: ButtonContainer(
-                      icon: FluentIcons.add,
-                      text: 'add'.tr(),
-                      showBottom: false,
-                      showCounter: false,
-                      action: () {
-                        final index = ChauffeurTabsState.tabs.length + 1;
-                        final tab = generateTab(index);
-                        ChauffeurTabsState.tabs.add(tab);
-                        ChauffeurTabsState.currentIndex.value = index - 1;
-                      },
-                    )),
+                ButtonContainer(
+                  icon: FluentIcons.add,
+                  text: 'add'.tr(),
+                  showBottom: false,
+                  showCounter: false,
+                  action: () {
+                    final index = ChauffeurTabsState.tabs.length + 1;
+                    final tab = generateTab(index);
+                    ChauffeurTabsState.tabs.add(tab);
+                    ChauffeurTabsState.currentIndex.value = index - 1;
+                  },
+                ),
               ],
             ),
       ),

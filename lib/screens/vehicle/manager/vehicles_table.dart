@@ -118,24 +118,6 @@ class VehicleTableState extends State<VehicleTable> {
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Text(
-            'year',
-            style: tstyle,
-          ).tr(),
-        ),
-        size: ColumnSize.S,
-        onSort: (s, c) {
-          sortColumn = 2;
-          assending = !assending;
-
-          vehicleDataSource.sort(sortColumn, assending);
-          setState(() {});
-        },
-      ),
-      DataColumn2(
-        numeric: true,
-        label: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
             'etat',
             style: tstyle,
           ).tr(),

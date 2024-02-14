@@ -174,7 +174,8 @@ class _EmptyListWidgetState extends State<EmptyWidget>
             offset: const Offset(20, 0),
             color: appTheme.fillColor,
             spreadRadius: -5),
-      ], shape: BoxShape.circle),
+      ],
+          shape: BoxShape.circle),
     );
   }
 

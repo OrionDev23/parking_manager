@@ -50,7 +50,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
     return ScaffoldPage(
       header: const PageTitle(text: 'home'),
       content: ListView(
-        padding: const EdgeInsets.all(5),
+        padding: const EdgeInsets.all(10),
         children: [
           StaggeredGrid.count(
             crossAxisCount:

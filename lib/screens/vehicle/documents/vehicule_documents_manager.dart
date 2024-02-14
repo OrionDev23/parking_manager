@@ -25,21 +25,18 @@ class VehiculeDocumentsState extends State<VehiculeDocuments> {
     return ScaffoldPage(
       header: PageTitle(
         text: 'gestiondocument'.tr(),
-        trailing: SizedBox(
-            width: 15.w,
-            height: 10.h,
-            child: ButtonContainer(
-              icon: FluentIcons.add,
-              text: 'add'.tr(),
-              showBottom: false,
-              showCounter: false,
-              action: () {
-                final index = DocumentTabsState.tabs.length + 1;
-                final tab = generateTab(index);
-                DocumentTabsState.tabs.add(tab);
-                DocumentTabsState.currentIndex.value = index - 1;
-              },
-            )),
+        trailing: ButtonContainer(
+          icon: FluentIcons.add,
+          text: 'add'.tr(),
+          showBottom: false,
+          showCounter: false,
+          action: () {
+            final index = DocumentTabsState.tabs.length + 1;
+            final tab = generateTab(index);
+            DocumentTabsState.tabs.add(tab);
+            DocumentTabsState.currentIndex.value = index - 1;
+          },
+        ),
       ),
       content: const DocumentTable(),
     );

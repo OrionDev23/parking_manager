@@ -81,108 +81,105 @@ class _LoginScreenState extends State<LoginScreen>{
                   bigSpace,
                   Image.asset(
                     'assets/images/logo.webp',
-                    width: 400.px,
+                    width: 300.px,
                   ),
                   bigSpace,
                   bigSpace,
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    alignment: Alignment.center,
-                    width: pwidth,
-                    height: pheight,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: appTheme.mode == ThemeMode.dark
-                          ? Colors.grey
-                          : appTheme.mode == ThemeMode.light
-                              ? Colors.white
-                              : ThemeMode.system == ThemeMode.light
-                                  ? Colors.white
-                                  : Colors.grey,
-                      boxShadow: kElevationToShadow[2],
-                    ),
+                  Flexible(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        SizedBox(
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          alignment: Alignment.center,
                           width: pwidth,
-                          child: InfoLabel(
-                            label: validEmail || email.text.isEmpty
-                                ? ''
-                                : 'entervalidemail'.tr(),
-                            labelStyle: TextStyle(color: Colors.red),
-                            child: TextBox(
-                              controller: email,
-                              placeholder: 'email'.tr(),
-                              keyboardType: TextInputType.emailAddress,
-                              onChanged: (s) {
-                                if (!FormValidators.isEmail(s)) {
-                                  setState(() {
-                                    validEmail = false;
-                                  });
-                                } else {
-                                  setState(() {
-                                    validEmail = true;
-                                  });
-                                }
-                              },
-                            ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: appTheme.backGroundColor,
+                            boxShadow: kElevationToShadow[3],
                           ),
-                        ),
-                        SizedBox(
-                          height: 2.h,
-                        ),
-                        SizedBox(
-                          width: pwidth,
-                          child: TextBox(
-                            controller: password,
-                            placeholder: 'motdepasse'.tr(),
-                            suffix: IconButton(
-                              icon: Icon(
-                                showPassword
-                                    ? FluentIcons.hide
-                                    : FluentIcons.red_eye,
-                                color: !showPassword
-                                    ? appTheme.color
-                                    : Colors.grey[100],
-                                size: 12.sp,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                width: pwidth,
+                                child: InfoLabel(
+                                  label: validEmail || email.text.isEmpty
+                                      ? ''
+                                      : 'entervalidemail'.tr(),
+                                  labelStyle: TextStyle(color: Colors.red),
+                                  child: TextBox(
+                                    controller: email,
+                                    placeholder: 'email'.tr(),
+                                    keyboardType: TextInputType.emailAddress,
+                                    onChanged: (s) {
+                                      if (!FormValidators.isEmail(s)) {
+                                        setState(() {
+                                          validEmail = false;
+                                        });
+                                      } else {
+                                        setState(() {
+                                          validEmail = true;
+                                        });
+                                      }
+                                    },
+                                  ),
+                                ),
                               ),
-                              onPressed: () {
-                                setState(() {
-                                  showPassword = !showPassword;
-                                });
-                              },
-                            ),
-                            obscureText: !showPassword,
-                            onSubmitted: (s) {
-                              signIn();
-                            },
+                              bigSpace,
+                              SizedBox(
+                                width: pwidth,
+                                child: TextBox(
+                                  controller: password,
+                                  placeholder: 'motdepasse'.tr(),
+                                  suffix: IconButton(
+                                    icon: Icon(
+                                      showPassword
+                                          ? FluentIcons.hide
+                                          : FluentIcons.red_eye,
+                                      color: !showPassword
+                                          ? appTheme.color
+                                          : Colors.grey[100],
+                                      size: 13.px,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        showPassword = !showPassword;
+                                      });
+                                    },
+                                  ),
+                                  obscureText: !showPassword,
+                                  onSubmitted: (s) {
+                                    signIn();
+                                  },
+                                ),
+                              ),
+                              bigSpace,
+                              smallSpace,
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  OnTapScaleAndFade(
+                                      onTap: forgotPassword,
+                                      child: Text(
+                                        'forgot',
+                                        style: TextStyle(color: appTheme.color),
+                                      ).tr()),
+                                ],
+                              ),
+                              bigSpace,
+                              smallSpace,
+
+                              FilledButton(
+                                  onPressed: checking ? null : signIn,
+                                  child: checking
+                                      ? const ProgressRing(strokeWidth: 2.0)
+                                      : const Text('seconnecter').tr()),
+                            ],
                           ),
                         ),
-                        SizedBox(
-                          height: 2.h,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            OnTapScaleAndFade(
-                                onTap: forgotPassword,
-                                child: Text(
-                                  'forgot',
-                                  style: TextStyle(color: Colors.blue),
-                                ).tr()),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 2.h,
-                        ),
-                        FilledButton(
-                            onPressed: checking ? null : signIn,
-                            child: checking
-                                ? const ProgressRing(strokeWidth: 2.0)
-                                : const Text('seconnecter').tr()),
                       ],
                     ),
                   ),
