@@ -4,7 +4,6 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
-  file_saver
   printing
   screen_retriever
   share_plus

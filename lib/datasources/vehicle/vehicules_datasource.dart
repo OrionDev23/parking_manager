@@ -30,33 +30,41 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
   List<DataCell> getCellsToShow(MapEntry<String, Vehicle> element) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
     return [
-      DataCell(SelectableText(
-        element.value.matricule,
-        style: rowTextStyle,
-      )),
-      DataCell(Row(
+      DataCell(f.Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset(
-            element.value.marque == null ||
+          Row(
+            children: [
+              Image.asset(
+                element.value.marque == null ||
                     element.value.marque!.isEmpty ||
                     element.value.marque!.contains('null')
-                ? 'assets/images/marques/default.webp'
-                : 'assets/images/marques/${element.value.marque ?? 'default'}.webp',
-            width: 3.5.h,
-            height: 3.5.h,
+                    ? 'assets/images/marques/default.webp'
+                    : 'assets/images/marques/${element.value.marque ?? 'default'}.webp',
+                width: 3.5.h,
+                height: 3.5.h,
+              ),
+              const SizedBox(
+                width: 2,
+              ),
+              Expanded(
+                  child: Text(
+                    element.value.type ?? '',
+                    style: rowTextStyle,
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                  )),
+            ],
           ),
-          const SizedBox(
-            width: 2,
-          ),
-          Expanded(
-              child: Text(
-            element.value.type ?? '',
+          SelectableText(
+            element.value.matricule,
             style: rowTextStyle,
-            softWrap: true,
-            overflow: TextOverflow.ellipsis,
-          )),
+          ),
         ],
-      )),
+      ),
+      onDoubleTap: ()=>showEditStuff(element),
+      ),
       DataCell(Text(
               VehiclesUtilities.getEtatName(element.value.etatactuel ?? 0),
               style: rowTextStyle)
@@ -92,129 +100,7 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
                               ))),
                       smallSpace,
                       OnTapScaleAndFade(
-                          onTap: () {
-                            element.value.controller.showFlyout(builder: (context) {
-                              return f.MenuFlyout(
-                                items: [
-                                  f.MenuFlyoutItem(
-                                      text: const Text('mod').tr(),
-                                      onPressed: () {
-                                        Navigator.of(current).pop();
-                                        late f.Tab tab;
-                                        tab = f.Tab(
-                                          key: UniqueKey(),
-                                          text: Text(
-                                              '${"mod".tr()} ${'vehicule'.tr().toLowerCase()} ${element.value.matricule}'),
-                                          semanticLabel:
-                                              '${'mod'.tr()} ${element.value.matricule}',
-                                          icon: const Icon(f.FluentIcons.edit),
-                                          body: VehicleForm(
-                                            vehicle: element.value,
-                                          ),
-                                          onClosed: () {
-                                            VehicleTabsState.tabs.remove(tab);
-
-                                            if (VehicleTabsState
-                                                    .currentIndex.value >
-                                                0) {
-                                              VehicleTabsState.currentIndex.value--;
-                                            }
-                                          },
-                                        );
-                                        final index =
-                                            VehicleTabsState.tabs.length + 1;
-                                        VehicleTabsState.tabs.add(tab);
-                                        VehicleTabsState.currentIndex.value =
-                                            index - 1;
-                                      }),
-                                  if (ClientDatabase().isAdmin())
-                                    f.MenuFlyoutItem(
-                                        text: const Text('delete').tr(),
-                                        onPressed: () {
-                                          showDeleteConfirmation(element.value);
-                                        }),
-                                  const f.MenuFlyoutSeparator(),
-                                  f.MenuFlyoutItem(
-                                      text: const Text('nouvdocument').tr(),
-                                      onPressed: () {
-                                        Future.delayed(
-                                                const Duration(milliseconds: 50))
-                                            .then((value) => f.showDialog(
-                                                context: current,
-                                                barrierDismissible: true,
-                                                builder: (context) {
-                                                  return f.ContentDialog(
-                                                    title: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        const Text('nouvdocument')
-                                                            .tr(),
-                                                        f.Button(
-                                                            child: const Icon(f
-                                                                .FluentIcons
-                                                                .cancel),
-                                                            onPressed: () {
-                                                              Navigator.of(context)
-                                                                  .pop();
-                                                            }),
-                                                      ],
-                                                    ),
-                                                    constraints:
-                                                        BoxConstraints.loose(
-                                                            Size(420.px, 450.px)),
-                                                    content: DocumentForm(
-                                                      vehicle: element.value,
-                                                    ),
-                                                  );
-                                                }));
-                                      }),
-                                  f.MenuFlyoutSubItem(
-                                    text: const Text('chstates').tr(),
-                                    items: (BuildContext context) {
-                                      return [
-                                        f.MenuFlyoutItem(
-                                            text: const Text('gstate').tr(),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                              showStateForm(element.value, 0);
-                                            }),
-                                        f.MenuFlyoutItem(
-                                            text: const Text('bstate').tr(),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-
-                                              showStateForm(element.value, 1);
-                                            }),
-                                        f.MenuFlyoutItem(
-                                            text: const Text('rstate').tr(),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-
-                                              showStateForm(element.value, 2);
-                                            }),
-                                        f.MenuFlyoutItem(
-                                            text: const Text('ostate').tr(),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-
-                                              showStateForm(element.value, 3);
-                                            }),
-                                        f.MenuFlyoutItem(
-                                            text: const Text('restate').tr(),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-
-                                              showStateForm(element.value, 4);
-                                            }),
-                                      ];
-                                    },
-                                  ),
-                                ],
-                              );
-                            });
-                          },
+                          onTap: ()=>showEditStuff(element),
                           child: f.Container(
                               decoration: BoxDecoration(
                                 color: appTheme?.color.lightest,
@@ -237,6 +123,137 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
                       .color.darkest,))),
         ),
     ];
+  }
+
+  void showEditStuff(MapEntry<String, Vehicle> element){
+
+      element.value.controller.showFlyout(builder: (context) {
+        return f.MenuFlyout(
+          items: [
+            f.MenuFlyoutItem(
+                text: const Text('mod').tr(),
+                onPressed: () {
+                  Navigator.of(current).pop();
+                  late f.Tab tab;
+                  tab = f.Tab(
+                    key: UniqueKey(),
+                    text: Text(
+                        '${"mod".tr()} ${'vehicule'.tr().toLowerCase()} ${element.value.matricule}'),
+                    semanticLabel:
+                    '${'mod'.tr()} ${element.value.matricule}',
+                    icon: const Icon(f.FluentIcons.edit),
+                    body: VehicleForm(
+                      vehicle: element.value,
+                    ),
+                    onClosed: () {
+                      VehicleTabsState.tabs.remove(tab);
+
+                      if (VehicleTabsState
+                          .currentIndex.value >
+                          0) {
+                        VehicleTabsState.currentIndex.value--;
+                      }
+                    },
+                  );
+                  final index =
+                      VehicleTabsState.tabs.length + 1;
+                  VehicleTabsState.tabs.add(tab);
+                  VehicleTabsState.currentIndex.value =
+                      index - 1;
+                }),
+            if (ClientDatabase().isAdmin())
+              f.MenuFlyoutItem(
+                  text: const Text('delete').tr(),
+                  onPressed: () {
+                    showDeleteConfirmation(element.value);
+                  }),
+            const f.MenuFlyoutSeparator(),
+            f.MenuFlyoutItem(
+                text: const Text('nouvdocument').tr(),
+                onPressed: () {
+                  Future.delayed(
+                      const Duration(milliseconds: 50))
+                      .then((value) => f.showDialog(
+                      context: current,
+                      barrierDismissible: true,
+                      builder: (context) {
+                        return f.ContentDialog(
+                          title: Row(
+                            mainAxisAlignment:
+                            MainAxisAlignment
+                                .spaceBetween,
+                            children: [
+                              const Text('nouvdocument')
+                                  .tr(),
+                              f.Button(
+                                  child: const Icon(f
+                                      .FluentIcons
+                                      .cancel),
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .pop();
+                                  }),
+                            ],
+                          ),
+                          constraints:
+                          BoxConstraints.loose(
+                              Size(420.px, 450.px)),
+                          content: DocumentForm(
+                            vehicle: element.value,
+                          ),
+                        );
+                      }));
+                }),
+            f.MenuFlyoutSubItem(
+              text: const Text('chstates').tr(),
+              items: (BuildContext context) {
+                return [
+                  f.MenuFlyoutItem(
+                      text: const Text('gstate').tr(),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        showStateForm(element.value, 0);
+                      }),
+                  f.MenuFlyoutItem(
+                      text: const Text('bstate').tr(),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+
+                        showStateForm(element.value, 1);
+                      }),
+                  f.MenuFlyoutItem(
+                      text: const Text('rstate').tr(),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+
+                        showStateForm(element.value, 2);
+                      }),
+                  f.MenuFlyoutItem(
+                      text: const Text('ostate').tr(),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+
+                        showStateForm(element.value, 3);
+                      }),
+                  f.MenuFlyoutItem(
+                      text: const Text('restate').tr(),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+
+                        showStateForm(element.value, 4);
+                      }),
+                ];
+              },
+            ),
+          ],
+        );
+      });
+
+  }
+
+  @override
+  void longPressing(MapEntry<String, Vehicle> element) {
+    showEditStuff(element);
   }
 
   @override

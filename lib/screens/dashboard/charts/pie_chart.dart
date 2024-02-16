@@ -7,14 +7,16 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../../../widgets/empty_widget/src/widget.dart';
 
-
 class ParcOtoPie extends StatefulWidget {
   final String? title;
 
   final List<MapEntry<String, Future<int>>> labels;
 
-  const ParcOtoPie(
-      {super.key, required this.labels, this.title,});
+  const ParcOtoPie({
+    super.key,
+    required this.labels,
+    this.title,
+  });
 
   @override
   State<ParcOtoPie> createState() => _ParcOtoPieState();
@@ -35,6 +37,7 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
 
   int indexOfBiggest = 0;
   int valueOfBiggest = 0;
+  List<Color> colors = [];
   void initValues() async {
     loading = true;
     List<Future> tasks = [];
@@ -49,9 +52,8 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
     }
     totalNumber = temp;
     loading = false;
-    if(mounted){
-      setState(() {
-      });
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -60,9 +62,9 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
         MapEntry(widget.labels[index].key, await widget.labels[index].value));
   }
 
-  bool notOnlyOne=false;
+  bool notOnlyOne = false;
   void sortAsIntended() {
-    int noo=0;
+    int noo = 0;
     List<MapEntry<String, int>> result = [];
     for (int i = 0; i < widget.labels.length; i++) {
       for (int j = 0; j < values.length; j++) {
@@ -71,8 +73,8 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
             valueOfBiggest = values[j].value;
             indexOfBiggest = i;
           }
-          if(values[j].value>0){
-              noo++;
+          if (values[j].value > 0) {
+            noo++;
           }
           result.add(MapEntry(values[j].key, values[j].value));
 
@@ -81,25 +83,34 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
         }
       }
     }
-    if(noo>1){
-      notOnlyOne=true;
-    }
-    else{
-      notOnlyOne=false;
+    if (noo > 1) {
+      notOnlyOne = true;
+    } else {
+      notOnlyOne = false;
     }
     values.addAll(result);
-
   }
 
   late final int totalNumber;
 
   int minValue = 10;
+
+  bool gotenColors = false;
+  void getColors(AppTheme appTheme) {
+    if (!gotenColors) {
+      colors = appTheme.getRandomColors(values.length);
+      gotenColors = true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
+
     if (loading) {
       return const Center(child: ProgressRing());
     }
+    getColors(appTheme);
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -134,17 +145,16 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                       isVisible: true,
                     ),
                     tooltipBehavior: TooltipBehavior(
-                      enable: true,
-                      format: 'point.x : point.y'
-                    ),
+                        enable: true, format: 'point.x : point.y'),
                     series: [
                       PieSeries<MapEntry<String, int>, String>(
                         radius: '85%',
                         legendIconType: LegendIconType.circle,
                         explode: true,
                         explodeIndex: indexOfBiggest,
-                        groupMode: notOnlyOne&&group?CircularChartGroupMode
-                            .value:null,
+                        groupMode: notOnlyOne && group
+                            ? CircularChartGroupMode.value
+                            : null,
                         groupTo: minValue.toDouble(),
                         dataSource: values,
                         xValueMapper: (s, t) {
@@ -156,12 +166,15 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                         dataLabelMapper: (s, t) {
                           return s.key.tr();
                         },
+                        pointColorMapper: (s, i) {
+                          return colors[i];
+                        },
                         dataLabelSettings: const DataLabelSettings(
                             isVisible: true,
                             textStyle: TextStyle(fontSize: 10),
                             showZeroValue: false,
-                            connectorLineSettings:
-                                ConnectorLineSettings(type: ConnectorType.line)),
+                            connectorLineSettings: ConnectorLineSettings(
+                                type: ConnectorType.line)),
                       )
                     ],
                   ),
@@ -184,7 +197,6 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                           setState(() {
                             minValue = s ?? 0;
                           });
-
                         }),
                   ),
                   smallSpace,

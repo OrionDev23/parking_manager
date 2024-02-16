@@ -88,6 +88,7 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
       rowTextStyle = TextStyle(
         fontSize: portrait?13.sp:10.sp,
       );
+      lastPortrait=portrait;
     }
     if (errorCounter != null) {
       errorCounter = errorCounter! + 1;
@@ -116,12 +117,16 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
     return r;
   }
 
+  void longPressing(MapEntry<String,T> element){
+
+  }
   DataRow rowDisplay(
       int startIndex, int count, MapEntry<String, dynamic> element) {
 
 
     return DataRow(
       key: ValueKey<String>(element.value.id),
+      onLongPress: ()=>longPressing(element),
       onSelectChanged: selectC == true
           ? (value) {
               if (value == true) {
@@ -253,9 +258,17 @@ abstract class ParcOtoDatasourceUsers<S, T> extends AsyncDataTableSource {
     return Future<int>.delayed(
         const Duration(milliseconds: 0), () => empty ? 0 : data.length);
   }
+  static bool lastPortrait=false;
 
   @override
   Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
+    bool portrait=MediaQuery.of(current).orientation==Orientation.portrait;
+    if(portrait!=lastPortrait){
+      rowTextStyle = TextStyle(
+        fontSize: portrait?13.sp:10.sp,
+      );
+      lastPortrait=portrait;
+    }
     if (errorCounter != null) {
       errorCounter = errorCounter! + 1;
 

@@ -140,7 +140,7 @@ class PanesListState extends State<PanesList> with WindowListener {
               valueListenable: index,
               builder: (BuildContext context, int value, Widget? child) {
                 return NavigationView(
-                  //key: UniqueKey(),
+                  key: widget.key,
                   transitionBuilder: (w, d) => DrillInPageTransition(
                     animation: d,
                     child: w,

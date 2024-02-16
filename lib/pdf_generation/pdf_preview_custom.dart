@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'package:document_file_save_plus/document_file_save_plus.dart';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:file_saver/file_saver.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:parc_oto/pdf_generation/pdf_theming.dart';
@@ -12,6 +13,7 @@ import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../serializables/reparation/reparation.dart';
 
@@ -52,7 +54,7 @@ class PdfPreviewPO extends StatelessWidget {
               FluentIcons.save,
               color: Colors.white,
             ),
-            onPressed: saveFile,
+            onPressed: saveThisFile,
           ),
           PdfPreviewAction(
               icon: const Icon(
@@ -80,18 +82,24 @@ class PdfPreviewPO extends StatelessWidget {
     );
   }
 
-  void saveFile(
+  void saveThisFile(
       BuildContext s,
       FutureOr<Uint8List> Function(PdfPageFormat) futureFile,
       PdfPageFormat pageFormat) async {
     if (DeviceType.android == Device.deviceType ||
-        Device.deviceType == DeviceType.ios || kIsWeb) {
-      FileSaver.instance.saveFile(
-          'ordre${numberFormat.format(reparation.numero)}',
+        Device.deviceType == DeviceType.ios ) {
+      DocumentFileSavePlus().saveFile(
           await futureFile(pageFormat),
-          'pdf',
-          mimeType:MimeType.PDF);
-    } else {
+          'ordre${numberFormat.format(reparation.numero)}.pdf',
+          "appliation/pdf");
+    }
+    else if(kIsWeb){
+      launchUrl(Uri.parse("data:application/octet-stream;base64,"
+          "${base64Encode(await futureFile(pageFormat))}/ordre${numberFormat
+          .format(reparation.numero)}.pdf"));
+
+    }
+    else {
       String? path = await FilePicker.platform.saveFile(
         dialogTitle: "save".tr(),
         fileName: 'ordre${numberFormat.format(reparation.numero)}',

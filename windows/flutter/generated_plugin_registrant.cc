@@ -7,7 +7,6 @@
 #include "generated_plugin_registrant.h"
 
 #include <connectivity_plus/connectivity_plus_windows_plugin.h>
-#include <file_saver/file_saver_plugin.h>
 #include <printing/printing_plugin.h>
 #include <screen_retriever/screen_retriever_plugin.h>
 #include <share_plus/share_plus_windows_plugin_c_api.h>
@@ -19,8 +18,6 @@
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   ConnectivityPlusWindowsPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("ConnectivityPlusWindowsPlugin"));
-  FileSaverPluginRegisterWithRegistrar(
-      registry->GetRegistrarForPlugin("FileSaverPlugin"));
   PrintingPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("PrintingPlugin"));
   ScreenRetrieverPluginRegisterWithRegistrar(

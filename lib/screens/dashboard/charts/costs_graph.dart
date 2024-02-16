@@ -45,10 +45,6 @@ class _CostGraphState extends State<CostGraph> {
       print('got them lenght :${reparations.length}');
     }
     fillValues();
-    gradiantColors = [
-      widget.appTheme.color.darkest,
-      widget.appTheme.color.light,
-    ];
 
     loading = false;
     if(mounted){
@@ -89,7 +85,6 @@ class _CostGraphState extends State<CostGraph> {
     return false;
   }
 
-  List<Color> gradiantColors = [];
   @override
   Widget build(BuildContext context) {
     var appTheme=context.watch<AppTheme>();

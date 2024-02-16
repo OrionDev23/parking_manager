@@ -15,7 +15,9 @@ class DataTableParc extends StatefulWidget {
   final bool hidePaginator;
   final int? numberOfRows;
   final bool pages;
-  const DataTableParc({super.key, this.header, required this.source, required
+  final double? rowHeight;
+  const DataTableParc({super.key,this.rowHeight, this.header, required this
+      .source, required
   this.sortAscending, required this.sortColumnIndex, required this.columns,
     this.numberOfRows,
     this.pages=true,
@@ -47,7 +49,8 @@ class _DataTableParcState extends State<DataTableParc> {
       pageSyncApproach: PageSyncApproach.goToFirst,
       horizontalMargin: 8,
       columnSpacing: 0,
-      dataRowHeight: widget.numberOfRows==null?rowHeight:rowHeight*2,
+      dataRowHeight: widget.rowHeight==null?widget
+          .numberOfRows==null?rowHeight:rowHeight*2:widget.rowHeight!,
       onPageChanged: (s) {},
       rowsPerPage: widget.numberOfRows ?? rowPerPage,
       onRowsPerPageChanged: widget.pages

@@ -285,10 +285,10 @@ packages:
     dependency: "direct main"
     description:
       name: dart_appwrite
-      sha256: da1b7752e7402e76a95824d1292dc337958994d228aca315d6d4562e8fe747f5
+      sha256: "6bf029cd42fb8bcea30e5bc201c3c07b07ea6116284d7c16cdbb5aa9379168df"
       url: "https://pub.dev"
     source: hosted
-    version: "10.1.0"
+    version: "10.1.1"
   dart_style:
     dependency: transitive
     description:
@@ -329,6 +329,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.0"
+  document_file_save_plus:
+    dependency: "direct main"
+    description:
+      name: document_file_save_plus
+      sha256: ff05c6a3b072377566e8e92666db38eb277786f90c0ac267ea47dc22725c1df3
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   dzair_data_usage:
     dependency: "direct main"
     description:
@@ -341,10 +349,10 @@ packages:
     dependency: "direct main"
     description:
       name: easy_localization
-      sha256: de63e3b422adfc97f256cbb3f8cf12739b6a4993d390f3cadb3f51837afaefe5
+      sha256: "9c86754b22aaa3e74e471635b25b33729f958dd6fb83df0ad6612948a7b231af"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.3"
+    version: "3.0.4"
   easy_logger:
     dependency: transitive
     description:
@@ -401,14 +409,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.1"
-  file_saver:
-    dependency: "direct main"
-    description:
-      name: file_saver
-      sha256: "9efc615b43127952aa394e98b23d9e932715e8c008dc10710177008882b3d141"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.1"
   fixnum:
     dependency: transitive
     description:
@@ -417,14 +417,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
-  fl_chart:
-    dependency: "direct main"
-    description:
-      name: fl_chart
-      sha256: b5e2b0f13d93f8c532b5a2786bfb44580de1f50b927bf95813fa1af617e9caf8
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.66.1"
   fluent_ui:
     dependency: "direct main"
     description:
@@ -537,10 +529,10 @@ packages:
     dependency: "direct main"
     description:
       name: go_router
-      sha256: "07ee2436909f749d606f53521dc1725dd738dc5196e5ff815bc254253c594075"
+      sha256: "170c46e237d6eb0e6e9f0e8b3f56101e14fb64f787016e42edd74c39cf8b176a"
       url: "https://pub.dev"
     source: hosted
-    version: "13.1.0"
+    version: "13.2.0"
   graphs:
     dependency: transitive
     description:
@@ -585,10 +577,10 @@ packages:
     dependency: transitive
     description:
       name: image
-      sha256: "49a0d4b0c12402853d3f227fe7c315601b238d126aa4caa5dbb2dcf99421aa4a"
+      sha256: "4c68bfd5ae83e700b5204c1e74451e7bf3cf750e6843c6e158289cf56bda018e"
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.6"
+    version: "4.1.7"
   internet_connection_checker_plus:
     dependency: "direct main"
     description:
@@ -1110,50 +1102,50 @@ packages:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_calendar
-      sha256: "4151e01aa1d6f17b2bcb19d709b93f231d40c9ce78db52ea195b7b7233ce0149"
+      sha256: "1d5b2f47ebf19eb7c772819f06c8bd1bf5f6bedd1120bd744db01ed113f3417b"
       url: "https://pub.dev"
     source: hosted
-    version: "24.2.4"
+    version: "24.2.6"
   syncfusion_flutter_charts:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_charts
-      sha256: c45cf2e4f7cdb8f597a8c46d7518457e101d0c5a50ca633f7a858e33a18adc86
+      sha256: "6e152d6a16c1cda73936487f6d18e10e9fe060f5b3e5c345e971db35068d030f"
       url: "https://pub.dev"
     source: hosted
-    version: "24.2.4+2"
+    version: "24.2.6"
   syncfusion_flutter_core:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: e8580e201c7197feac830b501889e877796a9fabbe20dcdbe90a981603939101
+      sha256: "4eed0d3ae50c16b5e8e4957f3c1917e9bd0315a08dfb49a104ca8fc10244bef3"
       url: "https://pub.dev"
     source: hosted
-    version: "24.2.4"
+    version: "24.2.6"
   syncfusion_flutter_datepicker:
     dependency: transitive
     description:
       name: syncfusion_flutter_datepicker
-      sha256: "7d1ce5501c96ba1df68b833436f21e8ab46b7be5de0a99d7d8017fd3932cc0f5"
+      sha256: "0c2314958bdc98c6a693aebee9617406df3a93776519e877f58f77829f918848"
       url: "https://pub.dev"
     source: hosted
-    version: "24.2.4"
+    version: "24.2.6"
   syncfusion_flutter_gauges:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_gauges
-      sha256: "07db7bf414a0d9b09a84678a191c47954c80788ec83fb227373dc2ff5fdfb2ca"
+      sha256: "13649480bb4a064c244a4df836c7d1ba3a5ea8640bc57d5ddc42b238a026e9fc"
       url: "https://pub.dev"
     source: hosted
-    version: "24.2.4"
+    version: "24.2.6"
   syncfusion_localizations:
     dependency: "direct main"
     description:
       name: syncfusion_localizations
-      sha256: "63b88148855e1a3fe8bff837c08065d6b327a2edd2c13a4d925418a21cc95ab1"
+      sha256: "621995c5573c0ef503aea42e24d26871704de86dc3efc843a83c5f92f9062064"
       url: "https://pub.dev"
     source: hosted
-    version: "24.2.4"
+    version: "24.2.6"
   synchronized:
     dependency: transitive
     description:
@@ -1235,7 +1227,7 @@ packages:
     source: hosted
     version: "2.2.2"
   url_launcher:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: url_launcher
       sha256: c512655380d241a337521703af62d2c122bf7b77a46ff7dd750092aa9433499c
@@ -1246,10 +1238,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_android
-      sha256: "507dc655b1d9cb5ebc756032eb785f114e415f91557b73bf60b7e201dfedeb2f"
+      sha256: d4ed0711849dd8e33eb2dd69c25db0d0d3fdc37e0a62e629fe32f57a22db2745
       url: "https://pub.dev"
     source: hosted
-    version: "6.2.2"
+    version: "6.3.0"
   url_launcher_ios:
     dependency: transitive
     description:
@@ -1278,10 +1270,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_platform_interface
-      sha256: a932c3a8082e118f80a475ce692fde89dc20fddb24c57360b96bc56f7035de1f
+      sha256: "552f8a1e663569be95a8190206a38187b531910283c3e982193e4f2733f01029"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.1"
+    version: "2.3.2"
   url_launcher_web:
     dependency: transitive
     description:

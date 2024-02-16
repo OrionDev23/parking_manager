@@ -22,6 +22,8 @@ class _StateBarsState extends State<StateCategoryBars> {
   bool loading = false;
   late TooltipBehavior tooltip;
   List<ChartDataCategory> values = [];
+
+  List<Color> colors=[];
   @override
   void initState() {
     tooltip = TooltipBehavior(enable: true);
@@ -29,6 +31,15 @@ class _StateBarsState extends State<StateCategoryBars> {
     super.initState();
   }
 
+
+  bool gotenColors=false;
+
+  void getColors(AppTheme appTheme){
+    if(!gotenColors){
+      colors=appTheme.getRandomColors(values.length);
+      gotenColors=true;
+    }
+  }
   void initValues() async {
     loading = true;
     List<Future> tasks = [];
@@ -75,6 +86,7 @@ class _StateBarsState extends State<StateCategoryBars> {
     if (loading) {
       return const Center(child: ProgressRing());
     }
+    getColors(appTheme);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,6 +122,7 @@ class _StateBarsState extends State<StateCategoryBars> {
                   name: values[index].category.tr(),
                   borderRadius:
                       const BorderRadius.vertical(top: Radius.circular(5)),
+                  color: colors[index],
                   dataSource: values[index].values,
                   width: 1,
                   spacing: 0.1,

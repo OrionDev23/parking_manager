@@ -3,7 +3,6 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  file_saver
   printing
   screen_retriever
   system_theme

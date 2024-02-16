@@ -421,6 +421,17 @@
   "majconducteurs": "Latest drivers updates",
   "affectation": "Belonging",
   "vehiculesempty": "Vehicle list is empty",
-  "selectprestataire": "Select a service provider"
-
+  "selectprestataire": "Select a service provider",
+  "theme": "Theme",
+  "dispositionpaneau": "Navigation panel layout",
+  "top": "Top",
+  "open": "Always open",
+  "compact": "Compact",
+  "minimal": "Minimal",
+  "auto": "Automatic",
+  "couleurprincipale": "Main color",
+  "langue": "Language",
+  "system": "System",
+  "light": "Light",
+  "dark": "Dark"
 }

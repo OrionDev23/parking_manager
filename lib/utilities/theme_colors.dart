@@ -7,8 +7,6 @@ class ThemeColors {
   static List<AccentColor> accentColors = [
     orange,
     red,
-    magenta,
-    purple,
     blue,
     green
   ];

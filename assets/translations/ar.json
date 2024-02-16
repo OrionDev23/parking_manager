@@ -419,6 +419,17 @@
   "majconducteurs": "آخر تحديثات السائقين",
   "affectation": "الإنتماء",
   "vehiculesempty": "قائمة المركبات فارغة",
-  "selectprestataire": "اختر مزود الخدمة"
-
+  "selectprestataire": "اختر مزود الخدمة",
+  "theme": "المظهر",
+  "dispositionpaneau": "موقع لوحة التنقل",
+  "top": " من الأعلى",
+  "open": "دائما مفتوح",
+  "compact": "مدمج",
+  "minimal": "مغلق",
+  "auto": "تلقائي",
+  "couleurprincipale": "اللون الأساسي",
+  "langue": "اللغة",
+  "system": "نظام الجهاز",
+  "light": "فاتح",
+  "dark": "مظلم"
 }

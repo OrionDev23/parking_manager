@@ -75,7 +75,7 @@ class VehicleTableState extends State<VehicleTable> {
     super.initState();
   }
 
-  int sortColumn = 6;
+  int sortColumn = 5;
 
   void initColumns() {
     columns = [
@@ -83,7 +83,7 @@ class VehicleTableState extends State<VehicleTable> {
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Text(
-            'nummat',
+            'vehicule',
             style: tstyle,
           ).tr(),
         ),
@@ -91,25 +91,7 @@ class VehicleTableState extends State<VehicleTable> {
         onSort: (s, c) {
           sortColumn = 0;
           assending = !assending;
-
-          vehicleDataSource.sort(sortColumn, assending);
-          setState(() {});
-        },
-      ),
-      DataColumn2(
-        label: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'type',
-            style: tstyle,
-          ).tr(),
-        ),
-        size: ColumnSize.L,
-        onSort: (s, c) {
-          sortColumn = 1;
-          assending = !assending;
-
-          vehicleDataSource.sort(sortColumn, assending);
+          vehicleDataSource.sort(1, assending);
           setState(() {});
         },
       ),
@@ -752,44 +734,46 @@ class VehicleTableState extends State<VehicleTable> {
                           ),
                         ),
                         smallSpace,
-                        SizedBox(
-                          width: 350.px,
-                          height: 45.px,
-                          child: TextBox(
-                            controller: searchController,
-                            placeholder: 'search'.tr(),
-                            style: appTheme.writingStyle,
-                            cursorColor: appTheme.color.darker,
-                            placeholderStyle: placeStyle,
-                            decoration:
-                                BoxDecoration(color: appTheme.fillColor),
-                            onSubmitted: (s) {
-                              if (s.isNotEmpty) {
-                                vehicleDataSource.search(s);
-                                if (!notEmpty) {
-                                  setState(() {
-                                    notEmpty = true;
-                                  });
-                                }
-                              } else {
-                                if (notEmpty) {
-                                  setState(() {
-                                    notEmpty = false;
-                                  });
-                                  vehicleDataSource.search('');
-                                }
-                              }
-                            },
-                            suffix: notEmpty
-                                ? IconButton(
-                                    icon: const Icon(FluentIcons.cancel),
-                                    onPressed: () {
-                                      searchController.text = "";
+                        Flexible(
+                          child: SizedBox(
+                            width: 350.px,
+                            height: 45.px,
+                            child: TextBox(
+                              controller: searchController,
+                              placeholder: 'search'.tr(),
+                              style: appTheme.writingStyle,
+                              cursorColor: appTheme.color.darker,
+                              placeholderStyle: placeStyle,
+                              decoration:
+                                  BoxDecoration(color: appTheme.fillColor),
+                              onSubmitted: (s) {
+                                if (s.isNotEmpty) {
+                                  vehicleDataSource.search(s);
+                                  if (!notEmpty) {
+                                    setState(() {
+                                      notEmpty = true;
+                                    });
+                                  }
+                                } else {
+                                  if (notEmpty) {
+                                    setState(() {
                                       notEmpty = false;
-                                      setState(() {});
-                                      vehicleDataSource.search('');
-                                    })
-                                : null,
+                                    });
+                                    vehicleDataSource.search('');
+                                  }
+                                }
+                              },
+                              suffix: notEmpty
+                                  ? IconButton(
+                                      icon: const Icon(FluentIcons.cancel),
+                                      onPressed: () {
+                                        searchController.text = "";
+                                        notEmpty = false;
+                                        setState(() {});
+                                        vehicleDataSource.search('');
+                                      })
+                                  : null,
+                            ),
                           ),
                         ),
                         bigSpace,
@@ -801,6 +785,7 @@ class VehicleTableState extends State<VehicleTable> {
                       ],
                     ),
                   ),
+                  rowHeight: 40.px,
                   sortAscending: assending,
                   sortColumnIndex: sortColumn,
                   columns: columns,

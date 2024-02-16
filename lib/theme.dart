@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' as m;
+import 'package:flutter_randomcolor/flutter_randomcolor.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -12,6 +13,8 @@ enum NavigationIndicators { sticky, end }
 late final double rowHeight;
 TextStyle tstyle = const TextStyle(fontSize:9, fontWeight:
 FontWeight.bold);
+TextStyle formHintStyle = TextStyle(fontSize:10, fontWeight:
+FontWeight.bold,color: placeStyle.color);
 final placeStyle = TextStyle(color: Colors.grey[100]);
 const smallSpace = SizedBox(
   width: 5,
@@ -48,6 +51,52 @@ class AppTheme extends ChangeNotifier {
       backGroundColor.withAlpha(10),
       backGroundColor.withAlpha(0),
     ]);
+  }
+
+
+  List<Color> getRandomColors(int nbr){
+    Options options = Options(
+        format: Format.rgbArray,
+        colorType: getColorType(),
+        luminosity: Luminosity.bright,
+        alpha: 1,
+        count: nbr
+    );
+    var colors=RandomColor.getColor(options);
+    return getColorsFromString(colors.toString());
+  }
+
+  List<Color> getColorsFromString(String colors){
+    List<String> s=colors.toString().replaceAll('[', '').replaceAll(']','')
+        .replaceAll(' ', '').split(',');
+    List<Color> result=[];
+
+    for(int i=0;i<s.length;i+=3){
+      result.add(Color.fromARGB(255, int.tryParse(s[i])??255, int.tryParse
+        (s[i+1])??255, int.tryParse(s[i+2])??255));
+    }
+
+    return result;
+  }
+
+
+  List<ColorType> getColorType(){
+      if(ThemeColors.orange.value==color.value){
+        return [ColorType.orange,ColorType.red,];
+      }
+      else if(ThemeColors.red.value==color.value){
+        return [ColorType.orange,ColorType.pink,ColorType.red,];
+      }
+      else if(ThemeColors.green.value==color.value){
+        return [ColorType.orange,ColorType.green,ColorType.red,];
+      }
+      else if(ThemeColors.blue.value==color.value){
+        return [ColorType.blue,ColorType.purple,];
+      }
+      else {
+        return [ColorType.orange,ColorType.green,ColorType.red,];
+      }
+
   }
 
   RadialGradient getRadiantLight() {
@@ -262,6 +311,7 @@ class AppTheme extends ChangeNotifier {
     }
   }
 }
+
 
 AccentColor get systemAccentColor {
   if ((defaultTargetPlatform == TargetPlatform.windows ||

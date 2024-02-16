@@ -34,7 +34,7 @@ class Settings extends ScrollablePage {
 
   @override
   Widget buildHeader(BuildContext context) {
-    return const PageTitle(text: 'Paramètres');
+    return PageTitle(text: 'parametres'.tr());
   }
 
   @override
@@ -49,7 +49,7 @@ class Settings extends ScrollablePage {
         appTheme.locale ?? Localizations.maybeLocaleOf(context);
 
     return [
-      Text('Theme', style: FluentTheme.of(context).typography.subtitle),
+      Text('theme', style: FluentTheme.of(context).typography.subtitle).tr(),
       spacer,
       ...List.generate(ThemeMode.values.length, (index) {
         final mode = ThemeMode.values[index];
@@ -63,15 +63,15 @@ class Settings extends ScrollablePage {
                 prefs.setInt('themeMode', mode.index);
               }
             },
-            content: Text('$mode'.replaceAll('ThemeMode.', '')),
+            content: Text('$mode'.replaceAll('ThemeMode.', '')).tr(),
           ),
         );
       }),
       biggerSpacer,
       Text(
-        'Disposition du paneau de navigation',
+        'dispositionpaneau',
         style: FluentTheme.of(context).typography.subtitle,
-      ),
+      ).tr(),
       spacer,
       ...List.generate(PaneDisplayMode.values.length, (index) {
         final mode = PaneDisplayMode.values[index];
@@ -87,13 +87,13 @@ class Settings extends ScrollablePage {
             },
             content: Text(
               mode.toString().replaceAll('PaneDisplayMode.', ''),
-            ),
+            ).tr(),
           ),
         );
       }),
       biggerSpacer,
-      Text('Couleur des bouttons',
-          style: FluentTheme.of(context).typography.subtitle),
+      Text('couleurprincipale',
+          style: FluentTheme.of(context).typography.subtitle).tr(),
       spacer,
       Wrap(children: [
         ...List.generate(ThemeColors.accentColors.length, (index) {
@@ -106,7 +106,7 @@ class Settings extends ScrollablePage {
       ]),
       biggerSpacer,
       biggerSpacer,
-      Text('Langue', style: FluentTheme.of(context).typography.subtitle),
+      Text('langue', style: FluentTheme.of(context).typography.subtitle).tr(),
       Wrap(
         spacing: 15.0,
         runSpacing: 10.0,

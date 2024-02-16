@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../theme.dart';
-import '../utilities/color_manip.dart';
 import 'on_tap_scale.dart';
 
 class ButtonContainer extends StatefulWidget {
@@ -78,7 +77,7 @@ class _ButtonContainerState extends State<ButtonContainer> {
             color: appTheme.color.lightest,
             width: 1,
           ),
-          boxShadow: kElevationToShadow[2],
+          boxShadow: kElevationToShadow[4],
         ),
         width: 220.px,
         height: 80.px,
@@ -88,8 +87,7 @@ class _ButtonContainerState extends State<ButtonContainer> {
           children: [
             Container(
               height: 80.px,
-              color: ColorManipulation.darken(widget.color ?? appTheme.color
-                  .dark),
+              color:widget.color ?? appTheme.color.dark,
               child: Padding(
                 padding: const EdgeInsets.all(15),
                 child: Icon(
@@ -117,7 +115,7 @@ class _ButtonContainerState extends State<ButtonContainer> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      FilledButton(
+                      HyperlinkButton(
                         onPressed: widget.actionList,
                         child: Text(
                           widget.textList,
@@ -133,7 +131,7 @@ class _ButtonContainerState extends State<ButtonContainer> {
                         ),
                       if (widget.showBothLN) smallSpace,
                       if (widget.showBothLN)
-                        FilledButton(
+                        HyperlinkButton(
                           onPressed: widget.actionNouveau,
                           child: Text(
                             widget.textNouveau,

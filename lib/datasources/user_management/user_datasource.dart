@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/user_management/user_webservice.dart';
 import 'package:parc_oto/theme.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/client_database.dart';
 import '../../screens/user_management/user_creation.dart';
@@ -86,13 +85,13 @@ class UsersManagementDatasource
     }
 
     return [
-      DataCell(SelectableText(element.value.key.name, style: tstyle)),
-      DataCell(SelectableText(element.value.key.email, style: tstyle)),
-      DataCell(SelectableText(element.value.key.$id, style: tstyle)),
-      DataCell(SelectableText((roles), style: tstyle)),
+      DataCell(SelectableText(element.value.key.name, style: rowTextStyle)),
+      DataCell(SelectableText(element.value.key.email, style: rowTextStyle)),
+      DataCell(SelectableText(element.value.key.$id, style: rowTextStyle)),
+      DataCell(SelectableText((roles), style: rowTextStyle)),
       DataCell(SelectableText(
           dateFormat.format(DateTime.parse(element.value.key.$createdAt)),
-          style: tstyle)),
+          style: rowTextStyle)),
       DataCell(f.FlyoutTarget(
         controller: controllers[element.value.key.$id]!,
         child: OnTapScaleAndFade(
@@ -134,7 +133,15 @@ class UsersManagementDatasource
                 );
               });
             },
-            child: const Icon(Icons.more_vert_sharp)),
+            child: f.Container(
+                decoration: BoxDecoration(
+                  color: appTheme?.color.lightest,
+                  boxShadow: kElevationToShadow[2],
+                ),
+                child: Icon(
+                  Icons.edit,
+                  color: appTheme!.color.darkest,
+                ))),
       )),
     ];
   }

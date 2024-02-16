@@ -460,5 +460,17 @@
  "majconducteurs": "Dernières maj des conducteurs",
  "affectation": "Appartenance",
  "vehiculesempty": "La liste des véhicules est vide",
- "selectprestataire": "Selectionner un prestataire"
+ "selectprestataire": "Selectionner un prestataire",
+ "theme": "Thème",
+ "dispositionpaneau": "Disposition du panneau de navigation",
+ "top": "En Haut",
+ "open": "Toujours ouvert",
+ "compact": "Compact",
+ "minimal": "Minimal",
+ "auto": "Automatique",
+ "couleurprincipale": "Couleur principale",
+ "langue": "Langue",
+ "system": "Système",
+ "light": "Clair",
+ "dark": "Sombre"
 }

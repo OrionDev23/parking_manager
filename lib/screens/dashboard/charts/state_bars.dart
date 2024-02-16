@@ -27,6 +27,7 @@ class _StateBarsState extends State<StateBars> {
   bool loading = false;
 
   List<ChartData> values = [];
+  List<Color> colors=[];
   late TooltipBehavior tooltip;
   @override
   void initState() {
@@ -76,12 +77,22 @@ class _StateBarsState extends State<StateBars> {
   }
 
   bool hideEmptyFil = true;
+
+  bool gotenColors=false;
+
+  void getColors(AppTheme appTheme){
+    if(!gotenColors){
+      colors=appTheme.getRandomColors(values.length);
+      gotenColors=true;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
     if (loading) {
       return const Center(child: ProgressRing());
     }
+    getColors(appTheme);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,7 +125,9 @@ class _StateBarsState extends State<StateBars> {
               ColumnSeries(
                   width: widget.vertical ? 0.5 : 0.7,
                   name: '',
-                  color: appTheme.color.lightest,
+                  pointColorMapper: (s,o){
+                    return colors[o];
+                  },
                   borderRadius: widget.vertical
                       ? const BorderRadius.horizontal(right: Radius.circular(5))
                       : const BorderRadius.vertical(top: Radius.circular(5)),
