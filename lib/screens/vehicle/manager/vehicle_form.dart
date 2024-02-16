@@ -21,7 +21,9 @@ class VehicleForm extends StatefulWidget {
   final Vehicle? vehicle;
   final Tab? tab;
 
-  const VehicleForm({super.key, this.vehicle, this.tab});
+  final bool readOnly;
+
+  const VehicleForm({super.key, this.vehicle, this.tab,this.readOnly=false});
 
   @override
   State<VehicleForm> createState() => _VehicleFormState();
@@ -182,7 +184,7 @@ class _VehicleFormState extends State<VehicleForm>
                 )),
           ],
         ),
-        bottomBar: Padding(
+        bottomBar: widget.readOnly?null:Padding(
           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -245,6 +247,7 @@ class _VehicleFormState extends State<VehicleForm>
                   style: formHintStyle,
                 ).tr(),
                 CountryCodePicker(
+                  enabled: !widget.readOnly,
                   boxDecoration: BoxDecoration(
                       color: appTheme.backGroundColor,
                       boxShadow: kElevationToShadow[2]),
@@ -269,6 +272,7 @@ class _VehicleFormState extends State<VehicleForm>
                 SizedBox(
                   height: 5.h,
                   child: AutoSuggestBox<String>(
+                    enabled: !widget.readOnly,
                     controller: wilayaCont,
                     placeholder: 'wilaya'.tr(),
                     placeholderStyle: placeStyle,
@@ -361,7 +365,7 @@ class _VehicleFormState extends State<VehicleForm>
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 5.0),
                   child: autreMat
-                      ? TextBox(
+                      ? TextBox(enabled:!widget.readOnly,
                           controller: matriculeEtr,
                           maxLength: 30,
                           cursorColor: appTheme.color.darker,
@@ -382,7 +386,7 @@ class _VehicleFormState extends State<VehicleForm>
                           children: [
                             Flexible(
                               flex: 6,
-                              child: TextBox(
+                              child: TextBox(enabled:!widget.readOnly,
                                 controller: matr1,
                                 cursorColor: appTheme.color.darker,
                                 style: appTheme.writingStyle,
@@ -406,7 +410,7 @@ class _VehicleFormState extends State<VehicleForm>
                             smallSpace,
                             Flexible(
                               flex: 3,
-                              child: TextBox(
+                              child: TextBox(enabled:!widget.readOnly,
                                 controller: matr2,
                                 cursorColor: appTheme.color.darker,
                                 style: appTheme.writingStyle,
@@ -433,7 +437,7 @@ class _VehicleFormState extends State<VehicleForm>
                             smallSpace,
                             Flexible(
                               flex: 2,
-                              child: TextBox(
+                              child: TextBox(enabled:!widget.readOnly,
                                 controller: matr3,
                                 cursorColor: appTheme.color.darker,
                                 style: appTheme.writingStyle,
@@ -460,12 +464,13 @@ class _VehicleFormState extends State<VehicleForm>
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Checkbox(
+
                       checked: autreMat,
                       content: Text(
                         'autremat',
                         style: appTheme.writingStyle,
                       ).tr(),
-                      onChanged: (s) {
+                      onChanged: widget.readOnly?null:(s) {
                         if (s != null) {
                           setState(() {
                             autreMat = s;
@@ -512,6 +517,7 @@ class _VehicleFormState extends State<VehicleForm>
                 SizedBox(
                   height: 5.h,
                   child: AutoSuggestBox<String>(
+                    enabled: !widget.readOnly,
                     controller: dairaCont,
                     placeholder: 'daira'.tr(),
                     cursorColor: appTheme.color.darker,
@@ -549,6 +555,7 @@ class _VehicleFormState extends State<VehicleForm>
                 SizedBox(
                   height: 5.h,
                   child: AutoSuggestBox<String>(
+                    enabled: !widget.readOnly,
                     controller: communeCont,
                     placeholder: 'commune'.tr(),
                     placeholderStyle: placeStyle,
@@ -618,7 +625,7 @@ class _VehicleFormState extends State<VehicleForm>
                 ).tr(),
                 DatePicker(
                   selected: selectedDate,
-                  onChanged: (s) {
+                  onChanged: widget.readOnly?null:(s) {
                     setState(() {
                       selectedDate = s;
                     });
@@ -657,7 +664,7 @@ class _VehicleFormState extends State<VehicleForm>
                 'quittance',
                 style: formHintStyle,
               ).tr(),
-              TextBox(
+              TextBox(enabled:!widget.readOnly,
                 controller: quittance,
                 placeholder: 'quittance'.tr(),
                 cursorColor: appTheme.color.darker,
@@ -699,7 +706,7 @@ class _VehicleFormState extends State<VehicleForm>
                 'num',
                 style: formHintStyle,
               ).tr(),
-              TextBox(
+              TextBox(enabled:!widget.readOnly,
                 controller: numero,
                 placeholder: 'num'.tr(),
                 maxLength: 30,
@@ -745,7 +752,7 @@ class _VehicleFormState extends State<VehicleForm>
               ).tr(),
               SizedBox(
                   height: 5.h,
-                  child: TextBox(
+                  child: TextBox(enabled:!widget.readOnly,
                     controller: lname,
                     maxLength: 30,
                     placeholder: 'nomf'.tr(),
@@ -786,7 +793,7 @@ class _VehicleFormState extends State<VehicleForm>
                 ).tr(),
                 SizedBox(
                     height: 5.h,
-                    child: TextBox(
+                    child: TextBox(enabled:!widget.readOnly,
                       controller: fname,
                       maxLength: 30,
                       placeholder: 'prenom'.tr(),
@@ -826,7 +833,7 @@ class _VehicleFormState extends State<VehicleForm>
               ).tr(),
               SizedBox(
                   height: 5.h,
-                  child: TextBox(
+                  child: TextBox(enabled:!widget.readOnly,
                     controller: profession,
                     maxLength: 40,
                     placeholder: 'profession'.tr(),
@@ -872,7 +879,7 @@ class _VehicleFormState extends State<VehicleForm>
               ).tr(),
               SizedBox(
                   height: 5.h,
-                  child: TextBox(
+                  child: TextBox(enabled:!widget.readOnly,
                     controller: adresse,
                     placeholder: 'adresse'.tr(),
                     maxLength: 100,
@@ -932,6 +939,7 @@ class _VehicleFormState extends State<VehicleForm>
                   style: formHintStyle,
                 ).tr(),
                 AutoSuggestBox<String>(
+                  enabled: !widget.readOnly,
                   placeholder: 'appartenance'.tr(),
                   placeholderStyle: placeStyle,
                   controller: selectedAppartenance,
@@ -972,6 +980,7 @@ class _VehicleFormState extends State<VehicleForm>
                   style: formHintStyle,
                 ).tr(),
                 AutoSuggestBox<String>(
+                  enabled: !widget.readOnly,
                   placeholder: 'filialeexploit'.tr(),
                   placeholderStyle: placeStyle,
                   controller: selectedFiliale,
@@ -1012,6 +1021,7 @@ class _VehicleFormState extends State<VehicleForm>
                   style: formHintStyle,
                 ).tr(),
                 AutoSuggestBox<String>(
+                  enabled: !widget.readOnly,
                   placeholder: 'direction'.tr(),
                   placeholderStyle: placeStyle,
                   controller: selectedDirection,
@@ -1058,7 +1068,7 @@ class _VehicleFormState extends State<VehicleForm>
                       softWrap: true,
                       maxLines: 1,
                     ),
-                    onPressed: () {
+                    onPressed: widget.readOnly?null:() {
                       SelectDialog.showModal<int>(context,
                           selectedValue: genre,
                           backgroundColor: appTheme.backGroundColor,
@@ -1153,7 +1163,7 @@ class _VehicleFormState extends State<VehicleForm>
                       minFontSize: 5,
                       maxLines: 1,
                     ),
-                    onPressed: () {
+                    onPressed: widget.readOnly?null:() {
                       SelectDialog.showModal<int?>(
                         context,
                         selectedValue: marque,
@@ -1221,7 +1231,7 @@ class _VehicleFormState extends State<VehicleForm>
                   'type',
                   style: formHintStyle,
                 ).tr(),
-                TextBox(
+                TextBox(enabled:!widget.readOnly,
                   controller: type,
                   placeholder: 'type'.tr(),
                   maxLength: 30,
@@ -1255,7 +1265,7 @@ class _VehicleFormState extends State<VehicleForm>
                   'nchassi',
                   style: formHintStyle,
                 ).tr(),
-                TextBox(
+                TextBox(enabled:!widget.readOnly,
                   controller: numSer,
                   maxLength: 30,
                   placeholder: 'nchassi'.tr(),
@@ -1294,7 +1304,7 @@ class _VehicleFormState extends State<VehicleForm>
                   'caross',
                   style: formHintStyle,
                 ).tr(),
-                TextBox(
+                TextBox(enabled:!widget.readOnly,
                   controller: caross,
                   maxLength: 30,
                   placeholder: 'caross'.tr(),
@@ -1328,7 +1338,7 @@ class _VehicleFormState extends State<VehicleForm>
                   'energie',
                   style: formHintStyle,
                 ).tr(),
-                TextBox(
+                TextBox(enabled:!widget.readOnly,
                   controller: energie,
                   maxLength: 20,
                   placeholder: 'energie'.tr(),
@@ -1362,7 +1372,7 @@ class _VehicleFormState extends State<VehicleForm>
                   'puissance',
                   style: formHintStyle,
                 ).tr(),
-                TextBox(
+                TextBox(enabled:!widget.readOnly,
                   placeholder: '0000',
                   controller: puissance,
                   maxLength: 4,
@@ -1397,7 +1407,7 @@ class _VehicleFormState extends State<VehicleForm>
                   'placeassise',
                   style: formHintStyle,
                 ).tr(),
-                TextBox(
+                TextBox(enabled:!widget.readOnly,
                   placeholder: '000',
                   controller: places,
                   maxLength: 3,
@@ -1432,7 +1442,7 @@ class _VehicleFormState extends State<VehicleForm>
                   'poidstotal',
                   style: formHintStyle,
                 ).tr(),
-                TextBox(
+                TextBox(enabled:!widget.readOnly,
                   placeholder: '000000',
                   controller: poidsT,
                   maxLength: 15,
@@ -1470,7 +1480,7 @@ class _VehicleFormState extends State<VehicleForm>
                 const Spacer(),
                 Checkbox(
                   checked: lourd,
-                  onChanged: (s) {
+                  onChanged:widget.readOnly?null: (s) {
                     setState(() {
                       lourd = s ?? false;
                     });
@@ -1504,7 +1514,7 @@ class _VehicleFormState extends State<VehicleForm>
                   'chargeutil',
                   style: formHintStyle,
                 ).tr(),
-                TextBox(
+                TextBox(enabled:!widget.readOnly,
                   placeholder: '000000',
                   controller: charg,
                   maxLength: 15,
@@ -1539,7 +1549,7 @@ class _VehicleFormState extends State<VehicleForm>
                   'precmat',
                   style: formHintStyle,
                 ).tr(),
-                TextBox(
+                TextBox(enabled:!widget.readOnly,
                   controller: matrPrec,
                   maxLength: 30,
                   placeholder: 'precmat'.tr(),
@@ -1581,7 +1591,7 @@ class _VehicleFormState extends State<VehicleForm>
                   showDay: false,
                   showMonth: false,
                   selected: selectedAnnee,
-                  onChanged: (s) {
+                  onChanged:widget.readOnly?null: (s) {
                     setState(() {
                       selectedAnnee = s;
                     });

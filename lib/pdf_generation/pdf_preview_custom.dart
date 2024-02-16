@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:convert';
+import 'package:universal_html/html.dart' as html;
 import 'dart:io';
 import 'package:document_file_save_plus/document_file_save_plus.dart';
 
@@ -13,7 +13,6 @@ import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../serializables/reparation/reparation.dart';
 
@@ -24,9 +23,8 @@ class PdfPreviewPO extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ContentDialog(
-      
       content: PdfPreview(
-        maxPageWidth: 430.px,
+        maxPageWidth: 550.px,
         shouldRepaint: true,
         pdfFileName: 'ordre${numberFormat.format(reparation.numero)}',
         initialPageFormat: PdfPageFormat.a4,
@@ -35,7 +33,8 @@ class PdfPreviewPO extends StatelessWidget {
         canChangePageFormat: false,
         allowPrinting: false,
         allowSharing: false,
-        dynamicLayout: false,
+        dpi: 400,
+        dynamicLayout: true,
         loadingWidget: const ProgressBar(
           strokeWidth: 8,
         ),
@@ -78,7 +77,7 @@ class PdfPreviewPO extends StatelessWidget {
           ),
         ],
       ),
-      constraints: BoxConstraints.loose(Size(500.px,700.px)),
+      constraints: BoxConstraints.loose(Size(600.px, 700.px)),
     );
   }
 
@@ -87,19 +86,17 @@ class PdfPreviewPO extends StatelessWidget {
       FutureOr<Uint8List> Function(PdfPageFormat) futureFile,
       PdfPageFormat pageFormat) async {
     if (DeviceType.android == Device.deviceType ||
-        Device.deviceType == DeviceType.ios ) {
+        Device.deviceType == DeviceType.ios) {
       DocumentFileSavePlus().saveFile(
           await futureFile(pageFormat),
           'ordre${numberFormat.format(reparation.numero)}.pdf',
           "appliation/pdf");
-    }
-    else if(kIsWeb){
-      launchUrl(Uri.parse("data:application/octet-stream;base64,"
-          "${base64Encode(await futureFile(pageFormat))}/ordre${numberFormat
-          .format(reparation.numero)}.pdf"));
-
-    }
-    else {
+    } else if (kIsWeb) {
+      saveFileWeb(
+          await futureFile(pageFormat),
+          'ordre${numberFormat.format(reparation.numero)}'
+          '.pdf');
+    } else {
       String? path = await FilePicker.platform.saveFile(
         dialogTitle: "save".tr(),
         fileName: 'ordre${numberFormat.format(reparation.numero)}',
@@ -111,5 +108,22 @@ class PdfPreviewPO extends StatelessWidget {
         f.writeAsBytes(await futureFile(pageFormat), mode: FileMode.write);
       }
     }
+  }
+
+  void saveFileWeb(Uint8List bytes, String name) {
+    final blob = html.Blob([bytes]);
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.document.createElement('a') as html.AnchorElement
+      ..href = url
+      ..style.display = 'none'
+      ..download = name;
+    html.document.body?.children.add(anchor);
+
+// download
+    anchor.click();
+
+// cleanup
+    html.document.body?.children.remove(anchor);
+    html.Url.revokeObjectUrl(url);
   }
 }

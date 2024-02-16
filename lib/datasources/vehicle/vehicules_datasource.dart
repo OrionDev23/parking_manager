@@ -63,7 +63,7 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
           ),
         ],
       ),
-      onDoubleTap: ()=>showEditStuff(element),
+      onDoubleTap: ()=>viewVehicule(element),
       ),
       DataCell(Text(
               VehiclesUtilities.getEtatName(element.value.etatactuel ?? 0),
@@ -88,7 +88,7 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       OnTapScaleAndFade(
-                          onTap: (){},
+                          onTap: (){viewVehicule(element);},
                           child: f.Container(
                               decoration: BoxDecoration(
                                 color: appTheme?.color.lightest,
@@ -112,7 +112,7 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
                   ),
                 )
               : OnTapScaleAndFade(
-              onTap: (){},
+              onTap: (){viewVehicule(element);},
               child: f.Container(
                   decoration: BoxDecoration(
                     color: appTheme?.color.lightest,
@@ -249,6 +249,24 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
         );
       });
 
+  }
+
+  void viewVehicule(MapEntry<String,Vehicle> element){
+    Future.delayed(const Duration(milliseconds: 50))
+        .then((value) => f.showDialog(
+        context: current,
+        barrierDismissible: true,
+        builder: (c) {
+          return f.ContentDialog(
+            constraints: BoxConstraints.loose(f.Size(900.px, 800.px)),
+            content: VehicleForm(readOnly: true,vehicle: element.value,),
+            actions: [
+              f.Button(child:const Text('fermer').tr(),onPressed:(){
+                Navigator.of(current).pop();
+              })
+            ],
+          );
+        }));
   }
 
   @override

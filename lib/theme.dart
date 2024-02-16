@@ -82,7 +82,7 @@ class AppTheme extends ChangeNotifier {
 
   List<ColorType> getColorType(){
       if(ThemeColors.orange.value==color.value){
-        return [ColorType.orange,ColorType.red,];
+        return [ColorType.orange,ColorType.red,ColorType.yellow];
       }
       else if(ThemeColors.red.value==color.value){
         return [ColorType.orange,ColorType.pink,ColorType.red,];

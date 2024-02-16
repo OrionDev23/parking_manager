@@ -102,13 +102,25 @@ class _ButtonContainerState extends State<ButtonContainer> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  widget.showCounter == true
-                      ? loadingCount
-                          ? '- ${widget.text}'
-                          : '$count ${widget.text}'
-                      : widget.text,
-                  style: textStyle,
+                Row(
+                  children: [
+                    if(widget.showCounter)
+                    Text(
+                      widget.showCounter == true
+                          ? loadingCount
+                          ? '-'
+                          : '$count'
+                          : '-',
+                      style: textStyle.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    if(widget.showCounter)
+                      smallSpace,
+                    Text(
+                      widget.text,
+                      style: textStyle,
+                    ),
+
+                  ],
                 ),
                 bigSpace,
                 if (widget.showBottom)
