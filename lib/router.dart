@@ -1,3 +1,4 @@
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:parc_oto/screens/accept_invitation.dart';
 import 'package:parc_oto/screens/dashboard/dashboard.dart';
@@ -14,6 +15,7 @@ import 'package:parc_oto/theme.dart';
 
 import 'main.dart';
 
+GlobalKey sideKey=GlobalKey();
 class Routes {
   Routes(AppTheme appTheme) {
     final savedSettings = prefs;
@@ -23,7 +25,7 @@ class Routes {
       routes: [
         ShellRoute(
 
-            builder: (context, state,s ) => PanesList(
+            builder: (context, state,s ) => PanesList(key: sideKey,
                   paneList: PaneItemsAndFooters(savedSettings,appTheme), appTheme:
             appTheme,
                 ),

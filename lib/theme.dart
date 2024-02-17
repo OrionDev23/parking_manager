@@ -1,7 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' as m;
-import 'package:flutter_randomcolor/flutter_randomcolor.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -55,49 +54,54 @@ class AppTheme extends ChangeNotifier {
 
 
   List<Color> getRandomColors(int nbr){
-    Options options = Options(
-        format: Format.rgbArray,
-        colorType: getColorType(),
-        luminosity: Luminosity.bright,
-        alpha: 1,
-        count: nbr
-    );
-    var colors=RandomColor.getColor(options);
-    return getColorsFromString(colors.toString());
-  }
 
-  List<Color> getColorsFromString(String colors){
-    List<String> s=colors.toString().replaceAll('[', '').replaceAll(']','')
-        .replaceAll(' ', '').split(',');
-    List<Color> result=[];
 
-    for(int i=0;i<s.length;i+=3){
-      result.add(Color.fromARGB(255, int.tryParse(s[i])??255, int.tryParse
-        (s[i+1])??255, int.tryParse(s[i+2])??255));
+
+    if(nbr<=13){
+      return [
+        const Color(0xFF8f8446),
+        const Color(0xFF8e9958),
+        const Color(0xFF89af70),
+        const Color(0xFF81c48d),
+        const Color(0xFF77d8b0),
+        const Color(0xFF6becd6),
+        const Color(0xFF64ffff),
+        const Color(0xFF3bdbec),
+        const Color(0xFF0fb8d6),
+        const Color(0xFF0096bc),
+        const Color(0xFF0075a0),
+        const Color(0xFF005581),
+        const Color(0xFF043761),
+
+      ];
+    }
+    else{
+      return [
+        const Color(0xFF8f8446),
+        const Color(0xFF8e9958),
+        const Color(0xFF89af70),
+        const Color(0xFF81c48d),
+        const Color(0xFF77d8b0),
+        const Color(0xFF6becd6),
+        const Color(0xFF64ffff),
+        const Color(0xFF3bdbec),
+        const Color(0xFF0fb8d6),
+        const Color(0xFF0096bc),
+        const Color(0xFF0075a0),
+        const Color(0xFF005581),
+        const Color(0xFF043761),
+        ...List.generate(nbr-13, (index) =>const Color(0xFF6becd6),
+        )
+      ];
     }
 
-    return result;
   }
 
 
-  List<ColorType> getColorType(){
-      if(ThemeColors.orange.value==color.value){
-        return [ColorType.orange,ColorType.red,ColorType.yellow];
-      }
-      else if(ThemeColors.red.value==color.value){
-        return [ColorType.orange,ColorType.pink,ColorType.red,];
-      }
-      else if(ThemeColors.green.value==color.value){
-        return [ColorType.orange,ColorType.green,ColorType.red,];
-      }
-      else if(ThemeColors.blue.value==color.value){
-        return [ColorType.blue,ColorType.purple,];
-      }
-      else {
-        return [ColorType.orange,ColorType.green,ColorType.red,];
-      }
 
-  }
+
+
+
 
   RadialGradient getRadiantLight() {
     return RadialGradient(radius: 0.6, colors: [

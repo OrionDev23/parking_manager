@@ -35,7 +35,7 @@ class PanesList extends StatefulWidget {
   State<PanesList> createState() => PanesListState();
 }
 
-class PanesListState extends State<PanesList> with WindowListener {
+class PanesListState extends State<PanesList> with WindowListener, AutomaticKeepAliveClientMixin {
   static ValueNotifier<int> _index = ValueNotifier(0);
 
   static ValueNotifier<int> get index => _index;
@@ -128,6 +128,7 @@ class PanesListState extends State<PanesList> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     if (firstLoading) {
       return const Center(child: ProgressRing());
     }
@@ -140,7 +141,6 @@ class PanesListState extends State<PanesList> with WindowListener {
               valueListenable: index,
               builder: (BuildContext context, int value, Widget? child) {
                 return NavigationView(
-                  key: widget.key,
                   transitionBuilder: (w, d) => DrillInPageTransition(
                     animation: d,
                     child: w,
@@ -257,6 +257,9 @@ class PanesListState extends State<PanesList> with WindowListener {
     listener?.cancel();
     super.dispose();
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
 }
 
