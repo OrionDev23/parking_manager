@@ -63,7 +63,6 @@ dependencies:
   share_plus: ^7.2.2
   syncfusion_flutter_charts: ^24.2.3+1
   flutter_randomcolor: ^1.0.14
-  url_launcher: ^6.2.4
   document_file_save_plus: ^2.0.0
   universal_html: ^2.2.4
 
