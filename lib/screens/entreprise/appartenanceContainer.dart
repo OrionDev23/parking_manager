@@ -110,7 +110,6 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
                 .indexOf(PaneItemsAndFooters.vehicles) +
             1;
         VehicleTabsState.currentIndex.value = 0;
-
         VehicleTableState.filterNow = true;
         VehicleTableState.filterVehicule.value =
             '"${widget.name.replaceAll(' ', '').toUpperCase()}"';
