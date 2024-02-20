@@ -49,7 +49,7 @@ class TableStats extends StatelessWidget {
               bigSpace,
               Text(
                 title ?? '',
-                style: const TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 18.px),
               ),
             ],
           ),

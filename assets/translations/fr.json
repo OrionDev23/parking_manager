@@ -447,6 +447,7 @@
  "fillialesempty": "Vous n'avez pas encore ajouté de filiales",
  "directionssempty": "Vous n'avez pas encore ajouté de départements",
  "filialeexploit": "Filiale qui exploite le véhicule",
+ "exploitationvehicule": "Exploitation des véhicules",
  "direction": "Direction",
  "lourd?": "Véhicule lourd ?",
  "nodatayet": "Pas encore de données",
@@ -472,5 +473,7 @@
  "langue": "Langue",
  "system": "Système",
  "light": "Clair",
- "dark": "Sombre"
+ "dark": "Sombre",
+ "addnewfiliale": "Ajouter une nouvelle filiale",
+ "addnewdepartment": "Ajouter un nouveau département"
 }

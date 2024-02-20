@@ -431,5 +431,8 @@
   "langue": "اللغة",
   "system": "نظام الجهاز",
   "light": "فاتح",
-  "dark": "مظلم"
+  "dark": "مظلم",
+  "exploitationvehicule": "تشغيل السيارة",
+  "addnewfiliale": "إضافة فرع جديد",
+  "addnewdepartment": "إضافة قسم جديد"
 }

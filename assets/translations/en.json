@@ -433,5 +433,8 @@
   "langue": "Language",
   "system": "System",
   "light": "Light",
-  "dark": "Dark"
+  "dark": "Dark",
+  "exploitationvehicule": "Vehicle operation",
+  "addnewfiliale": "Add a new subsidiary",
+  "addnewdepartment": "Add a new department"
 }

@@ -458,7 +458,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         crossAxisCellCount: 1,
         child: TableStats(
           height: height*2,
-          title: 'fililales'.tr(),
+          title: 'exploitationvehicule'.tr(),
           icon: Icon(
             Icons.hub,
             color: appTheme.color.darker,
