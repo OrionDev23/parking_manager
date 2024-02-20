@@ -476,5 +476,6 @@
  "dark": "Sombre",
  "addnewfiliale": "Ajouter une nouvelle filiale",
  "addnewdepartment": "Ajouter un nouveau département",
- "nomrequired": "Un nom doit être renseigné"
+ "nomrequired": "Un nom doit être renseigné",
+ "confirmsuppr": "Confirmer la suppression ?"
 }

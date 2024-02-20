@@ -437,6 +437,7 @@
   "exploitationvehicule": "Vehicle operation",
   "addnewfiliale": "Add a new subsidiary",
   "addnewdepartment": "Add a new department",
-  "nomrequired": "A name is required"
+  "nomrequired": "A name is required",
+  "confirmsuppr": "Confirm deletion ?"
 
 }

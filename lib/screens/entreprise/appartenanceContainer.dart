@@ -9,17 +9,23 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../theme.dart';
+import '../../main.dart';
 import '../sidemenu/pane_items.dart';
 import '../sidemenu/sidemenu.dart';
 import '../vehicle/manager/vehicles_table.dart';
+import 'entreprise.dart';
+import 'fililales.dart';
 
 class AppartenanceContainer extends StatefulWidget {
   final String fieldToSearch;
   final bool filliale;
   final String name;
 
+  final MesFillialesState state;
+
   const AppartenanceContainer(
       {super.key,
+        required this.state,
       this.filliale = true,
       required this.fieldToSearch,
       required this.name});
@@ -83,12 +89,18 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
             const Spacer(),
             Container(
               padding: const EdgeInsets.all(5),
-              child: loading
-                  ? const Text('')
-                  : Text(
-                      '$vCount ${'vehicules'.tr()}',
-                      style: appTheme.writingStyle,
-                    ),
+                  child:  Row(
+                children: [
+                  loading
+                      ? const Text('')
+                      : Text(
+                          '$vCount ${'vehicules'.tr()}',
+                          style: appTheme.writingStyle,
+                        ),
+                  const Spacer(),
+                  Button(onPressed: confirmDelete,child: const Icon(FluentIcons.delete,),),
+                ],
+              ),
             ),
           ],
         ),
@@ -104,5 +116,62 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
             '"${widget.name.replaceAll(' ', '').toUpperCase()}"';
       },
     );
+  }
+
+
+
+  void confirmDelete(){
+    showDialog(
+        context: widget.state.context,
+        barrierDismissible: true,
+        builder: (c) {
+          return ContentDialog(
+            constraints: BoxConstraints.loose(Size(300.px, 150.px)),
+            content: Text('confirmsuppr',style:TextStyle(fontSize: 16.px)).tr(),
+            actions: [
+              Button(child:const Text('fermer').tr(),onPressed:(){
+                Navigator.of(context).pop();
+              }),
+              FilledButton(onPressed: delete, child: const Text('confirmer').tr())
+            ],
+          );
+        });
+  }
+
+  void delete() async{
+
+    Navigator.of(widget.state.context).pop();
+    if(!widget.filliale){
+      if(MyEntrepriseState.p!.directions==null){
+        MyEntrepriseState.p!.directions=[];
+      }
+      MyEntrepriseState.p!.directions!.remove(widget.name);
+    }
+    else{
+      if(MyEntrepriseState.p!.filiales==null){
+        MyEntrepriseState.p!.filiales=[];
+      }
+      MyEntrepriseState.p!.filiales!.remove(widget.name);
+    }
+    await ClientDatabase.database!
+        .updateDocument(
+        databaseId: databaseId,
+        collectionId: entrepriseid,
+        documentId: MyEntrepriseState.p!.id,
+        data: {
+          if(!widget.filliale)
+            'directions':MyEntrepriseState.p!.directions,
+          if(widget.filliale)
+            'filiales':MyEntrepriseState.p!.filiales,
+        })
+        .then((value) {
+      displayMessage(widget.state.context,'done',InfoBarSeverity.success);
+      widget.state.setState(() {
+
+      });
+    }).onError((AppwriteException error, stackTrace) {
+      displayMessage(widget.state.context,'error',InfoBarSeverity.error);
+    });
+
   }
 }

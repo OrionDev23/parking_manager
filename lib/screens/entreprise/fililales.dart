@@ -26,10 +26,10 @@ class MesFilliales extends StatefulWidget {
   const MesFilliales({super.key,this.direction=false});
 
   @override
-  State<MesFilliales> createState() => _MesFillialesState();
+  State<MesFilliales> createState() => MesFillialesState();
 }
 
-class _MesFillialesState extends State<MesFilliales> {
+class MesFillialesState extends State<MesFilliales> {
   TextEditingController searchController = TextEditingController();
 
   bool notEmpty = false;
@@ -90,7 +90,7 @@ class _MesFillialesState extends State<MesFilliales> {
                 ],
               ),
             ),
-            if(!widget.direction)
+            !widget.direction?
             Flexible(
               child: ListView(
                 padding: const EdgeInsets.all(10),
@@ -102,6 +102,7 @@ class _MesFillialesState extends State<MesFilliales> {
                     crossAxisSpacing: 5,
                     children: directionsSearched()
                         .map((e) => AppartenanceContainer(
+                              state: this,
                               key: ValueKey(e),
                               filliale: true,
                               name: e,
@@ -217,9 +218,7 @@ class _MesFillialesState extends State<MesFilliales> {
                       ]),
                 ],
               ),
-            ),
-            if(widget.direction)
-              Flexible(
+            ): Flexible(
                 child: ListView(
                   padding: const EdgeInsets.all(10),
                   children: [
@@ -230,6 +229,7 @@ class _MesFillialesState extends State<MesFilliales> {
                       crossAxisSpacing: 5,
                       children: directionsSearched()
                           .map((e) => AppartenanceContainer(
+                        state: this,
                         key: ValueKey(e),
                         filliale: false,
                         name: e,
@@ -327,7 +327,7 @@ class _MesFillialesState extends State<MesFilliales> {
               Button(child:const Text('fermer').tr(),onPressed:(){
                 Navigator.of(context).pop();
               }),
-              FilledButton(child: const Text('confirmer').tr(), onPressed: (){})
+              FilledButton(onPressed: confirmChanges, child: const Text('confirmer').tr())
             ],
           );
         });
@@ -336,10 +336,22 @@ class _MesFillialesState extends State<MesFilliales> {
 
   void confirmChanges() async{
     if(textToEdit.text.trim().isEmpty){
-      Future.delayed(Duration(milliseconds:50)).then((s)=>
+      Future.delayed(const Duration(milliseconds:50)).then((s)=>
           displayMessage(context,'nomrequired',InfoBarSeverity.error)
       );
       return;
+    }
+    if(widget.direction){
+      if(MyEntrepriseState.p!.directions==null){
+        MyEntrepriseState.p!.directions=[];
+      }
+      MyEntrepriseState.p!.directions!.add(textToEdit.text);
+    }
+    else{
+      if(MyEntrepriseState.p!.filiales==null){
+        MyEntrepriseState.p!.filiales=[];
+      }
+      MyEntrepriseState.p!.filiales!.add(textToEdit.text);
     }
     Navigator.of(context).pop();
     await ClientDatabase.database!
@@ -357,7 +369,7 @@ class _MesFillialesState extends State<MesFilliales> {
       displayMessage(context,'done',InfoBarSeverity.success);
           setState((){});
          }).onError((AppwriteException error, stackTrace) {
-      print(error.message);
+      displayMessage(context,'error',InfoBarSeverity.error);
     });
   }
 }

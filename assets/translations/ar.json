@@ -435,6 +435,7 @@
   "exploitationvehicule": "تشغيل السيارة",
   "addnewfiliale": "إضافة فرع جديد",
   "addnewdepartment": "إضافة قسم جديد",
-  "nomrequired": "الاسم مطلوب"
+  "nomrequired": "الاسم مطلوب",
+  "confirmsuppr": "تأكيد الحذف ؟"
 
 }
