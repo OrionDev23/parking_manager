@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parc_oto/screens/entreprise/directions.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -163,7 +162,7 @@ class PaneItemsAndFooters {
         PaneItem(
           icon: Icon(FluentIcons.company_directory,color: appTheme.color.lightest,),
           title: const Text('directions').tr(),
-          body: const MesDirections(),
+          body: const MesFilliales(direction:true),
         ),
       ]
     );

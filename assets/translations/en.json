@@ -436,5 +436,7 @@
   "dark": "Dark",
   "exploitationvehicule": "Vehicle operation",
   "addnewfiliale": "Add a new subsidiary",
-  "addnewdepartment": "Add a new department"
+  "addnewdepartment": "Add a new department",
+  "nomrequired": "A name is required"
+
 }

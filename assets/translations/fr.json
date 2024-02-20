@@ -475,5 +475,6 @@
  "light": "Clair",
  "dark": "Sombre",
  "addnewfiliale": "Ajouter une nouvelle filiale",
- "addnewdepartment": "Ajouter un nouveau département"
+ "addnewdepartment": "Ajouter un nouveau département",
+ "nomrequired": "Un nom doit être renseigné"
 }

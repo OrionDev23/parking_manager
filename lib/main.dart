@@ -37,6 +37,16 @@ void main() async {
   launchApp();
 }
 
+void displayMessage(BuildContext context,String msg,InfoBarSeverity severity){
+  displayInfoBar(context,
+      builder: (BuildContext context, void Function() close) {
+        return InfoBar(
+          title: Text(msg).tr(),
+          severity: severity,
+        );
+      }, duration: snackbarShortDuration);
+}
+
 void launchApp() async {
   prefs = await SharedPreferences.getInstance();
   VehiclesUtilities();

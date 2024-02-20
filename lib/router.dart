@@ -25,7 +25,7 @@ class Routes {
       routes: [
         ShellRoute(
 
-            builder: (context, state,s ) => PanesList(key: sideKey,
+            builder: (context, state,s ) => PanesList(key: UniqueKey(),
                   paneList: PaneItemsAndFooters(savedSettings,appTheme), appTheme:
             appTheme,
                 ),

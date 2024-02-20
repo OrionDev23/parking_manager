@@ -63,7 +63,9 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
         width: 200.px,
         height: 80.px,
         decoration: BoxDecoration(
-            color: appTheme.backGroundColor, boxShadow: kElevationToShadow[2]),
+            borderRadius:BorderRadius.circular(5),
+            color: appTheme.backGroundColor,
+            boxShadow: kElevationToShadow[2]),
         child: Column(
           children: [
             if (widget.filliale)

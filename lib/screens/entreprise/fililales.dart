@@ -17,9 +17,13 @@ import '../sidemenu/pane_items.dart';
 import '../sidemenu/sidemenu.dart';
 import 'appartenanceContainer.dart';
 import 'entreprise.dart';
+import '../../providers/client_database.dart';
+import '../../main.dart';
 
 class MesFilliales extends StatefulWidget {
-  const MesFilliales({super.key});
+
+  final bool direction;
+  const MesFilliales({super.key,this.direction=false});
 
   @override
   State<MesFilliales> createState() => _MesFillialesState();
@@ -35,7 +39,7 @@ class _MesFillialesState extends State<MesFilliales> {
     var appTheme = context.watch<AppTheme>();
     return ScaffoldPage(
         header: PageTitle(
-          text: 'fililales'.tr(),
+          text: widget.direction?'directions'.tr():'fililales'.tr(),
           trailing: ButtonContainer(
             icon: FluentIcons.add,
             text: 'add'.tr(),
@@ -48,13 +52,13 @@ class _MesFillialesState extends State<MesFilliales> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(5.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   SizedBox(
-                    width: 30.w,
-                    height: 7.h,
+                    width: 300.px,
+                    height: 40.px,
                     child: TextBox(
                       controller: searchController,
                       placeholder: 'search'.tr(),
@@ -86,6 +90,7 @@ class _MesFillialesState extends State<MesFilliales> {
                 ],
               ),
             ),
+            if(!widget.direction)
             Flexible(
               child: ListView(
                 padding: const EdgeInsets.all(10),
@@ -213,17 +218,87 @@ class _MesFillialesState extends State<MesFilliales> {
                 ],
               ),
             ),
+            if(widget.direction)
+              Flexible(
+                child: ListView(
+                  padding: const EdgeInsets.all(10),
+                  children: [
+                    StaggeredGrid.count(
+                      crossAxisCount:
+                      Device.orientation == Orientation.portrait ? 2 : 4,
+                      mainAxisSpacing: 5,
+                      crossAxisSpacing: 5,
+                      children: directionsSearched()
+                          .map((e) => AppartenanceContainer(
+                        key: ValueKey(e),
+                        filliale: false,
+                        name: e,
+                        fieldToSearch: 'direction',
+                      ))
+                          .toList(),
+                    ),
+                    smallSpace,
+                    StaggeredGrid.count(
+                        crossAxisCount:
+                        Device.orientation == Orientation.landscape ? 2 : 1,
+                        mainAxisSpacing: 5,
+                        crossAxisSpacing: 5,
+                        children: [
+                          StaggeredGridTile.fit(
+                            crossAxisCellCount: 2,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: appTheme.backGroundColor,
+                                boxShadow: kElevationToShadow[2],
+                              ),
+                              padding: const EdgeInsets.all(10),
+                              height: height * 2,
+                              child: StateBars(
+                                hideEmpty: true,
+                                vertical: true,
+                                labels: List.generate(
+                                    MyEntrepriseState.p!.directions?.length ?? 0,
+                                        (index) => MapEntry(
+                                        MyEntrepriseState.p!.directions![index],
+                                        DatabaseCounters()
+                                            .countVehiclesWithCondition([
+                                          Query.equal(
+                                              'direction',
+                                              MyEntrepriseState
+                                                  .p!.directions![index]
+                                                  .replaceAll(' ', '')
+                                                  .trim())
+                                        ]))),
+                              ),
+                            ),
+                          ),
+                        ]),
+                  ],
+                ),
+              ),
           ],
         ));
   }
 
   List<String> directionsSearched() {
     List<String> result = List.empty(growable: true);
-    MyEntrepriseState.p?.filiales?.forEach((value) {
-      if (value.toUpperCase().contains(searchController.text.toUpperCase())) {
-        result.add(value);
-      }
-    });
+    if(widget.direction){
+      MyEntrepriseState.p?.directions?.forEach((value) {
+        if (value.toUpperCase().contains(searchController.text.toUpperCase())) {
+          result.add(value);
+        }
+      });
+
+    }
+    else{
+
+      MyEntrepriseState.p?.filiales?.forEach((value) {
+        if (value.toUpperCase().contains(searchController.text.toUpperCase())) {
+          result.add(value);
+        }
+      });
+    }
+
     return result;
   }
 
@@ -235,7 +310,7 @@ class _MesFillialesState extends State<MesFilliales> {
         barrierDismissible: true,
         builder: (c) {
           return ContentDialog(
-            title: Text('addnewfiliale',style: TextStyle(fontSize: 16
+            title: Text(widget.direction?'addnewdirection':'addnewfiliale',style: TextStyle(fontSize: 16
                 .px),).tr(),
             constraints: BoxConstraints.loose(Size(300.px, 190.px)),
             content: TextBox(
@@ -256,5 +331,33 @@ class _MesFillialesState extends State<MesFilliales> {
             ],
           );
         });
+  }
+
+
+  void confirmChanges() async{
+    if(textToEdit.text.trim().isEmpty){
+      Future.delayed(Duration(milliseconds:50)).then((s)=>
+          displayMessage(context,'nomrequired',InfoBarSeverity.error)
+      );
+      return;
+    }
+    Navigator.of(context).pop();
+    await ClientDatabase.database!
+        .updateDocument(
+        databaseId: databaseId,
+        collectionId: entrepriseid,
+        documentId: MyEntrepriseState.p!.id,
+        data: {
+          if(widget.direction)
+          'directions':MyEntrepriseState.p!.directions,
+          if(!widget.direction)
+            'filiales':MyEntrepriseState.p!.filiales,
+        })
+        .then((value) {
+      displayMessage(context,'done',InfoBarSeverity.success);
+          setState((){});
+         }).onError((AppwriteException error, stackTrace) {
+      print(error.message);
+    });
   }
 }
