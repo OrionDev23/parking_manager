@@ -19,6 +19,7 @@ import '../utilities/profil_beautifier.dart';
 const databaseId = "6531ad112080ae3b14a7";
 const userid = "users";
 const trialID = "trialdate";
+const limitsID = "limits";
 const chauffeurid = "6537d87b492c80f255e8";
 const genreid = "6537960246d5b0e1ab77";
 const vehiculeid = "6531ad22153b2a49ca2c";
@@ -60,6 +61,8 @@ class ClientDatabase {
     account ??= Account(client!);
     database ??= Databases(client!);
     storage ??= Storage(client!);
+    getLimits();
+
     getEntreprise();
   }
 
@@ -97,6 +100,8 @@ class ClientDatabase {
           .then((value) {
         secretKey = value.data['key'];
         secretKeySet = true;
+      }).onError((error, stackTrace) {
+
       });
     }
   }
@@ -149,6 +154,35 @@ class ClientDatabase {
   }
 
   static DateTime? trialDate;
+
+
+  static Map<String,int> limits={};
+
+  static bool gotLimit=false;
+
+  Future<void> getLimits() async{
+    if(!gotLimit){
+      await database!
+          .getDocument(
+          databaseId: databaseId,
+          collectionId: limitsID,
+          documentId: '1')
+          .then((value) {
+
+        if(value.data.containsKey('vehicles')){
+          limits['vehicles']=value.data['vehicles'];
+        }
+        if(value.data.containsKey('users')){
+          limits['users']=value.data['users'];
+        }
+        gotLimit=true;
+
+      }).onError((AppwriteException error, stackTrace) {
+        gotLimit=false;
+      });
+    }
+
+  }
 
   Future<void> getTrialDate() async {
     await database!

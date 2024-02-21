@@ -8,6 +8,8 @@ import 'on_tap_scale.dart';
 class ButtonContainer extends StatefulWidget {
   final IconData icon;
   final int? counter;
+
+  final int? maxCounter;
   final String text;
   final String textList;
   final String textNouveau;
@@ -30,6 +32,7 @@ class ButtonContainer extends StatefulWidget {
       this.actionList,
       this.actionNouveau,
       this.counter,
+        this.maxCounter,
       required this.text,
       this.color,
       this.textList = "Liste",
@@ -108,9 +111,12 @@ class _ButtonContainerState extends State<ButtonContainer> {
                     Text(
                       widget.showCounter == true
                           ? loadingCount
-                          ? '-'
-                          : '$count'
-                          : '-',
+                          ? '- ${widget.maxCounter!=null ?'/ ${widget
+                          .maxCounter}':''}'
+                          : '$count ${widget.maxCounter!=null ?'/ ${widget
+                          .maxCounter}':''}'
+                          : '- ${widget.maxCounter!=null ?'/ ${widget
+                          .maxCounter}':''}',
                       style: textStyle.copyWith(fontWeight: FontWeight.bold),
                     ),
                     if(widget.showCounter)

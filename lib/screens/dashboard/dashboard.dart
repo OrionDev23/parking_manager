@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
 import 'package:parc_oto/screens/dashboard/charts/state_category_bar.dart';
@@ -82,6 +83,8 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         icon: FluentIcons.car,
         text: 'vehicules'.tr(),
         getCount: DatabaseCounters().countVehicles,
+        maxCounter: ClientDatabase.gotLimit && ClientDatabase.limits
+            .containsKey('vehicles')?ClientDatabase.limits['vehicles']:null,
         action: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
               .indexOf(PaneItemsAndFooters.vehicles);
