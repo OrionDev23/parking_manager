@@ -94,7 +94,7 @@ class UsersManagementDatasource
           style: rowTextStyle)),
       DataCell(f.FlyoutTarget(
         controller: controllers[element.value.key.$id]!,
-        child: OnTapScaleAndFade(
+        child: !isAdmin(element.value.value)?OnTapScaleAndFade(
             onTap: () {
               controllers[element.value.key.$id]!.showFlyout(
                   builder: (context) {
@@ -141,7 +141,8 @@ class UsersManagementDatasource
                 child: Icon(
                   Icons.edit,
                   color: appTheme!.color.darkest,
-                ))),
+                ))):
+        const Text(''),
       )),
     ];
   }
@@ -168,6 +169,17 @@ class UsersManagementDatasource
     return false;
   }
 
+  bool isAdmin(List<Membership>? e) {
+    if (e != null) {
+      for (var t in e) {
+        if (t.teamName.toLowerCase() == 'admins') {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
   bool isInvitedButNotJoined(List<Membership>? e) {
     if (e != null) {
       for (var t in e) {

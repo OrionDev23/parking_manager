@@ -1,3 +1,4 @@
+import 'package:appwrite/models.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
@@ -81,6 +82,26 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
   }
 
   static bool lastPortrait=false;
+
+  List<Map<String,dynamic>> getJsonData(List<dynamic> data){
+    bool isDocument=data.first is Document;
+    List<Map<String,dynamic>> result=[];
+    for(int i=0;i<data.length;i++){
+      if(isDocument){
+        result.add(data[i].data);
+
+      }
+      else{
+        result.add(data[i].value!.toJson());
+      }
+
+    }
+
+    print(result.toString());
+
+    return result;
+  }
+
   @override
   Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
     bool portrait=MediaQuery.of(current).orientation==Orientation.portrait;
@@ -315,6 +336,16 @@ abstract class ParcOtoDatasourceUsers<S, T> extends AsyncDataTableSource {
   }
 
   List<DataCell> getCellsToShow(MapEntry<S, T> element);
+
+
+  List<Map<String,dynamic>> getJsonData(List<dynamic> data){
+    List<Map<String,dynamic>> result=[];
+    for(int i=0;i<data.length;i++){
+      result.add(data[i].value!.toJson());
+    }
+
+    return result;
+  }
 
   void selectRow(T c) {
     Navigator.of(current).pop(c);

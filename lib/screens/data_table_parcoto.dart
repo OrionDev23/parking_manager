@@ -46,7 +46,7 @@ class _DataTableParcState extends State<DataTableParc> {
       empty: NoDataWidget(
         datasource: widget.source,
       ),
-      pageSyncApproach: PageSyncApproach.goToFirst,
+      pageSyncApproach: PageSyncApproach.goToLast,
       horizontalMargin: 8,
       columnSpacing: 0,
       dataRowHeight: widget.rowHeight==null?widget

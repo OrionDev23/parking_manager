@@ -1,8 +1,11 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/pdf_generation/pdf_preview_listing.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:pdf/widgets.dart' show PageOrientation;
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -189,6 +192,8 @@ class VehicleTableState extends State<VehicleTable> {
   TextEditingController yearMin = TextEditingController();
   TextEditingController yearMax = TextEditingController();
   Map<String, String> filters = {};
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -734,6 +739,8 @@ class VehicleTableState extends State<VehicleTable> {
                           ),
                         ),
                         smallSpace,
+                        FilledButton(onPressed: showPdf, child: const Text('PDF').tr()),
+                        smallSpace,
                         Flexible(
                           child: SizedBox(
                             width: 350.px,
@@ -762,6 +769,17 @@ class VehicleTableState extends State<VehicleTable> {
                                     vehicleDataSource.search('');
                                   }
                                 }
+                              },
+                              onChanged: (s){
+                                if(s.isEmpty){
+                                  notEmpty=false;
+                                  vehicleDataSource.search('');
+                                }
+                                else{
+                                    notEmpty=true;
+                                }
+                                setState(() {
+                                });
                               },
                               suffix: notEmpty
                                   ? IconButton(
@@ -793,6 +811,31 @@ class VehicleTableState extends State<VehicleTable> {
                 );
               });
         });
+  }
+
+
+  void showPdf() {
+    ClientDatabase.database!.listDocuments(
+        databaseId: databaseId,
+        collectionId: vehiculeid,queries: [
+          Query.limit(ClientDatabase.limits['vehicles']??500)
+    ]).then((value){
+      Future.delayed(const Duration(milliseconds: 50))
+          .then((s) => showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (context){
+            return PdfPreviewListing(
+              list: vehicleDataSource.getJsonData(
+                  value.documents),
+              orientation: PageOrientation.landscape,
+              keysToInclude: const ['matricule','nom','prenom','type','apparten'
+                  'ance','direction'],
+              name: 'Liste des véhicules',
+            );
+          }));
+    });
+
   }
 
   @override

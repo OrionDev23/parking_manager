@@ -39,7 +39,8 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
               Image.asset(
                 element.value.marque == null ||
                     element.value.marque!.isEmpty ||
-                    element.value.marque!.contains('null')
+                    element.value.marque!.contains('null') || element.value
+                    .marque=='-1'
                     ? 'assets/images/marques/default.webp'
                     : 'assets/images/marques/${element.value.marque ?? 'default'}.webp',
                 width: 3.5.h,

@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
@@ -67,7 +68,7 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
     return OnTapScaleAndFade(
       child: Container(
         width: 200.px,
-        height: 80.px,
+        height: 70.px,
         decoration: BoxDecoration(
             borderRadius:BorderRadius.circular(5),
             color: appTheme.backGroundColor,
@@ -75,16 +76,16 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
         child: Column(
           children: [
             if (widget.filliale)
-              Text(
+              AutoSizeText(
                 VehiclesUtilities.getAppartenance(widget.name),
                 style:
-                    TextStyle(fontSize: 18.px, color: appTheme.color.lightest),
+                    TextStyle(color: appTheme.color.lightest),
               ),
             if (!widget.filliale)
-              Text(
+              AutoSizeText(
                 VehiclesUtilities.getDirection(widget.name),
                 style:
-                    TextStyle(fontSize: 18.px, color: appTheme.color.lightest),
+                    TextStyle(color: appTheme.color.lightest),
               ),
             const Spacer(),
             Container(

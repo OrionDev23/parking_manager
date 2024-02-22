@@ -32,8 +32,8 @@ class _BrandListState extends State<BrandList> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   SizedBox(
-                    width: 30.w,
-                    height: 7.h,
+                    width: 350.px,
+                    height: 45.px,
                     child: TextBox(
                       controller: searchController,
                       placeholder: 'search'.tr(),

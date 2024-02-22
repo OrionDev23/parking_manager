@@ -202,11 +202,24 @@ class ReparationTableState extends State<ReparationTable> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   SizedBox(
-                    width: 30.w,
-                    height: 7.h,
+                    width: 350.px,
+                    height: 45.px,
                     child: TextBox(
+                      onChanged: (s){
+                        if(s.isEmpty){
+                          notEmpty=false;
+                          reparationDataSource.search('');
+                        }
+                        else{
+                          notEmpty=true;
+                        }
+                        setState(() {
+                        });
+                      },
                       controller: searchController,
                       placeholder: 'search'.tr(),
+
+
                       style: appTheme.writingStyle,
                       cursorColor: appTheme.color.darker,
                       placeholderStyle: placeStyle,
