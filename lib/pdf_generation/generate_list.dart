@@ -15,7 +15,6 @@ class List2PDF {
 
   PageOrientation orientation;
 
-  String? picKey;
   final List<String> keysToInclude;
 
   final int firstPageLimit;
@@ -27,7 +26,6 @@ class List2PDF {
         required this.midPagesLimit,
       this.orientation = PageOrientation.portrait,
       required this.list,
-      this.picKey,
       required this.title});
 
   Future<Uint8List> generatePDF() async {

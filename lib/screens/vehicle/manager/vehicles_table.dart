@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../datasources/vehicle/vehicules_datasource.dart';
+import '../../../excel_generation/generate_list_excel.dart';
 import '../../../theme.dart';
 import '../../../utilities/vehicle_util.dart';
 import '../../../widgets/select_dialog/select_dialog.dart';
@@ -741,6 +742,8 @@ class VehicleTableState extends State<VehicleTable> {
                         smallSpace,
                         FilledButton(onPressed: showPdf, child: const Text('PDF').tr()),
                         smallSpace,
+                        FilledButton(onPressed: saveExcell, child: const Text('EXCEL')),
+                        smallSpace,
                         Flexible(
                           child: SizedBox(
                             width: 350.px,
@@ -838,6 +841,23 @@ class VehicleTableState extends State<VehicleTable> {
           }));
     });
 
+  }
+
+  void saveExcell(){
+    ClientDatabase.database!.listDocuments(
+        databaseId: databaseId,
+        collectionId: vehiculeid,queries: [
+      Query.limit(ClientDatabase.limits['vehicles']??500)
+    ]).then((value){
+
+      List2Excel(
+        list: vehicleDataSource.getJsonData(value.documents),
+        keysToInclude: const ['matricule','type','apparten'
+          'ance','nom','prenom','direction'],
+        title: 'Liste des véhicules',
+      )
+          .getExcel();
+    });
   }
 
   @override
