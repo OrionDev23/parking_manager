@@ -613,7 +613,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
     return SizedBox(
       height: filliales.isEmpty?100.px:filliales.length * tilesHeight + 80.px,
       child: ZoneBox(
-        label: 'fililales'.tr(),
+        label: 'filiales'.tr(),
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(

@@ -826,11 +826,13 @@ class VehicleTableState extends State<VehicleTable> {
           barrierDismissible: true,
           builder: (context){
             return PdfPreviewListing(
+              firstPageLimit: 30,
+              midPagesLimit: 35,
               list: vehicleDataSource.getJsonData(
                   value.documents),
               orientation: PageOrientation.landscape,
-              keysToInclude: const ['matricule','nom','prenom','type','apparten'
-                  'ance','direction'],
+              keysToInclude: const ['matricule','type','apparten'
+                  'ance','nom','prenom','direction'],
               name: 'Liste des véhicules',
             );
           }));

@@ -156,7 +156,7 @@ class PaneItemsAndFooters {
       items:[
         PaneItem(
           icon: Icon(FluentIcons.sections,color: appTheme.color.lightest,),
-          title: const Text('fililales').tr(),
+          title: const Text('filiales').tr(),
           body: const MesFilliales(),
         ),
         PaneItem(

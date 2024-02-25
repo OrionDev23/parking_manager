@@ -20,9 +20,11 @@ class PdfPreviewListing extends StatelessWidget {
   final List<String>keysToInclude;
   final PageOrientation orientation;
   final String name;
+  final int firstPageLimit;
+  final int midPagesLimit;
   const PdfPreviewListing({super.key,this.orientation=PageOrientation.portrait,
   required this.list,this
-      .name='List', required this.keysToInclude});
+      .name='List', required this.keysToInclude, required this.firstPageLimit, required this.midPagesLimit});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,7 @@ class PdfPreviewListing extends StatelessWidget {
         maxPageWidth: orientation==PageOrientation.portrait?550.px:2000.px,
         shouldRepaint: false,
         pdfFileName: name,
-        initialPageFormat: PdfPageFormat.a4,
+        initialPageFormat: PdfPageFormat.a4.landscape,
         canDebug: false,
         canChangeOrientation: false,
         canChangePageFormat: false,
@@ -48,6 +50,8 @@ class PdfPreviewListing extends StatelessWidget {
             orientation: orientation,
             list: list,
             title: name,
+            firstPageLimit: firstPageLimit,
+            midPagesLimit: midPagesLimit,
           ).generatePDF();
         },
         actions: [

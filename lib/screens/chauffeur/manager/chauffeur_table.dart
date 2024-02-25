@@ -1,12 +1,15 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:parc_oto/datasources/conducteurs/conducteur_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:pdf/widgets.dart' show PageOrientation;
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../../pdf_generation/pdf_preview_listing.dart';
 import '../../../theme.dart';
 import '../../../widgets/zone_box.dart';
 import '../../data_table_parcoto.dart';
@@ -405,9 +408,9 @@ class ChauffeurTableState extends State<ChauffeurTable> {
                       ],
                     ),
                   ),
-                  const SizedBox(
-                    width: 10,
-                  ),
+                  smallSpace,
+                  FilledButton(onPressed: showPdf, child: const Text('PDF')),
+                  smallSpace,
                   SizedBox(
                     width: 350.px,
                     height: 45.px,
@@ -468,6 +471,32 @@ class ChauffeurTableState extends State<ChauffeurTable> {
         });
   }
 
+
+  void showPdf() {
+    ClientDatabase.database!.listDocuments(
+        databaseId: databaseId,
+        collectionId: chauffeurid,queries: [
+      Query.limit(ClientDatabase.limits['vehicles']??500)
+    ]).then((value){
+      Future.delayed(const Duration(milliseconds: 50))
+          .then((s) => showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (context){
+            return PdfPreviewListing(
+              firstPageLimit: 30,
+              midPagesLimit: 35,
+              list: conducteurDataSource.getJsonData(
+                  value.documents),
+              orientation: PageOrientation.landscape,
+              keysToInclude: const ['matricule','name','prenom','filliale','d'
+                  'irection','vehicules'],
+              name: 'Liste des conducteurs',
+            );
+          }));
+    });
+
+  }
   @override
   void dispose() {
     conducteurDataSource.dispose();
