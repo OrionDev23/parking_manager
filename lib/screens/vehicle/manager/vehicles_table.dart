@@ -196,6 +196,10 @@ class VehicleTableState extends State<VehicleTable> {
 
 
 
+
+  FlyoutController export = FlyoutController();
+
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
@@ -253,469 +257,7 @@ class VehicleTableState extends State<VehicleTable> {
                                         ],
                                       ),
                                       onPressed: () {
-                                        filterFlyout.showFlyout(
-                                            builder: (context) {
-                                          return FlyoutContent(
-                                              color: appTheme.backGroundColor,
-                                              child: StatefulBuilder(
-                                                  builder: (context, setS) {
-                                                return SizedBox(
-                                                  width: 30.w,
-                                                  height: 45.h,
-                                                  child: Column(
-                                                    children: [
-                                                      Flexible(
-                                                        child: ZoneBox(
-                                                          label: 'year'.tr(),
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(10.0),
-                                                            child: Row(
-                                                              children: [
-                                                                const Text(
-                                                                        'min')
-                                                                    .tr(),
-                                                                smallSpace,
-                                                                Flexible(
-                                                                  child:
-                                                                      TextBox(
-                                                                    controller:
-                                                                        yearMin,
-                                                                    placeholder:
-                                                                        'min'
-                                                                            .tr(),
-                                                                    placeholderStyle:
-                                                                        placeStyle,
-                                                                    style: appTheme
-                                                                        .writingStyle,
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: appTheme
-                                                                          .fillColor,
-                                                                    ),
-                                                                    cursorColor:
-                                                                        appTheme
-                                                                            .color
-                                                                            .darker,
-                                                                  ),
-                                                                ),
-                                                                smallSpace,
-                                                                const Text(
-                                                                        'max')
-                                                                    .tr(),
-                                                                smallSpace,
-                                                                Flexible(
-                                                                  child:
-                                                                      TextBox(
-                                                                    controller:
-                                                                        yearMax,
-                                                                    placeholder:
-                                                                        'max'
-                                                                            .tr(),
-                                                                    placeholderStyle:
-                                                                        placeStyle,
-                                                                    style: appTheme
-                                                                        .writingStyle,
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: appTheme
-                                                                          .fillColor,
-                                                                    ),
-                                                                    cursorColor:
-                                                                        appTheme
-                                                                            .color
-                                                                            .darker,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      smallSpace,
-                                                      Flexible(
-                                                        child: ZoneBox(
-                                                          label: 'marque'.tr(),
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(10.0),
-                                                            child: Row(
-                                                              children: [
-                                                                Flexible(
-                                                                  child:
-                                                                      ListTile(
-                                                                    leading: Image
-                                                                        .asset(
-                                                                      'assets/images/marques/${marque ?? 'default'}.webp',
-                                                                      width:
-                                                                          4.h,
-                                                                      height:
-                                                                          4.h,
-                                                                    ),
-                                                                    title:
-                                                                        AutoSizeText(
-                                                                      VehiclesUtilities.marques![marque ??
-                                                                              0] ??
-                                                                          'nonind'
-                                                                              .tr(),
-                                                                      minFontSize:
-                                                                          5,
-                                                                      maxLines:
-                                                                          1,
-                                                                    ),
-                                                                    onPressed:
-                                                                        () {
-                                                                      SelectDialog
-                                                                          .showModal<
-                                                                              int?>(
-                                                                        context,
-                                                                        selectedValue:
-                                                                            marque,
-                                                                        backgroundColor:
-                                                                            appTheme.backGroundColor,
-                                                                        gridView:
-                                                                            true,
-                                                                        numberOfGridCross:
-                                                                            3,
-                                                                        constraints: BoxConstraints.loose(Size(
-                                                                            60.w,
-                                                                            70.h)),
-                                                                        items: VehiclesUtilities
-                                                                            .marques!
-                                                                            .keys
-                                                                            .toList(),
-                                                                        itemBuilder: (c,
-                                                                            v,
-                                                                            e) {
-                                                                          return Card(
-                                                                              child: Image.asset('assets/images/marques/${v ?? 'default'}.webp'));
-                                                                        },
-                                                                        onChange:
-                                                                            (s) {
-                                                                          marque =
-                                                                              s;
-                                                                          setState(
-                                                                              () {});
-                                                                          setS(
-                                                                              () {});
-                                                                        },
-                                                                        onFind:
-                                                                            VehiclesUtilities.findMarque,
-                                                                        emptyBuilder:
-                                                                            (s) {
-                                                                          return Center(
-                                                                            child:
-                                                                                Text(
-                                                                              'lvide',
-                                                                              style: TextStyle(color: Colors.grey[100]),
-                                                                            ).tr(),
-                                                                          );
-                                                                        },
-                                                                        loadingBuilder:
-                                                                            (s) {
-                                                                          return Center(
-                                                                            child:
-                                                                                Text('telechargement', style: TextStyle(color: Colors.grey[100])).tr(),
-                                                                          );
-                                                                        },
-                                                                        searchBoxDecoration: appTheme
-                                                                            .inputDecoration
-                                                                            .copyWith(
-                                                                          labelText:
-                                                                              'search'.tr(),
-                                                                          labelStyle:
-                                                                              placeStyle,
-                                                                        ),
-                                                                        searchTextStyle:
-                                                                            appTheme.writingStyle,
-                                                                        searchCursorColor:
-                                                                            appTheme.color,
-                                                                      );
-                                                                    },
-                                                                  ),
-                                                                ),
-                                                                smallSpace,
-                                                                smallSpace,
-                                                                if (marque !=
-                                                                    null)
-                                                                  IconButton(
-                                                                      icon:
-                                                                          Icon(
-                                                                        FluentIcons
-                                                                            .cancel,
-                                                                        color: appTheme
-                                                                            .color,
-                                                                      ),
-                                                                      onPressed:
-                                                                          () {
-                                                                        marque =
-                                                                            null;
-
-                                                                        setState(
-                                                                            () {});
-                                                                        setS(
-                                                                            () {});
-                                                                      })
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Flexible(
-                                                        child: ZoneBox(
-                                                          label: 'genre'.tr(),
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(10.0),
-                                                            child: Row(
-                                                              children: [
-                                                                Flexible(
-                                                                  child:
-                                                                      ListTile(
-                                                                    title:
-                                                                        AutoSizeText(
-                                                                      (VehiclesUtilities.genres![genre ?? -1] ??
-                                                                              'nonind')
-                                                                          .tr(),
-                                                                      minFontSize:
-                                                                          5,
-                                                                      softWrap:
-                                                                          true,
-                                                                      maxLines:
-                                                                          1,
-                                                                    ),
-                                                                    onPressed:
-                                                                        () {
-                                                                      SelectDialog
-                                                                          .showModal<
-                                                                              int>(
-                                                                        context,
-                                                                        selectedValue:
-                                                                            genre,
-                                                                        items: VehiclesUtilities
-                                                                            .genres!
-                                                                            .keys
-                                                                            .toList(),
-                                                                        backgroundColor:
-                                                                            appTheme.backGroundColor,
-                                                                        itemBuilder: (c,
-                                                                            v,
-                                                                            e) {
-                                                                          return Container(
-                                                                            padding:
-                                                                                const EdgeInsets.all(5.0),
-                                                                            color: v % 2 == 0
-                                                                                ? Colors.transparent
-                                                                                : appTheme.color.lightest,
-                                                                            child:
-                                                                                Row(
-                                                                              children: [
-                                                                                Text(v.toString()),
-                                                                                smallSpace,
-                                                                                smallSpace,
-                                                                                smallSpace,
-                                                                                Text(VehiclesUtilities.genres?[v] ?? '').tr(),
-                                                                              ],
-                                                                            ),
-                                                                          );
-                                                                        },
-                                                                        onChange:
-                                                                            (s) {
-                                                                          genre =
-                                                                              s;
-                                                                          setState(
-                                                                              () {});
-                                                                          setS(
-                                                                              () {});
-                                                                        },
-                                                                        onFind:
-                                                                            VehiclesUtilities.findGenres,
-                                                                        emptyBuilder:
-                                                                            (s) {
-                                                                          return Center(
-                                                                            child:
-                                                                                Text(
-                                                                              'lvide',
-                                                                              style: TextStyle(color: Colors.grey[100]),
-                                                                            ).tr(),
-                                                                          );
-                                                                        },
-                                                                        loadingBuilder:
-                                                                            (s) {
-                                                                          return Center(
-                                                                            child:
-                                                                                Text('telechargement', style: TextStyle(color: Colors.grey[100])).tr(),
-                                                                          );
-                                                                        },
-                                                                        searchBoxDecoration: appTheme
-                                                                            .inputDecoration
-                                                                            .copyWith(
-                                                                          labelText:
-                                                                              'search'.tr(),
-                                                                          labelStyle:
-                                                                              placeStyle,
-                                                                        ),
-                                                                        searchTextStyle:
-                                                                            appTheme.writingStyle,
-                                                                        searchCursorColor:
-                                                                            appTheme.color,
-                                                                      );
-                                                                    },
-                                                                  ),
-                                                                ),
-                                                                smallSpace,
-                                                                smallSpace,
-                                                                if (genre !=
-                                                                    null)
-                                                                  IconButton(
-                                                                      icon:
-                                                                          Icon(
-                                                                        FluentIcons
-                                                                            .cancel,
-                                                                        color: appTheme
-                                                                            .color,
-                                                                      ),
-                                                                      onPressed:
-                                                                          () {
-                                                                        genre =
-                                                                            null;
-                                                                        setState(
-                                                                            () {});
-                                                                        setS(
-                                                                            () {});
-                                                                      })
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      smallSpace,
-                                                      smallSpace,
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .end,
-                                                          children: [
-                                                            FilledButton(
-                                                              style:
-                                                                  ButtonStyle(
-                                                                backgroundColor:
-                                                                    ButtonState.all<
-                                                                            Color>(
-                                                                        appTheme
-                                                                            .color
-                                                                            .lightest),
-                                                              ),
-                                                              onPressed:
-                                                                  filtered
-                                                                      ? () {
-                                                                          Navigator.of(context)
-                                                                              .pop();
-                                                                          setState(
-                                                                              () {
-                                                                            filtered =
-                                                                                false;
-                                                                            filters.clear();
-                                                                          });
-                                                                          vehicleDataSource
-                                                                              .filter(filters);
-                                                                        }
-                                                                      : null,
-                                                              child: const Text(
-                                                                      'clear')
-                                                                  .tr(),
-                                                            ),
-                                                            const Spacer(),
-                                                            Button(
-                                                                onPressed: () {
-                                                                  Navigator.of(
-                                                                          context)
-                                                                      .pop();
-                                                                },
-                                                                child: const Text(
-                                                                        'annuler')
-                                                                    .tr()),
-                                                            smallSpace,
-                                                            smallSpace,
-                                                            FilledButton(
-                                                                style:
-                                                                    ButtonStyle(
-                                                                  backgroundColor: ButtonState.all<
-                                                                          Color>(
-                                                                      appTheme
-                                                                          .color
-                                                                          .lighter),
-                                                                ),
-                                                                child: const Text(
-                                                                        'confirmer')
-                                                                    .tr(),
-                                                                onPressed: () {
-                                                                  Navigator.of(
-                                                                          context)
-                                                                      .pop();
-
-                                                                  if (yearMin
-                                                                      .text
-                                                                      .isNotEmpty) {
-                                                                    filters['yearmin'] =
-                                                                        yearMin
-                                                                            .text;
-                                                                  } else {
-                                                                    filters.remove(
-                                                                        'yearmin');
-                                                                  }
-                                                                  if (yearMax
-                                                                      .text
-                                                                      .isNotEmpty) {
-                                                                    filters['yearmax'] =
-                                                                        yearMax
-                                                                            .text;
-                                                                  } else {
-                                                                    filters.remove(
-                                                                        'yearmax');
-                                                                  }
-                                                                  if (genre !=
-                                                                      null) {
-                                                                    filters['genre'] =
-                                                                        genre
-                                                                            .toString();
-                                                                  } else {
-                                                                    filters.remove(
-                                                                        'genre');
-                                                                  }
-                                                                  if (marque !=
-                                                                      null) {
-                                                                    filters['marque'] =
-                                                                        marque
-                                                                            .toString();
-                                                                  } else {
-                                                                    filters.remove(
-                                                                        'marque');
-                                                                  }
-
-                                                                  filtered =
-                                                                      true;
-                                                                  setState(
-                                                                      () {});
-                                                                  vehicleDataSource
-                                                                      .filter(
-                                                                          filters);
-                                                                }),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                );
-                                              }));
-                                        });
+                                        showFilters(appTheme);
                                       }),
                                 ),
                               ),
@@ -740,9 +282,29 @@ class VehicleTableState extends State<VehicleTable> {
                           ),
                         ),
                         smallSpace,
-                        FilledButton(onPressed: showPdf, child: const Text('PDF').tr()),
-                        smallSpace,
-                        FilledButton(onPressed: saveExcell, child: const Text('EXCEL')),
+                        FlyoutTarget(
+                          controller: export,
+                          child: SizedBox(
+                            height: 45.px,
+                            width: 80.px,
+                            child: Button(onPressed: (){
+                              export.showFlyout(
+                                  builder: (context){
+                                return MenuFlyout(
+                                  items: [
+                                    MenuFlyoutItem(
+                                        text: const Text('PDF'), onPressed: showPdf),
+                                    MenuFlyoutItem(
+                                        text: const Text('EXCEL'), onPressed:
+                                    saveExcell),
+                                  ],
+                                );
+                              });
+                            }, child: const Text
+                              ('export').tr
+                              ()),
+                          ),
+                        ),
                         smallSpace,
                         Flexible(
                           child: SizedBox(
@@ -853,11 +415,478 @@ class VehicleTableState extends State<VehicleTable> {
       List2Excel(
         list: vehicleDataSource.getJsonData(value.documents),
         keysToInclude: const ['matricule','type','apparten'
-          'ance','nom','prenom','direction'],
+          'ance','nom','prenom','direction','etatactuel','perimetre'],
         title: 'Liste des véhicules',
       )
           .getExcel();
     });
+  }
+
+
+  void showFilters(AppTheme appTheme){
+    filterFlyout.showFlyout(
+        builder: (context) {
+          return FlyoutContent(
+              color: appTheme.backGroundColor,
+              child: StatefulBuilder(
+                  builder: (context, setS) {
+                    return SizedBox(
+                      width: 30.w,
+                      height: 45.h,
+                      child: Column(
+                        children: [
+                          Flexible(
+                            child: ZoneBox(
+                              label: 'year'.tr(),
+                              child: Padding(
+                                padding:
+                                const EdgeInsets
+                                    .all(10.0),
+                                child: Row(
+                                  children: [
+                                    const Text(
+                                        'min')
+                                        .tr(),
+                                    smallSpace,
+                                    Flexible(
+                                      child:
+                                      TextBox(
+                                        controller:
+                                        yearMin,
+                                        placeholder:
+                                        'min'
+                                            .tr(),
+                                        placeholderStyle:
+                                        placeStyle,
+                                        style: appTheme
+                                            .writingStyle,
+                                        decoration:
+                                        BoxDecoration(
+                                          color: appTheme
+                                              .fillColor,
+                                        ),
+                                        cursorColor:
+                                        appTheme
+                                            .color
+                                            .darker,
+                                      ),
+                                    ),
+                                    smallSpace,
+                                    const Text(
+                                        'max')
+                                        .tr(),
+                                    smallSpace,
+                                    Flexible(
+                                      child:
+                                      TextBox(
+                                        controller:
+                                        yearMax,
+                                        placeholder:
+                                        'max'
+                                            .tr(),
+                                        placeholderStyle:
+                                        placeStyle,
+                                        style: appTheme
+                                            .writingStyle,
+                                        decoration:
+                                        BoxDecoration(
+                                          color: appTheme
+                                              .fillColor,
+                                        ),
+                                        cursorColor:
+                                        appTheme
+                                            .color
+                                            .darker,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          smallSpace,
+                          Flexible(
+                            child: ZoneBox(
+                              label: 'marque'.tr(),
+                              child: Padding(
+                                padding:
+                                const EdgeInsets
+                                    .all(10.0),
+                                child: Row(
+                                  children: [
+                                    Flexible(
+                                      child:
+                                      ListTile(
+                                        leading: Image
+                                            .asset(
+                                          'assets/images/marques/${marque ?? 'default'}.webp',
+                                          width:
+                                          4.h,
+                                          height:
+                                          4.h,
+                                        ),
+                                        title:
+                                        AutoSizeText(
+                                          VehiclesUtilities.marques![marque ??
+                                              0] ??
+                                              'nonind'
+                                                  .tr(),
+                                          minFontSize:
+                                          5,
+                                          maxLines:
+                                          1,
+                                        ),
+                                        onPressed:
+                                            () {
+                                          SelectDialog
+                                              .showModal<
+                                              int?>(
+                                            context,
+                                            selectedValue:
+                                            marque,
+                                            backgroundColor:
+                                            appTheme.backGroundColor,
+                                            gridView:
+                                            true,
+                                            numberOfGridCross:
+                                            3,
+                                            constraints: BoxConstraints.loose(Size(
+                                                60.w,
+                                                70.h)),
+                                            items: VehiclesUtilities
+                                                .marques!
+                                                .keys
+                                                .toList(),
+                                            itemBuilder: (c,
+                                                v,
+                                                e) {
+                                              return Card(
+                                                  child: Image.asset('assets/images/marques/${v ?? 'default'}.webp'));
+                                            },
+                                            onChange:
+                                                (s) {
+                                              marque =
+                                                  s;
+                                              setState(
+                                                      () {});
+                                              setS(
+                                                      () {});
+                                            },
+                                            onFind:
+                                            VehiclesUtilities.findMarque,
+                                            emptyBuilder:
+                                                (s) {
+                                              return Center(
+                                                child:
+                                                Text(
+                                                  'lvide',
+                                                  style: TextStyle(color: Colors.grey[100]),
+                                                ).tr(),
+                                              );
+                                            },
+                                            loadingBuilder:
+                                                (s) {
+                                              return Center(
+                                                child:
+                                                Text('telechargement', style: TextStyle(color: Colors.grey[100])).tr(),
+                                              );
+                                            },
+                                            searchBoxDecoration: appTheme
+                                                .inputDecoration
+                                                .copyWith(
+                                              labelText:
+                                              'search'.tr(),
+                                              labelStyle:
+                                              placeStyle,
+                                            ),
+                                            searchTextStyle:
+                                            appTheme.writingStyle,
+                                            searchCursorColor:
+                                            appTheme.color,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    smallSpace,
+                                    smallSpace,
+                                    if (marque !=
+                                        null)
+                                      IconButton(
+                                          icon:
+                                          Icon(
+                                            FluentIcons
+                                                .cancel,
+                                            color: appTheme
+                                                .color,
+                                          ),
+                                          onPressed:
+                                              () {
+                                            marque =
+                                            null;
+
+                                            setState(
+                                                    () {});
+                                            setS(
+                                                    () {});
+                                          })
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            child: ZoneBox(
+                              label: 'genre'.tr(),
+                              child: Padding(
+                                padding:
+                                const EdgeInsets
+                                    .all(10.0),
+                                child: Row(
+                                  children: [
+                                    Flexible(
+                                      child:
+                                      ListTile(
+                                        title:
+                                        AutoSizeText(
+                                          (VehiclesUtilities.genres![genre ?? -1] ??
+                                              'nonind')
+                                              .tr(),
+                                          minFontSize:
+                                          5,
+                                          softWrap:
+                                          true,
+                                          maxLines:
+                                          1,
+                                        ),
+                                        onPressed:
+                                            () {
+                                          SelectDialog
+                                              .showModal<
+                                              int>(
+                                            context,
+                                            selectedValue:
+                                            genre,
+                                            items: VehiclesUtilities
+                                                .genres!
+                                                .keys
+                                                .toList(),
+                                            backgroundColor:
+                                            appTheme.backGroundColor,
+                                            itemBuilder: (c,
+                                                v,
+                                                e) {
+                                              return Container(
+                                                padding:
+                                                const EdgeInsets.all(5.0),
+                                                color: v % 2 == 0
+                                                    ? Colors.transparent
+                                                    : appTheme.color.lightest,
+                                                child:
+                                                Row(
+                                                  children: [
+                                                    Text(v.toString()),
+                                                    smallSpace,
+                                                    smallSpace,
+                                                    smallSpace,
+                                                    Text(VehiclesUtilities.genres?[v] ?? '').tr(),
+                                                  ],
+                                                ),
+                                              );
+                                            },
+                                            onChange:
+                                                (s) {
+                                              genre =
+                                                  s;
+                                              setState(
+                                                      () {});
+                                              setS(
+                                                      () {});
+                                            },
+                                            onFind:
+                                            VehiclesUtilities.findGenres,
+                                            emptyBuilder:
+                                                (s) {
+                                              return Center(
+                                                child:
+                                                Text(
+                                                  'lvide',
+                                                  style: TextStyle(color: Colors.grey[100]),
+                                                ).tr(),
+                                              );
+                                            },
+                                            loadingBuilder:
+                                                (s) {
+                                              return Center(
+                                                child:
+                                                Text('telechargement', style: TextStyle(color: Colors.grey[100])).tr(),
+                                              );
+                                            },
+                                            searchBoxDecoration: appTheme
+                                                .inputDecoration
+                                                .copyWith(
+                                              labelText:
+                                              'search'.tr(),
+                                              labelStyle:
+                                              placeStyle,
+                                            ),
+                                            searchTextStyle:
+                                            appTheme.writingStyle,
+                                            searchCursorColor:
+                                            appTheme.color,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    smallSpace,
+                                    smallSpace,
+                                    if (genre !=
+                                        null)
+                                      IconButton(
+                                          icon:
+                                          Icon(
+                                            FluentIcons
+                                                .cancel,
+                                            color: appTheme
+                                                .color,
+                                          ),
+                                          onPressed:
+                                              () {
+                                            genre =
+                                            null;
+                                            setState(
+                                                    () {});
+                                            setS(
+                                                    () {});
+                                          })
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          smallSpace,
+                          smallSpace,
+                          Padding(
+                            padding:
+                            const EdgeInsets
+                                .all(8.0),
+                            child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment
+                                  .end,
+                              children: [
+                                FilledButton(
+                                  style:
+                                  ButtonStyle(
+                                    backgroundColor:
+                                    ButtonState.all<
+                                        Color>(
+                                        appTheme
+                                            .color
+                                            .lightest),
+                                  ),
+                                  onPressed:
+                                  filtered
+                                      ? () {
+                                    Navigator.of(context)
+                                        .pop();
+                                    setState(
+                                            () {
+                                          filtered =
+                                          false;
+                                          filters.clear();
+                                        });
+                                    vehicleDataSource
+                                        .filter(filters);
+                                  }
+                                      : null,
+                                  child: const Text(
+                                      'clear')
+                                      .tr(),
+                                ),
+                                const Spacer(),
+                                Button(
+                                    onPressed: () {
+                                      Navigator.of(
+                                          context)
+                                          .pop();
+                                    },
+                                    child: const Text(
+                                        'annuler')
+                                        .tr()),
+                                smallSpace,
+                                smallSpace,
+                                FilledButton(
+                                    style:
+                                    ButtonStyle(
+                                      backgroundColor: ButtonState.all<
+                                          Color>(
+                                          appTheme
+                                              .color
+                                              .lighter),
+                                    ),
+                                    child: const Text(
+                                        'confirmer')
+                                        .tr(),
+                                    onPressed: () {
+                                      Navigator.of(
+                                          context)
+                                          .pop();
+
+                                      if (yearMin
+                                          .text
+                                          .isNotEmpty) {
+                                        filters['yearmin'] =
+                                            yearMin
+                                                .text;
+                                      } else {
+                                        filters.remove(
+                                            'yearmin');
+                                      }
+                                      if (yearMax
+                                          .text
+                                          .isNotEmpty) {
+                                        filters['yearmax'] =
+                                            yearMax
+                                                .text;
+                                      } else {
+                                        filters.remove(
+                                            'yearmax');
+                                      }
+                                      if (genre !=
+                                          null) {
+                                        filters['genre'] =
+                                            genre
+                                                .toString();
+                                      } else {
+                                        filters.remove(
+                                            'genre');
+                                      }
+                                      if (marque !=
+                                          null) {
+                                        filters['marque'] =
+                                            marque
+                                                .toString();
+                                      } else {
+                                        filters.remove(
+                                            'marque');
+                                      }
+
+                                      filtered =
+                                      true;
+                                      setState(
+                                              () {});
+                                      vehicleDataSource
+                                          .filter(
+                                          filters);
+                                    }),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }));
+        });
   }
 
   @override

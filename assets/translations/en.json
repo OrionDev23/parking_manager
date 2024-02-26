@@ -25,6 +25,7 @@
   "vehiclerequired": "A vehicle must be selected",
   "selectreparation": "Select a repair order",
   "etat": "State",
+  "etatactuel": "State",
   "notes": "Notes",
   "nouvetat": "New state",
   "chauffeur": "Driver",
@@ -440,6 +441,7 @@
   "addnewfiliale": "Add a new subsidiary",
   "addnewdepartment": "Add a new department",
   "nomrequired": "A name is required",
-  "confirmsuppr": "Confirm deletion ?"
+  "confirmsuppr": "Confirm deletion ?",
+  "export": "Export"
 
 }

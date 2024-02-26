@@ -192,6 +192,7 @@
  "vehicules": "Véhicules",
  "vehicule": "Véhicule",
  "etat": "État",
+ "etatactuel": "État",
  "nouvvehicule": "Nouveau véhicule",
  "gestionvehicles": "Gestion des véhicules",
  "vehiclerequired": "Un vehicule doit être selectionné",
@@ -479,5 +480,6 @@
  "addnewfiliale": "Ajouter une nouvelle filiale",
  "addnewdepartment": "Ajouter un nouveau département",
  "nomrequired": "Un nom doit être renseigné",
- "confirmsuppr": "Confirmer la suppression ?"
+ "confirmsuppr": "Confirmer la suppression ?",
+ "export": "Exporter"
 }

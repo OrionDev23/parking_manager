@@ -12,6 +12,7 @@
   "vehiclerequired": "يجب اختيار مركبة",
   "selectreparation": "حدد أمر الإصلاح",
   "etat": "الحالة",
+  "etatactuel": "الحالة",
   "notes": "ملحوظات",
   "nouvetat": "حالة جديدة",
   "etatmodif": "تم تحديث الحالة",
@@ -19,6 +20,7 @@
   "alreadyinvited": "تم إرسال الدعوة ليصبح مديرًا",
   "enattente": "في الانتظار",
   "lactivities": "الأنشطة الأخيرة",
+  "export": "تصدير",
 
   "etatajout": "تم إنشاء الحالة الجديدة",
   "wilaya": "الولاية",

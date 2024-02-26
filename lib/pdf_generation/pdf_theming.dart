@@ -113,4 +113,12 @@ class PDFTheming {
       getEntrepriseLogo(),
     ]);
   }
+
+
+  Future<void> initLogosOnly() async{
+    await Future.wait([
+      getPoLogo(),
+      getEntrepriseLogo(),
+    ]);
+  }
 }
