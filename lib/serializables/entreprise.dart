@@ -11,6 +11,8 @@ class Entreprise extends Prestataire {
   List<String>? filiales=[];
   List<String>? directions=[];
 
+  List<String>? departments=[];
+
   Entreprise(
       {required super.id,
       required super.nom,
@@ -27,6 +29,7 @@ class Entreprise extends Prestataire {
       super.updatedAt,
       this.directions,
       this.filiales,
+        this.departments,
       this.logo});
 
   factory Entreprise.fromJson(Map<String, dynamic> json) =>

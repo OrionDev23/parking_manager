@@ -55,6 +55,8 @@ class Vehicle extends ParcOtoDefault {
   String? filliale;
   String? direction;
   String? appartenance;
+
+  String? departement;
   bool lourd;
 
   int perimetre;
@@ -76,6 +78,7 @@ class Vehicle extends ParcOtoDefault {
     this.commune,
     this.date,
     this.adresse,
+    this.departement,
     this.quittance,
     this.numero,
     this.nom,

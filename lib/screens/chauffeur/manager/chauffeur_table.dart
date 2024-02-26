@@ -9,6 +9,7 @@ import 'package:pdf/widgets.dart' show PageOrientation;
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../../excel_generation/generate_list_excel.dart';
 import '../../../pdf_generation/pdf_preview_listing.dart';
 import '../../../theme.dart';
 import '../../../widgets/zone_box.dart';
@@ -167,6 +168,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
 
   bool notEmpty = false;
   FlyoutController filterFlyout = FlyoutController();
+  FlyoutController export = FlyoutController();
   TextEditingController ageMin = TextEditingController();
   TextEditingController ageMax = TextEditingController();
   Map<String, String> filters = {};
@@ -409,7 +411,29 @@ class ChauffeurTableState extends State<ChauffeurTable> {
                     ),
                   ),
                   smallSpace,
-                  FilledButton(onPressed: showPdf, child: const Text('PDF')),
+                  FlyoutTarget(
+                    controller: export,
+                    child: SizedBox(
+                      height: 45.px,
+                      width: 80.px,
+                      child: Button(onPressed: (){
+                        export.showFlyout(
+                            builder: (context){
+                              return MenuFlyout(
+                                items: [
+                                  MenuFlyoutItem(
+                                      text: const Text('PDF'), onPressed: showPdf),
+                                  MenuFlyoutItem(
+                                      text: const Text('EXCEL'), onPressed:
+                                  saveExcell),
+                                ],
+                              );
+                            });
+                      }, child: const Text
+                        ('export').tr
+                        ()),
+                    ),
+                  ),
                   smallSpace,
                   SizedBox(
                     width: 350.px,
@@ -496,6 +520,24 @@ class ChauffeurTableState extends State<ChauffeurTable> {
           }));
     });
 
+  }
+
+
+  void saveExcell(){
+    ClientDatabase.database!.listDocuments(
+        databaseId: databaseId,
+        collectionId: chauffeurid,queries: [
+      Query.limit(ClientDatabase.limits['vehicles']??500),
+      Query.notEqual('etat', 3),
+    ]).then((value){
+
+      List2Excel(
+        list: conducteurDataSource.getJsonData(value.documents),
+        keysToInclude: const ['matricule','nom','prenom','filliale','direction','etat','vehicules'],
+        title: 'Liste des conducteurs',
+      )
+          .getExcel();
+    });
   }
   @override
   void dispose() {

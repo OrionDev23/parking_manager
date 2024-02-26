@@ -113,6 +113,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
       adresse.text = p!.adresse;
       directions=p!.directions??[];
       filliales=p!.filiales??[];
+      departments=p!.departments??[];
     }
   }
 
@@ -127,7 +128,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
           rc.text == p!.rc &&
           descr.text == p!.description &&
           email.text == p!.email && p!.filiales==filliales && p!
-          .directions==directions) {
+          .directions==directions && p!.departments==departments) {
         if (changes) {
           setState(() {
             changes = false;
@@ -180,6 +181,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
   double progress = 0;
 
   List<String> directions = [];
+  List<String> departments = [];
   List<String> filliales = [];
 
   Future<void> downloadLogo() async {
@@ -608,6 +610,8 @@ class MyEntrepriseState extends State<MyEntreprise> {
   TextEditingController fillialeToAdd = TextEditingController();
   TextEditingController directionToAdd = TextEditingController();
 
+  TextEditingController departmentToAdd = TextEditingController();
+
   double tilesHeight=50.px;
   Widget fillialeWidget(AppTheme appTheme) {
     return SizedBox(
@@ -811,6 +815,106 @@ class MyEntrepriseState extends State<MyEntreprise> {
     );
   }
 
+  Widget departmentsWidget(AppTheme appTheme) {
+    return SizedBox(
+      height: directions.isEmpty?100.px:directions.length * tilesHeight + 80.px,
+      child: ZoneBox(
+        label: 'departments'.tr(),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: 35.px,
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 4,
+                      child: TextBox(
+                        controller: departmentToAdd,
+                        placeholder: 'writedepartment'.tr(),
+                        style: appTheme.writingStyle,
+                        placeholderStyle: placeStyle,
+                        cursorColor: appTheme.color.darker,
+                        decoration: BoxDecoration(
+                          color: appTheme.fillColor,
+                        ),
+                        onChanged: (s) {
+                          setState(() {});
+                        },
+                        onSubmitted: (s) {
+                          if (s.isNotEmpty) {
+                            departments.add(s.trim());
+                            setState(() {
+                              departmentToAdd.clear();
+                            });
+                          }
+                          checkChanges();
+                        },
+                      ),
+                    ),
+                    smallSpace,
+                    FilledButton(
+                        onPressed: departmentToAdd.text.trim().isEmpty
+                            ? null
+                            : () {
+                          if (departmentToAdd.text.trim().isNotEmpty) {
+                            departments.add(departmentToAdd.text.trim());
+                            setState(() {
+                              departmentToAdd.clear();
+                            });
+                          }
+                          checkChanges();
+                        },
+                        child: const Text('add').tr())
+                  ],
+                ),
+              ),
+              smallSpace,
+              ListView.builder(
+                itemCount: departments.isEmpty?1:departments.length,
+                shrinkWrap: true,
+                itemBuilder: (BuildContext context, int index) {
+                  if(departments.isEmpty){
+                    return Center(
+                        child: SizedBox(
+                          height: 20.px,
+                          child: Text('departmentempty',
+                              style:TextStyle(color:Colors.grey[100],
+                                  fontStyle: FontStyle.italic))
+                              .tr(),
+                        )
+                    );
+                  }
+                  return SizedBox(
+                    height: tilesHeight,
+                    child: ListTile(
+                      tileColor:
+                      ButtonState.all<Color>(appTheme.fillColor),
+                      title: Text(
+                        directions[index],
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(FluentIcons.cancel),
+                        onPressed: () {
+                          setState(() {
+                            departments.removeAt(index);
+                          });
+                        },
+                      ),
+                    ),
+                  );
+                },
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
   void upload() async {
     if (nom.value.text.isEmpty || adresse.text.isEmpty) {
       showMessage('nomadresreq', 'erreur');
@@ -871,6 +975,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
       logo: logoid,
       filiales: filliales,
       directions: directions,
+      departments: departments,
       description: descr.text,
       search: '${nom.text} ${nif.text} ${nis.text} ${rc.text} ${email.text} '
           '${telephone.text} ${adresse.text} ${descr.text} 1 $logoid ${art.text}',

@@ -25,6 +25,8 @@ class Conducteur extends ParcOtoDefault {
   int? etat;
   String? filliale;
   String? direction;
+
+  String? departement;
   List<String>? vehicules=[];
 
   String matricule;
@@ -46,6 +48,7 @@ class Conducteur extends ParcOtoDefault {
       this.email,
         this.search,
       this.dateNaissance,
+        this.departement,
       this.telephone}){
       search='$name $prenom $direction $filliale ${ClientDatabase
           .getEtat(etat).tr()} $matricule $adresse $email ${dateNaissance?.toIso8601String()??''} $telephone';
