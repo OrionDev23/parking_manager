@@ -269,7 +269,7 @@ class _ImportVehiclesState extends State<ImportVehicles> {
 
             case TextCellValue():
               final value = cell!.value as TextCellValue;
-              if (value.value.toLowerCase().contains('matricul') &&
+              if (value.value.toLowerCase()=='immatriculation' &&
                   !foundMatric) {
                 columnToRead['mat'] = cell.columnIndex;
                 foundMatric = true;

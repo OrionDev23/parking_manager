@@ -6,15 +6,19 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../theme.dart';
 
 class BigTitleForm extends StatelessWidget {
+
+
   const BigTitleForm({
     super.key,
     required this.bigTitle,
     this.littleTitle,
+    this.trailing,
   });
 
   final String bigTitle;
   final String? littleTitle;
 
+  final Widget? trailing;
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
@@ -39,6 +43,10 @@ class BigTitleForm extends StatelessWidget {
             Text(
               littleTitle!,
             ).tr(),
+          if(trailing!=null)
+            const   Spacer(),
+          if(trailing!=null)
+            trailing!,
         ],
       ),
     );

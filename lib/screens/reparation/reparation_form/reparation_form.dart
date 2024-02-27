@@ -63,6 +63,9 @@ class ReparationFormState extends State<ReparationForm>
 
   TextEditingController remarqueEntretien = TextEditingController();
 
+  bool showEtat=true;
+  bool showEtretient=true;
+
   @override
   void initState() {
     if (widget.reparation != null) {
@@ -421,16 +424,41 @@ class ReparationFormState extends State<ReparationForm>
                 ),
                 buildTable(appTheme),
                 smallSpace,
-                const BigTitleForm(
+                BigTitleForm(
                   bigTitle: 'etatvehicule',
                   littleTitle: 'selectetat',
+                  trailing: Row(
+                    children: [
+                      const Text('Afficher état ?'),
+                      smallSpace,
+                      ToggleSwitch(checked: showEtat, onChanged: (s){
+                        setState(() {
+                          showEtat=s;
+                        });
+                      }),
+                    ],
+                  ),
                 ),
+                if(showEtat)
                 VehicleDamage(etatVehicle: etatVehicle),
+                if(showEtat)
                 smallSpace,
-                const BigTitleForm(
+                BigTitleForm(
                   bigTitle: 'entretienvehicule',
                   littleTitle: 'selectentretien',
+                  trailing: Row(
+                    children: [
+                      const Text('Afficher entretien ?'),
+                      smallSpace,
+                      ToggleSwitch(checked: showEtretient, onChanged: (s){
+                        setState(() {
+                          showEtretient=s;
+                        });
+                      }),
+                    ],
+                  ),
                 ),
+                if(showEtretient)
                 Container(
                   height: 170.px,
                   padding: const EdgeInsets.all(5),
