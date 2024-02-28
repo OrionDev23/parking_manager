@@ -429,7 +429,7 @@ class ReparationFormState extends State<ReparationForm>
                   littleTitle: 'selectetat',
                   trailing: Row(
                     children: [
-                      const Text('Afficher état ?'),
+                      const Text('afficherquestion').tr(),
                       smallSpace,
                       ToggleSwitch(checked: showEtat, onChanged: (s){
                         setState(() {
@@ -448,7 +448,7 @@ class ReparationFormState extends State<ReparationForm>
                   littleTitle: 'selectentretien',
                   trailing: Row(
                     children: [
-                      const Text('Afficher entretien ?'),
+                      const Text('afficherquestion').tr(),
                       smallSpace,
                       ToggleSwitch(checked: showEtretient, onChanged: (s){
                         setState(() {
@@ -1029,8 +1029,8 @@ class ReparationFormState extends State<ReparationForm>
       marque: marque.text,
       couleur: couleur.text,
       designations: designations.map((e) => e.designation).toList(),
-      entretien: entretienVehicle,
-      etatActuel: etatVehicle,
+      entretien: showEtretient?entretienVehicle:null,
+      etatActuel: showEtat?etatVehicle:null,
       gaz: carburant.ceil(),
       kilometrage: int.tryParse(km.text),
       modele: type.text,
@@ -1068,8 +1068,8 @@ class ReparationFormState extends State<ReparationForm>
       anneeUtil: anneeUtil.year,
       couleur: couleur.text,
       designations: designations.map((e) => e.designation).toList(),
-      entretien: entretienVehicle,
-      etatActuel: etatVehicle,
+      entretien: showEtretient?entretienVehicle:null,
+      etatActuel: showEtat?etatVehicle:null,
       gaz: carburant.ceil(),
       kilometrage: int.tryParse(km.text),
       modele: type.text,

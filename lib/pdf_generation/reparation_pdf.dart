@@ -22,6 +22,13 @@ class ReparationPdf {
   PdfUtilities pdfUtilities = PdfUtilities();
 
   Future<Uint8List> getDocument() async {
+
+    if(etatEmpty()){
+      nbrPageOne+=16;
+    }
+    if(entretienEmpty()){
+      nbrPageOne+=6;
+    }
     await Future.wait([
       pdfUtilities.initPrestataire(reparation),
       PDFTheming().initFontsAndLogos()
@@ -73,6 +80,43 @@ class ReparationPdf {
 
     return doc.save();
   }
+  bool entretienEmpty(){
+    if(reparation.entretien==null){
+      return true;
+    }
+    else{
+      List values=reparation.entretien!.toJson().values.toList();
+      for(int i=0;i<values.length;i++){
+        if(values[i]==true){
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+  bool etatEmpty(){
+    if(reparation.etatActuel!=null){
+      return true;
+    }
+    else{
+      bool result=true;
+      reparation.etatActuel!.toJson().forEach((key, value) {
+        if(key=='avdp' || key=='avgp' || key=='ardp' || key=='argp'){
+          if(value!=100){
+           result=false;
+           return;
+          }
+        }
+        else{
+          if(value==true){
+            result=false;
+            return;
+          }
+        }
+      });
+    return result;
+    }
+  }
 
   Widget getPageContent(int page, int nbrPages, int lastIndex) {
     return Column(
@@ -85,10 +129,10 @@ class ReparationPdf {
           if (page == 0) bigSpace,
           if (page == 0) getVehicleInfo(),
           if (page == 0) bigSpace,
-          if (page == 0) VehicleDamagePDF(reparation).vehicleDamage(),
-          if (page == 0) bigSpace,
-          if (page == 0) VehicleEntretienPDF(reparation).vehicleEntretien(),
-          if (page == 0) bigSpace,
+          if (page == 0 && !etatEmpty()) VehicleDamagePDF(reparation).vehicleDamage(),
+          if (page == 0&& !etatEmpty()) bigSpace,
+          if (page == 0&& !entretienEmpty()) VehicleEntretienPDF(reparation).vehicleEntretien(),
+          if (page == 0&& !entretienEmpty()) bigSpace,
           getDesignations(page, nbrPages, lastIndex),
           if (page == nbrPages - 1) getPrixInLetter(),
           if (page == nbrPages - 1) bigSpace,
@@ -198,7 +242,11 @@ class ReparationPdf {
       ),
       child: Row(children: [
         SizedBox(
-          width: PdfPageFormat.cm * 11.22,
+          width: PdfPageFormat.cm * 1.3,
+          child: Text('N°', style: smallTextBold,),
+        ),
+        SizedBox(
+          width: PdfPageFormat.cm * 10.22,
           child: Text('Observations', style: smallTextBold),
         ),
         SizedBox(
@@ -295,8 +343,16 @@ class ReparationPdf {
                       index == reparation.designations!.length - 1)
               ? []
               : [
+            SizedBox(
+              width: PdfPageFormat.cm * 1.2,
+              child: Text(
+                  numberFormat2
+                      .format(index),
+                  style: smallText,
+                  textAlign: TextAlign.start),
+            ),
                   SizedBox(
-                    width: PdfPageFormat.cm * 11,
+                    width: PdfPageFormat.cm * 10,
                     child: Text(reparation.designations![index].designation,
                         style: smallText),
                   ),

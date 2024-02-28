@@ -440,6 +440,7 @@
   "addnewfiliale": "إضافة فرع جديد",
   "addnewdepartment": "إضافة قسم جديد",
   "nomrequired": "الاسم مطلوب",
-  "confirmsuppr": "تأكيد الحذف ؟"
+  "confirmsuppr": "تأكيد الحذف ؟",
+  "afficherquestion": "عرض ؟"
 
 }

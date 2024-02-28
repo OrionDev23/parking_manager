@@ -442,6 +442,8 @@
   "addnewdepartment": "Add a new department",
   "nomrequired": "A name is required",
   "confirmsuppr": "Confirm deletion ?",
-  "export": "Export"
+  "export": "Export",
+  "afficherquestion": "Show ?"
+
 
 }
