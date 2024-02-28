@@ -26,6 +26,9 @@ Entreprise _$EntrepriseFromJson(Map<String, dynamic> json) => Entreprise(
       filiales: (json['filiales'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
+      departments: (json['departments'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
       logo: json['logo'] as String?,
     );
 
@@ -44,4 +47,5 @@ Map<String, dynamic> _$EntrepriseToJson(Entreprise instance) =>
       'logo': instance.logo,
       'filiales': instance.filiales,
       'directions': instance.directions,
+      'departments': instance.departments,
     };

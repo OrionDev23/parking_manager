@@ -22,12 +22,11 @@ class ReparationPdf {
   PdfUtilities pdfUtilities = PdfUtilities();
 
   Future<Uint8List> getDocument() async {
-
-    if(etatEmpty()){
-      nbrPageOne+=16;
+    if (etatEmpty()) {
+      nbrPageOne += 12;
     }
-    if(entretienEmpty()){
-      nbrPageOne+=6;
+    if (entretienEmpty()) {
+      nbrPageOne += 9;
     }
     await Future.wait([
       pdfUtilities.initPrestataire(reparation),
@@ -80,41 +79,40 @@ class ReparationPdf {
 
     return doc.save();
   }
-  bool entretienEmpty(){
-    if(reparation.entretien==null){
+
+  bool entretienEmpty() {
+    if (reparation.entretien == null) {
       return true;
-    }
-    else{
-      List values=reparation.entretien!.toJson().values.toList();
-      for(int i=0;i<values.length;i++){
-        if(values[i]==true){
+    } else {
+      List values = reparation.entretien!.toJson().values.toList();
+      for (int i = 0; i < values.length; i++) {
+        if (values[i] == true) {
           return false;
         }
       }
       return true;
     }
   }
-  bool etatEmpty(){
-    if(reparation.etatActuel!=null){
+
+  bool etatEmpty() {
+    if (reparation.etatActuel == null) {
       return true;
-    }
-    else{
-      bool result=true;
+    } else {
+      bool result = true;
       reparation.etatActuel!.toJson().forEach((key, value) {
-        if(key=='avdp' || key=='avgp' || key=='ardp' || key=='argp'){
-          if(value!=100){
-           result=false;
-           return;
+        if (key == 'avdp' || key == 'avgp' || key == 'ardp' || key == 'argp') {
+          if (value != 100) {
+            result = false;
+            return;
           }
-        }
-        else{
-          if(value==true){
-            result=false;
+        } else {
+          if (value == true) {
+            result = false;
             return;
           }
         }
       });
-    return result;
+      return result;
     }
   }
 
@@ -129,10 +127,12 @@ class ReparationPdf {
           if (page == 0) bigSpace,
           if (page == 0) getVehicleInfo(),
           if (page == 0) bigSpace,
-          if (page == 0 && !etatEmpty()) VehicleDamagePDF(reparation).vehicleDamage(),
-          if (page == 0&& !etatEmpty()) bigSpace,
-          if (page == 0&& !entretienEmpty()) VehicleEntretienPDF(reparation).vehicleEntretien(),
-          if (page == 0&& !entretienEmpty()) bigSpace,
+          if (page == 0 && !etatEmpty())
+            VehicleDamagePDF(reparation).vehicleDamage(),
+          if (page == 0 && !etatEmpty()) bigSpace,
+          if (page == 0 && !entretienEmpty())
+            VehicleEntretienPDF(reparation).vehicleEntretien(),
+          if (page == 0 && !entretienEmpty()) bigSpace,
           getDesignations(page, nbrPages, lastIndex),
           if (page == nbrPages - 1) getPrixInLetter(),
           if (page == nbrPages - 1) bigSpace,
@@ -238,16 +238,19 @@ class ReparationPdf {
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
         color: orange,
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(5)),
       ),
       child: Row(children: [
         SizedBox(
-          width: PdfPageFormat.cm * 1.3,
-          child: Text('N°', style: smallTextBold,),
+          width: PdfPageFormat.cm * 1,
+          child: Text(
+            '  N°',
+            style: smallTextBold,
+          ),
         ),
         SizedBox(
           width: PdfPageFormat.cm * 10.22,
-          child: Text('Observations', style: smallTextBold),
+          child: Text('    Observations', style: smallTextBold),
         ),
         SizedBox(
           width: PdfPageFormat.cm * 1,
@@ -343,14 +346,11 @@ class ReparationPdf {
                       index == reparation.designations!.length - 1)
               ? []
               : [
-            SizedBox(
-              width: PdfPageFormat.cm * 1.2,
-              child: Text(
-                  numberFormat2
-                      .format(index),
-                  style: smallText,
-                  textAlign: TextAlign.start),
-            ),
+                  SizedBox(
+                    width: PdfPageFormat.cm * 1,
+                    child: Text(numberFormat2.format(index + 1),
+                        style: smallText, textAlign: TextAlign.start),
+                  ),
                   SizedBox(
                     width: PdfPageFormat.cm * 10,
                     child: Text(reparation.designations![index].designation,
@@ -661,268 +661,384 @@ class ReparationPdf {
     double height = PdfPageFormat.cm * 0.6;
     double bottom = 4;
     double bottomFill = 3;
-    return Table(
-        columnWidths: {
-          0: const FlexColumnWidth(2),
-          1: const FixedColumnWidth(4 * PdfPageFormat.cm),
-          2: const FlexColumnWidth(3),
-          3: const FlexColumnWidth(3),
-        },
-        border: TableBorder.all(),
+    return
+      Column(
         children: [
-          TableRow(children: [
-            Padding(
-                padding: const EdgeInsets.all(5),
-                child: Row(children: [
-                  Text('Marque', style: smallTextBold),
-                  SizedBox(
-                    width: width,
-                    height: height,
-                    child: Stack(children: [
-                      Positioned.fill(
-                          bottom: bottomFill,
-                          left: 0,
-                          right: 5,
-                          child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                dotsSpacer(),
-                              ])),
-                      Positioned(
-                        bottom: 5,
-                        left: 5,
-                        right: 5,
-                        child: Text(reparation.marque ?? '', style: smallText),
-                      ),
-                    ]),
-                  ),
-                ])),
-            Padding(
-                padding: const EdgeInsets.all(5),
-                child: Row(children: [
-                  Text('Modele', style: smallTextBold),
-                  SizedBox(
-                    width: width,
-                    height: height,
-                    child: Stack(children: [
-                      Positioned.fill(
-                          bottom: bottomFill,
-                          left: 0,
-                          right: 5,
-                          child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                dotsSpacer(),
-                              ])),
-                      Positioned(
-                        bottom: bottom,
-                        left: 5,
-                        right: 5,
-                        child: Text(reparation.modele ?? '', style: smallText),
-                      ),
-                    ]),
-                  ),
-                ])),
-            Padding(
-                padding: const EdgeInsets.all(5),
-                child: Row(children: [
-                  Text('Immatriculation', style: smallTextBold),
-                  SizedBox(
-                    width: width,
-                    height: height,
-                    child: Stack(children: [
-                      Positioned.fill(
-                          bottom: bottomFill,
-                          left: 0,
-                          right: 5,
-                          child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                dotsSpacer(),
-                              ])),
-                      Positioned(
-                        bottom: bottom,
-                        left: 5,
-                        right: 5,
-                        child: Text(reparation.vehiculemat ?? '',
-                            style: smallText),
-                      ),
-                    ]),
-                  ),
-                ])),
-            Padding(
-                padding: const EdgeInsets.all(5),
-                child: Row(children: [
-                  Text('N° Chassis', style: smallTextBold),
-                  SizedBox(
-                    width: width,
-                    height: height,
-                    child: Stack(children: [
-                      Positioned.fill(
-                          bottom: bottomFill,
-                          left: 0,
-                          right: 5,
-                          child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                dotsSpacer(),
-                              ])),
-                      Positioned(
-                        bottom: bottom,
-                        left: 5,
-                        right: 5,
-                        child: Text(reparation.nchassi ?? '', style: smallText),
-                      ),
-                    ]),
-                  ),
-                ])),
-          ]),
-          TableRow(children: [
-            Padding(
-                padding: const EdgeInsets.all(5),
-                child: Row(children: [
-                  Text('Couleur', style: smallTextBold),
-                  SizedBox(
-                    width: width,
-                    height: height,
-                    child: Stack(children: [
-                      Positioned.fill(
-                          bottom: bottomFill,
-                          left: 0,
-                          right: 5,
-                          child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                dotsSpacer(),
-                              ])),
-                      Positioned(
-                        bottom: bottom,
-                        left: 5,
-                        right: 5,
-                        child: Text(reparation.couleur ?? '', style: smallText),
-                      ),
-                    ]),
-                  ),
-                ])),
-            Padding(
-                padding: const EdgeInsets.all(5),
-                child: Row(children: [
-                  Text('Killometrage', style: smallTextBold),
-                  SizedBox(
-                    width: width,
-                    height: height,
-                    child: Stack(children: [
-                      Positioned.fill(
-                          bottom: bottomFill,
-                          left: 0,
-                          right: 5,
-                          child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                dotsSpacer(),
-                              ])),
-                      Positioned(
-                        bottom: bottom,
-                        left: 5,
-                        right: 5,
-                        child: Text(reparation.kilometrage?.toString() ?? '',
-                            style: smallText),
-                      ),
-                    ]),
-                  ),
-                ])),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Padding(
-                  padding: const EdgeInsets.fromLTRB(5, 5, 2.5, 5),
-                  child: Row(children: [
-                    Text('Année', style: smallTextBold),
-                    SizedBox(
-                      width: width / 3,
-                      height: height,
-                      child: Stack(children: [
-                        Positioned.fill(
-                            bottom: bottomFill,
-                            left: 0,
-                            right: 2.5,
-                            child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  dotsSpacer(),
-                                ])),
-                        Positioned(
-                          bottom: bottom,
-                          left: 5,
-                          right: 5,
-                          child: Text(reparation.anneeUtil?.toString() ?? '',
-                              style: smallText),
-                        ),
-                      ]),
-                    ),
-                  ])),
-              SizedBox(
-                height: height + 10,
-                child: VerticalDivider(
-                    width: 1,
-                    indent: 0,
-                    endIndent: 0,
-                    borderStyle: BorderStyle.solid),
+          Table(
+              columnWidths: {
+                0: const FlexColumnWidth(3),
+                1: const FlexColumnWidth(3),
+                2: const FlexColumnWidth(5),
+                3: const FlexColumnWidth(5),
+              },
+              border: const TableBorder(
+                verticalInside: BorderSide(),
               ),
-              Padding(
-                  padding: const EdgeInsets.fromLTRB(5, 5, 2.5, 5),
-                  child: Row(children: [
-                    Text('Carburant', style: smallTextBold),
-                    SizedBox(
-                      width: width,
-                      height: height,
-                      child: Stack(children: [
-                        Positioned.fill(
-                            bottom: bottomFill,
-                            left: 0,
-                            right: 2.5,
-                            child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  dotsSpacer(),
-                                ])),
-                        Positioned(
-                          bottom: bottom,
-                          left: 5,
-                          right: 5,
-                          child: Text('${reparation.gaz?.toString() ?? '4'}/8',
-                              style: smallText),
-                        ),
-                      ]),
+              children: [
+                TableRow(
+                    decoration: BoxDecoration(
+                      border: Border.all(),
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(5)),
                     ),
-                  ])),
-            ]),
-            Padding(
-                padding: const EdgeInsets.all(5),
-                child: Row(children: [
-                  Text('N° Moteur', style: smallTextBold),
-                  SizedBox(
-                    width: width,
-                    height: height,
-                    child: Stack(children: [
-                      Positioned.fill(
-                          bottom: bottomFill,
-                          left: 0,
-                          right: 5,
-                          child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                dotsSpacer(),
-                              ])),
-                      Positioned(
-                        bottom: 5,
-                        left: 5,
-                        right: 5,
-                        child: Text(reparation.nmoteur ?? '', style: smallText),
-                      ),
+                    children: [
+                      Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(children: [
+                            Text('Marque', style: smallTextBold),
+                            SizedBox(
+                              width: width,
+                              height: height,
+                              child: Stack(children: [
+                                Positioned.fill(
+                                    bottom: bottomFill,
+                                    left: 0,
+                                    right: 5,
+                                    child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          dotsSpacer(),
+                                        ])),
+                                Positioned(
+                                  bottom: 5,
+                                  left: 5,
+                                  right: 5,
+                                  child: Text(reparation.marque ?? '', style: smallText),
+                                ),
+                              ]),
+                            ),
+                          ])),
+                      Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(children: [
+                            Text('Modele', style: smallTextBold),
+                            SizedBox(
+                              width: width,
+                              height: height,
+                              child: Stack(children: [
+                                Positioned.fill(
+                                    bottom: bottomFill,
+                                    left: 0,
+                                    right: 5,
+                                    child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          dotsSpacer(),
+                                        ])),
+                                Positioned(
+                                  bottom: bottom,
+                                  left: 5,
+                                  right: 5,
+                                  child: Text(reparation.modele ?? '', style: smallText),
+                                ),
+                              ]),
+                            ),
+                          ])),
+                      Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(children: [
+                            Text('Immatriculation', style: smallTextBold),
+                            SizedBox(
+                              width: width,
+                              height: height,
+                              child: Stack(children: [
+                                Positioned.fill(
+                                    bottom: bottomFill,
+                                    left: 0,
+                                    right: 5,
+                                    child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          dotsSpacer(),
+                                        ])),
+                                Positioned(
+                                  bottom: bottom,
+                                  left: 5,
+                                  right: 5,
+                                  child: Text(reparation.vehiculemat ?? '',
+                                      style: smallText),
+                                ),
+                              ]),
+                            ),
+                          ])),
+                      Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(children: [
+                            Text('N° Chassis', style: smallTextBold),
+                            SizedBox(
+                              width: width,
+                              height: height,
+                              child: Stack(children: [
+                                Positioned.fill(
+                                    bottom: bottomFill,
+                                    left: 0,
+                                    right: 5,
+                                    child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          dotsSpacer(),
+                                        ])),
+                                Positioned(
+                                  bottom: bottom,
+                                  left: 5,
+                                  right: 5,
+                                  child: Text(reparation.nchassi ?? '', style: smallText),
+                                ),
+                              ]),
+                            ),
+                          ])),
                     ]),
-                  ),
-                ])),
-          ]),
-        ]);
+                TableRow(
+                    decoration: BoxDecoration(
+                      border: Border.all(),
+                    ),
+                    children: [
+                      Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(children: [
+                            Text('Couleur', style: smallTextBold),
+                            SizedBox(
+                              width: width,
+                              height: height,
+                              child: Stack(children: [
+                                Positioned.fill(
+                                    bottom: bottomFill,
+                                    left: 0,
+                                    right: 5,
+                                    child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          dotsSpacer(),
+                                        ])),
+                                Positioned(
+                                  bottom: bottom,
+                                  left: 5,
+                                  right: 5,
+                                  child: Text(reparation.couleur ?? '', style: smallText),
+                                ),
+                              ]),
+                            ),
+                          ])),
+                      Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(children: [
+                            Text('Killometrage', style: smallTextBold),
+                            SizedBox(
+                              width: width,
+                              height: height,
+                              child: Stack(children: [
+                                Positioned.fill(
+                                    bottom: bottomFill,
+                                    left: 0,
+                                    right: 5,
+                                    child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          dotsSpacer(),
+                                        ])),
+                                Positioned(
+                                  bottom: bottom,
+                                  left: 5,
+                                  right: 5,
+                                  child: Text(reparation.kilometrage?.toString() ?? '',
+                                      style: smallText),
+                                ),
+                              ]),
+                            ),
+                          ])),
+                      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        Padding(
+                            padding: const EdgeInsets.fromLTRB(5, 5, 2.5, 5),
+                            child: Row(children: [
+                              Text('Année', style: smallTextBold),
+                              SizedBox(
+                                width: width / 3,
+                                height: height,
+                                child: Stack(children: [
+                                  Positioned.fill(
+                                      bottom: bottomFill,
+                                      left: 0,
+                                      right: 2.5,
+                                      child: Row(
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            dotsSpacer(),
+                                          ])),
+                                  Positioned(
+                                    bottom: bottom,
+                                    left: 5,
+                                    right: 5,
+                                    child: Text(reparation.anneeUtil?.toString() ?? '',
+                                        style: smallText),
+                                  ),
+                                ]),
+                              ),
+                            ])),
+                        SizedBox(
+                          height: height + 10,
+                          child: VerticalDivider(
+                              width: 1,
+                              indent: 0,
+                              endIndent: 0,
+                              borderStyle: BorderStyle.solid),
+                        ),
+                        Padding(
+                            padding: const EdgeInsets.fromLTRB(5, 5, 2.5, 5),
+                            child: Row(children: [
+                              Text('Carburant', style: smallTextBold),
+                              SizedBox(
+                                width: width,
+                                height: height,
+                                child: Stack(children: [
+                                  Positioned.fill(
+                                      bottom: bottomFill,
+                                      left: 0,
+                                      right: 2.5,
+                                      child: Row(
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            dotsSpacer(),
+                                          ])),
+                                  Positioned(
+                                    bottom: bottom,
+                                    left: 5,
+                                    right: 5,
+                                    child: Text('${reparation.gaz?.toString() ?? '4'}/8',
+                                        style: smallText),
+                                  ),
+                                ]),
+                              ),
+                            ])),
+                      ]),
+                      Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(children: [
+                            Text('N° Moteur', style: smallTextBold),
+                            SizedBox(
+                              width: width,
+                              height: height,
+                              child: Stack(children: [
+                                Positioned.fill(
+                                    bottom: bottomFill,
+                                    left: 0,
+                                    right: 5,
+                                    child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          dotsSpacer(),
+                                        ])),
+                                Positioned(
+                                  bottom: 5,
+                                  left: 5,
+                                  right: 5,
+                                  child: Text(reparation.nmoteur ?? '', style: smallText),
+                                ),
+                              ]),
+                            ),
+                          ])),
+                    ]),
+              ]),
+          Table(
+              columnWidths: {
+                0: const FlexColumnWidth(6),
+                1: const FlexColumnWidth(5),
+                2: const FlexColumnWidth(5),
+              },
+              border: const TableBorder(
+                verticalInside: BorderSide(),
+              ),
+              children: [
+                TableRow(
+                    decoration: BoxDecoration(
+                      borderRadius:
+                      const BorderRadius.vertical(bottom: Radius.circular(5)),
+                      border: Border.all(),
+                    ),
+                    children: [
+                      Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(children: [
+                            Text('Mat. conducteur', style: smallTextBold),
+                            SizedBox(
+                              width: width*1.5,
+                              height: height,
+                              child: Stack(children: [
+                                Positioned.fill(
+                                    bottom: bottomFill,
+                                    left: 0,
+                                    right: 5,
+                                    child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          dotsSpacer(),
+                                        ])),
+                                Positioned(
+                                  bottom: bottom,
+                                  left: 5,
+                                  right: 5,
+                                  child: Text(reparation.matriculeConducteur ?? '',
+                                      style: smallText),
+                                ),
+                              ]),
+                            ),
+                          ])),
+                      Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(children: [
+                            Text('Nom', style: smallTextBold),
+                            SizedBox(
+                              width: width*1.5,
+                              height: height,
+                              child: Stack(children: [
+                                Positioned.fill(
+                                    bottom: bottomFill,
+                                    left: 0,
+                                    right: 5,
+                                    child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          dotsSpacer(),
+                                        ])),
+                                Positioned(
+                                  bottom: bottom,
+                                  left: 5,
+                                  right: 5,
+                                  child: Text(reparation.nomConducteur ?? '',
+                                      style: smallText),
+                                ),
+                              ]),
+                            ),
+                          ])),
+                      Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Row(children: [
+                            Text('Prénom', style: smallTextBold),
+                            SizedBox(
+                              width: width*1.5,
+                              height: height,
+                              child: Stack(children: [
+                                Positioned.fill(
+                                    bottom: bottomFill,
+                                    left: 0,
+                                    right: 5,
+                                    child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          dotsSpacer(),
+                                        ])),
+                                Positioned(
+                                  bottom: bottom,
+                                  left: 5,
+                                  right: 5,
+                                  child: Text(reparation.prenomConducteur ?? '',
+                                      style: smallText),
+                                ),
+                              ]),
+                            ),
+                          ])),
+                    ]),
+              ]),
+        ]
+      );
   }
 
   Widget brandingAndPaging(int page, int nbrPages) {

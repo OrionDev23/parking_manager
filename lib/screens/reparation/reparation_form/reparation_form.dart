@@ -57,6 +57,9 @@ class ReparationFormState extends State<ReparationForm>
 
   TextEditingController nchassi = TextEditingController();
   TextEditingController nmoteur = TextEditingController();
+  TextEditingController matriculeConducteur=TextEditingController();
+  TextEditingController nom=TextEditingController();
+  TextEditingController prenom=TextEditingController();
   DateTime anneeUtil = DateTime.now();
 
   double carburant = 4;
@@ -94,6 +97,9 @@ class ReparationFormState extends State<ReparationForm>
       km.text = widget.reparation!.kilometrage?.toString() ?? '0';
       carburant = widget.reparation!.gaz?.toDouble() ?? 4;
       selectedDate = widget.reparation!.date;
+      matriculeConducteur.text=widget.reparation!.matriculeConducteur??'';
+      nom.text=widget.reparation!.nomConducteur??'';
+      prenom.text=widget.reparation!.prenomConducteur??'';
       anneeUtil = DateTime(widget.reparation!.anneeUtil ??
           selectedVehicle?.anneeUtil ??
           DateTime.now().year);
@@ -222,6 +228,9 @@ class ReparationFormState extends State<ReparationForm>
       nchassi.text = selectedVehicle!.numeroSerie ?? '';
       matricule.text = selectedVehicle!.matricule;
       anneeUtil = DateTime(selectedVehicle!.anneeUtil ?? 2023);
+      nom.text=selectedVehicle!.nom??'';
+      prenom.text=selectedVehicle!.prenom??'';
+      matriculeConducteur.text=selectedVehicle!.matriculeConducteur??'';
     }
     setState(() {});
   }
@@ -460,16 +469,19 @@ class ReparationFormState extends State<ReparationForm>
                 ),
                 if(showEtretient)
                 Container(
-                  height: 170.px,
+                  height: 260.px,
                   padding: const EdgeInsets.all(5),
                   decoration: BoxDecoration(
                     border: Border.all(),
                   ),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       EntretienWidget(entretienVehicle: entretienVehicle),
                       bigSpace,
-                      Flexible(
+                      SizedBox(
+                        height: 180.px,
+                        width: 400.px,
                         child: ZoneBox(
                           label: 'remarqueplus'.tr(),
                           child: Padding(
@@ -851,12 +863,103 @@ class ReparationFormState extends State<ReparationForm>
           TableCell(
               verticalAlignment: TableCellVerticalAlignment.top,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: 16.px,
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Row(
+                      children: [
+                        Text(
+                          'matriculeemploye',
+                          style: littleStyle,
+                        ).tr(),
+                        const Spacer(),
+                        SizedBox(
+                          width: 160.px,
+                          child: TextBox(
+                            controller: matriculeConducteur,
+                            placeholder: 'matriculeemploye'.tr(),
+                            style: appTheme.writingStyle,
+                            decoration: BoxDecoration(
+                              color: appTheme.fillColor,
+                            ),
+                            cursorColor: appTheme.color.darker,
+                            placeholderStyle: placeStyle,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  Container(
+                    height: 1.px,
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Row(
+                      children: [
+                        Text(
+                          'nom',
+                          style: littleStyle,
+                        ).tr(),
+                        const Spacer(),
+                        SizedBox(
+                          width: 160.px,
+                          child: TextBox(
+                            controller: nom,
+                            placeholder: 'nom'.tr(),
+                            style: appTheme.writingStyle,
+                            decoration: BoxDecoration(
+                              color: appTheme.fillColor,
+                            ),
+                            cursorColor: appTheme.color.darker,
+                            placeholderStyle: placeStyle,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    height: 1.px,
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Row(
+                      children: [
+                        Text(
+                          'prenom',
+                          style: littleStyle,
+                        ).tr(),
+                        const Spacer(),
+                        SizedBox(
+                          width: 160.px,
+                          child: TextBox(
+                            controller: prenom,
+                            placeholder: 'prenom'.tr(),
+                            style: appTheme.writingStyle,
+                            decoration: BoxDecoration(
+                              color: appTheme.fillColor,
+                            ),
+                            cursorColor: appTheme.color.darker,
+                            placeholderStyle: placeStyle,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                 ],
               )),
+
         ]),
       ],
     );
@@ -1041,6 +1144,9 @@ class ReparationFormState extends State<ReparationForm>
       vehicule: selectedVehicle?.id,
       vehiculemat: selectedVehicle?.matricule,
       remarque: remarqueEntretien.text,
+      matriculeConducteur: matriculeConducteur.text,
+      nomConducteur: nom.text,
+      prenomConducteur: prenom.text
     );
 
     showDialog(
@@ -1080,6 +1186,9 @@ class ReparationFormState extends State<ReparationForm>
       vehicule: selectedVehicle?.id,
       vehiculemat: selectedVehicle?.matricule,
       remarque: remarqueEntretien.text,
+        matriculeConducteur: matriculeConducteur.text,
+        nomConducteur: nom.text,
+        prenomConducteur: prenom.text
     );
 
     if (!modif) {

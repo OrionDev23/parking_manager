@@ -22,7 +22,7 @@ class VehicleEntretienPDF {
 
     return Container(
       width: 20 * PdfPageFormat.cm,
-      height: 2.7 * PdfPageFormat.cm,
+      height: 3.9 * PdfPageFormat.cm,
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
@@ -35,57 +35,29 @@ class VehicleEntretienPDF {
             Text('Entretien du vehicule', style: kindaBigTextBold),
             SizedBox(
                 width: 20 * PdfPageFormat.cm,
-                height: 1.8 * PdfPageFormat.cm,
+                height: 2.9 * PdfPageFormat.cm,
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Container(
+                      ...List.generate(4, (index) => Container(
                         padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                        ),
+
                         child: Column(
                           children:
-                              entretiens.getRange(0, 4).toList(growable: false),
+                          entretiens.getRange(index*7, (index+1)*7<entretiens
+                              .length+1?(index+1)*7:entretiens.length)
+                              .toList
+                            (growable:
+                          false),
                         ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                        ),
-                        child: Column(
-                          children:
-                              entretiens.getRange(4, 8).toList(growable: false),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                        ),
-                        child: Column(
-                          children: entretiens
-                              .getRange(8, 12)
-                              .toList(growable: false),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                        ),
-                        child: Column(
-                          children: entretiens
-                              .getRange(12, 16)
-                              .toList(growable: false),
-                        ),
-                      ),
+                      ),),
                       bigSpace,
                       bigSpace,
                     ])),
           ]),
     );
   }
+  
+  
 }

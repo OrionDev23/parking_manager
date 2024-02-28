@@ -39,6 +39,10 @@ class Reparation extends ParcOtoDefault {
 
   String? marque;
 
+  String? nomConducteur;
+  String? prenomConducteur;
+  String? matriculeConducteur;
+
   @JsonKey(toJson: designationsToJson, fromJson: designationsFromJson)
   List<Designation>? designations;
 
@@ -74,7 +78,12 @@ class Reparation extends ParcOtoDefault {
       this.type,
       this.vehicule,
       this.vehiculemat,
-      this.marque});
+      this.marque,
+        this.matriculeConducteur,
+        this.prenomConducteur,
+        this.nomConducteur
+
+      });
 
   factory Reparation.fromJson(Map<String, dynamic> json) =>
       _$ReparationFromJson(json);

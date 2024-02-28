@@ -384,8 +384,22 @@
  "entretienClimatiseur": "Entretien climatisation",
  "balaisEssuieGlace": "Balais essuie-glace",
  "eclairage": "Eclairage",
- "obd": "OBD",
+ "obd": "Diagnostic à bord",
  "bougies": "Bougies",
+
+  "cire": "Cire",
+  "liquideTransmission": "Liquide de transmission",
+  "inspectionAmortisseurs": "Amortisseurs",
+  "courroies" : "Courroies",
+  "tuyaux": "Tuyaux",
+  "echappement": "Échappement",
+  "differentielAvAr": "Différentiel AV/AR",
+  "batterie": "Batterie",
+  "changerPneux": "Changement de pneux",
+  "systemSuspension": "Système de suspension",
+  "systemFreinage": "Système de freinage",
+
+
  "supreuser": "Supprimer l'utilisateur",
  "supretat": "Supprimer l'état du vehicule",
  "role": "Role",
@@ -482,5 +496,6 @@
  "nomrequired": "Un nom doit être renseigné",
  "confirmsuppr": "Confirmer la suppression ?",
  "export": "Exporter",
- "afficherquestion": "Afficher ?"
+ "afficherquestion": "Afficher ?",
+ "matriculeemploye": "Mat. employé"
 }

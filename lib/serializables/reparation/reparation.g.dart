@@ -30,6 +30,9 @@ Reparation _$ReparationFromJson(Map<String, dynamic> json) => Reparation(
       vehicule: json['vehicule'] as String?,
       vehiculemat: json['vehiculemat'] as String?,
       marque: json['marque'] as String?,
+      matriculeConducteur: json['matriculeConducteur'] as String?,
+      prenomConducteur: json['prenomConducteur'] as String?,
+      nomConducteur: json['nomConducteur'] as String?,
     );
 
 Map<String, dynamic> _$ReparationToJson(Reparation instance) =>
@@ -49,6 +52,9 @@ Map<String, dynamic> _$ReparationToJson(Reparation instance) =>
       'couleur': instance.couleur,
       'remarque': instance.remarque,
       'marque': instance.marque,
+      'nomConducteur': instance.nomConducteur,
+      'prenomConducteur': instance.prenomConducteur,
+      'matriculeConducteur': instance.matriculeConducteur,
       'designations': designationsToJson(instance.designations),
       'etatActuel': etatVehiculeToJson(instance.etatActuel),
       'entretien': entretienToJson(instance.entretien),

@@ -57,6 +57,7 @@ class Vehicle extends ParcOtoDefault {
   String? appartenance;
 
   String? departement;
+  String? matriculeConducteur;
   bool lourd;
 
   int perimetre;
@@ -101,6 +102,7 @@ class Vehicle extends ParcOtoDefault {
     this.createdBy,
     this.etat,
     this.etatactuel = 0,
+    this.matriculeConducteur
   }) {
     search = '$matricule $wilaya $commune $anneeUtil '
         '$adresse $numero $nom $prenom $profession '

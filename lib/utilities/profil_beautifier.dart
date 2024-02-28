@@ -92,11 +92,12 @@ String? entretienToJson(EntretienVehicle? entretienVehicle) {
 }
 
 EtatVehicle? etatFromJson(String? json) {
-  return json == null ? null : EtatVehicle.fromJson(jsonDecode(json));
+  return json == null || json=='null'? null : EtatVehicle.fromJson(jsonDecode
+    (json));
 }
 
 EntretienVehicle? entretienFromJson(String? json) {
-  return json == null ? null : EntretienVehicle.fromJson(jsonDecode(json));
+  return json == null || json=='null'? null : EntretienVehicle.fromJson(jsonDecode(json));
 }
 
 List<Designation>? designationsFromJson(List<dynamic> json) {
