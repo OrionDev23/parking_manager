@@ -79,7 +79,11 @@ class VehicleTableState extends State<VehicleTable> {
     super.initState();
   }
 
-  int sortColumn = 4;
+  int sortColumn = 0;
+
+  double large=250.px;
+  double medium=150.px;
+  double small=80.px;
 
   void initColumns() {
     columns = [
@@ -87,14 +91,47 @@ class VehicleTableState extends State<VehicleTable> {
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Text(
-            'vehicule',
+            'N',
             style: tstyle,
           ).tr(),
         ),
-        size: ColumnSize.L,
+        fixedWidth: small,
         onSort: (s, c) {
           sortColumn = 0;
           assending = !assending;
+          vehicleDataSource.sort(7, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'matricule',
+            style: tstyle,
+          ).tr(),
+        ),
+        fixedWidth: medium,
+        onSort: (s, c) {
+          sortColumn = 1;
+          assending = !assending;
+          vehicleDataSource.sort(0, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'type',
+            style: tstyle,
+          ).tr(),
+        ),
+        fixedWidth: large,
+        onSort: (s, c) {
+          sortColumn = 2;
+          assending = !assending;
+
           vehicleDataSource.sort(1, assending);
           setState(() {});
         },
@@ -108,9 +145,9 @@ class VehicleTableState extends State<VehicleTable> {
             style: tstyle,
           ).tr(),
         ),
-        size: ColumnSize.S,
+        fixedWidth: small,
         onSort: (s, c) {
-          sortColumn = 1;
+          sortColumn = 3;
           assending = !assending;
 
           vehicleDataSource.sort(3, assending);
@@ -126,9 +163,9 @@ class VehicleTableState extends State<VehicleTable> {
             style: tstyle,
           ).tr(),
         ),
-        size: ColumnSize.S,
+        fixedWidth: small,
         onSort: (s, c) {
-          sortColumn = 2;
+          sortColumn = 4;
           assending = !assending;
 
           vehicleDataSource.sort(5, assending);
@@ -140,16 +177,106 @@ class VehicleTableState extends State<VehicleTable> {
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Text(
-            'appartenance',
+            'appartenancevehiculesingle',
             style: tstyle,
           ).tr(),
         ),
-        size: ColumnSize.M,
+        fixedWidth: medium,
         onSort: (s, c) {
-          sortColumn = 3;
+          sortColumn = 5;
           assending = !assending;
 
           vehicleDataSource.sort(6, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        numeric: true,
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'direction',
+            style: tstyle,
+          ).tr(),
+        ),
+        fixedWidth: large,
+        onSort: (s, c) {
+          sortColumn = 6;
+          assending = !assending;
+
+          vehicleDataSource.sort(8, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        numeric: true,
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'matriculeemploye',
+            style: tstyle,
+          ).tr(),
+        ),
+        fixedWidth: medium,
+        onSort: (s, c) {
+          sortColumn = 7;
+          assending = !assending;
+
+          vehicleDataSource.sort(9, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        numeric: true,
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'nom',
+            style: tstyle,
+          ).tr(),
+        ),
+        fixedWidth: small,
+        onSort: (s, c) {
+          sortColumn = 8;
+          assending = !assending;
+
+          vehicleDataSource.sort(10, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        numeric: true,
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'prenom',
+            style: tstyle,
+          ).tr(),
+        ),
+        fixedWidth: small,
+        onSort: (s, c) {
+          sortColumn = 9;
+          assending = !assending;
+
+          vehicleDataSource.sort(11, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        numeric: true,
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'poste',
+            style: tstyle,
+          ).tr(),
+        ),
+        fixedWidth: medium,
+        onSort: (s, c) {
+          sortColumn = 10;
+          assending = !assending;
+
+          vehicleDataSource.sort(12, assending);
           setState(() {});
         },
       ),
@@ -162,9 +289,9 @@ class VehicleTableState extends State<VehicleTable> {
             style: tstyle,
           ).tr(),
         ),
-        size: ColumnSize.L,
+        fixedWidth: large,
         onSort: (s, c) {
-          sortColumn = 4;
+          sortColumn = 11;
           assending = !assending;
           vehicleDataSource.sort(4, assending);
           setState(() {});
@@ -174,7 +301,7 @@ class VehicleTableState extends State<VehicleTable> {
         DataColumn2(
           label: const Text(''),
           size: ColumnSize.M,
-          fixedWidth: 80.px,
+          fixedWidth: medium,
           onSort: null,
         ),
     ];
@@ -225,6 +352,7 @@ class VehicleTableState extends State<VehicleTable> {
                   filterNow = false;
                 }
                 return DataTableParc(
+                  horizontalScroll: true,
                   header: Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 5.0, horizontal: 10),
@@ -368,7 +496,6 @@ class VehicleTableState extends State<VehicleTable> {
                       ],
                     ),
                   ),
-                  rowHeight: 41.px,
                   sortAscending: assending,
                   sortColumnIndex: sortColumn,
                   columns: columns,

@@ -82,6 +82,42 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
         } else {
           return Query.orderDesc('appartenance');
         }
+      case 7:
+        if (sortedAsc) {
+          return Query.orderAsc('\$id');
+        } else {
+          return Query.orderDesc('\$id');
+        }
+      case 8:
+        if (sortedAsc) {
+          return Query.orderAsc('direction');
+        } else {
+          return Query.orderDesc('direction');
+        }
+      case 9:
+        if (sortedAsc) {
+          return Query.orderAsc('matriculeConducteur');
+        } else {
+          return Query.orderDesc('matriculeConducteur');
+        }
+      case 10:
+        if (sortedAsc) {
+          return Query.orderAsc('nom');
+        } else {
+          return Query.orderDesc('nom');
+        }
+      case 11:
+        if (sortedAsc) {
+          return Query.orderAsc('prenom');
+        } else {
+          return Query.orderDesc('prenom');
+        }
+      case 12:
+        if (sortedAsc) {
+          return Query.orderAsc('profession');
+        } else {
+          return Query.orderDesc('profession');
+        }
     }
     return Query.orderAsc('\$id');
   }
@@ -127,6 +163,30 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
           return coef * (d1.value.appartenance ?? '').compareTo((d2.value.appartenance ?? ''));
         };
 
+      case 7:return (d1, d2) {
+        return coef * (int.tryParse(d1.value.id)??0).compareTo(int.tryParse(d2.value
+            .id)??0);
+      };
+      case 8:return (d1, d2) {
+        return coef * (d1.value.direction??'').compareTo((d2.value
+            .direction??''));
+      };
+      case 9:return (d1, d2) {
+        return coef * (d1.value.matriculeConducteur??'').compareTo((d2.value
+            .matriculeConducteur??''));
+      };
+      case 10:return (d1, d2) {
+        return coef * (d1.value.nom??'').compareTo((d2.value
+            .nom??''));
+      };
+      case 11:return (d1, d2) {
+        return coef * (d1.value.prenom??'').compareTo((d2.value
+            .prenom??''));
+      };
+      case 12:return (d1, d2) {
+        return coef * (d1.value.profession??'').compareTo((d2.value
+            .profession??''));
+      };
       default:
         return (d1, d2) => coef * d1.key.compareTo(d2.key);
     }

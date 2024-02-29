@@ -504,6 +504,8 @@
   "changerPneux": "Tire change",
   "systemSuspension": "Suspension system",
   "systemFreinage": "Braking system",
-  "matriculeemploye": "Employee number"
-
+  "matriculeemploye": "Employee number",
+  "poste": "Job",
+  "appartenancevehiculesingle": "Vehicle belonging",
+  "appartenanceemploye": "Employee belonging"
 }

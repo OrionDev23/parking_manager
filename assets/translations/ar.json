@@ -501,6 +501,8 @@
   "changerPneux": "تغيير الإطارات",
   "systemSuspension": "نظام التعليق",
   "systemFreinage": "نظام الكبح",
-  "matriculeemploye": "رقم الموظف"
-
+  "matriculeemploye": "رقم الموظف",
+  "poste": "المنصب",
+  "appartenancevehiculesingle": "انتماء للمركبة",
+  "appartenanceemploye": "انتماء الموظف"
 }

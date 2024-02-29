@@ -13,7 +13,7 @@ import 'vehicle_form.dart';
 import 'vehicle_tabs.dart';
 import 'vehicles_table.dart';
 
-const showImportButton = false;
+const showImportButton = true;
 
 class VehicleManagement extends StatefulWidget {
   const VehicleManagement({super.key});

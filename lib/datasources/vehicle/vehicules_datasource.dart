@@ -1,3 +1,4 @@
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
@@ -30,41 +31,41 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
   List<DataCell> getCellsToShow(MapEntry<String, Vehicle> element) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
     return [
-      DataCell(f.Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Image.asset(
-                element.value.marque == null ||
-                    element.value.marque!.isEmpty ||
-                    element.value.marque!.contains('null') || element.value
-                    .marque=='-1'
-                    ? 'assets/images/marques/default.webp'
-                    : 'assets/images/marques/${element.value.marque ?? 'default'}.webp',
-                width: 3.5.h,
-                height: 3.5.h,
-              ),
-              const SizedBox(
-                width: 2,
-              ),
-              Expanded(
-                  child: Text(
-                    element.value.type ?? '',
-                    style: rowTextStyle,
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
-                  )),
-            ],
-          ),
-          SelectableText(
-            element.value.matricule,
-            style: rowTextStyle,
-          ),
-        ],
+      DataCell(Text(
+        element.value.id,
+        style: rowTextStyle,
+      ),
+      ),
+      DataCell(SelectableText(
+        element.value.matricule,
+        style: rowTextStyle,
       ),
       onDoubleTap: ()=>viewVehicule(element),
+      ),
+      DataCell(Row(
+        children: [
+          Image.asset(
+            element.value.marque == null ||
+                element.value.marque!.isEmpty ||
+                element.value.marque!.contains('null') || element.value
+                .marque=='-1'
+                ? 'assets/images/marques/default.webp'
+                : 'assets/images/marques/${element.value.marque ?? 'default'}.webp',
+            width: 3.5.h,
+            height: 3.5.h,
+          ),
+          const SizedBox(
+            width: 2,
+          ),
+          Expanded(
+              child: Text(
+                element.value.type ?? '',
+                style: rowTextStyle,
+                softWrap: true,
+                overflow: TextOverflow.ellipsis,
+              )),
+        ],
+      ),
       ),
       DataCell(Text(
               VehiclesUtilities.getEtatName(element.value.etatactuel ?? 0),
@@ -78,6 +79,30 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
           VehiclesUtilities.getAppartenance(element.value.appartenance),
           style: rowTextStyle)
           .tr()),
+      DataCell(Text(
+          VehiclesUtilities.getDirection(element.value.direction),
+          style: rowTextStyle)
+          .tr()),
+      DataCell(Text(
+          element.value.matriculeConducteur==null || element.value
+              .matriculeConducteur=='null'?'':element.value
+              .matriculeConducteur!,
+          style: rowTextStyle)),
+      DataCell(Text(
+          element.value.nom==null || element.value
+              .nom=='null'?'':element.value
+              .nom!,
+          style: rowTextStyle)),
+      DataCell(Text(
+          element.value.prenom==null || element.value
+              .prenom=='null'?'':element.value
+              .prenom!,
+          style: rowTextStyle)),
+      DataCell(Text(
+          element.value.profession==null || element.value
+              .profession=='null'?'':element.value
+              .profession!,
+          style: rowTextStyle)),
       DataCell(
           Text(dateFormat.format(element.value.updatedAt!), style: rowTextStyle)),
       if (selectC != true)

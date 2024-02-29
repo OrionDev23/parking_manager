@@ -425,6 +425,8 @@
  "subjectrequired": "Le titre est requis",
  "matriculerequis": "Le matricule est requis",
  "appartenance": "Appartenance",
+ "appartenancevehiculesingle": "Appartenance du vehicule",
+ "appartenanceemploye": "Appartenance de l'employé",
  "perimetre": "Périmetre",
  "buisiness": "Buisiness",
  "hors perimetre": "Hors périmetre",
@@ -497,5 +499,7 @@
  "confirmsuppr": "Confirmer la suppression ?",
  "export": "Exporter",
  "afficherquestion": "Afficher ?",
- "matriculeemploye": "Mat. employé"
+ "matriculeemploye": "Mat. employé",
+ "poste": "Poste"
+
 }

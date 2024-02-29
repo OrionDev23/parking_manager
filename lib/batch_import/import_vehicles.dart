@@ -60,12 +60,16 @@ class _ImportVehiclesState extends State<ImportVehicles> {
       });
       var excel = Excel.decodeBytes(bytes);
       for (var table in excel.tables.keys) {
-        print('trying table $table');
+        if (kDebugMode) {
+          print('trying table $table');
+        }
         setState(() {
           progressLoadingFile += 80 / (excel.tables.length);
         });
         if (isFileValid(excel, table)) {
-          print('table $table is valid');
+          if (kDebugMode) {
+            print('table $table is valid');
+          }
           for (var row in excel.tables[table]!.rows) {
             addVehicle(row);
           }
@@ -104,6 +108,12 @@ class _ImportVehiclesState extends State<ImportVehicles> {
     String model = columnToRead.containsKey('model')? data[columnToRead['model']!]!.value.toString():'';
     String nom = columnToRead.containsKey('nom')?data[columnToRead['nom']!]!
         .value.toString():"";
+    String matriculeEmploye=columnToRead.containsKey('matEmp')
+        ?data[columnToRead['matEmp']!]!
+        .value.toString():"";
+    String poste=columnToRead.containsKey('poste')
+        ?data[columnToRead['poste']!]!
+        .value.toString():"";
     String prenom = columnToRead.containsKey('prenom')
         ?data[columnToRead['prenom']!]!.value.toString():"";
     String filliale=columnToRead.containsKey('filliale')
@@ -140,6 +150,8 @@ class _ImportVehiclesState extends State<ImportVehicles> {
         filliale: filliale,
         appartenance: apartenance,
         direction: direction,
+        matriculeConducteur: matriculeEmploye,
+        profession: poste,
         wilaya: etrang ? null : wilaya,
         daira: etrang
             ? null
@@ -322,6 +334,17 @@ class _ImportVehiclesState extends State<ImportVehicles> {
                   .value.toLowerCase().trim().replaceAll(' ', '').contains
                 ('Lourd/Leger')){
                 columnToRead['poids']=cell.columnIndex;
+              }
+              if(value.value.toLowerCase().trim().contains('matricule '
+                  'employé') || value
+                  .value.toLowerCase().trim().replaceAll(' ', '').contains
+                ('matriculeemploye')){
+                columnToRead['matEmp']=cell.columnIndex;
+              }
+              if(value.value.toLowerCase().trim().contains('poste occupé') || value
+                  .value.toLowerCase().trim().replaceAll(' ', '').contains
+                ('poste')){
+                columnToRead['poste']=cell.columnIndex;
               }
               break;
             case BoolCellValue():
@@ -508,7 +531,9 @@ class _ImportVehiclesState extends State<ImportVehicles> {
         uploaded++;
       });
     }).onError((AppwriteException error, stackTrace) {
-      print('erreur vehicule ${v.matricule} : ${error.message}');
+      if (kDebugMode) {
+        print('erreur vehicule ${v.matricule} : ${error.message}');
+      }
       setState(() {
         notUploaded++;
       });
