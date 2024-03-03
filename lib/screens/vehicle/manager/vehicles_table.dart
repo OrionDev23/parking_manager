@@ -542,7 +542,8 @@ class VehicleTableState extends State<VehicleTable> {
       List2Excel(
         list: vehicleDataSource.getJsonData(value.documents),
         keysToInclude: const ['matricule','type','apparten'
-          'ance','nom','prenom','direction','etatactuel','perimetre'],
+          'ance','matriculeConducteur','nom','prenom','direction','departement',
+        'etatactuel','appartenanceconducteur','service','decision','perimetre','emplacement'],
         title: 'Liste des véhicules',
       )
           .getExcel();
