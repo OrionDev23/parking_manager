@@ -72,7 +72,7 @@ class PDFTheming {
   }
 
   Future<void> getEntrepriseLogo() async {
-    if (kIsWeb) {
+    if (kIsWeb || Platform.isAndroid || Platform.isIOS ) {
       if (MyEntrepriseState.logo == null) {
         await ClientDatabase.downloadLogo();
       }

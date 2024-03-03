@@ -47,8 +47,10 @@ class ChauffeurFormState extends State<ChauffeurForm> {
 
   TextEditingController selectedAppartenance = TextEditingController();
   TextEditingController selectedDirection = TextEditingController();
+  TextEditingController selectedDepartment = TextEditingController();
+  TextEditingController profession = TextEditingController();
   DateTime? birthDay;
-
+  bool service=false;
   @override
   void initState() {
     initValues();
@@ -74,6 +76,9 @@ class ChauffeurFormState extends State<ChauffeurForm> {
           VehiclesUtilities.getDirection(widget.chauf!.direction);
       selectedAppartenance.text =
           VehiclesUtilities.getAppartenance(widget.chauf!.filliale);
+      selectedDepartment.text=VehiclesUtilities.getDepartment(widget.chauf!.departement);
+      profession.text=widget.chauf!.profession??'';
+      service=widget.chauf!.service;
     }
   }
 
@@ -101,6 +106,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
     return Container(
       color: appTheme.backGroundColor,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Flexible(
             child: Container(
@@ -111,7 +117,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                 shrinkWrap: true,
                 children: [
                   SizedBox(
-                    height: 550.px,
+                    height: 700.px,
                     width: 500.px,
                     child: Column(
                       children: [
@@ -175,6 +181,50 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                       checkChanges();
                                     },
                                   )),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        smallSpace,
+                        Flexible(
+                          flex: 2,
+                          child: ZoneBox(
+                            label: 'poste'.tr(),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Row(
+                                children: [
+                                  Flexible(
+                                      child: TextBox(
+                                        controller: profession,
+                                        placeholder: 'poste'.tr(),
+                                        style: appTheme.writingStyle,
+                                        placeholderStyle: placeStyle,
+                                        cursorColor: appTheme.color.darker,
+                                        decoration: BoxDecoration(
+                                          color: appTheme.fillColor,
+                                        ),
+                                        onChanged: (s) {
+                                          checkChanges();
+                                        },
+                                      )),
+                                  smallSpace,
+                                  Flexible(
+                                      child: Row(
+                                        children: [
+                                          const Text('fonction').tr(),
+                                          smallSpace,
+                                          ToggleSwitch(checked: service,
+                                              onChanged: (s){
+                                            setState(() {
+                                              service=s;
+                                            });
+                                              }),
+                                          smallSpace,
+                                          const Text('service').tr(),
+                                        ],
+                                      )),
                                 ],
                               ),
                             ),
@@ -267,7 +317,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                         ),
                         smallSpace,
                         Flexible(
-                          flex: 3,
+                          flex: 4,
                           child: ZoneBox(
                             label: 'affectation'.tr(),
                             child: Padding(
@@ -276,7 +326,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                 children: [
                                   Flexible(
                                     child: AutoSuggestBox<String>(
-                                      placeholder: 'appartenance'.tr(),
+                                      placeholder: 'filiale'.tr(),
                                       placeholderStyle: placeStyle,
                                       controller: selectedAppartenance,
                                       items: List.generate(
@@ -306,6 +356,22 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                                   .toUpperCase())),
                                     ),
                                   ),
+                                  smallSpace,
+                                  Flexible(
+                                    child: AutoSuggestBox<String>(
+                                      placeholder: 'departement'.tr(),
+                                      placeholderStyle: placeStyle,
+                                      controller: selectedDepartment,
+                                      items: List.generate(
+                                          MyEntrepriseState.p!.departments!.length,
+                                              (index) => AutoSuggestBoxItem(
+                                              value: MyEntrepriseState
+                                                  .p!.departments![index],
+                                              label: MyEntrepriseState
+                                                  .p!.departments![index]
+                                                  .toUpperCase())),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -320,7 +386,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                               padding: const EdgeInsets.all(10.0),
                               child: DropDownButton(
                                 title: Text(ClientDatabase.getEtat(etat)).tr(),
-                                placement: FlyoutPlacementMode.bottomLeft,
+                                placement: FlyoutPlacementMode.bottomCenter,
                                 closeAfterClick: false,
                                 items: [
                                   MenuFlyoutItem(
@@ -525,7 +591,14 @@ class ChauffeurFormState extends State<ChauffeurForm> {
           ((disp == null && etat == widget.chauf!.etat) ||
               (disp != null && disp!.type == etat)) &&
           adresse.text == widget.chauf!.adresse &&
-          telephone.text == widget.chauf!.telephone &&
+          telephone.text == widget.chauf!.telephone && profession
+          .text==widget.chauf!.profession && service==widget.chauf!.service &&
+          selectedDepartment.text==VehiclesUtilities.getDepartment(widget
+              .chauf!.departement) &&
+          selectedAppartenance.text==VehiclesUtilities.getAppartenance(widget
+              .chauf!.filliale) &&
+          selectedDirection.text==VehiclesUtilities.getDirection(widget
+              .chauf!.direction) &&
           email.text == widget.chauf!.email) {
         if (changes) {
           setState(() {
@@ -614,6 +687,9 @@ class ChauffeurFormState extends State<ChauffeurForm> {
       telephone: telephone.value.text,
       filliale: selectedAppartenance.text.replaceAll(' ', '').trim(),
       direction: selectedDirection.text.replaceAll(' ', '').trim(),
+      departement: selectedDepartment.text.replaceAll('', '').tr(),
+      profession: profession.text,
+      service: service,
       adresse: adresse.value.text,
       dateNaissance: birthDay,
       etat: etat,

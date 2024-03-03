@@ -111,6 +111,9 @@ class _ImportVehiclesState extends State<ImportVehicles> {
     String matriculeEmploye=columnToRead.containsKey('matEmp')
         ?data[columnToRead['matEmp']!]!
         .value.toString():"";
+    String emplacement=columnToRead.containsKey('emplacement')
+        ?data[columnToRead['emplacement']!]!
+        .value.toString():"";
     String poste=columnToRead.containsKey('poste')
         ?data[columnToRead['poste']!]!
         .value.toString():"";
@@ -125,6 +128,24 @@ class _ImportVehiclesState extends State<ImportVehicles> {
       (data[columnToRead['appartenance']!]!.value
         .toString())
       .replaceAll(' ', '').trim().toUpperCase()
+        :"";
+    String apartenanceSalar=columnToRead.containsKey('appartenancesalar')
+        ?VehiclesUtilities.getAppartenance
+      (data[columnToRead['appartenancesalar']!]!.value
+        .toString())
+        .replaceAll(' ', '').trim().toUpperCase()
+        :"";
+    bool service=columnToRead.containsKey('service')
+        ?data[columnToRead['service']!]?.value.toString().toLowerCase()
+    .trim()=='service'?true:false:false;
+    bool decision=columnToRead.containsKey('decision')
+        ?data[columnToRead['decision']!]?.value.toString().toLowerCase()
+        .trim()=='oui'?true:false:false;
+    String departement=columnToRead.containsKey('departement')
+        ?VehiclesUtilities.getDepartment
+      (data[columnToRead['departement']!]!.value
+        .toString())
+        .replaceAll(' ', '').trim().toUpperCase()
         :"";
     String direction=columnToRead.containsKey('direction')
         ?VehiclesUtilities.getDirection
@@ -147,10 +168,15 @@ class _ImportVehiclesState extends State<ImportVehicles> {
         nom: nom,
         prenom: prenom,
         type: model,
+        emplacement:emplacement,
         filliale: filliale,
         appartenance: apartenance,
         direction: direction,
         matriculeConducteur: matriculeEmploye,
+        departement: departement,
+        decision: decision,
+        service: service,
+        appartenanceconducteur: apartenanceSalar,
         profession: poste,
         wilaya: etrang ? null : wilaya,
         daira: etrang
@@ -172,6 +198,10 @@ class _ImportVehiclesState extends State<ImportVehicles> {
         genre: (genre).toString(),
         lourd: lourd,
         anneeUtil: VehiclesUtilities.getAnneeFromMatricule(matricule));
+
+    if(kDebugMode){
+      print(vehicle.toJson());
+    }
     if(importedVehicles.containsKey(vehicle.matricule)){
       replaceVehicleEmptiness(vehicle);
     }
@@ -315,9 +345,11 @@ class _ImportVehiclesState extends State<ImportVehicles> {
                       .contains('firstname')) {
                 columnToRead['prenom'] = cell.columnIndex;
               }
-              if(value.value.toLowerCase().contains('appartenance') && value
-                  .value.toLowerCase().contains('vehicule')){
+              if(value.value.toLowerCase().trim()=='appartenance vehicule'){
                 columnToRead['appartenance']=cell.columnIndex;
+              }
+              if(value.value.toLowerCase().trim()=='appartenance salarié'){
+                columnToRead['appartenancesalar']=cell.columnIndex;
               }
               if(value.value.toLowerCase().contains('filiale') && value
                   .value.toLowerCase().contains('vehicule')){
@@ -326,9 +358,26 @@ class _ImportVehiclesState extends State<ImportVehicles> {
               if(value.value.toLowerCase().contains('direction') ){
                 columnToRead['direction']=cell.columnIndex;
               }
+              if(value.value.toLowerCase().contains('departement') ){
+                columnToRead['departement']=cell.columnIndex;
+              }
+              if(value.value.toLowerCase().contains('matricule employé') ){
+                columnToRead['matemp']=cell.columnIndex;
+              }
               if(value.value.toLowerCase().trim().contains('périmetre') || value
                   .value.toLowerCase().trim().contains('perimetre')){
                 columnToRead['perimetre']=cell.columnIndex;
+              }
+              if(value.value.toLowerCase().trim().contains('service') || value
+                  .value.toLowerCase().trim().contains('fonction')){
+                columnToRead['service']=cell.columnIndex;
+              }
+              if(value.value.toLowerCase().trim().contains('décision') ||
+                  value.value.toLowerCase().trim().contains('decision')){
+                columnToRead['decision']=cell.columnIndex;
+              }
+              if(value.value.toLowerCase().trim().contains('emplacement')){
+                columnToRead['emplacement']=cell.columnIndex;
               }
               if(value.value.toLowerCase().trim().contains('poids') || value
                   .value.toLowerCase().trim().replaceAll(' ', '').contains

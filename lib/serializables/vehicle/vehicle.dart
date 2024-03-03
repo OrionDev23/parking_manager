@@ -55,10 +55,15 @@ class Vehicle extends ParcOtoDefault {
   String? filliale;
   String? direction;
   String? appartenance;
+  String? appartenanceconducteur;
+  bool service;
 
   String? departement;
   String? matriculeConducteur;
   bool lourd;
+  bool decision;
+
+  String? emplacement;
 
   int perimetre;
 
@@ -101,6 +106,10 @@ class Vehicle extends ParcOtoDefault {
     this.puissance,
     this.createdBy,
     this.etat,
+    this.service=false,
+    this.appartenanceconducteur,
+    this.decision=false,
+    this.emplacement,
     this.etatactuel = 0,
     this.matriculeConducteur
   }) {
@@ -109,8 +118,14 @@ class Vehicle extends ParcOtoDefault {
         '$numeroSerie $type $carrosserie $daira $energie'
         ' ${VehiclesUtilities.getMarqueName(marque)} ${VehiclesUtilities.getAnneeFromMatricule(matricule)}'
         '$pays $matriculePrec ${VehiclesUtilities.getEtatName(etatactuel ??
-        0)} ${VehiclesUtilities.getPerimetre(perimetre)} $appartenance '
-        '$filliale $direction';
+        0)} ${VehiclesUtilities.getPerimetre(perimetre)} ${VehiclesUtilities
+        .getAppartenance(appartenance)} '
+        '${VehiclesUtilities
+        .getAppartenance(filliale)} ${VehiclesUtilities
+        .getDirection(direction)} ${VehiclesUtilities
+        .getDepartment(departement)} ${VehiclesUtilities
+        .getAppartenance(appartenanceconducteur)} $matriculeConducteur '
+        '${service?'service':'fonction'} $emplacement';
   }
 
   @override

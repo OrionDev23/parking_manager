@@ -43,6 +43,10 @@ Vehicle _$VehicleFromJson(Map<String, dynamic> json) => Vehicle(
       puissance: json['puissance'] as int?,
       createdBy: json['user_creation'] as String?,
       etat: json['etat'] as String?,
+      service: json['service'] as bool? ?? false,
+      appartenanceconducteur: json['appartenanceconducteur'] as String?,
+      decision: json['decision'] as bool? ?? false,
+      emplacement: json['emplacement'] as String?,
       etatactuel: json['etatactuel'] as int? ?? 0,
       matriculeConducteur: json['matriculeConducteur'] as String?,
     )..search = json['search'] as String?;
@@ -80,8 +84,12 @@ Map<String, dynamic> _$VehicleToJson(Vehicle instance) => <String, dynamic>{
       'filliale': instance.filliale,
       'direction': instance.direction,
       'appartenance': instance.appartenance,
+      'appartenanceconducteur': instance.appartenanceconducteur,
+      'service': instance.service,
       'departement': instance.departement,
       'matriculeConducteur': instance.matriculeConducteur,
       'lourd': instance.lourd,
+      'decision': instance.decision,
+      'emplacement': instance.emplacement,
       'perimetre': instance.perimetre,
     };

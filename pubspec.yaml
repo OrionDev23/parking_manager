@@ -39,7 +39,7 @@ dependencies:
   window_manager: ^0.3.8
   screen_retriever: ^0.1.9
   responsive_sizer: ^3.3.0+1
-  provider: ^6.1.1
+  provider: ^6.1.2
   get: ^4.6.6
   appwrite: ^11.0.1
   country_code_picker: ^3.0.0

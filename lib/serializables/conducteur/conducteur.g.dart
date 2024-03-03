@@ -26,6 +26,8 @@ Conducteur _$ConducteurFromJson(Map<String, dynamic> json) => Conducteur(
       search: json['search'] as String?,
       dateNaissance: dateFromIntJson(json['dateNaissance'] as int?),
       departement: json['departement'] as String?,
+      profession: json['profession'] as String?,
+      service: json['service'] as bool? ?? false,
       telephone: json['telephone'] as String?,
     );
 
@@ -37,6 +39,8 @@ Map<String, dynamic> _$ConducteurToJson(Conducteur instance) =>
       'email': instance.email,
       'telephone': instance.telephone,
       'adresse': instance.adresse,
+      'profession': instance.profession,
+      'service': instance.service,
       'dateNaissance': dateToIntJson(instance.dateNaissance),
       'createdBy': instance.createdBy,
       'etatactuel': instance.etatactuel,

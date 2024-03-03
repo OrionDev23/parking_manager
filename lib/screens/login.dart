@@ -19,7 +19,7 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>{
+class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClientMixin{
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
@@ -65,6 +65,7 @@ class _LoginScreenState extends State<LoginScreen>{
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     if (PanesListState.firstLoading) {
       return const Center(child: ProgressRing());
     }    var appTheme = context.watch<AppTheme>();
@@ -263,4 +264,7 @@ class _LoginScreenState extends State<LoginScreen>{
       });
     }
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

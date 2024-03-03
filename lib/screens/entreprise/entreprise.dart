@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
+import 'package:parc_oto/batch_import/import_appartenance.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../providers/client_database.dart';
@@ -568,6 +569,8 @@ class MyEntrepriseState extends State<MyEntreprise> {
                       fillialeWidget(appTheme),
                       smallSpace,
                       directionsWidget(appTheme),
+                      smallSpace,
+                      departmentsWidget(appTheme),
                     ],
                   ),
                 ),
@@ -665,7 +668,12 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                 }
                                 checkChanges();
                               },
-                        child: const Text('add').tr())
+                        child: const Text('add').tr()),
+                    smallSpace,
+                    FilledButton(
+                        onPressed: ()=>importFiliales(),
+                        child: const Text('importlist').tr()),
+
                   ],
                 ),
               ),
@@ -766,7 +774,11 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                 }
                                 checkChanges();
                               },
-                        child: const Text('add').tr())
+                        child: const Text('add').tr()),
+                    smallSpace,
+                    FilledButton(
+                        onPressed: ()=>importDirections(),
+                        child: const Text('importlist').tr()),
                   ],
                 ),
               ),
@@ -819,7 +831,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
     return SizedBox(
       height: directions.isEmpty?100.px:directions.length * tilesHeight + 80.px,
       child: ZoneBox(
-        label: 'departments'.tr(),
+        label: 'departements'.tr(),
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
@@ -867,20 +879,24 @@ class MyEntrepriseState extends State<MyEntreprise> {
                           }
                           checkChanges();
                         },
-                        child: const Text('add').tr())
+                        child: const Text('add').tr()),
+                    smallSpace,
+                    FilledButton(
+                        onPressed: ()=>importDepartments(),
+                        child: const Text('importlist').tr()),
                   ],
                 ),
               ),
               smallSpace,
               ListView.builder(
-                itemCount: departments.isEmpty?1:departments.length,
+                itemCount: departments.isEmpty?1:directions.length,
                 shrinkWrap: true,
                 itemBuilder: (BuildContext context, int index) {
                   if(departments.isEmpty){
                     return Center(
                         child: SizedBox(
                           height: 20.px,
-                          child: Text('departmentempty',
+                          child: Text('departmentsempty',
                               style:TextStyle(color:Colors.grey[100],
                                   fontStyle: FontStyle.italic))
                               .tr(),
@@ -893,7 +909,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                       tileColor:
                       ButtonState.all<Color>(appTheme.fillColor),
                       title: Text(
-                        directions[index],
+                        departments[index],
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -914,6 +930,51 @@ class MyEntrepriseState extends State<MyEntreprise> {
         ),
       ),
     );
+  }
+
+  void importDepartments() async{
+    FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['xlsx'],
+      allowMultiple: false,
+    );
+    if (pickedFile != null) {
+      departments.addAll(await ImportAppartenance(file: pickedFile,type:2)
+          .loadFile());
+      setState(() {
+
+      });
+    }
+  }
+
+  void importDirections() async{
+    FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['xlsx'],
+      allowMultiple: false,
+    );
+    if (pickedFile != null) {
+      directions.addAll(await ImportAppartenance(file: pickedFile,type:1)
+          .loadFile());
+      setState(() {
+
+      });
+    }
+  }
+
+  void importFiliales() async{
+    FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['xlsx'],
+      allowMultiple: false,
+    );
+    if (pickedFile != null) {
+      filliales.addAll(await ImportAppartenance(file: pickedFile,type:0)
+          .loadFile());
+      setState(() {
+
+      });
+    }
   }
   void upload() async {
     if (nom.value.text.isEmpty || adresse.text.isEmpty) {
@@ -960,6 +1021,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
       });
     }
   }
+
 
   Future<void> uploadEntreprise() async {
     Entreprise prest = Entreprise(

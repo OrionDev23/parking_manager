@@ -426,6 +426,8 @@
  "matriculerequis": "Le matricule est requis",
  "appartenance": "Appartenance",
  "appartenancevehiculesingle": "Appartenance du vehicule",
+ "appartenanceconducteursingle": "Appartenance du conducteur",
+
  "appartenanceemploye": "Appartenance de l'employé",
  "perimetre": "Périmetre",
  "buisiness": "Buisiness",
@@ -460,11 +462,13 @@
  "filiales": "Filiales",
  "filiale": "Filiale",
  "filliale": "Filiale",
- "directions": "Départements",
+ "directions": "Directions",
  "writefiliale": "Ajouter une filiale...",
- "writedirection": "Ajouter un département...",
+ "writedirection": "Ajouter une direction...",
+ "writedepartment": "Ajouter un département",
  "fillialesempty": "Vous n'avez pas encore ajouté de filiales",
- "directionssempty": "Vous n'avez pas encore ajouté de départements",
+ "directionssempty": "Vous n'avez pas encore ajouté de directions",
+ "departmentsempty": "Vous n'avez pas encore ajouté de départements",
  "filialeexploit": "Filiale qui exploite le véhicule",
  "exploitationvehicule": "Exploitation des véhicules",
  "direction": "Direction",
@@ -500,6 +504,14 @@
  "export": "Exporter",
  "afficherquestion": "Afficher ?",
  "matriculeemploye": "Mat. employé",
- "poste": "Poste"
-
+ "poste": "Poste",
+ "datecartegrise": "Date de la carte grise",
+ "numcartegrise": "Numéro de la carte grise",
+ "select": "Sélectionner",
+ "existingdriver": "Conducteur existant ?",
+ "servicefonction": "Service/Fonction ?",
+ "service": "Service",
+ "fonction": "Fonction",
+ "departement": "Département",
+ "departements": "Départements"
 }

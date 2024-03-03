@@ -405,11 +405,13 @@
   "filiales": "Subsidiaries",
   "filiale": "Subsidiary",
   "filliale": "Subsidiary",
-  "directions": "Departments",
+  "directions": "Directions",
   "writefiliale": "Add a subsidiary...",
-  "writedirection": "Add a departement...",
+  "writedirection": "Add a direction...",
+  "writedepartment": "Add a department...",
   "fillialesempty": "You have not yet added any subsidiaries",
-  "directionssempty": "You have not yet added any departements",
+  "directionssempty": "You have not yet added any directions",
+  "departmentsempty": "You have not yet added any department",
   "filialeexploit": "Subsidiary that operates the vehicle",
   "direction": "Departement",
   "lourd?": "Heavy vehicle?",
@@ -507,5 +509,18 @@
   "matriculeemploye": "Employee number",
   "poste": "Job",
   "appartenancevehiculesingle": "Vehicle belonging",
-  "appartenanceemploye": "Employee belonging"
+  "appartenanceconducteursingle": "Driver belonging",
+  "appartenanceemploye": "Employee belonging",
+  "datecartegrise": "Date of the registration document",
+  "numcartegrise": "Document number",
+  "select": "Select",
+  "existingdriver": "Existing driver ?",
+  "servicefonction": "Service/Job ?",
+  "service": "Service",
+  "fonction": "Job",
+  "departement": "Department",
+  "departements": "Departments"
+
+
+
 }

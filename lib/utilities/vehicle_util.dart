@@ -313,4 +313,18 @@ class VehiclesUtilities {
 
     return '';
   }
+
+  static String getDepartment(String? department){
+    if(MyEntrepriseState.p!=null && department!=null){
+      for(int i=0;i<MyEntrepriseState.p!.departments!.length;i++){
+        if(MyEntrepriseState.p!.departments![i].replaceAll(' ', '').toUpperCase
+          ().contains(department.replaceAll(' ', '').toUpperCase())){
+          return MyEntrepriseState.p!.departments![i];
+        }
+      }
+    }
+
+
+    return '';
+  }
 }

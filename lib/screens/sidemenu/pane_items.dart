@@ -162,7 +162,12 @@ class PaneItemsAndFooters {
         PaneItem(
           icon: Icon(FluentIcons.company_directory,color: appTheme.color.lightest,),
           title: const Text('directions').tr(),
-          body: const MesFilliales(direction:true),
+          body: const MesFilliales(type: 1,),
+        ),
+        PaneItem(
+          icon: Icon(FluentIcons.company_directory_mirrored,color: appTheme.color.lightest,),
+          title: const Text('departements').tr(),
+          body: const MesFilliales(type: 2,),
         ),
       ]
     );
@@ -198,8 +203,8 @@ class PaneItemsAndFooters {
 
     footerItems = [
       PaneItemSeparator(),
-      if (isAdmin) entreprise,
-      if (isAdmin) backup,
+      if (isAdmin && PanesListState.signedIn.value) entreprise,
+      if (isAdmin && PanesListState.signedIn.value) backup,
       if (PanesListState.signedIn.value) logout,
       parametres,
     ];

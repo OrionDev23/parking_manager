@@ -22,8 +22,8 @@ import '../../main.dart';
 
 class MesFilliales extends StatefulWidget {
 
-  final bool direction;
-  const MesFilliales({super.key,this.direction=false});
+  final int type;
+  const MesFilliales({super.key,this.type=0});
 
   @override
   State<MesFilliales> createState() => MesFillialesState();
@@ -39,7 +39,9 @@ class MesFillialesState extends State<MesFilliales> {
     var appTheme = context.watch<AppTheme>();
     return ScaffoldPage(
         header: PageTitle(
-          text: widget.direction?'directions'.tr():'fililales'.tr(),
+          text: widget.type==1?'directions'.tr():widget
+              .type==2?'departements'.tr():'fililales'
+              .tr(),
           trailing: ButtonContainer(
             icon: FluentIcons.add,
             text: 'add'.tr(),
@@ -90,7 +92,7 @@ class MesFillialesState extends State<MesFilliales> {
                 ],
               ),
             ),
-            !widget.direction?
+            widget.type==0?
             Flexible(
               child: ListView(
                 padding: const EdgeInsets.all(10),
@@ -104,7 +106,7 @@ class MesFillialesState extends State<MesFilliales> {
                         .map((e) => AppartenanceContainer(
                               state: this,
                               key: ValueKey(e),
-                              filliale: true,
+                              type: widget.type,
                               name: e,
                               fieldToSearch: 'filliale',
                             ))
@@ -218,7 +220,9 @@ class MesFillialesState extends State<MesFilliales> {
                       ]),
                 ],
               ),
-            ): Flexible(
+            ):
+            widget.type==1?
+            Flexible(
                 child: ListView(
                   padding: const EdgeInsets.all(10),
                   children: [
@@ -231,7 +235,7 @@ class MesFillialesState extends State<MesFilliales> {
                           .map((e) => AppartenanceContainer(
                         state: this,
                         key: ValueKey(e),
-                        filliale: false,
+                        type: widget.type,
                         name: e,
                         fieldToSearch: 'direction',
                       ))
@@ -275,14 +279,72 @@ class MesFillialesState extends State<MesFilliales> {
                         ]),
                   ],
                 ),
-              ),
+              ):
+            Flexible(
+                  child: ListView(
+                    padding: const EdgeInsets.all(10),
+                    children: [
+                      StaggeredGrid.count(
+                        crossAxisCount:
+                        Device.orientation == Orientation.portrait ? 2 : 4,
+                        mainAxisSpacing: 5,
+                        crossAxisSpacing: 5,
+                        children: directionsSearched()
+                            .map((e) => AppartenanceContainer(
+                          state: this,
+                          key: ValueKey(e),
+                          type: widget.type,
+                          name: e,
+                          fieldToSearch: 'departement',
+                        ))
+                            .toList(),
+                      ),
+                      smallSpace,
+                      StaggeredGrid.count(
+                          crossAxisCount:
+                          Device.orientation == Orientation.landscape ? 2 : 1,
+                          mainAxisSpacing: 5,
+                          crossAxisSpacing: 5,
+                          children: [
+                            StaggeredGridTile.fit(
+                              crossAxisCellCount: 2,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: appTheme.backGroundColor,
+                                  boxShadow: kElevationToShadow[2],
+                                ),
+                                padding: const EdgeInsets.all(10),
+                                height: height * 2,
+                                child: StateBars(
+                                  hideEmpty: true,
+                                  vertical: true,
+                                  labels: List.generate(
+                                      MyEntrepriseState.p!.departments?.length ?? 0,
+                                          (index) => MapEntry(
+                                          MyEntrepriseState.p!.departments![index],
+                                          DatabaseCounters()
+                                              .countVehiclesWithCondition([
+                                            Query.equal(
+                                                'departement',
+                                                MyEntrepriseState
+                                                    .p!.departments![index]
+                                                    .replaceAll(' ', '')
+                                                    .trim())
+                                          ]))),
+                                ),
+                              ),
+                            ),
+                          ]),
+                    ],
+                  ),
+                )
           ],
         ));
   }
 
   List<String> directionsSearched() {
     List<String> result = List.empty(growable: true);
-    if(widget.direction){
+    if(widget.type==1){
       MyEntrepriseState.p?.directions?.forEach((value) {
         if (value.toUpperCase().contains(searchController.text.toUpperCase())) {
           result.add(value);
@@ -290,9 +352,16 @@ class MesFillialesState extends State<MesFilliales> {
       });
 
     }
-    else{
+    else if (widget.type==0){
 
       MyEntrepriseState.p?.filiales?.forEach((value) {
+        if (value.toUpperCase().contains(searchController.text.toUpperCase())) {
+          result.add(value);
+        }
+      });
+    }
+    else {
+      MyEntrepriseState.p?.departments?.forEach((value) {
         if (value.toUpperCase().contains(searchController.text.toUpperCase())) {
           result.add(value);
         }
@@ -310,7 +379,11 @@ class MesFillialesState extends State<MesFilliales> {
         barrierDismissible: true,
         builder: (c) {
           return ContentDialog(
-            title: Text(widget.direction?'addnewdirection':'addnewfiliale',style: TextStyle(fontSize: 16
+            title: Text(widget.type==1?
+            'addnewdirection'
+                :widget.type==2?'addnewdepartment':'addnewfiliale',style:
+            TextStyle
+              (fontSize: 16
                 .px),).tr(),
             constraints: BoxConstraints.loose(Size(300.px, 190.px)),
             content: TextBox(
@@ -341,17 +414,23 @@ class MesFillialesState extends State<MesFilliales> {
       );
       return;
     }
-    if(widget.direction){
+    if(widget.type==1){
       if(MyEntrepriseState.p!.directions==null){
         MyEntrepriseState.p!.directions=[];
       }
       MyEntrepriseState.p!.directions!.add(textToEdit.text);
     }
-    else{
+    else if(widget.type==0){
       if(MyEntrepriseState.p!.filiales==null){
         MyEntrepriseState.p!.filiales=[];
       }
       MyEntrepriseState.p!.filiales!.add(textToEdit.text);
+    }
+    else{
+      if(MyEntrepriseState.p!.departments==null){
+        MyEntrepriseState.p!.departments=[];
+      }
+      MyEntrepriseState.p!.departments!.add(textToEdit.text);
     }
     Navigator.of(context).pop();
     await ClientDatabase.database!
@@ -360,10 +439,12 @@ class MesFillialesState extends State<MesFilliales> {
         collectionId: entrepriseid,
         documentId: MyEntrepriseState.p!.id,
         data: {
-          if(widget.direction)
+          if(widget.type==1)
           'directions':MyEntrepriseState.p!.directions,
-          if(!widget.direction)
+          if(widget.type==0)
             'filiales':MyEntrepriseState.p!.filiales,
+          if(widget.type==2)
+            'departement':MyEntrepriseState.p!.departments,
         })
         .then((value) {
       displayMessage(context,'done',InfoBarSeverity.success);

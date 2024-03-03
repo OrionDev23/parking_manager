@@ -24,7 +24,8 @@ class Routes {
       initialLocation: '/dashboard',
       routes: [
         ShellRoute(
-            builder: (context, state,s ) => PanesList(key: UniqueKey(),
+            builder: (context, state,s ) =>
+                PanesList(key: sideKey,
                   paneList: PaneItemsAndFooters(savedSettings,appTheme), appTheme:
             appTheme,
                 ),

@@ -7,7 +7,9 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/screens/chauffeur/manager/chauffeur_table.dart';
 import 'package:parc_oto/screens/entreprise/entreprise.dart';
+import 'package:parc_oto/serializables/conducteur/conducteur.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -40,6 +42,8 @@ class _VehicleFormState extends State<VehicleForm>
   TextEditingController communeCont = TextEditingController();
   TextEditingController quittance = TextEditingController(text: '800');
   TextEditingController numero = TextEditingController();
+
+  TextEditingController matempl=TextEditingController();
   TextEditingController lname = TextEditingController();
   TextEditingController fname = TextEditingController();
   TextEditingController profession = TextEditingController();
@@ -71,8 +75,11 @@ class _VehicleFormState extends State<VehicleForm>
   DateTime selectedDate = DateTime.now();
 
   bool lourd = false;
+  bool service=false;
 
   TextEditingController selectedAppartenance = TextEditingController();
+  TextEditingController selectedAppartenanceEmploye = TextEditingController();
+  TextEditingController selectedDepartment = TextEditingController();
   TextEditingController selectedDirection = TextEditingController();
   TextEditingController selectedFiliale = TextEditingController();
 
@@ -125,6 +132,13 @@ class _VehicleFormState extends State<VehicleForm>
       matrPrec.text = widget.vehicle!.matriculePrec ?? '';
       selectedDate = widget.vehicle!.date ?? DateTime.now();
       lourd = widget.vehicle!.lourd;
+      matempl.text=widget.vehicle!.matriculeConducteur??'';
+      service=widget.vehicle!.decision;
+
+      selectedDepartment.text= VehiclesUtilities
+          .getDepartment(widget.vehicle!.departement);
+      selectedAppartenanceEmploye.text=          VehiclesUtilities
+        .getAppartenance(widget.vehicle!.appartenanceconducteur);
       selectedFiliale.text =
           VehiclesUtilities.getAppartenance(widget.vehicle!.filliale);
       selectedAppartenance.text =
@@ -173,7 +187,7 @@ class _VehicleFormState extends State<VehicleForm>
                                   MediaQuery.of(context).orientation ==
                                           Orientation.portrait
                                       ? 1
-                                      : 6,
+                                      : 12,
                               mainAxisSpacing: 0,
                               crossAxisSpacing: 0,
                               children: gridChildren(appTheme)),
@@ -221,7 +235,7 @@ class _VehicleFormState extends State<VehicleForm>
   List<Widget> firstLine(AppTheme appTheme) {
     return [
       StaggeredGridTile.fit(
-          crossAxisCellCount: 2,
+          crossAxisCellCount: 4,
           child: Container(
             height: heightFirst,
 
@@ -317,7 +331,7 @@ class _VehicleFormState extends State<VehicleForm>
             ),
           )),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: 4,
         child: Container(
 
           decoration: BoxDecoration(
@@ -489,7 +503,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-          crossAxisCellCount: 2,
+          crossAxisCellCount: 4,
           child: Container(
             decoration: BoxDecoration(
               border: Border(
@@ -601,7 +615,7 @@ class _VehicleFormState extends State<VehicleForm>
   List<Widget> secondLine(AppTheme appTheme) {
     return [
       StaggeredGridTile.fit(
-          crossAxisCellCount: 2,
+          crossAxisCellCount: 4,
           child: Container(
             decoration: BoxDecoration(
               border: Border(
@@ -620,7 +634,7 @@ class _VehicleFormState extends State<VehicleForm>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'date',
+                  'datecartegrise',
                   style: formHintStyle,
                 ).tr(),
                 DatePicker(
@@ -634,17 +648,9 @@ class _VehicleFormState extends State<VehicleForm>
               ],
             ),
           )),
-      if (MediaQuery.of(context).orientation == Orientation.landscape)
-        StaggeredGridTile.fit(
-          crossAxisCellCount: 1,
-          child: SizedBox(
-            height: height,
-          ),
-        ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
+        crossAxisCellCount: 4,
         child: Container(
-          height: height,
           decoration: BoxDecoration(
             border: Device.orientation==Orientation.portrait?Border(
               left:  BorderSide(
@@ -654,6 +660,55 @@ class _VehicleFormState extends State<VehicleForm>
                 color: appTheme.color,
               ),
             ):const Border(),
+          ),
+
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          height: height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'numcartegrise',
+                style: formHintStyle,
+              ).tr(),
+              TextBox(enabled:!widget.readOnly,
+                controller: numero,
+                placeholder: 'numcartegrise'.tr(),
+                maxLength: 30,
+                placeholderStyle: placeStyle,
+                cursorColor: appTheme.color.darker,
+                style: appTheme.writingStyle,
+                decoration: BoxDecoration(
+                  color: appTheme.fillColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      if (MediaQuery.of(context).orientation == Orientation.landscape)
+        StaggeredGridTile.fit(
+          crossAxisCellCount: 2,
+          child: SizedBox(
+
+            height: height,
+          ),
+        ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 2,
+        child: Container(
+          height: height,
+          decoration: BoxDecoration(
+            border: Border(
+              right:  BorderSide(
+                color: appTheme.color,
+              ),
+              left: Device.orientation==Orientation.portrait?BorderSide(
+                color: appTheme.color,
+              ):BorderSide.none,
+            ),
+
           ),
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Column(
@@ -682,45 +737,7 @@ class _VehicleFormState extends State<VehicleForm>
           ),
         ),
       ),
-      StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border(
-              right:  BorderSide(
-                color: appTheme.color,
-              ),
-              left: Device.orientation==Orientation.portrait?BorderSide(
-                color: appTheme.color,
-              ):BorderSide.none,
-            ),
-          ),
 
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          height: height,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'num',
-                style: formHintStyle,
-              ).tr(),
-              TextBox(enabled:!widget.readOnly,
-                controller: numero,
-                placeholder: 'num'.tr(),
-                maxLength: 30,
-                placeholderStyle: placeStyle,
-                cursorColor: appTheme.color.darker,
-                style: appTheme.writingStyle,
-                decoration: BoxDecoration(
-                  color: appTheme.fillColor,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     ];
   }
 
@@ -731,6 +748,10 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           decoration: BoxDecoration(
             border: Border(
+
+              top: BorderSide(
+                color: appTheme.color,
+              ),
               left:  BorderSide(
                 color: appTheme.color,
               ),
@@ -740,6 +761,90 @@ class _VehicleFormState extends State<VehicleForm>
             ),
           ),
 
+          padding: const EdgeInsets.symmetric(horizontal: 10,),
+          height: height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+
+              Text(
+                'existingdriver',
+                style: formHintStyle,
+              ).tr(),
+              SizedBox(
+                width: 500.px,
+                child: Button(
+                  onPressed: ()=>selectConducteur(appTheme),
+                  child: const Text('select').tr(),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 2,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Device.orientation==Orientation.portrait?Border(
+              left:  BorderSide(
+                color: appTheme.color,
+              ),
+              right: BorderSide(
+                color: appTheme.color,
+              ),
+            ):Border(
+              top: BorderSide(
+                color: appTheme.color,
+              ),
+            ),
+          ),
+
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          height: height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'matriculeemploye',
+                style: formHintStyle,
+              ).tr(),
+              SizedBox(
+                  height: 5.h,
+                  child: TextBox(enabled:!widget.readOnly,
+                    controller: matempl,
+                    maxLength: 30,
+                    placeholder: 'matriculeemploye'.tr(),
+                    placeholderStyle: placeStyle,
+                    cursorColor: appTheme.color.darker,
+                    style: appTheme.writingStyle,
+                    decoration: BoxDecoration(
+                      color: appTheme.fillColor,
+                    ),
+                  )),
+            ],
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 2,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Device.orientation==Orientation.portrait?Border(
+              left:  BorderSide(
+                color: appTheme.color,
+              ),
+              right: BorderSide(
+                color: appTheme.color,
+              ),
+            ):Border(
+              top: BorderSide(
+                color: appTheme.color,
+              ),
+            ),
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 10),
           height: height,
           child: Column(
@@ -780,7 +885,11 @@ class _VehicleFormState extends State<VehicleForm>
               right: BorderSide(
                 color: appTheme.color,
               ),
-            ):const Border(),
+            ):Border(
+              top: BorderSide(
+                color: appTheme.color,
+              ),
+            ),
           ),
           height: height,
           child: Column(
@@ -808,10 +917,14 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: 4,
         child: Container(
           decoration: BoxDecoration(
             border: Border(
+              top: Device.orientation==Orientation
+                  .portrait?BorderSide.none:BorderSide(
+                color: appTheme.color,
+              ),
               right:  BorderSide(
                 color: appTheme.color,
               ),
@@ -828,7 +941,7 @@ class _VehicleFormState extends State<VehicleForm>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'profession',
+                'poste',
                 style: formHintStyle,
               ).tr(),
               SizedBox(
@@ -836,7 +949,7 @@ class _VehicleFormState extends State<VehicleForm>
                   child: TextBox(enabled:!widget.readOnly,
                     controller: profession,
                     maxLength: 40,
-                    placeholder: 'profession'.tr(),
+                    placeholder: 'poste'.tr(),
                     placeholderStyle: placeStyle,
                     cursorColor: appTheme.color.darker,
                     style: appTheme.writingStyle,
@@ -848,22 +961,82 @@ class _VehicleFormState extends State<VehicleForm>
           ),
         ),
       ),
+
     ];
   }
 
   List<Widget> forthLine(AppTheme appTheme) {
     return [
       StaggeredGridTile.fit(
-        crossAxisCellCount: 4,
+        crossAxisCellCount: 3,
         child: Container(
           decoration: BoxDecoration(
             border: Border(
+              bottom: Device.orientation==Orientation
+                  .portrait?BorderSide.none:BorderSide(
+                color: appTheme.color,
+              ),
               left:  BorderSide(
                 color: appTheme.color,
               ),
               right: Device.orientation==Orientation.portrait?BorderSide(
                 color: appTheme.color,
               ):BorderSide.none,
+            ),
+          ),
+
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          height: height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'servicefonction',
+                style: formHintStyle,
+              ).tr(),
+              SizedBox(
+                  height: 5.h,
+                  child: Row(
+                    children: [
+                      const Text('fonction').tr(),
+                      smallSpace,
+                      ToggleSwitch(
+                        checked: service,
+                        onChanged: (s){
+                          setState(() {
+                            service=s;
+                          });
+                        },
+
+                      ),
+                      smallSpace,
+                      const Text('service').tr(),
+                    ],
+                  )),
+            ],
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 6,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Device.orientation==Orientation.portrait?Border(
+              bottom: Device.orientation==Orientation
+                  .portrait?BorderSide.none:BorderSide(
+                color: appTheme.color,
+              ),
+              left:  BorderSide(
+                color: appTheme.color,
+              ),
+              right: BorderSide(
+                color: appTheme.color,
+              ),
+            ):Border(
+              bottom: BorderSide(
+                color: appTheme.color,
+              ),
             ),
           ),
 
@@ -894,28 +1067,57 @@ class _VehicleFormState extends State<VehicleForm>
           ),
         ),
       ),
-      if (MediaQuery.of(context).orientation == Orientation.landscape)
-        StaggeredGridTile.fit(
-          crossAxisCellCount: 2,
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border(
-                right:  BorderSide(
-                  color: appTheme.color,
-                ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 3,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: appTheme.color,
               ),
+              right:  BorderSide(
+                color: appTheme.color,
+              ),
+              left: Device.orientation==Orientation.portrait?BorderSide(
+                color: appTheme.color,
+              ):BorderSide.none,
             ),
-            padding: const EdgeInsets.all(10),
-            height: height,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'appartenanceconducteursingle',
+                  style: formHintStyle,
+                ).tr(),
+                AutoSuggestBox<String>(
+                  enabled: !widget.readOnly,
+                  placeholder: 'appartenanceconducteursingle'.tr(),
+                  placeholderStyle: placeStyle,
+                  controller: selectedAppartenanceEmploye,
+                  items: List.generate(
+                      MyEntrepriseState.p!.filiales!.length,
+                          (index) => AutoSuggestBoxItem(
+                          value: MyEntrepriseState.p!.filiales![index],
+                          label: MyEntrepriseState.p!.filiales![index]
+                              .toUpperCase())),
+                ),
+              ],
+            ),
           ),
         ),
+      ),
     ];
   }
 
   List<Widget> fifthLine(AppTheme appTheme) {
     return [
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: 3,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -935,12 +1137,12 @@ class _VehicleFormState extends State<VehicleForm>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'appartenance',
+                  'appartenancevehiculesingle',
                   style: formHintStyle,
                 ).tr(),
                 AutoSuggestBox<String>(
                   enabled: !widget.readOnly,
-                  placeholder: 'appartenance'.tr(),
+                  placeholder: 'appartenancevehiculesingle'.tr(),
                   placeholderStyle: placeStyle,
                   controller: selectedAppartenance,
                   items: List.generate(
@@ -956,7 +1158,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: 3,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -997,19 +1199,19 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: 3,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
           decoration: BoxDecoration(
-            border: Border(
-              right:  BorderSide(
+            border: Device.orientation==Orientation.portrait?Border(
+              left:  BorderSide(
                 color: appTheme.color,
               ),
-              left: Device.orientation==Orientation.portrait?BorderSide(
+              right: BorderSide(
                 color: appTheme.color,
-              ):BorderSide.none,
-            ),
+              ),
+            ):const Border(),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -1037,13 +1239,54 @@ class _VehicleFormState extends State<VehicleForm>
           ),
         ),
       ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 3,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border(
+              right:  BorderSide(
+                color: appTheme.color,
+              ),
+              left: Device.orientation==Orientation.portrait?BorderSide(
+                color: appTheme.color,
+              ):BorderSide.none,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'departement',
+                  style: formHintStyle,
+                ).tr(),
+                AutoSuggestBox<String>(
+                  enabled: !widget.readOnly,
+                  placeholder: 'departement'.tr(),
+                  placeholderStyle: placeStyle,
+                  controller: selectedDepartment,
+                  items: List.generate(
+                      MyEntrepriseState.p!.departments!.length,
+                          (index) => AutoSuggestBoxItem(
+                          value: MyEntrepriseState.p!.departments![index],
+                          label: MyEntrepriseState.p!.departments![index]
+                              .toUpperCase())),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     ];
   }
 
   List<Widget> sixthLine(AppTheme appTheme) {
     return [
       StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
+        crossAxisCellCount: 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -1132,7 +1375,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
+        crossAxisCellCount: 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -1214,7 +1457,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
+        crossAxisCellCount: 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -1248,7 +1491,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 3,
+        crossAxisCellCount: 6,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -1287,7 +1530,7 @@ class _VehicleFormState extends State<VehicleForm>
   List<Widget> seventhLine(AppTheme appTheme) {
     return [
       StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
+        crossAxisCellCount: 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -1321,7 +1564,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
+        crossAxisCellCount: 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -1355,7 +1598,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
+        crossAxisCellCount: 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -1390,7 +1633,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
+        crossAxisCellCount: 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -1425,7 +1668,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
+        crossAxisCellCount: 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -1460,7 +1703,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
+        crossAxisCellCount: 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -1497,7 +1740,7 @@ class _VehicleFormState extends State<VehicleForm>
   List<Widget> eightLine(AppTheme appTheme) {
     return [
       StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
+        crossAxisCellCount: 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -1532,7 +1775,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 3,
+        crossAxisCellCount: 6,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -1569,7 +1812,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: 4,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -1603,6 +1846,45 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
     ];
+  }
+
+
+  void selectConducteur(AppTheme appTheme) async{
+    Conducteur? conducteur = await showDialog<Conducteur>(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) {
+          return ContentDialog(
+            constraints: BoxConstraints.tight(
+                Size(700.px, 550.px)),
+            title: const Text('selectchauffeur').tr(),
+            style: ContentDialogThemeData(
+                titleStyle: appTheme.writingStyle
+                    .copyWith(
+                    fontWeight:
+                    FontWeight.bold)),
+            content: const ChauffeurTable(
+              selectD: true,
+            ),
+            actions: [Button(child: const Text('fermer').tr(),
+                onPressed: (){
+                  Navigator.of(context).pop();
+                })],
+          );
+        });
+    if(conducteur!=null){
+      selectedAppartenanceEmploye.text=VehiclesUtilities.getAppartenance(conducteur.filliale);
+      adresse.text=conducteur.adresse??'';
+      fname.text=conducteur.prenom;
+      matempl.text=conducteur.matricule;
+      lname.text=conducteur.name;
+      service=conducteur.service;
+      profession.text=conducteur.profession??'';
+      setState(() {
+
+      });
+
+    }
   }
 
 
@@ -1716,6 +1998,11 @@ class _VehicleFormState extends State<VehicleForm>
         appartenance:
             selectedAppartenance.text.toUpperCase().replaceAll(' ', '').trim(),
         filliale: selectedFiliale.text.toUpperCase().replaceAll(' ', '').trim(),
+        departement: selectedDepartment.text.toUpperCase().replaceAll(' ', '').trim(),
+        appartenanceconducteur: selectedAppartenanceEmploye.text.toUpperCase().replaceAll(' ', '')
+            .trim(),
+        service: service,
+        matriculeConducteur: matempl.text,
       );
       if (widget.vehicle != null) {
         await Future.wait([

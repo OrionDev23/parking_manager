@@ -19,7 +19,7 @@ import 'fililales.dart';
 
 class AppartenanceContainer extends StatefulWidget {
   final String fieldToSearch;
-  final bool filliale;
+  final int type;
   final String name;
 
   final MesFillialesState state;
@@ -27,7 +27,7 @@ class AppartenanceContainer extends StatefulWidget {
   const AppartenanceContainer(
       {super.key,
         required this.state,
-      this.filliale = true,
+      this.type = 0,
       required this.fieldToSearch,
       required this.name});
 
@@ -75,19 +75,25 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
             boxShadow: kElevationToShadow[2]),
         child: Column(
           children: [
-            if (widget.filliale)
+            if (widget.type==0)
               AutoSizeText(
                 VehiclesUtilities.getAppartenance(widget.name),
                 style:
                     TextStyle(color: appTheme.color.lightest),
               ),
-            if (!widget.filliale)
+            if (widget.type==1)
               AutoSizeText(
                 VehiclesUtilities.getDirection(widget.name),
                 style:
                     TextStyle(color: appTheme.color.lightest),
               ),
-            const Spacer(),
+            if (widget.type==2)
+              AutoSizeText(
+                VehiclesUtilities.getDepartment(widget.name),
+                style:
+                TextStyle(color: appTheme.color.lightest),
+              ),
+              const Spacer(),
             Container(
               padding: const EdgeInsets.all(5),
                   child:  Row(
@@ -141,17 +147,23 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
   void delete() async{
 
     Navigator.of(widget.state.context).pop();
-    if(!widget.filliale){
+    if(widget.type==1){
       if(MyEntrepriseState.p!.directions==null){
         MyEntrepriseState.p!.directions=[];
       }
       MyEntrepriseState.p!.directions!.remove(widget.name);
     }
-    else{
+    else if(widget.type==0){
       if(MyEntrepriseState.p!.filiales==null){
         MyEntrepriseState.p!.filiales=[];
       }
       MyEntrepriseState.p!.filiales!.remove(widget.name);
+    }
+    else if(widget.type==2){
+      if(MyEntrepriseState.p!.departments==null){
+        MyEntrepriseState.p!.departments=[];
+      }
+      MyEntrepriseState.p!.departments!.remove(widget.name);
     }
     await ClientDatabase.database!
         .updateDocument(
@@ -159,10 +171,12 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
         collectionId: entrepriseid,
         documentId: MyEntrepriseState.p!.id,
         data: {
-          if(!widget.filliale)
+          if(widget.type==1)
             'directions':MyEntrepriseState.p!.directions,
-          if(widget.filliale)
+          if(widget.type==0)
             'filiales':MyEntrepriseState.p!.filiales,
+          if(widget.type==2)
+            'departments':MyEntrepriseState.p!.departments,
         })
         .then((value) {
       displayMessage(widget.state.context,'done',InfoBarSeverity.success);

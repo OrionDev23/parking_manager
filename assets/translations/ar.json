@@ -406,9 +406,12 @@
   "filliale": "الفرع",
   "directions": "الإدارات",
   "writefiliale": "إضافة فرعية...",
-  "writedirection": "إضافة قسم...",
+  "writedirection": "إضافة إدارة...",
+  "writedepartment": "إضافة قسم...",
   "fillialesempty": "لم تقم بإضافة أي شركات تابعة بعد",
   "directionssempty": "لم تقم بإضافة أي إدارة بعد",
+  "departmentsempty": "لم تقم بإضافة أي قسم بعد",
+
   "filialeexploit": "الشركة التابعة التي تقوم بتشغيل السيارة",
   "direction": "الإدارة",
   "lourd?": "المركبة ثقيلة؟",
@@ -503,6 +506,16 @@
   "systemFreinage": "نظام الكبح",
   "matriculeemploye": "رقم الموظف",
   "poste": "المنصب",
-  "appartenancevehiculesingle": "انتماء للمركبة",
-  "appartenanceemploye": "انتماء الموظف"
+  "appartenancevehiculesingle": "انتماء المركبة",
+  "appartenanceconducteursingle": "انتماء السائق",
+  "appartenanceemploye": "انتماء الموظف",
+  "datecartegrise": "تاريخ وثيقة التسجيل",
+  "numcartegrise": "رقم المستند",
+  "select": "اختيار",
+  "existingdriver": "السائق الموجود؟",
+  "servicefonction": "وظيفة/خدمة",
+  "service": "وظيفة",
+  "fonction": "خدمة",
+  "departement": "القسم",
+  "departements": "الأقسام"
 }
