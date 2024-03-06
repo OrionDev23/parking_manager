@@ -4,6 +4,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/providers/vehicle_provider.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
 import 'package:parc_oto/screens/dashboard/charts/state_category_bar.dart';
@@ -45,34 +46,41 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
     var appTheme = context.watch<AppTheme>();
     bool portrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return ScaffoldPage(
-      header: const PageTitle(text: 'home'),
-      content: ListView(
-        padding: const EdgeInsets.all(10),
-        children: [
-          StaggeredGrid.count(
-            crossAxisCount:
-            portrait
-                    ? 2
-                    : 4,
-            mainAxisSpacing: 5,
-            crossAxisSpacing: 5,
-            children: buttonList(appTheme),
-          ),
-          smallSpace,
-          StaggeredGrid.count(
-            crossAxisCount:
-            portrait
-                    ? 1
-                    : 2,
-            mainAxisSpacing: 5,
-            crossAxisSpacing: 5,
-            children: widgetList(appTheme),
-          ),
-        ],
+      header:  PageTitle(text: 'home',trailing: Button(
+          child: const Text('refresh').tr(), onPressed: (){setState(() {
+
+          });}),),
+      content: ChangeNotifierProvider(
+          create: (BuildContext context) =>VehicleProvider(),
+        builder: (context,vehicles) {
+          return ListView(
+            padding: const EdgeInsets.all(10),
+            children: [
+              StaggeredGrid.count(
+                crossAxisCount:
+                portrait
+                        ? 2
+                        : 4,
+                mainAxisSpacing: 5,
+                crossAxisSpacing: 5,
+                children: buttonList(appTheme),
+              ),
+              smallSpace,
+              StaggeredGrid.count(
+                crossAxisCount:
+                portrait
+                        ? 1
+                        : 2,
+                mainAxisSpacing: 5,
+                crossAxisSpacing: 5,
+                children: widgetList(appTheme),
+              ),
+            ],
+          );
+        }
       ),
     );
   }
