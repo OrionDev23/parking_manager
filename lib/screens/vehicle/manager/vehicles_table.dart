@@ -1,11 +1,9 @@
-import 'package:appwrite/appwrite.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parc_oto/pdf_generation/pdf_preview_listing.dart';
 import 'package:parc_oto/providers/client_database.dart';
-import 'package:pdf/widgets.dart' show PageOrientation;
+import 'package:parc_oto/providers/vehicle_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -506,48 +504,31 @@ class VehicleTableState extends State<VehicleTable> {
   }
 
 
-  void showPdf() {
-    ClientDatabase.database!.listDocuments(
-        databaseId: databaseId,
-        collectionId: vehiculeid,queries: [
-          Query.limit(ClientDatabase.limits['vehicles']??500)
-    ]).then((value){
-      Future.delayed(const Duration(milliseconds: 50))
-          .then((s) => showDialog(
-          context: context,
-          barrierDismissible: true,
-          builder: (context){
-            return PdfPreviewListing(
-              firstPageLimit: 30,
-              midPagesLimit: 35,
-              list: vehicleDataSource.getJsonData(
-                  value.documents),
-              orientation: PageOrientation.landscape,
-              keysToInclude: const ['matricule','type','apparten'
-                  'ance','nom','prenom','direction'],
-              name: 'Liste des véhicules',
-            );
-          }));
-    });
+  void showPdf() async{
+
+
+
 
   }
 
-  void saveExcell(){
-    ClientDatabase.database!.listDocuments(
-        databaseId: databaseId,
-        collectionId: vehiculeid,queries: [
-      Query.limit(ClientDatabase.limits['vehicles']??500)
-    ]).then((value){
+  void saveExcell() async{
 
+    if(!VehicleProvider.downloaded){
+      VehicleProvider();
+      while(!VehicleProvider.downloaded){
+        await Future.delayed(const Duration(milliseconds: 300));
+      }
+    }
+    Future.delayed(const Duration(milliseconds: 50)).then((value) {
       List2Excel(
-        list: vehicleDataSource.getJsonData(value.documents),
-        keysToInclude: const ['matricule','type','apparten'
-          'ance','matriculeConducteur','nom','prenom','direction','departement',
-        'etatactuel','appartenanceconducteur','service','decision','perimetre','emplacement'],
-        title: 'Liste des véhicules',
-      )
-          .getExcel();
-    });
+              list: vehicleDataSource.getJsonData(VehicleProvider.vehicles
+                  .entries.toList()),
+              keysToInclude: const ['matricule','type','apparten'
+                  'ance','matriculeConducteur','nom','prenom','direction','departement',
+                'etatactuel','appartenanceconducteur','service','decision','perimetre','emplacement'],
+              title: 'Liste des véhicules',
+            ).getExcel();
+          });
   }
 
 

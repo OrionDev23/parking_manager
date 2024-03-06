@@ -5,16 +5,16 @@ import '../serializables/vehicle/vehicle.dart';
 import 'client_database.dart';
 
 class VehicleProvider extends ChangeNotifier {
-  Map<String,Vehicle> vehicles={};
-  bool downloaded=false;
-  bool downloading=false;
+  static Map<String,Vehicle> vehicles={};
+  static bool downloaded=false;
+  static bool downloading=false;
   VehicleProvider(){
     if(!downloaded){
       refreshDatabase();
     }
   }
 
-  void refreshDatabase() async{
+  Future<void> refreshDatabase() async{
     if(downloading){
       return;
     }
