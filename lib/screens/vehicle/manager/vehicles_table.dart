@@ -513,9 +513,9 @@ class VehicleTableState extends State<VehicleTable> {
 
   void saveExcell() async{
 
-    if(!VehicleProvider.downloaded){
+    if(!VehicleProvider.downloadedVehicles){
       VehicleProvider();
-      while(!VehicleProvider.downloaded){
+      while(!VehicleProvider.downloadedVehicles){
         await Future.delayed(const Duration(milliseconds: 300));
       }
     }

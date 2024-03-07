@@ -6,7 +6,7 @@ class DatabaseCounters {
   Future<int> countVehicles({int etat = -1}) async {
     int result = 0;
 
-    if(VehicleProvider.downloaded){
+    if(VehicleProvider.downloadedVehicles){
       if(etat==-1){
         return VehicleProvider.vehicles.length;
       }
