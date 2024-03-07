@@ -4,11 +4,13 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
+import 'package:pdf/widgets.dart' show PageOrientation;
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../datasources/vehicle/vehicules_datasource.dart';
 import '../../../excel_generation/generate_list_excel.dart';
+import '../../../pdf_generation/pdf_preview_listing.dart';
 import '../../../theme.dart';
 import '../../../utilities/vehicle_util.dart';
 import '../../../widgets/select_dialog/select_dialog.dart';
@@ -506,9 +508,30 @@ class VehicleTableState extends State<VehicleTable> {
 
   void showPdf() async{
 
+    if(!VehicleProvider.downloadedVehicles){
+      VehicleProvider();
+      while(!VehicleProvider.downloadedVehicles){
+        await Future.delayed(const Duration(milliseconds: 300));
+      }
+    }
+    Future.delayed(const Duration(milliseconds: 50)).then((value) {
 
-
-
+      showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (context){
+            return PdfPreviewListing(
+              firstPageLimit: 30,
+              midPagesLimit: 35,
+              list: vehicleDataSource.getJsonData(
+                  VehicleProvider.vehicles.entries.toList()),
+              orientation: PageOrientation.landscape,
+              keysToInclude: const ['matricule','type','apparten'
+                  'ance','nom','prenom','direction'],
+              name: 'Liste des véhicules',
+            );
+          });
+  });
   }
 
   void saveExcell() async{
