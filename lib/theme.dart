@@ -52,45 +52,31 @@ class AppTheme extends ChangeNotifier {
     ]);
   }
 
+  List<Color> colors=[
+    Colors.red,
+    Colors.green.darker,
+    Colors.blue.lighter,
+    Colors.orange,
+    Colors.blue,
+    Colors.orange.darker,
+    Colors.yellow,
+    Colors.green,
+
+    Colors.blue.darker,
+    Colors.orange.lightest
+  ];
 
   List<Color> getRandomColors(int nbr){
 
 
 
-    if(nbr<=13){
-      return [
-        const Color(0xFF8f8446),
-        const Color(0xFF8e9958),
-        const Color(0xFF89af70),
-        const Color(0xFF81c48d),
-        const Color(0xFF77d8b0),
-        const Color(0xFF6becd6),
-        const Color(0xFF64ffff),
-        const Color(0xFF3bdbec),
-        const Color(0xFF0fb8d6),
-        const Color(0xFF0096bc),
-        const Color(0xFF0075a0),
-        const Color(0xFF005581),
-        const Color(0xFF043761),
-
-      ];
+    if(nbr<=colors.length){
+      return colors;
     }
     else{
       return [
-        const Color(0xFF8f8446),
-        const Color(0xFF8e9958),
-        const Color(0xFF89af70),
-        const Color(0xFF81c48d),
-        const Color(0xFF77d8b0),
-        const Color(0xFF6becd6),
-        const Color(0xFF64ffff),
-        const Color(0xFF3bdbec),
-        const Color(0xFF0fb8d6),
-        const Color(0xFF0096bc),
-        const Color(0xFF0075a0),
-        const Color(0xFF005581),
-        const Color(0xFF043761),
-        ...List.generate(nbr-13, (index) =>const Color(0xFF6becd6),
+        ...colors,
+        ...List.generate(nbr-colors.length, (index) =>colors[colors.length-1],
         )
       ];
     }
