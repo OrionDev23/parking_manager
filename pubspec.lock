@@ -285,10 +285,10 @@ packages:
     dependency: "direct main"
     description:
       name: dart_appwrite
-      sha256: "6bf029cd42fb8bcea30e5bc201c3c07b07ea6116284d7c16cdbb5aa9379168df"
+      sha256: da1b7752e7402e76a95824d1292dc337958994d228aca315d6d4562e8fe747f5
       url: "https://pub.dev"
     source: hosted
-    version: "10.1.1"
+    version: "10.1.0"
   dart_style:
     dependency: transitive
     description:
@@ -1258,6 +1258,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
+  tutorial_coach_mark:
+    dependency: "direct main"
+    description:
+      name: tutorial_coach_mark
+      sha256: "1f1fd234790afb929dec7391a4d90aa54ffe8c8e4d278d9283df8e3f5ac5d63e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.11"
   typed_data:
     dependency: transitive
     description:
@@ -1398,10 +1406,10 @@ packages:
     dependency: transitive
     description:
       name: win32
-      sha256: "464f5674532865248444b4c3daca12bd9bf2d7c47f759ce2617986e7229494a8"
+      sha256: "8cb58b45c47dcb42ab3651533626161d6b67a2921917d8d429791f76972b3480"
       url: "https://pub.dev"
     source: hosted
-    version: "5.2.0"
+    version: "5.3.0"
   win32_registry:
     dependency: transitive
     description:

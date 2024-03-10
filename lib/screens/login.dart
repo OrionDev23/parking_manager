@@ -205,8 +205,9 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
       setState(() {
         checking = true;
       });
-      await ClientDatabase.account!
-          .createEmailSession(email: email.text, password: password.text)
+      await ClientDatabase.account!.createEmailSession(
+          email: email.text,
+          password: password.text)
           .then((value) async {
         await ClientDatabase().getUser();
         PanesListState.signedIn.value = true;
@@ -257,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
         }
 
         return Token(
-            $id: '', $createdAt: '', userId: '', secret: '', expire: '');
+            $id: '', $createdAt: '', userId: '', secret: '', expire: '', );
       });
       setState(() {
         error = "";

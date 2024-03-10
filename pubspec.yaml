@@ -41,7 +41,7 @@ dependencies:
   responsive_sizer: ^3.3.0+1
   provider: ^6.1.2
   get: ^4.6.6
-  appwrite: ^11.0.1
+  appwrite: 11.0.1
   country_code_picker: ^3.0.0
   file_picker: ^6.2.0
   cached_network_image: ^3.3.1
@@ -53,7 +53,7 @@ dependencies:
   syncfusion_flutter_gauges: ^24.2.9
   pdf: ^3.10.8
   printing: ^5.12.0
-  dart_appwrite: ^10.1.1
+  dart_appwrite: 10.1.0
   syncfusion_flutter_calendar: ^24.2.9
   timezone: ^0.9.2
   syncfusion_localizations: ^24.2.9
@@ -66,6 +66,7 @@ dependencies:
   document_file_save_plus: ^2.0.0
   universal_html: ^2.2.4
   syncfusion_flutter_xlsio: ^24.2.9
+  tutorial_coach_mark: ^1.2.11
 
 dev_dependencies:
   flutter_test:

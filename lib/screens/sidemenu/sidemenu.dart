@@ -185,11 +185,11 @@ class PanesListState extends State<PanesList> with WindowListener, AutomaticKeep
                                     height: 60.px,
                                   ),
                                 const Spacer(),
-                                if (!loading && signedIn.value)
+                                if (!loading && signedIn.value && ClientDatabase.trialDate != null)
                                   const NotifList(),
-                                if (!loading && signedIn.value)
+                                if (!loading && signedIn.value&& ClientDatabase.trialDate != null)
                                   const SizedBox(width: 10),
-                                if (!loading && signedIn.value)
+                                if (!loading && signedIn.value&& ClientDatabase.trialDate != null)
                                   const ProfilNameTopBar(),
                                 smallSpace,
                                 if (!kIsWeb)

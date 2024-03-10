@@ -56,7 +56,6 @@ class ClientDatabase {
   ClientDatabase() {
     client ??= Client()
       ..setEndpoint(endpoint)
-      ..setSelfSigned(status: true)
       ..setProject(project);
     account ??= Account(client!);
     database ??= Databases(client!);
@@ -81,6 +80,7 @@ class ClientDatabase {
         if (teams == null && !secretKeySet) {
           setSecretKey();
         }
+        print('is admin');
         return true;
       }
     }
@@ -140,7 +140,10 @@ class ClientDatabase {
           );
           uploadUser(me.value!);
         });
-      }).catchError((error) {
+      }).
+      onError((AppwriteException error,stacktrace) {
+        print(error.message);
+        print(error.response);
         user = null;
       });
       gettingUser = false;
