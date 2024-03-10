@@ -53,14 +53,14 @@ class AppTheme extends ChangeNotifier {
   }
 
   List<Color> colors=[
-    Colors.red,
-    Colors.green.darker,
-    Colors.blue.lighter,
-    Colors.orange,
     Colors.blue,
-    Colors.orange.darker,
-    Colors.yellow,
+    Colors.orange,
     Colors.green,
+    Colors.red,
+    Colors.blue.lighter,
+    Colors.teal,
+    Colors.yellow,
+    Colors.orange.darker,
 
     Colors.blue.darker,
     Colors.orange.lightest
