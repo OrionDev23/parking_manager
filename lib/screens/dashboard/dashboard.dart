@@ -48,15 +48,18 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
     super.build(context);
     var appTheme = context.watch<AppTheme>();
     bool portrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    return ScaffoldPage(
-      header:  PageTitle(text: 'home',trailing: Button(
-          child: const Text('refresh').tr(), onPressed: (){setState(() {
-
-          });}),),
-      content: ChangeNotifierProvider(
-          create: (BuildContext context) =>VehicleProvider(),
+    return ChangeNotifierProvider(
+        create: (BuildContext context) =>VehicleProvider(),
         builder: (context,vehicles) {
-          return ListView(
+          return  ScaffoldPage(
+      header:  PageTitle(text: 'home',trailing: Button(
+          child: const Text('refresh').tr(), onPressed: () async{
+           await  VehicleProvider().refreshVehicles();
+           setState(() {
+
+           });
+      },),),
+      content: ListView(
             padding: const EdgeInsets.all(10),
             children: [
               StaggeredGrid.count(
@@ -79,9 +82,8 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                 children: widgetList(appTheme),
               ),
             ],
-          );
+          ));
         }
-      ),
     );
   }
 
