@@ -145,7 +145,10 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                       isVisible: true,
                     ),
                     tooltipBehavior: TooltipBehavior(
-                        enable: true, format: 'point.x : point.y'),
+                        enable: true, format: 'point.x : point.y',
+                        color: appTheme.backGroundColor,
+                        textStyle: appTheme.writingStyle
+                    ),
                     series: [
                       PieSeries<MapEntry<String, int>, String>(
                         radius: '85%',
@@ -169,11 +172,12 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                         pointColorMapper: (s, i) {
                           return colors[i];
                         },
-                        dataLabelSettings: const DataLabelSettings(
+                        dataLabelSettings: DataLabelSettings(
                             isVisible: true,
-                            textStyle: TextStyle(fontSize: 10),
+                            textStyle: TextStyle(fontSize: 10,color: appTheme
+                                .writingStyle.color),
                             showZeroValue: false,
-                            connectorLineSettings: ConnectorLineSettings(
+                            connectorLineSettings: const ConnectorLineSettings(
                                 type: ConnectorType.line)),
                       )
                     ],

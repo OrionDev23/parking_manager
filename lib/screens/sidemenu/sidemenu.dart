@@ -87,39 +87,50 @@ class PanesListState extends State<PanesList> with WindowListener, AutomaticKeep
   }
 
   bool noConnection = false;
-  StreamSubscription<InternetStatus>? listener;
 
-  void listenToInternet() {
-    listener = InternetConnection().onStatusChange.listen((status) {
-      switch (status) {
-        case InternetStatus.connected:
+  void listenToInternet() async{
+
+    bool check=false;
+    while(mounted){
+        check = await InternetConnection().hasInternetAccess;
+        if(check){
           if (noConnection) {
-            displayInfoBar(context,
-                builder: (BuildContext context, void Function() close) {
-              return InfoBar(
-                title: const Text('connectionback').tr(),
-                severity: InfoBarSeverity.success,
-              );
-            }, duration: snackbarShortDuration);
+            Future.delayed(const Duration(milliseconds: 10)).whenComplete(() {
+              displayInfoBar(context,
+                  builder: (BuildContext context, void Function() close) {
+                    return InfoBar(
+                      title: const Text('connectionback').tr(),
+                      severity: InfoBarSeverity.success,
+                    );
+                  }, duration: snackbarShortDuration);
+            });
             setState(() {
-              noConnection = false;
+              noConnection=false;
             });
           }
-          break;
-        case InternetStatus.disconnected:
-          setState(() {
-            noConnection = true;
-          });
-          displayInfoBar(context,
-              builder: (BuildContext context, void Function() close) {
-            return InfoBar(
-              title: const Text('noconnection').tr(),
-              severity: InfoBarSeverity.warning,
-            );
-          }, duration: snackbarShortDuration * 3);
-          break;
-      }
-    });
+        }
+        else{
+          if(!noConnection){
+            Future.delayed(const Duration(milliseconds: 10)).whenComplete(()
+            {
+              displayInfoBar(context,
+                  builder: (BuildContext context, void Function() close) {
+                    return InfoBar(
+                      title: const Text('noconnection').tr(),
+                      severity: InfoBarSeverity.warning,
+                    );
+                  }, duration: snackbarShortDuration * 3);
+            });
+            setState(() {
+              noConnection=true;
+            });
+
+          }
+        }
+
+
+      await Future.delayed(const Duration(seconds: 10));
+    }
   }
 
   double pwidth = 250.px;
@@ -252,11 +263,6 @@ class PanesListState extends State<PanesList> with WindowListener, AutomaticKeep
     });
   }
 
-  @override
-  void dispose() {
-    listener?.cancel();
-    super.dispose();
-  }
 
   @override
   bool get wantKeepAlive => true;

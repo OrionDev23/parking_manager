@@ -43,28 +43,32 @@ class UsersManagementDatasource
 
     await Future.wait([
       Users(client).delete(userId: t.key.$id).then((value) async {
-        await Databases(client).deleteDocument(
-            databaseId: databaseId,
-            collectionId: userid,
-            documentId: t.key.$id);
-        data.remove(MapEntry(c, t));
-        refreshDatasource();
-      }),
-      addToActivity(t),
-    ]).onError((error, stackTrace) {
-      return [
         f.displayInfoBar(
           current,
-          builder: (c, s) {
+          builder: (co, s) {
             return f.InfoBar(
-                title: const Text('erreur').tr(),
-                severity: f.InfoBarSeverity.error);
+                title: const Text('done').tr(),
+                severity: f.InfoBarSeverity.success);
           },
           alignment:
-              Alignment.lerp(Alignment.topCenter, Alignment.center, 0.6)!,
-        )
-      ];
-    });
+          Alignment.lerp(Alignment.topCenter, Alignment.center, 0.6)!,
+        );
+          try{
+            await Databases(client).deleteDocument(
+                databaseId: databaseId,
+                collectionId: userid,
+                documentId: t.key.$id);
+          }
+          catch(e){
+            //
+          }
+
+          data.remove(MapEntry(c, t));
+          refreshDatasource();
+        }
+      ),
+      addToActivity(t),
+    ]);
   }
 
   @override

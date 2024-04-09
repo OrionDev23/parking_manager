@@ -225,6 +225,13 @@ class _UsersTableState extends State<UsersTable> {
                           : null,
                     ),
                   ),
+                  smallSpace,
+                  IconButton(icon: const Icon(FluentIcons.refresh), onPressed: (){
+                    userDataSource.refreshDatasource();
+                    setState(() {
+
+                    });
+                  })
                 ],
               ),
             ),

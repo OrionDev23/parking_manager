@@ -102,7 +102,12 @@ class _CostGraphState extends State<CostGraph> {
                   enable: true,
                   activationMode: ActivationMode.singleTap,
                   tooltipSettings:
-                      const InteractiveTooltip(format: 'point.x : point.y DA')),
+                      InteractiveTooltip(
+                          format: 'point.x : point.y DA',
+                          color: appTheme.backGroundColor,
+                          textStyle: appTheme.writingStyle
+
+                      )),
               primaryXAxis: DateTimeAxis(
 
                   intervalType: DateTimeIntervalType.months,

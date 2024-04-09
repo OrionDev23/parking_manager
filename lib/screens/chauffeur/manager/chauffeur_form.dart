@@ -1,3 +1,4 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -12,6 +13,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../serializables/vehicle/vehicle.dart';
 import '../../../theme.dart';
+import '../../../utilities/form_validators.dart';
 import '../../entreprise/entreprise.dart';
 import '../../sidemenu/pane_items.dart';
 import '../../sidemenu/sidemenu.dart';
@@ -677,13 +679,13 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   DisponibiliteChauffeur? disp;
   String? etatID;
 
-  Future<Document> uploadChauffeur() async {
+  Future<void> uploadChauffeur() async {
     Conducteur chauf = Conducteur(
       id: chaufID!,
       matricule: matricule.text,
       name: nom.value.text,
       prenom: prenom.value.text,
-      email: email.value.text,
+      email: FormValidators.isEmail(email.value.text)?email.value.text:null,
       telephone: telephone.value.text,
       filliale: selectedAppartenance.text.replaceAll(' ', '').trim(),
       direction: selectedDirection.text.replaceAll(' ', '').trim(),
@@ -696,7 +698,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
       etatactuel: etatID,
     );
     if (widget.chauf != null) {
-      return await ClientDatabase.database!
+      await ClientDatabase.database!
           .updateDocument(
               databaseId: databaseId,
               collectionId: chauffeurid,
@@ -705,11 +707,11 @@ class ChauffeurFormState extends State<ChauffeurForm> {
           .then((value) {
         ClientDatabase().ajoutActivity(17, chaufID!,
             docName: '${chauf.name} ${chauf.prenom}');
-
-        return value;
+      }).onError((AppwriteException error, stackTrace) {
+        print(error.message);
       });
     } else {
-      return await ClientDatabase.database!
+      await ClientDatabase.database!
           .createDocument(
               databaseId: databaseId,
               collectionId: chauffeurid,
@@ -719,7 +721,8 @@ class ChauffeurFormState extends State<ChauffeurForm> {
         ClientDatabase().ajoutActivity(16, chaufID!,
             docName: '${chauf.name} ${chauf.prenom}');
 
-        return value;
+      }).onError((AppwriteException error, stackTrace) {
+        print(error.message);
       });
     }
   }

@@ -28,10 +28,8 @@ class _StateBarsState extends State<StateBars> {
 
   List<ChartData> values = [];
   List<Color> colors=[];
-  late TooltipBehavior tooltip;
   @override
   void initState() {
-    tooltip = TooltipBehavior(enable: true);
 
     initValues();
     super.initState();
@@ -115,7 +113,11 @@ class _StateBarsState extends State<StateBars> {
                 interval: 10,
                 axisLine: AxisLine(width: 0),
                 majorTickLines: MajorTickLines(size: 0)),
-            tooltipBehavior: tooltip,
+            tooltipBehavior: TooltipBehavior(
+                enable: true,
+                color: appTheme.backGroundColor,
+                textStyle: appTheme.writingStyle
+            ),
             primaryXAxis: const CategoryAxis(
               labelIntersectAction: AxisLabelIntersectAction.multipleRows,
               majorGridLines: MajorGridLines(width: 0),

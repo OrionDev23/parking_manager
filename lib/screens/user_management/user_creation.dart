@@ -45,7 +45,8 @@ class _UserFormState extends State<UserForm> {
   bool showPasswordConfirm = false;
 
   void initValues() {
-    userID = widget.user?.$id ?? ID.unique();
+    userID = widget.user?.$id ?? DateTime.now().difference(ClientDatabase.ref)
+        .inMilliseconds.toString();
     email = TextEditingController(text: widget.user?.email);
     password = TextEditingController(text: widget.user?.password);
     passwordConfirm = TextEditingController(text: widget.user?.password);
@@ -377,6 +378,29 @@ class _UserFormState extends State<UserForm> {
   bool uploading = false;
 
   void onConfirm() async {
+
+    if(password.text.length<8 || password.text!=passwordConfirm.text){
+      if(password.text.length<8){
+        displayInfoBar(context,
+            builder: (BuildContext context, void Function() close) {
+              return InfoBar(
+                title: const Text('general_argument_invalid').tr(),
+                severity: InfoBarSeverity.warning,
+              );
+            }, duration: snackbarShortDuration);
+      }
+      else{
+        displayInfoBar(context,
+            builder: (BuildContext context, void Function() close) {
+              return InfoBar(
+                title: const Text('passwordmatch').tr(),
+                severity: InfoBarSeverity.warning,
+              );
+            }, duration: snackbarShortDuration);
+      }
+
+    }
+
     if (email.text.isNotEmpty &&
         validEmail &&
         somethingChanged &&
@@ -389,9 +413,9 @@ class _UserFormState extends State<UserForm> {
       await addUserToUsersList().then((value) async {
         ParcUser newme = ParcUser(
           email: email.text,
-          name: name.text,
+          name: name.text.isEmpty?null:name.text,
           id: userID!,
-          tel: '$phoneDial${phone.text}',
+          tel: phone.text.trim().isEmpty?null:'$phoneDial${phone.text}',
           avatar: null,
         );
         await uploadUserInDB(newme).then((value) {}).then((value) {
@@ -402,21 +426,24 @@ class _UserFormState extends State<UserForm> {
               severity: InfoBarSeverity.success,
             );
           }, duration: snackbarShortDuration);
-        }).onError((error, stackTrace) {
+        }).onError(( AppwriteException error, stackTrace) {
+          print(error.message);
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
             return InfoBar(
               title: const Text('echec').tr(),
-              severity: InfoBarSeverity.success,
+              severity: InfoBarSeverity.error,
             );
           }, duration: snackbarShortDuration);
         });
-      }).onError((error, stackTrace) {
+      }).onError((AppwriteException error, stackTrace) {
+        print(stackTrace);
+        print(error.message);
         displayInfoBar(context,
             builder: (BuildContext context, void Function() close) {
           return InfoBar(
             title: const Text('echec').tr(),
-            severity: InfoBarSeverity.success,
+            severity: InfoBarSeverity.error,
           );
         }, duration: snackbarShortDuration);
         setState(() {
@@ -436,10 +463,14 @@ class _UserFormState extends State<UserForm> {
           .createDocument(
               databaseId: databaseId,
               collectionId: userid,
-              documentId: userID!,
+              documentId: newme.id,
+              permissions: [
+                Permission.update(Role.user(newme.id)),
+                Permission.delete(Role.user(newme.id)),
+                Permission.write(Role.user(newme.id)),
+              ],
               data: newme.toJson())
           .then((value) {
-        ClientDatabase.me.value = newme;
         Navigator.pop(
           context,
         );
@@ -470,10 +501,12 @@ class _UserFormState extends State<UserForm> {
     if (widget.user == null) {
       await Users(client).create(
           userId: userID!,
-          name: name.text,
+          name: name.text.isEmpty?null:name.text,
           email: email.text,
           password: password.text,
-          phone: '$phoneDial${phone.text}');
+        phone: phone.text.trim().isEmpty?null:'$phoneDial${phone.text}',
+
+      );
       ClientDatabase().ajoutActivity(32, userID!, docName: name.text);
     } else {
       if (widget.user!.name != name.text) {

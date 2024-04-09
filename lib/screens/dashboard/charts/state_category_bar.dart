@@ -20,26 +20,24 @@ class StateCategoryBars extends StatefulWidget {
 
 class _StateBarsState extends State<StateCategoryBars> {
   bool loading = false;
-  late TooltipBehavior tooltip;
   List<ChartDataCategory> values = [];
 
-  List<Color> colors=[];
+  List<Color> colors = [];
   @override
   void initState() {
-    tooltip = TooltipBehavior(enable: true);
     initValues();
     super.initState();
   }
 
+  bool gotenColors = false;
 
-  bool gotenColors=false;
-
-  void getColors(AppTheme appTheme){
-    if(!gotenColors){
-      colors=appTheme.getRandomColors(values.length);
-      gotenColors=true;
+  void getColors(AppTheme appTheme) {
+    if (!gotenColors) {
+      colors = appTheme.getRandomColors(values.length);
+      gotenColors = true;
     }
   }
+
   void initValues() async {
     loading = true;
     List<Future> tasks = [];
@@ -50,11 +48,9 @@ class _StateBarsState extends State<StateCategoryBars> {
     sortAsIntended();
     loading = false;
 
-    if(mounted){
-      setState(() {
-      });
+    if (mounted) {
+      setState(() {});
     }
-
   }
 
   void sortAsIntended() {
@@ -107,15 +103,17 @@ class _StateBarsState extends State<StateCategoryBars> {
               isVisible: true,
             ),
             margin: const EdgeInsets.all(5),
-            tooltipBehavior: tooltip,
+            tooltipBehavior: TooltipBehavior(
+                enable: true,
+                color: appTheme.backGroundColor,
+                textStyle: appTheme.writingStyle),
             primaryYAxis: const NumericAxis(
                 interval: 10,
                 axisLine: AxisLine(width: 0),
                 majorTickLines: MajorTickLines(size: 0)),
             primaryXAxis: const CategoryAxis(
                 labelIntersectAction: AxisLabelIntersectAction.multipleRows,
-                majorGridLines: MajorGridLines(width: 0)
-                ),
+                majorGridLines: MajorGridLines(width: 0)),
             series: List<ColumnSeries<ChartData, String>>.generate(
                 values.length, (index) {
               return ColumnSeries(
@@ -130,8 +128,7 @@ class _StateBarsState extends State<StateCategoryBars> {
                     return s.label.tr();
                   },
                   dataLabelMapper: (s, t) {
-                    return '${s.y.toString()} \n ${s
-                        .label.tr()}';
+                    return '${s.y.toString()} \n ${s.label.tr()}';
                   },
                   yValueMapper: (s, r) {
                     return s.y;
@@ -142,6 +139,7 @@ class _StateBarsState extends State<StateCategoryBars> {
       ],
     );
   }
+
   @override
   void dispose() {
     values.clear();

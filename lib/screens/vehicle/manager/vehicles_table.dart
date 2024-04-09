@@ -76,6 +76,8 @@ class VehicleTableState extends State<VehicleTable> {
       filterVehicule.value = null;
     }
     initColumns();
+    sortColumn=columns.length-2;
+
     super.initState();
   }
 
