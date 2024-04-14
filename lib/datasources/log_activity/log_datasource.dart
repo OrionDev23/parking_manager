@@ -5,7 +5,6 @@ import 'package:parc_oto/datasources/log_activity/log_webservice.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/serializables/activity.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../widgets/on_tap_scale.dart';
 
@@ -78,7 +77,15 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
                           );
                         });
                       },
-                      child: const Icon(Icons.more_vert_sharp)))
+                      child: f.Container(
+                          decoration: BoxDecoration(
+                            color: appTheme?.color.lightest,
+                            boxShadow: kElevationToShadow[2],
+                          ),
+                          child: Icon(Icons.edit,color: appTheme!
+                              .color.darkest,))
+                  )
+          )
               : const Text(''),
         )
     ];

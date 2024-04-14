@@ -292,7 +292,10 @@ class List2PDF {
                 ? const EdgeInsets.fromLTRB(2, 1, 2, 60)
                 : const EdgeInsets.fromLTRB(2, 1, 2, 1),
             child: Text(
-              list[index][keysToInclude[i]]=='null'?'':list[index][keysToInclude[i]] ?? ''.toString(),
+              list[index
+                ][keysToInclude[i]]!=null?list[index
+              ][keysToInclude[i]].toString()=='null'?'':list[index
+              ][keysToInclude[i]].toString(): '',
               textDirection: TextDirection.rtl,
               style: ts,
             ),

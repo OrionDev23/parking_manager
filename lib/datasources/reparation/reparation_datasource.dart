@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/datasources/reparation/reparation_webservice.dart';
 import 'package:parc_oto/screens/reparation/reparation_form/reparation_form.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../pdf_generation/pdf_preview_custom.dart';
 import '../../providers/client_database.dart';
@@ -42,7 +41,11 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation> {
       DataCell(SelectableText(
         numberFormat.format(element.value.numero),
         style: rowTextStyle,
-      )),
+      ),
+        onDoubleTap: (){
+          showPdf(element.value);
+        }
+      ),
       DataCell(SelectableText(element.value.vehiculemat ?? '', style: rowTextStyle)),
       DataCell(
           SelectableText(element.value.prestatairenom ?? '', style: rowTextStyle)),
@@ -110,7 +113,13 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation> {
                   );
                 });
               },
-              child: const Icon(Icons.more_vert_sharp)),
+              child: f.Container(
+              decoration: BoxDecoration(
+                color: appTheme?.color.lightest,
+                boxShadow: kElevationToShadow[2],
+              ),
+              child: Icon(Icons.edit,color: appTheme!
+                  .color.darkest,))),
         )),
     ];
   }

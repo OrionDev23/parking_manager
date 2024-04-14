@@ -89,7 +89,13 @@ class VStatesDatasource extends ParcOtoDatasource<Etat> {
                       );
                     });
                   },
-                  child: const Icon(Icons.more_vert_sharp)),
+                  child: f.Container(
+                      decoration: BoxDecoration(
+                        color: appTheme?.color.lightest,
+                        boxShadow: kElevationToShadow[2],
+                      ),
+                      child: Icon(Icons.edit,color: appTheme!
+                          .color.darkest,)))
             )
           : const Text('')),
     ];

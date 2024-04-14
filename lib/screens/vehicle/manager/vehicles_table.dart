@@ -422,11 +422,30 @@ class VehicleTableState extends State<VehicleTable> {
                                   builder: (context){
                                 return MenuFlyout(
                                   items: [
-                                    MenuFlyoutItem(
+                                    MenuFlyoutSubItem(
+                                        text: const Text('listcomplete').tr(),
+                                    items: (BuildContext context) {
+                                        return [
+                                        MenuFlyoutItem(
                                         text: const Text('PDF'), onPressed: showPdf),
                                     MenuFlyoutItem(
-                                        text: const Text('EXCEL'), onPressed:
+                                    text: const Text('EXCEL'), onPressed:
                                     saveExcell),
+                                        ];
+                                    }),
+                                    MenuFlyoutSubItem(
+                                        text: const Text('costpervehic').tr(),
+                                        items: (BuildContext context) {
+                                          return [
+                                            MenuFlyoutItem(
+                                                text: const Text('PDF'),
+                                                onPressed: showCostPdf),
+                                            MenuFlyoutItem(
+                                                text: const Text('EXCEL'), onPressed:
+                                            saveExcelCost),
+                                          ];
+                                        }),
+
                                   ],
                                 );
                               });
@@ -534,6 +553,7 @@ class VehicleTableState extends State<VehicleTable> {
             );
           });
   });
+
   }
 
   void saveExcell() async{
@@ -554,6 +574,43 @@ class VehicleTableState extends State<VehicleTable> {
               title: 'Liste des véhicules',
             ).getExcel();
           });
+  }
+
+  void showCostPdf() async{
+    await VehicleProvider.downloadReparations();
+
+    Future.delayed(const Duration(milliseconds: 50)).then((value){
+      showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (context){
+            return PdfPreviewListing(
+              firstPageLimit: 30,
+              midPagesLimit: 35,
+              list: VehicleProvider.prepareVehicRepList(VehicleProvider
+                  .repPerVeh),
+              orientation: PageOrientation.landscape,
+              keysToInclude: const ['vehicule','modele','mat. conducteur','nom conducteur','nbr. rep','cost','dern. '
+            'rep'],
+              name: 'Couts par vehicule',
+            );
+          });
+    });
+
+  }
+
+  void saveExcelCost() async{
+    await VehicleProvider.downloadReparations();
+    Future.delayed(const Duration(milliseconds: 50)).then((value) {
+      List2Excel(
+        list: VehicleProvider.prepareVehicRepList(VehicleProvider
+            .repPerVeh),
+        keysToInclude: const ['vehicule','modele','mat. conducteur','nom conducteur','nbr. rep','cost','dern. '
+            'rep'],
+        title: 'Couts par vehicule',
+      ).getExcel();
+    });
+
   }
 
 

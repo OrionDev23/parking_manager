@@ -133,7 +133,8 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
                                 boxShadow: kElevationToShadow[2],
                               ),
                               child: Icon(Icons.edit,color: appTheme!
-                                  .color.darkest,))),
+                                  .color.darkest,))
+                      ),
                     ],
                   ),
                 )

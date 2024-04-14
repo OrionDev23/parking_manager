@@ -44,8 +44,8 @@ class _UserManagementState extends State<UserManagement> {
         ));
   }
 
-  void showUserForm() {
-    showDialog(
+  void showUserForm() async {
+    await showDialog(
         context: context,
         builder: (c) {
           return const UserForm();

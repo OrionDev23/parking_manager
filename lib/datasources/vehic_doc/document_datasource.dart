@@ -5,7 +5,6 @@ import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/screens/vehicle/documents/document_form.dart';
 import 'package:parc_oto/screens/vehicle/documents/document_tabs.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/client_database.dart';
 import '../../screens/sidemenu/sidemenu.dart';
@@ -105,7 +104,13 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
                       );
                     });
                   },
-                  child: const Icon(Icons.more_vert_sharp)),
+                  child: f.Container(
+                      decoration: BoxDecoration(
+                        color: appTheme?.color.lightest,
+                        boxShadow: kElevationToShadow[2],
+                      ),
+                      child: Icon(Icons.edit,color: appTheme!
+                          .color.darkest,))),
             )
           : const Text('')),
     ];

@@ -517,5 +517,13 @@
   "service": "وظيفة",
   "fonction": "خدمة",
   "departement": "القسم",
-  "departements": "الأقسام"
+  "departements": "الأقسام",
+  "listcomplete": "القائمة الكاملة",
+  "costpervehic": "التكلفة لكل مركبة",
+  "modele": "النموذج",
+  "mat. conducteur": "رقم السائق",
+  "nom conducteur": "اسم السائق",
+  "nbr. rep": "عدد الإصلاحات",
+  "cost": "التكلفة الإجمالية",
+  "dern. rep": "آخر اصلاح"
 }

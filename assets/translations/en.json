@@ -519,8 +519,15 @@
   "service": "Service",
   "fonction": "Job",
   "departement": "Department",
-  "departements": "Departments"
-
+  "departements": "Departments",
+  "listcomplete": "Complete list",
+  "costpervehic": "Cost per vehicule",
+  "modele": "Model",
+  "mat. conducteur": "Driver number",
+  "nom conducteur": "Driver name",
+  "nbr. rep": "Nbr of repairs",
+  "cost": "Total cost",
+  "dern. rep": "Last repair"
 
 
 }

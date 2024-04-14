@@ -45,8 +45,7 @@ class _UserFormState extends State<UserForm> {
   bool showPasswordConfirm = false;
 
   void initValues() {
-    userID = widget.user?.$id ?? DateTime.now().difference(ClientDatabase.ref)
-        .inMilliseconds.toString();
+
     email = TextEditingController(text: widget.user?.email);
     password = TextEditingController(text: widget.user?.password);
     passwordConfirm = TextEditingController(text: widget.user?.password);
@@ -409,7 +408,13 @@ class _UserFormState extends State<UserForm> {
       setState(() {
         uploading = true;
       });
-
+      userID ??= widget.user?.$id ?? DateTime.now().difference(ClientDatabase
+          .ref)
+          .inMilliseconds.abs().toString();
+      client = Client()
+        ..setEndpoint(endpoint)
+        ..setProject(project)
+        ..setKey(secretKey);
       await addUserToUsersList().then((value) async {
         ParcUser newme = ParcUser(
           email: email.text,
@@ -427,7 +432,7 @@ class _UserFormState extends State<UserForm> {
             );
           }, duration: snackbarShortDuration);
         }).onError(( AppwriteException error, stackTrace) {
-          print(error.message);
+
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
             return InfoBar(
@@ -437,8 +442,7 @@ class _UserFormState extends State<UserForm> {
           }, duration: snackbarShortDuration);
         });
       }).onError((AppwriteException error, stackTrace) {
-        print(stackTrace);
-        print(error.message);
+
         displayInfoBar(context,
             builder: (BuildContext context, void Function() close) {
           return InfoBar(
@@ -459,8 +463,7 @@ class _UserFormState extends State<UserForm> {
 
   Future<void> uploadUserInDB(ParcUser newme) async {
     if (widget.user == null) {
-      await ClientDatabase.database!
-          .createDocument(
+      await Databases(client!).createDocument(
               databaseId: databaseId,
               collectionId: userid,
               documentId: newme.id,
@@ -476,7 +479,7 @@ class _UserFormState extends State<UserForm> {
         );
       });
     } else {
-      await ClientDatabase.database!
+      await Databases(client!)
           .updateDocument(
               databaseId: databaseId,
               collectionId: userid,
@@ -493,13 +496,11 @@ class _UserFormState extends State<UserForm> {
 
   bool alreadyAdded = false;
 
+  Client? client;
   Future<void> addUserToUsersList() async {
-    Client client = Client()
-      ..setEndpoint(endpoint)
-      ..setProject(project)
-      ..setKey(secretKey);
+
     if (widget.user == null) {
-      await Users(client).create(
+      await Users(client!).create(
           userId: userID!,
           name: name.text.isEmpty?null:name.text,
           email: email.text,
@@ -510,11 +511,11 @@ class _UserFormState extends State<UserForm> {
       ClientDatabase().ajoutActivity(32, userID!, docName: name.text);
     } else {
       if (widget.user!.name != name.text) {
-        await Users(client)
+        await Users(client!)
             .updateName(userId: widget.user!.$id, name: name.text);
       }
       if (widget.user!.phone != '$phoneDial${phone.text}') {
-        await Users(client).updatePhone(
+        await Users(client!).updatePhone(
             userId: widget.user!.$id, number: '$phoneDial${phone.text}');
       }
       ClientDatabase().ajoutActivity(33, userID!, docName: name.text);

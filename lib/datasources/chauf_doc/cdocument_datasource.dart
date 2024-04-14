@@ -6,7 +6,6 @@ import 'package:parc_oto/screens/chauffeur/manager/chauffeur_table.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
 import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/serializables/conducteur/document_chauffeur.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/client_database.dart';
 import '../../screens/chauffeur/document/chauf_document_form.dart';
@@ -105,7 +104,15 @@ class ChaufDocumentsDataSource extends ParcOtoDatasource<DocumentChauffeur> {
                       );
                     });
                   },
-                  child: const Icon(Icons.more_vert_sharp)))
+                  child: f.Container(
+                      decoration: BoxDecoration(
+                        color: appTheme?.color.lightest,
+                        boxShadow: kElevationToShadow[2],
+                      ),
+                      child: Icon(Icons.edit,color: appTheme!
+                          .color.darkest,))
+              )
+      )
           : const Text('')),
     ];
   }

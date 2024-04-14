@@ -513,5 +513,13 @@
  "service": "Service",
  "fonction": "Fonction",
  "departement": "Département",
- "departements": "Départements"
+ "departements": "Départements",
+ "listcomplete": "Liste complète",
+ "costpervehic": "Couts par vehicule",
+ "modele": "Modèle",
+ "mat. conducteur": "Mat. conducteur",
+ "nom conducteur": "Nom conducteur",
+ "nbr. rep": "Nbr de réparations",
+ "cost": "Cout total",
+ "dern. rep": "Dern. réparation"
 }

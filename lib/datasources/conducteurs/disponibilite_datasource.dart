@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/serializables/conducteur/disponibilite_chauffeur.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../widgets/on_tap_scale.dart';
 import 'disponibilite_webservice.dart';
@@ -64,7 +63,15 @@ class DisponibiliteDataSource
                         );
                       });
                     },
-                    child: const Icon(Icons.more_vert_sharp)))
+                    child: f.Container(
+                        decoration: BoxDecoration(
+                          color: appTheme?.color.lightest,
+                          boxShadow: kElevationToShadow[2],
+                        ),
+                        child: Icon(Icons.edit,color: appTheme!
+                            .color.darkest,))
+                )
+        )
             : const Text(''),
       ),
     ];

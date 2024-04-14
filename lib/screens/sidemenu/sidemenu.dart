@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
@@ -92,7 +92,7 @@ class PanesListState extends State<PanesList> with WindowListener, AutomaticKeep
 
     bool check=false;
     while(mounted){
-        check = await InternetConnection().hasInternetAccess;
+        check = await InternetConnectionChecker().hasConnection;
         if(check){
           if (noConnection) {
             Future.delayed(const Duration(milliseconds: 10)).whenComplete(() {
