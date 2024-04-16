@@ -68,19 +68,13 @@ dependencies:
   syncfusion_flutter_xlsio: ^25.1.39
   tutorial_coach_mark: ^1.2.11
   video_player_media_kit: ^1.0.5
-
-  # NOTE:
-  # It is not necessary to select all.
-  # Select based on your usage:
-  media_kit_libs_android_video: any
-  media_kit_libs_ios_video: any
-  media_kit_libs_macos_video: any
   media_kit_libs_windows_video: any
   media_kit_libs_linux: any
-  media_kit_video: ^1.2.4                        # For video rendering.
+  media_kit_video: ^1.2.4
   media_kit_libs_video: ^1.0.4
   media_kit: ^1.1.10+1
   video_player: ^2.8.6
+  youtube_player_iframe: ^4.0.4
 
 dev_dependencies:
   flutter_test:

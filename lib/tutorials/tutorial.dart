@@ -47,7 +47,7 @@ class Tutorial extends StatelessWidget {
         icon: FluentIcons.car,
         text: 'vehicules'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/voitures.mp4',context);
+          viewVideo('http://www.parcoto.com/tutorials/voitures.mp4','JWXY28n2vTQ',context);
         },
         showCounter: false,
         showBothLN: false,
@@ -57,7 +57,8 @@ class Tutorial extends StatelessWidget {
         icon: FluentIcons.people_external_share,
         text: 'chauffeurs'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/conducteurs.mp4',context);
+          viewVideo('http://www.parcoto.com/tutorials/conducteurs.mp4','RXwB6'
+              'u4ni0M',context);
         },
         showCounter: false,
         showBothLN: false,
@@ -67,7 +68,8 @@ class Tutorial extends StatelessWidget {
         icon: FluentIcons.repair,
         text: 'reparations'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/reparations.mp4',context);
+          viewVideo('http://www.parcoto.com/tutorials/reparations.mp4','_7XCO'
+              '8QHGtw',context);
         },
         showCounter: false,
         showBothLN: false,
@@ -77,7 +79,8 @@ class Tutorial extends StatelessWidget {
         icon: FluentIcons.user_optional,
         text: 'users'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/utilisateurs.mp4',context);
+          viewVideo('http://www.parcoto.com/tutorials/utilisateurs.mp4','7Dw5rl77xTY',
+              context);
         },
         showCounter: false,
         showBothLN: false,
@@ -87,7 +90,8 @@ class Tutorial extends StatelessWidget {
         icon: FluentIcons.external_build,
         text: 'monentreprise'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/entreprise.mp4',context);
+          viewVideo('http://www.parcoto.com/tutorials/entreprise.mp4','Jb9vVX'
+              'tJPmo',context);
         },
         showCounter: false,
         showBothLN: false,
@@ -97,7 +101,8 @@ class Tutorial extends StatelessWidget {
         icon: FluentIcons.database_activity,
         text: 'journal'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/log.mp4',context);
+          viewVideo('http://www.parcoto.com/tutorials/log.mp4','oYx_GWlgRew',
+              context);
         },
         showCounter: false,
         showBothLN: false,
@@ -107,7 +112,8 @@ class Tutorial extends StatelessWidget {
         icon: FluentIcons.settings,
         text: 'parametres'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/parametres.mp4',context);
+          viewVideo('http://www.parcoto.com/tutorials/parametres.mp4','GL7tXP'
+              'itaH4',context);
         },
         showCounter: false,
         showBothLN: false,
@@ -117,7 +123,8 @@ class Tutorial extends StatelessWidget {
         icon: FluentIcons.plan_view,
         text: 'planifier'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/planning.mp4',context);
+          viewVideo('http://www.parcoto.com/tutorials/planning.mp4','J69pgMwc'
+              'BqM',context);
         },
         showCounter: false,
         showBothLN: false,
@@ -127,7 +134,8 @@ class Tutorial extends StatelessWidget {
         icon: FluentIcons.view_dashboard,
         text: 'home'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/tableaudebord.mp4',context);
+          viewVideo('http://www.parcoto.com/tutorials/tableaudebord.mp4','MbV'
+              'YdcSZcYg',context);
         },
         showCounter: false,
         showBothLN: false,
@@ -136,7 +144,7 @@ class Tutorial extends StatelessWidget {
     ];
   }
 
-  void viewVideo(String link,BuildContext context){
+  void viewVideo(String link,String ytLink,BuildContext context){
     Future.delayed(const Duration(milliseconds: 50))
         .then((value) => showDialog(
         context: context,
@@ -144,7 +152,7 @@ class Tutorial extends StatelessWidget {
         builder: (c) {
           return ContentDialog(
             constraints: BoxConstraints.loose(Size(900.px, 800.px)),
-            content: PaOVideoPlayer(link: link,),
+            content: PaOVideoPlayer(link: link,ytLink: ytLink,),
             actions: [
               Button(child:const Text('fermer').tr(),onPressed:(){
                 Navigator.of(context).pop();
