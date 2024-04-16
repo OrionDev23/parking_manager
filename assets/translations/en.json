@@ -527,7 +527,8 @@
   "nom conducteur": "Driver name",
   "nbr. rep": "Nbr of repairs",
   "cost": "Total cost",
-  "dern. rep": "Last repair"
+  "dern. rep": "Last repair",
+  "tutorial": "Tutorials"
 
 
 }

@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as td;
+import 'package:video_player_media_kit/video_player_media_kit.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'providers/client_database.dart';
@@ -25,6 +26,14 @@ late final SharedPreferences prefs;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  VideoPlayerMediaKit.ensureInitialized(
+    android: true,          // default: false    -    dependency: media_kit_libs_android_video
+    iOS: true,              // default: false    -    dependency: media_kit_libs_ios_video
+    macOS: true,            // default: false    -    dependency: media_kit_libs_macos_video
+    windows: true,          // default: false    -    dependency: media_kit_libs_windows_video
+    linux: true, // default: false    -    dependency: media_kit_libs_linux
+    web:true,
+  );
   tz.initializeTimeZones();
   td.initializeDatabase([]);
   usePathUrlStrategy();

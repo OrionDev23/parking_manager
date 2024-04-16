@@ -20,6 +20,7 @@ import '../prestataire/prestataire_tabs.dart';
 import '../reparation/manager/reparation_tabs.dart';
 import '../reparation/reparation_dashboard.dart';
 import '../settings.dart';
+import '../tutorial.dart';
 import '../user_management/user_management.dart';
 import '../vehicle/brand/brand_list.dart';
 import '../vehicle/documents/document_tabs.dart';
@@ -49,6 +50,8 @@ class PaneItemsAndFooters {
   static late PaneItem backup;
 
   static late PaneItem entreprise;
+
+  static late PaneItem tutorial;
 
   initPanes() {
     dashboard = PaneItem(
@@ -182,6 +185,10 @@ class PaneItemsAndFooters {
         ),
       ),
     );
+    tutorial = PaneItem(
+        icon: Icon(FluentIcons.guid,color: appTheme.color.lightest,),
+        title: const Text('tutorial').tr(),
+        body: const Tutorial());
     bool isAdmin = ClientDatabase().isAdmin();
     bool isManager = ClientDatabase().isManager();
 
@@ -207,6 +214,7 @@ class PaneItemsAndFooters {
       if (isAdmin && PanesListState.signedIn.value) backup,
       if (PanesListState.signedIn.value) logout,
       parametres,
+      tutorial,
     ];
   }
 
