@@ -20,7 +20,7 @@ import '../prestataire/prestataire_tabs.dart';
 import '../reparation/manager/reparation_tabs.dart';
 import '../reparation/reparation_dashboard.dart';
 import '../settings.dart';
-import '../tutorial.dart';
+import '../../tutorials/tutorial.dart';
 import '../user_management/user_management.dart';
 import '../vehicle/brand/brand_list.dart';
 import '../vehicle/documents/document_tabs.dart';
