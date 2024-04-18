@@ -1,4 +1,4 @@
-package com.abcpointcom.parcoto
+package com.example.parc_oto
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -214,6 +214,7 @@ class PaneItemsAndFooters {
       if (isAdmin && PanesListState.signedIn.value) backup,
       if (PanesListState.signedIn.value) logout,
       parametres,
+      if(PanesListState.signedIn.value)
       tutorial,
     ];
   }
