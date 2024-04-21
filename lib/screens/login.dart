@@ -112,6 +112,13 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
                                       : 'entervalidemail'.tr(),
                                   labelStyle: TextStyle(color: Colors.red),
                                   child: TextBox(
+                                    prefix: Padding(
+                                      padding: const EdgeInsets.fromLTRB(8,5,
+                                        5,5),
+                                      child: Icon(FluentIcons.mail,size:14.px,
+                                        color:
+                                      Colors.grey[100],),
+                                    ),
                                     controller: email,
                                     placeholder: 'email'.tr(),
                                     keyboardType: TextInputType.emailAddress,
@@ -133,6 +140,13 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
                               SizedBox(
                                 width: pwidth,
                                 child: TextBox(
+                                  prefix: Padding(
+                                    padding: const EdgeInsets.fromLTRB(8,5,
+                                        5,5),
+                                    child: Icon(FluentIcons.lock,size:14.px,
+                                      color:
+                                    Colors.grey[100],),
+                                  ),
                                   controller: password,
                                   placeholder: 'motdepasse'.tr(),
                                   suffix: IconButton(
