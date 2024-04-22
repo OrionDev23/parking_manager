@@ -12,14 +12,17 @@ import 'package:parc_oto/widgets/page_header.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../main.dart';
+
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key,});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClientMixin{
+  TextEditingController projectName = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
@@ -34,6 +37,7 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
 
   @override
   void initState() {
+    projectName.text=prefs.getString('project')??'';
     waitForFirstLoading();
     super.initState();
   }
@@ -104,6 +108,22 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisSize: MainAxisSize.min,
                             children: [
+                              SizedBox(
+                                width: pwidth,
+                                child: TextBox(
+                                  prefix: Padding(
+                                    padding: const EdgeInsets.fromLTRB(8,5,
+                                        5,5),
+                                    child: Icon(FluentIcons.external_build,size:14.px,
+                                      color:
+                                      Colors.grey[100],),
+                                  ),
+                                  controller: projectName,
+                                  placeholder: 'entreprise'.tr(),
+                                ),
+                              ),
+                              bigSpace,
+                              const Divider(),
                               SizedBox(
                                 width: pwidth,
                                 child: InfoLabel(
@@ -215,26 +235,33 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
   String error = "";
 
   void signIn() async {
-    if (validEmail && password.text.isNotEmpty) {
+    if (validEmail && password.text.isNotEmpty && projectName.text
+      .trim().isNotEmpty) {
       setState(() {
         checking = true;
       });
-      await ClientDatabase.account!.createEmailSession(
-          email: email.text,
-          password: password.text)
-          .then((value) async {
-        await ClientDatabase().getUser();
-        PanesListState.signedIn.value = true;
-        setState(() {
-          signedIn = true;
-        });
-      }).onError<AppwriteException>((e, s) {
-        error = e.type!.tr();
-        setState(() {
-          checking = false;
-          signedIn = false;
+      project=projectName.text;
+      ClientDatabase();
+      Future.delayed(const Duration(milliseconds: 300)).then((value) async{
+        await ClientDatabase.account!.createEmailSession(
+            email: email.text,
+            password: password.text)
+            .then((value) async {
+          prefs.setString('project', projectName.text);
+          await ClientDatabase().getUser();
+          PanesListState.signedIn.value = true;
+          setState(() {
+            signedIn = true;
+          });
+        }).onError<AppwriteException>((e, s) {
+          error = e.type!.tr();
+          setState(() {
+            checking = false;
+            signedIn = false;
+          });
         });
       });
+
     } else if (password.text.isEmpty) {
       setState(() {
         error = "emptypassword".tr();

@@ -13,12 +13,10 @@ import 'package:parc_oto/screens/vehicle/states/state_tabs.dart';
 import 'package:parc_oto/screens/vehicle/vehicle_dashboard.dart';
 import 'package:parc_oto/theme.dart';
 
-import 'main.dart';
 
 GlobalKey sideKey=GlobalKey();
 class Routes {
   Routes(AppTheme appTheme) {
-    final savedSettings = prefs;
     router = GoRouter(
 
       initialLocation: '/dashboard',
@@ -26,7 +24,7 @@ class Routes {
         ShellRoute(
             builder: (context, state,s ) =>
                 PanesList(key: sideKey,
-                  paneList: PaneItemsAndFooters(savedSettings,appTheme), appTheme:
+                  paneList: PaneItemsAndFooters(appTheme), appTheme:
             appTheme,
                 ),
             routes: [

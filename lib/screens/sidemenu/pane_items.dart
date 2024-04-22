@@ -1,10 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/main.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../providers/client_database.dart';
 import '../../theme.dart';
+import '../backup/backup_manager.dart';
 import '../chauffeur/conducteur_dashboard.dart';
 import '../chauffeur/disponibilite/disponibilite_tabs.dart';
 import '../chauffeur/document/chauf_document_tabs.dart';
@@ -29,10 +30,9 @@ import '../vehicle/states/state_tabs.dart';
 import '../vehicle/vehicle_dashboard.dart';
 
 class PaneItemsAndFooters {
-  SharedPreferences savedPrefs;
   AppTheme appTheme;
 
-  PaneItemsAndFooters(this.savedPrefs,this.appTheme) {
+  PaneItemsAndFooters(this.appTheme) {
     initPanes();
   }
 
@@ -150,7 +150,7 @@ class PaneItemsAndFooters {
     parametres = PaneItem(
       icon: Icon(FluentIcons.settings,color: appTheme.color.lightest,),
       title: const Text('parametres').tr(),
-      body: Settings(savedPrefs),
+      body: Settings(prefs),
     );
     entreprise = PaneItemExpander(
       icon: Icon(FluentIcons.build_definition,color: appTheme.color.lightest,),
@@ -178,12 +178,7 @@ class PaneItemsAndFooters {
     backup = PaneItem(
       icon: Icon(FluentIcons.backlog,color: appTheme.color.lightest,),
       title: const Text('backup').tr(),
-      body: const Center(
-        child: Text(
-          'DEMO',
-          style: TextStyle(fontSize: 20),
-        ),
-      ),
+      body: const BackupManager(),
     );
     tutorial = PaneItem(
         icon: Icon(FluentIcons.guid,color: appTheme.color.lightest,),

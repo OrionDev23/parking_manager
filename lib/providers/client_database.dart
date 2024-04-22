@@ -35,7 +35,7 @@ const reparationId = "reparation";
 const activityId = "activity";
 const prestataireId = "prestataire";
 const endpoint = "https://cloud.appwrite.io/v1";
-const project = "6531ace99382e496a904";
+String? project;
 
 late String secretKey;
 
@@ -54,15 +54,19 @@ class ClientDatabase {
   static ValueNotifier<ParcUser?> me = ValueNotifier(null);
 
   ClientDatabase() {
-    client ??= Client()
-      ..setEndpoint(endpoint)
-      ..setProject(project);
-    account ??= Account(client!);
-    database ??= Databases(client!);
-    storage ??= Storage(client!);
-    getLimits();
+    project ??= prefs.getString('project');
+    if(project!=null){
+      client ??= Client()
+        ..setEndpoint(endpoint)
+        ..setProject(project);
+      account ??= Account(client!);
+      database ??= Databases(client!);
+      storage ??= Storage(client!);
+      getLimits();
 
-    getEntreprise();
+      getEntreprise();
+    }
+
   }
 
   bool isManager({List<Team>? teams}) {

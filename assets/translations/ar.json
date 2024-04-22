@@ -526,6 +526,11 @@
   "nbr. rep": "عدد الإصلاحات",
   "cost": "التكلفة الإجمالية",
   "dern. rep": "آخر اصلاح",
-  "tutorial": "دروس"
+  "tutorial": "دروس",
+  "entreprise": "الشركة",
+  "project" : "المشروع",
+  "general_unknown_origin": "لم يتم العثور على الشركة",
+  "backupnow": "اعمل نسخة الان"
+
 
 }

@@ -38,7 +38,6 @@ void main() async {
     await initWindow();
   }
 
-  ClientDatabase();
   launchApp();
 }
 
@@ -54,6 +53,8 @@ void displayMessage(BuildContext context,String msg,InfoBarSeverity severity){
 
 void launchApp() async {
   prefs = await SharedPreferences.getInstance();
+  ClientDatabase();
+
   VehiclesUtilities();
   EasyLocalization.logger.enableBuildModes = [];
   await EasyLocalization.ensureInitialized();

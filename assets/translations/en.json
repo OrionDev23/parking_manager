@@ -528,7 +528,9 @@
   "nbr. rep": "Nbr of repairs",
   "cost": "Total cost",
   "dern. rep": "Last repair",
-  "tutorial": "Tutorials"
-
-
+  "tutorial": "Tutorials",
+  "entreprise": "Company",
+  "project" : "Project",
+  "general_unknown_origin": "Company not found",
+  "backupnow": "Backup now"
 }
