@@ -61,7 +61,7 @@ class _BackupManagerState extends State<BackupManager> {
                 'backupnow',
                 style: TextStyle(fontSize: 16.px),
               ).tr(),
-              constraints: BoxConstraints.loose(Size(400.px, 450.px)),
+              constraints: BoxConstraints.loose(Size(400.px, 460.px)),
               content: const BackupSelection(),
             );
           });
