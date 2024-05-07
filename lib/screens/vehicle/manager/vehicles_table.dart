@@ -3,6 +3,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/providers/repair_provider.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
 import 'package:pdf/widgets.dart' show PageOrientation;
 import 'package:provider/provider.dart';
@@ -577,7 +578,7 @@ class VehicleTableState extends State<VehicleTable> {
   }
 
   void showCostPdf() async{
-    await VehicleProvider.downloadReparations();
+    await RepairProvider.downloadReparations();
 
     Future.delayed(const Duration(milliseconds: 50)).then((value){
       showDialog(
@@ -587,7 +588,7 @@ class VehicleTableState extends State<VehicleTable> {
             return PdfPreviewListing(
               firstPageLimit: 30,
               midPagesLimit: 35,
-              list: VehicleProvider.prepareVehicRepList(VehicleProvider
+              list: RepairProvider.prepareVehicRepList(RepairProvider
                   .repPerVeh),
               orientation: PageOrientation.landscape,
               keysToInclude: const ['vehicule','modele','mat. conducteur','nom conducteur','nbr. rep','cost','dern. '
@@ -600,10 +601,10 @@ class VehicleTableState extends State<VehicleTable> {
   }
 
   void saveExcelCost() async{
-    await VehicleProvider.downloadReparations();
+    await RepairProvider.downloadReparations();
     Future.delayed(const Duration(milliseconds: 50)).then((value) {
       List2Excel(
-        list: VehicleProvider.prepareVehicRepList(VehicleProvider
+        list: RepairProvider.prepareVehicRepList(RepairProvider
             .repPerVeh),
         keysToInclude: const ['vehicule','modele','mat. conducteur','nom conducteur','nbr. rep','cost','dern. '
             'rep'],

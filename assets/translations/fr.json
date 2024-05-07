@@ -411,6 +411,7 @@
  "admins, managers": "Admin et gérant",
  "managers, admins": "Admin et gérant",
  "importlist": "Importer une liste",
+ "import": "Importer",
  "selectimport": "Selectionner les données à importer",
  "invalidvehiclefile": "Le Fichier importé n'est pas formatté correctement\nLe fichier doit être formatté de cette maniere :\n  N    |  Immatriculation   | Model  |  Nom | Prenom\n  1     |    123456-123-12  |  ibiza   |  john  | doe\n  2     |    123456-123-12  |  polo   |  john  | doe",
 
@@ -526,5 +527,15 @@
  "dern. rep": "Dern. réparation",
  "tutorial": "Didacticiels",
  "entreprise": "Entreprise",
- "project" : "Projet"
+ "project" : "Projet",
+ "vehiclescount": "{v} Vehicule(s)",
+ "conducteurcount": "{c} Conducteur(s)",
+ "reparationcount": "{r} Réparation(s)",
+ "prestcount": "{p} Prestataire(s)",
+ "dispcount": "{d} Disponiblité(s)",
+ "doccount": "{d} Document(s)",
+ "statecount": "{s} État(s)",
+ "logcount": "{l} Log(s)",
+ "planningcount": "{p} Planning(s)",
+ "planifications": "Planifications"
 }

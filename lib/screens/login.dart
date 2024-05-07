@@ -243,7 +243,7 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
       project=projectName.text;
       ClientDatabase();
       Future.delayed(const Duration(milliseconds: 300)).then((value) async{
-        await ClientDatabase.account!.createEmailSession(
+        await ClientDatabase.account!.createEmailPasswordSession(
             email: email.text,
             password: password.text)
             .then((value) async {
@@ -299,7 +299,7 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
         }
 
         return Token(
-            $id: '', $createdAt: '', userId: '', secret: '', expire: '', );
+            $id: '', $createdAt: '', userId: '', secret: '', expire: '', phrase: '', );
       });
       setState(() {
         error = "";

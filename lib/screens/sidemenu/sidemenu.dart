@@ -11,14 +11,12 @@ import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:window_manager/window_manager.dart';
 
+import '../../admin_parameters.dart';
+import '../../main.dart';
 import '../../theme.dart';
 import '../dashboard/notifications/notif_list.dart';
 
-const defaultUserPic =
-    "https://upload.wikimedia.org/wikipedia/commons/7/72/Default-welcomer.png";
 
-const demo = true;
-const brandt = true;
 
 class PanesList extends StatefulWidget {
   final PaneItemsAndFooters paneList;
@@ -169,9 +167,11 @@ class PanesListState extends State<PanesList> with WindowListener, AutomaticKeep
                                   width: 80.px,
                                   height: 80.px,
                                 ),
-                                if (demo && ClientDatabase.me.value != null)
+                                smallSpace,
+                                Text('v${packageInfo.version}'),
+                                if (ClientDatabase.trialDate != null && ClientDatabase.me.value != null)
                                   bigSpace,
-                                if (demo && ClientDatabase.trialDate != null)
+                                if (ClientDatabase.trialDate != null)
                                   const Text('daysremain').tr(namedArgs: {
                                     'days': ClientDatabase.trialDate!
                                         .difference(DateTime.now())

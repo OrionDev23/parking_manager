@@ -5,6 +5,7 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../../admin_parameters.dart';
 import '../../../batch_import/import_vehicles.dart';
 import '../../../theme.dart';
 import '../../../widgets/button_container.dart';
@@ -13,7 +14,6 @@ import 'vehicle_form.dart';
 import 'vehicle_tabs.dart';
 import 'vehicles_table.dart';
 
-const showImportButton = false;
 
 class VehicleManagement extends StatefulWidget {
   const VehicleManagement({super.key});
@@ -39,7 +39,7 @@ class VehicleManagementState extends State<VehicleManagement>
         text: 'gestionvehicles'.tr(),
         trailing: Row(
           children: [
-            if (showImportButton && ClientDatabase().isAdmin())
+            if (showImportVehicles && ClientDatabase().isAdmin())
               ButtonContainer(
                 color: appTheme.color.darkest,
                 icon: FluentIcons.add,
@@ -48,7 +48,7 @@ class VehicleManagementState extends State<VehicleManagement>
                 showCounter: false,
                 action: importList,
               ),
-            if (showImportButton && ClientDatabase().isAdmin()) smallSpace,
+            if (showImportVehicles && ClientDatabase().isAdmin()) smallSpace,
             ButtonContainer(
               icon: FluentIcons.add,
               text: 'add'.tr(),

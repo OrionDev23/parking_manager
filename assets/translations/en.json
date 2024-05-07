@@ -225,9 +225,9 @@
   "fullname": "Full name",
   "archive": "Archive",
   "nouvchauf": "New driver",
-  "disponible": "Disponible",
-  "absent": "Absent/En congé",
-  "mission": "En mission",
+  "disponible": "Available",
+  "absent": "Absent/Vacation",
+  "mission": "Mission",
   "quitteentre": "No longer employer",
   "done": "Done !",
  "suprdoc": "Delete the document",
@@ -532,5 +532,17 @@
   "entreprise": "Company",
   "project" : "Project",
   "general_unknown_origin": "Company not found",
-  "backupnow": "Backup now"
+  "backupnow": "Backup now",
+  "import": "Import",
+  "vehiclescount": "{v} Vehicle(s)",
+  "conducteurcount": "{c} Driver(s)",
+  "reparationcount": "{r} Repair(s)",
+  "logcount": "{l} Log(s)",
+  "planningcount": "{p} Planning(s)",
+  "prestcount": "{p} Provider(s)",
+  "dispcount": "{d} Availability(ies)",
+  "doccount": "{d} Document(s)",
+  "statecount": "{s} State(s)",
+  "planifications": "Planifications"
+
 }

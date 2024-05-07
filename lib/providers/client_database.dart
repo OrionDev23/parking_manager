@@ -105,7 +105,6 @@ class ClientDatabase {
         secretKey = value.data['key'];
         secretKeySet = true;
       }).onError((error, stackTrace) {
-
       });
     }
   }
@@ -117,7 +116,6 @@ class ClientDatabase {
       gettingUser = true;
       await account?.get().then((value) async {
         user = value;
-        if (demo) {
           await getTrialDate();
           if (trialDate == null ||
               trialDate!.difference(DateTime.now()).inMilliseconds <= 0) {
@@ -127,7 +125,6 @@ class ClientDatabase {
             PanesListState.index.value = 0;
             return;
           }
-        }
         await database!
             .getDocument(
                 databaseId: databaseId,
@@ -192,17 +189,22 @@ class ClientDatabase {
   }
 
   Future<void> getTrialDate() async {
-    await database!
-        .getDocument(
-            databaseId: databaseId,
-            collectionId: trialID,
-            documentId: user!.$id)
-        .then((value) {
-      trialDate = DateTime.tryParse(value.data['date']);
-    }).onError((AppwriteException error, stackTrace) {
-      print(stackTrace);
-      print(error.message);
-    });
+    if(user!.$id=='999'){
+      trialDate = DateTime(2100);
+
+    }
+    else{
+      await database!
+          .getDocument(
+          databaseId: databaseId,
+          collectionId: trialID,
+          documentId: '1')
+          .then((value) {
+        trialDate = DateTime.tryParse(value.data['date']);
+      }).onError((AppwriteException error, stackTrace) {
+      });
+    }
+
   }
 
   Future<void> getEntreprise() async {

@@ -403,6 +403,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
           },
         ),
       ),
+      if(MyEntrepriseState.p!=null)
       StaggeredGridTile.fit(
         crossAxisCellCount: 1,
         child: TableStats(
@@ -413,7 +414,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
             color: appTheme.color.darker,
           ),
           content: ParcOtoPie(
-            labels: List.generate(MyEntrepriseState.p!.filiales?.length??0,
+            labels: List.generate(MyEntrepriseState.p?.filiales?.length??0,
                     (index) => MapEntry(MyEntrepriseState.p!
                     .filiales![index], DatabaseCounters().countVehiclesWithCondition([
                   Query.equal('appartenance', MyEntrepriseState.p!
@@ -467,7 +468,8 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
           },
         ),
       ),
-      StaggeredGridTile.fit(
+      if(MyEntrepriseState.p!=null)
+        StaggeredGridTile.fit(
         crossAxisCellCount: 1,
         child: TableStats(
           height: height*2,
@@ -494,7 +496,8 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
           },
         ),
       ),
-      StaggeredGridTile.fit(
+      if(MyEntrepriseState.p!=null)
+        StaggeredGridTile.fit(
         crossAxisCellCount: 1,
         child: TableStats(
           height: height*2,
@@ -521,7 +524,8 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
           },
         ),
       ),
-      StaggeredGridTile.fit(
+      if(MyEntrepriseState.p!=null)
+        StaggeredGridTile.fit(
         crossAxisCellCount: 1,
         child: TableStats(
           height: height,

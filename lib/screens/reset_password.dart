@@ -233,7 +233,6 @@ class _ResetScreenState extends State<ResetScreen> {
               userId: userId,
               secret: secret,
               password: password.text,
-              passwordAgain: passwordConfirmation.text,
 
       )
           .then((value) async {

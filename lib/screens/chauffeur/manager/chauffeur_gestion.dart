@@ -8,12 +8,12 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../../theme.dart';
 import '../../../../widgets/button_container.dart';
 import '../../../../widgets/page_header.dart';
+import '../../../admin_parameters.dart';
 import '../../../providers/client_database.dart';
 import 'chauffeur_form.dart';
 import 'chauffeur_table.dart';
 import 'chauffeur_tabs.dart';
 
-bool showImportConducteur=false;
 class ChauffeurGestion extends StatefulWidget {
   final bool archive;
 

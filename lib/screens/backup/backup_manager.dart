@@ -1,9 +1,13 @@
+
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/widgets/button_container.dart';
 import 'package:parc_oto/widgets/page_header.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../theme.dart';
+import 'backup_selection.dart';
 class BackupManager extends StatefulWidget {
   const BackupManager({super.key});
 
@@ -17,17 +21,50 @@ class _BackupManagerState extends State<BackupManager> {
     return ScaffoldPage(
       header: PageTitle(
         text: 'backup'.tr(),
-        trailing: SizedBox(
-          width: 250.px,
-          child: ButtonContainer(
-            icon: FluentIcons.save_all,
-            text: 'backupnow'.tr(),
-            showBottom: false,
-            showCounter: false,
-          ),
+        trailing: Row(
+          children: [
+            SizedBox(
+              width: 200.px,
+              child: ButtonContainer(
+                icon: FluentIcons.import,
+                text: 'import'.tr(),
+                showBottom: false,
+                showCounter: false,
+              ),
+            ),
+            smallSpace,
+            SizedBox(
+              width: 200.px,
+              child: ButtonContainer(
+                icon: FluentIcons.save_all,
+                text: 'save'.tr(),
+                showBottom: false,
+                showCounter: false,
+                action: showSaveScreen,
+              ),
+            ),
+          ],
         ),
-
       ),
     );
+  }
+
+  void showSaveScreen() {
+
+    Future.delayed(const Duration(milliseconds: 30)).then((value) {
+      showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (c) {
+            return ContentDialog(
+              title: Text(
+                'backupnow',
+                style: TextStyle(fontSize: 16.px),
+              ).tr(),
+              constraints: BoxConstraints.loose(Size(400.px, 450.px)),
+              content: const BackupSelection(),
+            );
+          });
+    });
   }
 }

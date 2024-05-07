@@ -41,10 +41,12 @@ class ProfilNameTopBar extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if(Device.orientation==Orientation.landscape)
                   const SizedBox(
                     width: 10,
                   ),
-                  Text(me?.email ?? ''),
+                  if(Device.orientation==Orientation.landscape)
+                    Text(me?.email ?? ''),
                 ],
               ),
               onTap: () {

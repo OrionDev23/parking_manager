@@ -1,15 +1,11 @@
 
-import 'dart:io';
 import 'package:parc_oto/utilities/vehicle_util.dart';
-import 'package:universal_html/html.dart' as html;
-import 'package:document_file_save_plus/document_file_save_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
 import '../pdf_generation/pdf_theming.dart';
+import '../utilities/file_manipulation.dart';
 class List2Excel{
   List<Map<String, dynamic>> list;
   final List<String> keysToInclude;
@@ -45,7 +41,7 @@ class List2Excel{
 
 
     final List<int> bytes = workbook.saveAsStream();
-    saveThisFile(Uint8List.fromList(bytes));
+    saveThisFile(Uint8List.fromList(bytes,),title,".xlxs","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     workbook.dispose();
   }
 
@@ -93,47 +89,6 @@ class List2Excel{
   }
 
 
-
-  void saveThisFile(Uint8List file,) async {
-    if (DeviceType.android == Device.deviceType ||
-        Device.deviceType == DeviceType.ios) {
-      DocumentFileSavePlus().saveFile(file,
-          '$title.xlsx',
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-    } else if (kIsWeb) {
-      saveFileWeb(
-          file,
-          '$title.xlsx');
-    } else {
-      String? path = await FilePicker.platform.saveFile(
-        dialogTitle: "save".tr(),
-        fileName: '$title.xlsx',
-        type: FileType.custom,
-        allowedExtensions: ['xlsx'],
-      );
-      if (path != null) {
-        File f = File(path);
-        f.writeAsBytes(file, mode: FileMode.write);
-      }
-    }
-  }
-
-  void saveFileWeb(Uint8List bytes, String name) {
-    final blob = html.Blob([bytes]);
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.document.createElement('a') as html.AnchorElement
-      ..href = url
-      ..style.display = 'none'
-      ..download = name;
-    html.document.body?.children.add(anchor);
-
-// download
-    anchor.click();
-
-// cleanup
-    html.document.body?.children.remove(anchor);
-    html.Url.revokeObjectUrl(url);
-  }
 
 
 

@@ -19,7 +19,6 @@ import '../../sidemenu/pane_items.dart';
 import '../../sidemenu/sidemenu.dart';
 import '../../vehicle/manager/vehicle_tabs.dart';
 
-int chaufCounter = 0;
 
 class ChauffeurForm extends StatefulWidget {
   final Conducteur? chauf;
@@ -708,7 +707,6 @@ class ChauffeurFormState extends State<ChauffeurForm> {
         ClientDatabase().ajoutActivity(17, chaufID!,
             docName: '${chauf.name} ${chauf.prenom}');
       }).onError((AppwriteException error, stackTrace) {
-        print(error.message);
       });
     } else {
       await ClientDatabase.database!
@@ -722,7 +720,6 @@ class ChauffeurFormState extends State<ChauffeurForm> {
             docName: '${chauf.name} ${chauf.prenom}');
 
       }).onError((AppwriteException error, stackTrace) {
-        print(error.message);
       });
     }
   }

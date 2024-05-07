@@ -530,7 +530,17 @@
   "entreprise": "الشركة",
   "project" : "المشروع",
   "general_unknown_origin": "لم يتم العثور على الشركة",
-  "backupnow": "اعمل نسخة الان"
-
+  "backupnow": "اعمل نسخة الان",
+  "import": "تحميل بيانات",
+  "vehiclescount": "{v} سيارة",
+  "conducteurcount": "{c} سائق",
+  "reparationcount": "{r} إصلاح",
+  "logcount": "{l} سجل",
+  "planningcount": "{p} تخطيط",
+  "prestcount": "{p} موفر",
+  "dispcount": "{d} توفر",
+  "doccount": "{d} وثيقة",
+  "statecount": "{s} حالة",
+  "planifications": "التخطيطات"
 
 }

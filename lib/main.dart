@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:parc_oto/router.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
@@ -21,14 +22,16 @@ import 'providers/client_database.dart';
 import 'theme.dart';
 
 const appTitle = "ParcOto";
-
+late final PackageInfo packageInfo;
 late final SharedPreferences prefs;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  packageInfo = await PackageInfo.fromPlatform();
   VideoPlayerMediaKit.ensureInitialized(
-    windows: true,          // default: false    -    dependency: media_kit_libs_windows_video
-    linux: true, // default: false    -    dependency: media_kit_libs_linux
+    windows: true,
+    macOS:true,
+    linux: true,
   );
   tz.initializeTimeZones();
   td.initializeDatabase([]);
