@@ -272,10 +272,69 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
                 ];
               },
             ),
+            f.MenuFlyoutSubItem(
+              text: const Text('perimetre').tr(),
+              items: (BuildContext context){
+                return [
+                  f.MenuFlyoutItem(
+                      text: const Text('buisiness').tr(),
+                      onPressed: () {
+                        changePerimeter(element,0);
+
+                      }
+                  ),
+                  f.MenuFlyoutItem(
+                      text: const Text('hors perimetre').tr(),
+                      onPressed: () {
+                        changePerimeter(element,1);
+
+                      }
+                  ),
+                  f.MenuFlyoutItem(
+                      text: const Text('industrie').tr(),
+                      onPressed: () {
+                        changePerimeter(element,2);
+                      }
+                  ),
+                ];
+              }
+            ),
           ],
         );
       });
 
+  }
+
+  void changePerimeter(MapEntry<String,Vehicle> element,int
+  perimeter) async{
+      await ClientDatabase.database?.updateDocument(
+          databaseId: databaseId,
+          collectionId: vehiculeid,
+          documentId: element.key,
+          data: {
+            'perimetre':perimeter
+          }
+      ).then((value) {
+        element.value.perimetre=perimeter;
+        f.displayInfoBar(current,
+            builder: (BuildContext context, void Function() close) {
+              return f.InfoBar(
+                title: const Text('done').tr(),
+                severity: f.InfoBarSeverity.success,
+              );
+            }, duration: snackbarShortDuration);
+        ClientDatabase().ajoutActivity(35, element.key,docName:element.value
+            .matricule);
+        notifyListeners();
+      }).onError((error, stackTrace) {
+        f.displayInfoBar(current,
+            builder: (BuildContext context, void Function() close) {
+              return f.InfoBar(
+                title: const Text('erreur').tr(),
+                severity: f.InfoBarSeverity.error,
+              );
+            }, duration: snackbarShortDuration);
+      });
   }
 
   void viewVehicule(MapEntry<String,Vehicle> element){

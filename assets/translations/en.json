@@ -543,6 +543,7 @@
   "dispcount": "{d} Availability(ies)",
   "doccount": "{d} Document(s)",
   "statecount": "{s} State(s)",
-  "planifications": "Planifications"
+  "planifications": "Planifications",
+  "changePermi": "Perimeter changed"
 
 }

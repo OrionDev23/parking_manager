@@ -541,6 +541,7 @@
   "dispcount": "{d} توفر",
   "doccount": "{d} وثيقة",
   "statecount": "{s} حالة",
-  "planifications": "التخطيطات"
+  "planifications": "التخطيطات",
+  "changePermi": "تم تغيير النطاق"
 
 }

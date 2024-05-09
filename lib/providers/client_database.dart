@@ -409,6 +409,8 @@ class ClientDatabase {
         return "modifutilisateur";
       case 34:
         return "suprutilisateur";
+      case 35:
+        return "changePermi";
     }
     return '';
   }

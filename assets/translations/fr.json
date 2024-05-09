@@ -537,5 +537,6 @@
  "statecount": "{s} État(s)",
  "logcount": "{l} Log(s)",
  "planningcount": "{p} Planning(s)",
- "planifications": "Planifications"
+ "planifications": "Planifications",
+ "changePermi": "Perimetre changé"
 }

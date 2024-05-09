@@ -2042,7 +2042,7 @@ class _VehicleFormState extends State<VehicleForm>
               builder: (BuildContext context, void Function() close) {
             return InfoBar(
               title: const Text('echec').tr(),
-              severity: InfoBarSeverity.success,
+              severity: InfoBarSeverity.error,
             );
           }, duration: snackbarShortDuration);
         });
