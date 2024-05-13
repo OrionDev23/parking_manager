@@ -538,5 +538,10 @@
  "logcount": "{l} Log(s)",
  "planningcount": "{p} Planning(s)",
  "planifications": "Planifications",
- "changePermi": "Perimetre changé"
+ "changePermi": "Perimetre changé",
+ "savedone": "Sauvegarde effectuée",
+ "regcopie": "Enregistrer une copie",
+ "uploading": "Sauvegarde en cours",
+ "crypting": "Cryptage en cours",
+ "compressing": "Compression en cours"
 }

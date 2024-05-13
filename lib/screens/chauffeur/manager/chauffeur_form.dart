@@ -3,6 +3,7 @@ import 'package:appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/providers/driver_provider.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicles_table.dart';
 import 'package:parc_oto/serializables/conducteur/conducteur.dart';
 import 'package:parc_oto/serializables/conducteur/disponibilite_chauffeur.dart';
@@ -386,7 +387,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                             child: Padding(
                               padding: const EdgeInsets.all(10.0),
                               child: DropDownButton(
-                                title: Text(ClientDatabase.getEtat(etat)).tr(),
+                                title: Text(DriverProvider.getEtat(etat)).tr(),
                                 placement: FlyoutPlacementMode.bottomCenter,
                                 closeAfterClick: false,
                                 items: [

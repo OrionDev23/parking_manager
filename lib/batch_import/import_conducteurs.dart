@@ -58,12 +58,16 @@ class _ImportConducteursState extends State<ImportConducteurs> {
       });
       var excel = Excel.decodeBytes(bytes);
       for (var table in excel.tables.keys) {
-        print('trying table $table');
+        if (kDebugMode) {
+          print('trying table $table');
+        }
         setState(() {
           progressLoadingFile += 80 / (excel.tables.length);
         });
         if (isFileValid(excel, table)) {
-          print('table $table is valid');
+          if (kDebugMode) {
+            print('table $table is valid');
+          }
           for (var row in excel.tables[table]!.rows) {
             addConducteur(row);
           }
@@ -370,7 +374,9 @@ class _ImportConducteursState extends State<ImportConducteurs> {
         uploaded++;
       });
     }).onError((AppwriteException error, stackTrace) {
-      print('erreur conducteur ${c.matricule} : ${error.message}');
+      if (kDebugMode) {
+        print('erreur conducteur ${c.matricule} : ${error.message}');
+      }
       setState(() {
         notUploaded++;
       });

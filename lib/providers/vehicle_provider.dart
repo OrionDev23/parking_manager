@@ -1,8 +1,10 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
+import '../main.dart';
 import '../serializables/vehicle/document_vehicle.dart';
 import '../serializables/vehicle/state.dart';
 import '../serializables/vehicle/vehicle.dart';
+import '../utilities/profil_beautifier.dart';
 import 'client_database.dart';
 
 class VehicleProvider extends ChangeNotifier {
@@ -104,6 +106,65 @@ class VehicleProvider extends ChangeNotifier {
   void removeVehicle(Vehicle v){
     vehicles.remove(v.id);
     notifyListeners();
+  }
+
+
+  static List<String> removedVehiDocs = [];
+  Future<List<DocumentVehicle>> getDocumentsBeforeTime(
+      DateTime expiration) async {
+    removedVehiDocs = prefs.getStringList('removedDocs') ?? [];
+
+    List<DocumentVehicle> result = [];
+    while(downloadingDocuments){
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+    if(downloadedDocuments){
+      for(var element in documentsVehicules.values){
+        if(element.dateExpiration!=null && element.dateExpiration!.isBefore
+          (expiration) && !removedVehiDocs.contains(element.id)){
+          result.add(element);
+        }
+      }
+    }
+    else{
+    await ClientDatabase.database!.listDocuments(
+        databaseId: databaseId,
+        collectionId: vehicDoc,
+        queries: [
+          Query.lessThanEqual('date_expiration', dateToIntJson(expiration)),
+          if (removedVehiDocs.isNotEmpty)
+            ...removedVehiDocs.map((e) => Query.notEqual(r'$id', e))
+        ]).then((value) {
+      for (int i = 0; i < value.documents.length; i++) {
+        result.add(value.documents[i].convertTo(
+                (p0) => DocumentVehicle.fromJson(p0 as Map<String, dynamic>)));
+      }
+    }).onError((error, stackTrace) {
+      if (kDebugMode) {
+        print(stackTrace);
+      }
+    });}
+    return result;
+  }
+
+
+  Future<Vehicle?> getVehicle(String docID) async {
+    if(vehicles.containsKey(docID)){
+      return vehicles[docID];
+    }
+    else{
+      return await ClientDatabase.database!
+          .getDocument(
+          databaseId: databaseId, collectionId: vehiculeid, documentId: docID)
+          .then((value) {
+        return value
+            .convertTo((p0) => Vehicle.fromJson(p0 as Map<String, dynamic>));
+      }).onError((error, stackTrace) {
+        return Future.value(
+            Vehicle(id: docID, matricule: '', matriculeEtrang: false));
+      });
+    }
+
   }
 
 }

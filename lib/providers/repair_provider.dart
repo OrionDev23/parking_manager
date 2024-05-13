@@ -1,9 +1,10 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:parc_oto/serializables/prestataire.dart';
 import 'package:parc_oto/serializables/reparation/reparation.dart';
 
+import '../utilities/profil_beautifier.dart';
 import 'client_database.dart';
 
 class RepairProvider extends ChangeNotifier {
@@ -176,4 +177,60 @@ class RepairProvider extends ChangeNotifier {
     }
     return result?.trim();
   }
+
+  Future<List<Reparation>> getReparationInMarge(
+      DateTime start, DateTime end) async {
+    List<Reparation> result = [];
+    while(downloadingReparations){
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+    if(downloadedReparations){
+      for(var element in reparations.values){
+        if((element.date.isAtSameMomentAs(start) || element.date.isAfter(start)
+        ) && (element.date.isAtSameMomentAs(end) || element.date.isBefore(end))){
+          result.add(element);
+        }
+      }
+    }
+    else{
+      await ClientDatabase.database!.listDocuments(
+          databaseId: databaseId,
+          collectionId: reparationId,
+          queries: [
+            Query.greaterThanEqual('date', dateToIntJson(start)),
+            Query.lessThanEqual('date', dateToIntJson(end)),
+          ]).then((value) {
+        for (int i = 0; i < value.documents.length; i++) {
+          result.add(value.documents[i].convertTo(
+                  (p0) => Reparation.fromJson(p0 as Map<String, dynamic>)));
+        }
+      }).onError((error, stackTrace) {
+        if (kDebugMode) {
+          print(stackTrace);
+        }
+      });
+    }
+    return result;
+  }
+  Future<Prestataire?> getPrestataire(String? docID) async {
+    if (docID == null) {
+      return Prestataire(id: '', nom: '', adresse: '');
+    }
+    return await ClientDatabase.database!
+        .getDocument(
+        databaseId: databaseId,
+        collectionId: prestataireId,
+        documentId: docID)
+        .then((value) {
+      return value
+          .convertTo((p0) => Prestataire.fromJson(p0 as Map<String, dynamic>));
+    }).onError((error, stackTrace) {
+      return Future.value(Prestataire(
+        id: docID,
+        nom: '',
+        adresse: '',
+      ));
+    });
+  }
+
 }

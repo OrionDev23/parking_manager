@@ -1,11 +1,11 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parc_oto/serializables/prestataire.dart';
-import 'package:parc_oto/serializables/reparation/reparation.dart';
+import 'package:flutter/foundation.dart';
 
+import '../main.dart';
 import '../serializables/conducteur/disponibilite_chauffeur.dart';
 import '../serializables/conducteur/document_chauffeur.dart';
 import '../serializables/conducteur/conducteur.dart';
+import '../utilities/profil_beautifier.dart';
 import 'client_database.dart';
 
 class DriverProvider extends ChangeNotifier {
@@ -104,6 +104,62 @@ class DriverProvider extends ChangeNotifier {
   void removeConducteur(Conducteur c){
     conducteurs.remove(c.id);
     notifyListeners();
+  }
+  static List<String> removedCondDocs = [];
+
+  Future<List<DocumentChauffeur>> getConduDocumentsBeforeTime(
+      DateTime expiration) async {
+    List<DocumentChauffeur> result = [];
+    removedCondDocs = prefs.getStringList('removedCondDocs') ?? [];
+    while(downloadingDocuments){
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+    if(downloadedDocuments){
+      for(var element in documentConducteurs.values){
+        if(element.dateExpiration!=null && element.dateExpiration!.isBefore
+          (expiration) && !removedCondDocs.contains(element.id)){
+          result.add(element);
+        }
+      }
+    }
+    else{
+      await ClientDatabase.database!.listDocuments(
+          databaseId: databaseId,
+          collectionId: chaufDoc,
+          queries: [
+            Query.lessThanEqual('date_expiration', dateToIntJson(expiration)),
+            if (removedCondDocs.isNotEmpty)
+              ...removedCondDocs.map((e) => Query.notEqual(r'$id', e))
+          ]).then((value) {
+        for (int i = 0; i < value.documents.length; i++) {
+          result.add(value.documents[i].convertTo(
+                  (p0) => DocumentChauffeur.fromJson(p0 as Map<String, dynamic>)));
+        }
+      }).onError((AppwriteException error, stackTrace) {
+        if (kDebugMode) {
+          print(error.message);
+          print(error.response);
+        }
+      });
+    }
+
+
+    return result;
+  }
+
+  static String getEtat(int? etat) {
+    switch (etat) {
+      case 0:
+        return 'disponible';
+      case 1:
+        return 'mission';
+      case 2:
+        return 'absent';
+      case 3:
+        return 'quitteentre';
+      default:
+        return 'disponible';
+    }
   }
 
 

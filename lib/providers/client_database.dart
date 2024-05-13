@@ -2,19 +2,12 @@ import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:parc_oto/serializables/activity.dart';
-import 'package:parc_oto/serializables/vehicle/vehicle.dart';
 
 import '../main.dart';
 import '../screens/entreprise/entreprise.dart';
 import '../screens/sidemenu/sidemenu.dart';
-import '../serializables/conducteur/document_chauffeur.dart';
 import '../serializables/entreprise.dart';
 import '../serializables/parc_user.dart';
-import '../serializables/planning.dart';
-import '../serializables/prestataire.dart';
-import '../serializables/reparation/reparation.dart';
-import '../serializables/vehicle/document_vehicle.dart';
-import '../utilities/profil_beautifier.dart';
 
 const databaseId = "6531ad112080ae3b14a7";
 const userid = "users";
@@ -34,6 +27,7 @@ const adminID = "admin_keys";
 const reparationId = "reparation";
 const activityId = "activity";
 const prestataireId = "prestataire";
+const backupId="backup";
 const endpoint = "https://cloud.appwrite.io/v1";
 String? project;
 
@@ -84,7 +78,6 @@ class ClientDatabase {
         if (teams == null && !secretKeySet) {
           setSecretKey();
         }
-        print('is admin');
         return true;
       }
     }
@@ -143,8 +136,11 @@ class ClientDatabase {
         });
       }).
       onError((AppwriteException error,stacktrace) {
-        print(error.message);
-        print(error.response);
+        if (kDebugMode) {
+          print(error.message);
+          print(error.response);
+
+        }
         user = null;
       });
       gettingUser = false;
@@ -252,33 +248,7 @@ class ClientDatabase {
         ]);
   }
 
-  static String getEtat(int? etat) {
-    switch (etat) {
-      case 0:
-        return 'disponible';
-      case 1:
-        return 'mission';
-      case 2:
-        return 'absent';
-      case 3:
-        return 'quitteentre';
-      default:
-        return 'disponible';
-    }
-  }
 
-  Future<Vehicle?> getVehicle(String docID) async {
-    return await database!
-        .getDocument(
-            databaseId: databaseId, collectionId: vehiculeid, documentId: docID)
-        .then((value) {
-      return value
-          .convertTo((p0) => Vehicle.fromJson(p0 as Map<String, dynamic>));
-    }).onError((error, stackTrace) {
-      return Future.value(
-          Vehicle(id: docID, matricule: '', matriculeEtrang: false));
-    });
-  }
 
   Future<ParcUser?> getUserFromID(String docID) async {
     return await database!
@@ -295,26 +265,6 @@ class ClientDatabase {
     });
   }
 
-  Future<Prestataire?> getPrestataire(String? docID) async {
-    if (docID == null) {
-      return Prestataire(id: '', nom: '', adresse: '');
-    }
-    return await database!
-        .getDocument(
-            databaseId: databaseId,
-            collectionId: prestataireId,
-            documentId: docID)
-        .then((value) {
-      return value
-          .convertTo((p0) => Prestataire.fromJson(p0 as Map<String, dynamic>));
-    }).onError((error, stackTrace) {
-      return Future.value(Prestataire(
-        id: docID,
-        nom: '',
-        adresse: '',
-      ));
-    });
-  }
 
   Future<void> ajoutActivity(
     int type,
@@ -415,108 +365,11 @@ class ClientDatabase {
     return '';
   }
 
-  Future<List<Reparation>> getReparationInMarge(
-      DateTime start, DateTime end) async {
-    List<Reparation> result = [];
 
-    await database!.listDocuments(
-        databaseId: databaseId,
-        collectionId: reparationId,
-        queries: [
-          Query.greaterThanEqual('date', dateToIntJson(start)),
-          Query.lessThanEqual('date', dateToIntJson(end)),
-        ]).then((value) {
-      for (int i = 0; i < value.documents.length; i++) {
-        result.add(value.documents[i].convertTo(
-            (p0) => Reparation.fromJson(p0 as Map<String, dynamic>)));
-      }
-    }).onError((error, stackTrace) {
-      if (kDebugMode) {
-        print(stackTrace);
-      }
-    });
 
-    return result;
-  }
 
-  Future<List<DocumentVehicle>> getDocumentsBeforeTime(
-      DateTime expiration) async {
-    removedVehiDocs = prefs.getStringList('removedDocs') ?? [];
 
-    List<DocumentVehicle> result = [];
-    await database!.listDocuments(
-        databaseId: databaseId,
-        collectionId: vehicDoc,
-        queries: [
-          Query.lessThanEqual('date_expiration', dateToIntJson(expiration)),
-          if (removedVehiDocs.isNotEmpty)
-            ...removedVehiDocs.map((e) => Query.notEqual(r'$id', e))
-        ]).then((value) {
-      for (int i = 0; i < value.documents.length; i++) {
-        result.add(value.documents[i].convertTo(
-            (p0) => DocumentVehicle.fromJson(p0 as Map<String, dynamic>)));
-      }
-    }).onError((error, stackTrace) {
-      if (kDebugMode) {
-        print(stackTrace);
-      }
-    });
-    return result;
-  }
 
-  Future<List<DocumentChauffeur>> getConduDocumentsBeforeTime(
-      DateTime expiration) async {
-    List<DocumentChauffeur> result = [];
 
-    removedCondDocs = prefs.getStringList('removedCondDocs') ?? [];
-    await database!.listDocuments(
-        databaseId: databaseId,
-        collectionId: chaufDoc,
-        queries: [
-          Query.lessThanEqual('date_expiration', dateToIntJson(expiration)),
-          if (removedCondDocs.isNotEmpty)
-            ...removedCondDocs.map((e) => Query.notEqual(r'$id', e))
-        ]).then((value) {
-      for (int i = 0; i < value.documents.length; i++) {
-        result.add(value.documents[i].convertTo(
-            (p0) => DocumentChauffeur.fromJson(p0 as Map<String, dynamic>)));
-      }
-    }).onError((AppwriteException error, stackTrace) {
-      if (kDebugMode) {
-        print(error.message);
-        print(error.response);
-      }
-    });
 
-    return result;
-  }
-
-  Future<List<Planning>> getPlanningBeforeTime(DateTime expiration) async {
-    List<Planning> result = [];
-
-    removedPlanDocs = prefs.getStringList('removedPlanning') ?? [];
-    await database!.listDocuments(
-        databaseId: databaseId,
-        collectionId: planningID,
-        queries: [
-          Query.lessThanEqual('startTime', dateToIntJson(expiration)),
-          if (removedPlanDocs.isNotEmpty)
-            ...removedPlanDocs.map((e) => Query.notEqual(r'$id', e))
-        ]).then((value) {
-      for (int i = 0; i < value.documents.length; i++) {
-        result.add(value.documents[i]
-            .convertTo((p0) => Planning.fromJson(p0 as Map<String, dynamic>)));
-      }
-    }).onError((error, stackTrace) {
-      if (kDebugMode) {
-        print(stackTrace);
-      }
-    });
-
-    return result;
-  }
-
-  static List<String> removedVehiDocs = [];
-  static List<String> removedCondDocs = [];
-  static List<String> removedPlanDocs = [];
 }

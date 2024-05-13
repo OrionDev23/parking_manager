@@ -3,6 +3,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/providers/repair_provider.dart';
+import 'package:parc_oto/providers/vehicle_provider.dart';
 import 'package:parc_oto/screens/entreprise/entreprise.dart';
 import 'package:parc_oto/screens/prestataire/prestataire_table.dart';
 import 'package:parc_oto/screens/reparation/reparation_form/designation_reparation.dart';
@@ -117,7 +119,7 @@ class ReparationFormState extends State<ReparationForm>
 
   Future<void> getPrestatataire() async {
     if (widget.reparation != null && widget.reparation!.prestataire != null) {
-      selectedPrest = await ClientDatabase()
+      selectedPrest = await RepairProvider()
           .getPrestataire(widget.reparation!.prestataire!);
     }
   }
@@ -125,7 +127,7 @@ class ReparationFormState extends State<ReparationForm>
   Future<void> getVehicle() async {
     if (widget.reparation != null && widget.reparation!.vehicule != null) {
       selectedVehicle =
-          await ClientDatabase().getVehicle(widget.reparation!.vehicule!);
+          await VehicleProvider().getVehicle(widget.reparation!.vehicule!);
     }
   }
 

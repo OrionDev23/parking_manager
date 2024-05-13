@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' show Badge, LinearProgressIndicator;
-import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/providers/driver_provider.dart';
+import 'package:parc_oto/providers/planning_provider.dart';
+import 'package:parc_oto/providers/vehicle_provider.dart';
 import 'package:parc_oto/serializables/conducteur/document_chauffeur.dart';
 import 'package:parc_oto/serializables/planning.dart';
 import 'package:parc_oto/serializables/vehicle/document_vehicle.dart';
@@ -70,15 +72,15 @@ class NotifListState extends State<NotifList>
   DateTime beforTime = DateTime.now().add(const Duration(days: 60));
 
   Future<void> getVehicDocs() async {
-    docVehic = await ClientDatabase().getDocumentsBeforeTime(beforTime);
+    docVehic = await VehicleProvider().getDocumentsBeforeTime(beforTime);
   }
 
   Future<void> getChaufDocs() async {
-    docChauf = await ClientDatabase().getConduDocumentsBeforeTime(beforTime);
+    docChauf = await DriverProvider().getConduDocumentsBeforeTime(beforTime);
   }
 
   Future<void> getPlanningDocs() async {
-    plannings = await ClientDatabase().getPlanningBeforeTime(beforTime);
+    plannings = await PlanningProvider().getPlanningBeforeTime(beforTime);
   }
 
   void createNotifListFromLists() {

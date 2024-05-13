@@ -1,9 +1,8 @@
-import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:go_router/go_router.dart';
+import 'package:parc_oto/screens/backup/backup_uploader.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -45,72 +44,82 @@ class _BackupSelectionState extends State<BackupSelection> {
   }
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Flexible(
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: FilledButton(
-                        child:
-                        checkers.every((element) => element == true)
-                            ? const Text('clear').tr()
-                            : const Text('selectall').tr(),
-                        onPressed: () {
-                          if (checkers.every((element) => element)) {
-                            for (int i = 0; i < checkers.length; i++) {
-                              checkers[i] = false;
+
+    if(result!=null && !loading){
+      return BackupUploader(data: result!, date: DateTime.now());
+    }
+    else{
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FilledButton(
+                          child:
+                          checkers.every((element) => element == true)
+                              ? const Text('clear').tr()
+                              : const Text('selectall').tr(),
+                          onPressed: () {
+                            if (checkers.every((element) => element)) {
+                              for (int i = 0; i < checkers.length; i++) {
+                                checkers[i] = false;
+                              }
+                            } else {
+                              for (int i = 0; i < checkers.length; i++) {
+                                checkers[i] = true;
+                              }
                             }
-                          } else {
-                            for (int i = 0; i < checkers.length; i++) {
-                              checkers[i] = true;
-                            }
-                          }
-                          setState(() {});
-                        }),
-                  )
-                ],
-              ),
-              vehicleElement(),
-              condElement(),
-              repairElement(),
-              planningElement(),
-              logElement(),
-            ],
+                            setState(() {});
+                          }),
+                    )
+                  ],
+                ),
+                vehicleElement(),
+                condElement(),
+                repairElement(),
+                planningElement(),
+                logElement(),
+              ],
+            ),
           ),
-        ),
-        SizedBox(
-          height: 40.px,
-          width: 400.px,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Expanded(
-                child: Button(
-                    onPressed: () {
-                      context.pop();
-                    },
-                    child: const Text('annuler').tr()),
-              ),
-              smallSpace,
-              Expanded(
-                child: FilledButton(
-                    onPressed: () {makeFile();}, child: const Text('confirmer')
-                    .tr()),
-              )
-            ],
+          SizedBox(
+            height: 40.px,
+            width: 400.px,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Expanded(
+                  child: Button(
+                      onPressed: () {
+                        context.pop();
+                      },
+                      child: const Text('annuler').tr()),
+                ),
+                smallSpace,
+                Expanded(
+                  child: FilledButton(
+                      onPressed: checkers.every((element) => !element) || loading
+                          ? null:() {saveBackup();},
+                      child: loading?const ProgressRing():const Text
+                        ('confirmer')
+                          .tr()),
+                )
+              ],
+            ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
+    }
+
   }
 
   List<bool> checkers = [false, false, false, false, false];
@@ -325,8 +334,15 @@ class _BackupSelectionState extends State<BackupSelection> {
   }
 
 
-  void makeFile(){
-    String result="{";
+  bool loading=false;
+  void saveBackup(){
+    if(loading || checkers.every((element) => !element)){
+      return;
+    }
+    setState(() {
+      loading=true;
+    });
+    result="{";
     if(checkers[0]){
 
       result='$result ${addList("vehicles", VehicleProvider.vehicles, true)}';
@@ -368,11 +384,16 @@ class _BackupSelectionState extends State<BackupSelection> {
           false)} ]';
     }
     result='$result }';
-    DateTime now=DateTime.now();
-    saveThisFile(Uint8List.fromList(utf8.encode(result)), "BACKUP ${now
-        .day}-${now.month}-${now.year}-${now.hour}-${now.minute}-${now
-        .second}",'json',"text/plain");
+
+    setState(() {
+      loading=false;
+    });
+
+
   }
+
+  String? result;
+
 
 
   String addList(String title,Map<String,dynamic> elements,bool next){

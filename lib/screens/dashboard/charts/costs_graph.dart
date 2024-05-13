@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/providers/repair_provider.dart';
 import 'package:parc_oto/screens/dashboard/charts/common.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
@@ -40,7 +40,7 @@ class _CostGraphState extends State<CostGraph> {
 
   void initValues() async {
     reparations =
-        await ClientDatabase().getReparationInMarge(widget.start, widget.end);
+        await RepairProvider().getReparationInMarge(widget.start, widget.end);
     if (kDebugMode) {
       print('got them lenght :${reparations.length}');
     }

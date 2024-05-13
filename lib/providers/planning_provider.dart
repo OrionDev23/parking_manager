@@ -1,7 +1,9 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:parc_oto/serializables/planning.dart';
 
+import '../main.dart';
+import '../utilities/profil_beautifier.dart';
 import 'client_database.dart';
 
 class PlanningProvider extends ChangeNotifier {
@@ -38,6 +40,43 @@ class PlanningProvider extends ChangeNotifier {
     downloadingPlanning=false;
     notifyListeners();
 
+  }
+  static List<String> removedPlanDocs = [];
+  Future<List<Planning>> getPlanningBeforeTime(DateTime expiration) async {
+    List<Planning> result = [];
+
+    removedPlanDocs = prefs.getStringList('removedPlanning') ?? [];
+    while(downloadingPlanning){
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+    if(downloadedPlanning){
+      for(var element in plannings.values){
+        if(element.startTime.isBefore
+          (expiration) && !removedPlanDocs.contains(element.id)){
+          result.add(element);
+        }
+      }
+    }
+    else{
+    await ClientDatabase.database!.listDocuments(
+        databaseId: databaseId,
+        collectionId: planningID,
+        queries: [
+          Query.lessThanEqual('startTime', dateToIntJson(expiration)),
+          if (removedPlanDocs.isNotEmpty)
+            ...removedPlanDocs.map((e) => Query.notEqual(r'$id', e))
+        ]).then((value) {
+      for (int i = 0; i < value.documents.length; i++) {
+        result.add(value.documents[i]
+            .convertTo((p0) => Planning.fromJson(p0 as Map<String, dynamic>)));
+      }
+    }).onError((error, stackTrace) {
+      if (kDebugMode) {
+        print(stackTrace);
+      }
+    });}
+
+    return result;
   }
 
 

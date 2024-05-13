@@ -224,7 +224,7 @@
   "nouvdocument": "وثيقة جديدة",
   "gestiondocument": "إدارة الوثائق",
 
-  "journal": "سجل الأحداث",
+  "journal": "سجل الأنشطة",
   "lclient": "قائمة الزبائن",
   "feuille": "خرائط الطريق",
   "lbons": "قائمة الأوامر",
@@ -542,6 +542,11 @@
   "doccount": "{d} وثيقة",
   "statecount": "{s} حالة",
   "planifications": "التخطيطات",
-  "changePermi": "تم تغيير النطاق"
+  "changePermi": "تم تغيير النطاق",
+  "savedone": "تم إجراء النسخ الاحتياطي",
+  "regcopie": "احفظ نسخة",
+  "uploading": "النسخ الاحتياطي قيد التنفيذ",
+  "crypting": "التشفير قيد التنفيذ",
+  "compressing": "الضغط قيد التنفيذ"
 
 }

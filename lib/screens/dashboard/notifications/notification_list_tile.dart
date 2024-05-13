@@ -1,7 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
-import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/providers/driver_provider.dart';
+import 'package:parc_oto/providers/planning_provider.dart';
+import 'package:parc_oto/providers/vehicle_provider.dart';
 import 'package:parc_oto/screens/dashboard/notifications/notif_list.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
@@ -121,25 +123,25 @@ class _NotificationTileState extends State<NotificationTile> {
 
     late List<String> storedData;
     if (widget.pNotification.type == 0) {
-      ClientDatabase.removedVehiDocs = prefs.getStringList(recordName) ?? [];
-      storedData = ClientDatabase.removedVehiDocs;
+      VehicleProvider.removedVehiDocs = prefs.getStringList(recordName) ?? [];
+      storedData = VehicleProvider.removedVehiDocs;
     } else if (widget.pNotification.type == 1) {
-      ClientDatabase.removedCondDocs = prefs.getStringList(recordName) ?? [];
-      storedData = ClientDatabase.removedCondDocs;
+      DriverProvider.removedCondDocs = prefs.getStringList(recordName) ?? [];
+      storedData = DriverProvider.removedCondDocs;
     } else {
-      ClientDatabase.removedPlanDocs = prefs.getStringList(recordName) ?? [];
-      storedData = ClientDatabase.removedPlanDocs;
+      PlanningProvider.removedPlanDocs = prefs.getStringList(recordName) ?? [];
+      storedData = PlanningProvider.removedPlanDocs;
     }
 
     storedData.add(widget.pNotification.id);
 
     await prefs.setStringList(recordName, storedData).then((value) {
       if (widget.pNotification.type == 0) {
-        ClientDatabase.removedVehiDocs.add(widget.pNotification.id);
+        VehicleProvider.removedVehiDocs.add(widget.pNotification.id);
       } else if (widget.pNotification.type == 1) {
-        ClientDatabase.removedCondDocs.add(widget.pNotification.id);
+        DriverProvider.removedCondDocs.add(widget.pNotification.id);
       } else {
-        ClientDatabase.removedPlanDocs.add(widget.pNotification.id);
+        PlanningProvider.removedPlanDocs.add(widget.pNotification.id);
       }
       Navigator.pop(context);
     }).onError((error, stackTrace) {

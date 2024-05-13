@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/datasources/conducteurs/disponibilite_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/providers/driver_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -229,8 +230,8 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                 child: DropDownButton(
                                                   title: Text(type == null
                                                           ? ''
-                                                          : ClientDatabase
-                                                              .getEtat(type))
+                                                          : DriverProvider
+                                                      .getEtat(type))
                                                       .tr(),
                                                   placement: FlyoutPlacementMode
                                                       .bottomLeft,

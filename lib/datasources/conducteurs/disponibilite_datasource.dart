@@ -3,6 +3,7 @@ import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/providers/driver_provider.dart';
 import 'package:parc_oto/serializables/conducteur/disponibilite_chauffeur.dart';
 
 import '../../widgets/on_tap_scale.dart';
@@ -22,7 +23,7 @@ class DisponibiliteDataSource
 
   @override
   String deleteConfirmationMessage(DisponibiliteChauffeur c) {
-    return '${'supdisp'.tr()} ${c.chauffeurNom} ${ClientDatabase.getEtat(c.type)}';
+    return '${'supdisp'.tr()} ${c.chauffeurNom} ${DriverProvider.getEtat(c.type)}';
   }
 
   @override
@@ -38,7 +39,7 @@ class DisponibiliteDataSource
         },
       )),
       DataCell(SelectableText(
-        ClientDatabase.getEtat(element.value.type).tr(),
+        DriverProvider.getEtat(element.value.type).tr(),
         style: rowTextStyle,
       )),
       DataCell(SelectableText(

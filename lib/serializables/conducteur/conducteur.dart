@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/providers/driver_provider.dart';
 import 'package:parc_oto/serializables/parc_oto_serializable.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 
@@ -57,7 +57,8 @@ class Conducteur extends ParcOtoDefault {
         this.service=false,
       this.telephone}){
       search='$name $prenom ${VehiclesUtilities.getDepartment(departement)} '
-          '${VehiclesUtilities.getDirection(direction)} ${VehiclesUtilities.getAppartenance(filliale)} ${ClientDatabase
+          '${VehiclesUtilities.getDirection(direction)} ${VehiclesUtilities
+          .getAppartenance(filliale)} ${DriverProvider
           .getEtat(etat).tr()} $matricule $adresse $email '
           '${dateNaissance?.toIso8601String()??''} $telephone $profession ${service?'service':'fonction'}';
   }

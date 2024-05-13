@@ -176,7 +176,7 @@ class PaneItemsAndFooters {
     );
 
     backup = PaneItem(
-      icon: Icon(FluentIcons.backlog,color: appTheme.color.lightest,),
+      icon: Icon(FluentIcons.save,color: appTheme.color.lightest,),
       title: const Text('backup').tr(),
       body: const BackupManager(),
     );

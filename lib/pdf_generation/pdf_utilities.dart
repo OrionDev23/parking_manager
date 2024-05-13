@@ -1,11 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:parc_oto/pdf_generation/pdf_theming.dart';
+import 'package:parc_oto/providers/repair_provider.dart';
 import 'package:parc_oto/serializables/prestataire.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
-import '../providers/client_database.dart';
 import '../serializables/reparation/reparation.dart';
 
 Widget dotsSpacer() {
@@ -27,7 +27,7 @@ class PdfUtilities {
   Prestataire? p;
 
   Future<void> initPrestataire(Reparation reparation) async {
-    p = await ClientDatabase().getPrestataire(reparation.prestataire);
+    p = await RepairProvider().getPrestataire(reparation.prestataire);
   }
 
   static List<Widget> getTextListFromMap(
