@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/backup/backup_webservice.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
@@ -47,8 +48,9 @@ class BackupDataSource extends ParcOtoDatasource<Backup>{
       DataCell(
         SizedBox(
             width: 350.px,
-            height: 100.px,
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Flexible(child: createCountersWidget(element,appTheme!)),
@@ -99,6 +101,9 @@ class BackupDataSource extends ParcOtoDatasource<Backup>{
   appTheme){
     return GridView.count(
       crossAxisCount: 3,
+      scrollDirection: Axis.horizontal,
+      mainAxisSpacing: 2,
+      crossAxisSpacing: 2,
       shrinkWrap: true,
       children: [
         if(element.value.vehicles!=0)
@@ -126,18 +131,30 @@ class BackupDataSource extends ParcOtoDatasource<Backup>{
   }
 
   Widget counterElement(String name,String key,int counter,AppTheme appTheme){
-    return Row(
-      children: [
-        Flexible(
-          child: Container(
-            color: appTheme.color.lightest,
-            child: Text(name.tr(namedArgs: {
-              key:counter.toString(),
-            })),
-          ),
-        )
-      ],
-    );
+    return
+        Row(
+          mainAxisSize: MainAxisSize.min,
+
+          children: [
+            Flexible(child:
+            Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: appTheme.color.lightest,
+                borderRadius: BorderRadius.circular(5)
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                child: Text(name.tr(namedArgs: {
+                  key:counter.toString(),
+                })),
+              ),]
+            ))
+                ),
+          ],
+        );
   }
 
   void showApplicationConfirmation(MapEntry<String,Backup> element) {
