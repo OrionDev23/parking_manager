@@ -549,6 +549,9 @@
   "regcopie": "Save a copy",
   "uploading": "Backup in progress",
   "crypting": "Encryption in progress",
-  "compressing": "Compression in progress"
+  "compressing": "Compression in progress",
+  "deletebackup": "Delete this backup?",
+  "backupname": "Backup {d}-{m}-{y} {h}:{M}:{s}",
+  "content": "Content"
 
 }

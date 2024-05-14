@@ -10,14 +10,14 @@ Etat _$EtatFromJson(Map<String, dynamic> json) => Etat(
       id: json[r'$id'] as String,
       createdAt: createdAtJson(json[r'$createdAt'] as String),
       updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
-      type: json['type'] as int,
+      type: (json['type'] as num).toInt(),
       valeur: (json['valeur'] as num?)?.toDouble(),
       remarque: json['remarque'] as String?,
       createdBy: json['createdBy'] as String?,
       vehicle: json['vehicle'] as String,
-      date: dateFromIntJson(json['date'] as int?),
+      date: dateFromIntJson((json['date'] as num?)?.toInt()),
       ordreID: json['ordreID'] as String?,
-      ordreNum: json['ordreNum'] as int?,
+      ordreNum: (json['ordreNum'] as num?)?.toInt(),
       vehicleMat: json['vehicleMat'] as String,
     );
 

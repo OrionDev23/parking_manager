@@ -10,7 +10,7 @@ Activity _$ActivityFromJson(Map<String, dynamic> json) => Activity(
       id: json[r'$id'] as String,
       createdAt: createdAtJson(json[r'$createdAt'] as String),
       updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
-      type: json['type'] as int,
+      type: (json['type'] as num).toInt(),
       docID: json['docID'] as String,
       personName: json['personName'] as String?,
       createdBy: json['createdBy'] as String?,

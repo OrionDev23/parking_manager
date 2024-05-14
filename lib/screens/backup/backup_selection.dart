@@ -46,7 +46,19 @@ class _BackupSelectionState extends State<BackupSelection> {
   Widget build(BuildContext context) {
 
     if(result!=null && !loading){
-      return BackupUploader(data: result!, date: DateTime.now());
+      return BackupUploader(data: result!, date: DateTime.now(),
+        vehicCount: checkers[0]?VehicleProvider.vehicles.length:0,
+        vehicDocCount: checkers[0]?VehicleProvider.documentsVehicules.length:0,
+        vehicStatesCount: checkers[0]?VehicleProvider.etats.length:0,
+        condCount: checkers[1]?DriverProvider.conducteurs.length:0,
+        condDocCount: checkers[1]?DriverProvider.documentConducteurs.length:0,
+        condStateCount: checkers[1]?DriverProvider.disponibiliteConducteurs.length:0,
+        repairCount: checkers[2]?RepairProvider.reparations.length:0,
+        prestCount: checkers[2]?RepairProvider.prestataires.length:0,
+        planCount: checkers[3]?PlanningProvider.plannings.length:0,
+        logCount: checkers[4]?LogProvider.activities.length:0,
+
+      );
     }
     else{
       return Column(

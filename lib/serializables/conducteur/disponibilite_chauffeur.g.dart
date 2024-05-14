@@ -13,7 +13,7 @@ DisponibiliteChauffeur _$DisponibiliteChauffeurFromJson(
       chauffeurNom: json['chauffeurNom'] as String,
       createdAt: createdAtJson(json[r'$createdAt'] as String),
       updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
-      type: json['type'] as int,
+      type: (json['type'] as num).toInt(),
       createdBy: json['createdBy'] as String?,
       chauffeur: json['chauffeur'] as String,
     );

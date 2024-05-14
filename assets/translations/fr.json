@@ -543,5 +543,8 @@
  "regcopie": "Enregistrer une copie",
  "uploading": "Sauvegarde en cours",
  "crypting": "Cryptage en cours",
- "compressing": "Compression en cours"
+ "compressing": "Compression en cours",
+ "deletebackup": "Supprimer cette sauvegarde ?",
+ "backupname": "Sauvegarde {d}-{m}-{y} {h}:{M}:{s}",
+ "content": "Contenu"
 }

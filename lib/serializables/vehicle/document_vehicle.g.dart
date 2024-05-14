@@ -12,7 +12,8 @@ DocumentVehicle _$DocumentVehicleFromJson(Map<String, dynamic> json) =>
       nom: json['nom'] as String,
       vehiclemat: json['vehiclemat'] as String?,
       vehicle: json['vehicle'] as String?,
-      dateExpiration: dateFromIntJson(json['date_expiration'] as int?),
+      dateExpiration:
+          dateFromIntJson((json['date_expiration'] as num?)?.toInt()),
       createdBy: json['createdBy'] as String?,
       createdAt: createdAtJson(json[r'$createdAt'] as String),
       updatedAt: updatedAtJson(json[r'$updatedAt'] as String),

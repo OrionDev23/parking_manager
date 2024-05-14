@@ -2,6 +2,7 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/screens/backup/backup_table.dart';
 import 'package:parc_oto/widgets/button_container.dart';
 import 'package:parc_oto/widgets/page_header.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -46,6 +47,7 @@ class _BackupManagerState extends State<BackupManager> {
           ],
         ),
       ),
+      content: const BackupTable(selectD: false,),
     );
   }
 
