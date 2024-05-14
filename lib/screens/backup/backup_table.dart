@@ -53,7 +53,7 @@ class _BackupTableState extends State<BackupTable> {
     super.initState();
   }
 
-  int sortColumn = 2;
+  int sortColumn = 0;
   double medium=150.px;
 
   void initColumns() {
@@ -66,11 +66,10 @@ class _BackupTableState extends State<BackupTable> {
             style: tstyle,
           ).tr(),
         ),
-        size: ColumnSize.L,
+        fixedWidth: medium,
         onSort: (s, c) {
           sortColumn = 0;
           assending = !assending;
-
           backupDataSource.sort(sortColumn, assending);
           setState(() {});
         },
@@ -93,26 +92,8 @@ class _BackupTableState extends State<BackupTable> {
         },
       ),
       DataColumn2(
-        label: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'date',
-            style: tstyle,
-          ).tr(),
-        ),
-        size: ColumnSize.M,
-        onSort: (s, c) {
-          sortColumn = 2;
-          assending = !assending;
-
-          backupDataSource.sort(sortColumn, assending);
-          setState(() {});
-        },
-      ),
-      DataColumn2(
         label: const Text(''),
-        size: ColumnSize.M,
-        fixedWidth: medium,
+        fixedWidth: medium*0.5,
         onSort: null,
       ),
     ];
@@ -330,7 +311,6 @@ class _BackupTableState extends State<BackupTable> {
       }
       return DataTableParc(
         horizontalScroll: false,
-        numberOfRows: 6,
         header: Padding(
           padding: const EdgeInsets.symmetric(
               vertical: 5.0, horizontal: 10),
@@ -399,6 +379,7 @@ class _BackupTableState extends State<BackupTable> {
         ),
         sortAscending: assending,
         sortColumnIndex: sortColumn,
+        rowHeight: 45,
         columns: columns,
         source: backupDataSource,
       );});

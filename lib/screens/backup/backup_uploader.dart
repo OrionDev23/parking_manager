@@ -29,7 +29,20 @@ class BackupUploader extends StatefulWidget {
   final int planCount;
   final int logCount;
   final DateTime date;
-  const BackupUploader({super.key, required this.data, required this.date, required this.vehicCount, required this.vehicDocCount, required this.vehicStatesCount, required this.condCount, required this.condDocCount, required this.condStateCount, required this.repairCount, required this.prestCount, required this.planCount, required this.logCount});
+  const BackupUploader(
+      {super.key,
+      required this.data,
+      required this.date,
+      required this.vehicCount,
+      required this.vehicDocCount,
+      required this.vehicStatesCount,
+      required this.condCount,
+      required this.condDocCount,
+      required this.condStateCount,
+      required this.repairCount,
+      required this.prestCount,
+      required this.planCount,
+      required this.logCount});
 
   @override
   BackupUploaderState createState() => BackupUploaderState();
@@ -49,61 +62,39 @@ class BackupUploaderState extends State<BackupUploader> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 400.px,
-      height: 200.px,
-      child: Column(
+    return ContentDialog(
+      constraints: BoxConstraints(
+        minWidth: 300.px,
+        maxWidth: 500.px
+      ),
+      title: const Text('backupnow').tr(),
+      content: ListView(
+        shrinkWrap: true,
         children: [
-          Flexible(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                ProgressBar(
-                  value: progress,
-                ),
-                bigSpace,
-                if (progress >= 35 && progress < 100) const Text('uploading').tr(),
-                if (progress < 10) const Text('crypting').tr(),
-                if (progress >= 10 && progress < 35) const Text('compressing').tr(),
-                if (progress == 100) const Text('savedone').tr(),
-              ],
-            ),
+          ProgressBar(
+            value: progress,
           ),
-          if (progress == 100)
-            SizedBox(
-              height: 40.px,
-              width: 400.px,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Expanded(
-                    child: Button(
-                        onPressed: () {
-                          context.pop();
-                        },
-                        child: const Text('fermer').tr()),
-                  ),
-                  smallSpace,
-                  Expanded(
-                    child: FilledButton(
-                        onPressed: saveCopy,
-                        child: Row(
-                          children: [
-                            const Icon(FluentIcons.save),
-                            smallSpace,
-                            const Text('regcopie').tr(),
-                          ],
-                        ))
-                  )
-                ],
-              ),
-            ),
-
+          bigSpace,
+          if (progress >= 35 && progress < 100) const Text('uploading').tr(),
+          if (progress < 10) const Text('crypting').tr(),
+          if (progress >= 10 && progress < 35) const Text('compressing').tr(),
+          if (progress == 100) const Text('savedone').tr(),
         ],
       ),
+      actions: [
+        Button(
+            onPressed: progress == 100 ? () => context.pop() : null,
+            child: const Text('fermer').tr()),
+        FilledButton(
+            onPressed: progress == 100 ? saveCopy : null,
+            child:  Row(
+                    children: [
+                      const Icon(FluentIcons.save),
+                      smallSpace,
+                      const Text('regcopie').tr(),
+                    ],
+                  ))
+      ],
     );
   }
 
@@ -151,10 +142,11 @@ class BackupUploaderState extends State<BackupUploader> {
           .createFile(
               bucketId: backupId,
               fileId: id!,
-              file: InputFile.fromBytes(bytes: file!, filename: 'BACKUP '
-                  '${widget.date.day}-${widget.date.month}-${widget.date
-                  .year}-${widget.date.hour}-${widget.date.minute}-${widget
-                  .date.second}.gz',),
+              file: InputFile.fromBytes(
+                bytes: file!,
+                filename: 'BACKUP '
+                    '${widget.date.day}-${widget.date.month}-${widget.date.year}-${widget.date.hour}-${widget.date.minute}-${widget.date.second}.gz',
+              ),
               onProgress: (p) {
                 setState(() {
                   progress += 0.45 * p.progress + 35;
@@ -164,7 +156,6 @@ class BackupUploaderState extends State<BackupUploader> {
         if (kDebugMode) {
           print(error.message);
           print(error.response);
-
         }
         return Future.value(File(
             $id: '',
@@ -184,7 +175,6 @@ class BackupUploaderState extends State<BackupUploader> {
         });
         updateDb();
       });
-
     } else {
       if (kDebugMode) {
         print('erreur fichier');
@@ -198,18 +188,18 @@ class BackupUploaderState extends State<BackupUploader> {
         collectionId: backupId,
         documentId: id!,
         data: Backup(
-            id: id!,
-            vehicles: widget.vehicCount,
-            vehicledocs: widget.vehicDocCount,
-            vehiclesstates: widget.vehicStatesCount,
-            drivers: widget.condCount,
-            driversdocs: widget.condDocCount,
-            driversstates: widget.condStateCount,
-            repairs: widget.repairCount,
-            providers: widget.prestCount,
-            plannings: widget.planCount,
-            logs: widget.logCount,
-            createdBy: ClientDatabase.me.value?.id,
+          id: id!,
+          vehicles: widget.vehicCount,
+          vehicledocs: widget.vehicDocCount,
+          vehiclesstates: widget.vehicStatesCount,
+          drivers: widget.condCount,
+          driversdocs: widget.condDocCount,
+          driversstates: widget.condStateCount,
+          repairs: widget.repairCount,
+          providers: widget.prestCount,
+          plannings: widget.planCount,
+          logs: widget.logCount,
+          createdBy: ClientDatabase.me.value?.id,
         ).toJson());
     setState(() {
       progress = 100;

@@ -1,12 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:parc_oto/datasources/backup/backup_webservice.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
+import 'package:parc_oto/screens/backup/backup_restore.dart';
 import 'package:parc_oto/serializables/backup.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:parc_oto/utilities/profil_beautifier.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../providers/client_database.dart';
 import '../../theme.dart';
 import '../../widgets/on_tap_scale.dart';
@@ -31,8 +31,6 @@ class BackupDataSource extends ParcOtoDatasource<Backup>{
   @override
   List<DataCell> getCellsToShow(MapEntry<String, Backup> element) {
     DateTime? dateTime=dateFromIntJson(int.tryParse(element.value.id)??0);
-    final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
-
     return [
       DataCell(
         Text('backupname'.tr(namedArgs: {
@@ -42,24 +40,14 @@ class BackupDataSource extends ParcOtoDatasource<Backup>{
           'h':dateTime?.hour.toString()??'09',
           'M':dateTime?.minute.toString()??'00',
           's':dateTime?.second.toString()??'00'
-        })),
+        }),style: rowTextStyle,),
         onDoubleTap: ()=>showApplicationConfirmation(element),
       ),
       DataCell(
-        SizedBox(
-            width: 350.px,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(child: createCountersWidget(element,appTheme!)),
-              ],
-            )),
+        Padding(
+            padding: const EdgeInsets.all(3),
+            child: createCountersWidget(element,appTheme!)),
         onDoubleTap: ()=>showApplicationConfirmation(element),
-      ),
-      DataCell(
-        Text(dateFormat.format(element.value.createdAt??DateTime(2024,01,01,09)))
       ),
       if (selectC != true && ClientDatabase().isAdmin())
         DataCell(f.FlyoutTarget(
@@ -97,68 +85,90 @@ class BackupDataSource extends ParcOtoDatasource<Backup>{
   }
 
 
+
   Widget createCountersWidget(MapEntry<String,Backup> element,AppTheme
   appTheme){
-    return GridView.count(
-      crossAxisCount: 3,
-      scrollDirection: Axis.horizontal,
-      mainAxisSpacing: 2,
-      crossAxisSpacing: 2,
-      shrinkWrap: true,
+    List<Widget> tiles= [
+      if(element.value.vehicles!=0)
+        counterElement('vehiclescount','v',element.value.vehicles,appTheme),
+      if(element.value.vehicledocs!=0)
+        counterElement('doccount','d',element.value.vehicledocs,appTheme),
+      if(element.value.vehiclesstates!=0)
+        counterElement('statecount','s',element.value.vehiclesstates,appTheme),
+      if(element.value.drivers!=0)
+        counterElement('conducteurcount','c',element.value.drivers,appTheme),
+      if(element.value.driversdocs!=0)
+        counterElement('doccount','d',element.value.driversdocs,appTheme),
+      if(element.value.driversstates!=0)
+        counterElement('dispcount','d',element.value.driversstates,appTheme),
+      if(element.value.repairs!=0)
+        counterElement('reparationcount','r',element.value.repairs,appTheme),
+      if(element.value.providers!=0)
+        counterElement('prestcount','p',element.value.providers,appTheme),
+      if(element.value.plannings!=0)
+        counterElement('planningcount','p',element.value.plannings,appTheme),
+      if(element.value.logs!=0)
+        counterElement('logcount','l',element.value.logs,appTheme),
+    ];
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        if(element.value.vehicles!=0)
-          counterElement('vehiclescount','v',element.value.vehicles,appTheme),
-        if(element.value.vehicledocs!=0)
-          counterElement('doccount','d',element.value.vehicles,appTheme),
-        if(element.value.vehiclesstates!=0)
-          counterElement('statecount','s',element.value.vehicles,appTheme),
-        if(element.value.drivers!=0)
-          counterElement('conducteurcount','c',element.value.vehicles,appTheme),
-        if(element.value.driversdocs!=0)
-          counterElement('doccount','d',element.value.vehicles,appTheme),
-        if(element.value.driversstates!=0)
-          counterElement('dispcount','d',element.value.vehicles,appTheme),
-        if(element.value.repairs!=0)
-          counterElement('reparationcount','r',element.value.vehicles,appTheme),
-        if(element.value.providers!=0)
-          counterElement('prestcount','p',element.value.vehicles,appTheme),
-        if(element.value.plannings!=0)
-          counterElement('planningcount','p',element.value.vehicles,appTheme),
-        if(element.value.logs!=0)
-          counterElement('logcount','l',element.value.vehicles,appTheme),
+        Flexible(
+          child: MasonryGridView.count(
+            shrinkWrap: true,
+            crossAxisCount: 5,
+            itemCount: tiles.length,
+            mainAxisSpacing: 2,
+            crossAxisSpacing: 2,
+            itemBuilder: (con,index){
+              return tiles[index];
+            },
+          ),
+        ),
       ],
     );
   }
 
   Widget counterElement(String name,String key,int counter,AppTheme appTheme){
     return
-        Row(
-          mainAxisSize: MainAxisSize.min,
-
-          children: [
-            Flexible(child:
-            Container(
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                color: appTheme.color.lightest,
-                borderRadius: BorderRadius.circular(5)
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Expanded(
-                child: Text(name.tr(namedArgs: {
-                  key:counter.toString(),
-                })),
-              ),]
-            ))
-                ),
-          ],
+        Container(
+            padding: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              color: appTheme.color.lightest,
+              borderRadius: BorderRadius.circular(5)
+            ),
+            child: Text(name.tr(namedArgs: {
+              key:counter.toString(),
+            }),style: rowTextStyle,)
         );
   }
 
   void showApplicationConfirmation(MapEntry<String,Backup> element) {
+    Future.delayed(const Duration(milliseconds: 30)).then((value) {
+      f.showDialog(context: current, builder: (con){
+        return BackupRestore(backup: element.value);
+      });
+    });
+  }
 
+  @override
+  void deleteRow(c) async{
+    await ClientDatabase.storage!.deleteFile(bucketId: backupId, fileId: c
+        .id).then((value) =>super.deleteRow(c)).onError((error, stackTrace)
+    {
+      f.displayInfoBar(
+        current,
+        builder: (c, s) {
+          return f.InfoBar(
+              title: const Text('erreur').tr(),
+              severity: f.InfoBarSeverity.error);
+        },
+        alignment:
+        Alignment.lerp(Alignment.topCenter, Alignment.center, 0.6)!,
+      );
+    });
   }
 
 }

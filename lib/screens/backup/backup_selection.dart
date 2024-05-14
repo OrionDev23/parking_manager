@@ -3,8 +3,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:parc_oto/screens/backup/backup_uploader.dart';
-import 'package:parc_oto/theme.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/driver_provider.dart';
 import '../../providers/log_provider.dart';
@@ -61,73 +59,62 @@ class _BackupSelectionState extends State<BackupSelection> {
       );
     }
     else{
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Flexible(
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: FilledButton(
-                          child:
-                          checkers.every((element) => element == true)
-                              ? const Text('clear').tr()
-                              : const Text('selectall').tr(),
-                          onPressed: () {
-                            if (checkers.every((element) => element)) {
-                              for (int i = 0; i < checkers.length; i++) {
-                                checkers[i] = false;
+      return ContentDialog(
+        title: const Text('backupnow').tr(),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: FilledButton(
+                            child:
+                            checkers.every((element) => element == true)
+                                ? const Text('clear').tr()
+                                : const Text('selectall').tr(),
+                            onPressed: () {
+                              if (checkers.every((element) => element)) {
+                                for (int i = 0; i < checkers.length; i++) {
+                                  checkers[i] = false;
+                                }
+                              } else {
+                                for (int i = 0; i < checkers.length; i++) {
+                                  checkers[i] = true;
+                                }
                               }
-                            } else {
-                              for (int i = 0; i < checkers.length; i++) {
-                                checkers[i] = true;
-                              }
-                            }
-                            setState(() {});
-                          }),
-                    )
-                  ],
-                ),
-                vehicleElement(),
-                condElement(),
-                repairElement(),
-                planningElement(),
-                logElement(),
-              ],
+                              setState(() {});
+                            }),
+                      )
+                    ],
+                  ),
+                  vehicleElement(),
+                  condElement(),
+                  repairElement(),
+                  planningElement(),
+                  logElement(),
+                ],
+              ),
             ),
-          ),
-          SizedBox(
-            height: 40.px,
-            width: 400.px,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Expanded(
-                  child: Button(
-                      onPressed: () {
-                        context.pop();
-                      },
-                      child: const Text('annuler').tr()),
-                ),
-                smallSpace,
-                Expanded(
-                  child: FilledButton(
-                      onPressed: checkers.every((element) => !element) || loading
-                          ? null:() {saveBackup();},
-                      child: loading?const ProgressRing():const Text
-                        ('confirmer')
-                          .tr()),
-                )
-              ],
-            ),
-          ),
+          ],
+        ),
+        actions: [
+          Button(
+              onPressed: () {
+                context.pop();
+              },
+              child: const Text('annuler').tr()),
+          FilledButton(
+              onPressed: checkers.every((element) => !element) || loading
+                  ? null:() {saveBackup();},
+              child: loading?const ProgressRing():const Text
+                ('confirmer')
+                  .tr())
         ],
       );
     }
