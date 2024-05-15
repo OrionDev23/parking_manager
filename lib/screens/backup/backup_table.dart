@@ -100,8 +100,8 @@ class _BackupTableState extends State<BackupTable> {
   }
   bool notEmpty = false;
   FlyoutController filterFlyout = FlyoutController();
-  TextEditingController yearMin = TextEditingController();
-  TextEditingController yearMax = TextEditingController();
+  DateTime dateMin = DateTime.now().subtract(const Duration(days: 31));
+  DateTime dateMax = DateTime.now();
   Map<String, String> filters = {};
 
   final rowPerPageC = 12;
@@ -128,59 +128,40 @@ class _BackupTableState extends State<BackupTable> {
                                     .all(10.0),
                                 child: Row(
                                   children: [
-                                    const Text(
-                                        'min')
-                                        .tr(),
-                                    smallSpace,
                                     Flexible(
                                       child:
-                                      TextBox(
-                                        controller:
-                                        yearMin,
-                                        placeholder:
-                                        'min'
-                                            .tr(),
-                                        placeholderStyle:
-                                        placeStyle,
-                                        style: appTheme
-                                            .writingStyle,
-                                        decoration:
-                                        BoxDecoration(
-                                          color: appTheme
-                                              .fillColor,
-                                        ),
-                                        cursorColor:
-                                        appTheme
-                                            .color
-                                            .darker,
+                                      DatePicker(
+                                        selected:
+                                        dateMin,
+                                        header: 'min'.tr(),
+                                        headerStyle: placeStyle,
+                                        onChanged: (s){
+                                          setState(() {
+                                            dateMin=DateTime(s.year,s.month,s
+                                                .day,0,0,0);
+
+                                          });
+                                          setS((){});
+
+                                        },
                                       ),
                                     ),
                                     smallSpace,
-                                    const Text(
-                                        'max')
-                                        .tr(),
-                                    smallSpace,
                                     Flexible(
                                       child:
-                                      TextBox(
-                                        controller:
-                                        yearMax,
-                                        placeholder:
-                                        'max'
-                                            .tr(),
-                                        placeholderStyle:
-                                        placeStyle,
-                                        style: appTheme
-                                            .writingStyle,
-                                        decoration:
-                                        BoxDecoration(
-                                          color: appTheme
-                                              .fillColor,
-                                        ),
-                                        cursorColor:
-                                        appTheme
-                                            .color
-                                            .darker,
+                                      DatePicker(
+                                        selected:
+                                        dateMax,
+                                        header: 'max'.tr(),
+                                        headerStyle: placeStyle,
+                                        onChanged: (s){
+                                          setState(() {
+                                            dateMax=DateTime(s.year,s.month,s
+                                                .day,23,59,59);
+                                          });
+                                          setS((){});
+
+                                        },
                                       ),
                                     ),
                                   ],
@@ -257,27 +238,10 @@ class _BackupTableState extends State<BackupTable> {
                                           context)
                                           .pop();
 
-                                      if (yearMin
-                                          .text
-                                          .isNotEmpty) {
                                         filters['datemin'] =
-                                            yearMin
-                                                .text;
-                                      } else {
-                                        filters.remove(
-                                            'datemin');
-                                      }
-                                      if (yearMax
-                                          .text
-                                          .isNotEmpty) {
-                                        filters['datemax'] =
-                                            yearMax
-                                                .text;
-                                      } else {
-                                        filters.remove(
-                                            'datemax');
-                                      }
-
+                                            dateMin.difference(ClientDatabase
+                        .ref).inMilliseconds.toString();
+                                        filters['datemax'] = dateMax.difference(ClientDatabase.ref).inMilliseconds.toString();
                                       filtered =
                                       true;
                                       setState(

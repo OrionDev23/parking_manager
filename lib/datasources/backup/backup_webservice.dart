@@ -26,9 +26,9 @@ class BackupWebService extends ParcOtoWebService<Backup> {
       {int? index}) {
     return [
       if (filters.containsKey('datemin'))
-        Query.greaterThanEqual('\$createdAt', filters['datemin']!),
+        Query.greaterThanEqual('\$id', filters['datemin']!),
       if (filters.containsKey('datemax'))
-        Query.lessThanEqual('\$createdAt', filters['datemax']!),
+        Query.lessThanEqual('\$id', filters['datemax']!),
     ];
   }
 
@@ -76,8 +76,19 @@ class BackupWebService extends ParcOtoWebService<Backup> {
         return (d1, d2) =>
         coef * d1.value.id.compareTo(d2.value.id);
       case 1:
-        return (d1,d2)=>
-        coef * d1.value.vehicles.compareTo(d2.value.vehicles);
+        return (d1,d2){
+          int count1=d1.value.vehicles+d1.value.drivers+d1.value.repairs+d1
+              .value.providers+d1.value.plannings+d1.value.logs+d1.value
+              .vehicledocs+d1.value.vehiclesstates+d1.value.driversdocs+d1
+              .value.driversstates;
+          int count2=d2.value.vehicles+d2.value.drivers+d2.value.repairs+d2
+              .value.providers+d2.value.plannings+d2.value.logs+d2.value
+              .vehicledocs+d2.value.vehiclesstates+d2.value.driversdocs+d2
+              .value.driversstates;
+
+          return coef * count1.compareTo(count2);
+        };
+
       case 2:
         return (d1,d2)=>
         coef * (d1.value.createdBy??'').compareTo(d2.value.createdBy??'');

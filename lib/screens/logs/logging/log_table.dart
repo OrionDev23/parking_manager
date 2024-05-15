@@ -230,11 +230,15 @@ class LogTableState extends State<LogTable> {
                                                                     DatePicker(
                                                                   selected:
                                                                       dateMin,
-                                                                  endDate:
-                                                                      dateMax,
                                                                   onChanged:
-                                                                      (d) {
-                                                                    dateMin = d;
+                                                                      (s) {
+                                                                    dateMin = DateTime(
+                                                                        s.year,
+                                                                        s.month,
+                                                                        s.day,
+                                                                        0,
+                                                                        0,
+                                                                        0);
                                                                     setState(
                                                                         () {});
                                                                     setS(() {});
@@ -258,11 +262,15 @@ class LogTableState extends State<LogTable> {
                                                                     DatePicker(
                                                                   selected:
                                                                       dateMax,
-                                                                  startDate:
-                                                                      dateMin,
                                                                   onChanged:
-                                                                      (d) {
-                                                                    dateMax = d;
+                                                                      (s) {
+                                                                    dateMax = DateTime(
+                                                                        s.year,
+                                                                        s.month,
+                                                                        s.day,
+                                                                        23,
+                                                                        59,
+                                                                        59);
                                                                     setState(
                                                                         () {});
                                                                     setS(() {});
@@ -410,24 +418,14 @@ class LogTableState extends State<LogTable> {
 
                                                             if (dateMin !=
                                                                 null) {
-                                                              filters['datemin'] = dateMin!
-                                                                  .difference(
-                                                                      ClientDatabase
-                                                                          .ref)
-                                                                  .inMilliseconds
-                                                                  .toString();
+                                                              filters['datemin'] = dateMin!.toIso8601String();
                                                             } else {
                                                               filters.remove(
                                                                   'datemin');
                                                             }
                                                             if (dateMax !=
                                                                 null) {
-                                                              filters['datemax'] = dateMax!
-                                                                  .difference(
-                                                                      ClientDatabase
-                                                                          .ref)
-                                                                  .inMilliseconds
-                                                                  .toString();
+                                                              filters['datemax'] = dateMax!.toIso8601String();
                                                             } else {
                                                               filters.remove(
                                                                   'datemax');
@@ -484,16 +482,14 @@ class LogTableState extends State<LogTable> {
                     width: 350.px,
                     height: 45.px,
                     child: TextBox(
-                      onChanged: (s){
-                        if(s.isEmpty){
-                          notEmpty=false;
+                      onChanged: (s) {
+                        if (s.isEmpty) {
+                          notEmpty = false;
                           logDatasource.search('');
+                        } else {
+                          notEmpty = true;
                         }
-                        else{
-                          notEmpty=true;
-                        }
-                        setState(() {
-                        });
+                        setState(() {});
                       },
                       controller: searchController,
                       placeholder: 'search'.tr(),

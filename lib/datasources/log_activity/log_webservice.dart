@@ -56,11 +56,9 @@ class LogWebService extends ParcOtoWebService<Activity> {
       int startingAt, int sortedBy, bool sortedAsc,
       {int? index}) {
     return [
-      if (filters.containsKey('datemin'))
-        Query.greaterThanEqual(
-            r'$updatedAt', int.tryParse(filters['datemin']!)),
-      if (filters.containsKey('datemax'))
-        Query.lessThanEqual(r'$updatedAt', int.tryParse(filters['datemax']!)),
+      if (filters.containsKey('datemin') || filters.containsKey('datemax'))
+      Query.between(r'$createdAt', filters['datemin']??DateTime(2000).toIso8601String(),
+      filters['datemax']??DateTime(2400).toIso8601String()),
       if (filters.containsKey('createdBy'))
         Query.equal('createdBy', filters['createdBy']),
       if (filters.containsKey('type'))
