@@ -136,6 +136,8 @@ class Vehicle extends ParcOtoDefault {
   @override
   Map<String, dynamic> toJson() => _$VehicleToJson(this);
 
+
+
   int compareTo(Vehicle vehicle) {
     return id.compareTo(vehicle.id);
   }

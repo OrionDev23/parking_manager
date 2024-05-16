@@ -545,6 +545,9 @@
  "crypting": "Cryptage en cours",
  "compressing": "Compression en cours",
  "deletebackup": "Supprimer cette sauvegarde ?",
- "backupname": "Sauvegarde {d}-{m}-{y} {h}:{M}:{s}",
- "content": "Contenu"
+ "backupname": "Sauvegarde du {d}-{m}-{y} {h}:{M}",
+ "content": "Contenu",
+ "addnewdata": "Ajouter les nouvelles données en gardant celles actuelles",
+ "appenddata": "Ajouter les données et écraser celles existantes",
+ "deletealldata": "Supprimer toutes les données actuelles avant d'ajouter les nouvelles"
 }

@@ -91,6 +91,7 @@ class Reparation extends ParcOtoDefault {
   @override
   Map<String, dynamic> toJson() => _$ReparationToJson(this);
 
+
   double getPrixTTC() {
     if (designations == null) {
       return 0;

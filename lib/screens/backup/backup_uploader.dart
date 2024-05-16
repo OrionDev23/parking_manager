@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
-import 'package:encrypt/encrypt.dart' as en;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -99,26 +98,15 @@ class BackupUploaderState extends State<BackupUploader> {
   }
 
   void cryptString() {
-    String s;
-
-    if (secretKey.length < 32) {
-      s = secretKey;
-      for (int i = 0; i < (32 - secretKey.length); i++) {
-        s = '${s}p';
-      }
-    } else {
-      s = secretKey.substring(0, 32);
+    if(ClientDatabase.encrypter!=null){
+      cryptedString = ClientDatabase.encrypter!.encrypt(widget.data, iv: ClientDatabase.iv).base64;
+      setState(() {
+        progress = 10;
+      });
+      compressFile();
     }
-    final key = en.Key.fromUtf8(s);
-    final iv = en.IV.fromLength(16);
-    final encrypter = en.Encrypter(en.AES(key));
-
-    cryptedString = encrypter.encrypt(widget.data, iv: iv).base64;
-    setState(() {
-      progress = 10;
-    });
-    compressFile();
   }
+
 
   void compressFile() async {
     if (cryptedString != null) {

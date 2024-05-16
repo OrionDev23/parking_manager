@@ -27,4 +27,6 @@ class DisponibiliteChauffeur extends ParcOtoDefault {
 
   @override
   Map<String, dynamic> toJson() => _$DisponibiliteChauffeurToJson(this);
+
+
 }

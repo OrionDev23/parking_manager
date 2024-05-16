@@ -551,7 +551,9 @@
   "crypting": "Encryption in progress",
   "compressing": "Compression in progress",
   "deletebackup": "Delete this backup?",
-  "backupname": "Backup {d}-{m}-{y} {h}:{M}:{s}",
-  "content": "Content"
-
+  "backupname": "Backup of {d}-{m}-{y} {h}:{M}",
+  "content": "Content",
+  "addnewdata": "Add new data while keeping current ones",
+  "appenddata": "Add data and overwrite existing ones",
+  "deletealldata": "Delete all current data before adding new ones"
 }

@@ -31,4 +31,5 @@ class Backup extends ParcOtoDefault {
 
   @override
   Map<String, dynamic> toJson() => _$BackupToJson(this);
+
 }

@@ -37,4 +37,5 @@ class Entreprise extends Prestataire {
 
   @override
   Map<String, dynamic> toJson() => _$EntrepriseToJson(this);
+
 }

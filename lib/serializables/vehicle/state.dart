@@ -37,4 +37,6 @@ class Etat extends ParcOtoDefault {
 
   @override
   Map<String, dynamic> toJson() => _$EtatToJson(this);
+
+
 }

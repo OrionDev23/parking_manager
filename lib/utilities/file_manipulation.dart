@@ -70,21 +70,19 @@ String jsonify(Map<String,dynamic> map){
     }
 
     else if(value is String){
-        result='$result "$key":"${value.trim()}"';
+        result='$result "$key":${jsonEncode(value.trim().replaceAll('\n', '\\n')
+            .replaceAll('\t', '\\t'))}';
     }
-    else if(value is List<String?>  || value is List<String> ){
+    else if(value is List<String> ){
       String temp="[";
       bool f=true;
-      if(value!=null)
-      {
-        for(int i=0;i<value.length;i++){
-          if(!f){
-            temp='$temp,';
-          }
-          temp='$temp "${value[i].trim()}"';
-          if(f){
-            f=false;
-          }
+      for(int i=0;i<value.length;i++){
+        if(!f){
+          temp='$temp,';
+        }
+        temp='$temp ${jsonEncode(value[i].trim())}';
+        if(f){
+          f=false;
         }
       }
 
@@ -103,5 +101,5 @@ String jsonify(Map<String,dynamic> map){
 
   });
   result="$result }";
-  return jsonEncode(result);
+  return result;
 }

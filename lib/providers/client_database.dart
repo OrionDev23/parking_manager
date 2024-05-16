@@ -2,6 +2,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:parc_oto/serializables/activity.dart';
+import 'package:encrypt/encrypt.dart' as en;
 
 import '../main.dart';
 import '../screens/entreprise/entreprise.dart';
@@ -86,6 +87,9 @@ class ClientDatabase {
 
   static bool settingSecretKey = false;
 
+
+  static en.Encrypter? encrypter;
+  static en.IV? iv;
   void setSecretKey() async {
     if (!settingSecretKey && !secretKeySet) {
       settingSecretKey = true;
@@ -97,6 +101,19 @@ class ClientDatabase {
           .then((value) {
         secretKey = value.data['key'];
         secretKeySet = true;
+        String s;
+
+        if (secretKey.length < 32) {
+          s = secretKey;
+          for (int i = 0; i < (32 - secretKey.length); i++) {
+            s = '${s}p';
+          }
+        } else {
+          s = secretKey.substring(0, 32);
+        }
+        final key = en.Key.fromUtf8(s);
+        iv = en.IV.fromUtf8(s.substring(0,16));
+        encrypter = en.Encrypter(en.AES(key));
       }).onError((error, stackTrace) {
       });
     }

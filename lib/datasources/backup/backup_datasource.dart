@@ -39,7 +39,6 @@ class BackupDataSource extends ParcOtoDatasource<Backup>{
           'y':dateTime?.year.toString()??'2024',
           'h':dateTime?.hour.toString()??'09',
           'M':dateTime?.minute.toString()??'00',
-          's':dateTime?.second.toString()??'00'
         }),style: rowTextStyle,),
         onDoubleTap: ()=>showApplicationConfirmation(element),
       ),

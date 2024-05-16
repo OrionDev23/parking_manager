@@ -29,4 +29,5 @@ class DocumentVehicle extends ParcOtoDefault {
 
   @override
   Map<String, dynamic> toJson() => _$DocumentVehicleToJson(this);
+
 }

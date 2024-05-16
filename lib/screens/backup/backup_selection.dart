@@ -401,10 +401,10 @@ class _BackupSelectionState extends State<BackupSelection> {
     elements.forEach((key, value) {
       if(first){
         first=false;
-        result='$result ${jsonify(value.toJson())}';
+        result='$result ${jsonify(value.toJsonWithId())}';
       }
       else{
-        result='$result, ${jsonify(value.toJson())}';
+        result='$result, ${jsonify(value.toJsonWithId())}';
       }
     });
     if(next){

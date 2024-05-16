@@ -68,4 +68,6 @@ class Conducteur extends ParcOtoDefault {
 
   @override
   Map<String, dynamic> toJson() => _$ConducteurToJson(this);
+
+
 }
