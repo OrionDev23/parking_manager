@@ -41,6 +41,21 @@ class PlanningProvider extends ChangeNotifier {
     notifyListeners();
 
   }
+
+
+  Future<int> getPlanningCount() async{
+    if(!downloadedPlanning && !downloadingPlanning){
+      await refreshPlannings();
+
+    }
+    else{
+      while(downloadingPlanning){
+        await Future.delayed(const Duration(milliseconds: 30));
+      }
+    }
+    return plannings.length;
+
+  }
   static List<String> removedPlanDocs = [];
   Future<List<Planning>> getPlanningBeforeTime(DateTime expiration) async {
     List<Planning> result = [];

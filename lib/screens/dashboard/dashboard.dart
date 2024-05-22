@@ -4,6 +4,10 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/providers/driver_provider.dart';
+import 'package:parc_oto/providers/log_provider.dart';
+import 'package:parc_oto/providers/planning_provider.dart';
+import 'package:parc_oto/providers/repair_provider.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
@@ -48,51 +52,83 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
     super.build(context);
     var appTheme = context.watch<AppTheme>();
     bool portrait = MediaQuery.of(context).orientation == Orientation.portrait;
-    return ChangeNotifierProvider(
-        create: (BuildContext context) =>VehicleProvider(),
-        builder: (context,vehicles) {
-          return  ScaffoldPage(
-      header:  PageTitle(text: 'home',trailing: Button(
-          child: const Text('refresh').tr(), onPressed: () async{
-           await  VehicleProvider().refreshVehicles();
-           setState(() {
-
-           });
-      },),),
-      content: ListView(
-            padding: const EdgeInsets.all(10),
-            children: [
-              StaggeredGrid.count(
-                crossAxisCount:
-                portrait
-                        ? 2
-                        : 4,
-                mainAxisSpacing: 5,
-                crossAxisSpacing: 5,
-                children: buttonList(appTheme),
-              ),
-              smallSpace,
-              StaggeredGrid.count(
-                crossAxisCount:
-                portrait
-                        ? 1
-                        : 2,
-                mainAxisSpacing: 5,
-                crossAxisSpacing: 5,
-                children: widgetList(appTheme),
-              ),
-            ],
-          ));
-        }
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<VehicleProvider>(create:(c)=> VehicleProvider()),
+        ChangeNotifierProvider<DriverProvider>(create:(c)=> DriverProvider()),
+        ChangeNotifierProvider<LogProvider>(create:(c)=> LogProvider()),
+        ChangeNotifierProvider<PlanningProvider>(create:(c)=> PlanningProvider()),
+        ChangeNotifierProvider<RepairProvider>(create:(c)=> RepairProvider()),
+      ],
+      builder: (con,w){
+        var vehicles=Provider.of<VehicleProvider>(con);
+        var drivers=Provider.of<DriverProvider>(con);
+        var logs=Provider.of<LogProvider>(con);
+        var plannings=Provider.of<PlanningProvider>(con);
+        var repairs=Provider.of<RepairProvider>(con);
+        return ScaffoldPage(
+            header:  PageTitle(text: 'home',trailing: Button(
+              onPressed: ()=>onRefresh(vehicles,drivers,logs,
+                  plannings,repairs),
+              child: const Text('refresh').tr(),),),
+            content: ListView(
+              padding: const EdgeInsets.all(10),
+              children: [
+                StaggeredGrid.count(
+                  crossAxisCount:
+                  portrait
+                      ? 2
+                      : 4,
+                  mainAxisSpacing: 5,
+                  crossAxisSpacing: 5,
+                  children: buttonList(appTheme,vehicles,drivers,logs,
+                    plannings,repairs),
+                ),
+                smallSpace,
+                StaggeredGrid.count(
+                  crossAxisCount:
+                  portrait
+                      ? 1
+                      : 2,
+                  mainAxisSpacing: 5,
+                  crossAxisSpacing: 5,
+                  children: widgetList(appTheme),
+                ),
+              ],
+            ));
+      },
     );
   }
 
-  List<Widget> buttonList(AppTheme appTheme) {
+
+  void onRefresh(VehicleProvider vehicles,
+      DriverProvider drivers,LogProvider logs,PlanningProvider plannings,
+      RepairProvider repairs)async{
+    await Future.wait([
+      vehicles.refreshVehicles(),
+      vehicles.refreshDocuments(),
+      drivers.refreshConducteurs(),
+      drivers.refreshDocuments(),
+      logs.refreshLogs(),
+      plannings.refreshPlannings(),
+      repairs.refreshReparations()
+    ]);
+    setState(() {
+
+    });
+  }
+
+  List<ButtonContainer> buttonList(AppTheme appTheme,VehicleProvider vehicles,
+      DriverProvider drivers,LogProvider logs,PlanningProvider plannings,
+      RepairProvider repairs) {
     return [
       ButtonContainer(
         icon: FluentIcons.car,
         text: 'vehicules'.tr(),
-        getCount: DatabaseCounters().countVehicles,
+        getCount:!VehicleProvider.downloadedVehicles?vehicles
+            .getVehicleCount:null,
+        counter: VehicleProvider.downloadedVehicles?VehicleProvider
+            .vehicles.length:null,
         maxCounter: ClientDatabase.gotLimit && ClientDatabase.limits
             .containsKey('vehicles')?ClientDatabase.limits['vehicles']:null,
         action: () {
@@ -133,7 +169,10 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
       ButtonContainer(
         icon: FluentIcons.document_set,
         text: 'vehicledocuments'.tr(),
-        getCount: DatabaseCounters().countVdocs,
+        getCount:!VehicleProvider.downloadedDocuments?vehicles
+            .getVehicleDocsCount:null,
+        counter: VehicleProvider.downloadedDocuments?VehicleProvider
+        .documentsVehicules.length:null,
         action: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.vehicles) +
@@ -175,7 +214,10 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
       ButtonContainer(
         icon: FluentIcons.repair,
         text: 'reparations'.tr(),
-        getCount: DatabaseCounters().countReparation,
+        getCount:!RepairProvider.downloadedReparations?repairs
+            .getRepairsCount:null,
+        counter: RepairProvider.downloadedReparations?RepairProvider
+            .reparations.length:null,
         action: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.reparations) +
@@ -217,7 +259,10 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
       ButtonContainer(
         icon: FluentIcons.service_activity,
         text: 'prestataires'.tr(),
-        getCount: DatabaseCounters().countPrestataire,
+        getCount:!RepairProvider.downloadedPrestataires?repairs
+            .getProvidersCount:null,
+        counter: RepairProvider.downloadedPrestataires?RepairProvider
+            .prestataires.length:null,
         action: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.reparations) +
@@ -257,7 +302,10 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
       ButtonContainer(
         icon: FluentIcons.people,
         text: 'chauffeurs'.tr(),
-        getCount: DatabaseCounters().countChauffeur,
+        getCount:!DriverProvider.downloadedConducteurs?drivers
+        .getDriversCount:null,
+        counter:DriverProvider.downloadedConducteurs?DriverProvider
+        .conducteurs.length:null,
         action: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.chauffeurs) +
@@ -297,7 +345,10 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
       ButtonContainer(
         icon: FluentIcons.document_set,
         text: 'chaufdocuments'.tr(),
-        getCount: DatabaseCounters().countCDocs,
+        getCount:!DriverProvider.downloadedDocuments?drivers
+            .getDriversDocsCount:null,
+        counter:DriverProvider.downloadedDocuments?DriverProvider
+            .documentConducteurs.length:null,
         action: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.chauffeurs) +
@@ -339,7 +390,10 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
       ButtonContainer(
         icon: FluentIcons.edit_event,
         text: 'reservation'.tr(),
-        getCount: DatabaseCounters().countReservation,
+        getCount:!PlanningProvider.downloadedPlanning?plannings
+            .getPlanningCount:null,
+        counter:PlanningProvider.downloadedPlanning?PlanningProvider
+            .plannings.length:null,
         action: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.planner) +
@@ -355,7 +409,10 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
       ButtonContainer(
         icon: FluentIcons.database_activity,
         text: 'activities'.tr(),
-        getCount: DatabaseCounters().countLog,
+        getCount:!LogProvider.downloadedActivities?logs
+            .getLogCount:null,
+        counter:LogProvider.downloadedActivities?LogProvider
+            .activities.length:null,
         action: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.evenements) +
@@ -419,7 +476,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                     .filiales![index], DatabaseCounters().countVehiclesWithCondition([
                   Query.equal('appartenance', MyEntrepriseState.p!
                       .filiales![index]
-                      .replaceAll(' ', '').trim())
+                      .replaceAll(' ', '').trim().toUpperCase())
                 ]))),
           ),
           onTap: () {
@@ -486,7 +543,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                     .filiales![index], DatabaseCounters().countVehiclesWithCondition([
                   Query.equal('filliale', MyEntrepriseState.p!
                       .filiales![index]
-                      .replaceAll(' ', '').trim())
+                      .replaceAll(' ', '').trim().toUpperCase())
                 ]))),
           ),
           onTap: () {
@@ -514,7 +571,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                     .directions![index], DatabaseCounters().countVehiclesWithCondition([
                   Query.equal('direction', MyEntrepriseState.p!
                       .directions![index]
-                      .replaceAll(' ', '').trim())
+                      .replaceAll(' ', '').trim().toUpperCase())
                 ]))),
           ),
           onTap: () {
@@ -540,7 +597,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                     .filiales![index], DatabaseCounters().countChauffeurWithCondition([
                   Query.equal('filliale', MyEntrepriseState.p!
                       .filiales![index]
-                      .replaceAll(' ', '').trim())
+                      .replaceAll(' ', '').trim().toUpperCase())
                 ]))),
           ),
           onTap: () {

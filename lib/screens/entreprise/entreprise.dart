@@ -312,7 +312,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                           : kIsWeb
                                               ? MyEntrepriseState.logo != null
                                                   ? Image.memory(
-                                                      MyEntrepriseState.logo!,
+                                                      logo!,
                                                       fit: BoxFit.fitWidth)
                                                   : Image.asset(
                                                       'assets/images/logo.webp',

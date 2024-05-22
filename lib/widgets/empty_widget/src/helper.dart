@@ -3,14 +3,13 @@ import 'package:flutter/material.dart';
 
 class CustomText extends StatefulWidget {
   const CustomText(
-      {Key? key,
+      {super.key,
       this.msg,
       this.style,
       this.textAlign,
       this.overflow,
       this.context,
-      this.softwrap})
-      : super(key: key);
+      this.softwrap});
 
   final BuildContext? context;
   final String? msg;
@@ -19,6 +18,7 @@ class CustomText extends StatefulWidget {
   final TextStyle? style;
   final TextAlign? textAlign;
 
+  @override
   _CustomTextState createState() => _CustomTextState();
 }
 

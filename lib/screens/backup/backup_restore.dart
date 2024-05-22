@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:dart_appwrite/dart_appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gzip/gzip.dart';
 import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/restore/restore_database.dart';
 import 'package:parc_oto/serializables/conducteur/disponibilite_chauffeur.dart';
 import 'package:parc_oto/serializables/conducteur/document_chauffeur.dart';
 import 'package:parc_oto/serializables/prestataire.dart';
@@ -20,12 +22,14 @@ import '../../serializables/planning.dart';
 import '../../serializables/reparation/reparation.dart';
 import '../../serializables/vehicle/state.dart';
 import '../../serializables/vehicle/vehicle.dart';
+import '../../theme.dart';
 import 'import_list_element.dart';
 
 class BackupRestore extends StatefulWidget {
 
-  final Backup backup;
-  const BackupRestore({super.key, required this.backup});
+  final Backup? backup;
+  final Uint8List? backupFile;
+  const BackupRestore({super.key, this.backup, this.backupFile});
 
   @override
   State<BackupRestore> createState() => _BackupRestoreState();
@@ -72,10 +76,16 @@ class _BackupRestoreState extends State<BackupRestore> {
                 content: const Text('addnewdata').tr(),
                 onChanged: (s){
                   setState(() {
-                    addNewData=s;
-                    if(s){
-                      deleteAllData=false;
-                      appendAllData=false;
+
+                    if(!s && !deleteAllData && !appendAllData){
+                      addNewData=true;
+                    }
+                    else{
+                      addNewData=s;
+                      if(s){
+                        deleteAllData=false;
+                        appendAllData=false;
+                      }
                     }
                   });
                 },
@@ -125,17 +135,19 @@ class _BackupRestoreState extends State<BackupRestore> {
         ],
       ),
       actions: [
-        Button(child: const Text('fermer').tr(),onPressed: ()=>context.pop(),),
-        FilledButton(onPressed: progress==100 && somethingIsSelected
-          ()?confirmSelection:null, child:
+        Button(onPressed: restoring?null:()
+    =>context.pop(),child: const Text('fermer').tr(),),
+        FilledButton(onPressed: !restoring && progress==100 &&
+            somethingIsSelected
+          ()?confirmSelection:null, child:restoring?const ProgressRing():
         const Text('confirmer').tr()),
       ],
     );
   }
 
   void confirmSelection(){
-    if(somethingIsSelected()){
-
+    if(somethingIsSelected() && !restoring){
+      restoreData();
     }
   }
 
@@ -290,14 +302,24 @@ class _BackupRestoreState extends State<BackupRestore> {
   }
 
   void loadFile() async{
-    ClientDatabase.storage!.getFileDownload(bucketId: backupId, fileId: widget
-        .backup.id).then((value) {
-          loadedFile=value;
-          decompressFile();
-          setState(() {
-            progress=60;
-          });
-    });
+    if(widget.backupFile==null&& widget.backup!=null){
+      ClientDatabase.storage!.getFileDownload(bucketId: backupId, fileId: widget
+          .backup!.id).then((value) {
+        loadedFile=value;
+        decompressFile();
+        setState(() {
+          progress=60;
+        });
+      });
+    }
+    else if(widget.backupFile!=null){
+      loadedFile=widget.backupFile;
+      decompressFile();
+      setState(() {
+        progress=60;
+      });
+    }
+
   }
 
   void decompressFile() async{
@@ -453,5 +475,67 @@ class _BackupRestoreState extends State<BackupRestore> {
     }
 
   }
+
+  bool restoring=false;
+  Future<void> restoreData() async{
+    if(secretKey!=null && !restoring){
+      setState(() {
+        restoring=true;
+      });
+      Client client = Client()
+        ..setEndpoint(endpoint)
+        ..setProject(project)
+        ..setKey(secretKey);
+
+      RestoreDatabase restoreDatabase=RestoreDatabase(databases: Databases
+        (client),
+      vehicles: vehiculesSelected?vehicles:null,
+      vehiclesDocs: vehiclesDocsSelected?vehiclesDocs:null,
+      vehiclesStates: vehiclesStatesSelected?vehiclesStates:null,
+      drivers: driversSelected?drivers:null,
+      driversDocs: driversDocsSelected?driversDocs:null,
+      driversStates: driversStatesSelected?driversStates:null,
+      repairs: repairsSelected?repairs:null,
+      providers: providersSelected?providers:null,
+      logs: logsSelected?logs:null,
+      plannings: planningsSelected?plannings:null,
+      );
+
+      if(addNewData){
+        await restoreDatabase.addNewData();
+      }
+      else if(appendAllData){
+        await restoreDatabase.addOrUpdateNewData();
+
+      }
+      else if(deleteAllData){
+        print('normalement tsupprimi');
+        await restoreDatabase.deleteThenAddData();
+
+      }
+      else{
+        await restoreDatabase.addNewData();
+      }
+
+      Future.delayed(const Duration(milliseconds: 20)).then((s){
+        context.pop();
+
+        displayInfoBar(context,
+            builder: (BuildContext context, void Function() close) {
+              return InfoBar(
+                title: const Text('done').tr(),
+                severity: InfoBarSeverity.success,
+              );
+            }, duration: snackbarShortDuration);
+      });
+
+    }
+
+    setState(() {
+      restoring=false;
+    });
+
+  }
+
 
 }

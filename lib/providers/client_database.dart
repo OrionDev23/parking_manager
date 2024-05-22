@@ -32,7 +32,7 @@ const backupId="backup";
 const endpoint = "https://cloud.appwrite.io/v1";
 String? project;
 
-late String secretKey;
+String? secretKey;
 
 class ClientDatabase {
   static bool secretKeySet = false;
@@ -102,18 +102,21 @@ class ClientDatabase {
         secretKey = value.data['key'];
         secretKeySet = true;
         String s;
-
-        if (secretKey.length < 32) {
-          s = secretKey;
-          for (int i = 0; i < (32 - secretKey.length); i++) {
-            s = '${s}p';
+        if(secretKey!=null){
+          if (secretKey!.length < 32) {
+            s = secretKey!;
+            for (int i = 0; i < (32 - secretKey!.length); i++) {
+              s = '${s}p';
+            }
+          } else {
+            s = secretKey!.substring(0, 32);
           }
-        } else {
-          s = secretKey.substring(0, 32);
+          final key = en.Key.fromUtf8(s);
+          iv = en.IV.fromUtf8(s.substring(0,16));
+          encrypter = en.Encrypter(en.AES(key));
         }
-        final key = en.Key.fromUtf8(s);
-        iv = en.IV.fromUtf8(s.substring(0,16));
-        encrypter = en.Encrypter(en.AES(key));
+
+
       }).onError((error, stackTrace) {
       });
     }

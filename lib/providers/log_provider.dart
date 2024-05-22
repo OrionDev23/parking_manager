@@ -40,6 +40,19 @@ class LogProvider extends ChangeNotifier {
 
   }
 
+  Future<int> getLogCount() async{
+    if(!downloadedActivities && !downloadingActivities){
+      await refreshLogs();
+
+    }
+    else{
+      while(downloadingActivities){
+        await Future.delayed(const Duration(milliseconds: 30));
+      }
+    }
+    return activities.length;
+
+  }
 
 
 }

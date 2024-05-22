@@ -110,10 +110,16 @@ class _ButtonContainerState extends State<ButtonContainer> {
                     if(widget.showCounter)
                     Text(
                       widget.showCounter == true
-                          ? loadingCount
+                          ? (widget.counter==null&&widget.getCount==null)  ||
+                          loadingCount
                           ? '- ${widget.maxCounter!=null ?'/ ${widget
                           .maxCounter}':''}'
-                          : '$count ${widget.maxCounter!=null ?'/ ${widget
+                          :widget.counter!=null?
+                          '${widget.counter} ${widget.maxCounter!=null
+                              ?'/ ${widget
+                              .maxCounter}':''}'
+                          :'$count ${widget.maxCounter!=null
+                          ?'/ ${widget
                           .maxCounter}':''}'
                           : '- ${widget.maxCounter!=null ?'/ ${widget
                           .maxCounter}':''}',

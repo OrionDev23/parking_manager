@@ -1,6 +1,7 @@
 
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/screens/backup/backup_table.dart';
 import 'package:parc_oto/widgets/button_container.dart';
@@ -8,6 +9,7 @@ import 'package:parc_oto/widgets/page_header.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../theme.dart';
+import 'backup_restore.dart';
 import 'backup_selection.dart';
 class BackupManager extends StatefulWidget {
   const BackupManager({super.key});
@@ -28,9 +30,10 @@ class _BackupManagerState extends State<BackupManager> {
               width: 200.px,
               child: ButtonContainer(
                 icon: FluentIcons.import,
-                text: 'import'.tr(),
+                text: 'importfile'.tr(),
                 showBottom: false,
                 showCounter: false,
+                action: pickingFile?null:showImportScreen,
               ),
             ),
             smallSpace,
@@ -49,6 +52,38 @@ class _BackupManagerState extends State<BackupManager> {
       ),
       content: const BackupTable(selectD: false,),
     );
+  }
+
+
+  bool pickingFile=false;
+  void showImportScreen() async{
+    if(!pickingFile){
+      setState(() {
+        pickingFile=true;
+      });
+      await FilePicker.platform
+          .pickFiles(
+          dialogTitle: 'importfile'.tr(),
+          type: FileType.custom,
+          withData: true,
+          allowedExtensions: ['gz']
+      )
+          .then((value) {
+        if(value!=null){
+          var bytes=value.files.first.bytes;
+          Future.delayed(const Duration(milliseconds: 30)).then((value) {
+            showDialog(context: context, builder: (con){
+              return BackupRestore(backupFile: bytes);
+            });
+          });
+        }
+      });
+      setState(() {
+        pickingFile=false;
+      });
+    }
+
+
   }
 
   void showSaveScreen() {

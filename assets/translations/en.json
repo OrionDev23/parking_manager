@@ -386,7 +386,7 @@
   "costs":"Expenses",
   "avg": "Average",
   "deletenotif": "Do not show this notification again ?",
-  "backup": "Data backup",
+  "backup": "Backup and restoration",
   "notifications": "Alerts",
   "noconnection": "No internet connection",
   "connectionback": "Connected",
@@ -555,5 +555,7 @@
   "content": "Content",
   "addnewdata": "Add new data while keeping current ones",
   "appenddata": "Add data and overwrite existing ones",
-  "deletealldata": "Delete all current data before adding new ones"
+  "deletealldata": "Delete all current data before adding new ones",
+  "importfile": "Import a file"
+
 }

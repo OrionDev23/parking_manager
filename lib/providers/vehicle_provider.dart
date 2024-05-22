@@ -98,6 +98,47 @@ class VehicleProvider extends ChangeNotifier {
   }
 
 
+  Future<int> getVehicleCount() async{
+    if(!downloadedVehicles && !downloadingVehicles){
+      await refreshVehicles();
+
+    }
+    else{
+      while(downloadingVehicles){
+        await Future.delayed(const Duration(milliseconds: 30));
+      }
+    }
+    return vehicles.length;
+
+  }
+  Future<int> getVehicleDocsCount() async{
+    if(!downloadedDocuments && !downloadingDocuments){
+      await refreshDocuments();
+
+    }
+    else{
+      while(downloadingDocuments){
+        await Future.delayed(const Duration(milliseconds: 30));
+      }
+    }
+    return documentsVehicules.length;
+
+  }
+  Future<int> getVehicleStatesCount() async{
+    if(!downloadedStates && !downloadingStates){
+      await refreshStates();
+
+    }
+    else{
+      while(downloadingStates){
+        await Future.delayed(const Duration(milliseconds: 30));
+      }
+    }
+    return etats.length;
+
+  }
+
+
   void addVehicle(Vehicle v){
     vehicles[v.id]=v;
     notifyListeners();

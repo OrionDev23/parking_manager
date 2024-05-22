@@ -23,8 +23,6 @@ class DriverProvider extends ChangeNotifier {
       refreshConducteurs();
     }
   }
-
-
   Future<void> refreshConducteurs() async{
     if(downloadingConducteurs){
       return;
@@ -94,6 +92,46 @@ class DriverProvider extends ChangeNotifier {
     });
     downloadingDisp=false;
     notifyListeners();
+
+  }
+
+  Future<int> getDriversCount() async{
+    if(!downloadedConducteurs && !downloadingConducteurs){
+      await refreshConducteurs();
+
+    }
+    else{
+      while(downloadingConducteurs){
+        await Future.delayed(const Duration(milliseconds: 30));
+      }
+    }
+    return conducteurs.length;
+
+  }
+  Future<int> getDriversDocsCount() async{
+    if(!downloadedDocuments && !downloadingDocuments){
+      await refreshDocuments();
+
+    }
+    else{
+      while(downloadingDocuments){
+        await Future.delayed(const Duration(milliseconds: 30));
+      }
+    }
+    return documentConducteurs.length;
+
+  }
+  Future<int> getDriversStatesCount() async{
+    if(!downloadedDisp && !downloadingDisp ){
+      await refreshDocuments();
+
+    }
+    else{
+      while(downloadingDisp){
+        await Future.delayed(const Duration(milliseconds: 30));
+      }
+    }
+    return disponibiliteConducteurs.length;
 
   }
   void addConducteur(Conducteur c){

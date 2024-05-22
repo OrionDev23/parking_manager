@@ -73,6 +73,33 @@ class RepairProvider extends ChangeNotifier {
     notifyListeners();
 
   }
+
+  Future<int> getRepairsCount() async{
+    if(!downloadedReparations && !downloadingReparations){
+      await refreshReparations();
+
+    }
+    else{
+      while(downloadingReparations){
+        await Future.delayed(const Duration(milliseconds: 30));
+      }
+    }
+    return reparations.length;
+
+  }
+  Future<int> getProvidersCount() async{
+    if(!downloadedPrestataires && !downloadingPrestataires){
+      await refreshPrestataires();
+
+    }
+    else{
+      while(downloadingPrestataires){
+        await Future.delayed(const Duration(milliseconds: 30));
+      }
+    }
+    return prestataires.length;
+
+  }
   static Future<Map<String,List<Reparation>>> downloadReparations()async {
 
 
@@ -95,8 +122,6 @@ class RepairProvider extends ChangeNotifier {
 
     return {};
   }
-
-
   static List<Map<String,dynamic>> prepareVehicRepList(Map<String,
       List<Reparation>> repPerVeh){
     List<Map<String,dynamic>> result=[];
