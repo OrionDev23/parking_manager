@@ -478,7 +478,7 @@ class _BackupRestoreState extends State<BackupRestore> {
 
   bool restoring=false;
   Future<void> restoreData() async{
-    if(secretKey!=null && !restoring){
+    if(ClientDatabase.encrypter!=null && !restoring){
       setState(() {
         restoring=true;
       });

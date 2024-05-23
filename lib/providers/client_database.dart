@@ -29,7 +29,7 @@ const reparationId = "reparation";
 const activityId = "activity";
 const prestataireId = "prestataire";
 const backupId="backup";
-const endpoint = "https://cloud.appwrite.io/v1";
+const endpoint = "https://appwrite.parcoto.com/v1";
 String? project;
 
 String? secretKey;
@@ -98,23 +98,31 @@ class ClientDatabase {
               databaseId: databaseId,
               collectionId: adminID,
               documentId: 'admin')
-          .then((value) {
+          .then((value) async{
         secretKey = value.data['key'];
         secretKeySet = true;
-        String s;
-        if(secretKey!=null){
-          if (secretKey!.length < 32) {
-            s = secretKey!;
-            for (int i = 0; i < (32 - secretKey!.length); i++) {
-              s = '${s}p';
+
+        await database!
+            .getDocument(
+            databaseId: databaseId,
+            collectionId: adminID,
+            documentId: 'cryptkey')
+            .then((value){
+          String s=value.data['key'];
+
+            if (s.length < 32) {
+              for (int i = 0; i < (32 - value.data['key'].length); i++) {
+                s = '${s}p';
+              }
+            } else {
+              s = s.substring(0, 32);
             }
-          } else {
-            s = secretKey!.substring(0, 32);
-          }
-          final key = en.Key.fromUtf8(s);
-          iv = en.IV.fromUtf8(s.substring(0,16));
-          encrypter = en.Encrypter(en.AES(key));
-        }
+            final key = en.Key.fromUtf8(s);
+            iv = en.IV.fromUtf8(s.substring(0,16));
+            encrypter = en.Encrypter(en.AES(key));
+
+        });
+
 
 
       }).onError((error, stackTrace) {
