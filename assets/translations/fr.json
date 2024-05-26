@@ -550,5 +550,9 @@
  "addnewdata": "Ajouter les nouvelles données en gardant celles actuelles",
  "appenddata": "Ajouter les données et écraser celles existantes",
  "deletealldata": "Supprimer toutes les données actuelles avant d'ajouter les nouvelles",
- "importfile": "Importer un fichier"
+ "importfile": "Importer un fichier",
+ "workshop": "Atelier",
+ "pieces": "Pièces détachées",
+ "inventaire": "Inventaire",
+ "localrepair": "Réparations locales"
 }

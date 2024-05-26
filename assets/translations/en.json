@@ -556,6 +556,11 @@
   "addnewdata": "Add new data while keeping current ones",
   "appenddata": "Add data and overwrite existing ones",
   "deletealldata": "Delete all current data before adding new ones",
-  "importfile": "Import a file"
+  "importfile": "Import a file",
+  "workshop": "Workshop",
+  "pieces": "Vehicles parts",
+  "inventaire": "Inventory",
+  "localrepair": "Local repairs"
+
 
 }
