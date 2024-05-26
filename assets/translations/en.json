@@ -560,7 +560,8 @@
   "workshop": "Workshop",
   "pieces": "Vehicles parts",
   "inventaire": "Inventory",
-  "localrepair": "Local repairs"
-
-
+  "localrepair": "Local repairs",
+  "gpieces": "Parts management",
+  "stock": "Stock",
+  "fournisseurs": "Suppliers"
 }

@@ -558,6 +558,9 @@
   "workshop": "ورشة العمل",
   "pieces": "قطع غيار المركبات",
   "inventaire": "المخزون",
-  "localrepair": "الإصلاحات المحلية"
+  "localrepair": "الإصلاحات المحلية",
+  "gpieces": "إدارة قطع الغيار",
+  "stock": "المخزون",
+  "fournisseurs": "الموردون"
 
 }

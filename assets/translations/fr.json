@@ -222,6 +222,7 @@
  "feuille": "Feuilles de route",
  "lbons": "Liste des bons",
  "lfourn": "Liste des fournisseurs",
+ "fournisseurs": "Fournisseurs",
  "bonsdecommande": "Bons de commande",
  "email": "Email",
  "aide": "Aide",
@@ -553,6 +554,8 @@
  "importfile": "Importer un fichier",
  "workshop": "Atelier",
  "pieces": "Pièces détachées",
+ "gpieces": "Gestion des pièces",
  "inventaire": "Inventaire",
- "localrepair": "Réparations locales"
+ "localrepair": "Réparations locales",
+ "stock": "Stockage"
 }

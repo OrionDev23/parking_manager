@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:parc_oto/admin_parameters.dart';
 import 'package:parc_oto/main.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
-import 'package:parc_oto/screens/workshop/inventory.dart';
+import 'package:parc_oto/screens/workshop/inventory/inventory.dart';
+import 'package:parc_oto/screens/workshop/inventory/suppliers.dart';
 import 'package:parc_oto/screens/workshop/my_repair.dart';
+import 'package:parc_oto/screens/workshop/parts/brands.dart';
+import 'package:parc_oto/screens/workshop/parts/categories.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/client_database.dart';
@@ -33,6 +36,7 @@ import '../vehicle/documents/document_tabs.dart';
 import '../vehicle/manager/vehicle_tabs.dart';
 import '../vehicle/states/state_tabs.dart';
 import '../vehicle/vehicle_dashboard.dart';
+import '../workshop/parts/options.dart';
 import '../workshop/parts/parts_management.dart';
 import '../workshop/workshop_dashboard.dart';
 
@@ -255,16 +259,33 @@ class PaneItemsAndFooters {
           ).tr(),
           body: const SelfRepair(),
         ),
+        PaneItemHeader(
+            header: Text('inventaire',style: paneTextStyle,).tr()
+        ),
         PaneItem(
           icon: Icon(
-            Icons.inventory,
+            Icons.inventory_2_outlined,
             color: appTheme.color.lightest,
           ),
           title: Text(
-            'inventaire',
+            'stock',
             style: paneTextStyle,
           ).tr(),
           body: const PartsInventory(),
+        ),
+        PaneItem(
+          icon: Icon(
+            FluentIcons.service_activity,
+            color: appTheme.color.lightest,
+          ),
+          title: Text(
+            'fournisseurs',
+            style: paneTextStyle,
+          ).tr(),
+          body: const SuppliersManagement(),
+        ),
+        PaneItemHeader(
+            header: Text('pieces',style: paneTextStyle,).tr()
         ),
         PaneItem(
           icon: Icon(
@@ -273,10 +294,43 @@ class PaneItemsAndFooters {
           ),
           body: const PartsManagement(),
           title: Text(
-            "pieces",
+            "gpieces",
             style: paneTextStyle,
           ).tr(),
-        )
+        ),
+        PaneItem(
+          icon: Icon(
+            FluentIcons.verified_brand,
+            color: appTheme.color.lightest,
+          ),
+          body: const PartsBrands(),
+          title: Text(
+            "brands",
+            style: paneTextStyle,
+          ).tr(),
+        ),
+        PaneItem(
+          icon: Icon(
+            FluentIcons.category_classification,
+            color: appTheme.color.lightest,
+          ),
+          body: const PartsCategories(),
+          title: Text(
+            "categories",
+            style: paneTextStyle,
+          ).tr(),
+        ),
+        PaneItem(
+          icon: Icon(
+            FluentIcons.text_paragraph_option,
+            color: appTheme.color.lightest,
+          ),
+          body: const PartsOptions(),
+          title: Text(
+            "options",
+            style: paneTextStyle,
+          ).tr(),
+        ),
       ],
     );
     evenements = PaneItem(
