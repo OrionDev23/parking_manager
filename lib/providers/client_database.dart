@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:parc_oto/serializables/activity.dart';
 import 'package:encrypt/encrypt.dart' as en;
 
+import '../admin_parameters.dart';
 import '../main.dart';
 import '../screens/entreprise/entreprise.dart';
 import '../screens/sidemenu/sidemenu.dart';
@@ -65,6 +66,12 @@ class ClientDatabase {
   }
 
   bool isManager({List<Team>? teams}) {
+    if(isAdminUI){
+      return false;
+    }
+    if(isManagerUI){
+      return true;
+    }
     for (var element in teams ?? myTeams) {
       if (element.name.toLowerCase() == 'managers') {
         return true;
@@ -74,6 +81,12 @@ class ClientDatabase {
   }
 
   bool isAdmin({List<Team>? teams}) {
+    if(isAdminUI){
+      return true;
+    }
+    if(isManagerUI){
+      return false;
+    }
     for (var element in teams ?? myTeams) {
       if (element.name.toLowerCase() == 'admins') {
         if (teams == null && !secretKeySet) {

@@ -49,12 +49,12 @@ class PaneItemsAndFooters {
 
   static late PaneItem dashboard;
   static late PaneItem usermanagement;
-  static late PaneItem vehicles;
-  static late PaneItem reparations;
-  static late PaneItem chauffeurs;
+  static late PaneItemExpander vehicles;
+  static late PaneItemExpander reparations;
+  static late PaneItemExpander chauffeurs;
   static late PaneItem evenements;
   static late PaneItem planner;
-  static late PaneItem atelier;
+  static late PaneItemExpander atelier;
   static late PaneItem login;
   static late PaneItem parametres;
   static late PaneItem logout;
@@ -460,12 +460,12 @@ class PaneItemsAndFooters {
 
     if (PanesListState.signedIn.value) {
       originalItems = [
-        if (isAdmin || isManager) dashboard,
+        if (PanesListState.signedIn.value)dashboard,
         if (isAdmin) usermanagement,
-        if (isAdmin || isManager) vehicles,
-        if (isAdmin || isManager) reparations,
-        if ((isAdmin || isManager) && showAtelier) atelier,
-        if (isAdmin || isManager) chauffeurs,
+        if (PanesListState.signedIn.value)vehicles,
+        if (PanesListState.signedIn.value)reparations,
+        if (showAtelier) atelier,
+        if (PanesListState.signedIn.value)chauffeurs,
         if (isAdmin || isManager) planner,
         if (isAdmin || isManager) evenements,
       ];

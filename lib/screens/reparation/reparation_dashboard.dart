@@ -17,9 +17,6 @@ import 'reparation_form/reparation_form.dart';
 
 class ReparationDashboard extends StatelessWidget {
   const ReparationDashboard({super.key});
-
-  final int indexAdition = 4;
-
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
@@ -44,8 +41,7 @@ class ReparationDashboard extends StatelessWidget {
                   PanesListState.index.value = PaneItemsAndFooters
                           .originalItems
                           .indexOf(PaneItemsAndFooters.reparations) +
-                      1 +
-                      indexAdition;
+                      PaneItemsAndFooters.vehicles.items.length+1;
                 },
                 icon: FluentIcons.list,
                 text: 'greparations'.tr(),
@@ -58,8 +54,7 @@ class ReparationDashboard extends StatelessWidget {
                   PanesListState.index.value = PaneItemsAndFooters
                           .originalItems
                           .indexOf(PaneItemsAndFooters.reparations) +
-                      1 +
-                      indexAdition;
+                      PaneItemsAndFooters.vehicles.items.length+1;
                   Future.delayed(const Duration(milliseconds: 300))
                       .whenComplete(() {
                     late Tab tab;
@@ -97,8 +92,7 @@ class ReparationDashboard extends StatelessWidget {
                   PanesListState.index.value = PaneItemsAndFooters
                           .originalItems
                           .indexOf(PaneItemsAndFooters.reparations) +
-                      2 +
-                      indexAdition;
+                      PaneItemsAndFooters.vehicles.items.length+2;
                 },
                 icon: FluentIcons.list,
                 text: 'prestataires'.tr(),
@@ -111,8 +105,7 @@ class ReparationDashboard extends StatelessWidget {
                   PanesListState.index.value = PaneItemsAndFooters
                           .originalItems
                           .indexOf(PaneItemsAndFooters.reparations) +
-                      2 +
-                      indexAdition;
+                      PaneItemsAndFooters.vehicles.items.length+2;
                   Future.delayed(const Duration(milliseconds: 300))
                       .whenComplete(() {
                     late Tab tab;

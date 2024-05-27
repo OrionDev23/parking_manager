@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:parc_oto/admin_parameters.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/driver_provider.dart';
 import 'package:parc_oto/providers/log_provider.dart';
@@ -221,17 +222,19 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         action: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.reparations) +
-              4;
+
+              PaneItemsAndFooters.vehicles.items.length;
         },
         actionList: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.reparations) +
-              5;
+
+              PaneItemsAndFooters.vehicles.items.length+1;
         },
         actionNouveau: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.reparations) +
-              5;
+              PaneItemsAndFooters.vehicles.items.length+1;
           Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
             late Tab tab;
             tab = Tab(
@@ -266,12 +269,12 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         action: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.reparations) +
-              6;
+              PaneItemsAndFooters.vehicles.items.length+2;
         },
         actionList: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.reparations) +
-              6;
+              PaneItemsAndFooters.vehicles.items.length+2;
         },
         actionNouveau: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
@@ -309,17 +312,24 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         action: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.chauffeurs) +
-              6;
+              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+              .reparations.items.length+(showAtelier?PaneItemsAndFooters
+              .atelier.items.length:0)-2;
         },
         actionList: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.chauffeurs) +
-              7;
+              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+              .reparations.items.length+(showAtelier?PaneItemsAndFooters
+              .atelier.items.length:0)-1;
         },
         actionNouveau: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.chauffeurs) +
-              7;
+
+              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+              .reparations.items.length+(showAtelier?PaneItemsAndFooters
+              .atelier.items.length:0)-1;
           Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
             late Tab tab;
             tab = Tab(
@@ -352,17 +362,23 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         action: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.chauffeurs) +
-              9;
+              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+              .reparations.items.length+(showAtelier?PaneItemsAndFooters
+              .atelier.items.length:0)+1;
         },
         actionList: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.chauffeurs) +
-              9;
+              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+              .reparations.items.length+(showAtelier?PaneItemsAndFooters
+              .atelier.items.length:0)+1;
         },
         actionNouveau: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.chauffeurs) +
-              9;
+              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+              .reparations.items.length+(showAtelier?PaneItemsAndFooters
+              .atelier.items.length:0)+1;
           Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
             late Tab tab;
             tab = Tab(
@@ -397,13 +413,20 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         action: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.planner) +
-              10;
+              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+              .reparations.items.length+(showAtelier?PaneItemsAndFooters
+              .atelier.items.length:0)+PaneItemsAndFooters.chauffeurs.items
+              .length-2;
         },
         showBothLN: false,
         actionList: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.planner) +
-              10;
+
+              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+              .reparations.items.length+(showAtelier?PaneItemsAndFooters
+              .atelier.items.length:0)+PaneItemsAndFooters.chauffeurs.items
+              .length-2;
         },
       ),
       ButtonContainer(
@@ -416,7 +439,11 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         action: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.evenements) +
-              10;
+
+              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+              .reparations.items.length+(showAtelier?PaneItemsAndFooters
+              .atelier.items.length:0)+PaneItemsAndFooters.chauffeurs.items
+              .length-2;
         },
         showBothLN: false,
         actionList: () {
@@ -651,7 +678,8 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
           onTap: () {
             PanesListState.index.value = PaneItemsAndFooters.originalItems
                     .indexOf(PaneItemsAndFooters.reparations) +
-                5;
+
+                PaneItemsAndFooters.vehicles.items.length+1;
           },
         ),
       ),
@@ -678,7 +706,8 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
           onTap: () {
             PanesListState.index.value = PaneItemsAndFooters.originalItems
                     .indexOf(PaneItemsAndFooters.reparations) +
-                5;
+
+                PaneItemsAndFooters.vehicles.items.length+1;
           },
         ),
       ),
@@ -705,7 +734,10 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
           onTap: () {
             PanesListState.index.value = PaneItemsAndFooters.originalItems
                     .indexOf(PaneItemsAndFooters.chauffeurs) +
-                7;
+
+                PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+                .reparations.items.length+(showAtelier?PaneItemsAndFooters
+                .atelier.items.length:0)-1;
           },
         ),
       ),

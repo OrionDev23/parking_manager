@@ -7,6 +7,7 @@ import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
 import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/serializables/conducteur/document_chauffeur.dart';
 
+import '../../admin_parameters.dart';
 import '../../providers/client_database.dart';
 import '../../screens/chauffeur/document/chauf_document_form.dart';
 import '../../screens/chauffeur/document/chauf_document_tabs.dart';
@@ -24,7 +25,10 @@ class ChaufDocumentsDataSource extends ParcOtoDatasource<DocumentChauffeur> {
     if (chauffeur != null) {
       PanesListState.index.value = PaneItemsAndFooters.originalItems
               .indexOf(PaneItemsAndFooters.chauffeurs) +
-          1;
+
+          PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+          .reparations.items.length+(showAtelier?PaneItemsAndFooters
+          .atelier.items.length:0)-1;
       ChauffeurTabsState.currentIndex.value = 0;
 
       ChauffeurTableState.filterNow = true;

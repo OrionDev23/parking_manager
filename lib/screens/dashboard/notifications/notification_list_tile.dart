@@ -8,6 +8,7 @@ import 'package:parc_oto/screens/dashboard/notifications/notif_list.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
 
+import '../../../admin_parameters.dart';
 import '../../../main.dart';
 import '../../../serializables/notification.dart';
 import '../../sidemenu/pane_items.dart';
@@ -161,17 +162,24 @@ class _NotificationTileState extends State<NotificationTile> {
       case 0:
         PanesListState.index.value = PaneItemsAndFooters.originalItems
                 .indexOf(PaneItemsAndFooters.vehicles) +
-            4;
+            PaneItemsAndFooters.vehicles.items.length;
         break;
       case 1:
         PanesListState.index.value = PaneItemsAndFooters.originalItems
                 .indexOf(PaneItemsAndFooters.chauffeurs) +
-            9;
+
+            PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+            .reparations.items.length+(showAtelier?PaneItemsAndFooters
+            .atelier.items.length:0)+1;
         break;
       case 2:
         PanesListState.index.value = PaneItemsAndFooters.originalItems
                 .indexOf(PaneItemsAndFooters.planner) +
-            10;
+
+            PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+            .reparations.items.length+(showAtelier?PaneItemsAndFooters
+            .atelier.items.length:0)+PaneItemsAndFooters.chauffeurs.items
+            .length-2;
         break;
     }
     Navigator.of(context).pop();

@@ -88,6 +88,8 @@ Future<void> initWindow() async {
     await windowManager.show();
     await windowManager.focus();
   });
+  await windowManager.maximize();
+
 }
 
 class MyApp extends StatelessWidget {

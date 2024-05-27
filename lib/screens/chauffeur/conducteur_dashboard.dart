@@ -4,6 +4,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../admin_parameters.dart';
 import '../../providers/counters.dart';
 import '../../theme.dart';
 import '../../widgets/button_container.dart';
@@ -45,8 +46,10 @@ class ConducteurDashboard extends StatelessWidget {
                 action: () {
                   PanesListState.index.value = PaneItemsAndFooters.originalItems
                           .indexOf(PaneItemsAndFooters.chauffeurs) +
-                      1 +
-                      indexAdition;
+
+                      PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+                      .reparations.items.length+(showAtelier?PaneItemsAndFooters
+                      .atelier.items.length:0)-1;
                 },
                 icon: FluentIcons.list,
                 text: 'gchauffeurs'.tr(),
@@ -58,8 +61,9 @@ class ConducteurDashboard extends StatelessWidget {
                 action: () {
                   PanesListState.index.value = PaneItemsAndFooters.originalItems
                           .indexOf(PaneItemsAndFooters.chauffeurs) +
-                      1 +
-                      indexAdition;
+                      PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+                      .reparations.items.length+(showAtelier?PaneItemsAndFooters
+                      .atelier.items.length:0)-1;
                   Future.delayed(const Duration(milliseconds: 300))
                       .whenComplete(() {
                     late Tab tab;
@@ -93,8 +97,9 @@ class ConducteurDashboard extends StatelessWidget {
                 action: () {
                   PanesListState.index.value = PaneItemsAndFooters.originalItems
                           .indexOf(PaneItemsAndFooters.chauffeurs) +
-                      2 +
-                      indexAdition;
+                      PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+                      .reparations.items.length+(showAtelier?PaneItemsAndFooters
+                      .atelier.items.length:0);
                 },
                 color: appTheme.color,
                 icon: FluentIcons.health,
@@ -107,8 +112,9 @@ class ConducteurDashboard extends StatelessWidget {
                 action: () {
                   PanesListState.index.value = PaneItemsAndFooters.originalItems
                           .indexOf(PaneItemsAndFooters.chauffeurs) +
-                      3 +
-                      indexAdition;
+                      PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+                      .reparations.items.length+(showAtelier?PaneItemsAndFooters
+                      .atelier.items.length:0)+1;
                 },
                 color: appTheme.color,
                 icon: FluentIcons.document_set,
@@ -121,8 +127,9 @@ class ConducteurDashboard extends StatelessWidget {
                 action: () {
                   PanesListState.index.value = PaneItemsAndFooters.originalItems
                           .indexOf(PaneItemsAndFooters.chauffeurs) +
-                      3 +
-                      indexAdition;
+                      PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+                      .reparations.items.length+(showAtelier?PaneItemsAndFooters
+                      .atelier.items.length:0)+1;
                   Future.delayed(const Duration(milliseconds: 400))
                       .whenComplete(() {
                     late Tab tab;
@@ -159,8 +166,9 @@ class ConducteurDashboard extends StatelessWidget {
                 action: () {
                   PanesListState.index.value = PaneItemsAndFooters.originalItems
                           .indexOf(PaneItemsAndFooters.chauffeurs) +
-                      4 +
-                      indexAdition;
+                      PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
+                      .reparations.items.length+(showAtelier?PaneItemsAndFooters
+                      .atelier.items.length:0)+2;
                 },
                 icon: FluentIcons.list,
                 text: 'archive'.tr(),
