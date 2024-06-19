@@ -486,7 +486,6 @@ class _UserFormState extends State<UserForm> {
               documentId: userID!,
               data: newme.toJson())
           .then((value) {
-        ClientDatabase.me.value = newme;
         Navigator.pop(
           context,
         );

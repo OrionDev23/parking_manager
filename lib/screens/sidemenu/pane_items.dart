@@ -145,40 +145,7 @@ class PaneItemsAndFooters {
           ),
         ],
         body: const VehicleDashboard());
-    reparations = PaneItemExpander(
-        icon: Icon(
-          FluentIcons.repair,
-          color: appTheme.color.lightest,
-        ),
-        title: Text(
-          'reparations',
-          style: paneTextStyle,
-        ).tr(),
-        items: [
-          PaneItem(
-            icon: Icon(
-              FluentIcons.list,
-              color: appTheme.color.lightest,
-            ),
-            title: Text(
-              'greparations',
-              style: paneTextStyle,
-            ).tr(),
-            body: const ReparationTabs(),
-          ),
-          PaneItem(
-            icon: Icon(
-              FluentIcons.service_activity,
-              color: appTheme.color.lightest,
-            ),
-            title: Text(
-              'prestataires',
-              style: paneTextStyle,
-            ).tr(),
-            body: const PrestataireTabs(),
-          ),
-        ],
-        body: const ReparationDashboard());
+
     chauffeurs = PaneItemExpander(
         icon: Icon(
           FluentIcons.people,
@@ -433,7 +400,40 @@ class PaneItemsAndFooters {
             ),
           ),
         ]);
-
+    reparations = PaneItemExpander(
+        icon: Icon(
+          FluentIcons.repair,
+          color: appTheme.color.lightest,
+        ),
+        title: Text(
+          'reparations',
+          style: paneTextStyle,
+        ).tr(),
+        items: [
+          PaneItem(
+            icon: Icon(
+              FluentIcons.list,
+              color: appTheme.color.lightest,
+            ),
+            title: Text(
+              'greparations',
+              style: paneTextStyle,
+            ).tr(),
+            body: const ReparationTabs(),
+          ),
+          PaneItem(
+            icon: Icon(
+              FluentIcons.service_activity,
+              color: appTheme.color.lightest,
+            ),
+            title: Text(
+              'prestataires',
+              style: paneTextStyle,
+            ).tr(),
+            body: const PrestataireTabs(),
+          ),
+        ],
+        body: const ReparationDashboard());
     backup = PaneItem(
       icon: Icon(
         FluentIcons.save,
