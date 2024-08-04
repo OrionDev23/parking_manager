@@ -245,7 +245,7 @@ class ClientDatabase {
   }
 
   Future<void> getEntreprise() async {
-    if (MyEntrepriseState.p == null) {
+    if (MyEntrepriseState.p == null && !MyEntrepriseState.downloading) {
       MyEntrepriseState.downloading = true;
       try {
         await database!

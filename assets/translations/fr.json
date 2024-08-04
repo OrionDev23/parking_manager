@@ -191,6 +191,7 @@
  "factures" : "Factures",
  "facture" : "Facture",
  "vehicules": "Véhicules",
+ "thevehicles": "Véhicules",
  "vehicule": "Véhicule",
  "etat": "État",
  "etatactuel": "État",
@@ -304,6 +305,7 @@
  "documents": "Documents",
  "suprdoc": "Supprimer le document",
  "reparations": "Réparations",
+ "thereparations": "Réparations",
  "reparation": "Ordre",
  "nouvrepar": "Nouvel ordre",
  "greparations": "Gestion des réparations",
@@ -557,5 +559,6 @@
  "gpieces": "Gestion des pièces",
  "inventaire": "Inventaire",
  "localrepair": "Réparations locales",
- "stock": "Stockage"
+ "stock": "Stockage",
+ "thechauffeurs": "Conducteurs"
 }

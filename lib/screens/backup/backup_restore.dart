@@ -163,7 +163,7 @@ class _BackupRestoreState extends State<BackupRestore> {
     return [
       if(vehicles.isNotEmpty)
         ImportListElement(
-          title: 'vehicules'.tr(),
+          title: 'thevehicules'.tr(),
           checked: vehiculesSelected,
           onChecked: (s) {
             setState(() {
@@ -202,7 +202,7 @@ class _BackupRestoreState extends State<BackupRestore> {
         ),
       if(drivers.isNotEmpty)
         ImportListElement(
-          title: 'chauffeurs'.tr(),
+          title: 'thechauffeurs'.tr(),
           checked: driversSelected,
           onChecked: (s) {
             setState(() {
@@ -272,7 +272,7 @@ class _BackupRestoreState extends State<BackupRestore> {
         ),
       if(repairs.isNotEmpty)
         ImportListElement(
-          title: 'reparations'.tr(),
+          title: 'thereparations'.tr(),
           checked: repairsSelected,
           onChecked: (s) {
             setState(() {

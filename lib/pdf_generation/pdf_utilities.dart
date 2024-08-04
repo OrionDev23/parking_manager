@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:parc_oto/pdf_generation/pdf_theming.dart';
 import 'package:parc_oto/providers/repair_provider.dart';
@@ -43,7 +42,7 @@ class PdfUtilities {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    key.tr().uppercaseFirst(),
+                    key.uppercaseFirst(),
                     style: smallText.copyWith(
                       fontSize: 9,
                     ),

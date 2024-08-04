@@ -214,7 +214,7 @@ class _BackupSelectionState extends State<BackupSelection> {
 
   Widget vehicleElement() {
     return ImportListElement(
-      title: 'vehicules'.tr(),
+      title: 'thevehicules'.tr(),
       checked: checkers[0],
       refreshing: refreshers[0],
       onRefresh: () async {
@@ -240,7 +240,7 @@ class _BackupSelectionState extends State<BackupSelection> {
 
   Widget condElement() {
     return ImportListElement(
-      title: 'chauffeurs'.tr(),
+      title: 'thechauffeurs'.tr(),
       checked: checkers[1],
       refreshing: refreshers[1],
       onRefresh: () async {
@@ -266,7 +266,7 @@ class _BackupSelectionState extends State<BackupSelection> {
 
   Widget repairElement() {
     return ImportListElement(
-      title: 'reparations'.tr(),
+      title: 'thereparations'.tr(),
       checked: checkers[2],
       refreshing: refreshers[2],
       onRefresh: () async {

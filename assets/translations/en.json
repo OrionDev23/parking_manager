@@ -563,5 +563,9 @@
   "localrepair": "Local repairs",
   "gpieces": "Parts management",
   "stock": "Stock",
-  "fournisseurs": "Suppliers"
+  "fournisseurs": "Suppliers",
+  "thevehicles": "Vehicles",
+  "thereparations": "Repairs",
+  "thechauffeurs": "Drivers"
+
 }

@@ -96,7 +96,7 @@ class PaneItemsAndFooters {
           color: appTheme.color.lightest,
         ),
         title: Text(
-          'vehicules',
+          'thevehicles',
           style: paneTextStyle,
         ).tr(),
         items: [
@@ -152,7 +152,7 @@ class PaneItemsAndFooters {
           color: appTheme.color.lightest,
         ),
         title: Text(
-          "chauffeurs",
+          "thechauffeurs",
           style: paneTextStyle,
         ).tr(),
         body: const ConducteurDashboard(),
@@ -406,7 +406,7 @@ class PaneItemsAndFooters {
           color: appTheme.color.lightest,
         ),
         title: Text(
-          'reparations',
+          'thereparations',
           style: paneTextStyle,
         ).tr(),
         items: [

@@ -69,6 +69,7 @@ class PanesListState extends State<PanesList> with WindowListener, AutomaticKeep
 
   void getProfil() async {
     loading = true;
+    firstLoading=true;
     if (mounted) {
       setState(() {});
     }

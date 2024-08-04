@@ -14,7 +14,7 @@ class Designation {
   double prix = 0;
 
   Designation(
-      {required this.designation, this.prix = 0, this.qte = 0, this.tva = 0});
+      {required this.designation, this.prix = 0, this.qte = 1, this.tva = 0});
 
   factory Designation.fromJson(Map<String, dynamic> json) =>
       _$DesignationFromJson(json);
