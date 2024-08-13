@@ -46,7 +46,7 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
   }
 
   void getCount() async {
-    await ClientDatabase.database!.listDocuments(
+    await DatabaseGetter.database!.listDocuments(
         databaseId: databaseId,
         collectionId: vehiculeid,
         queries: [
@@ -165,7 +165,7 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
       }
       MyEntrepriseState.p!.departments!.remove(widget.name);
     }
-    await ClientDatabase.database!
+    await DatabaseGetter.database!
         .updateDocument(
         databaseId: databaseId,
         collectionId: entrepriseid,

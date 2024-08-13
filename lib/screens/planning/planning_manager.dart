@@ -46,8 +46,8 @@ class _PlanningManagerState extends State<PlanningManager> {
               showCounter: false,
               action: selectedPlanning != null &&
                       (selectedPlanning!.createdBy ==
-                              ClientDatabase.me.value!.id ||
-                          ClientDatabase().isAdmin())
+                              DatabaseGetter.me.value!.id ||
+                          DatabaseGetter().isAdmin())
                   ? deleteAppointement
                   : null,
             ),
@@ -96,7 +96,7 @@ class _PlanningManagerState extends State<PlanningManager> {
 
   void deleteAppointement() {
     if (selectedPlanning != null) {
-      ClientDatabase.database!
+      DatabaseGetter.database!
           .deleteDocument(
               databaseId: databaseId,
               collectionId: planningID,

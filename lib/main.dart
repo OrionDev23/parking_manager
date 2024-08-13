@@ -56,7 +56,7 @@ void displayMessage(BuildContext context,String msg,InfoBarSeverity severity){
 
 void launchApp() async {
   prefs = await SharedPreferences.getInstance();
-  ClientDatabase();
+  DatabaseGetter();
 
   VehiclesUtilities();
   EasyLocalization.logger.enableBuildModes = [];

@@ -39,7 +39,7 @@ class VehicleManagementState extends State<VehicleManagement>
         text: 'gestionvehicles'.tr(),
         trailing: Row(
           children: [
-            if (showImportVehicles && ClientDatabase().isAdmin())
+            if (showImportVehicles && DatabaseGetter().isAdmin())
               ButtonContainer(
                 color: appTheme.color.darkest,
                 icon: FluentIcons.add,
@@ -48,7 +48,7 @@ class VehicleManagementState extends State<VehicleManagement>
                 showCounter: false,
                 action: importList,
               ),
-            if (showImportVehicles && ClientDatabase().isAdmin()) smallSpace,
+            if (showImportVehicles && DatabaseGetter().isAdmin()) smallSpace,
             ButtonContainer(
               icon: FluentIcons.add,
               text: 'add'.tr(),

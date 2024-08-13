@@ -3,14 +3,14 @@ import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/datasources/prestataire/prestataire_webservice.dart';
-import 'package:parc_oto/serializables/prestataire.dart';
 
 import '../../providers/client_database.dart';
 import '../../screens/prestataire/prestataire_form.dart';
 import '../../screens/prestataire/prestataire_tabs.dart';
+import '../../serializables/client.dart';
 import '../../widgets/on_tap_scale.dart';
 
-class PrestataireDataSource extends ParcOtoDatasource<Prestataire> {
+class PrestataireDataSource extends ParcOtoDatasource<Client> {
   final bool archive;
 
   PrestataireDataSource(
@@ -25,13 +25,12 @@ class PrestataireDataSource extends ParcOtoDatasource<Prestataire> {
   }
 
   @override
-  String deleteConfirmationMessage(Prestataire c) {
+  String deleteConfirmationMessage(Client c) {
     return '${'supprest'.tr()} ${c.nom} ';
   }
 
   @override
-  List<DataCell> getCellsToShow(MapEntry<String, Prestataire> element) {
-    final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
+  List<DataCell> getCellsToShow(MapEntry<String, Client> element) {
     return [
       DataCell(SelectableText(
         element.value.nom,
@@ -58,7 +57,7 @@ class PrestataireDataSource extends ParcOtoDatasource<Prestataire> {
         style: rowTextStyle,
       )),
       DataCell(
-        ClientDatabase().isAdmin() || ClientDatabase().isManager()
+        DatabaseGetter().isAdmin() || DatabaseGetter().isManager()
             ? f.FlyoutTarget(
                 controller: element.value.controller,
                 child: OnTapScaleAndFade(
@@ -98,7 +97,7 @@ class PrestataireDataSource extends ParcOtoDatasource<Prestataire> {
                                   PrestataireTabsState.currentIndex.value =
                                       index - 1;
                                 }),
-                            if (ClientDatabase().isAdmin())
+                            if (DatabaseGetter().isAdmin())
                               f.MenuFlyoutItem(
                                   text: const Text('delete').tr(),
                                   onPressed: () {
@@ -123,6 +122,6 @@ class PrestataireDataSource extends ParcOtoDatasource<Prestataire> {
 
   @override
   Future<void> addToActivity(c) async {
-    await ClientDatabase().ajoutActivity(15, c.id, docName: c.nom);
+    await DatabaseGetter().ajoutActivity(15, c.id, docName: c.nom);
   }
 }

@@ -29,13 +29,16 @@ const adminID = "admin_keys";
 const reparationId = "reparation";
 const activityId = "activity";
 const prestataireId = "prestataire";
+const clientsID="clients";
+const fournsID="fournisseurs";
+const optionsID="options";
 const backupId="backup";
 const endpoint = "https://appwrite.parcoto.com/v1";
 String? project;
 
 String? secretKey;
 
-class ClientDatabase {
+class DatabaseGetter {
   static bool secretKeySet = false;
   static Client? client;
   static Account? account;
@@ -49,7 +52,7 @@ class ClientDatabase {
 
   static ValueNotifier<ParcUser?> me = ValueNotifier(null);
 
-  ClientDatabase() {
+  DatabaseGetter() {
     project ??= prefs.getString('project');
     if(project!=null){
       client ??= Client()
@@ -268,7 +271,7 @@ class ClientDatabase {
   }
 
   static Future<void> downloadLogo() async {
-    await ClientDatabase.storage!
+    await DatabaseGetter.storage!
         .getFileDownload(bucketId: buckedId, fileId: 'mylogo.png')
         .then((value) async {
       MyEntrepriseState.logo = value;
@@ -402,10 +405,62 @@ class ClientDatabase {
         return "suprutilisateur";
       case 35:
         return "changePermi";
+      case 36:
+        return "ajoutclient";
+      case 37:
+        return "modclient";
+      case 38:
+        return "supprimerclient";
+      case 39:
+        return "ajoutfacture";
+      case 40:
+        return "modfacture";
+      case 41:
+        return "supfacture";
+      case 42:
+        return "ajoutcheck";
+      case 43:
+        return "modcheck";
+      case 44:
+        return "supcheck";
+      case 45:
+        return "ajoutbon";
+      case 46:
+        return "modbon";
+      case 47:
+        return "superbon";
+      case 48:
+        return "ajoutfourn";
+      case 49:
+        return "modfourn";
+      case 50:
+        return "supfourn";
+      case 51:
+        return "ajoutoption";
+      case 52:
+        return "modifoption";
+      case 53:
+        return "suproption";
     }
     return '';
   }
 
+  Future<void> addDocument(
+      {required String collectionId,
+        required String documentId,
+        required Map<String, dynamic> data}) async {
+    await database?.createDocument(
+        databaseId: databaseId,
+        collectionId: collectionId,documentId: documentId,data:data);
+  }
+  Future<void> updateDocument(
+      {required String collectionId,
+        required String documentId,
+        required Map<String, dynamic> data}) async {
+    await database?.updateDocument(
+        databaseId: databaseId,collectionId:
+        collectionId,documentId: documentId,data:data);
+  }
 
 
 

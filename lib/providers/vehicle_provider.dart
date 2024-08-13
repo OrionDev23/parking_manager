@@ -31,10 +31,10 @@ class VehicleProvider extends ChangeNotifier {
     }
     downloadingVehicles=true;
     vehicles.clear();
-   await ClientDatabase.database!.listDocuments(
+   await DatabaseGetter.database!.listDocuments(
         databaseId: databaseId,
         collectionId: vehiculeid,queries: [
-      Query.limit(ClientDatabase.limits['vehicles']??500)
+      Query.limit(DatabaseGetter.limits['vehicles']??500)
     ]).then((value) {
       for(int i=0;i<value.documents.length;i++){
         vehicles[value.documents[i].$id]=value.documents[i].convertTo(
@@ -56,7 +56,7 @@ class VehicleProvider extends ChangeNotifier {
     }
     downloadingDocuments=true;
     documentsVehicules.clear();
-   await ClientDatabase.database!.listDocuments(
+   await DatabaseGetter.database!.listDocuments(
         databaseId: databaseId,
         collectionId: vehicDoc,queries: [Query.limit(5000)]).then((value) {
       for(int i=0;i<value.documents.length;i++){
@@ -79,7 +79,7 @@ class VehicleProvider extends ChangeNotifier {
     }
     downloadingStates=true;
     etats.clear();
-   await ClientDatabase.database!.listDocuments(
+   await DatabaseGetter.database!.listDocuments(
         databaseId: databaseId,
         collectionId: etatId,queries: [Query.limit(5000)]).then((value) {
       for(int i=0;i<value.documents.length;i++){
@@ -168,7 +168,7 @@ class VehicleProvider extends ChangeNotifier {
       }
     }
     else{
-    await ClientDatabase.database!.listDocuments(
+    await DatabaseGetter.database!.listDocuments(
         databaseId: databaseId,
         collectionId: vehicDoc,
         queries: [
@@ -194,7 +194,7 @@ class VehicleProvider extends ChangeNotifier {
       return vehicles[docID];
     }
     else{
-      return await ClientDatabase.database!
+      return await DatabaseGetter.database!
           .getDocument(
           databaseId: databaseId, collectionId: vehiculeid, documentId: docID)
           .then((value) {

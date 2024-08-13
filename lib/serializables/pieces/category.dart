@@ -21,4 +21,10 @@ class Category extends ParcOtoDefault{
       'name':name,
     };
   }
+
+  factory Category.fromJson(Map<String, dynamic> json) =>
+      _$CategoryFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$CategoryToJson(this);
 }

@@ -107,7 +107,7 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
           Text(dateFormat.format(element.value.updatedAt!), style: rowTextStyle)),
       if (selectC != true)
         DataCell(
-          ClientDatabase().isAdmin() || ClientDatabase().isManager()
+          DatabaseGetter().isAdmin() || DatabaseGetter().isManager()
               ? f.FlyoutTarget(
                   controller: element.value.controller,
                   child: f.Row(
@@ -188,7 +188,7 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
                   VehicleTabsState.currentIndex.value =
                       index - 1;
                 }),
-            if (ClientDatabase().isAdmin())
+            if (DatabaseGetter().isAdmin())
               f.MenuFlyoutItem(
                   text: const Text('delete').tr(),
                   onPressed: () {
@@ -307,7 +307,7 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
 
   void changePerimeter(MapEntry<String,Vehicle> element,int
   perimeter) async{
-      await ClientDatabase.database?.updateDocument(
+      await DatabaseGetter.database?.updateDocument(
           databaseId: databaseId,
           collectionId: vehiculeid,
           documentId: element.key,
@@ -323,7 +323,7 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
                 severity: f.InfoBarSeverity.success,
               );
             }, duration: snackbarShortDuration);
-        ClientDatabase().ajoutActivity(35, element.key,docName:element.value
+        DatabaseGetter().ajoutActivity(35, element.key,docName:element.value
             .matricule);
         notifyListeners();
       }).onError((error, stackTrace) {
@@ -367,7 +367,7 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
 
   @override
   Future<void> addToActivity(c) async {
-    await ClientDatabase().ajoutActivity(2, c.id, docName: c.matricule);
+    await DatabaseGetter().ajoutActivity(2, c.id, docName: c.matricule);
   }
 
   void showStateForm(Vehicle v, int type) {

@@ -17,7 +17,7 @@ class UsersWebservice
   }
 
   void initClient() async {
-    while (!ClientDatabase.secretKeySet) {
+    while (!DatabaseGetter.secretKeySet) {
       await Future.delayed(const Duration(milliseconds: 300));
     }
     client.setProject(project)

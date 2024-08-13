@@ -219,7 +219,7 @@ class AppTheme extends ChangeNotifier {
   Locale? get locale => _locale;
 
   set locale(Locale? locale) {
-    ClientDatabase.client?.setLocale(locale?.languageCode);
+    DatabaseGetter.client?.setLocale(locale?.languageCode);
     _locale = locale;
     notifyListeners();
   }

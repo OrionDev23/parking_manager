@@ -52,12 +52,12 @@ class CDocumentFormState extends State<CDocumentForm>
       downloadChauffeur(widget.cid!);
     }
     documentID ??=
-        DateTime.now().difference(ClientDatabase.ref).inMilliseconds.toString();
+        DateTime.now().difference(DatabaseGetter.ref).inMilliseconds.toString();
   }
 
   void downloadChauffeur(String id) async {
     loadingConducteur = true;
-    await ClientDatabase.database!
+    await DatabaseGetter.database!
         .getDocument(
             databaseId: databaseId, collectionId: chauffeurid, documentId: id)
         .then((value) {
@@ -267,22 +267,22 @@ class CDocumentFormState extends State<CDocumentForm>
           chauffeurNom:
               '${selectedConducteur?.name} ${selectedConducteur?.prenom}',
           dateExpiration: selectedDate,
-          createdBy: ClientDatabase.me.value?.id);
+          createdBy: DatabaseGetter.me.value?.id);
       if (widget.dc != null) {
-        await ClientDatabase.database!.updateDocument(
+        await DatabaseGetter.database!.updateDocument(
             databaseId: databaseId,
             collectionId: chaufDoc,
             documentId: documentID!,
             data: dv.toJson());
-        ClientDatabase()
+        DatabaseGetter()
             .ajoutActivity(24, documentID!, docName: dv.chauffeurNom);
       } else {
-        await ClientDatabase.database!.createDocument(
+        await DatabaseGetter.database!.createDocument(
             databaseId: databaseId,
             collectionId: chaufDoc,
             documentId: documentID!,
             data: dv.toJson());
-        ClientDatabase()
+        DatabaseGetter()
             .ajoutActivity(23, documentID!, docName: dv.chauffeurNom);
       }
 

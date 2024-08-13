@@ -184,7 +184,7 @@ class _BackupTableState extends State<BackupTable> {
                                   style:
                                   ButtonStyle(
                                     backgroundColor:
-                                    ButtonState.all<
+                                    WidgetStatePropertyAll<
                                         Color>(
                                         appTheme
                                             .color
@@ -224,7 +224,7 @@ class _BackupTableState extends State<BackupTable> {
                                 FilledButton(
                                     style:
                                     ButtonStyle(
-                                      backgroundColor: ButtonState.all<
+                                      backgroundColor:WidgetStatePropertyAll<
                                           Color>(
                                           appTheme
                                               .color
@@ -239,9 +239,9 @@ class _BackupTableState extends State<BackupTable> {
                                           .pop();
 
                                         filters['datemin'] =
-                                            dateMin.difference(ClientDatabase
+                                            dateMin.difference(DatabaseGetter
                         .ref).inMilliseconds.toString();
-                                        filters['datemax'] = dateMax.difference(ClientDatabase.ref).inMilliseconds.toString();
+                                        filters['datemax'] = dateMax.difference(DatabaseGetter.ref).inMilliseconds.toString();
                                       filtered =
                                       true;
                                       setState(

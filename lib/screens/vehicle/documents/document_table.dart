@@ -286,7 +286,7 @@ class DocumentTableState extends State<DocumentTable> {
                                                 FilledButton(
                                                   style: ButtonStyle(
                                                     backgroundColor:
-                                                        ButtonState.all<Color>(
+                                                    WidgetStatePropertyAll<Color>(
                                                             appTheme.color
                                                                 .lightest),
                                                   ),
@@ -322,7 +322,7 @@ class DocumentTableState extends State<DocumentTable> {
                                                 FilledButton(
                                                     style: ButtonStyle(
                                                       backgroundColor:
-                                                          ButtonState.all<
+                                                      WidgetStatePropertyAll<
                                                                   Color>(
                                                               appTheme.color
                                                                   .lighter),
@@ -338,7 +338,7 @@ class DocumentTableState extends State<DocumentTable> {
                                                         filters['datemin'] =
                                                             dateMin!
                                                                 .difference(
-                                                                    ClientDatabase
+                                                                    DatabaseGetter
                                                                         .ref)
                                                                 .inMilliseconds
                                                                 .toString();
@@ -350,7 +350,7 @@ class DocumentTableState extends State<DocumentTable> {
                                                         filters['datemax'] =
                                                             dateMax!
                                                                 .difference(
-                                                                    ClientDatabase
+                                                                    DatabaseGetter
                                                                         .ref)
                                                                 .inMilliseconds
                                                                 .toString();

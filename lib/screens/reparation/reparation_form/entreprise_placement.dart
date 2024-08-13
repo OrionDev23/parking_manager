@@ -21,7 +21,7 @@ class EntreprisePlacement extends StatelessWidget {
         if (kIsWeb)
           FutureBuilder(
               future: MyEntrepriseState.logo == null
-                  ? ClientDatabase.downloadLogo()
+                  ? DatabaseGetter.downloadLogo()
                   : null,
               builder: (c, snapshot) {
                 if (MyEntrepriseState.logo != null) {

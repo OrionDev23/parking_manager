@@ -59,7 +59,7 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
             : dateFormat.format(element.value.updatedAt!),
         style: rowTextStyle,
       )),
-      DataCell(ClientDatabase().isAdmin() || ClientDatabase().isManager()
+      DataCell(DatabaseGetter().isAdmin() || DatabaseGetter().isManager()
           ? f.FlyoutTarget(
               controller: element.value.controller,
               child: OnTapScaleAndFade(
@@ -67,7 +67,7 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
                     element.value.controller.showFlyout(builder: (context) {
                       return f.MenuFlyout(
                         items: [
-                          if (!archive || ClientDatabase().isAdmin())
+                          if (!archive || DatabaseGetter().isAdmin())
                             f.MenuFlyoutItem(
                                 text: const Text('mod').tr(),
                                 onPressed: () {
@@ -78,7 +78,7 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
                                     modifyChauffeur(element.value);
                                   }
                                 }),
-                          if (ClientDatabase().isAdmin() && archive)
+                          if (DatabaseGetter().isAdmin() && archive)
                             f.MenuFlyoutItem(
                                 text: const Text('delete').tr(),
                                 onPressed: () {
@@ -116,7 +116,7 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
                                           );
                                         }));
                               }),
-                          if (!archive || ClientDatabase().isAdmin())
+                          if (!archive || DatabaseGetter().isAdmin())
                             f.MenuFlyoutSubItem(
                               text: const Text('disponibilite').tr(),
                               items: (BuildContext context) {
@@ -142,7 +142,7 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
                                     },
                                     selected: element.value.etat == 2,
                                   ),
-                                  if (ClientDatabase().isAdmin())
+                                  if (DatabaseGetter().isAdmin())
                                     f.MenuFlyoutItem(
                                       text: const Text('quitteentre').tr(),
                                       onPressed: () {
@@ -172,7 +172,7 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
 
   @override
   Future<void> addToActivity(c) async {
-    await ClientDatabase()
+    await DatabaseGetter()
         .ajoutActivity(18, c.id, docName: '${c.name} ${c.prenom}');
   }
 
@@ -232,24 +232,24 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
   Future<void> uploadEtat(Conducteur c, int etat) async {
     if (etat != c.etat) {
       String etatID = DateTime.now()
-          .difference(ClientDatabase.ref)
+          .difference(DatabaseGetter.ref)
           .inMilliseconds
           .abs()
           .toString();
       DisponibiliteChauffeur disp = DisponibiliteChauffeur(
           id: etatID,
           type: etat,
-          createdBy: ClientDatabase.me.value?.id,
+          createdBy: DatabaseGetter.me.value?.id,
           chauffeur: c.id,
           chauffeurNom: '${c.name} ${c.prenom}');
-      await ClientDatabase.database!
+      await DatabaseGetter.database!
           .createDocument(
               databaseId: databaseId,
               collectionId: chaufDispID,
               documentId: etatID,
               data: disp.toJson())
           .then((value) async {
-        await ClientDatabase.database!.updateDocument(
+        await DatabaseGetter.database!.updateDocument(
             databaseId: databaseId,
             collectionId: chauffeurid,
             documentId: c.id,
@@ -258,10 +258,10 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
               'etat': etat,
             }).then((value) {
           if (etat == 3) {
-            ClientDatabase()
+            DatabaseGetter()
                 .ajoutActivity(19, c.id, docName: '${c.name} ${c.prenom}');
           } else {
-            ClientDatabase()
+            DatabaseGetter()
                 .ajoutActivity(21, c.id, docName: '${c.name} ${c.prenom}');
           }
           displayMessageDone();

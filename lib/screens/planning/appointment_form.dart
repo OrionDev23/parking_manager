@@ -413,7 +413,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
       sumbmiting = true;
     });
     documentID ??= DateTime.now()
-        .difference(ClientDatabase.ref)
+        .difference(DatabaseGetter.ref)
         .inMilliseconds
         .abs()
         .toString();
@@ -424,17 +424,17 @@ class _AppointmentFormState extends State<AppointmentForm> {
         endTime: _endDate,
         notes: _notes,
         color: _colorCollection[_selectedColorIndex],
-        createdBy: ClientDatabase.me.value?.id,
+        createdBy: DatabaseGetter.me.value?.id,
         isAllDay: _isAllDay,
         type: _selectedCategorie);
-    await ClientDatabase.database!.createDocument(
+    await DatabaseGetter.database!.createDocument(
         databaseId: databaseId,
         collectionId: planningID,
         documentId: documentID!,
         data: planning.toJson(),
         permissions: [
-          Permission.delete(Role.user(ClientDatabase.me.value!.id)),
-          Permission.update(Role.user(ClientDatabase.me.value!.id)),
+          Permission.delete(Role.user(DatabaseGetter.me.value!.id)),
+          Permission.update(Role.user(DatabaseGetter.me.value!.id)),
         ]).then((value) {
       displayInfoBar(context,
           builder: (BuildContext context, void Function() close) {

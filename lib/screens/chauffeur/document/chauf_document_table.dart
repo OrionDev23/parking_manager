@@ -294,7 +294,7 @@ class CDocumentTableState extends State<CDocumentTable> {
                                                 FilledButton(
                                                   style: ButtonStyle(
                                                     backgroundColor:
-                                                        ButtonState.all<Color>(
+                                                    WidgetStatePropertyAll<Color>(
                                                             appTheme.color
                                                                 .lightest),
                                                   ),
@@ -330,7 +330,7 @@ class CDocumentTableState extends State<CDocumentTable> {
                                                 FilledButton(
                                                     style: ButtonStyle(
                                                       backgroundColor:
-                                                          ButtonState.all<
+                                                      WidgetStatePropertyAll<
                                                                   Color>(
                                                               appTheme.color
                                                                   .lighter),
@@ -346,7 +346,7 @@ class CDocumentTableState extends State<CDocumentTable> {
                                                         filters['datemin'] =
                                                             dateMin!
                                                                 .difference(
-                                                                    ClientDatabase
+                                                                    DatabaseGetter
                                                                         .ref)
                                                                 .inMilliseconds
                                                                 .toString();
@@ -358,7 +358,7 @@ class CDocumentTableState extends State<CDocumentTable> {
                                                         filters['datemax'] =
                                                             dateMax!
                                                                 .difference(
-                                                                    ClientDatabase
+                                                                    DatabaseGetter
                                                                         .ref)
                                                                 .inMilliseconds
                                                                 .toString();

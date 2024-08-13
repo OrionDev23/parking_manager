@@ -1,4 +1,4 @@
-import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/appwrite.dart' hide Client;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
@@ -12,7 +12,7 @@ import 'package:parc_oto/screens/reparation/reparation_form/entreprise_placement
 import 'package:parc_oto/screens/reparation/reparation_form/entretien_widget.dart';
 import 'package:parc_oto/screens/reparation/reparation_form/vehicle_damage.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicles_table.dart';
-import 'package:parc_oto/serializables/prestataire.dart';
+import 'package:parc_oto/serializables/client.dart';
 import 'package:parc_oto/serializables/reparation/etat_vehicle.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:parc_oto/widgets/big_title_form.dart';
@@ -49,7 +49,7 @@ class ReparationFormState extends State<ReparationForm>
   TextEditingController numOrdre = TextEditingController();
   DateTime selectedDate = DateTime.now();
 
-  Prestataire? selectedPrest;
+  Client? selectedPrest;
   Vehicle? selectedVehicle;
   TextEditingController marque = TextEditingController();
   TextEditingController type = TextEditingController();
@@ -140,7 +140,7 @@ class ReparationFormState extends State<ReparationForm>
     if (mounted) {
       setState(() {});
     }
-    await ClientDatabase.database!.listDocuments(
+    await DatabaseGetter.database!.listDocuments(
         databaseId: databaseId,
         collectionId: reparationId,
         queries: [
@@ -179,7 +179,7 @@ class ReparationFormState extends State<ReparationForm>
       });
       result = true;
     } else {
-      result = await ClientDatabase.database!.listDocuments(
+      result = await DatabaseGetter.database!.listDocuments(
           databaseId: databaseId,
           collectionId: reparationId,
           queries: [
@@ -405,7 +405,7 @@ class ReparationFormState extends State<ReparationForm>
                         ).tr(),
                         title: Text(selectedPrest?.nom ?? 'nonind'.tr()),
                         onPressed: () async {
-                          selectedPrest = await showDialog<Prestataire>(
+                          selectedPrest = await showDialog<Client>(
                               context: context,
                               barrierDismissible: true,
                               builder: (context) {
@@ -532,14 +532,14 @@ class ReparationFormState extends State<ReparationForm>
           children: [
             FilledButton(
                 style: ButtonStyle(
-                  backgroundColor: ButtonState.all(appTheme.color.lightest),
+                  backgroundColor: WidgetStatePropertyAll(appTheme.color.lightest),
                 ),
                 onPressed: uploading ? null : showPdf,
                 child: const Text('voir')),
             smallSpace,
             FilledButton(
                 style: ButtonStyle(
-                  backgroundColor: ButtonState.all(appTheme.color.darkest),
+                  backgroundColor: WidgetStatePropertyAll(appTheme.color.darkest),
                 ),
                 onPressed: uploading ? null : uploadForm,
                 child: const Text('save').tr())
@@ -1164,7 +1164,7 @@ class ReparationFormState extends State<ReparationForm>
     });
     bool modif = documentID != null;
     documentID ??= DateTime.now()
-        .difference(ClientDatabase.ref)
+        .difference(DatabaseGetter.ref)
         .inMilliseconds
         .abs()
         .toString();
@@ -1244,7 +1244,7 @@ class ReparationFormState extends State<ReparationForm>
   }
 
   Future<void> updateReparation(Reparation reparation) async {
-    await ClientDatabase.database!
+    await DatabaseGetter.database!
         .updateDocument(
             databaseId: databaseId,
             collectionId: reparationId,
@@ -1257,7 +1257,7 @@ class ReparationFormState extends State<ReparationForm>
   }
 
   Future<void> createReparation(Reparation reparation) async {
-    await ClientDatabase.database!.createDocument(
+    await DatabaseGetter.database!.createDocument(
         databaseId: databaseId,
         collectionId: reparationId,
         documentId: documentID!,
@@ -1266,10 +1266,10 @@ class ReparationFormState extends State<ReparationForm>
 
   Future<void> uploadActivity(bool update, Reparation reparation) async {
     if (update) {
-      await ClientDatabase().ajoutActivity(11, reparation.id,
+      await DatabaseGetter().ajoutActivity(11, reparation.id,
           docName: pdf_theme.numberFormat.format(reparation.numero));
     } else {
-      await ClientDatabase().ajoutActivity(10, reparation.id,
+      await DatabaseGetter().ajoutActivity(10, reparation.id,
           docName: pdf_theme.numberFormat.format(reparation.numero));
     }
   }

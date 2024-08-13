@@ -148,7 +148,7 @@ class _VehicleFormState extends State<VehicleForm>
       selectedAnnee =
           DateTime(widget.vehicle!.anneeUtil ?? DateTime.now().year);
     }
-    documentID ??= ClientDatabase.ref
+    documentID ??= DatabaseGetter.ref
         .difference(DateTime.now())
         .inMilliseconds
         .abs()
@@ -1991,7 +1991,7 @@ class _VehicleFormState extends State<VehicleForm>
         matriculePrec: matrPrec.text,
         carrosserie: caross.text,
         charegeUtile: int.tryParse(charg.text),
-        createdBy: ClientDatabase.me.value?.id,
+        createdBy: DatabaseGetter.me.value?.id,
         lourd: lourd,
         direction:
             selectedDirection.text.toUpperCase().replaceAll(' ', '').trim(),
@@ -2051,7 +2051,7 @@ class _VehicleFormState extends State<VehicleForm>
   }
 
   Future<void> updateVehicle(Vehicle vehicle) async {
-    await ClientDatabase.database!
+    await DatabaseGetter.database!
         .updateDocument(
           databaseId: databaseId,
           collectionId: vehiculeid,
@@ -2068,7 +2068,7 @@ class _VehicleFormState extends State<VehicleForm>
   }
 
   Future<void> createVehicle(Vehicle vehicle) async {
-    await ClientDatabase.database!
+    await DatabaseGetter.database!
         .createDocument(
           databaseId: databaseId,
           collectionId: vehiculeid,
@@ -2086,10 +2086,10 @@ class _VehicleFormState extends State<VehicleForm>
 
   Future<void> uploadActivity(bool update, Vehicle vehicle) async {
     if (update) {
-      await ClientDatabase()
+      await DatabaseGetter()
           .ajoutActivity(1, vehicle.id, docName: vehicle.matricule);
     } else {
-      await ClientDatabase()
+      await DatabaseGetter()
           .ajoutActivity(0, vehicle.id, docName: vehicle.matricule);
     }
   }

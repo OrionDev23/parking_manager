@@ -77,7 +77,7 @@ class StateFormState extends State<StateForm> {
 
   Future<void> downloadVehicle(String id) async {
     loadingVehicle = true;
-    await ClientDatabase.database!
+    await DatabaseGetter.database!
         .getDocument(
             databaseId: databaseId, collectionId: vehiculeid, documentId: id)
         .then((value) {
@@ -95,7 +95,7 @@ class StateFormState extends State<StateForm> {
 
   Future<void> downloadReparation(String id) async {
     loadingReparation = true;
-    await ClientDatabase.database!
+    await DatabaseGetter.database!
         .getDocument(
             databaseId: databaseId, collectionId: reparationId, documentId: id)
         .then((value) {
@@ -402,7 +402,7 @@ class StateFormState extends State<StateForm> {
       sumbmiting = true;
     });
     documentID ??= DateTime.now()
-        .difference(ClientDatabase.ref)
+        .difference(DatabaseGetter.ref)
         .inMilliseconds
         .abs()
         .toString();
@@ -418,14 +418,14 @@ class StateFormState extends State<StateForm> {
           '',
       remarque: remarque,
       type: type,
-      createdBy: ClientDatabase.me.value?.id,
+      createdBy: DatabaseGetter.me.value?.id,
       ordreID: selectedReparation?.id,
       ordreNum: selectedReparation?.numero,
       valeur: valeur,
     );
     await updateOrCreate(etat).then((value) {
       if (affectNow || widget.vehicle != null) {
-        ClientDatabase.database!.updateDocument(
+        DatabaseGetter.database!.updateDocument(
             databaseId: databaseId,
             collectionId: vehiculeid,
             documentId: selectedVehicle?.id ??
@@ -462,22 +462,22 @@ class StateFormState extends State<StateForm> {
 
   Future<void> updateOrCreate(Etat etat) async {
     if (widget.etat != null) {
-      await ClientDatabase.database!.updateDocument(
+      await DatabaseGetter.database!.updateDocument(
         databaseId: databaseId,
         collectionId: etatId,
         documentId: documentID!,
         data: etat.toJson(),
       );
 
-      ClientDatabase().ajoutActivity(5, documentID!, docName: etat.vehicleMat);
+      DatabaseGetter().ajoutActivity(5, documentID!, docName: etat.vehicleMat);
     } else {
-      await ClientDatabase.database!.createDocument(
+      await DatabaseGetter.database!.createDocument(
         databaseId: databaseId,
         collectionId: etatId,
         documentId: documentID!,
         data: etat.toJson(),
       );
-      ClientDatabase().ajoutActivity(4, documentID!, docName: etat.vehicleMat);
+      DatabaseGetter().ajoutActivity(4, documentID!, docName: etat.vehicleMat);
     }
   }
 

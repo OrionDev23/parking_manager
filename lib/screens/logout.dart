@@ -102,9 +102,9 @@ class _LogoutScreenState extends State<LogoutScreen> {
     setState(() {
       loginOut = true;
     });
-    await ClientDatabase.account!.deleteSession(sessionId: 'current');
+    await DatabaseGetter.account!.deleteSession(sessionId: 'current');
 
-    ClientDatabase.user = null;
+    DatabaseGetter.user = null;
     PanesListState.signedIn.value = false;
     PanesListState.index.value = 0;
   }

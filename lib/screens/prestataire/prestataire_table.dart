@@ -1,12 +1,12 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parc_oto/datasources/prestataire/prestataire_datasource.dart';
-import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../theme.dart';
+import '../../datasources/prestataire/prestataire_datasource.dart';
+import '../../providers/client_database.dart';
 import '../data_table_parcoto.dart';
 
 class PrestataireTable extends StatefulWidget {
@@ -36,28 +36,41 @@ class PrestataireTableState extends State<PrestataireTable> {
 
   late List<DataColumn2> columns;
 
+  bool initialized = false;
+
   @override
   void initState() {
-    if (filterDocument.value != null) {
-      startedWithFiltersOn = true;
-      searchController.text = filterDocument.value!;
-      prestataireDataSource = PrestataireDataSource(
-          current: context,
-          selectC: widget.selectD,
-          collectionID: prestataireId,
-          searchKey: filterDocument.value);
-      filterDocument.value = null;
-    } else {
-      startedWithFiltersOn = false;
-
-      prestataireDataSource = PrestataireDataSource(
-          current: context,
-          collectionID: prestataireId,
-          selectC: widget.selectD,
-          archive: widget.archive);
-    }
-    initColumns();
+    initValues();
     super.initState();
+  }
+
+  String getCollectionID() {
+    return prestataireId;
+  }
+
+  void initValues() {
+    if (!initialized) {
+      initialized = true;
+      if (filterDocument.value != null) {
+        startedWithFiltersOn = true;
+        searchController.text = filterDocument.value!;
+        prestataireDataSource = PrestataireDataSource(
+            current: context,
+            selectC: widget.selectD,
+            collectionID: getCollectionID(),
+            searchKey: filterDocument.value);
+        filterDocument.value = null;
+      } else {
+        startedWithFiltersOn = false;
+
+        prestataireDataSource = PrestataireDataSource(
+            current: context,
+            collectionID: getCollectionID(),
+            selectC: widget.selectD,
+            archive: widget.archive);
+      }
+      initColumns();
+    }
   }
 
   int sortColumn = 5;
@@ -196,7 +209,7 @@ class PrestataireTableState extends State<PrestataireTable> {
           return DataTableParc(
             header: Padding(
               padding:
-                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+              const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -204,16 +217,14 @@ class PrestataireTableState extends State<PrestataireTable> {
                     width: 350.px,
                     height: 45.px,
                     child: TextBox(
-                      onChanged: (s){
-                        if(s.isEmpty){
-                          notEmpty=false;
+                      onChanged: (s) {
+                        if (s.isEmpty) {
+                          notEmpty = false;
                           prestataireDataSource.search('');
+                        } else {
+                          notEmpty = true;
                         }
-                        else{
-                          notEmpty=true;
-                        }
-                        setState(() {
-                        });
+                        setState(() {});
                       },
                       controller: searchController,
                       placeholder: 'search'.tr(),
@@ -239,13 +250,13 @@ class PrestataireTableState extends State<PrestataireTable> {
                       },
                       suffix: notEmpty
                           ? IconButton(
-                              icon: const Icon(FluentIcons.cancel),
-                              onPressed: () {
-                                searchController.text = "";
-                                notEmpty = false;
-                                setState(() {});
-                                prestataireDataSource.search('');
-                              })
+                          icon: const Icon(FluentIcons.cancel),
+                          onPressed: () {
+                            searchController.text = "";
+                            notEmpty = false;
+                            setState(() {});
+                            prestataireDataSource.search('');
+                          })
                           : null,
                     ),
                   ),

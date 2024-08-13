@@ -8,14 +8,14 @@ import 'package:parc_oto/screens/entreprise/entreprise.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
-import '../serializables/prestataire.dart';
+import '../serializables/client.dart';
 import '../serializables/reparation/reparation.dart';
 import '../utilities/num_to_word.dart';
 
 class ReparationPdf {
   final Reparation reparation;
 
-  Prestataire? p;
+  Client? p;
 
   ReparationPdf({required this.reparation});
 
@@ -41,7 +41,7 @@ class ReparationPdf {
       ),
       title: 'ordre ${reparation.numero}',
       author:
-          ClientDatabase.me.value?.name ?? ClientDatabase.me.value?.email ?? '',
+          DatabaseGetter.me.value?.name ?? DatabaseGetter.me.value?.email ?? '',
       producer: 'ParcOto',
     );
 

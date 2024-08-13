@@ -24,5 +24,9 @@ class Brand extends ParcOtoDefault{
       'name':name,
     };
   }
+  factory Brand.fromJson(Map<String, dynamic> json) =>
+      _$BrandFromJson(json);
 
+  @override
+  Map<String, dynamic> toJson() => _$BrandToJson(this);
 }

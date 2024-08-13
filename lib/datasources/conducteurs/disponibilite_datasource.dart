@@ -47,7 +47,7 @@ class DisponibiliteDataSource
         style: rowTextStyle,
       )),
       DataCell(
-        ClientDatabase().isAdmin()
+        DatabaseGetter().isAdmin()
             ? f.FlyoutTarget(
                 controller: element.value.controller,
                 child: OnTapScaleAndFade(
@@ -82,6 +82,6 @@ class DisponibiliteDataSource
 
   @override
   Future<void> addToActivity(c) async {
-    await ClientDatabase().ajoutActivity(22, c.id, docName: c.chauffeurNom);
+    await DatabaseGetter().ajoutActivity(22, c.id, docName: c.chauffeurNom);
   }
 }

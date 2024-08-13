@@ -1,4 +1,4 @@
-import 'package:dart_appwrite/dart_appwrite.dart';
+import 'package:dart_appwrite/dart_appwrite.dart' hide Client;
 import 'package:dart_appwrite/models.dart';
 import 'package:parc_oto/providers/client_database.dart';
 
@@ -7,7 +7,7 @@ import '../serializables/conducteur/conducteur.dart';
 import '../serializables/conducteur/disponibilite_chauffeur.dart';
 import '../serializables/conducteur/document_chauffeur.dart';
 import '../serializables/planning.dart';
-import '../serializables/prestataire.dart';
+import '../serializables/client.dart';
 import '../serializables/reparation/reparation.dart';
 import '../serializables/vehicle/document_vehicle.dart';
 import '../serializables/vehicle/state.dart';
@@ -21,7 +21,7 @@ class RestoreDatabase {
   final Map<String,Etat>? vehiclesStates;
 
   final Map<String,Reparation>? repairs;
-  final Map<String,Prestataire>? providers;
+  final Map<String,Client>? providers;
   final Map<String,Conducteur>? drivers;
   final Map<String,DocumentChauffeur>? driversDocs;
   final Map<String,DisponibiliteChauffeur>? driversStates;

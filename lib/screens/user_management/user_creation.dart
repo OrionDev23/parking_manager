@@ -408,7 +408,7 @@ class _UserFormState extends State<UserForm> {
       setState(() {
         uploading = true;
       });
-      userID ??= widget.user?.$id ?? DateTime.now().difference(ClientDatabase
+      userID ??= widget.user?.$id ?? DateTime.now().difference(DatabaseGetter
           .ref)
           .inMilliseconds.abs().toString();
       client = Client()
@@ -507,7 +507,7 @@ class _UserFormState extends State<UserForm> {
         phone: phone.text.trim().isEmpty?null:'$phoneDial${phone.text}',
 
       );
-      ClientDatabase().ajoutActivity(32, userID!, docName: name.text);
+      DatabaseGetter().ajoutActivity(32, userID!, docName: name.text);
     } else {
       if (widget.user!.name != name.text) {
         await Users(client!)
@@ -517,7 +517,7 @@ class _UserFormState extends State<UserForm> {
         await Users(client!).updatePhone(
             userId: widget.user!.$id, number: '$phoneDial${phone.text}');
       }
-      ClientDatabase().ajoutActivity(33, userID!, docName: name.text);
+      DatabaseGetter().ajoutActivity(33, userID!, docName: name.text);
     }
   }
 }

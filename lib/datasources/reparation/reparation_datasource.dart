@@ -65,8 +65,8 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation> {
                 element.value.controller.showFlyout(builder: (context) {
                   return f.MenuFlyout(
                     items: [
-                      if (ClientDatabase().isAdmin() ||
-                          ClientDatabase().isManager())
+                      if (DatabaseGetter().isAdmin() ||
+                          DatabaseGetter().isManager())
                         f.MenuFlyoutItem(
                             text: const Text('mod').tr(),
                             onPressed: () {
@@ -97,7 +97,7 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation> {
                               ReparationTabsState.currentIndex.value =
                                   index - 1;
                             }),
-                      if (ClientDatabase().isAdmin())
+                      if (DatabaseGetter().isAdmin())
                         f.MenuFlyoutItem(
                             text: const Text('delete').tr(),
                             onPressed: () {
@@ -136,7 +136,7 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation> {
 
   @override
   Future<void> addToActivity(c) async {
-    await ClientDatabase()
+    await DatabaseGetter()
         .ajoutActivity(12, c.id, docName: c.numero.toString());
   }
 }

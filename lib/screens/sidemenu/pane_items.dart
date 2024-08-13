@@ -5,7 +5,6 @@ import 'package:parc_oto/admin_parameters.dart';
 import 'package:parc_oto/main.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:parc_oto/screens/workshop/inventory/inventory.dart';
-import 'package:parc_oto/screens/workshop/inventory/suppliers.dart';
 import 'package:parc_oto/screens/workshop/my_repair.dart';
 import 'package:parc_oto/screens/workshop/parts/brands.dart';
 import 'package:parc_oto/screens/workshop/parts/categories.dart';
@@ -36,7 +35,8 @@ import '../vehicle/documents/document_tabs.dart';
 import '../vehicle/manager/vehicle_tabs.dart';
 import '../vehicle/states/state_tabs.dart';
 import '../vehicle/vehicle_dashboard.dart';
-import '../workshop/parts/options.dart';
+import '../workshop/inventory/fournisseurs/fournisseur_tabs.dart';
+import '../workshop/parts/options/option_tabs.dart';
 import '../workshop/parts/parts_management.dart';
 import '../workshop/workshop_dashboard.dart';
 
@@ -249,7 +249,7 @@ class PaneItemsAndFooters {
             'fournisseurs',
             style: paneTextStyle,
           ).tr(),
-          body: const SuppliersManagement(),
+          body: const FournisseurTabs(),
         ),
         PaneItemHeader(
             header: Text('pieces',style: paneTextStyle,).tr()
@@ -292,7 +292,7 @@ class PaneItemsAndFooters {
             FluentIcons.text_paragraph_option,
             color: appTheme.color.lightest,
           ),
-          body: const PartsOptions(),
+          body: const OptionTabs(),
           title: Text(
             "options",
             style: paneTextStyle,
@@ -455,8 +455,8 @@ class PaneItemsAndFooters {
           style: paneTextStyle,
         ).tr(),
         body: const Tutorial());
-    bool isAdmin = ClientDatabase().isAdmin();
-    bool isManager = ClientDatabase().isManager();
+    bool isAdmin = DatabaseGetter().isAdmin();
+    bool isManager = DatabaseGetter().isManager();
 
     if (PanesListState.signedIn.value) {
       originalItems = [

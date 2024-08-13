@@ -12,5 +12,9 @@ class Accesoire extends ParcOtoDefault{
   Accesoire({required this.designation,required this.prix,required super.id,
     super.createdAt,super.updatedAt});
 
+  factory Accesoire.fromJson(Map<String, dynamic> json) =>
+      _$AccesoireFromJson(json);
 
+  @override
+  Map<String, dynamic> toJson() => _$AccesoireToJson(this);
 }

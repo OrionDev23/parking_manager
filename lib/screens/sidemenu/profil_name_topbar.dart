@@ -16,7 +16,7 @@ class ProfilNameTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
     return ValueListenableBuilder(
-        valueListenable: ClientDatabase.me,
+        valueListenable: DatabaseGetter.me,
         builder: (context, me, _) {
           return OnTapScaleAndFade(
               child: Row(

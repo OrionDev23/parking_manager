@@ -16,7 +16,7 @@ class FutureImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: ClientDatabase.storage!.getFileView(
+        future: DatabaseGetter.storage!.getFileView(
           bucketId: bucketID,
           fileId: fileID,
         ),

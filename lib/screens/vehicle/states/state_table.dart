@@ -438,7 +438,7 @@ class StateTableState extends State<StateTable> {
                   FilledButton(
                     style: ButtonStyle(
                       backgroundColor:
-                          ButtonState.all<Color>(appTheme.color.lightest),
+                      WidgetStatePropertyAll<Color>(appTheme.color.lightest),
                     ),
                     onPressed: filtered
                         ? () {
@@ -467,7 +467,7 @@ class StateTableState extends State<StateTable> {
                   FilledButton(
                       style: ButtonStyle(
                         backgroundColor:
-                            ButtonState.all<Color>(appTheme.color.lighter),
+                        WidgetStatePropertyAll<Color>(appTheme.color.lighter),
                       ),
                       child: const Text('confirmer').tr(),
                       onPressed: () {
@@ -479,7 +479,7 @@ class StateTableState extends State<StateTable> {
 
                         if (dateMin != null) {
                           filters['datemin'] = dateMin!
-                              .difference(ClientDatabase.ref)
+                              .difference(DatabaseGetter.ref)
                               .inMilliseconds
                               .toString();
                         } else {
@@ -487,7 +487,7 @@ class StateTableState extends State<StateTable> {
                         }
                         if (dateMax != null) {
                           filters['datemax'] = dateMax!
-                              .difference(ClientDatabase.ref)
+                              .difference(DatabaseGetter.ref)
                               .inMilliseconds
                               .toString();
                         } else {

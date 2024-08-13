@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:dart_appwrite/dart_appwrite.dart';
+import 'package:dart_appwrite/dart_appwrite.dart' as da;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -11,7 +11,7 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/restore/restore_database.dart';
 import 'package:parc_oto/serializables/conducteur/disponibilite_chauffeur.dart';
 import 'package:parc_oto/serializables/conducteur/document_chauffeur.dart';
-import 'package:parc_oto/serializables/prestataire.dart';
+import 'package:parc_oto/serializables/client.dart';
 import 'package:parc_oto/serializables/vehicle/document_vehicle.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -303,7 +303,7 @@ class _BackupRestoreState extends State<BackupRestore> {
 
   void loadFile() async{
     if(widget.backupFile==null&& widget.backup!=null){
-      ClientDatabase.storage!.getFileDownload(bucketId: backupId, fileId: widget
+      DatabaseGetter.storage!.getFileDownload(bucketId: backupId, fileId: widget
           .backup!.id).then((value) {
         loadedFile=value;
         decompressFile();
@@ -335,9 +335,9 @@ class _BackupRestoreState extends State<BackupRestore> {
   }
   String? decryptedString;
   void decryptFile(){
-    if(loadedFile!=null && ClientDatabase.encrypter!=null){
-      decryptedString=ClientDatabase.encrypter!.decrypt64(utf8.decode(loadedFile!),
-          iv: ClientDatabase.iv);
+    if(loadedFile!=null && DatabaseGetter.encrypter!=null){
+      decryptedString=DatabaseGetter.encrypter!.decrypt64(utf8.decode(loadedFile!),
+          iv: DatabaseGetter.iv);
       setState(() {
         progress=80;
       });
@@ -387,7 +387,7 @@ class _BackupRestoreState extends State<BackupRestore> {
   Map<String,Reparation> repairs={};
   bool repairsSelected=true;
 
-  Map<String,Prestataire> providers={};
+  Map<String,Client> providers={};
   bool providersSelected=true;
 
   Map<String,Conducteur> drivers={};
@@ -456,7 +456,7 @@ class _BackupRestoreState extends State<BackupRestore> {
   }
   Future<void> getProviders(List<dynamic> list) async {
     for(var element in list){
-      providers[element[r'$id']]=Prestataire.fromJson(jsonDecode(jsonEncode
+      providers[element[r'$id']]=Client.fromJson(jsonDecode(jsonEncode
         (element)));
     }
 
@@ -478,16 +478,16 @@ class _BackupRestoreState extends State<BackupRestore> {
 
   bool restoring=false;
   Future<void> restoreData() async{
-    if(ClientDatabase.encrypter!=null && !restoring){
+    if(DatabaseGetter.encrypter!=null && !restoring){
       setState(() {
         restoring=true;
       });
-      Client client = Client()
+      da.Client client = da.Client()
         ..setEndpoint(endpoint)
         ..setProject(project)
         ..setKey(secretKey);
 
-      RestoreDatabase restoreDatabase=RestoreDatabase(databases: Databases
+      RestoreDatabase restoreDatabase=RestoreDatabase(databases: da.Databases
         (client),
       vehicles: vehiculesSelected?vehicles:null,
       vehiclesDocs: vehiclesDocsSelected?vehiclesDocs:null,

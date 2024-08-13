@@ -1,13 +1,14 @@
-import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/appwrite.dart' hide Client;
 import 'package:parc_oto/datasources/parcoto_webservice.dart';
-import 'package:parc_oto/serializables/prestataire.dart';
 
-class PrestataireWebservice extends ParcOtoWebService<Prestataire> {
+import '../../serializables/client.dart';
+
+class PrestataireWebservice extends ParcOtoWebService<Client> {
   PrestataireWebservice(super.data, super.collectionID, super.columnForSearch);
 
   @override
-  Prestataire fromJsonFunction(Map<String, dynamic> json) {
-    return Prestataire.fromJson(json);
+  Client fromJsonFunction(Map<String, dynamic> json) {
+    return Client.fromJson(json);
   }
 
   @override
@@ -17,7 +18,7 @@ class PrestataireWebservice extends ParcOtoWebService<Prestataire> {
 
   @override
   int Function(
-          MapEntry<String, Prestataire> p1, MapEntry<String, Prestataire> p2)?
+          MapEntry<String, Client> p1, MapEntry<String, Client> p2)?
       getComparisonFunction(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {

@@ -98,8 +98,8 @@ class BackupUploaderState extends State<BackupUploader> {
   }
 
   void cryptString() {
-    if(ClientDatabase.encrypter!=null){
-      cryptedString = ClientDatabase.encrypter!.encrypt(widget.data, iv: ClientDatabase.iv).base64;
+    if(DatabaseGetter.encrypter!=null){
+      cryptedString = DatabaseGetter.encrypter!.encrypt(widget.data, iv: DatabaseGetter.iv).base64;
       setState(() {
         progress = 10;
       });
@@ -125,8 +125,8 @@ class BackupUploaderState extends State<BackupUploader> {
   void uploadFile() async {
     if (file != null) {
       id ??=
-          widget.date.difference(ClientDatabase.ref).inMilliseconds.toString();
-      await ClientDatabase.storage!
+          widget.date.difference(DatabaseGetter.ref).inMilliseconds.toString();
+      await DatabaseGetter.storage!
           .createFile(
               bucketId: backupId,
               fileId: id!,
@@ -171,7 +171,7 @@ class BackupUploaderState extends State<BackupUploader> {
   }
 
   void updateDb() async {
-    await ClientDatabase.database!.createDocument(
+    await DatabaseGetter.database!.createDocument(
         databaseId: databaseId,
         collectionId: backupId,
         documentId: id!,
@@ -187,7 +187,7 @@ class BackupUploaderState extends State<BackupUploader> {
           providers: widget.prestCount,
           plannings: widget.planCount,
           logs: widget.logCount,
-          createdBy: ClientDatabase.me.value?.id,
+          createdBy: DatabaseGetter.me.value?.id,
         ).toJson());
     setState(() {
       progress = 100;

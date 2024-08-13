@@ -74,7 +74,7 @@ class PDFTheming {
   Future<void> getEntrepriseLogo() async {
     if (kIsWeb || Platform.isAndroid || Platform.isIOS ) {
       if (MyEntrepriseState.logo == null) {
-        await ClientDatabase.downloadLogo();
+        await DatabaseGetter.downloadLogo();
       }
       if (MyEntrepriseState.logo != null) {
         entrepriseLogo ??= MemoryImage(MyEntrepriseState.logo!);

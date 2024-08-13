@@ -130,8 +130,8 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
             .getVehicleCount:null,
         counter: VehicleProvider.downloadedVehicles?VehicleProvider
             .vehicles.length:null,
-        maxCounter: ClientDatabase.gotLimit && ClientDatabase.limits
-            .containsKey('vehicles')?ClientDatabase.limits['vehicles']:null,
+        maxCounter: DatabaseGetter.gotLimit && DatabaseGetter.limits
+            .containsKey('vehicles')?DatabaseGetter.limits['vehicles']:null,
         action: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
               .indexOf(PaneItemsAndFooters.vehicles);

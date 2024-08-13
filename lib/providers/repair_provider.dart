@@ -1,7 +1,7 @@
-import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/appwrite.dart' hide Client;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
-import 'package:parc_oto/serializables/prestataire.dart';
+import 'package:parc_oto/serializables/client.dart';
 import 'package:parc_oto/serializables/reparation/reparation.dart';
 
 import '../utilities/profil_beautifier.dart';
@@ -11,7 +11,7 @@ class RepairProvider extends ChangeNotifier {
 
 
   static Map<String,Reparation> reparations={};
-  static Map<String,Prestataire> prestataires={};
+  static Map<String,Client> prestataires={};
   static bool downloadedReparations=false;
   static bool downloadingReparations=false;
   static bool downloadedPrestataires=false;
@@ -33,7 +33,7 @@ class RepairProvider extends ChangeNotifier {
     }
     downloadingReparations=true;
     reparations.clear();
-    await ClientDatabase.database!.listDocuments(
+    await DatabaseGetter.database!.listDocuments(
         databaseId: databaseId,
         collectionId: reparationId,queries: [Query.limit(5000)]).then((value) {
       for(int i=0;i<value.documents.length;i++){
@@ -56,12 +56,12 @@ class RepairProvider extends ChangeNotifier {
     }
     downloadingPrestataires=true;
     prestataires.clear();
-    await ClientDatabase.database!.listDocuments(
+    await DatabaseGetter.database!.listDocuments(
         databaseId: databaseId,
         collectionId: reparationId,queries: [Query.limit(5000)]).then((value) {
       for(int i=0;i<value.documents.length;i++){
         prestataires[value.documents[i].$id]=value.documents[i].convertTo(
-                (p0) => Prestataire.fromJson(p0 as Map<String,dynamic>));
+                (p0) => Client.fromJson(p0 as Map<String,dynamic>));
       }
       downloadedPrestataires=true;
 
@@ -103,7 +103,7 @@ class RepairProvider extends ChangeNotifier {
   static Future<Map<String,List<Reparation>>> downloadReparations()async {
 
 
-    await ClientDatabase.database!.listDocuments(
+    await DatabaseGetter.database!.listDocuments(
       databaseId: databaseId,
       collectionId: reparationId,
     ).then((value) {
@@ -218,7 +218,7 @@ class RepairProvider extends ChangeNotifier {
       }
     }
     else{
-      await ClientDatabase.database!.listDocuments(
+      await DatabaseGetter.database!.listDocuments(
           databaseId: databaseId,
           collectionId: reparationId,
           queries: [
@@ -237,20 +237,20 @@ class RepairProvider extends ChangeNotifier {
     }
     return result;
   }
-  Future<Prestataire?> getPrestataire(String? docID) async {
+  Future<Client?> getPrestataire(String? docID) async {
     if (docID == null) {
-      return Prestataire(id: '', nom: '', adresse: '');
+      return Client(id: '', nom: '', adresse: '');
     }
-    return await ClientDatabase.database!
+    return await DatabaseGetter.database!
         .getDocument(
         databaseId: databaseId,
         collectionId: prestataireId,
         documentId: docID)
         .then((value) {
       return value
-          .convertTo((p0) => Prestataire.fromJson(p0 as Map<String, dynamic>));
+          .convertTo((p0) => Client.fromJson(p0 as Map<String, dynamic>));
     }).onError((error, stackTrace) {
-      return Future.value(Prestataire(
+      return Future.value(Client(
         id: docID,
         nom: '',
         adresse: '',

@@ -49,12 +49,12 @@ class DocumentFormState extends State<DocumentForm>
       selectedVehicle = widget.vehicle;
     }
     documentID ??=
-        DateTime.now().difference(ClientDatabase.ref).inMilliseconds.toString();
+        DateTime.now().difference(DatabaseGetter.ref).inMilliseconds.toString();
   }
 
   void downloadVehicle(String id) async {
     loadingVehicle = true;
-    await ClientDatabase.database!
+    await DatabaseGetter.database!
         .getDocument(
             databaseId: databaseId, collectionId: vehiculeid, documentId: id)
         .then((value) {
@@ -254,22 +254,22 @@ class DocumentFormState extends State<DocumentForm>
           vehicle: selectedVehicle?.id,
           vehiclemat: selectedVehicle?.matricule,
           dateExpiration: selectedDate,
-          createdBy: ClientDatabase.me.value?.id);
+          createdBy: DatabaseGetter.me.value?.id);
       if (widget.vd != null) {
-        await ClientDatabase.database!.updateDocument(
+        await DatabaseGetter.database!.updateDocument(
             databaseId: databaseId,
             collectionId: vehicDoc,
             documentId: documentID!,
             data: dv.toJson());
-        ClientDatabase()
+        DatabaseGetter()
             .ajoutActivity(8, documentID!, docName: selectedVehicle?.matricule);
       } else {
-        await ClientDatabase.database!.createDocument(
+        await DatabaseGetter.database!.createDocument(
             databaseId: databaseId,
             collectionId: vehicDoc,
             documentId: documentID!,
             data: dv.toJson());
-        ClientDatabase()
+        DatabaseGetter()
             .ajoutActivity(7, documentID!, docName: selectedVehicle?.matricule);
       }
 

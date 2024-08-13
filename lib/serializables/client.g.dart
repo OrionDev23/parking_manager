@@ -1,15 +1,15 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'prestataire.dart';
+part of 'client.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-Prestataire _$PrestataireFromJson(Map<String, dynamic> json) => Prestataire(
-      id: json[r'$id'] as String,
-      createdAt: createdAtJson(json[r'$createdAt'] as String),
-      updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
+Client _$ClientFromJson(Map<String, dynamic> json) => Client(
+      id: json['id'] as String,
+      createdAt: stringtoTime(json['createdAt'] as String?),
+      updatedAt: stringtoTime(json['updatedAt'] as String?),
       description: json['description'] as String?,
       nom: json['nom'] as String,
       adresse: json['adresse'] as String,
@@ -22,8 +22,10 @@ Prestataire _$PrestataireFromJson(Map<String, dynamic> json) => Prestataire(
       rc: json['rc'] as String?,
     );
 
-Map<String, dynamic> _$PrestataireToJson(Prestataire instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$ClientToJson(Client instance) => <String, dynamic>{
+      'id': instance.id,
+      'updatedAt': timeToJson(instance.updatedAt),
+      'createdAt': timeToJson(instance.createdAt),
       'nom': instance.nom,
       'adresse': instance.adresse,
       'telephone': instance.telephone,

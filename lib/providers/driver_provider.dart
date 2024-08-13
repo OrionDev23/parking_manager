@@ -29,10 +29,10 @@ class DriverProvider extends ChangeNotifier {
     }
     downloadingConducteurs=true;
     conducteurs.clear();
-    await ClientDatabase.database!.listDocuments(
+    await DatabaseGetter.database!.listDocuments(
         databaseId: databaseId,
         collectionId: chauffeurid,queries: [
-      Query.limit(ClientDatabase.limits['vehicles']??500)
+      Query.limit(DatabaseGetter.limits['vehicles']??500)
     ]).then((value) {
       for(int i=0;i<value.documents.length;i++){
         conducteurs[value.documents[i].$id]=value.documents[i].convertTo(
@@ -54,7 +54,7 @@ class DriverProvider extends ChangeNotifier {
     }
     downloadingDocuments=true;
     documentConducteurs.clear();
-    await ClientDatabase.database!.listDocuments(
+    await DatabaseGetter.database!.listDocuments(
         databaseId: databaseId,
         collectionId: chaufDoc,queries: [Query.limit(5000)]).then((value) {
       for(int i=0;i<value.documents.length;i++){
@@ -77,7 +77,7 @@ class DriverProvider extends ChangeNotifier {
     }
     downloadingDisp=true;
     disponibiliteConducteurs.clear();
-    await ClientDatabase.database!.listDocuments(
+    await DatabaseGetter.database!.listDocuments(
         databaseId: databaseId,
         collectionId: chaufDispID,queries: [Query.limit(5000)]).then((value) {
       for(int i=0;i<value.documents.length;i++){
@@ -161,7 +161,7 @@ class DriverProvider extends ChangeNotifier {
       }
     }
     else{
-      await ClientDatabase.database!.listDocuments(
+      await DatabaseGetter.database!.listDocuments(
           databaseId: databaseId,
           collectionId: chaufDoc,
           queries: [

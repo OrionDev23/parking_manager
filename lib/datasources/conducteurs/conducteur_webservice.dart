@@ -98,14 +98,14 @@ class ConducteurWebService extends ParcOtoWebService<Conducteur> {
             'dateNaissance',
             DateTime.now()
                 .add(Duration(days: 365 * int.parse(filters['agemin']!)))
-                .difference(ClientDatabase.ref)
+                .difference(DatabaseGetter.ref)
                 .inMilliseconds),
       if (filters.containsKey('agemax'))
         Query.greaterThanEqual(
             'dateNaissance',
             DateTime.now()
                 .add(Duration(days: 365 * int.parse(filters['agemax']!)))
-                .difference(ClientDatabase.ref)
+                .difference(DatabaseGetter.ref)
                 .inMilliseconds),
     ];
   }

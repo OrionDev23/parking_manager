@@ -22,7 +22,7 @@ class DatabaseCounters {
       bool cont = true;
 
       while (cont) {
-        await ClientDatabase.database!.listDocuments(
+        await DatabaseGetter.database!.listDocuments(
             databaseId: databaseId,
             collectionId: vehiculeid,
             queries: [
@@ -51,7 +51,7 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await ClientDatabase.database!.listDocuments(
+      await DatabaseGetter.database!.listDocuments(
           databaseId: databaseId,
           collectionId: vehiculeid,
           queries: [
@@ -75,7 +75,7 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await ClientDatabase.database!.listDocuments(
+      await DatabaseGetter.database!.listDocuments(
           databaseId: databaseId,
           collectionId: chauffeurid,
           queries: [
@@ -98,7 +98,7 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await ClientDatabase.database!.listDocuments(
+      await DatabaseGetter.database!.listDocuments(
           databaseId: databaseId,
           collectionId: chauffeurid,
           queries: [
@@ -123,7 +123,7 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await ClientDatabase.database!.listDocuments(
+      await DatabaseGetter.database!.listDocuments(
           databaseId: databaseId,
           collectionId: vehicDoc,
           queries: [
@@ -148,7 +148,7 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await ClientDatabase.database!.listDocuments(
+      await DatabaseGetter.database!.listDocuments(
           databaseId: databaseId,
           collectionId: chaufDoc,
           queries: [
@@ -173,7 +173,7 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await ClientDatabase.database!.listDocuments(
+      await DatabaseGetter.database!.listDocuments(
           databaseId: databaseId,
           collectionId: planningID,
           queries: [
@@ -198,7 +198,7 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await ClientDatabase.database!.listDocuments(
+      await DatabaseGetter.database!.listDocuments(
           databaseId: databaseId,
           collectionId: activityId,
           queries: [
@@ -223,7 +223,7 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await ClientDatabase.database!.listDocuments(
+      await DatabaseGetter.database!.listDocuments(
           databaseId: databaseId,
           collectionId: reparationId,
           queries: [
@@ -248,7 +248,7 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await ClientDatabase.database!.listDocuments(
+      await DatabaseGetter.database!.listDocuments(
           databaseId: databaseId,
           collectionId: prestataireId,
           queries: [

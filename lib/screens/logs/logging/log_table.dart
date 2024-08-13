@@ -118,7 +118,7 @@ class LogTableState extends State<LogTable> {
             setState(() {});
           },
         ),
-      if (widget.fieldsToShow.contains('user') && ClientDatabase().isAdmin())
+      if (widget.fieldsToShow.contains('user') && DatabaseGetter().isAdmin())
         DataColumn2(
           label: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
@@ -298,7 +298,7 @@ class LogTableState extends State<LogTable> {
                                                             title: Text(type ==
                                                                     null
                                                                 ? '/'
-                                                                : ClientDatabase()
+                                                                : DatabaseGetter()
                                                                     .getActivityType(
                                                                         type!)
                                                                     .tr()),
@@ -329,7 +329,7 @@ class LogTableState extends State<LogTable> {
                                                                     35,
                                                                     (index) {
                                                               return MenuFlyoutItem(
-                                                                  text: Text(ClientDatabase()
+                                                                  text: Text(DatabaseGetter()
                                                                           .getActivityType(
                                                                               index))
                                                                       .tr(),
@@ -357,7 +357,7 @@ class LogTableState extends State<LogTable> {
                                                       FilledButton(
                                                         style: ButtonStyle(
                                                           backgroundColor:
-                                                              ButtonState.all<
+                                                          WidgetStatePropertyAll<
                                                                       Color>(
                                                                   appTheme.color
                                                                       .lightest),
@@ -402,7 +402,7 @@ class LogTableState extends State<LogTable> {
                                                       FilledButton(
                                                           style: ButtonStyle(
                                                             backgroundColor:
-                                                                ButtonState.all<
+                                                            WidgetStatePropertyAll<
                                                                         Color>(
                                                                     appTheme
                                                                         .color

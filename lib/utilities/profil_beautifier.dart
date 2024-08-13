@@ -36,19 +36,19 @@ class ParcOtoUtilities {
 }
 
 int? dateToIntJson(DateTime? date) {
-  return date?.difference(ClientDatabase.ref).inMilliseconds;
+  return date?.difference(DatabaseGetter.ref).inMilliseconds;
 }
 
 DateTime? dateFromIntJson(int? json) {
   if (json != null) {
-    return ClientDatabase.ref.add(Duration(milliseconds: json));
+    return DatabaseGetter.ref.add(Duration(milliseconds: json));
   } else {
     return null;
   }
 }
 
 DateTime dateFromIntJsonNonNull(int json) {
-  return ClientDatabase.ref.add(Duration(milliseconds: json));
+  return DatabaseGetter.ref.add(Duration(milliseconds: json));
 }
 
 String? userToJson(ParcUser? value) {
@@ -148,7 +148,29 @@ Color colorFromInt(int? color) {
     return Color(color);
   }
 }
+String listToString(List<String>? words){
+  String result="";
+  if(words!=null){
+    for(int i=0;i<words.length;i++){
+      result+=words[i];
+      result+=" ";
+    }
+  }
 
+  result.trim();
+  return result;
+}
 int colorToInt(Color? color) {
   return color?.value ?? 0x00000000;
+}
+
+DateTime? stringtoTime(String? json) {
+  return DateTime.tryParse(json ?? '');
+}
+
+DateTime stringToTimeNN(String? json) {
+  return DateTime.tryParse(json ?? '') ?? DateTime.now();
+}
+String timeToJson(DateTime? date) {
+  return date?.toIso8601String() ?? DateTime.now().toIso8601String();
 }

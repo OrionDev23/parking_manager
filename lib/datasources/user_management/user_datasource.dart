@@ -28,7 +28,7 @@ class UsersManagementDatasource
 
   @override
   Future<void> addToActivity(MapEntry<User, List<Membership>?> c) async {
-    await ClientDatabase().ajoutActivity(34, c.key.$id,
+    await DatabaseGetter().ajoutActivity(34, c.key.$id,
         docName: c.key.name.isEmpty ? c.key.email : c.key.name);
   }
 
@@ -216,7 +216,7 @@ class UsersManagementDatasource
   }
 
   void inviteToBecomeManager(User user, List<Membership>? t) async {
-    await client_aw.Teams(ClientDatabase.client!)
+    await client_aw.Teams(DatabaseGetter.client!)
         .createMembership(
             teamId: 'managers',
             roles: ['member'],

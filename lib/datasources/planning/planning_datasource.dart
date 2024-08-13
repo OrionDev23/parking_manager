@@ -102,15 +102,15 @@ class PlanningDatasource extends CalendarDataSource<Planning> {
 
   @override
   Future<void> handleLoadMore(DateTime startDate, DateTime endDate) async {
-    await ClientDatabase.database!.listDocuments(
+    await DatabaseGetter.database!.listDocuments(
         databaseId: databaseId,
         collectionId: planningID,
         queries: [
           Query.orderAsc('startTime'),
           Query.greaterThanEqual('startTime',
-              startDate.difference(ClientDatabase.ref).inMilliseconds),
+              startDate.difference(DatabaseGetter.ref).inMilliseconds),
           Query.lessThanEqual(
-              'endTime', endDate.difference(ClientDatabase.ref).inMilliseconds),
+              'endTime', endDate.difference(DatabaseGetter.ref).inMilliseconds),
         ]).then((value) {
       for (var element in value.documents) {
         data[element.$id] = element

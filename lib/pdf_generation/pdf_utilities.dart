@@ -1,7 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:parc_oto/pdf_generation/pdf_theming.dart';
 import 'package:parc_oto/providers/repair_provider.dart';
-import 'package:parc_oto/serializables/prestataire.dart';
+import 'package:parc_oto/serializables/client.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
@@ -23,7 +23,7 @@ Widget dotsSpacer() {
 }
 
 class PdfUtilities {
-  Prestataire? p;
+  Client? p;
 
   Future<void> initPrestataire(Reparation reparation) async {
     p = await RepairProvider().getPrestataire(reparation.prestataire);

@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
     while (PanesListState.firstLoading) {
       await Future.delayed(const Duration(milliseconds: 100));
     }
-    if(ClientDatabase.user == null){
+    if(DatabaseGetter.user == null){
       checkUser();
     }
 
@@ -54,8 +54,8 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
 
   void checkUser() async {
     checking = true;
-    await ClientDatabase().getUser();
-    if (ClientDatabase.user != null) {
+    await DatabaseGetter().getUser();
+    if (DatabaseGetter.user != null) {
       PanesListState.signedIn.value = true;
     }
     checking = false;
@@ -241,14 +241,14 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
         checking = true;
       });
       project=projectName.text;
-      ClientDatabase();
+      DatabaseGetter();
       Future.delayed(const Duration(milliseconds: 300)).then((value) async{
-        await ClientDatabase.account!.createEmailPasswordSession(
+        await DatabaseGetter.account!.createEmailPasswordSession(
             email: email.text,
             password: password.text)
             .then((value) async {
           prefs.setString('project', projectName.text);
-          await ClientDatabase().getUser();
+          await DatabaseGetter().getUser();
           PanesListState.signedIn.value = true;
           setState(() {
             signedIn = true;
@@ -282,7 +282,7 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
       ..setEndpoint(endpoint)
       ..setKey(secretKey)
       ..setProject(project);*/
-      await ClientDatabase.account!
+      await DatabaseGetter.account!
           .createRecovery(
               email: email.text,
               url:

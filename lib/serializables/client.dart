@@ -1,11 +1,12 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:parc_oto/serializables/parc_oto_serializable.dart';
 
 import '../utilities/profil_beautifier.dart';
-part 'prestataire.g.dart';
+import 'parc_oto_serializable.dart';
+
+part 'client.g.dart';
 
 @JsonSerializable()
-class Prestataire extends ParcOtoDefault {
+class Client extends ParcOtoDefault {
   String nom;
   String adresse;
   String? telephone;
@@ -17,7 +18,7 @@ class Prestataire extends ParcOtoDefault {
   String? email;
   String? search;
 
-  Prestataire(
+  Client(
       {required super.id,
       super.createdAt,
       super.updatedAt,
@@ -32,9 +33,8 @@ class Prestataire extends ParcOtoDefault {
       this.nis,
       this.rc});
 
-  factory Prestataire.fromJson(Map<String, dynamic> json) =>
-      _$PrestataireFromJson(json);
+  factory Client.fromJson(Map<String, dynamic> json) => _$ClientFromJson(json);
 
   @override
-  Map<String, dynamic> toJson() => _$PrestataireToJson(this);
+  Map<String, dynamic> toJson() => _$ClientToJson(this);
 }

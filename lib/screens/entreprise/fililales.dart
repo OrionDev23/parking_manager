@@ -433,7 +433,7 @@ class MesFillialesState extends State<MesFilliales> {
       MyEntrepriseState.p!.departments!.add(textToEdit.text);
     }
     Navigator.of(context).pop();
-    await ClientDatabase.database!
+    await DatabaseGetter.database!
         .updateDocument(
         databaseId: databaseId,
         collectionId: entrepriseid,

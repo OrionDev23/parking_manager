@@ -80,7 +80,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
       setState(() {});
     }
     try {
-      await ClientDatabase.database!
+      await DatabaseGetter.database!
           .getDocument(
               databaseId: databaseId,
               collectionId: entrepriseid,
@@ -206,7 +206,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
       }
     }
 
-    await ClientDatabase.storage!
+    await DatabaseGetter.storage!
         .getFileDownload(bucketId: buckedId, fileId: link)
         .then((value) async {
       logo = value;
@@ -697,7 +697,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     height: tilesHeight,
                     child: ListTile(
                       tileColor:
-                      ButtonState.all<Color>(appTheme.fillColor),
+                      WidgetStatePropertyAll<Color>(appTheme.fillColor),
                       title: Text(
                         filliales[index],
                         softWrap: true,
@@ -802,7 +802,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     height: tilesHeight,
                     child: ListTile(
                       tileColor:
-                          ButtonState.all<Color>(appTheme.fillColor),
+                      WidgetStatePropertyAll<Color>(appTheme.fillColor),
                       title: Text(
                         directions[index],
                         softWrap: true,
@@ -907,7 +907,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     height: tilesHeight,
                     child: ListTile(
                       tileColor:
-                      ButtonState.all<Color>(appTheme.fillColor),
+                      WidgetStatePropertyAll<Color>(appTheme.fillColor),
                       title: Text(
                         departments[index],
                         softWrap: true,
@@ -1043,7 +1043,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
           '${telephone.text} ${adresse.text} ${descr.text} 1 $logoid ${art.text}',
     );
     if (p != null) {
-      await ClientDatabase.database!
+      await DatabaseGetter.database!
           .updateDocument(
               databaseId: databaseId,
               collectionId: entrepriseid,
@@ -1056,7 +1056,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
       });
     }
     else {
-      await ClientDatabase.database!
+      await DatabaseGetter.database!
           .createDocument(
               databaseId: databaseId,
               collectionId: entrepriseid,
@@ -1072,7 +1072,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
     if (imageFile != null) {
       var bytes = await imageFile!.readAsBytes();
       try {
-        await ClientDatabase.storage!
+        await DatabaseGetter.storage!
             .deleteFile(bucketId: buckedId, fileId: logoid);
       } catch (e) {
         //
@@ -1082,7 +1082,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
       } catch (e) {
         //
       }
-      await ClientDatabase.storage!
+      await DatabaseGetter.storage!
           .createFile(
               bucketId: buckedId,
               fileId: logoid,

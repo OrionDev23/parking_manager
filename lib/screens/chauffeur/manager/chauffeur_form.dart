@@ -415,9 +415,9 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                       setState(() {});
                                     },
                                   ),
-                                  if (ClientDatabase().isAdmin())
+                                  if (DatabaseGetter().isAdmin())
                                     const MenuFlyoutSeparator(),
-                                  if (ClientDatabase().isAdmin())
+                                  if (DatabaseGetter().isAdmin())
                                     MenuFlyoutItem(
                                       text: const Text('quitteentre').tr(),
                                       onPressed: () {
@@ -528,7 +528,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                   return SizedBox(
                     height: tilesHeight,
                     child: ListTile(
-                      tileColor: ButtonState.all<Color>(appTheme.fillColor),
+                      tileColor: WidgetStatePropertyAll<Color>(appTheme.fillColor),
                       title: Text(
                         vehicules[index],
                         softWrap: true,
@@ -639,11 +639,11 @@ class ChauffeurFormState extends State<ChauffeurForm> {
         progress = 0;
       });
       chaufID ??= DateTime.now()
-          .difference(ClientDatabase.ref)
+          .difference(DatabaseGetter.ref)
           .inMilliseconds
           .toString();
       etatID ??= DateTime.now()
-          .difference(ClientDatabase.ref)
+          .difference(DatabaseGetter.ref)
           .inMilliseconds
           .abs()
           .toString();
@@ -698,26 +698,26 @@ class ChauffeurFormState extends State<ChauffeurForm> {
       etatactuel: etatID,
     );
     if (widget.chauf != null) {
-      await ClientDatabase.database!
+      await DatabaseGetter.database!
           .updateDocument(
               databaseId: databaseId,
               collectionId: chauffeurid,
               documentId: chaufID!,
               data: chauf.toJson())
           .then((value) {
-        ClientDatabase().ajoutActivity(17, chaufID!,
+        DatabaseGetter().ajoutActivity(17, chaufID!,
             docName: '${chauf.name} ${chauf.prenom}');
       }).onError((AppwriteException error, stackTrace) {
       });
     } else {
-      await ClientDatabase.database!
+      await DatabaseGetter.database!
           .createDocument(
               databaseId: databaseId,
               collectionId: chauffeurid,
               documentId: chaufID!,
               data: chauf.toJson())
           .then((value) {
-        ClientDatabase().ajoutActivity(16, chaufID!,
+        DatabaseGetter().ajoutActivity(16, chaufID!,
             docName: '${chauf.name} ${chauf.prenom}');
 
       }).onError((AppwriteException error, stackTrace) {
@@ -731,7 +731,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
           etatID == null ||
           etatID == widget.chauf?.etatactuel) {
         etatID = DateTime.now()
-            .difference(ClientDatabase.ref)
+            .difference(DatabaseGetter.ref)
             .inMilliseconds
             .abs()
             .toString();
@@ -739,17 +739,17 @@ class ChauffeurFormState extends State<ChauffeurForm> {
       disp = DisponibiliteChauffeur(
           id: etatID!,
           type: etat ?? 0,
-          createdBy: ClientDatabase.me.value?.id,
+          createdBy: DatabaseGetter.me.value?.id,
           chauffeur: chaufID!,
           chauffeurNom: '${nom.text} ${prenom.text}');
-      return await ClientDatabase.database!
+      return await DatabaseGetter.database!
           .createDocument(
               databaseId: databaseId,
               collectionId: chaufDispID,
               documentId: etatID!,
               data: disp!.toJson())
           .then((value) {
-        ClientDatabase()
+        DatabaseGetter()
             .ajoutActivity(20, etatID!, docName: disp?.chauffeurNom);
         return value;
       });

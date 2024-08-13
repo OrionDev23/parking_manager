@@ -32,7 +32,7 @@ class _BrandContainerState extends State<BrandContainer> {
   }
 
   void getCount() async {
-    await ClientDatabase.database!.listDocuments(
+    await DatabaseGetter.database!.listDocuments(
         databaseId: databaseId,
         collectionId: vehiculeid,
         queries: [

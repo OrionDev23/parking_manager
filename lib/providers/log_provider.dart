@@ -22,7 +22,7 @@ class LogProvider extends ChangeNotifier {
     }
     downloadingActivities=true;
     activities.clear();
-    await ClientDatabase.database!.listDocuments(
+    await DatabaseGetter.database!.listDocuments(
         databaseId: databaseId,
         collectionId: activityId,queries: [Query.limit(5000)]).then((value) {
       for(int i=0;i<value.documents.length;i++){

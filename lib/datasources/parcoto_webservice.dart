@@ -71,7 +71,7 @@ abstract class ParcOtoWebService<T> {
     if (searchKey != null && searchKey.isNotEmpty) {
       late DocumentList d;
       for (int i = 0; i < columnForSearch; i++) {
-        d = await ClientDatabase.database!.listDocuments(
+        d = await DatabaseGetter.database!.listDocuments(
             databaseId: databaseId,
             collectionId: collectionID,
             queries: getQueriesForSearch(
@@ -82,7 +82,7 @@ abstract class ParcOtoWebService<T> {
       }
       return d;
     } else {
-      return await ClientDatabase.database!.listDocuments(
+      return await DatabaseGetter.database!.listDocuments(
           databaseId: databaseId,
           collectionId: collectionID,
           queries: getQueries(filters, count, startingAt, sortedBy, sortedAsc));

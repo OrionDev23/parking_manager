@@ -48,7 +48,7 @@ class BackupDataSource extends ParcOtoDatasource<Backup>{
             child: createCountersWidget(element,appTheme!)),
         onDoubleTap: ()=>showApplicationConfirmation(element),
       ),
-      if (selectC != true && ClientDatabase().isAdmin())
+      if (selectC != true && DatabaseGetter().isAdmin())
         DataCell(f.FlyoutTarget(
             controller: element.value.controller,
             child: f.Row(
@@ -154,7 +154,7 @@ class BackupDataSource extends ParcOtoDatasource<Backup>{
 
   @override
   void deleteRow(c) async{
-    await ClientDatabase.storage!.deleteFile(bucketId: backupId, fileId: c
+    await DatabaseGetter.storage!.deleteFile(bucketId: backupId, fileId: c
         .id).then((value) =>super.deleteRow(c)).onError((error, stackTrace)
     {
       f.displayInfoBar(

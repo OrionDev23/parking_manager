@@ -55,7 +55,7 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
               ? dateFormat.format(element.value.updatedAt!)
               : '',
           style: rowTextStyle)),
-      DataCell(ClientDatabase().isAdmin() || ClientDatabase().isManager()
+      DataCell(DatabaseGetter().isAdmin() || DatabaseGetter().isManager()
           ? f.FlyoutTarget(
               controller: element.value.controller,
               child: OnTapScaleAndFade(
@@ -94,7 +94,7 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
                                 DocumentTabsState.currentIndex.value =
                                     index - 1;
                               }),
-                          if (ClientDatabase().isAdmin())
+                          if (DatabaseGetter().isAdmin())
                             f.MenuFlyoutItem(
                                 text: const Text('delete').tr(),
                                 onPressed: () {
@@ -123,7 +123,7 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
 
   @override
   Future<void> addToActivity(c) async {
-    await ClientDatabase()
+    await DatabaseGetter()
         .ajoutActivity(9, c.id, docName: '${c.nom} ${c.vehiclemat}');
   }
 }

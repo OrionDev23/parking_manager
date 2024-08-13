@@ -276,30 +276,35 @@ class _ProfilFormState extends State<ProfilForm> {
         avatar: null,
       );
       if (widget.user == null) {
-        await ClientDatabase.database!
+        await DatabaseGetter.database!
             .createDocument(
                 databaseId: databaseId,
                 collectionId: userid,
                 documentId: userID,
                 data: newme.toJson())
             .then((value) {
-          ClientDatabase.me.value = newme;
-          Navigator.pop(
-            context,
-          );
+          DatabaseGetter.me.value = newme;
+          if(mounted){
+            Navigator.pop(
+              context,
+            );
+          }
+
         });
       } else {
-        await ClientDatabase.database!
+        await DatabaseGetter.database!
             .updateDocument(
                 databaseId: databaseId,
                 collectionId: userid,
                 documentId: userID,
                 data: newme.toJson())
             .then((value) {
-          ClientDatabase.me.value = newme;
-          Navigator.pop(
-            context,
-          );
+          DatabaseGetter.me.value = newme;
+          if(mounted){
+            Navigator.pop(
+              context,
+            );
+          }
         });
       }
 

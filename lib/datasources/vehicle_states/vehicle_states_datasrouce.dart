@@ -28,7 +28,7 @@ class VStatesDatasource extends ParcOtoDatasource<Etat> {
 
   @override
   Future<void> addToActivity(Etat c) async {
-    await ClientDatabase().ajoutActivity(6, c.id, docName: c.vehicleMat);
+    await DatabaseGetter().ajoutActivity(6, c.id, docName: c.vehicleMat);
   }
 
   @override
@@ -65,7 +65,7 @@ class VStatesDatasource extends ParcOtoDatasource<Etat> {
               ? dateFormat.format(element.value.updatedAt!)
               : '',
           style: rowTextStyle)),
-      DataCell(ClientDatabase().isAdmin() || ClientDatabase().isManager()
+      DataCell(DatabaseGetter().isAdmin() || DatabaseGetter().isManager()
           ? f.FlyoutTarget(
               controller: element.value.controller,
               child: OnTapScaleAndFade(
@@ -79,7 +79,7 @@ class VStatesDatasource extends ParcOtoDatasource<Etat> {
                                 Navigator.of(current).pop();
                                 showStateForm(element.value);
                               }),
-                          if (ClientDatabase().isAdmin())
+                          if (DatabaseGetter().isAdmin())
                             f.MenuFlyoutItem(
                                 text: const Text('delete').tr(),
                                 onPressed: () {

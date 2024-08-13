@@ -25,6 +25,7 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
   int sortColumn = 0;
   bool sortAscending = true;
   final String collectionID;
+  final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
 
   List<MapEntry<String, T>> data = List.empty(growable: true);
 
@@ -197,7 +198,7 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
 
   void deleteRow(dynamic c) async {
     await Future.wait([
-      ClientDatabase.database!
+      DatabaseGetter.database!
           .deleteDocument(
               databaseId: databaseId,
               collectionId: collectionID,

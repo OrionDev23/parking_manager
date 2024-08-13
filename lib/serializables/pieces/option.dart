@@ -9,8 +9,11 @@ class Option extends ParcOtoDefault{
   String code;
   String name;
   List<String>? values;
+  String? search;
   Option({required this.code,this.values,required this.name,required
-  super.id,super.createdAt,super.updatedAt});
+  super.id,super.createdAt,super.updatedAt}){
+    search="$code $name ${listToString(values)}";
+  }
 
 
   Map<String,dynamic> toJsonPDF(){
@@ -30,6 +33,11 @@ class Option extends ParcOtoDefault{
     return result;
   }
 
+  factory Option.fromJson(Map<String, dynamic> json) =>
+      _$OptionFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$OptionToJson(this);
 
 
 }

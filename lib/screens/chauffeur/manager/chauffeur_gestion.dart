@@ -39,7 +39,7 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
             ? null
             : Row(
               children: [
-                if (showImportConducteur && ClientDatabase().isAdmin())
+                if (showImportConducteur && DatabaseGetter().isAdmin())
                   ButtonContainer(
                     color: appTheme.color.darkest,
                     icon: FluentIcons.add,
@@ -48,7 +48,7 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
                     showCounter: false,
                     action: importList,
                   ),
-                if (showImportConducteur && ClientDatabase().isAdmin()) smallSpace,
+                if (showImportConducteur && DatabaseGetter().isAdmin()) smallSpace,
                 ButtonContainer(
                   icon: FluentIcons.add,
                   text: 'add'.tr(),

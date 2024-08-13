@@ -73,8 +73,8 @@ class PanesListState extends State<PanesList> with WindowListener, AutomaticKeep
     if (mounted) {
       setState(() {});
     }
-    await ClientDatabase().getUser();
-    if (ClientDatabase.user != null) {
+    await DatabaseGetter().getUser();
+    if (DatabaseGetter.user != null) {
       signedIn.value = true;
     }
     widget.paneList.initPanes();
@@ -170,11 +170,11 @@ class PanesListState extends State<PanesList> with WindowListener, AutomaticKeep
                                 ),
                                 smallSpace,
                                 Text('v${packageInfo.version}'),
-                                if (ClientDatabase.trialDate != null && ClientDatabase.me.value != null)
+                                if (DatabaseGetter.trialDate != null && DatabaseGetter.me.value != null)
                                   bigSpace,
-                                if (ClientDatabase.trialDate != null)
+                                if (DatabaseGetter.trialDate != null)
                                   const Text('daysremain').tr(namedArgs: {
-                                    'days': ClientDatabase.trialDate!
+                                    'days': DatabaseGetter.trialDate!
                                         .difference(DateTime.now())
                                         .inDays
                                         .toString()
@@ -197,11 +197,11 @@ class PanesListState extends State<PanesList> with WindowListener, AutomaticKeep
                                     height: 60.px,
                                   ),
                                 const Spacer(),
-                                if (!loading && signedIn.value && ClientDatabase.trialDate != null)
+                                if (!loading && signedIn.value && DatabaseGetter.trialDate != null)
                                   const NotifList(),
-                                if (!loading && signedIn.value&& ClientDatabase.trialDate != null)
+                                if (!loading && signedIn.value&& DatabaseGetter.trialDate != null)
                                   const SizedBox(width: 10),
-                                if (!loading && signedIn.value&& ClientDatabase.trialDate != null)
+                                if (!loading && signedIn.value&& DatabaseGetter.trialDate != null)
                                   const ProfilNameTopBar(),
                                 smallSpace,
                                 if (!kIsWeb)

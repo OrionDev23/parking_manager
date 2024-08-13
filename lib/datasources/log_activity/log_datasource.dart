@@ -29,7 +29,7 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
 
   @override
   String deleteConfirmationMessage(Activity c) {
-    return '${'delete'.tr()} LOG ${ClientDatabase().getActivityType(c.type)} ${c.docName}';
+    return '${'delete'.tr()} LOG ${DatabaseGetter().getActivityType(c.type)} ${c.docName}';
   }
 
   @override
@@ -39,7 +39,7 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
     return [
       if (fieldsToShow.contains('act'))
         DataCell(SelectableText(
-          ClientDatabase().getActivityType(element.value.type).tr(),
+          DatabaseGetter().getActivityType(element.value.type).tr(),
           style: rowTextStyle,
         )),
       if (fieldsToShow.contains('id'))
@@ -53,14 +53,14 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
                 ? dateFormat.format(element.value.updatedAt!)
                 : '',
             style: rowTextStyle)),
-      if (fieldsToShow.contains('user') && ClientDatabase().isAdmin())
+      if (fieldsToShow.contains('user') && DatabaseGetter().isAdmin())
         DataCell(SelectableText(
           element.value.personName ?? '',
           style: rowTextStyle,
         )),
       if (fieldsToShow.contains('plus'))
         DataCell(
-          ClientDatabase().isAdmin()
+          DatabaseGetter().isAdmin()
               ? f.FlyoutTarget(
                   controller: element.value.controller,
                   child: OnTapScaleAndFade(

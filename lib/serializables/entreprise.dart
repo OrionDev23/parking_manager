@@ -1,12 +1,12 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:parc_oto/serializables/prestataire.dart';
 
 import '../utilities/profil_beautifier.dart';
+import 'client.dart';
 
 part 'entreprise.g.dart';
 
 @JsonSerializable()
-class Entreprise extends Prestataire {
+class Entreprise extends Client {
   String? logo;
   List<String>? filiales=[];
   List<String>? directions=[];

@@ -29,9 +29,9 @@ class LogWebService extends ParcOtoWebService<Activity> {
       case 0:
         return (d1, d2) =>
             coef *
-            ClientDatabase()
+            DatabaseGetter()
                 .getActivityType(d1.value.type)
-                .compareTo(ClientDatabase().getActivityType(d2.value.type));
+                .compareTo(DatabaseGetter().getActivityType(d2.value.type));
       //vehicle
       case 1:
         return (d1, d2) {

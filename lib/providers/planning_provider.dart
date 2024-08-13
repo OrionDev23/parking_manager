@@ -24,7 +24,7 @@ class PlanningProvider extends ChangeNotifier {
     }
     downloadingPlanning=true;
     plannings.clear();
-    await ClientDatabase.database!.listDocuments(
+    await DatabaseGetter.database!.listDocuments(
         databaseId: databaseId,
         collectionId: planningID,queries: [Query.limit(5000)]).then((value) {
       for(int i=0;i<value.documents.length;i++){
@@ -73,7 +73,7 @@ class PlanningProvider extends ChangeNotifier {
       }
     }
     else{
-    await ClientDatabase.database!.listDocuments(
+    await DatabaseGetter.database!.listDocuments(
         databaseId: databaseId,
         collectionId: planningID,
         queries: [
