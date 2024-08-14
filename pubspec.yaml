@@ -79,6 +79,7 @@ dependencies:
   encrypt: ^5.0.3
   gzip: ^0.2.0
   flutter_chip_tags: ^2.0.2
+  dropdown_search: ^5.0.6
 
 dev_dependencies:
   flutter_test:

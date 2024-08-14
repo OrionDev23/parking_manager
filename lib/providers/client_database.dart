@@ -32,6 +32,8 @@ const prestataireId = "prestataire";
 const clientsID="clients";
 const fournsID="fournisseurs";
 const optionsID="options";
+const categoriesID="categories";
+const brandsID="partsbrands";
 const backupId="backup";
 const endpoint = "https://appwrite.parcoto.com/v1";
 String? project;
@@ -461,6 +463,28 @@ class DatabaseGetter {
         databaseId: databaseId,collectionId:
         collectionId,documentId: documentId,data:data);
   }
+
+
+  Future<List<Document>> listDocuments(String path) async {
+    List<Document> result = List.empty(growable: true);
+    int nextPageToken = 0;
+    bool hasNextPage = true;
+    while (hasNextPage) {
+      await database
+          ?.listDocuments(databaseId: databaseId,collectionId: path,queries: [
+            Query.limit(5000),
+            Query.offset(nextPageToken)
+      ])
+          .then((value) {
+        hasNextPage = value.total>=5000;
+        nextPageToken += 5000;
+        result.addAll(value.documents);
+      });
+    }
+
+    return result;
+  }
+
 
 
 
