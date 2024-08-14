@@ -197,13 +197,6 @@ class _OptionFormState extends State<OptionForm> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Button(
-                  child: const Text('annuler').tr(),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                smallSpace,
                 FilledButton(
                   child: const Text('confirmer').tr(),
                   onPressed: () {
@@ -267,10 +260,6 @@ class _OptionFormState extends State<OptionForm> {
             option));
         OptionDatasource.instance!.refreshDatasource();
 
-      }
-
-      if(mounted){
-        Navigator.of(context).pop();
       }
     setState(() {
       loading = false;

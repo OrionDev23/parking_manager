@@ -84,7 +84,7 @@ class OptionTableState extends State<OptionTable> {
             style: tstyle,
           ).tr(),
         ),
-        size: ColumnSize.L,
+        size: ColumnSize.S,
         onSort: (s, c) {
           sortColumn = 0;
           assending = !assending;
@@ -101,7 +101,7 @@ class OptionTableState extends State<OptionTable> {
             style: tstyle,
           ).tr(),
         ),
-        size: ColumnSize.L,
+        size: ColumnSize.S,
         onSort: (s, c) {
           sortColumn = 1;
           assending = !assending;
@@ -135,7 +135,7 @@ class OptionTableState extends State<OptionTable> {
             style: tstyle,
           ).tr(),
         ),
-        size: ColumnSize.L,
+        size: ColumnSize.M,
         onSort: (s, c) {
           sortColumn = 3;
           assending = !assending;
@@ -229,7 +229,6 @@ class OptionTableState extends State<OptionTable> {
                 ],
               ),
             ),
-            rowHeight: 50.px,
             sortAscending: assending,
             sortColumnIndex: sortColumn,
             columns: columns,

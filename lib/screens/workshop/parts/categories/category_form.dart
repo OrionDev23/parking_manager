@@ -234,13 +234,6 @@ class _CategoryFormState extends State<CategoryForm> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Button(
-                  child: const Text('annuler').tr(),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-                smallSpace,
                 FilledButton(
                   child: const Text('confirmer').tr(),
                   onPressed: () {

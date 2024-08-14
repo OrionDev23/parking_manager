@@ -1,5 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -11,6 +12,7 @@ class DataTableParc extends StatefulWidget {
   final Widget? header;
   final AsyncDataTableSource source;
   final bool sortAscending;
+  final bool autoRowHeight;
   final int sortColumnIndex;
   final List<DataColumn2> columns;
   final bool hidePaginator;
@@ -24,7 +26,7 @@ class DataTableParc extends StatefulWidget {
   this.sortAscending, required this.sortColumnIndex, required this.columns,
     this.numberOfRows,this.horizontalScroll=false,
     this.pages=true,
-    this.hidePaginator=false});
+    this.hidePaginator=false,this.autoRowHeight=true});
 
   @override
   State<DataTableParc> createState() => _DataTableParcState();
@@ -50,14 +52,15 @@ class _DataTableParcState extends State<DataTableParc> {
           borderRadius:
           const BorderRadius.vertical(top: Radius.circular(5))),
       dividerThickness: 0.5,
-      autoRowsToHeight: true,
+      autoRowsToHeight: widget.autoRowHeight,
       empty: NoDataWidget(
         datasource: widget.source,
       ),
       pageSyncApproach: PageSyncApproach.goToLast,
       horizontalMargin: 8,
-      columnSpacing: 0,
-      dataRowHeight: widget.rowHeight==null?widget
+      columnSpacing: 5,
+      dataRowHeight: widget.autoRowHeight?kMinInteractiveDimension:widget
+          .rowHeight==null?widget
           .numberOfRows==null?rowHeight:rowHeight*2:widget.rowHeight!,
       onPageChanged: (s) {},
       rowsPerPage: widget.numberOfRows ?? rowPerPage,

@@ -1,12 +1,11 @@
+import 'package:chip_list/chip_list.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:parc_oto/datasources/workshop/option/option_webservice.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:parc_oto/screens/workshop/parts/options/option_form.dart';
 import '../../../providers/client_database.dart';
 import '../../../screens/workshop/parts/options/option_tabs.dart';
-import '../../../utilities/adaptive_container.dart';
 import '../../../widgets/on_tap_scale.dart';
 import '../../parcoto_datasource.dart';
 import '../../../serializables/pieces/option.dart';
@@ -40,18 +39,22 @@ class OptionDatasource extends ParcOtoDatasource<Option> {
     return [
       DataCell(Text(element.value.code,style: rowTextStyle,)),
       DataCell(Text(element.value.name,style: rowTextStyle,)),
-      DataCell(MasonryGridView.count(
-        itemCount: element.value.values?.length??0,
-        crossAxisCount: 6,
-        shrinkWrap: true,
-        primary: false,
-        crossAxisSpacing: 5,
-        mainAxisSpacing: 5,
-        itemBuilder: (con,index){
-          return AdaptiveTextContainer(
-            text: element.value.values![index],
-          );
-        },
+      DataCell(ChipList(
+        interactable: false,
+        listOfChipNames: element.value.values??[],
+        listOfChipIndicesCurrentlySelected: const [],
+        style: rowTextStyle,
+        borderRadiiList: const [5],
+        inactiveBgColorList: [appTheme!.color.darkest],
+        inactiveTextColorList: [appTheme!.writingStyle.color!],
+        inactiveBorderColorList: [appTheme!.backGroundColor],
+        padding: EdgeInsets.zero,
+        widgetSpacing: 1,
+        showCheckmark: false,
+        shouldWrap: false,
+        wrapAlignment: WrapAlignment.start,
+        wrapCrossAlignment: WrapCrossAlignment.start,
+
       )),
       DataCell(SelectableText(dateFormat.format(element.value
           .updatedAt??DateTime(2024)),   style: rowTextStyle,),
