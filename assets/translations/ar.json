@@ -619,6 +619,10 @@
   "modifoption": "تم تعديل خيار",
   "suproption": "تمت إزالة خيار",
   "supproption": "حذف الخيار",
-  "nouvoption": "خيار جديد"
-
+  "nouvoption": "خيار جديد",
+  "nouvcategory": "فئة جديدة",
+  "supprcategory": "حذف الفئة",
+  "ajoutcategory": "تمت إضافة فئة جديدة",
+  "modifcategory": "تم تعديل فئة",
+  "suprcategory": "تم حذف فئة"
 }

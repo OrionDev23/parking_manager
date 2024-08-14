@@ -610,5 +610,10 @@
  "modifoption": "Une option a été modifiée",
  "suproption": "Une option a été supprimée",
  "supproption": "Supprimer l'option",
- "nouvoption": "Nouvelle option"
+ "nouvoption": "Nouvelle option",
+ "nouvcategory": "Nouvelle catégorie",
+"supprcategory": "Supprimer la catégorie",
+ "ajoutcategory": "Une nouvelle catégorie a été ajoutée",
+ "modifcategory": "Une catégorie a été modifiée",
+ "suprcategory": "Une catégorie a été supprimée"
 }

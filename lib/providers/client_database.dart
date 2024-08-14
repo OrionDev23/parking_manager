@@ -443,6 +443,9 @@ class DatabaseGetter {
         return "modifoption";
       case 53:
         return "suproption";
+      case 54: return "ajoutcategory";
+      case 55: return "modifcategory";
+      case 56: return "suprcategory";
     }
     return '';
   }

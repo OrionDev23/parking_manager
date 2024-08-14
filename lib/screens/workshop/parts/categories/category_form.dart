@@ -1,8 +1,11 @@
 
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' as m;
+import 'package:parc_oto/datasources/workshop/category/category_datasource.dart';
+import 'package:parc_oto/screens/workshop/parts/categories/category_table.dart';
+import 'package:parc_oto/theme.dart';
+import 'package:parc_oto/widgets/zone_box.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../../providers/client_database.dart';
@@ -54,67 +57,52 @@ class _CategoryFormState extends State<CategoryForm> {
         : null;
     categoryKey = widget.category?.id ??
         DateTime.now().difference(DatabaseGetter.ref).inMilliseconds.toString();
+    downloadCats();
     super.initState();
   }
 
   Category? selectedCat;
-  Widget categoryParents() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'catparnt',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ).tr(),
-        const Spacer(),
-        SizedBox(
-          width: 18.w,
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            m.Material(
-              child: DropdownSearch<Category>(
-                popupProps: PopupProps.menu(
-                  emptyBuilder: (c, msg) {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: Text('lvide',
-                                style: TextStyle(color: Colors.grey[100]))
-                            .tr(),
-                      ),
-                    );
-                  },
-                  fit: FlexFit.loose,
-                  showSearchBox: true,
-                  constraints: const BoxConstraints(
-                    maxHeight: 220,
-                  ),
-                ),
-                itemAsString: (c) {
-                  return c.name;
-                },
-                selectedItem: selectedCat,
-                dropdownBuilder: (context, category) {
-                  if (category == null) {
-                    return Text('catparnt',
-                            style: TextStyle(color: Colors.grey[100]))
-                        .tr();
-                  }
-                  return Text(category.name);
-                },
-                items: PartsProvider.categories.values.toList().skipWhile((s) {
-                  return categoryKey == s.id;
-                }).toList(),
-                onChanged: (c) {
-                  setState(() {
-                    selectedCat = c;
-                  });
-                },
-              ),
-            ),
-          ]),
+  Widget categoryParents( AppTheme appTheme) {
+    return Flexible(
+      child: ZoneBox(label: 'catparnt'.tr(),
+      child:        Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Button(
+          child: Text(selectedCat==null?'nonind'.tr():'${selectedCat!.code} : '
+              '${selectedCat!.name}'),
+          onPressed: () async{
+            selectedCat = await showDialog<Category>(
+                context: context,
+                barrierDismissible: true,
+                builder: (context) {
+                  return ContentDialog(
+                    constraints: BoxConstraints.tight(
+                        Size(700.px, 550.px)),
+                    title: const Text('catparnt').tr(),
+                    style: ContentDialogThemeData(
+                        titleStyle: appTheme.writingStyle
+                            .copyWith(
+                            fontWeight:
+                            FontWeight.bold)),
+                    content: const CategoryTable(
+                      selectD: true,
+                    ),
+                    actions: [Button(child: const Text('fermer').tr(),
+                        onPressed: (){
+                          selectedCat=null;
+                          setState(() {
+
+                          });
+                          Navigator.of(context).pop();
+                        })],
+                  );
+                });
+            setState(() {
+
+            });
+          },
         ),
-      ],
+      ),),
     );
   }
 
@@ -159,141 +147,131 @@ class _CategoryFormState extends State<CategoryForm> {
         ),
       );
     }
+    var appTheme=context.watch<AppTheme>();
     return SizedBox(
-      width: 30.w,
-      height: 45.h,
+      width: 400.px,
+      height: 400.px,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Column(
-            children: [
-              Row(
-                children: [
-                  const Text(
-                    'code',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ).tr(),
-                  const Spacer(),
-                  SizedBox(
-                    width: 18.w,
-                    child: Row(
-                      children: [
-                        Flexible(
-                          child: TextBox(
-                            controller: catCode,
-                            placeholder: 'code'.tr(),
-                            onChanged: (s) {
-                              if (PartsProvider.categories.containsKey(s)) {
-                                setState(() {
-                                  errorCode = true;
-                                });
-                              } else {
-                                errorCode = false;
-                                setState(() {});
-                              }
-                            },
-                            enabled: widget.category == null,
-                          ),
+          Container(
+            padding:const EdgeInsets.all(10),
+            height: 280.px,
+            width: 380.px,
+            decoration: BoxDecoration(
+              color: appTheme.backGroundColor,
+              boxShadow: kElevationToShadow[2],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              children: [
+                Flexible(child: ZoneBox(label: 'code'.tr(),child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    children: [
+                      Flexible(
+                        child: TextBox(
+                          controller: catCode,
+                          placeholder: 'code'.tr(),
+                          onChanged: (s) {
+                            if (PartsProvider.categories.containsKey(s)) {
+                              setState(() {
+                                errorCode = true;
+                              });
+                            } else {
+                              errorCode = false;
+                              setState(() {});
+                            }
+                          },
+                          enabled: widget.category == null,
                         ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Button(
-                            onPressed: widget.category == null
-                                ? () {
-                                    setState(() {
-                                      catCode.text = PartsProvider
-                                          .getUniqueCodeCategory();
-                                    });
-                                  }
-                                : null,
-                            child: const Text('generer').tr())
-                      ],
-                    ),
+                      ),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Button(
+                          onPressed: widget.category == null
+                              ? () {
+                            setState(() {
+                              catCode.text = PartsProvider
+                                  .getUniqueCodeCategory();
+                            });
+                          }
+                              : null,
+                          child: const Text('generer').tr())
+                    ],
                   ),
-                ],
-              ),
-              if (errorCode)
-                const SizedBox(
-                  height: 5,
+                ),)),
+                if (errorCode)
+                  smallSpace,
+                if (errorCode)
+                  Text(
+                    'codetaken',
+                    style: TextStyle(color: Colors.red),
+                  ).tr(),
+                Flexible(
+                  child: ZoneBox(label: 'nom'.tr(),child:  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: TextBox(
+                      controller: catName,
+                      placeholder: 'nom'.tr(),
+                      onChanged: (s) {
+                        setState(() {});
+                      },
+                    ),
+                  ),),
                 ),
-              if (errorCode)
-                Text(
-                  'codetaken',
-                  style: TextStyle(color: Colors.red),
-                ).tr()
-            ],
+                bigSpace,
+                categoryParents(appTheme),
+              ],
+            ),
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          Row(
-            children: [
-              const Text(
-                'nom',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ).tr(),
-              const Spacer(),
-              SizedBox(
-                width: 18.w,
-                child: TextBox(
-                  controller: catName,
-                  placeholder: 'nom'.tr(),
-                  onChanged: (s) {
-                    setState(() {});
+          bigSpace,
+          SizedBox(
+            width: 380.px,
+
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Button(
+                  child: const Text('annuler').tr(),
+                  onPressed: () {
+                    Navigator.of(context).pop();
                   },
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          categoryParents(),
-          const Spacer(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Button(
-                child: const Text('annuler').tr(),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              const SizedBox(
-                width: 5,
-              ),
-              FilledButton(
-                child: const Text('confirmer').tr(),
-                onPressed: () {
-                  if (catCode.text.isEmpty || catName.text.isEmpty) {
-                    if (catCode.text.isEmpty) {
-                      showMessage("codeerror", "erreur");
-                      return;
+                smallSpace,
+                FilledButton(
+                  child: const Text('confirmer').tr(),
+                  onPressed: () {
+                    if (catCode.text.isEmpty || catName.text.isEmpty) {
+                      if (catCode.text.isEmpty) {
+                        showMessage("codeerror", "erreur");
+                        return;
+                      }
+                      if (catName.text.isEmpty) {
+                        showMessage("nomerror", "erreur");
+                        return;
+                      }
+                    } else {
+                      DateTime date = DateTime.now();
+                      createCategory(
+                              Category(
+                                  id: catCode.text,
+                                  name: catName.text,
+                                  code: catCode.text,
+                                  codeParent: selectedCat?.id,
+                                  updatedAt: date,
+                                  createdAt: widget.category == null ||
+                                          widget.category!.createdAt == null
+                                      ? date
+                                      : widget.category!.createdAt),
+                              catCode.text);
                     }
-                    if (catName.text.isEmpty) {
-                      showMessage("nomerror", "erreur");
-                      return;
-                    }
-                  } else {
-                    DateTime date = DateTime.now();
-                    createCategory(
-                            Category(
-                                id: catCode.text,
-                                name: catName.text,
-                                code: catCode.text,
-                                codeParent: selectedCat?.id,
-                                updatedAt: date,
-                                createdAt: widget.category == null ||
-                                        widget.category!.createdAt == null
-                                    ? date
-                                    : widget.category!.createdAt),
-                            catCode.text);
-                  }
-                },
-              ),
-            ],
+                  },
+                ),
+              ],
+            ),
           )
         ],
       ),
@@ -320,8 +298,8 @@ class _CategoryFormState extends State<CategoryForm> {
 
       showMessage('catadd', 'fait');
       PartsProvider.categories[key] = cat;
-      if (CatDataSource.instance != null) {
-        CatDataSource.instance!.refreshDataSource();
+      if (CategoryDatasource.instance != null) {
+        CategoryDatasource.instance!.refreshDatasource();
       }
     setState(() {
       loading = false;

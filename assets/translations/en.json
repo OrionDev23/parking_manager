@@ -621,6 +621,10 @@
   "modifoption": "An option has been modified",
   "suproption": "An option has been removed",
   "supproption": "Delete option",
-  "nouvoption": "New option"
-
+  "nouvoption": "New option",
+  "nouvcategory": "New category",
+  "supprcategory": "Delete category",
+  "ajoutcategory": "A new category has been added",
+  "modifcategory": "A category has been modified",
+  "suprcategory": "A category has been deleted"
 }

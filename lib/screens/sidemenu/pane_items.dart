@@ -7,7 +7,6 @@ import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:parc_oto/screens/workshop/inventory/inventory.dart';
 import 'package:parc_oto/screens/workshop/my_repair.dart';
 import 'package:parc_oto/screens/workshop/parts/brands.dart';
-import 'package:parc_oto/screens/workshop/parts/categories.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/client_database.dart';
@@ -36,6 +35,7 @@ import '../vehicle/manager/vehicle_tabs.dart';
 import '../vehicle/states/state_tabs.dart';
 import '../vehicle/vehicle_dashboard.dart';
 import '../workshop/inventory/fournisseurs/fournisseur_tabs.dart';
+import '../workshop/parts/categories/category_tabs.dart';
 import '../workshop/parts/options/option_tabs.dart';
 import '../workshop/parts/parts_management.dart';
 import '../workshop/workshop_dashboard.dart';
@@ -281,7 +281,7 @@ class PaneItemsAndFooters {
             FluentIcons.category_classification,
             color: appTheme.color.lightest,
           ),
-          body: const PartsCategories(),
+          body: const CategoryTabs(),
           title: Text(
             "categories",
             style: paneTextStyle,

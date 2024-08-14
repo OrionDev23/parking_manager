@@ -1,32 +1,31 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'option_manager.dart';
+import 'category_manager.dart';
 
-import 'option_form.dart';
+import 'category_form.dart';
 
-class OptionTabs extends StatefulWidget {
-  final bool archive;
+class CategoryTabs extends StatefulWidget {
 
-  const OptionTabs({super.key, this.archive = false});
+  const CategoryTabs({super.key, });
 
   @override
-  OptionTabsState createState() => OptionTabsState();
+  CategoryTabsState createState() => CategoryTabsState();
 }
 
-class OptionTabsState extends State<OptionTabs> {
+class CategoryTabsState extends State<CategoryTabs> {
   static ValueNotifier<int> currentIndex = ValueNotifier(0);
   static List<Tab> tabs = [];
   Tab generateTab(int index) {
     late Tab tab;
     tab = Tab(
       key: UniqueKey(),
-      text: Text('nouvoption'.tr()),
-      semanticLabel: 'nouvoption'.tr(),
+      text: Text('nouvcategory'.tr()),
+      semanticLabel: 'nouvcategory'.tr(),
       icon: const Icon(FluentIcons.shop),
-      body: const OptionForm(),
+      body: const CategoryForm(),
       onClosed: () {
-          tabs.remove(tab);
-          if (currentIndex.value > 0) currentIndex.value--;
+        tabs.remove(tab);
+        if (currentIndex.value > 0) currentIndex.value--;
       },
     );
     return tab;
@@ -39,11 +38,11 @@ class OptionTabsState extends State<OptionTabs> {
   }
 
   String getTitle() {
-    return 'options';
+    return 'categories';
   }
 
   Widget getGestionnaire() {
-    return const OptionManager(
+    return const CategoryManager(
     );
   }
 
@@ -62,7 +61,7 @@ class OptionTabsState extends State<OptionTabs> {
   }
 
   void initValues() {
-      addTab1();
+    addTab1();
   }
 
   @override
@@ -80,9 +79,7 @@ class OptionTabsState extends State<OptionTabs> {
             tabWidthBehavior: TabWidthBehavior.equal,
             closeButtonVisibility: CloseButtonVisibilityMode.always,
             showScrollButtons: true,
-            onNewPressed: widget.archive
-                ? null
-                : () {
+            onNewPressed: () {
               setState(() {
                 final index = tabs.length + 1;
                 final tab = generateTab(index);
@@ -95,14 +92,14 @@ class OptionTabsState extends State<OptionTabs> {
                 if (oldIndex < newIndex) {
                   newIndex -= 1;
                 }
-                  final item = tabs.removeAt(oldIndex);
-                  tabs.insert(newIndex, item);
+                final item = tabs.removeAt(oldIndex);
+                tabs.insert(newIndex, item);
 
-                  if (currentIndex.value == newIndex) {
-                    currentIndex.value = oldIndex;
-                  } else if (currentIndex.value == oldIndex) {
-                    currentIndex.value = newIndex;
-                  }
+                if (currentIndex.value == newIndex) {
+                  currentIndex.value = oldIndex;
+                } else if (currentIndex.value == oldIndex) {
+                  currentIndex.value = newIndex;
+                }
 
               });
             },
