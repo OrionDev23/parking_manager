@@ -1,12 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:parc_oto/admin_parameters.dart';
-import 'package:parc_oto/main.dart';
-import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
-import 'package:parc_oto/screens/workshop/inventory/inventory.dart';
-import 'package:parc_oto/screens/workshop/my_repair.dart';
-import 'package:parc_oto/screens/workshop/parts/brands.dart';
+import '../../admin_parameters.dart';
+import '../../main.dart';
+import 'sidemenu.dart';
+import '../workshop/inventory/inventory.dart';
+import '../workshop/my_repair.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/client_database.dart';
@@ -35,6 +34,7 @@ import '../vehicle/manager/vehicle_tabs.dart';
 import '../vehicle/states/state_tabs.dart';
 import '../vehicle/vehicle_dashboard.dart';
 import '../workshop/inventory/fournisseurs/fournisseur_tabs.dart';
+import '../workshop/parts/brands/brand_tabs.dart';
 import '../workshop/parts/categories/category_tabs.dart';
 import '../workshop/parts/options/option_tabs.dart';
 import '../workshop/parts/parts_management.dart';
@@ -270,7 +270,7 @@ class PaneItemsAndFooters {
             FluentIcons.verified_brand,
             color: appTheme.color.lightest,
           ),
-          body: const PartsBrands(),
+          body: const BrandTabs(),
           title: Text(
             "brands",
             style: paneTextStyle,

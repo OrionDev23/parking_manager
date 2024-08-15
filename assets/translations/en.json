@@ -626,5 +626,13 @@
   "supprcategory": "Delete category",
   "ajoutcategory": "A new category has been added",
   "modifcategory": "A category has been modified",
-  "suprcategory": "A category has been deleted"
+  "suprcategory": "A category has been deleted",
+  "brandmod": "Brand successfully modified!",
+  "catmod": "Category successfully modified!",
+  "optionmod": "Option successfully modified!",
+  "nouvbrand": "New brand",
+  "supprbrand": "Delete brand",
+  "ajoutbrand": "A new brand has been added",
+  "modifbrand": "A brand has been modified",
+  "suprbrand": "A brand has been removed"
 }

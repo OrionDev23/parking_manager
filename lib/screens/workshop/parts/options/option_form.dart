@@ -242,25 +242,43 @@ class _OptionFormState extends State<OptionForm> {
             : widget.option!.createdAt);
     if(widget.option!=null){
       await DatabaseGetter().updateDocument(collectionId: optionsID,
-          documentId: optionKey, data: option.toJson()).catchError((s){
+          documentId: optionKey, data: option.toJson()).then((s){
+        DatabaseGetter().ajoutActivity(52, option.id, docName: option.name);
+
+        showMessage('optionadd', 'fait');
+        PartsProvider.options[optionKey] = option;
+        if (OptionDatasource.instance != null) {
+          OptionDatasource.instance!.repo.data.add(MapEntry(optionKey,
+              option));
+          OptionDatasource.instance!.refreshDatasource();
+
+        }
+
+      }).catchError(
+              (s){
 
             showMessage('errupld', 'erreur');});
     }
     else{
       await DatabaseGetter().addDocument(collectionId: optionsID,
-          documentId: optionKey, data: option.toJson()).catchError((s){
+          documentId: optionKey, data: option.toJson()).then((s){
+        DatabaseGetter().ajoutActivity(51, option.id, docName: option.name);
+
+        showMessage('optionmod', 'fait');
+        PartsProvider.options[optionKey] = option;
+        if (OptionDatasource.instance != null) {
+          OptionDatasource.instance!.repo.data.add(MapEntry(optionKey,
+              option));
+          OptionDatasource.instance!.refreshDatasource();
+
+        }
+      }).catchError(
+              (s){
 
         showMessage('errupld', 'erreur');});
     }
 
-      showMessage('optionadd', 'fait');
-      PartsProvider.options[optionKey] = option;
-      if (OptionDatasource.instance != null) {
-        OptionDatasource.instance!.repo.data.add(MapEntry(optionKey,
-            option));
-        OptionDatasource.instance!.refreshDatasource();
 
-      }
     setState(() {
       loading = false;
     });

@@ -615,5 +615,13 @@
 "supprcategory": "Supprimer la catégorie",
  "ajoutcategory": "Une nouvelle catégorie a été ajoutée",
  "modifcategory": "Une catégorie a été modifiée",
- "suprcategory": "Une catégorie a été supprimée"
+ "suprcategory": "Une catégorie a été supprimée",
+ "brandmod": "Marque modifiée avec succès !",
+ "catmod": "Catégorie modifiée avec succès !",
+ "optionmod": "Option modifiée avec succès !",
+ "nouvbrand": "Nouvelle marque",
+ "supprbrand": "Supprimer la marque",
+ "ajoutbrand": "Une nouvelle marque a été ajoutée",
+ "modifbrand": "Une marque a été modifiée",
+ "suprbrand": "Une marque a été supprimée"
 }

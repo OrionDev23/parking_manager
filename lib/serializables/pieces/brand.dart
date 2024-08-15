@@ -8,12 +8,14 @@ part 'brand.g.dart';
 @JsonSerializable()
 class Brand extends ParcOtoDefault{
   String code;
-  String? pic;
   String name;
-  Brand({required this.code,this.pic,required this.name,super.createdAt,super
+  String? search;
+  Brand({required this.code,required this.name,super.createdAt,super
       .updatedAt,
     required super
-      .id});
+      .id}){
+    search="$code $name";
+  }
 
 
   Map<String,dynamic> toJsonPDF(){

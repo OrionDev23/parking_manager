@@ -1,40 +1,44 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parc_oto/datasources/workshop/category/category_datasource.dart';
-import 'package:parc_oto/screens/workshop/parts/categories/category_table.dart';
-import 'package:parc_oto/theme.dart';
-import 'package:parc_oto/widgets/zone_box.dart';
+import 'package:parc_oto/providers/parts_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../../../datasources/workshop/brand/brand_datasrouce.dart';
 import '../../../../providers/client_database.dart';
-import '../../../../providers/parts_provider.dart';
-import '../../../../serializables/pieces/category.dart';
+import '../../../../serializables/pieces/brand.dart';
+import '../../../../theme.dart';
+import '../../../../widgets/zone_box.dart';
 
-class CategoryForm extends StatefulWidget {
-  final Category? category;
-  const CategoryForm({
-    super.key,
-    this.category,
-  });
+
+class BrandForm extends StatefulWidget {
+  final Brand? brand;
+
+  const BrandForm({super.key,  this.brand,});
 
   @override
-  State<CategoryForm> createState() => _CategoryFormState();
+  State<BrandForm> createState() => _BrandFormState();
 }
 
-class _CategoryFormState extends State<CategoryForm> {
-  TextEditingController catName = TextEditingController();
-  TextEditingController catCode = TextEditingController();
-  late String categoryKey;
+class _BrandFormState extends State<BrandForm> {
+  TextEditingController brandName = TextEditingController();
+  TextEditingController brandCode = TextEditingController();
+  late String brandKey;
+
   bool loading = false;
   bool error = false;
 
-  Future<void> downloadCats() async {
-    if (PartsProvider.errorCategories) {
+  Future<void> downloadBrands() async {
+    if (PartsProvider.errorBrands) {
       loading = true;
+      if(mounted){
+        setState(() {
+
+        });
+      }
       try {
-        await PartsProvider().downloadAllCategories();
+        await PartsProvider().downloadAllBrands();
         loading = false;
         error = false;
       } catch (e) {
@@ -48,62 +52,13 @@ class _CategoryFormState extends State<CategoryForm> {
 
   @override
   void initState() {
-    catName.text = widget.category?.name ?? '';
-    catCode.text = widget.category?.code ?? '';
-    selectedCat = widget.category != null &&
-            widget.category!.codeParent != null &&
-            PartsProvider.categories.containsKey(widget.category?.codeParent)
-        ? PartsProvider.categories[widget.category!.codeParent]!
-        : null;
-    categoryKey = widget.category?.id ??
-        DateTime.now().difference(DatabaseGetter.ref).inMilliseconds.toString();
-    downloadCats();
+    brandName.text = widget.brand?.name ?? '';
+    brandCode.text = widget.brand?.code ?? '';
+    brandKey = widget.brand?.id??DateTime.now()
+        .difference(DatabaseGetter.ref)
+        .inMilliseconds.toString();
+    downloadBrands();
     super.initState();
-  }
-
-  Category? selectedCat;
-  Widget categoryParents( AppTheme appTheme) {
-    return Flexible(
-      child: ZoneBox(label: 'catparnt'.tr(),
-      child:        Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Button(
-          child: Text(selectedCat==null?'nonind'.tr():'${selectedCat!.code} : '
-              '${selectedCat!.name}'),
-          onPressed: () async{
-            selectedCat = await showDialog<Category>(
-                context: context,
-                barrierDismissible: true,
-                builder: (context) {
-                  return ContentDialog(
-                    constraints: BoxConstraints.tight(
-                        Size(700.px, 550.px)),
-                    title: const Text('catparnt').tr(),
-                    style: ContentDialogThemeData(
-                        titleStyle: appTheme.writingStyle
-                            .copyWith(
-                            fontWeight:
-                            FontWeight.bold)),
-                    content: const CategoryTable(
-                      selectD: true,
-                    ),
-                    actions: [Button(child: const Text('fermer').tr(),
-                        onPressed: (){
-                          selectedCat=null;
-                          setState(() {
-
-                          });
-                          Navigator.of(context).pop();
-                        })],
-                  );
-                });
-            setState(() {
-
-            });
-          },
-        ),
-      ),),
-    );
   }
 
   bool errorCode = false;
@@ -141,7 +96,7 @@ class _CategoryFormState extends State<CategoryForm> {
                   ],
                 ),
                 onPressed: () {
-                  downloadCats();
+                  downloadBrands();
                 })
           ],
         ),
@@ -150,14 +105,14 @@ class _CategoryFormState extends State<CategoryForm> {
     var appTheme=context.watch<AppTheme>();
     return SizedBox(
       width: 400.px,
-      height: 400.px,
+      height: 200.px,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             padding:const EdgeInsets.all(10),
-            height: 280.px,
+            height: 180.px,
             width: 380.px,
             decoration: BoxDecoration(
               color: appTheme.backGroundColor,
@@ -172,10 +127,10 @@ class _CategoryFormState extends State<CategoryForm> {
                     children: [
                       Flexible(
                         child: TextBox(
-                          controller: catCode,
+                          controller: brandCode,
                           placeholder: 'code'.tr(),
                           onChanged: (s) {
-                            if (PartsProvider.categories.containsKey(s)) {
+                            if (PartsProvider.brands.containsKey(s)) {
                               setState(() {
                                 errorCode = true;
                               });
@@ -184,18 +139,18 @@ class _CategoryFormState extends State<CategoryForm> {
                               setState(() {});
                             }
                           },
-                          enabled: widget.category == null,
+                          enabled: widget.brand == null,
                         ),
                       ),
                       const SizedBox(
                         width: 5,
                       ),
                       Button(
-                          onPressed: widget.category == null
+                          onPressed: widget.brand == null
                               ? () {
                             setState(() {
-                              catCode.text = PartsProvider
-                                  .getUniqueCodeCategory();
+                              brandCode.text = PartsProvider
+                                  .getUniqueCodeBrand();
                             });
                           }
                               : null,
@@ -214,7 +169,7 @@ class _CategoryFormState extends State<CategoryForm> {
                   child: ZoneBox(label: 'nom'.tr(),child:  Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: TextBox(
-                      controller: catName,
+                      controller: brandName,
                       placeholder: 'nom'.tr(),
                       onChanged: (s) {
                         setState(() {});
@@ -222,32 +177,29 @@ class _CategoryFormState extends State<CategoryForm> {
                     ),
                   ),),
                 ),
-                bigSpace,
-                categoryParents(appTheme),
               ],
             ),
           ),
           bigSpace,
           SizedBox(
             width: 380.px,
-
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 FilledButton(
                   child: const Text('confirmer').tr(),
                   onPressed: () {
-                    if (catCode.text.isEmpty || catName.text.isEmpty) {
-                      if (catCode.text.isEmpty) {
+                    if (brandCode.text.isEmpty || brandName.text.isEmpty) {
+                      if (brandCode.text.isEmpty) {
                         showMessage("codeerror", "erreur");
                         return;
                       }
-                      if (catName.text.isEmpty) {
+                      if (brandName.text.isEmpty) {
                         showMessage("nomerror", "erreur");
                         return;
                       }
                     } else {
-                      createCategory();
+                      createBrand();
                     }
                   },
                 ),
@@ -259,53 +211,52 @@ class _CategoryFormState extends State<CategoryForm> {
     );
   }
 
-  Future<void> createCategory() async {
+  Future<void> createBrand() async {
     setState(() {
       loading = true;
     });
     DateTime date = DateTime.now();
 
-    Category cat=Category(
-        id: catCode.text,
-        name: catName.text,
-        code: catCode.text,
-        codeParent: selectedCat?.id,
+    Brand brand=Brand(
+        id: brandKey,
+        name: brandName.text,
+        code: brandCode.text,
         updatedAt: date,
-        createdAt: widget.category == null ||
-            widget.category!.createdAt == null
+        createdAt: widget.brand == null
             ? date
-            : widget.category!.createdAt);
-    if(widget.category==null){
-      await DatabaseGetter().addDocument(collectionId: categoriesID,
-          documentId: categoryKey, data: cat.toJson()).then((s){
-        DatabaseGetter().ajoutActivity(54, cat.id, docName: cat.name);
+            : widget.brand!.createdAt);
 
-        showMessage('catadd', 'fait');
-        PartsProvider.categories[categoryKey] = cat;
-        if (CategoryDatasource.instance != null) {
-          CategoryDatasource.instance!.refreshDatasource();
-        }
-      }).catchError((s){
+    if(widget.brand==null){
+      await DatabaseGetter().addDocument(
+          collectionId: brandsID,
+          documentId: brandKey,
+          data: brand.toJson()).then((s){
+        DatabaseGetter().ajoutActivity(57, brand.id, docName: brand.name);
+
+        showMessage('brandadd', 'fait');
+        PartsProvider.brands[brandKey] = brand;
+        if (BrandDatasource.instance != null ) {
+          BrandDatasource.instance!.refreshDatasource();}
+      }).catchError((e){
         showMessage('errupld', 'erreur');
       });
     }
     else{
-      await DatabaseGetter().updateDocument(collectionId: categoriesID,
-          documentId: categoryKey, data: cat.toJson()).then((s){
-        DatabaseGetter().ajoutActivity(55, cat.id, docName: cat.name);
+      await DatabaseGetter().updateDocument(
+          collectionId: brandsID,
+          documentId: brandKey,
+          data: brand.toJson()).then((s){
+        DatabaseGetter().ajoutActivity(58, brand.id, docName: brand.name);
 
-        showMessage('catmod', 'fait');
-        PartsProvider.categories[categoryKey] = cat;
-        if (CategoryDatasource.instance != null) {
-          CategoryDatasource.instance!.refreshDatasource();
+        showMessage('brandmod', 'fait');
+        PartsProvider.brands[brandKey] = brand;
+        if (BrandDatasource.instance != null ) {
+          BrandDatasource.instance!.refreshDatasource();
         }
-      }).catchError
-        ((s){
+      }).catchError((e){
         showMessage('errupld', 'erreur');
       });
     }
-
-
     setState(() {
       loading = false;
     });

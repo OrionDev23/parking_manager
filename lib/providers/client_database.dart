@@ -446,6 +446,9 @@ class DatabaseGetter {
       case 54: return "ajoutcategory";
       case 55: return "modifcategory";
       case 56: return "suprcategory";
+      case 57: return "ajoutbrand";
+      case 58: return "modifbrand";
+      case 59: return "suprbrand";
     }
     return '';
   }

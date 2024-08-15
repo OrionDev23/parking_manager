@@ -13,10 +13,11 @@ Category _$CategoryFromJson(Map<String, dynamic> json) => Category(
       id: json[r'$id'] as String,
       createdAt: createdAtJson(json[r'$createdAt'] as String),
       updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
-    );
+    )..search = json['search'] as String?;
 
 Map<String, dynamic> _$CategoryToJson(Category instance) => <String, dynamic>{
       'code': instance.code,
       'name': instance.name,
       'codeParent': instance.codeParent,
+      'search': instance.search,
     };
