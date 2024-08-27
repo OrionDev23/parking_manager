@@ -311,90 +311,93 @@ class _ImportVehiclesState extends State<ImportVehicles> {
 
             case TextCellValue():
               final value = cell!.value as TextCellValue;
-              if (value.value.toLowerCase()=='immatriculation' &&
-                  !foundMatric) {
-                columnToRead['mat'] = cell.columnIndex;
-                foundMatric = true;
+              if(value.value.text!=null){
+                if (value.value.text!.toLowerCase()=='immatriculation' &&
+                    !foundMatric) {
+                  columnToRead['mat'] = cell.columnIndex;
+                  foundMatric = true;
+                }
+
+                if (value.value.text!.toLowerCase().contains('model')|| value.value.text!
+                    .toLowerCase().contains('modèl')) {
+                  columnToRead['model'] = cell.columnIndex;
+                }
+                if (value.value.text!.toLowerCase() == 'n') {
+                  columnToRead['numero'] = cell.columnIndex;
+                }
+                if (value.value.text!.toLowerCase().contains('état') ||
+                    value.value.text!.toLowerCase().contains('etat') ||
+                    value.value.text!.toLowerCase().contains('state')) {
+                  columnToRead['etat'] = cell.columnIndex;
+                }
+                if (value.value.text!.toLowerCase().replaceAll(' ','').trim()=='nom' ||
+                    value.value.text!.toLowerCase().contains('familyname') ||
+                    value.value.text!
+                        .toLowerCase()
+                        .replaceAll(' ', '')
+                        .contains('secondname')) {
+                  columnToRead['nom'] = cell.columnIndex;
+                }
+                if (value.value.text!.toLowerCase().contains('prenom') ||
+                    value.value.text!.toLowerCase().contains('prénom') ||
+                    value.value.text!
+                        .toLowerCase()
+                        .replaceAll(' ', '')
+                        .contains('firstname')) {
+                  columnToRead['prenom'] = cell.columnIndex;
+                }
+                if(value.value.text!.toLowerCase().trim()=='appartenance vehicule'){
+                  columnToRead['appartenance']=cell.columnIndex;
+                }
+                if(value.value.text!.toLowerCase().trim()=='appartenance salarié'){
+                  columnToRead['appartenancesalar']=cell.columnIndex;
+                }
+                if(value.value.text!.toLowerCase().contains('filiale') && value
+                    .value.text!.toLowerCase().contains('vehicule')){
+                  columnToRead['filliale']=cell.columnIndex;
+                }
+                if(value.value.text!.toLowerCase().contains('direction') ){
+                  columnToRead['direction']=cell.columnIndex;
+                }
+                if(value.value.text!.toLowerCase().contains('departement') ){
+                  columnToRead['departement']=cell.columnIndex;
+                }
+                if(value.value.text!.toLowerCase().contains('matricule employé') ){
+                  columnToRead['matemp']=cell.columnIndex;
+                }
+                if(value.value.text!.toLowerCase().trim().contains('périmetre') || value
+                    .value.text!.toLowerCase().trim().contains('perimetre')){
+                  columnToRead['perimetre']=cell.columnIndex;
+                }
+                if(value.value.text!.toLowerCase().trim().contains('service') || value
+                    .value.text!.toLowerCase().trim().contains('fonction')){
+                  columnToRead['service']=cell.columnIndex;
+                }
+                if(value.value.text!.toLowerCase().trim().contains('décision') ||
+                    value.value.text!.toLowerCase().trim().contains('decision')){
+                  columnToRead['decision']=cell.columnIndex;
+                }
+                if(value.value.text!.toLowerCase().trim().contains('emplacement')){
+                  columnToRead['emplacement']=cell.columnIndex;
+                }
+                if(value.value.text!.toLowerCase().trim().contains('poids') || value
+                    .value.text!.toLowerCase().trim().replaceAll(' ', '').contains
+                  ('Lourd/Leger')){
+                  columnToRead['poids']=cell.columnIndex;
+                }
+                if(value.value.text!.toLowerCase().trim().contains('matricule '
+                    'employé') || value
+                    .value.text!.toLowerCase().trim().replaceAll(' ', '').contains
+                  ('matriculeemploye')){
+                  columnToRead['matEmp']=cell.columnIndex;
+                }
+                if(value.value.text!.toLowerCase().trim().contains('poste occupé') || value
+                    .value.text!.toLowerCase().trim().replaceAll(' ', '').contains
+                  ('poste')){
+                  columnToRead['poste']=cell.columnIndex;
+                }
               }
 
-              if (value.value.toLowerCase().contains('model')|| value.value
-                  .toLowerCase().contains('modèl')) {
-                columnToRead['model'] = cell.columnIndex;
-              }
-              if (value.value.toLowerCase() == 'n') {
-                columnToRead['numero'] = cell.columnIndex;
-              }
-              if (value.value.toLowerCase().contains('état') ||
-                  value.value.toLowerCase().contains('etat') ||
-                  value.value.toLowerCase().contains('state')) {
-                columnToRead['etat'] = cell.columnIndex;
-              }
-              if (value.value.toLowerCase().replaceAll(' ','').trim()=='nom' ||
-                  value.value.toLowerCase().contains('familyname') ||
-                  value.value
-                      .toLowerCase()
-                      .replaceAll(' ', '')
-                      .contains('secondname')) {
-                columnToRead['nom'] = cell.columnIndex;
-              }
-              if (value.value.toLowerCase().contains('prenom') ||
-                  value.value.toLowerCase().contains('prénom') ||
-                  value.value
-                      .toLowerCase()
-                      .replaceAll(' ', '')
-                      .contains('firstname')) {
-                columnToRead['prenom'] = cell.columnIndex;
-              }
-              if(value.value.toLowerCase().trim()=='appartenance vehicule'){
-                columnToRead['appartenance']=cell.columnIndex;
-              }
-              if(value.value.toLowerCase().trim()=='appartenance salarié'){
-                columnToRead['appartenancesalar']=cell.columnIndex;
-              }
-              if(value.value.toLowerCase().contains('filiale') && value
-                  .value.toLowerCase().contains('vehicule')){
-                columnToRead['filliale']=cell.columnIndex;
-              }
-              if(value.value.toLowerCase().contains('direction') ){
-                columnToRead['direction']=cell.columnIndex;
-              }
-              if(value.value.toLowerCase().contains('departement') ){
-                columnToRead['departement']=cell.columnIndex;
-              }
-              if(value.value.toLowerCase().contains('matricule employé') ){
-                columnToRead['matemp']=cell.columnIndex;
-              }
-              if(value.value.toLowerCase().trim().contains('périmetre') || value
-                  .value.toLowerCase().trim().contains('perimetre')){
-                columnToRead['perimetre']=cell.columnIndex;
-              }
-              if(value.value.toLowerCase().trim().contains('service') || value
-                  .value.toLowerCase().trim().contains('fonction')){
-                columnToRead['service']=cell.columnIndex;
-              }
-              if(value.value.toLowerCase().trim().contains('décision') ||
-                  value.value.toLowerCase().trim().contains('decision')){
-                columnToRead['decision']=cell.columnIndex;
-              }
-              if(value.value.toLowerCase().trim().contains('emplacement')){
-                columnToRead['emplacement']=cell.columnIndex;
-              }
-              if(value.value.toLowerCase().trim().contains('poids') || value
-                  .value.toLowerCase().trim().replaceAll(' ', '').contains
-                ('Lourd/Leger')){
-                columnToRead['poids']=cell.columnIndex;
-              }
-              if(value.value.toLowerCase().trim().contains('matricule '
-                  'employé') || value
-                  .value.toLowerCase().trim().replaceAll(' ', '').contains
-                ('matriculeemploye')){
-                columnToRead['matEmp']=cell.columnIndex;
-              }
-              if(value.value.toLowerCase().trim().contains('poste occupé') || value
-                  .value.toLowerCase().trim().replaceAll(' ', '').contains
-                ('poste')){
-                columnToRead['poste']=cell.columnIndex;
-              }
               break;
             case BoolCellValue():
               break;

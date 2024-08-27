@@ -19,7 +19,8 @@ class OptionForm extends StatefulWidget {
   State<OptionForm> createState() => _OptionFormState();
 }
 
-class _OptionFormState extends State<OptionForm> {
+class _OptionFormState extends State<OptionForm> with
+    AutomaticKeepAliveClientMixin<OptionForm>{
   TextEditingController optionName = TextEditingController();
   TextEditingController optionCode = TextEditingController();
   late String optionKey;
@@ -44,6 +45,7 @@ class _OptionFormState extends State<OptionForm> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     if (loading) {
       return SizedBox(
         width: 20.w,
@@ -303,4 +305,7 @@ class _OptionFormState extends State<OptionForm> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

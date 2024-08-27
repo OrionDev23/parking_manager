@@ -21,7 +21,8 @@ class BrandForm extends StatefulWidget {
   State<BrandForm> createState() => _BrandFormState();
 }
 
-class _BrandFormState extends State<BrandForm> {
+class _BrandFormState extends State<BrandForm> with
+    AutomaticKeepAliveClientMixin<BrandForm>{
   TextEditingController brandName = TextEditingController();
   TextEditingController brandCode = TextEditingController();
   late String brandKey;
@@ -65,6 +66,7 @@ class _BrandFormState extends State<BrandForm> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     if (loading) {
       return SizedBox(
         width: 20.w,
@@ -140,6 +142,12 @@ class _BrandFormState extends State<BrandForm> {
                             }
                           },
                           enabled: widget.brand == null,
+                          style: appTheme.writingStyle,
+                          placeholderStyle: placeStyle,
+                          cursorColor: appTheme.color.darker,
+                          decoration: BoxDecoration(
+                            color: appTheme.fillColor,
+                          ),
                         ),
                       ),
                       const SizedBox(
@@ -174,6 +182,12 @@ class _BrandFormState extends State<BrandForm> {
                       onChanged: (s) {
                         setState(() {});
                       },
+                      style: appTheme.writingStyle,
+                      placeholderStyle: placeStyle,
+                      cursorColor: appTheme.color.darker,
+                      decoration: BoxDecoration(
+                        color: appTheme.fillColor,
+                      ),
                     ),
                   ),),
                 ),
@@ -282,4 +296,7 @@ class _BrandFormState extends State<BrandForm> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

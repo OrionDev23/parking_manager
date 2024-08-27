@@ -102,15 +102,17 @@ class ImportAppartenance {
 
             case TextCellValue():
               final value = cell!.value as TextCellValue;
-              if (value.value.toLowerCase().trim()=='departement' && type==2) {
+              if (value.value.text?.toLowerCase().trim()=='departement' &&
+          type==2) {
                 columnToRead['departement'] = cell.columnIndex;
                 return true;
               }
-              if (value.value.toLowerCase().trim()=='direction' &&type==1) {
+              if (value.value.text?.toLowerCase().trim()=='direction' &&type==1) {
                 columnToRead['direction'] = cell.columnIndex;
                 return true;
               }
-              if (value.value.toLowerCase().contains('appartenance') &&
+              if (value.value.text!=null && value.value.text!.toLowerCase()
+              .contains('appartenance') &&
                   type==0) {
                 columnToRead['filiale'] = cell.columnIndex;
                 return true;

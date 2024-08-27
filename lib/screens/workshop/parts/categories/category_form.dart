@@ -23,7 +23,8 @@ class CategoryForm extends StatefulWidget {
   State<CategoryForm> createState() => _CategoryFormState();
 }
 
-class _CategoryFormState extends State<CategoryForm> {
+class _CategoryFormState extends State<CategoryForm> with
+    AutomaticKeepAliveClientMixin<CategoryForm>{
   TextEditingController catName = TextEditingController();
   TextEditingController catCode = TextEditingController();
   late String categoryKey;
@@ -110,6 +111,7 @@ class _CategoryFormState extends State<CategoryForm> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     if (loading) {
       return SizedBox(
         width: 20.w,
@@ -185,6 +187,12 @@ class _CategoryFormState extends State<CategoryForm> {
                             }
                           },
                           enabled: widget.category == null,
+                          style: appTheme.writingStyle,
+                          placeholderStyle: placeStyle,
+                          cursorColor: appTheme.color.darker,
+                          decoration: BoxDecoration(
+                            color: appTheme.fillColor,
+                          ),
                         ),
                       ),
                       const SizedBox(
@@ -219,6 +227,12 @@ class _CategoryFormState extends State<CategoryForm> {
                       onChanged: (s) {
                         setState(() {});
                       },
+                      style: appTheme.writingStyle,
+                      placeholderStyle: placeStyle,
+                      cursorColor: appTheme.color.darker,
+                      decoration: BoxDecoration(
+                        color: appTheme.fillColor,
+                      ),
                     ),
                   ),),
                 ),
@@ -331,4 +345,7 @@ class _CategoryFormState extends State<CategoryForm> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

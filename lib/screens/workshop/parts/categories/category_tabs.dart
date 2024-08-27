@@ -12,7 +12,8 @@ class CategoryTabs extends StatefulWidget {
   CategoryTabsState createState() => CategoryTabsState();
 }
 
-class CategoryTabsState extends State<CategoryTabs> {
+class CategoryTabsState extends State<CategoryTabs> with
+    AutomaticKeepAliveClientMixin<CategoryTabs>{
   static ValueNotifier<int> currentIndex = ValueNotifier(0);
   static List<Tab> tabs = [];
   Tab generateTab(int index) {
@@ -66,6 +67,7 @@ class CategoryTabsState extends State<CategoryTabs> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     if (tabs.isEmpty) {
       initValues();
     }
@@ -106,4 +108,7 @@ class CategoryTabsState extends State<CategoryTabs> {
           );
         });
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

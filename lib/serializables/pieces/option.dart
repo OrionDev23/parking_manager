@@ -39,5 +39,13 @@ class Option extends ParcOtoDefault{
   @override
   Map<String, dynamic> toJson() => _$OptionToJson(this);
 
+  @override
+  bool operator ==(Object other) {
+    return other is Option && other.code==code;
+  }
+
+  @override
+  int get hashCode => Object.hash(code, name);
+
 
 }

@@ -160,45 +160,54 @@ class _ImportConducteursState extends State<ImportConducteurs> {
 
             case TextCellValue():
               final value = cell!.value as TextCellValue;
-              if ((value.value.toLowerCase().contains('matricule employe') ||
-                      value.value.toLowerCase().contains('matricule employé') ||
-                      value.value
-                          .toLowerCase()
-                          .contains('matricule conducteur')) &&
-                  !foundMatric) {
-                columnToRead['mat'] = cell.columnIndex;
-                foundMatric = true;
+              if(value.value.text!=null){
+                if ((value.value.text!.toLowerCase()
+                    .contains
+                  ('matricule employe') ||
+                    value.value.text!.toLowerCase().contains('matricule '
+                        'employé') ||
+                    value.value
+                        .text!.toLowerCase()
+                        .contains('matricule conducteur')) &&
+                    !foundMatric) {
+                  columnToRead['mat'] = cell.columnIndex;
+                  foundMatric = true;
+                }
+                if (value.value.text!.toLowerCase()
+                    .contains('immatriculation')||
+                    value.value.text!.toLowerCase().contains('matricule '
+                        'vehicule'))
+                {
+                  columnToRead['vehicule']=cell.columnIndex;
+                }
+                if (value.value.text!.toLowerCase().replaceAll(' ','').trim()
+                    =='nom' ||
+                    value.value.text!.toLowerCase().contains('familyname') ||
+                    value.value.text!
+                        .toLowerCase()
+                        .replaceAll(' ', '')
+                        .contains('secondname')) {
+                  columnToRead['nom'] = cell.columnIndex;
+                }
+                if (value.value.text!.toLowerCase().contains('prenom') ||
+                    value.value.text!.toLowerCase().contains('prénom') ||
+                    value.value.text!
+                        .toLowerCase()
+                        .replaceAll(' ', '')
+                        .contains('firstname')) {
+                  columnToRead['prenom'] = cell.columnIndex;
+                }
+                if (value.value.text!.toLowerCase().contains('appartenance') &&
+                    (value.value.text!.toLowerCase().contains('salarié') ||
+                        value.value.text!.toLowerCase().contains('employe') ||
+                        value.value.text!.toLowerCase().contains('employé'))) {
+                  columnToRead['appartenance'] = cell.columnIndex;
+                }
+                if (value.value.text!.toLowerCase().contains('direction')) {
+                  columnToRead['direction'] = cell.columnIndex;
+                }
               }
-              if (value.value.toLowerCase().contains('immatriculation')||
-                  value.value.toLowerCase().contains('matricule vehicule'))
-              {
-                columnToRead['vehicule']=cell.columnIndex;
-              }
-              if (value.value.toLowerCase().replaceAll(' ','').trim()=='nom' ||
-                  value.value.toLowerCase().contains('familyname') ||
-                  value.value
-                      .toLowerCase()
-                      .replaceAll(' ', '')
-                      .contains('secondname')) {
-                columnToRead['nom'] = cell.columnIndex;
-              }
-              if (value.value.toLowerCase().contains('prenom') ||
-                  value.value.toLowerCase().contains('prénom') ||
-                  value.value
-                      .toLowerCase()
-                      .replaceAll(' ', '')
-                      .contains('firstname')) {
-                columnToRead['prenom'] = cell.columnIndex;
-              }
-              if (value.value.toLowerCase().contains('appartenance') &&
-                  (value.value.toLowerCase().contains('salarié') ||
-                      value.value.toLowerCase().contains('employe') ||
-                      value.value.toLowerCase().contains('employé'))) {
-                columnToRead['appartenance'] = cell.columnIndex;
-              }
-              if (value.value.toLowerCase().contains('direction')) {
-                columnToRead['direction'] = cell.columnIndex;
-              }
+
               break;
             case BoolCellValue():
               break;

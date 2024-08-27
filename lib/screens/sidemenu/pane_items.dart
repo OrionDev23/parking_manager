@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:parc_oto/screens/workshop/parts/parts_management/parts_form.dart';
 import '../../admin_parameters.dart';
 import '../../main.dart';
 import 'sidemenu.dart';
@@ -37,7 +38,6 @@ import '../workshop/inventory/fournisseurs/fournisseur_tabs.dart';
 import '../workshop/parts/brands/brand_tabs.dart';
 import '../workshop/parts/categories/category_tabs.dart';
 import '../workshop/parts/options/option_tabs.dart';
-import '../workshop/parts/parts_management.dart';
 import '../workshop/workshop_dashboard.dart';
 
 class PaneItemsAndFooters {
@@ -259,7 +259,7 @@ class PaneItemsAndFooters {
             Icons.plumbing,
             color: appTheme.color.lightest,
           ),
-          body: const PartsManagement(),
+          body: const PartsForm(),
           title: Text(
             "gpieces",
             style: paneTextStyle,
