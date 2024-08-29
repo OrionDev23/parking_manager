@@ -8,6 +8,7 @@ class ZoneBox extends StatelessWidget {
   final Widget? child;
   final double? width;
   final double? height;
+  final Widget? trailing;
   final Color? backGroundColor;
 
   const ZoneBox(
@@ -16,6 +17,7 @@ class ZoneBox extends StatelessWidget {
       required this.label,
       this.width,
       this.height,
+        this.trailing,
       this.backGroundColor});
 
   @override
@@ -48,6 +50,15 @@ class ZoneBox extends StatelessWidget {
                   style: placeStyle,
                 ),
               )),
+          if(trailing!=null)
+            Positioned(
+                right: 5,
+                top: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  color: backGroundColor ?? appTheme.backGroundColor,
+                  child: trailing,
+                )),
         ],
       ),
     );

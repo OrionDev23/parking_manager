@@ -634,5 +634,11 @@
   "supprbrand": "Delete brand",
   "ajoutbrand": "A new brand has been added",
   "modifbrand": "A brand has been modified",
-  "suprbrand": "A brand has been removed"
+  "suprbrand": "A brand has been removed",
+  "generalinformations": "General information",
+  "tarificationpar": "Pricing per",
+  "tarification": "Pricing",
+  "barcode": "Barcode",
+  "quantity": "Quantity"
+
 }

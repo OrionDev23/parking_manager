@@ -632,5 +632,10 @@
   "supprbrand": "حذف العلامة التجارية",
   "ajoutbrand": "تمت إضافة علامة تجارية جديدة",
   "modifbrand": "تم تعديل العلامة التجارية",
-  "suprbrand": "تمت إزالة علامة تجارية"
+  "suprbrand": "تمت إزالة علامة تجارية",
+  "generalinformations": "معلومات عامة",
+  "tarificationpar": "التسعير لكل",
+  "tarification": "التسعير",
+  "barcode": "الرمز الشريطي",
+  "quantity": "الكمية"
 }

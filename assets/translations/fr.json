@@ -623,5 +623,10 @@
  "supprbrand": "Supprimer la marque",
  "ajoutbrand": "Une nouvelle marque a été ajoutée",
  "modifbrand": "Une marque a été modifiée",
- "suprbrand": "Une marque a été supprimée"
+ "suprbrand": "Une marque a été supprimée",
+ "generalinformations": "Informations générales",
+ "tarificationpar": "Tarification par",
+ "tarification": "Tarification",
+ "barcode": "Code-barres",
+ "quantity": "Quantité"
 }

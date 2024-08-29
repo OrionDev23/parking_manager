@@ -177,6 +177,7 @@ class AppTheme extends ChangeNotifier {
   ThemeMode get mode => _mode;
 
   late TextStyle writingStyle;
+  late TextStyle titleStyle;
   late Color fillColor;
   late Color backGroundColor;
   late m.InputDecoration inputDecoration;
@@ -260,6 +261,16 @@ class AppTheme extends ChangeNotifier {
                 : ThemeMode.system == ThemeMode.light
                     ? Colors.black
                     : Colors.white);
+    titleStyle= TextStyle(
+        color: mode == ThemeMode.dark
+            ? Colors.white
+            : mode == ThemeMode.light
+            ? Colors.black
+            : ThemeMode.system == ThemeMode.light
+            ? Colors.black
+            : Colors.white,
+      fontSize: 16.sp,
+    );
 
     backGroundColor = mode == ThemeMode.dark
         ? Colors.grey

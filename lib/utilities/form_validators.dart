@@ -1,3 +1,41 @@
+import 'package:easy_localization/easy_localization.dart';
+
+NumberFormat upcFormat = NumberFormat('00000000000', 'fr_FR');
+int getLastDigitUPC(String num) {
+  int result = 0;
+  if (int.tryParse(num) != null) {
+    List<String> nums =
+    upcFormat.format(int.tryParse(num) ?? 0).toString().split('');
+
+    int odds = 0;
+    for (int i = 0; i < nums.length; i += 2) {
+      odds += int.tryParse(nums[i]) ?? 0;
+    }
+    odds *= 3;
+    int evens = 0;
+    for (int j = 1; j < nums.length-1 ; j += 2) {
+      evens += int.tryParse(nums[j]) ?? 0;
+
+    }
+
+    evens += odds;
+
+
+    evens = evens % 10;
+
+
+    if(evens!=0){
+      result = 10 - evens;
+    }
+    else{
+      result =evens;
+
+    }
+  }
+
+  return result;
+}
+
 class FormValidators {
   static bool isEmail(String email) {
     return RegExp(
@@ -5,3 +43,4 @@ class FormValidators {
         .hasMatch(email);
   }
 }
+
