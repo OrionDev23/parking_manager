@@ -11,6 +11,7 @@ import 'package:parc_oto/utilities/form_validators.dart';
 import '../../../../serializables/client.dart';
 import '../../../../serializables/pieces/part.dart';
 import '../../../../serializables/pieces/variation.dart';
+import '../../../../widgets/empty_table_widget.dart';
 import '../brands/brand_table.dart';
 import '../categories/category_table.dart';
 import '../../../../serializables/pieces/brand.dart';
@@ -22,6 +23,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../../serializables/pieces/option.dart';
 import '../../../../theme.dart';
 import '../options/option_table.dart';
+import 'variation_widget.dart';
 
 class PartsForm extends StatefulWidget {
   const PartsForm({super.key});
@@ -70,6 +72,7 @@ class _PartsFormState extends State<PartsForm>
       pricingWidget(appTheme, portrait),
       appArtenanceWidget(appTheme, portrait),
       inventoryWidget(appTheme, portrait),
+      variationsWidget(appTheme,portrait),
     ];
   }
 
@@ -630,24 +633,37 @@ class _PartsFormState extends State<PartsForm>
         crossAxisCellCount: 3,
         child: Container(
         width: 400.px,
-        height: portrait ? 355.px : 152.5.px,
+        height: 475.px,
         padding: const EdgeInsets.all(10),
     decoration: BoxDecoration(
     borderRadius: BorderRadius.circular(10),
     boxShadow: kElevationToShadow[2],
     color: appTheme.backGroundColor,
     ),
-        child: ,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'variations',
+              style: appTheme.titleStyle,
+            ).tr(),
+            smallSpace,
+            designationTable(appTheme),
+          ],
+        ),
         ));
   }
 
 
-  List<Variation> variations = List.empty(growable: true);
+  List<VariationWidget> variations = List.empty(growable: true);
 
   void addDesignation() {
-    variations.add(FactureDesignation(
+    variations.add(VariationWidget(
       key: UniqueKey(),
-      name: Variation(
+      variation: Variation(
+        id:variations.isEmpty
+            ? '1'
+            : (int.parse(variations.last.variation.id) + 1).toString(),
         name: '',
         sku: '',
       ),
@@ -689,8 +705,8 @@ class _PartsFormState extends State<PartsForm>
             child: Table(
               columnWidths: const {
                 0: FlexColumnWidth(1),
-                1: FlexColumnWidth(3),
-                2: FlexColumnWidth(1),
+                1: FlexColumnWidth(1),
+                2: FlexColumnWidth(3),
                 3: FlexColumnWidth(1),
               },
               children: [
@@ -702,24 +718,24 @@ class _PartsFormState extends State<PartsForm>
                       ).tr()),
                   TableCell(
                       child: const Text(
-                        'desi',
+                        'nom',
                         textAlign: TextAlign.center,
                       ).tr()),
                   TableCell(
                       child: const Text(
-                        'qte',
+                        'options',
                         textAlign: TextAlign.center,
                       ).tr()),
                   TableCell(
                       child: const Text(
-                        'prix',
+                        'sku',
                         textAlign: TextAlign.center,
                       ).tr()),
                 ]),
               ],
             ),
           ),
-          designations.isEmpty
+          variations.isEmpty
               ? Container(
               padding: const EdgeInsets.all(10),
               width: 300.px,
@@ -739,8 +755,8 @@ class _PartsFormState extends State<PartsForm>
   }
 
   bool selectedDesignationsExist() {
-    for (int i = 0; i < designations.length; i++) {
-      if (designations[i].name.selected) {
+    for (int i = 0; i < variations.length; i++) {
+      if (variations[i].variation.selected) {
         return true;
       }
     }
@@ -748,17 +764,17 @@ class _PartsFormState extends State<PartsForm>
   }
 
   void deleteAllSelected() {
-    List<FactureDesignation> temp = List.from(designations);
+    List<VariationWidget> temp = List.from(variations);
     for (int i = 0; i < temp.length; i++) {
-      if (temp[i].name.selected) {
-        designations.remove(temp[i]);
+      if (temp[i].variation.selected) {
+        variations.remove(temp[i]);
       }
     }
     setState(() {});
   }
 
   List<Widget> getDesignationList(AppTheme appTheme) {
-    return List.generate(designations.length, (index) {
+    return List.generate(variations.length, (index) {
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
         decoration: BoxDecoration(
@@ -770,17 +786,17 @@ class _PartsFormState extends State<PartsForm>
             Row(
               children: [
                 Checkbox(
-                    checked: designations[index].name.selected,
+                    checked: variations[index].variation.selected,
                     onChanged: (s) {
                       setState(() {
-                        designations[index].name.selected = s ?? false;
+                        variations[index].variation.selected = s ?? false;
                       });
                     }),
                 smallSpace,
                 Flexible(
                   child: SizedBox(
                     height: 35.px,
-                    child: designations[index],
+                    child: variations[index],
                   ),
                 ),
               ],

@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import '../../utilities/profil_beautifier.dart';
 import '../parc_oto_serializable.dart';
 
 part 'part.g.dart';

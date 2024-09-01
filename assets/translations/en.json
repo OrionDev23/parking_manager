@@ -639,6 +639,8 @@
   "tarificationpar": "Pricing per",
   "tarification": "Pricing",
   "barcode": "Barcode",
-  "quantity": "Quantity"
+  "quantity": "Quantity",
+  "variations": "Variations",
+  "nooptonadded": "You haven't added any options"
 
 }

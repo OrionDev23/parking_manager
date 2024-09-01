@@ -637,5 +637,8 @@
   "tarificationpar": "التسعير لكل",
   "tarification": "التسعير",
   "barcode": "الرمز الشريطي",
-  "quantity": "الكمية"
+  "quantity": "الكمية",
+  "variations": "التنويعات",
+  "nooptonadded": "لم تقم بإضافة أي خيارات"
+
 }
