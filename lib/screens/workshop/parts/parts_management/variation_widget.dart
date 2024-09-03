@@ -42,6 +42,7 @@ class VariationWidgetState extends State<VariationWidget> {
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Flexible(
             flex: 1,
@@ -61,7 +62,7 @@ class VariationWidgetState extends State<VariationWidget> {
   List<Widget> designationsDefault(AppTheme appTheme) {
     return [
       Flexible(
-        flex: 2,
+        flex: 3,
         child: TextBox(
           controller: name,
           enabled: widget.mod,
@@ -86,7 +87,8 @@ class VariationWidgetState extends State<VariationWidget> {
       ),
       smallSpace,
       Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
         children: getOptions(appTheme),
       ),
       VerticalDivider(
@@ -116,10 +118,32 @@ class VariationWidgetState extends State<VariationWidget> {
     ];
   }
 
+  Map<int,int> selectedItems={};
+
   List<Widget> getOptions(AppTheme appTheme){
     if(widget.options!=null && widget.options!.isNotEmpty){
       return List.generate(widget.options!.length, (index){
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          child: DropDownButton(
+            title: Text(selectedItems[index]==null?widget.options![index].name
+                :widget.options![index].values![selectedItems[index]!]),
+            items: List.generate(widget.options![index].values?.length??0,
+                    (ind){
+              return MenuFlyoutItem(
+                  text: Text(widget.options![index].values![ind]),
+                  onPressed: (){
+                    selectedItems[index]=ind;
+                    setState(() {
 
+                    });
+                  },
+                  selected: selectedItems[index]==ind
+              );
+                    }),
+
+          ),
+        );
       });
     }
     else{

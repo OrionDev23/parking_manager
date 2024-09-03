@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:chip_list/chip_list.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/material.dart' show Icons, Material;
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart' hide Trans;
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:parc_oto/screens/workshop/inventory/fournisseurs/fournisseur_table.dart';
 import 'package:parc_oto/utilities/form_validators.dart';
 import '../../../../serializables/client.dart';
@@ -42,7 +45,7 @@ class _PartsFormState extends State<PartsForm>
   int quantity = 1;
   Category? selectedCategory;
   Client? selectedFournisseur;
-  List<Option> selectedOptions = [];
+  Option? option1, option2, option3, option4;
   int selectedUnit = 0;
   Brand? selectedBrand;
   @override
@@ -64,7 +67,6 @@ class _PartsFormState extends State<PartsForm>
     );
   }
 
-  List<int> selectedOptionsToDelete = [];
   List<Widget> getWidgets(AppTheme appTheme, bool portrait) {
     return [
       generalInformation(appTheme, portrait),
@@ -72,7 +74,7 @@ class _PartsFormState extends State<PartsForm>
       pricingWidget(appTheme, portrait),
       appArtenanceWidget(appTheme, portrait),
       inventoryWidget(appTheme, portrait),
-      variationsWidget(appTheme,portrait),
+      variationsWidget(appTheme, portrait),
     ];
   }
 
@@ -409,72 +411,126 @@ class _PartsFormState extends State<PartsForm>
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Button(
-                          onPressed: selectedOptionsToDelete.isEmpty
-                              ? null
-                              : () {
-                                  for (int i = 0;
-                                      i < selectedOptionsToDelete.length;
-                                      i++) {
-                                    selectedOptions.removeAt(i);
+                          onPressed: option1?.selected == true ||
+                                  option2?.selected == true ||
+                                  option3?.selected == true ||
+                                  option4?.selected == true
+                              ? () {
+                                  if (option1?.selected == true) {
+                                    option1 = null;
                                   }
-                                  selectedOptionsToDelete.clear();
+                                  if (option2?.selected == true) {
+                                    option2 = null;
+                                  }
+                                  if (option3?.selected == true) {
+                                    option3 = null;
+                                  }
+                                  if (option4?.selected == true) {
+                                    option4 = null;
+                                  }
+                                  toggleFirstOptions();
                                   setState(() {});
-                                },
+                                }
+                              : null,
                           child: const Text('delete').tr(),
                         ),
                         smallSpace,
                         FilledButton(
-                            child: const Text('addoption').tr(),
-                            onPressed: () async {
-                              Option? option;
-                              option = await showDialog<Option>(
-                                  context: context,
-                                  barrierDismissible: true,
-                                  builder: (context) {
-                                    return ContentDialog(
-                                      constraints: BoxConstraints.tight(
-                                          Size(700.px, 550.px)),
-                                      title: const Text('addoption').tr(),
-                                      style: ContentDialogThemeData(
-                                          titleStyle: appTheme.writingStyle
-                                              .copyWith(
-                                                  fontWeight: FontWeight.bold)),
-                                      content: const OptionTable(
-                                        selectD: true,
-                                      ),
-                                      actions: [
-                                        Button(
-                                            child: const Text('fermer').tr(),
-                                            onPressed: () {
-                                              option = null;
-                                              setState(() {});
-                                              Navigator.of(context).pop();
-                                            })
-                                      ],
-                                    );
-                                  });
-                              if (option != null) {
-                                if (!selectedOptions.contains(option)) {
-                                  selectedOptions.add(option!);
-                                  setState(() {});
-                                }
-                              }
-                            }),
+                            onPressed: option1 != null &&
+                                    option2 != null &&
+                                    option3 != null &&
+                                    option4 != null
+                                ? null
+                                : () async {
+                                    Option? option;
+                                    option = await showDialog<Option>(
+                                        context: context,
+                                        barrierDismissible: true,
+                                        builder: (context) {
+                                          return ContentDialog(
+                                            constraints: BoxConstraints.tight(
+                                                Size(700.px, 550.px)),
+                                            title: const Text('addoption').tr(),
+                                            style: ContentDialogThemeData(
+                                                titleStyle: appTheme
+                                                    .writingStyle
+                                                    .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                            content: const OptionTable(
+                                              selectD: true,
+                                            ),
+                                            actions: [
+                                              Button(
+                                                  child:
+                                                      const Text('fermer').tr(),
+                                                  onPressed: () {
+                                                    option = null;
+                                                    setState(() {});
+                                                    Navigator.of(context).pop();
+                                                  })
+                                            ],
+                                          );
+                                        });
+                                    if (option != null) {
+                                      if (option1 == null) {
+                                        option1 = option;
+                                      } else if (option2 == null && option1!
+                                          .id!=option!.id) {
+                                        option2 = option;
+                                      } else if (option3 == null && option2!
+                                          .id!=option!.id && option1!
+                                          .id!=option!.id) {
+                                        option3 = option;
+                                      } else if(option4!=null && option3!
+                                          .id!=option!.id && option2!
+                                          .id!=option!.id&& option1!
+                                          .id!=option!.id){
+                                        option4 = option;
+                                      }
+                                      setState(() {});
+                                    }
+                                  },
+                            child: const Text('addoption').tr()),
                       ],
                     ),
                     bigSpace,
                     Material(
                       color: appTheme.backGroundColor,
                       child: ChipList(
-                        listOfChipNames: selectedOptions
-                            .map((o) => '${o.name}'
+                        listOfChipNames: [
+                          if (option1 != null) option1,
+                          if (option2 != null) option2,
+                          if (option3 != null) option3,
+                          if (option4 != null) option4
+                        ]
+                            .map((o) => '${o!.name}'
                                 ' (${o.code})')
                             .toList(),
                         supportsMultiSelect: true,
-                        listOfChipIndicesCurrentlySelected:
-                            selectedOptionsToDelete,
+                        listOfChipIndicesCurrentlySelected: [
+                          if (option1?.selected == true) 0,
+                          if (option2?.selected == true) 1,
+                          if (option3?.selected == true) 2,
+                          if (option4?.selected == true) 3
+                        ],
                         borderRadiiList: const [5],
-                        extraOnToggle: (s) => setState(() {}),
+                        extraOnToggle: (s) => setState(() {
+                          switch (s) {
+                            case 0:
+                              option1!.selected = !option1!.selected;
+                              break;
+                            case 1:
+                              option2!.selected = !option2!.selected;
+                              break;
+                            case 2:
+                              option3!.selected = !option3!.selected ;
+                              break;
+                            case 3:
+                              option4!.selected = !option4!.selected;
+                              break;
+                          }
+                        }),
                         inactiveBgColorList: [appTheme.color.darkest],
                         inactiveTextColorList: [appTheme.writingStyle.color!],
                         inactiveBorderColorList: [appTheme.backGroundColor],
@@ -494,6 +550,62 @@ class _PartsFormState extends State<PartsForm>
     );
   }
 
+  void toggleFirstOptions() {
+    if(option3==null && option4!=null){
+      option3=option4;
+      option4=null;
+    }
+    if(option2==null && option3!=null){
+
+      option2=option3;
+      if(option4!=null){
+        option3=option4;
+        option4=null;
+      }
+      else{
+        option3=null;
+
+      }
+    }
+    if(option1==null && option2!=null){
+      option1=option2;
+      if(option3!=null){
+        option2=option3;
+        if(option4!=null){
+          option3=option4;
+          option4=null;
+        }
+        else{
+          option3=null;
+        }
+      }
+      else{
+        option2=null;
+      }
+    }
+  }
+
+  String generateSKU() {
+    String result = 'XXXX-XXXX-STRD';
+
+    return result;
+  }
+
+  String generateBC() {
+    double num = (100000000000 * Random().nextDouble());
+    while (num > 99999999999) {
+      num -= 10000000000;
+    }
+    while (num < 0) {
+      num += 10000000;
+    }
+    return upcFormat.format(num.toInt());
+  }
+  MaskTextInputFormatter maskFormatter =  MaskTextInputFormatter(
+      mask: '####-####-####',
+      filter: { "#": RegExp(r'^[a-zA-Z0-9]+$') },
+      type: MaskAutoCompletionType.eager
+  );
   Widget inventoryWidget(AppTheme appTheme, bool portrait) {
     return StaggeredGridTile.fit(
       crossAxisCellCount: 2,
@@ -533,9 +645,12 @@ class _PartsFormState extends State<PartsForm>
                               elevation:
                                   const WidgetStatePropertyAll<double>(10),
                             ),
-                            icon:  Icon(Icons.auto_mode,color:appTheme
-                                .color.lightest),
-                            onPressed: () {},
+                            icon: Icon(Icons.auto_mode,
+                                color: appTheme.color.lightest),
+                            onPressed: () {
+                              sku.text = generateSKU();
+                              setState(() {});
+                            },
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(20),
@@ -547,6 +662,9 @@ class _PartsFormState extends State<PartsForm>
                               },
                               style: appTheme.writingStyle,
                               placeholderStyle: placeStyle,
+                              inputFormatters: [
+                                maskFormatter,
+                              ],
                               cursorColor: appTheme.color.darker,
                               decoration: BoxDecoration(
                                 color: appTheme.fillColor,
@@ -555,7 +673,7 @@ class _PartsFormState extends State<PartsForm>
                           ),
                         ),
                       );
-                    } else if(ind==1){
+                    } else if (ind == 1) {
                       return SizedBox(
                         height: 95.px,
                         child: ZoneBox(
@@ -569,10 +687,11 @@ class _PartsFormState extends State<PartsForm>
                               elevation:
                                   const WidgetStatePropertyAll<double>(10),
                             ),
-                            icon: Icon(Icons.auto_mode,color:appTheme
-                                .color.lightest),
+                            icon: Icon(Icons.auto_mode,
+                                color: appTheme.color.lightest),
                             onPressed: () {
-
+                              barcode.text = generateBC();
+                              setState(() {});
                             },
                           ),
                           child: Padding(
@@ -597,26 +716,28 @@ class _PartsFormState extends State<PartsForm>
                           ),
                         ),
                       );
-                    }
-                    else{
+                    } else {
                       return SizedBox(
                         height: 95.px,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.fromLTRB(5.0,0,0,0),
+                              padding: const EdgeInsets.fromLTRB(5.0, 0, 0, 0),
                               child: Text(sku.text),
                             ),
                             Flexible(
                               child: BarcodeWidget(
-                                color: appTheme.writingStyle.color!,
-                                style: placeStyle,
-                                barcode: Barcode.upcA(),
-                                data: barcode.text.isEmpty?'000000000000':upcFormat.format
-                                  (int.tryParse(barcode.text+getLastDigitUPC
-                                  (barcode.text).toString())??0)
-                              ),
+                                  color: appTheme.writingStyle.color!,
+                                  style: placeStyle,
+                                  barcode: Barcode.upcA(),
+                                  data: barcode.text.isEmpty
+                                      ? '000000000000'
+                                      : upcFormat.format(int.tryParse(
+                                              barcode.text +
+                                                  getLastDigitUPC(barcode.text)
+                                                      .toString()) ??
+                                          0)),
                             ),
                           ],
                         ),
@@ -628,32 +749,32 @@ class _PartsFormState extends State<PartsForm>
     );
   }
 
-  Widget variationsWidget(AppTheme appTheme,bool portrait){
+  Widget variationsWidget(AppTheme appTheme, bool portrait) {
     return StaggeredGridTile.fit(
         crossAxisCellCount: 3,
         child: Container(
-        width: 400.px,
-        height: 475.px,
-        padding: const EdgeInsets.all(10),
-    decoration: BoxDecoration(
-    borderRadius: BorderRadius.circular(10),
-    boxShadow: kElevationToShadow[2],
-    color: appTheme.backGroundColor,
-    ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'variations',
-              style: appTheme.titleStyle,
-            ).tr(),
-            smallSpace,
-            designationTable(appTheme),
-          ],
-        ),
+          width: 400.px,
+          height:
+              variations.isEmpty ? 475.px : 50.px * variations.length + 160.px,
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: kElevationToShadow[2],
+            color: appTheme.backGroundColor,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'variations',
+                style: appTheme.titleStyle,
+              ).tr(),
+              smallSpace,
+              designationTable(appTheme),
+            ],
+          ),
         ));
   }
-
 
   List<VariationWidget> variations = List.empty(growable: true);
 
@@ -661,12 +782,18 @@ class _PartsFormState extends State<PartsForm>
     variations.add(VariationWidget(
       key: UniqueKey(),
       variation: Variation(
-        id:variations.isEmpty
+        id: variations.isEmpty
             ? '1'
             : (int.parse(variations.last.variation.id) + 1).toString(),
         name: '',
         sku: '',
       ),
+      options: [
+        if (option1 != null) option1!,
+        if (option2 != null) option2!,
+        if (option3 != null) option3!,
+        if (option4 != null) option4!,
+      ],
       onPriceChanged: () {
         setState(() {});
       },
@@ -686,7 +813,7 @@ class _PartsFormState extends State<PartsForm>
               children: [
                 Button(
                     onPressed:
-                    selectedDesignationsExist() ? deleteAllSelected : null,
+                        selectedDesignationsExist() ? deleteAllSelected : null,
                     child: const Text('delete').tr()),
                 smallSpace,
                 FilledButton(
@@ -699,7 +826,7 @@ class _PartsFormState extends State<PartsForm>
             decoration: BoxDecoration(
               color: appTheme.color.lightest,
               borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(5)),
+                  const BorderRadius.vertical(top: Radius.circular(5)),
             ),
             padding: const EdgeInsets.all(5),
             child: Table(
@@ -713,42 +840,42 @@ class _PartsFormState extends State<PartsForm>
                 TableRow(children: [
                   TableCell(
                       child: const Text(
-                        'N°',
-                        textAlign: TextAlign.center,
-                      ).tr()),
+                    'N°',
+                    textAlign: TextAlign.center,
+                  ).tr()),
                   TableCell(
                       child: const Text(
-                        'nom',
-                        textAlign: TextAlign.center,
-                      ).tr()),
+                    'nom',
+                    textAlign: TextAlign.center,
+                  ).tr()),
                   TableCell(
                       child: const Text(
-                        'options',
-                        textAlign: TextAlign.center,
-                      ).tr()),
+                    'options',
+                    textAlign: TextAlign.center,
+                  ).tr()),
                   TableCell(
                       child: const Text(
-                        'sku',
-                        textAlign: TextAlign.center,
-                      ).tr()),
+                    'SKU',
+                    textAlign: TextAlign.center,
+                  ).tr()),
                 ]),
               ],
             ),
           ),
           variations.isEmpty
               ? Container(
-              padding: const EdgeInsets.all(10),
-              width: 300.px,
-              height: 320.px,
-              child: const NoDataWidget())
+                  padding: const EdgeInsets.all(10),
+                  width: 300.px,
+                  height: 320.px,
+                  child: const NoDataWidget())
               : Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: appTheme.fillColor),
-              borderRadius:
-              const BorderRadius.vertical(bottom: Radius.circular(5)),
-            ),
-            child: Column(children: getDesignationList(appTheme)),
-          ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: appTheme.fillColor),
+                    borderRadius:
+                        const BorderRadius.vertical(bottom: Radius.circular(5)),
+                  ),
+                  child: Column(children: getDesignationList(appTheme)),
+                ),
         ],
       ),
     );
