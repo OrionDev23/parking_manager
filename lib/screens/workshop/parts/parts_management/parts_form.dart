@@ -604,7 +604,7 @@ class _PartsFormState extends State<PartsForm>
   MaskTextInputFormatter maskFormatter =  MaskTextInputFormatter(
       mask: '####-####-####',
       filter: { "#": RegExp(r'^[a-zA-Z0-9]+$') },
-      type: MaskAutoCompletionType.eager
+      type: MaskAutoCompletionType.lazy
   );
   Widget inventoryWidget(AppTheme appTheme, bool portrait) {
     return StaggeredGridTile.fit(
@@ -656,7 +656,7 @@ class _PartsFormState extends State<PartsForm>
                             padding: const EdgeInsets.all(20),
                             child: TextBox(
                               controller: sku,
-                              placeholder: 'SKU'.tr(),
+                              placeholder: 'SKU',
                               onChanged: (s) {
                                 setState(() {});
                               },
