@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:parc_oto/serializables/parc_user.dart';
+import 'package:parc_oto/serializables/pieces/variation.dart';
 import 'package:parc_oto/serializables/reparation/etat_vehicle.dart';
 import 'package:parc_oto/serializables/vehicle/genre_vehicule.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -173,4 +174,15 @@ DateTime stringToTimeNN(String? json) {
 }
 String timeToJson(DateTime? date) {
   return date?.toIso8601String() ?? DateTime.now().toIso8601String();
+}
+
+
+List<dynamic>? listToJson(List<dynamic>? objects) {
+  return objects?.map((s) => s.toJson()).toList();
+}
+
+List<Variation>? variationsFromList(List<dynamic> json){
+  return json
+      .map((e) => Variation.fromJson(jsonDecode(e) as Map<String, dynamic>))
+      .toList();
 }
