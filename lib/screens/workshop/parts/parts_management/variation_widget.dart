@@ -10,6 +10,7 @@ import '../../../../theme.dart';
 class VariationWidget extends StatefulWidget {
   final Variation variation;
   final bool mod;
+  final String sku;
   final List<Option>? options;
 
   final Function()? onPriceChanged;
@@ -18,6 +19,7 @@ class VariationWidget extends StatefulWidget {
       {super.key,
         this.mod=true,
         required this.variation,
+        this.sku="XXXX-XXXX",
         this.onPriceChanged,
         this.options});
 
@@ -61,6 +63,9 @@ class VariationWidgetState extends State<VariationWidget> {
 
   List<Widget> designationsDefault(AppTheme appTheme) {
     return [
+      VerticalDivider(
+        color: placeStyle.color,
+      ),
       Flexible(
         flex: 3,
         child: TextBox(
@@ -96,23 +101,34 @@ class VariationWidgetState extends State<VariationWidget> {
       ),
       smallSpace,
       Flexible(
-        flex: 2,
-        child: TextBox(
-          controller: sku,
-          enabled: widget.mod,
-          placeholderStyle: placeStyle,
-          placeholder: 'SKU',
-          style: appTheme.writingStyle,
-          cursorColor: appTheme.color.darker,
-          maxLength: 60,
-          decoration: BoxDecoration(
-            color: appTheme.fillColor,
-          ),
-          onChanged: (s) {
-            setState(() {
-              widget.variation.name = s;
-            });
-          },
+        flex: 3,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Flexible(
+              flex:2,
+                child: Text('${widget.sku}-')),
+            Flexible(
+              flex:1,
+              child: TextBox(
+                controller: sku,
+                enabled: widget.mod,
+                placeholderStyle: placeStyle,
+                placeholder: 'SKU',
+                style: appTheme.writingStyle,
+                cursorColor: appTheme.color.darker,
+                maxLength: 4,
+                decoration: BoxDecoration(
+                  color: appTheme.fillColor,
+                ),
+                onChanged: (s) {
+                  setState(() {
+                    widget.variation.name = s;
+                  });
+                },
+              ),
+            ),
+          ],
         ),
       ),
     ];

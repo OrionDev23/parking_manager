@@ -429,6 +429,8 @@ class _PartsFormState extends State<PartsForm>
                                     option4 = null;
                                   }
                                   toggleFirstOptions();
+                                  changeSKUforAll();
+
                                   setState(() {});
                                 }
                               : null,
@@ -475,19 +477,21 @@ class _PartsFormState extends State<PartsForm>
                                     if (option != null) {
                                       if (option1 == null) {
                                         option1 = option;
-                                      } else if (option2 == null && option1!
-                                          .id!=option!.id) {
+                                      } else if (option2 == null &&
+                                          option1!.id != option!.id) {
                                         option2 = option;
-                                      } else if (option3 == null && option2!
-                                          .id!=option!.id && option1!
-                                          .id!=option!.id) {
+                                      } else if (option3 == null &&
+                                          option2!.id != option!.id &&
+                                          option1!.id != option!.id) {
                                         option3 = option;
-                                      } else if(option4!=null && option3!
-                                          .id!=option!.id && option2!
-                                          .id!=option!.id&& option1!
-                                          .id!=option!.id){
+                                      } else if (option4 == null &&
+                                          option3!.id != option!.id &&
+                                          option2!.id != option!.id &&
+                                          option1!.id != option!.id) {
                                         option4 = option;
                                       }
+                                      changeSKUforAll();
+
                                       setState(() {});
                                     }
                                   },
@@ -524,7 +528,7 @@ class _PartsFormState extends State<PartsForm>
                               option2!.selected = !option2!.selected;
                               break;
                             case 2:
-                              option3!.selected = !option3!.selected ;
+                              option3!.selected = !option3!.selected;
                               break;
                             case 3:
                               option4!.selected = !option4!.selected;
@@ -551,42 +555,72 @@ class _PartsFormState extends State<PartsForm>
   }
 
   void toggleFirstOptions() {
-    if(option3==null && option4!=null){
-      option3=option4;
-      option4=null;
+    if (option3 == null && option4 != null) {
+      option3 = option4;
+      option4 = null;
     }
-    if(option2==null && option3!=null){
-
-      option2=option3;
-      if(option4!=null){
-        option3=option4;
-        option4=null;
-      }
-      else{
-        option3=null;
-
+    if (option2 == null && option3 != null) {
+      option2 = option3;
+      if (option4 != null) {
+        option3 = option4;
+        option4 = null;
+      } else {
+        option3 = null;
       }
     }
-    if(option1==null && option2!=null){
-      option1=option2;
-      if(option3!=null){
-        option2=option3;
-        if(option4!=null){
-          option3=option4;
-          option4=null;
+    if (option1 == null && option2 != null) {
+      option1 = option2;
+      if (option3 != null) {
+        option2 = option3;
+        if (option4 != null) {
+          option3 = option4;
+          option4 = null;
+        } else {
+          option3 = null;
         }
-        else{
-          option3=null;
-        }
-      }
-      else{
-        option2=null;
+      } else {
+        option2 = null;
       }
     }
   }
 
   String generateSKU() {
-    String result = 'XXXX-XXXX-STRD';
+    String result = 'XXXX-XXXX-XXXX';
+
+    String part1 = "XXXX";
+    String part2 = "XXXX";
+    String part3 = "XXXX";
+
+    if (selectedFournisseur != null || selectedBrand != null) {
+      if (selectedFournisseur != null) {
+        part1 =
+            part1.replaceRange(0, 1, selectedFournisseur!.nom.substring(0, 2));
+      }
+      if (selectedBrand != null) {
+        part1 =
+            part1.replaceRange(2, null, selectedBrand!.name.substring(0, 2));
+      }
+    }
+
+    if (selectedCategory != null || name.text.isNotEmpty) {
+      if (selectedCategory != null) {
+        part2 =
+            part2.replaceRange(0, 1, selectedCategory!.name.substring(0, 2));
+      }
+      if (name.text.isNotEmpty) {
+        if(name.text.length>=2){
+          part2 =
+              part2.replaceRange(2, null, name.text.substring(0, 2));
+        }
+        else{
+          part2 =
+              part2.replaceRange(2, null, '${name.text}X');
+        }
+
+      }
+    }
+
+    result = '$part1-$part2-$part3'.toUpperCase();
 
     return result;
   }
@@ -601,11 +635,11 @@ class _PartsFormState extends State<PartsForm>
     }
     return upcFormat.format(num.toInt());
   }
-  MaskTextInputFormatter maskFormatter =  MaskTextInputFormatter(
+
+  MaskTextInputFormatter maskFormatter = MaskTextInputFormatter(
       mask: '####-####-####',
-      filter: { "#": RegExp(r'^[a-zA-Z0-9]+$') },
-      type: MaskAutoCompletionType.lazy
-  );
+      filter: {"#": RegExp(r'^[a-zA-Z0-9]+$')},
+      type: MaskAutoCompletionType.lazy);
   Widget inventoryWidget(AppTheme appTheme, bool portrait) {
     return StaggeredGridTile.fit(
       crossAxisCellCount: 2,
@@ -649,6 +683,7 @@ class _PartsFormState extends State<PartsForm>
                                 color: appTheme.color.lightest),
                             onPressed: () {
                               sku.text = generateSKU();
+                              changeSKUforAll();
                               setState(() {});
                             },
                           ),
@@ -658,6 +693,8 @@ class _PartsFormState extends State<PartsForm>
                               controller: sku,
                               placeholder: 'SKU',
                               onChanged: (s) {
+                                changeSKUforAll();
+
                                 setState(() {});
                               },
                               style: appTheme.writingStyle,
@@ -755,7 +792,7 @@ class _PartsFormState extends State<PartsForm>
         child: Container(
           width: 400.px,
           height:
-              variations.isEmpty ? 475.px : 50.px * variations.length + 160.px,
+              variations.isEmpty ? 480.px : 50.px * variations.length + 165.px,
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
@@ -786,8 +823,9 @@ class _PartsFormState extends State<PartsForm>
             ? '1'
             : (int.parse(variations.last.variation.id) + 1).toString(),
         name: '',
-        sku: '',
+        sku: 'XXXX',
       ),
+      sku: sku.text.length>8?sku.text.substring(0,9):'XXXX-XXXX',
       options: [
         if (option1 != null) option1!,
         if (option2 != null) option2!,
@@ -799,6 +837,22 @@ class _PartsFormState extends State<PartsForm>
       },
     ));
     setState(() {});
+  }
+  
+  void changeSKUforAll(){
+    for(int i=0;i<variations.length;i++){
+      variations[i]=VariationWidget(
+          key: variations[i].key,
+          variation: variations[i].variation,
+          sku: sku.text.length>8?sku.text.substring(0,9):'XXXX-XXXX',
+        options: [
+          if (option1 != null) option1!,
+          if (option2 != null) option2!,
+          if (option3 != null) option3!,
+          if (option4 != null) option4!,
+        ],
+      );
+  }
   }
 
   Widget designationTable(AppTheme appTheme) {
@@ -832,9 +886,9 @@ class _PartsFormState extends State<PartsForm>
             child: Table(
               columnWidths: const {
                 0: FlexColumnWidth(1),
-                1: FlexColumnWidth(1),
-                2: FlexColumnWidth(3),
-                3: FlexColumnWidth(1),
+                1: FlexColumnWidth(3),
+                2: FlexColumnWidth(5),
+                3: FlexColumnWidth(3),
               },
               children: [
                 TableRow(children: [
