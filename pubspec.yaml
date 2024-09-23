@@ -36,7 +36,7 @@ dependencies:
   fluent_ui: ^4.9.1
   easy_localization: ^3.0.7
   shared_preferences: ^2.3.2
-  system_theme: ^3.1.0
+  system_theme: ^3.1.1
   window_manager: ^0.4.2
   screen_retriever: ^0.2.0
   responsive_sizer: ^3.3.1
@@ -79,7 +79,7 @@ dependencies:
   encrypt: ^5.0.3
   gzip: ^0.2.0
   flutter_chip_tags: ^2.0.2
-  dropdown_search: ^6.0.0
+  dropdown_search: ^6.0.1
   chip_list: ^3.1.0
   barcode_widget: ^2.0.4
   mask_text_input_formatter: ^2.9.0

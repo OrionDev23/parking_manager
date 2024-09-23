@@ -40,6 +40,10 @@ class VariationWidgetState extends State<VariationWidget> {
     super.initState();
   }
 
+  void setSku(){
+
+  }
+
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
