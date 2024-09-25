@@ -41,6 +41,10 @@ class VariationWidgetState extends State<VariationWidget> {
   }
 
   void setSku(){
+    String n="XX";
+    if(name.text.isNotEmpty){
+      n=name.text.substring(0,2);
+    }
 
   }
 
@@ -121,7 +125,7 @@ class VariationWidgetState extends State<VariationWidget> {
                 placeholder: 'SKU',
                 style: appTheme.writingStyle,
                 cursorColor: appTheme.color.darker,
-                maxLength: 4,
+                maxLength: 6,
                 decoration: BoxDecoration(
                   color: appTheme.fillColor,
                 ),

@@ -585,11 +585,11 @@ class _PartsFormState extends State<PartsForm>
   }
 
   String generateSKU() {
-    String result = 'XXXX-XXXX-XXXX';
+    String result = 'XXXX-XXXX-XXXXXX';
 
     String part1 = "XXXX";
     String part2 = "XXXX";
-    String part3 = "XXXX";
+    String part3 = "XXXXXX";
 
     if (selectedFournisseur != null || selectedBrand != null) {
       if (selectedFournisseur != null) {
@@ -637,7 +637,7 @@ class _PartsFormState extends State<PartsForm>
   }
 
   MaskTextInputFormatter maskFormatter = MaskTextInputFormatter(
-      mask: '####-####-####',
+      mask: '####-####-######',
       filter: {"#": RegExp(r'^[a-zA-Z0-9]+$')},
       type: MaskAutoCompletionType.lazy);
   Widget inventoryWidget(AppTheme appTheme, bool portrait) {

@@ -40,7 +40,7 @@ class OptionDatasource extends ParcOtoDatasource<Option> {
       DataCell(Text(element.value.code,style: rowTextStyle,)),
       DataCell(Text(element.value.name,style: rowTextStyle,)),
       DataCell(ChipList(
-        interactable: false,
+        chipListDisabled: true,
         listOfChipNames: element.value.values??[],
         listOfChipIndicesCurrentlySelected: const [],
         style: rowTextStyle,

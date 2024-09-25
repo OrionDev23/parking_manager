@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
@@ -16,8 +16,6 @@ import '../../main.dart';
 import '../../theme.dart';
 import '../dashboard/notifications/notif_list.dart';
 
-
-
 class PanesList extends StatefulWidget {
   final PaneItemsAndFooters paneList;
   final Widget? widget;
@@ -26,14 +24,16 @@ class PanesList extends StatefulWidget {
   const PanesList({
     super.key,
     required this.paneList,
-    this.widget, required this.appTheme,
+    this.widget,
+    required this.appTheme,
   });
 
   @override
   State<PanesList> createState() => PanesListState();
 }
 
-class PanesListState extends State<PanesList> with WindowListener, AutomaticKeepAliveClientMixin {
+class PanesListState extends State<PanesList>
+    with WindowListener, AutomaticKeepAliveClientMixin {
   static ValueNotifier<int> _index = ValueNotifier(0);
 
   static ValueNotifier<int> get index => _index;
@@ -69,7 +69,7 @@ class PanesListState extends State<PanesList> with WindowListener, AutomaticKeep
 
   void getProfil() async {
     loading = true;
-    firstLoading=true;
+    firstLoading = true;
     if (mounted) {
       setState(() {});
     }
@@ -87,49 +87,47 @@ class PanesListState extends State<PanesList> with WindowListener, AutomaticKeep
 
   bool noConnection = false;
 
-  void listenToInternet() async{
+  StreamSubscription<InternetStatus>? internetListener;
 
-    bool check=false;
-    while(mounted){
-        check = await InternetConnectionChecker().hasConnection;
-        if(check){
+  void listenToInternet() async {
+
+    internetListener =
+        InternetConnection().onStatusChange.listen((InternetStatus status) {
+      switch (status) {
+        case InternetStatus.connected:
           if (noConnection) {
             Future.delayed(const Duration(milliseconds: 10)).whenComplete(() {
               displayInfoBar(context,
                   builder: (BuildContext context, void Function() close) {
-                    return InfoBar(
-                      title: const Text('connectionback').tr(),
-                      severity: InfoBarSeverity.success,
-                    );
-                  }, duration: snackbarShortDuration);
+                return InfoBar(
+                  title: const Text('connectionback').tr(),
+                  severity: InfoBarSeverity.success,
+                );
+              }, duration: snackbarShortDuration);
             });
             setState(() {
-              noConnection=false;
+              noConnection = false;
             });
           }
-        }
-        else{
-          if(!noConnection){
-            Future.delayed(const Duration(milliseconds: 10)).whenComplete(()
-            {
+          break;
+        case InternetStatus.disconnected:
+          if (!noConnection) {
+            Future.delayed(const Duration(milliseconds: 10)).whenComplete(() {
               displayInfoBar(context,
                   builder: (BuildContext context, void Function() close) {
-                    return InfoBar(
-                      title: const Text('noconnection').tr(),
-                      severity: InfoBarSeverity.warning,
-                    );
-                  }, duration: snackbarShortDuration * 3);
+                return InfoBar(
+                  title: const Text('noconnection').tr(),
+                  severity: InfoBarSeverity.warning,
+                );
+              }, duration: snackbarShortDuration * 3);
             });
             setState(() {
-              noConnection=true;
+              noConnection = true;
             });
-
           }
-        }
-
-
-      await Future.delayed(const Duration(seconds: 10));
-    }
+          break;
+      }
+    });
   }
 
   double pwidth = 250.px;
@@ -142,7 +140,7 @@ class PanesListState extends State<PanesList> with WindowListener, AutomaticKeep
     if (firstLoading) {
       return const Center(child: ProgressRing());
     }
-    bool portrait=MediaQuery.of(context).orientation==Orientation.portrait;
+    bool portrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return ValueListenableBuilder(
         valueListenable: signedIn,
         builder: (BuildContext context, bool value, Widget? child) {
@@ -170,7 +168,8 @@ class PanesListState extends State<PanesList> with WindowListener, AutomaticKeep
                                 ),
                                 smallSpace,
                                 Text('v${packageInfo.version}'),
-                                if (DatabaseGetter.trialDate != null && DatabaseGetter.me.value != null)
+                                if (DatabaseGetter.trialDate != null &&
+                                    DatabaseGetter.me.value != null)
                                   bigSpace,
                                 if (DatabaseGetter.trialDate != null)
                                   const Text('daysremain').tr(namedArgs: {
@@ -197,11 +196,17 @@ class PanesListState extends State<PanesList> with WindowListener, AutomaticKeep
                                     height: 60.px,
                                   ),
                                 const Spacer(),
-                                if (!loading && signedIn.value && DatabaseGetter.trialDate != null)
+                                if (!loading &&
+                                    signedIn.value &&
+                                    DatabaseGetter.trialDate != null)
                                   const NotifList(),
-                                if (!loading && signedIn.value&& DatabaseGetter.trialDate != null)
+                                if (!loading &&
+                                    signedIn.value &&
+                                    DatabaseGetter.trialDate != null)
                                   const SizedBox(width: 10),
-                                if (!loading && signedIn.value&& DatabaseGetter.trialDate != null)
+                                if (!loading &&
+                                    signedIn.value &&
+                                    DatabaseGetter.trialDate != null)
                                   const ProfilNameTopBar(),
                                 smallSpace,
                                 if (!kIsWeb)
@@ -264,10 +269,14 @@ class PanesListState extends State<PanesList> with WindowListener, AutomaticKeep
     });
   }
 
+  @override
+  void dispose() {
+    internetListener?.cancel();
+    super.dispose();
+  }
 
   @override
   bool get wantKeepAlive => true;
-
 }
 
 class WindowButtons extends StatelessWidget {
