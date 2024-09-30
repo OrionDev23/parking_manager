@@ -29,7 +29,7 @@ VehiclePart _$VehiclePartFromJson(Map<String, dynamic> json) => VehiclePart(
           ?.map((e) => e as String)
           .toList(),
       unitType: (json['unitType'] as num?)?.toInt() ?? 0,
-    );
+    )..search = json['search'] as String?;
 
 Map<String, dynamic> _$VehiclePartToJson(VehiclePart instance) =>
     <String, dynamic>{
@@ -47,5 +47,6 @@ Map<String, dynamic> _$VehiclePartToJson(VehiclePart instance) =>
       'categoryName': instance.categoryName,
       'selectedOptions': instance.selectedOptions,
       'selectedOptionsNames': instance.selectedOptionsNames,
+      'search': instance.search,
       'variations': listToJsonString(instance.variations),
     };

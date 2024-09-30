@@ -1141,7 +1141,6 @@ class _PartsFormState extends State<PartsForm>
         }
       }).onError((AppwriteException e,s) {
         vehicleID=null;
-        print(e.message);
 
         if (mounted) {
           displayMessage(context, 'errupld', InfoBarSeverity.error);

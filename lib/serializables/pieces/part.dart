@@ -33,6 +33,8 @@ class VehiclePart extends ParcOtoDefault{
   String? categoryName;
   List<String>?selectedOptions;
   List<String>?selectedOptionsNames;
+  
+  String? search;
 
   @JsonKey(toJson: listToJsonString,fromJson: variationsFromList)
   List<Variation>? variations;
@@ -41,7 +43,12 @@ class VehiclePart extends ParcOtoDefault{
   this.name,this.description,this.sku,this.variations,this.barcode,this
       .selectedOptions,this.price,this.brandName,this.fournisseurID,this
       .brandID,this.categoryID,this.categoryName,this.fournisseurName,this
-      .selectedOptionsNames,this.unitType=0});
+      .selectedOptionsNames,this.unitType=0}){
+    search="$name $description ${units[unitType]} $sku $barcode "
+        "$fournisseurName $categoryName $brandName ${listToString
+      (selectedOptionsNames)} ${listToString(variations?.map((e)=>e.name)
+            .toList())}";
+  }
 
   factory VehiclePart.fromJson(Map<String, dynamic> json) =>
       _$VehiclePartFromJson(json);
