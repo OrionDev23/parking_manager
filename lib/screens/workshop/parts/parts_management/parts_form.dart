@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:appwrite/appwrite.dart' show AppwriteException;
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:chip_list/chip_list.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -9,6 +10,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:parc_oto/main.dart';
+import 'package:parc_oto/providers/client_database.dart';
+import 'package:parc_oto/providers/parts_provider.dart';
 import 'package:parc_oto/screens/workshop/inventory/fournisseurs/fournisseur_table.dart';
 import 'package:parc_oto/utilities/form_validators.dart';
 import '../../../../serializables/client.dart';
@@ -29,7 +33,8 @@ import '../options/option_table.dart';
 import 'variation_widget.dart';
 
 class PartsForm extends StatefulWidget {
-  const PartsForm({super.key});
+  final VehiclePart? part;
+  const PartsForm({super.key, this.part});
 
   @override
   State<PartsForm> createState() => _PartsFormState();
@@ -49,19 +54,110 @@ class _PartsFormState extends State<PartsForm>
   int selectedUnit = 0;
   Brand? selectedBrand;
   @override
+  void initState() {
+    initValues();
+    super.initState();
+  }
+
+  bool loading = true;
+  void initValues() async {
+    if (widget.part != null) {
+      name.text = widget.part!.name;
+      description.text = widget.part!.description ?? '';
+      prix=widget.part!.price??0;
+      selectedUnit=widget.part!.unitType;
+      barcode.text=widget.part!.barcode??'';
+      sku.text=widget.part!.sku??'';
+      selectedFournisseur =
+          await PartsProvider().getFournisseur(widget.part?.fournisseurID);
+      selectedCategory =
+          await PartsProvider().getCategory(widget.part?.categoryID);
+      selectedBrand = await PartsProvider().getBrand(widget.part?.brandID);
+      List<Option>? options =
+          await PartsProvider().getOptionsList(widget.part?.selectedOptions);
+      if (options != null) {
+        for (int i = 0; i < options.length; i++) {
+          if (i == 0) {
+            option1 = options[i];
+          } else if (i == 1) {
+            option2 = options[i];
+          } else if (i == 2) {
+            option3 = options[i];
+          } else if (i == 3) {
+            option4 = options[i];
+          }
+        }
+      }
+      variations = widget.part?.variations
+              ?.map((e) => VariationWidget(
+                    variation: e,
+                    sku: sku.text.length > 8
+                        ? sku.text.substring(0, 9)
+                        : 'XXXX-XXXX',
+                    options: [
+                      if (option1 != null) option1!,
+                      if (option2 != null) option2!,
+                      if (option3 != null) option3!,
+                      if (option4 != null) option4!,
+                    ],
+                    onPriceChanged: () => setState(() {}),
+                  ))
+              .toList() ??
+          [];
+    }
+    loading = false;
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
     var appTheme = context.watch<AppTheme>();
     bool portrait = context.orientation == Orientation.portrait;
-    return ListView(
-      shrinkWrap: true,
-      padding: const EdgeInsets.all(10),
+    if(loading){
+      return const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ProgressRing()
+        ],
+      );
+    }
+    return Column(
       children: [
-        StaggeredGrid.count(
-          mainAxisSpacing: 5,
-          crossAxisSpacing: 5,
-          crossAxisCount: portrait ? 1 : 3,
-          children: getWidgets(appTheme, portrait),
+        Flexible(
+          child: ListView(
+            shrinkWrap: true,
+            padding: const EdgeInsets.all(10),
+            children: [
+              StaggeredGrid.count(
+                mainAxisSpacing: 5,
+                crossAxisSpacing: 5,
+                crossAxisCount: portrait ? 1 : 3,
+                children: getWidgets(appTheme, portrait),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+            color: appTheme.backGroundColor,
+            boxShadow: kElevationToShadow[2],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              FilledButton(
+                onPressed: name.text.isEmpty || uploading ? null : confirm,
+                child: uploading
+                    ? const ProgressRing()
+                    : const Text('confirmer').tr(),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -152,7 +248,7 @@ class _PartsFormState extends State<PartsForm>
       crossAxisCellCount: 1,
       child: Container(
         width: 200.px,
-        height: 150.px,
+        height: 160.px,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
@@ -216,7 +312,7 @@ class _PartsFormState extends State<PartsForm>
       crossAxisCellCount: 2,
       child: Container(
         width: 400.px,
-        height: portrait ? 215.px : 132.5.px,
+        height: portrait ? 215.px : 140.px,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
@@ -301,7 +397,7 @@ class _PartsFormState extends State<PartsForm>
       crossAxisCellCount: 1,
       child: Container(
         width: 200.px,
-        height: 420.px,
+        height: 425.px,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
@@ -585,38 +681,30 @@ class _PartsFormState extends State<PartsForm>
   }
 
   String generateSKU() {
-    String result = 'XXXX-XXXX-XXXXXX';
+    String result = 'XXXX-XXXX-XXXXXXXXXX';
 
     String part1 = "XXXX";
     String part2 = "XXXX";
-    String part3 = "XXXXXX";
+    String part3 = "XXXXXXXXXX";
 
     if (selectedFournisseur != null || selectedBrand != null) {
       if (selectedFournisseur != null) {
-        part1 =
-            part1.replaceRange(0, 1, selectedFournisseur!.nom.substring(0, 2));
+        part1 = part1.replaceRange(
+            0, 1, getFirstTwoLetters(selectedFournisseur!.nom));
       }
       if (selectedBrand != null) {
-        part1 =
-            part1.replaceRange(2, null, selectedBrand!.name.substring(0, 2));
+        part1 = part1.replaceRange(
+            2, null, getFirstTwoLetters(selectedBrand!.name));
       }
     }
 
     if (selectedCategory != null || name.text.isNotEmpty) {
       if (selectedCategory != null) {
-        part2 =
-            part2.replaceRange(0, 1, selectedCategory!.name.substring(0, 2));
+        part2 = part2.replaceRange(
+            0, 1, getFirstTwoLetters(selectedCategory!.name));
       }
       if (name.text.isNotEmpty) {
-        if(name.text.length>=2){
-          part2 =
-              part2.replaceRange(2, null, name.text.substring(0, 2));
-        }
-        else{
-          part2 =
-              part2.replaceRange(2, null, '${name.text}X');
-        }
-
+        part2 = part2.replaceRange(2, null, getFirstTwoLetters(name.text));
       }
     }
 
@@ -637,7 +725,7 @@ class _PartsFormState extends State<PartsForm>
   }
 
   MaskTextInputFormatter maskFormatter = MaskTextInputFormatter(
-      mask: '####-####-######',
+      mask: '####-####-##########',
       filter: {"#": RegExp(r'^[a-zA-Z0-9]+$')},
       type: MaskAutoCompletionType.lazy);
   Widget inventoryWidget(AppTheme appTheme, bool portrait) {
@@ -645,7 +733,7 @@ class _PartsFormState extends State<PartsForm>
       crossAxisCellCount: 2,
       child: Container(
         width: 400.px,
-        height: portrait ? 355.px : 152.5.px,
+        height: portrait ? 355.px : 160.5.px,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
@@ -825,7 +913,7 @@ class _PartsFormState extends State<PartsForm>
         name: '',
         sku: 'XXXX',
       ),
-      sku: sku.text.length>8?sku.text.substring(0,9):'XXXX-XXXX',
+      sku: sku.text.length > 8 ? sku.text.substring(0, 9) : 'XXXX-XXXX',
       options: [
         if (option1 != null) option1!,
         if (option2 != null) option2!,
@@ -838,13 +926,13 @@ class _PartsFormState extends State<PartsForm>
     ));
     setState(() {});
   }
-  
-  void changeSKUforAll(){
-    for(int i=0;i<variations.length;i++){
-      variations[i]=VariationWidget(
-          key: variations[i].key,
-          variation: variations[i].variation,
-          sku: sku.text.length>8?sku.text.substring(0,9):'XXXX-XXXX',
+
+  void changeSKUforAll() {
+    for (int i = 0; i < variations.length; i++) {
+      variations[i] = VariationWidget(
+        key: variations[i].key,
+        variation: variations[i].variation,
+        sku: sku.text.length > 8 ? sku.text.substring(0, 9) : 'XXXX-XXXX',
         options: [
           if (option1 != null) option1!,
           if (option2 != null) option2!,
@@ -852,7 +940,7 @@ class _PartsFormState extends State<PartsForm>
           if (option4 != null) option4!,
         ],
       );
-  }
+    }
   }
 
   Widget designationTable(AppTheme appTheme) {
@@ -989,12 +1077,95 @@ class _PartsFormState extends State<PartsForm>
     });
   }
 
+  String? vehicleID;
+
   @override
   bool get wantKeepAlive => true;
 
+  bool uploading = false;
+  void confirm() async {
+    if (name.text.isEmpty) {
+      displayMessage(context, 'nomrequired', InfoBarSeverity.error);
+    }
+    setState(() {
+      uploading = true;
+    });
+    DateTime date = DateTime.now();
 
+    bool newpart = vehicleID == null;
 
-  void confirm(){
+    vehicleID ??=
+        DateTime.now().difference(DatabaseGetter.ref).inMilliseconds.toString();
+    VehiclePart part = VehiclePart(
+      id: vehicleID!,
+      name: name.text,
+      createdAt: widget.part?.createdAt ?? date,
+      updatedAt: date,
+      description: description.text,
+      sku: sku.text,
+      variations: variations.map((s) {
+        return s.variation;
+      }).toList(),
+      barcode: barcode.text,
+      selectedOptions: [
+        if (option1 != null) option1!.id,
+        if (option2 != null) option2!.id,
+        if (option3 != null) option3!.id,
+        if (option4 != null) option4!.id,
+      ],
+      selectedOptionsNames: [
+        if (option1 != null) option1!.name,
+        if (option2 != null) option2!.name,
+        if (option3 != null) option3!.name,
+        if (option4 != null) option4!.name,
+      ],
+      price: prix,
+      unitType: selectedUnit,
+      brandID: selectedBrand?.id,
+      brandName: selectedBrand?.name,
+      categoryID: selectedCategory?.id,
+      categoryName: selectedCategory?.name,
+      fournisseurID: selectedFournisseur?.id,
+      fournisseurName: selectedFournisseur?.nom,
+    );
 
+    if (newpart) {
+      await DatabaseGetter()
+          .addDocument(
+              collectionId: partsID,
+              documentId: vehicleID!,
+              data: part.toJson())
+          .then((s) {
+        if (mounted) {
+          displayMessage(context, 'pieceadded', InfoBarSeverity.success);
+        }
+      }).onError((AppwriteException e,s) {
+        vehicleID=null;
+        print(e.message);
+
+        if (mounted) {
+          displayMessage(context, 'errupld', InfoBarSeverity.error);
+        }
+      });
+    } else {
+      await DatabaseGetter()
+          .updateDocument(
+              collectionId: partsID,
+              documentId: vehicleID!,
+              data: part.toJson())
+          .then((s) {
+        if (mounted) {
+          displayMessage(context, 'piecemoded', InfoBarSeverity.success);
+        }
+      }).onError((AppwriteException e,s) {
+
+        if (mounted) {
+          displayMessage(context, 'errupld', InfoBarSeverity.error);
+        }
+      });
+    }
+    setState(() {
+      uploading = false;
+    });
   }
 }

@@ -36,6 +36,29 @@ int getLastDigitUPC(String num) {
   return result;
 }
 
+String getFirstTwoLetters(String? string){
+  if(string==null || string.isEmpty){
+    return 'XX';
+  }
+  else{
+    if(string.length==1){
+      return '${string}X';
+    }
+    else{
+      if(string.split(RegExp(' +')).length>1){
+        return getInitials(string);
+      }
+      else{
+        return string.substring(0,2);
+      }
+    }
+  }
+}
+
+String getInitials(String words) => words.isNotEmpty
+    ? words.trim().split(RegExp(' +')).map((s) => s[0]).take(2).join()
+    : '';
+
 class FormValidators {
   static bool isEmail(String email) {
     return RegExp(

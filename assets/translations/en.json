@@ -641,6 +641,13 @@
   "barcode": "Barcode",
   "quantity": "Quantity",
   "variations": "Variations",
-  "nooptonadded": "You haven't added any options"
+  "nooptonadded": "You haven't added any options",
+  "pieceadded": "Part added",
+  "piecemoded": "Part modified",
+  "nouvpart": "New part",
+  "ajoutpart": "A new spare part has been added",
+  "modifpart": "A spare part has been modified",
+  "suprpart": "A spare part has been removed",
+  "modpart": "Modify part"
 
 }

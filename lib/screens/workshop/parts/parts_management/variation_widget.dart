@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../../serializables/pieces/option.dart';
 import '../../../../serializables/pieces/variation.dart';
 import '../../../../theme.dart';
+import '../../../../utilities/form_validators.dart';
 
 class VariationWidget extends StatefulWidget {
   final Variation variation;
@@ -43,8 +44,40 @@ class VariationWidgetState extends State<VariationWidget> {
   void setSku(){
     String n="XX";
     if(name.text.isNotEmpty){
-      n=name.text.substring(0,2);
+      n=getFirstTwoLetters(name.text);
     }
+    String o1="XX",o2="XX",o3="XX",o4='XX';
+    if(widget.options!=null && widget.options!.isNotEmpty){
+      for(int i=0;i<widget.options!.length;i++){
+        if(selectedItems.containsKey(i) &&  widget.options![i]
+            .values!=null && widget
+            .options![i]
+            .values!
+            .isNotEmpty){
+          switch(i){
+            case 0:o1=getFirstTwoLetters(widget.options![i]
+                .values![selectedItems[i]!]);
+            break;
+            case 1:o2=getFirstTwoLetters(widget.options![i]
+                .values![selectedItems[i]!]);
+            break;
+            case 2:o3=getFirstTwoLetters(widget.options![i]
+                .values![selectedItems[i]!]);
+            break;
+            case 3:o4=getFirstTwoLetters(widget.options![i]
+                .values![selectedItems[i]!]);
+            break;
+          }
+        }
+
+
+      }
+    }
+
+    sku.text=(n+o1+o2+o3+o4).toUpperCase();
+
+    setState((){});
+
 
   }
 
@@ -88,9 +121,9 @@ class VariationWidgetState extends State<VariationWidget> {
             color: appTheme.fillColor,
           ),
           onChanged: (s) {
-            setState(() {
-              widget.variation.name = s;
-            });
+            widget.variation.name = s;
+
+            setSku();
           },
         ),
       ),
@@ -131,7 +164,7 @@ class VariationWidgetState extends State<VariationWidget> {
                 ),
                 onChanged: (s) {
                   setState(() {
-                    widget.variation.name = s;
+                    widget.variation.sku = sku.text;
                   });
                 },
               ),
@@ -158,9 +191,7 @@ class VariationWidgetState extends State<VariationWidget> {
                   text: Text(widget.options![index].values![ind]),
                   onPressed: (){
                     selectedItems[index]=ind;
-                    setState(() {
-
-                    });
+                    setSku();
                   },
                   selected: selectedItems[index]==ind
               );

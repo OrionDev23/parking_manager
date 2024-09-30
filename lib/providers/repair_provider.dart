@@ -239,7 +239,7 @@ class RepairProvider extends ChangeNotifier {
   }
   Future<Client?> getPrestataire(String? docID) async {
     if (docID == null) {
-      return Client(id: '', nom: '', adresse: '');
+      return null;
     }
     return await DatabaseGetter.database!
         .getDocument(

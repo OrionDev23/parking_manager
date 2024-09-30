@@ -34,7 +34,7 @@ class VehiclePart extends ParcOtoDefault{
   List<String>?selectedOptions;
   List<String>?selectedOptionsNames;
 
-  @JsonKey(toJson: listToJson,fromJson: variationsFromList)
+  @JsonKey(toJson: listToJsonString,fromJson: variationsFromList)
   List<Variation>? variations;
 
   VehiclePart({required super.id,super.createdAt,super.updatedAt,required

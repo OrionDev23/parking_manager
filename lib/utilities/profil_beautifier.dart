@@ -161,6 +161,8 @@ String listToString(List<String>? words){
   result.trim();
   return result;
 }
+
+
 int colorToInt(Color? color) {
   return color?.value ?? 0x00000000;
 }
@@ -180,9 +182,12 @@ String timeToJson(DateTime? date) {
 List<dynamic>? listToJson(List<dynamic>? objects) {
   return objects?.map((s) => s.toJson()).toList();
 }
+List<String>? listToJsonString(List<dynamic>?objects){
+  return objects?.map((s)=>jsonEncode(s.toJson())).toList();
+}
 
-List<Variation>? variationsFromList(List<dynamic> json){
+List<Variation>? variationsFromList(List<dynamic>? json){
   return json
-      .map((e) => Variation.fromJson(jsonDecode(e) as Map<String, dynamic>))
+      ?.map((e) => Variation.fromJson(jsonDecode(e) as Map<String, dynamic>))
       .toList();
 }

@@ -13,7 +13,7 @@ VehiclePart _$VehiclePartFromJson(Map<String, dynamic> json) => VehiclePart(
       name: json['name'] as String,
       description: json['description'] as String?,
       sku: json['sku'] as String?,
-      variations: variationsFromList(json['variations'] as List),
+      variations: variationsFromList(json['variations'] as List?),
       barcode: json['barcode'] as String?,
       selectedOptions: (json['selectedOptions'] as List<dynamic>?)
           ?.map((e) => e as String)
@@ -47,5 +47,5 @@ Map<String, dynamic> _$VehiclePartToJson(VehiclePart instance) =>
       'categoryName': instance.categoryName,
       'selectedOptions': instance.selectedOptions,
       'selectedOptionsNames': instance.selectedOptionsNames,
-      'variations': listToJson(instance.variations),
+      'variations': listToJsonString(instance.variations),
     };

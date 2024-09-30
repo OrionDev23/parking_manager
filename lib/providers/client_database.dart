@@ -34,6 +34,7 @@ const fournsID="fournisseurs";
 const optionsID="options";
 const categoriesID="categories";
 const brandsID="partsbrands";
+const partsID="parts";
 const backupId="backup";
 const endpoint = "https://appwrite.parcoto.com/v1";
 String? project;
@@ -449,6 +450,9 @@ class DatabaseGetter {
       case 57: return "ajoutbrand";
       case 58: return "modifbrand";
       case 59: return "suprbrand";
+      case 60: return "ajoutpart";
+      case 61: return "modifpart";
+      case 62: return "suprpart";
     }
     return '';
   }
@@ -468,6 +472,14 @@ class DatabaseGetter {
     await database?.updateDocument(
         databaseId: databaseId,collectionId:
         collectionId,documentId: documentId,data:data);
+  }
+
+  Future<Document?> getDocument(String collectionId,String documentId) async{
+
+    return database?.getDocument(
+        databaseId: databaseId,
+        collectionId: collectionId,
+        documentId: documentId);
   }
 
 

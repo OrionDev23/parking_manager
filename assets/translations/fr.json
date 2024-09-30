@@ -630,5 +630,12 @@
  "barcode": "Code-barres",
  "quantity": "Quantité",
  "variations": "Variations",
- "nooptonadded": "Vous n'avez pas ajouté d'options"
+ "nooptonadded": "Vous n'avez pas ajouté d'options",
+ "pieceadded": "Pièce ajoutée",
+ "piecemoded": "Pièce modifiée",
+ "nouvpart": "Nouvelle pièce",
+ "ajoutpart": "Une nouvelle pièce détachée a été ajoutée",
+ "modifpart": "Une pièce détachée a été modifiée",
+ "suprpart": "Une pièce détachée a été supprimée",
+ "modpart": "Modifier la pièce"
 }
