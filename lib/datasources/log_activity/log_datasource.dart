@@ -29,7 +29,8 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
 
   @override
   String deleteConfirmationMessage(Activity c) {
-    return '${'delete'.tr()} LOG ${DatabaseGetter().getActivityType(c.type)} ${c.docName}';
+    return '${'delete'.tr()} "${DatabaseGetter().getActivityType(c.type).tr()
+    } ${c.docName}"';
   }
 
   @override
