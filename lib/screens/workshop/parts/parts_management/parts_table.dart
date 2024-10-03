@@ -72,7 +72,7 @@ class PartsTableState extends State<PartsTable> {
     }
   }
 
-  int sortColumn = 3;
+  int sortColumn = 5;
 
   void initColumns() {
     columns = [
