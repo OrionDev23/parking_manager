@@ -248,6 +248,8 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
             password: password.text)
             .then((value) async {
           prefs.setString('project', projectName.text);
+          DatabaseGetter();
+
           await DatabaseGetter().getUser();
           PanesListState.signedIn.value = true;
           setState(() {

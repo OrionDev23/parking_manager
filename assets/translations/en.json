@@ -648,6 +648,8 @@
   "ajoutpart": "A new spare part has been added",
   "modifpart": "A spare part has been modified",
   "suprpart": "A spare part has been removed",
-  "modpart": "Modify part"
+  "modpart": "Modify part",
+  "differentDates": "Different expiry dates ?",
+  "toexpire": "Does this product expire?"
 
 }

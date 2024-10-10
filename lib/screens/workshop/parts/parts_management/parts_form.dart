@@ -728,6 +728,7 @@ class _PartsFormState extends State<PartsForm>
       mask: '####-####-##########',
       filter: {"#": RegExp(r'^[a-zA-Z0-9]+$')},
       type: MaskAutoCompletionType.lazy);
+
   Widget inventoryWidget(AppTheme appTheme, bool portrait) {
     return StaggeredGridTile.fit(
       crossAxisCellCount: 2,

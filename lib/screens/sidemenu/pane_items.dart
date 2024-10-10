@@ -1,11 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
+import '../workshop/inventory/storage/storage_form.dart';
 import '../workshop/parts/parts_management/parts_tabs.dart';
 import '../../admin_parameters.dart';
 import '../../main.dart';
 import 'sidemenu.dart';
-import '../workshop/inventory/inventory.dart';
 import '../workshop/my_repair.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -238,7 +238,7 @@ class PaneItemsAndFooters {
             'stock',
             style: paneTextStyle,
           ).tr(),
-          body: const PartsInventory(),
+          body: const StorageForm(),
         ),
         PaneItem(
           icon: Icon(

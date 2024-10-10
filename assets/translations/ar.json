@@ -646,6 +646,8 @@
   "ajoutpart": "تمت إضافة قطعة غيار جديدة",
   "modifpart": "تم تعديل قطعة غيار",
   "suprpart": "تمت إزالة قطعة غيار",
-  "modpart": "تعديل قطعة الغيار"
+  "modpart": "تعديل قطعة الغيار",
+  "differentDates": "تواريخ انتهاء الصلاحية مختلفة ؟",
+  "toexpire": "Does this product expire?"
 
 }

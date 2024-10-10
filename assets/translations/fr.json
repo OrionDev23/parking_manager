@@ -637,5 +637,7 @@
  "ajoutpart": "Une nouvelle pièce détachée a été ajoutée",
  "modifpart": "Une pièce détachée a été modifiée",
  "suprpart": "Une pièce détachée a été supprimée",
- "modpart": "Modifier la pièce"
+ "modpart": "Modifier la pièce",
+ "differentDates": "Dates d'éxpiration differentes ?",
+ "toexpire": "Ce produit expire ?"
 }

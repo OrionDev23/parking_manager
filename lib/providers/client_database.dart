@@ -58,12 +58,12 @@ class DatabaseGetter {
   DatabaseGetter() {
     project ??= prefs.getString('project');
     if(project!=null){
-      client ??= Client()
+      client = Client()
         ..setEndpoint(endpoint)
         ..setProject(project);
-      account ??= Account(client!);
-      database ??= Databases(client!);
-      storage ??= Storage(client!);
+      account = Account(client!);
+      database = Databases(client!);
+      storage = Storage(client!);
       getLimits();
 
       getEntreprise();
