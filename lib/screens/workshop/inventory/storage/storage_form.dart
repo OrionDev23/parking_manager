@@ -8,6 +8,7 @@ import '../../../../serializables/pieces/part.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../theme.dart';
+import '../../../../widgets/empty_table_widget.dart';
 import '../../../../widgets/zone_box.dart';
 import 'variation_storage.dart';
 
@@ -238,7 +239,7 @@ class _StorageFormState extends State<StorageForm> {
               ),
             if(selectedPart!=null && selectedPart!.variations!=null &&
             selectedPart!.variations!.isNotEmpty)
-
+              variationsWidget(appTheme,portrait)
 
           ],
         ),
@@ -275,44 +276,17 @@ class _StorageFormState extends State<StorageForm> {
 
   List<VariationStorage> variations = List.empty(growable: true);
 
+  int qteRestant=1;
   void addDesignation() {
     variations.add(VariationStorage(
       key: UniqueKey(),
-      variation: Variation(
-        id: variations.isEmpty
-            ? '1'
-            : (int.parse(variations.last.variation.id) + 1).toString(),
-        name: '',
-        sku: 'XXXX',
-      ),
-      sku: sku.text.length > 8 ? sku.text.substring(0, 9) : 'XXXX-XXXX',
-      options: [
-        if (option1 != null) option1!,
-        if (option2 != null) option2!,
-        if (option3 != null) option3!,
-        if (option4 != null) option4!,
-      ],
-      onPriceChanged: () {
+      part: selectedPart!,
+      qte: qteRestant,
+      onQteChanged: () {
         setState(() {});
       },
     ));
     setState(() {});
-  }
-
-  void changeSKUforAll() {
-    for (int i = 0; i < variations.length; i++) {
-      variations[i] = VariationWidget(
-        key: variations[i].key,
-        variation: variations[i].variation,
-        sku: sku.text.length > 8 ? sku.text.substring(0, 9) : 'XXXX-XXXX',
-        options: [
-          if (option1 != null) option1!,
-          if (option2 != null) option2!,
-          if (option3 != null) option3!,
-          if (option4 != null) option4!,
-        ],
-      );
-    }
   }
 
   Widget designationTable(AppTheme appTheme) {
@@ -369,7 +343,7 @@ class _StorageFormState extends State<StorageForm> {
                       ).tr()),
                   TableCell(
                       child: const Text(
-                        'SKU',
+                        'dateexp',
                         textAlign: TextAlign.center,
                       ).tr()),
                 ]),
@@ -397,7 +371,7 @@ class _StorageFormState extends State<StorageForm> {
 
   bool selectedDesignationsExist() {
     for (int i = 0; i < variations.length; i++) {
-      if (variations[i].variation.selected) {
+      if (variations[i].selected) {
         return true;
       }
     }
@@ -405,9 +379,9 @@ class _StorageFormState extends State<StorageForm> {
   }
 
   void deleteAllSelected() {
-    List<VariationWidget> temp = List.from(variations);
+    List<VariationStorage> temp = List.from(variations);
     for (int i = 0; i < temp.length; i++) {
-      if (temp[i].variation.selected) {
+      if (temp[i].selected) {
         variations.remove(temp[i]);
       }
     }
@@ -427,10 +401,15 @@ class _StorageFormState extends State<StorageForm> {
             Row(
               children: [
                 Checkbox(
-                    checked: variations[index].variation.selected,
+                    checked: variations[index].selected,
                     onChanged: (s) {
                       setState(() {
-                        variations[index].variation.selected = s ?? false;
+                        variations[index]=VariationStorage
+                          (key:variations[index].key,
+                          qte: variations[index].qte,
+                          part: variations[index].part,
+                          selected: s??false,
+                          expirationDate: variations[index].expirationDate,);
                       });
                     }),
                 smallSpace,
