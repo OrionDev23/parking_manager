@@ -1,4 +1,4 @@
-library select_dialog;
+library;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' show Button;
