@@ -1,4 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:parc_oto/screens/accept_invitation.dart';
 import 'package:parc_oto/screens/dashboard/dashboard.dart';
@@ -19,7 +20,7 @@ class Routes {
   Routes(AppTheme appTheme) {
     router = GoRouter(
 
-      initialLocation: '/dashboard',
+      initialLocation: '/',
       routes: [
         ShellRoute(
             builder: (context, state,s ) =>
@@ -35,9 +36,10 @@ class Routes {
               ),
               GoRoute(
                 name: 'dashboard',
-                path: '/dashboard',
+                path: '/',
                 builder: (context, state) => const Dashboard(),
               ),
+
               GoRoute(
                   path: '/vehicles',
                   builder: (context, state) => const VehicleDashboard(),
@@ -69,4 +71,13 @@ class Routes {
   }
 
   late final GoRouter router;
+
+
+
+static final List<GetPage> pages=[
+
+];
+
 }
+
+

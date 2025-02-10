@@ -190,9 +190,8 @@ class _CategoryFormState extends State<CategoryForm> with
                           style: appTheme.writingStyle,
                           placeholderStyle: placeStyle,
                           cursorColor: appTheme.color.darker,
-                          decoration: BoxDecoration(
-                            color: appTheme.fillColor,
-                          ),
+                          decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                         ),
                       ),
                       const SizedBox(
@@ -230,9 +229,8 @@ class _CategoryFormState extends State<CategoryForm> with
                       style: appTheme.writingStyle,
                       placeholderStyle: placeStyle,
                       cursorColor: appTheme.color.darker,
-                      decoration: BoxDecoration(
-                        color: appTheme.fillColor,
-                      ),
+                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                     ),
                   ),),
                 ),

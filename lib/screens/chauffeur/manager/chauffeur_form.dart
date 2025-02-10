@@ -135,9 +135,8 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                 style: appTheme.writingStyle,
                                 placeholderStyle: placeStyle,
                                 cursorColor: appTheme.color.darker,
-                                decoration: BoxDecoration(
-                                  color: appTheme.fillColor,
-                                ),
+                                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                 onChanged: (s) {
                                   checkChanges();
                                 },
@@ -161,10 +160,9 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                     style: appTheme.writingStyle,
                                     placeholderStyle: placeStyle,
                                     cursorColor: appTheme.color.darker,
-                                    decoration: BoxDecoration(
-                                      color: appTheme.fillColor,
-                                    ),
-                                    onChanged: (s) {
+                                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
+                                        onChanged: (s) {
                                       checkChanges();
                                     },
                                   )),
@@ -176,10 +174,9 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                     style: appTheme.writingStyle,
                                     placeholderStyle: placeStyle,
                                     cursorColor: appTheme.color.darker,
-                                    decoration: BoxDecoration(
-                                      color: appTheme.fillColor,
-                                    ),
-                                    onChanged: (s) {
+                                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
+                                        onChanged: (s) {
                                       checkChanges();
                                     },
                                   )),
@@ -204,9 +201,8 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                         style: appTheme.writingStyle,
                                         placeholderStyle: placeStyle,
                                         cursorColor: appTheme.color.darker,
-                                        decoration: BoxDecoration(
-                                          color: appTheme.fillColor,
-                                        ),
+                                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                         onChanged: (s) {
                                           checkChanges();
                                         },
@@ -270,9 +266,8 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                           style: appTheme.writingStyle,
                                           placeholderStyle: placeStyle,
                                           cursorColor: appTheme.color.darker,
-                                          decoration: BoxDecoration(
-                                            color: appTheme.fillColor,
-                                          ),
+                                          decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                           onChanged: (s) {
                                             checkChanges();
                                           },
@@ -287,9 +282,8 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                             style: appTheme.writingStyle,
                                             placeholderStyle: placeStyle,
                                             cursorColor: appTheme.color.darker,
-                                            decoration: BoxDecoration(
-                                              color: appTheme.fillColor,
-                                            ),
+                                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                             onChanged: (s) {
                                               checkChanges();
                                             },
@@ -305,10 +299,9 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                     style: appTheme.writingStyle,
                                     placeholderStyle: placeStyle,
                                     cursorColor: appTheme.color.darker,
-                                    decoration: BoxDecoration(
-                                      color: appTheme.fillColor,
-                                    ),
-                                    onChanged: (s) {
+                                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
+                                        onChanged: (s) {
                                       checkChanges();
                                     },
                                   )),

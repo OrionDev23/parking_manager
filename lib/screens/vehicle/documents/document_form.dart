@@ -144,7 +144,7 @@ class DocumentFormState extends State<DocumentForm>
                         child: TextBox(
                           controller: nom,
                           style: appTheme.writingStyle,
-                          decoration: BoxDecoration(color: appTheme.fillColor),
+                          decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
                           cursorColor: appTheme.color.darker,
                           placeholderStyle: placeStyle,
                           placeholder: 'nom'.tr(),
@@ -279,6 +279,7 @@ class DocumentFormState extends State<DocumentForm>
       });
 
       Future.delayed(Duration.zero).whenComplete(() {
+        if(mounted){
         displayInfoBar(context,
             builder: (BuildContext context, void Function() close) {
           return InfoBar(
@@ -296,9 +297,9 @@ class DocumentFormState extends State<DocumentForm>
                     return appTheme.color;
                 }
               }));
-        }, duration: snackbarShortDuration);
+        }, duration: snackbarShortDuration);}
         Future.delayed(snackbarShortDuration).whenComplete(() {
-          if (widget.vehicle != null) {
+          if (widget.vehicle != null && mounted) {
             Navigator.pop(context);
           } else {}
         });

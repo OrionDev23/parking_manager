@@ -197,7 +197,7 @@ class CategoryTableState extends State<CategoryTable> {
                       style: appTheme.writingStyle,
                       cursorColor: appTheme.color.darker,
                       placeholderStyle: placeStyle,
-                      decoration: BoxDecoration(color: appTheme.fillColor),
+                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
                       onSubmitted: (s) {
                         if (s.isNotEmpty) {
                           categoryDataSource.search(s);

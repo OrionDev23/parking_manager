@@ -150,7 +150,7 @@ class CDocumentFormState extends State<CDocumentForm>
                         child: TextBox(
                           controller: nom,
                           style: appTheme.writingStyle,
-                          decoration: BoxDecoration(color: appTheme.fillColor),
+                          decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
                           cursorColor: appTheme.color.darker,
                           placeholderStyle: placeStyle,
                           placeholder: 'nom'.tr(),
@@ -292,26 +292,28 @@ class CDocumentFormState extends State<CDocumentForm>
       });
 
       Future.delayed(Duration.zero).whenComplete(() {
-        displayInfoBar(context,
-            builder: (BuildContext context, void Function() close) {
-          return InfoBar(
-              title: const Text('done').tr(),
-              severity: InfoBarSeverity.success,
-              style: InfoBarThemeData(iconColor: (c) {
-                switch (c) {
-                  case InfoBarSeverity.success:
-                    return appTheme.color.lightest;
-                  case InfoBarSeverity.error:
-                    return appTheme.color.darkest;
-                  case InfoBarSeverity.info:
-                    return appTheme.color;
-                  default:
-                    return appTheme.color;
-                }
-              }));
-        }, duration: snackbarShortDuration);
+        if(mounted) {
+          displayInfoBar(context,
+              builder: (BuildContext context, void Function() close) {
+                return InfoBar(
+                    title: const Text('done').tr(),
+                    severity: InfoBarSeverity.success,
+                    style: InfoBarThemeData(iconColor: (c) {
+                      switch (c) {
+                        case InfoBarSeverity.success:
+                          return appTheme.color.lightest;
+                        case InfoBarSeverity.error:
+                          return appTheme.color.darkest;
+                        case InfoBarSeverity.info:
+                          return appTheme.color;
+                        default:
+                          return appTheme.color;
+                      }
+                    }));
+              }, duration: snackbarShortDuration);
+        }
         Future.delayed(snackbarShortDuration).whenComplete(() {
-          if (widget.cid != null) {
+          if (widget.cid != null && mounted) {
             Navigator.pop(context);
           } else {}
         });

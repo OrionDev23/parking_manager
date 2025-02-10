@@ -67,7 +67,7 @@ class MesFillialesState extends State<MesFilliales> {
                       style: appTheme.writingStyle,
                       cursorColor: appTheme.color.darker,
                       placeholderStyle: placeStyle,
-                      decoration: BoxDecoration(color: appTheme.fillColor),
+                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
                       onChanged: (s) {
                         if (s.isNotEmpty) {
                           notEmpty = true;
@@ -392,9 +392,8 @@ class MesFillialesState extends State<MesFilliales> {
               style: appTheme.writingStyle,
               cursorColor: appTheme.color.dark,
               placeholder: 'nom'.tr(),
-              decoration: BoxDecoration(
-                color: appTheme.fillColor,
-              ),
+              decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
             ),
             actions: [
               Button(child:const Text('fermer').tr(),onPressed:(){
@@ -409,8 +408,11 @@ class MesFillialesState extends State<MesFilliales> {
 
   void confirmChanges() async{
     if(textToEdit.text.trim().isEmpty){
-      Future.delayed(const Duration(milliseconds:50)).then((s)=>
-          displayMessage(context,'nomrequired',InfoBarSeverity.error)
+      Future.delayed(const Duration(milliseconds:50)).then((s) {
+        if(mounted) {
+          displayMessage(context, 'nomrequired', InfoBarSeverity.error);
+        }
+      }
       );
       return;
     }
@@ -447,10 +449,12 @@ class MesFillialesState extends State<MesFilliales> {
             'departement':MyEntrepriseState.p!.departments,
         })
         .then((value) {
+          if(mounted){
       displayMessage(context,'done',InfoBarSeverity.success);
-          setState((){});
+          setState((){});}
          }).onError((AppwriteException error, stackTrace) {
-      displayMessage(context,'error',InfoBarSeverity.error);
+           if(mounted){
+      displayMessage(context,'error',InfoBarSeverity.error);}
     });
   }
 }

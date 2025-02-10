@@ -196,7 +196,7 @@ class _UsersTableState extends State<UsersTable> {
                       style: appTheme.writingStyle,
                       cursorColor: appTheme.color.darker,
                       placeholderStyle: placeStyle,
-                      decoration: BoxDecoration(color: appTheme.fillColor),
+                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
                       onSubmitted: (s) {
                         if (s.isNotEmpty) {
                           userDataSource.search(s);

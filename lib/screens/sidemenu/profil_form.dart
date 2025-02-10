@@ -153,9 +153,8 @@ class _ProfilFormState extends State<ProfilForm> {
                     placeholderStyle: placeStyle,
                     cursorColor: appTheme.color.darker,
                     style: appTheme.writingStyle,
-                    decoration: BoxDecoration(
-                      color: appTheme.fillColor,
-                    ),
+                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                   ),
                 ),
               ],
@@ -183,9 +182,8 @@ class _ProfilFormState extends State<ProfilForm> {
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: BoxDecoration(
-                    color: appTheme.fillColor,
-                  ),
+                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                 ),
               ),
             ],
@@ -233,10 +231,9 @@ class _ProfilFormState extends State<ProfilForm> {
                 placeholderStyle: placeStyle,
                 cursorColor: appTheme.color.darker,
                 style: appTheme.writingStyle,
-                decoration: BoxDecoration(
-                  color: appTheme.fillColor,
-                ),
-              )),
+                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
+                  )),
             ],
           ),
         ],

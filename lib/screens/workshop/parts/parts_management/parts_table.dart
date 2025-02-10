@@ -231,7 +231,7 @@ class PartsTableState extends State<PartsTable> {
                       style: appTheme.writingStyle,
                       cursorColor: appTheme.color.darker,
                       placeholderStyle: placeStyle,
-                      decoration: BoxDecoration(color: appTheme.fillColor),
+                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
                       onSubmitted: (s) {
                         if (s.isNotEmpty) {
                           partsDataSource.search(s);

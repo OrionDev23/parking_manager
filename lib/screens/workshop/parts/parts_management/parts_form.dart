@@ -207,9 +207,8 @@ class _PartsFormState extends State<PartsForm>
                   style: appTheme.writingStyle,
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
-                  decoration: BoxDecoration(
-                    color: appTheme.fillColor,
-                  ),
+                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                 ),
               ),
             ),
@@ -231,9 +230,8 @@ class _PartsFormState extends State<PartsForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   textAlignVertical: TextAlignVertical.top,
-                  decoration: BoxDecoration(
-                    color: appTheme.fillColor,
-                  ),
+                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                 ),
               ),
             ),
@@ -792,9 +790,8 @@ class _PartsFormState extends State<PartsForm>
                                 maskFormatter,
                               ],
                               cursorColor: appTheme.color.darker,
-                              decoration: BoxDecoration(
-                                color: appTheme.fillColor,
-                              ),
+                              decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                             ),
                           ),
                         ),
@@ -835,9 +832,8 @@ class _PartsFormState extends State<PartsForm>
                               style: appTheme.writingStyle,
                               placeholderStyle: placeStyle,
                               cursorColor: appTheme.color.darker,
-                              decoration: BoxDecoration(
-                                color: appTheme.fillColor,
-                              ),
+                              decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                             ),
                           ),
                         ),

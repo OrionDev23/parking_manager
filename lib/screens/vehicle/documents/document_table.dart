@@ -425,7 +425,7 @@ class DocumentTableState extends State<DocumentTable> {
                 style: appTheme.writingStyle,
                 cursorColor: appTheme.color.darker,
                 placeholderStyle: placeStyle,
-                decoration: BoxDecoration(color: appTheme.fillColor),
+                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
                 onSubmitted: (s) {
                   if (s.isNotEmpty) {
                     documentsDataSource.search(s);

@@ -371,9 +371,8 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                     style: appTheme.writingStyle,
                                     placeholderStyle: placeStyle,
                                     cursorColor: appTheme.color.darker,
-                                    decoration: BoxDecoration(
-                                      color: appTheme.fillColor,
-                                    ),
+                                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                     onChanged: (s) {
                                       checkChanges();
                                     },
@@ -394,9 +393,8 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                     style: appTheme.writingStyle,
                                     placeholderStyle: placeStyle,
                                     cursorColor: appTheme.color.darker,
-                                    decoration: BoxDecoration(
-                                      color: appTheme.fillColor,
-                                    ),
+                                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                     onChanged: (s) {
                                       checkChanges();
                                     },
@@ -424,9 +422,8 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                               placeholderStyle: placeStyle,
                                               cursorColor:
                                                   appTheme.color.darker,
-                                              decoration: BoxDecoration(
-                                                color: appTheme.fillColor,
-                                              ),
+                                              decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                               onChanged: (s) {
                                                 checkChanges();
                                               },
@@ -442,9 +439,8 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                                 placeholderStyle: placeStyle,
                                                 cursorColor:
                                                     appTheme.color.darker,
-                                                decoration: BoxDecoration(
-                                                  color: appTheme.fillColor,
-                                                ),
+                                                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                                 onChanged: (s) {
                                                   checkChanges();
                                                 },
@@ -460,10 +456,9 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                         style: appTheme.writingStyle,
                                         placeholderStyle: placeStyle,
                                         cursorColor: appTheme.color.darker,
-                                        decoration: BoxDecoration(
-                                          color: appTheme.fillColor,
-                                        ),
-                                        onChanged: (s) {
+                                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
+                                            onChanged: (s) {
                                           checkChanges();
                                         },
                                       )),
@@ -493,10 +488,9 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                               placeholderStyle: placeStyle,
                                               cursorColor:
                                                   appTheme.color.darker,
-                                              decoration: BoxDecoration(
-                                                color: appTheme.fillColor,
-                                              ),
-                                              onChanged: (s) {
+                                                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
+                                                  onChanged: (s) {
                                                 checkChanges();
                                               },
                                             )),
@@ -509,10 +503,9 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                               placeholderStyle: placeStyle,
                                               cursorColor:
                                                   appTheme.color.darker,
-                                              decoration: BoxDecoration(
-                                                color: appTheme.fillColor,
-                                              ),
-                                              onChanged: (s) {
+                                                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
+                                                  onChanged: (s) {
                                                 checkChanges();
                                               },
                                             )),
@@ -531,10 +524,9 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                               placeholderStyle: placeStyle,
                                               cursorColor:
                                                   appTheme.color.darker,
-                                              decoration: BoxDecoration(
-                                                color: appTheme.fillColor,
-                                              ),
-                                              onChanged: (s) {
+                                                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
+                                                  onChanged: (s) {
                                                 checkChanges();
                                               },
                                             )),
@@ -547,10 +539,9 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                               placeholderStyle: placeStyle,
                                               cursorColor:
                                                   appTheme.color.darker,
-                                              decoration: BoxDecoration(
-                                                color: appTheme.fillColor,
-                                              ),
-                                              onChanged: (s) {
+                                                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
+                                                  onChanged: (s) {
                                                 checkChanges();
                                               },
                                             )),
@@ -638,9 +629,8 @@ class MyEntrepriseState extends State<MyEntreprise> {
                         style: appTheme.writingStyle,
                         placeholderStyle: placeStyle,
                         cursorColor: appTheme.color.darker,
-                        decoration: BoxDecoration(
-                          color: appTheme.fillColor,
-                        ),
+                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                         onChanged: (s) {
                           setState(() {});
                         },
@@ -744,9 +734,8 @@ class MyEntrepriseState extends State<MyEntreprise> {
                         style: appTheme.writingStyle,
                         placeholderStyle: placeStyle,
                         cursorColor: appTheme.color.darker,
-                        decoration: BoxDecoration(
-                          color: appTheme.fillColor,
-                        ),
+                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                         onChanged: (s) {
                           setState(() {});
                         },
@@ -849,9 +838,8 @@ class MyEntrepriseState extends State<MyEntreprise> {
                         style: appTheme.writingStyle,
                         placeholderStyle: placeStyle,
                         cursorColor: appTheme.color.darker,
-                        decoration: BoxDecoration(
-                          color: appTheme.fillColor,
-                        ),
+                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                         onChanged: (s) {
                           setState(() {});
                         },
@@ -1052,7 +1040,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
           .then((value) {
         p = prest;
           }).onError((AppwriteException error, stackTrace) {
-        print(error.message);
+       // print(error.message);
       });
     }
     else {

@@ -103,9 +103,8 @@ class _OptionFormState extends State<OptionForm> with
                                   style: appTheme.writingStyle,
                                   placeholderStyle: placeStyle,
                                   cursorColor: appTheme.color.darker,
-                                  decoration: BoxDecoration(
-                                    color: appTheme.fillColor,
-                                  ),
+                                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                 ),
                               ),
                               smallSpace,
@@ -149,9 +148,8 @@ class _OptionFormState extends State<OptionForm> with
                         style: appTheme.writingStyle,
                         placeholderStyle: placeStyle,
                         cursorColor: appTheme.color.darker,
-                        decoration: BoxDecoration(
-                          color: appTheme.fillColor,
-                        ),
+                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                       ),
                     ),
                     ),

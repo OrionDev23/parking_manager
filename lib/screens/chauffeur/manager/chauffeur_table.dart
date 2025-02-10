@@ -455,7 +455,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
                       style: appTheme.writingStyle,
                       cursorColor: appTheme.color.darker,
                       placeholderStyle: placeStyle,
-                      decoration: BoxDecoration(color: appTheme.fillColor),
+                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
                       onSubmitted: (s) {
                         if (s.isNotEmpty) {
                           conducteurDataSource.search(s);
@@ -502,22 +502,33 @@ class ChauffeurTableState extends State<ChauffeurTable> {
         collectionId: chauffeurid,queries: [
       Query.limit(DatabaseGetter.limits['vehicles']??500)
     ]).then((value){
-      Future.delayed(const Duration(milliseconds: 50))
-          .then((s) => showDialog(
-          context: context,
-          barrierDismissible: true,
-          builder: (context){
-            return PdfPreviewListing(
-              firstPageLimit: 30,
-              midPagesLimit: 35,
-              list: conducteurDataSource.getJsonData(
-                  value.documents),
-              orientation: PageOrientation.landscape,
-              keysToInclude: const ['matricule','name','prenom','filliale','d'
-                  'irection','vehicules'],
-              name: 'Liste des conducteurs',
-            );
-          }));
+        Future.delayed(const Duration(milliseconds: 50))
+            .then((s) {
+              if(mounted){
+          showDialog(
+              context: context,
+              barrierDismissible: true,
+              builder: (context) {
+                return PdfPreviewListing(
+                  firstPageLimit: 30,
+                  midPagesLimit: 35,
+                  list: conducteurDataSource.getJsonData(
+                      value.documents),
+                  orientation: PageOrientation.landscape,
+                  keysToInclude: const [
+                    'matricule',
+                    'name',
+                    'prenom',
+                    'filliale',
+                    'd'
+                        'irection',
+                    'vehicules'
+                  ],
+                  name: 'Liste des conducteurs',
+                );
+              });
+              }}
+        );
     });
 
   }

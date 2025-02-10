@@ -260,9 +260,8 @@ class StateFormState extends State<StateForm> {
                           fontSize: 18,
                           color: appTheme.writingStyle.color,
                           fontWeight: FontWeight.w400),
-                      decoration: BoxDecoration(
-                        color: appTheme.fillColor,
-                      ),
+                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                     ),
                   ),
                   const Divider(),
@@ -337,9 +336,8 @@ class StateFormState extends State<StateForm> {
                           FilteringTextInputFormatter.allow(
                               RegExp(r'^(\d+)?\.?\d{0,2}'))
                         ],
-                        decoration: BoxDecoration(
-                          color: appTheme.fillColor,
-                        ),
+                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                       ),
                     ),
                   if (type == 2) const Divider(),
@@ -447,8 +445,9 @@ class StateFormState extends State<StateForm> {
           }
         });
       }
-      Navigator.pop(context);
-
+      if(mounted) {
+        Navigator.pop(context);
+      }
       displayMessageDone();
       VehicleManagementState.stateChanges.value++;
     }).onError((error, stackTrace) {

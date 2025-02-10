@@ -155,6 +155,7 @@ class PanesListState extends State<PanesList>
                   ),
                   appBar: NavigationAppBar(
                     automaticallyImplyLeading: false,
+                    height: 65.px,
                     title: () {
                       return DragToMoveArea(
                         child: Align(
@@ -241,30 +242,33 @@ class PanesListState extends State<PanesList>
   void onWindowClose() {
     windowManager.isPreventClose().then((value) {
       if (value) {
-        showDialog<String>(
-          context: context,
-          builder: (context) => ContentDialog(
-            title: const Text('sur').tr(),
-            content: const Text(
-              'sauv',
-            ).tr(),
-            actions: [
-              Button(
-                child: const Text('oui').tr(),
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await windowManager.destroy();
-                },
-              ),
-              FilledButton(
-                child: const Text('non').tr(),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ),
-        );
+        if(mounted){
+          showDialog<String>(
+            context: context,
+            builder: (context) => ContentDialog(
+              title: const Text('sur').tr(),
+              content: const Text(
+                'sauv',
+              ).tr(),
+              actions: [
+                Button(
+                  child: const Text('oui').tr(),
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                    await windowManager.destroy();
+                  },
+                ),
+                FilledButton(
+                  child: const Text('non').tr(),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          );
+        }
+
       }
     });
   }

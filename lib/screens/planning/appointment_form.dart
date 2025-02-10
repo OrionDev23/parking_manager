@@ -1,6 +1,6 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:fluent_ui/fluent_ui.dart' hide ColorPicker;
 import 'package:flutter/material.dart' as m;
 import 'package:parc_oto/datasources/planning/planning_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
@@ -99,9 +99,8 @@ class _AppointmentFormState extends State<AppointmentForm> {
                           fontSize: 25,
                           color: appTheme.writingStyle.color,
                           fontWeight: FontWeight.w400),
-                      decoration: BoxDecoration(
-                        color: appTheme.fillColor,
-                      ),
+                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                     ),
                   ),
                   const Divider(),
@@ -372,9 +371,8 @@ class _AppointmentFormState extends State<AppointmentForm> {
                           fontSize: 18,
                           color: appTheme.writingStyle.color,
                           fontWeight: FontWeight.w400),
-                      decoration: BoxDecoration(
-                        color: appTheme.fillColor,
-                      ),
+                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                     ),
                   ),
                   const Divider(),
@@ -436,25 +434,31 @@ class _AppointmentFormState extends State<AppointmentForm> {
           Permission.delete(Role.user(DatabaseGetter.me.value!.id)),
           Permission.update(Role.user(DatabaseGetter.me.value!.id)),
         ]).then((value) {
-      displayInfoBar(context,
-          builder: (BuildContext context, void Function() close) {
-        return InfoBar(
-          title: const Text('done').tr(),
-          severity: InfoBarSeverity.success,
-        );
-      }, duration: snackbarShortDuration);
+          if(mounted) {
+            displayInfoBar(context,
+                builder: (BuildContext context, void Function() close) {
+                  return InfoBar(
+                    title: const Text('done').tr(),
+                    severity: InfoBarSeverity.success,
+                  );
+                }, duration: snackbarShortDuration);
+          }
       widget.datasource.appointments!.add(planning);
       widget.datasource
           .notifyListeners(CalendarDataSourceAction.add, [planning]);
-      Navigator.pop(context);
+      if(mounted) {
+        Navigator.pop(context);
+      }
     }).onError((error, stackTrace) {
-      displayInfoBar(context,
-          builder: (BuildContext context, void Function() close) {
-        return InfoBar(
-          title: const Text('echec').tr(),
-          severity: InfoBarSeverity.success,
-        );
-      }, duration: snackbarShortDuration);
+      if(mounted) {
+        displayInfoBar(context,
+            builder: (BuildContext context, void Function() close) {
+              return InfoBar(
+                title: const Text('echec').tr(),
+                severity: InfoBarSeverity.success,
+              );
+            }, duration: snackbarShortDuration);
+      }
       setState(() {
         showMessage('erreur', 'erreur');
         sumbmiting = false;

@@ -99,9 +99,8 @@ class PrestataireFormState extends State<PrestataireForm> {
                               style: appTheme.writingStyle,
                               placeholderStyle: placeStyle,
                               cursorColor: appTheme.color.darker,
-                              decoration: BoxDecoration(
-                                color: appTheme.fillColor,
-                              ),
+                              decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                               onChanged: (s) {
                                 checkChanges();
                               },
@@ -122,9 +121,8 @@ class PrestataireFormState extends State<PrestataireForm> {
                               style: appTheme.writingStyle,
                               placeholderStyle: placeStyle,
                               cursorColor: appTheme.color.darker,
-                              decoration: BoxDecoration(
-                                color: appTheme.fillColor,
-                              ),
+                              decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                               onChanged: (s) {
                                 checkChanges();
                               },
@@ -151,9 +149,8 @@ class PrestataireFormState extends State<PrestataireForm> {
                                         style: appTheme.writingStyle,
                                         placeholderStyle: placeStyle,
                                         cursorColor: appTheme.color.darker,
-                                        decoration: BoxDecoration(
-                                          color: appTheme.fillColor,
-                                        ),
+                                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                         onChanged: (s) {
                                           checkChanges();
                                         },
@@ -168,9 +165,8 @@ class PrestataireFormState extends State<PrestataireForm> {
                                           style: appTheme.writingStyle,
                                           placeholderStyle: placeStyle,
                                           cursorColor: appTheme.color.darker,
-                                          decoration: BoxDecoration(
-                                            color: appTheme.fillColor,
-                                          ),
+                                          decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                           onChanged: (s) {
                                             checkChanges();
                                           },
@@ -186,9 +182,8 @@ class PrestataireFormState extends State<PrestataireForm> {
                                       style: appTheme.writingStyle,
                                       placeholderStyle: placeStyle,
                                       cursorColor: appTheme.color.darker,
-                                      decoration: BoxDecoration(
-                                        color: appTheme.fillColor,
-                                      ),
+                                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                       onChanged: (s) {
                                         checkChanges();
                                       },
@@ -218,9 +213,8 @@ class PrestataireFormState extends State<PrestataireForm> {
                                             style: appTheme.writingStyle,
                                             placeholderStyle: placeStyle,
                                             cursorColor: appTheme.color.darker,
-                                            decoration: BoxDecoration(
-                                              color: appTheme.fillColor,
-                                            ),
+                                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                             onChanged: (s) {
                                               checkChanges();
                                             },
@@ -233,9 +227,8 @@ class PrestataireFormState extends State<PrestataireForm> {
                                             style: appTheme.writingStyle,
                                             placeholderStyle: placeStyle,
                                             cursorColor: appTheme.color.darker,
-                                            decoration: BoxDecoration(
-                                              color: appTheme.fillColor,
-                                            ),
+                                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                             onChanged: (s) {
                                               checkChanges();
                                             },
@@ -254,9 +247,8 @@ class PrestataireFormState extends State<PrestataireForm> {
                                             style: appTheme.writingStyle,
                                             placeholderStyle: placeStyle,
                                             cursorColor: appTheme.color.darker,
-                                            decoration: BoxDecoration(
-                                              color: appTheme.fillColor,
-                                            ),
+                                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                             onChanged: (s) {
                                               checkChanges();
                                             },
@@ -269,9 +261,8 @@ class PrestataireFormState extends State<PrestataireForm> {
                                             style: appTheme.writingStyle,
                                             placeholderStyle: placeStyle,
                                             cursorColor: appTheme.color.darker,
-                                            decoration: BoxDecoration(
-                                              color: appTheme.fillColor,
-                                            ),
+                                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                             onChanged: (s) {
                                               checkChanges();
                                             },

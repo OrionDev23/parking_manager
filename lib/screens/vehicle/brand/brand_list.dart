@@ -40,7 +40,7 @@ class _BrandListState extends State<BrandList> {
                       style: appTheme.writingStyle,
                       cursorColor: appTheme.color.darker,
                       placeholderStyle: placeStyle,
-                      decoration: BoxDecoration(color: appTheme.fillColor),
+                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
                       onChanged: (s) {
                         if (s.isNotEmpty) {
                           notEmpty = true;

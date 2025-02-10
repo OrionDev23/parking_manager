@@ -117,9 +117,8 @@ class VariationWidgetState extends State<VariationWidget> {
           style: appTheme.writingStyle,
           cursorColor: appTheme.color.darker,
           maxLength: 60,
-          decoration: BoxDecoration(
-            color: appTheme.fillColor,
-          ),
+          decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
           onChanged: (s) {
             widget.variation.name = s;
 
@@ -159,9 +158,8 @@ class VariationWidgetState extends State<VariationWidget> {
                 style: appTheme.writingStyle,
                 cursorColor: appTheme.color.darker,
                 maxLength: 6,
-                decoration: BoxDecoration(
-                  color: appTheme.fillColor,
-                ),
+                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                 onChanged: (s) {
                   setState(() {
                     widget.variation.sku = sku.text;

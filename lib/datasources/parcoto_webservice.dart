@@ -29,12 +29,22 @@ abstract class ParcOtoWebService<T> {
         .then((value) {
       //stopwatch.stop();
       // print("finished in ${stopwatch.elapsed.inMilliseconds} s");
-
+      if(searchKey!=null && searchKey.isNotEmpty){
+        print('got $count results from searching $searchKey');
+      }
       for (var element in value.documents) {
         if (!testIfElementContained(element.$id)) {
+          if(searchKey!=null && searchKey.isNotEmpty){
+            print('here');
+          }
           data.add(MapEntry(element.$id, element.convertTo<T>((p0) {
             return fromJsonFunction(p0 as Map<String, dynamic>);
           })));
+        }
+        else{
+          if(searchKey!=null && searchKey.isNotEmpty){
+            print('here 2');
+          }
         }
       }
       var result = data;
@@ -123,7 +133,9 @@ abstract class ParcOtoWebService<T> {
   }
 
   String getSearchQueryPerIndex(int index, String searchKey) {
-    return Query.search(getAttributeForSearch(index), searchKey);
+    String test=Query.search(getAttributeForSearch(index), searchKey);
+    print(test);
+    return test;
   }
 
   String getAttributeForSearch(int att);

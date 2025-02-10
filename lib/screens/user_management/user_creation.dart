@@ -176,9 +176,8 @@ class _UserFormState extends State<UserForm> {
                     placeholderStyle: placeStyle,
                     cursorColor: appTheme.color.darker,
                     style: appTheme.writingStyle,
-                    decoration: BoxDecoration(
-                      color: appTheme.fillColor,
-                    ),
+                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                   ),
                 ),
               ],
@@ -206,9 +205,8 @@ class _UserFormState extends State<UserForm> {
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: BoxDecoration(
-                    color: appTheme.fillColor,
-                  ),
+                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                 ),
               ),
             ],
@@ -246,9 +244,8 @@ class _UserFormState extends State<UserForm> {
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: BoxDecoration(
-                    color: appTheme.fillColor,
-                  ),
+                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                   onChanged: (s) {
                     testIfSomethingChanged();
                   },
@@ -293,9 +290,8 @@ class _UserFormState extends State<UserForm> {
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: BoxDecoration(
-                    color: appTheme.fillColor,
-                  ),
+                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                   onChanged: (s) {
                     testIfSomethingChanged();
                   },
@@ -346,10 +342,9 @@ class _UserFormState extends State<UserForm> {
                 placeholderStyle: placeStyle,
                 cursorColor: appTheme.color.darker,
                 style: appTheme.writingStyle,
-                decoration: BoxDecoration(
-                  color: appTheme.fillColor,
-                ),
-              )),
+                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
+                  )),
             ],
           ),
         ],
@@ -424,32 +419,34 @@ class _UserFormState extends State<UserForm> {
           avatar: null,
         );
         await uploadUserInDB(newme).then((value) {}).then((value) {
+          if(mounted){
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
             return InfoBar(
               title: const Text('done').tr(),
               severity: InfoBarSeverity.success,
             );
-          }, duration: snackbarShortDuration);
+          }, duration: snackbarShortDuration);}
         }).onError(( AppwriteException error, stackTrace) {
-
+          if(mounted){
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
             return InfoBar(
               title: const Text('echec').tr(),
               severity: InfoBarSeverity.error,
             );
-          }, duration: snackbarShortDuration);
+          }, duration: snackbarShortDuration);}
         });
       }).onError((AppwriteException error, stackTrace) {
 
+        if(mounted){
         displayInfoBar(context,
             builder: (BuildContext context, void Function() close) {
           return InfoBar(
             title: const Text('echec').tr(),
             severity: InfoBarSeverity.error,
           );
-        }, duration: snackbarShortDuration);
+        }, duration: snackbarShortDuration);}
         setState(() {
           uploading = false;
         });
@@ -474,9 +471,10 @@ class _UserFormState extends State<UserForm> {
               ],
               data: newme.toJson())
           .then((value) {
+            if(mounted){
         Navigator.pop(
           context,
-        );
+        );}
       });
     } else {
       await Databases(client!)
@@ -486,9 +484,10 @@ class _UserFormState extends State<UserForm> {
               documentId: userID!,
               data: newme.toJson())
           .then((value) {
+            if(mounted){
         Navigator.pop(
           context,
-        );
+        );}
       });
     }
   }

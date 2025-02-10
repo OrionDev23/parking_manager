@@ -36,7 +36,9 @@ Vehicle _$VehicleFromJson(Map<String, dynamic> json) => Vehicle(
       energie: json['energie'] as String?,
       genre: json['genre'] as String?,
       marque: json['marque'] as String?,
-      matriculePrec: json['matricule_prec'] as String?,
+      matriculePrec: (json['matricule_prec'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
       pays: json['pays'] as String?,
       placesAssises: (json['place_assises'] as num?)?.toInt(),
       poidsTotal: (json['poids_total'] as num?)?.toInt(),

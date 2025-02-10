@@ -301,7 +301,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                 FilledButton(
                                                   style: ButtonStyle(
                                                     backgroundColor:
-                                                        ButtonState.all<Color>(
+                                                        WidgetStatePropertyAll<Color>(
                                                             appTheme.color
                                                                 .lightest),
                                                   ),
@@ -336,7 +336,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                 FilledButton(
                                                     style: ButtonStyle(
                                                       backgroundColor:
-                                                          ButtonState.all<
+                                                          WidgetStateProperty.all<
                                                                   Color>(
                                                               appTheme.color
                                                                   .lighter),
@@ -429,7 +429,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                 style: appTheme.writingStyle,
                 cursorColor: appTheme.color.darker,
                 placeholderStyle: placeStyle,
-                decoration: BoxDecoration(color: appTheme.fillColor),
+                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
                 onSubmitted: (s) {
                   if (s.isNotEmpty) {
                     disponibiliteDataSource.search(s);

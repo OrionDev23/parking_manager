@@ -43,7 +43,7 @@ class Vehicle extends ParcOtoDefault {
   @JsonKey(name: 'annee_util')
   int? anneeUtil;
   @JsonKey(name: 'matricule_prec')
-  String? matriculePrec;
+  List<String>? matriculePrec;
   @JsonKey(name: 'user_creation')
   String? createdBy;
   String? pays;

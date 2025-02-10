@@ -52,7 +52,7 @@
   "energie":"Energy",
   "caross": "Bodywork",
   "anneeutil": "Year Of First Use",
-  "precmat": "Previous Registration Number",
+  "precmat": "Previous Registration Numbers",
   "erreurmat": "Invalid number",
   "vstates": "Vehicle states",
   "chstates": "Update state",
@@ -76,6 +76,7 @@
   "linknotvalid": "This link is not valid",
 
   "passwordmatch": "The password and its confirmation must be identical",
+  "chassReq": "VIN is required",
 
   "documents": "Documents",
   "reparations": "Repairs",

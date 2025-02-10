@@ -8,3 +8,5 @@ const isAdminUI=false;
 const bool showAtelier=true;
 bool showImportConducteur=false;
 const showImportVehicles = false;
+const conducteurEmploye = false;
+const chassisKey=true;

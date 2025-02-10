@@ -145,7 +145,6 @@ class PaneItemsAndFooters {
           ),
         ],
         body: const VehicleDashboard());
-
     chauffeurs = PaneItemExpander(
         icon: Icon(
           FluentIcons.people,

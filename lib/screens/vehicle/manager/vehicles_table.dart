@@ -363,7 +363,7 @@ class VehicleTableState extends State<VehicleTable> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         SizedBox(
-                          width: 75.px,
+                          width: 80.px,
                           child: Stack(
                             children: [
                               Positioned.fill(
@@ -466,8 +466,8 @@ class VehicleTableState extends State<VehicleTable> {
                               style: appTheme.writingStyle,
                               cursorColor: appTheme.color.darker,
                               placeholderStyle: placeStyle,
-                              decoration:
-                                  BoxDecoration(color: appTheme.fillColor),
+                              decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                               onSubmitted: (s) {
                                 if (s.isNotEmpty) {
                                   vehicleDataSource.search(s);
@@ -538,6 +538,7 @@ class VehicleTableState extends State<VehicleTable> {
     }
     Future.delayed(const Duration(milliseconds: 50)).then((value) {
 
+      if(mounted){
       showDialog(
           context: context,
           barrierDismissible: true,
@@ -552,7 +553,7 @@ class VehicleTableState extends State<VehicleTable> {
                   'ance','nom','prenom','direction'],
               name: 'Liste des véhicules',
             );
-          });
+          });}
   });
 
   }
@@ -581,6 +582,7 @@ class VehicleTableState extends State<VehicleTable> {
     await RepairProvider.downloadReparations();
 
     Future.delayed(const Duration(milliseconds: 50)).then((value){
+      if(mounted){
       showDialog(
           context: context,
           barrierDismissible: true,
@@ -595,7 +597,7 @@ class VehicleTableState extends State<VehicleTable> {
             'rep'],
               name: 'Couts par vehicule',
             );
-          });
+          });}
     });
 
   }
@@ -652,11 +654,8 @@ class VehicleTableState extends State<VehicleTable> {
                                         placeStyle,
                                         style: appTheme
                                             .writingStyle,
-                                        decoration:
-                                        BoxDecoration(
-                                          color: appTheme
-                                              .fillColor,
-                                        ),
+                                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                         cursorColor:
                                         appTheme
                                             .color
@@ -680,11 +679,8 @@ class VehicleTableState extends State<VehicleTable> {
                                         placeStyle,
                                         style: appTheme
                                             .writingStyle,
-                                        decoration:
-                                        BoxDecoration(
-                                          color: appTheme
-                                              .fillColor,
-                                        ),
+                                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                         cursorColor:
                                         appTheme
                                             .color
@@ -970,7 +966,7 @@ class VehicleTableState extends State<VehicleTable> {
                                   style:
                                   ButtonStyle(
                                     backgroundColor:
-                                    ButtonState.all<
+                                    WidgetStateProperty.all<
                                         Color>(
                                         appTheme
                                             .color
@@ -1010,7 +1006,7 @@ class VehicleTableState extends State<VehicleTable> {
                                 FilledButton(
                                     style:
                                     ButtonStyle(
-                                      backgroundColor: ButtonState.all<
+                                      backgroundColor: WidgetStateProperty.all<
                                           Color>(
                                           appTheme
                                               .color

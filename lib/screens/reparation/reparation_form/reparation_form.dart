@@ -297,9 +297,8 @@ class ReparationFormState extends State<ReparationForm>
                                         placeholderStyle: placeStyle,
                                         style: appTheme.writingStyle,
                                         cursorColor: appTheme.color.darker,
-                                        decoration: BoxDecoration(
-                                          color: appTheme.fillColor,
-                                        ),
+                                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                         inputFormatters: [
                                           FilteringTextInputFormatter.digitsOnly
                                         ],
@@ -495,9 +494,8 @@ class ReparationFormState extends State<ReparationForm>
                               placeholderStyle: placeStyle,
                               style: appTheme.writingStyle,
                               cursorColor: appTheme.color.darker,
-                              decoration: BoxDecoration(
-                                color: appTheme.fillColor,
-                              ),
+                              decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                             ),
                           ),
                         ),
@@ -577,9 +575,8 @@ class ReparationFormState extends State<ReparationForm>
                     controller: marque,
                     placeholder: 'marque'.tr(),
                     style: appTheme.writingStyle,
-                    decoration: BoxDecoration(
-                      color: appTheme.fillColor,
-                    ),
+                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                     cursorColor: appTheme.color.darker,
                     placeholderStyle: placeStyle,
                   ),
@@ -603,9 +600,8 @@ class ReparationFormState extends State<ReparationForm>
                     controller: type,
                     placeholder: 'type'.tr(),
                     style: appTheme.writingStyle,
-                    decoration: BoxDecoration(
-                      color: appTheme.fillColor,
-                    ),
+                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                     cursorColor: appTheme.color.darker,
                     placeholderStyle: placeStyle,
                   ),
@@ -628,9 +624,8 @@ class ReparationFormState extends State<ReparationForm>
                     controller: nchassi,
                     placeholder: 'nchassi'.tr(),
                     style: appTheme.writingStyle,
-                    decoration: BoxDecoration(
-                      color: appTheme.fillColor,
-                    ),
+                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                     cursorColor: appTheme.color.darker,
                     placeholderStyle: placeStyle,
                   ),
@@ -655,9 +650,8 @@ class ReparationFormState extends State<ReparationForm>
                     //readOnly: selectedVehicle!=null,
                     placeholder: 'matricule'.tr(),
                     style: appTheme.writingStyle,
-                    decoration: BoxDecoration(
-                      color: appTheme.fillColor,
-                    ),
+                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                     cursorColor: appTheme.color.darker,
                     placeholderStyle: placeStyle,
                   ),
@@ -687,9 +681,8 @@ class ReparationFormState extends State<ReparationForm>
                             controller: nmoteur,
                             placeholder: 'nmoteur'.tr(),
                             style: appTheme.writingStyle,
-                            decoration: BoxDecoration(
-                              color: appTheme.fillColor,
-                            ),
+                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -720,9 +713,8 @@ class ReparationFormState extends State<ReparationForm>
                             controller: km,
                             placeholder: 'KM'.tr(),
                             style: appTheme.writingStyle,
-                            decoration: BoxDecoration(
-                              color: appTheme.fillColor,
-                            ),
+                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -823,9 +815,8 @@ class ReparationFormState extends State<ReparationForm>
                             controller: couleur,
                             placeholder: 'color'.tr(),
                             style: appTheme.writingStyle,
-                            decoration: BoxDecoration(
-                              color: appTheme.fillColor,
-                            ),
+                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -882,9 +873,8 @@ class ReparationFormState extends State<ReparationForm>
                             controller: matriculeConducteur,
                             placeholder: 'matriculeemploye'.tr(),
                             style: appTheme.writingStyle,
-                            decoration: BoxDecoration(
-                              color: appTheme.fillColor,
-                            ),
+                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -915,9 +905,8 @@ class ReparationFormState extends State<ReparationForm>
                             controller: nom,
                             placeholder: 'nom'.tr(),
                             style: appTheme.writingStyle,
-                            decoration: BoxDecoration(
-                              color: appTheme.fillColor,
-                            ),
+                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -948,9 +937,8 @@ class ReparationFormState extends State<ReparationForm>
                             controller: prenom,
                             placeholder: 'prenom'.tr(),
                             style: appTheme.writingStyle,
-                            decoration: BoxDecoration(
-                              color: appTheme.fillColor,
-                            ),
+                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -1198,41 +1186,47 @@ class ReparationFormState extends State<ReparationForm>
         createReparation(reparation),
         uploadActivity(modif, reparation),
       ]).then((value) {
+        if(mounted){
         displayInfoBar(context,
             builder: (BuildContext context, void Function() close) {
           return InfoBar(
             title: const Text('reparationajout').tr(),
             severity: InfoBarSeverity.success,
           );
-        }, duration: snackbarShortDuration);
+        }, duration: snackbarShortDuration);}
       }).onError((error, stackTrace) {
+        if(mounted){
         displayInfoBar(context,
             builder: (BuildContext context, void Function() close) {
           return InfoBar(
             title: const Text('echec').tr(),
             severity: InfoBarSeverity.error,
           );
-        }, duration: snackbarShortDuration);
+        }, duration: snackbarShortDuration);}
       });
     } else {
       await Future.wait(
               [updateReparation(reparation), uploadActivity(modif, reparation)])
           .then((value) {
-        displayInfoBar(context,
-            builder: (BuildContext context, void Function() close) {
-          return InfoBar(
-            title: const Text('reparationmodif').tr(),
-            severity: InfoBarSeverity.success,
-          );
-        }, duration: snackbarShortDuration);
+            if(mounted) {
+              displayInfoBar(context,
+                  builder: (BuildContext context, void Function() close) {
+                    return InfoBar(
+                      title: const Text('reparationmodif').tr(),
+                      severity: InfoBarSeverity.success,
+                    );
+                  }, duration: snackbarShortDuration);
+            }
       }).onError((error, stackTrace) {
-        displayInfoBar(context,
-            builder: (BuildContext context, void Function() close) {
-          return InfoBar(
-            title: const Text('echec').tr(),
-            severity: InfoBarSeverity.error,
-          );
-        });
+        if(mounted) {
+          displayInfoBar(context,
+              builder: (BuildContext context, void Function() close) {
+                return InfoBar(
+                  title: const Text('echec').tr(),
+                  severity: InfoBarSeverity.error,
+                );
+              });
+        }
       });
     }
 

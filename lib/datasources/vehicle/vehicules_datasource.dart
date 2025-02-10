@@ -154,6 +154,7 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
 
   void showEditStuff(MapEntry<String, Vehicle> element){
 
+
       element.value.controller.showFlyout(builder: (context) {
         return f.MenuFlyout(
           items: [
@@ -200,7 +201,9 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
                 onPressed: () {
                   Future.delayed(
                       const Duration(milliseconds: 50))
-                      .then((value) => f.showDialog(
+                      .then((value) {
+                        if(current.mounted){
+                        return f.showDialog(
                       context: current,
                       barrierDismissible: true,
                       builder: (context) {
@@ -229,7 +232,8 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
                             vehicle: element.value,
                           ),
                         );
-                      }));
+                      });}
+                      });
                 }),
             f.MenuFlyoutSubItem(
               text: const Text('chstates').tr(),
@@ -316,30 +320,34 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
           }
       ).then((value) {
         element.value.perimetre=perimeter;
+        if(current.mounted){
         f.displayInfoBar(current,
             builder: (BuildContext context, void Function() close) {
               return f.InfoBar(
                 title: const Text('done').tr(),
                 severity: f.InfoBarSeverity.success,
               );
-            }, duration: snackbarShortDuration);
+            }, duration: snackbarShortDuration);}
         DatabaseGetter().ajoutActivity(35, element.key,docName:element.value
             .matricule);
         notifyListeners();
       }).onError((error, stackTrace) {
+        if(current.mounted){
         f.displayInfoBar(current,
             builder: (BuildContext context, void Function() close) {
               return f.InfoBar(
                 title: const Text('erreur').tr(),
                 severity: f.InfoBarSeverity.error,
               );
-            }, duration: snackbarShortDuration);
+            }, duration: snackbarShortDuration);}
       });
   }
 
   void viewVehicule(MapEntry<String,Vehicle> element){
     Future.delayed(const Duration(milliseconds: 50))
-        .then((value) => f.showDialog(
+        .then((value) {
+          if(current.mounted){
+          return f.showDialog(
         context: current,
         barrierDismissible: true,
         builder: (c) {
@@ -352,7 +360,8 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
               })
             ],
           );
-        }));
+        });}
+        });
   }
 
   @override
@@ -372,7 +381,9 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
 
   void showStateForm(Vehicle v, int type) {
     Future.delayed(const Duration(milliseconds: 50))
-        .then((value) => f.showDialog(
+        .then((value) {
+          if(current.mounted){
+          return f.showDialog(
             context: current,
             barrierDismissible: true,
             builder: (c) {
@@ -385,6 +396,7 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
                   vehicleDatasource: this,
                 ),
               );
-            }));
+            });}
+        });
   }
 }

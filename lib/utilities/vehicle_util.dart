@@ -1,6 +1,6 @@
 import '../screens/entreprise/entreprise.dart';
 
-const marqueMax = 70;
+const marqueMax = 71;
 const genreMax = 10;
 
 class VehiclesUtilities {
@@ -212,6 +212,8 @@ class VehiclesUtilities {
         return "Kawasaki";
       case 70:
         return "MV Agusta";
+      case 71:
+        return "Renault Trucks";
       default:
         return "N/A";
     }

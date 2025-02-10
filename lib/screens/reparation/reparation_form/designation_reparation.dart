@@ -45,9 +45,8 @@ class DesignationReparationState extends State<DesignationReparation> {
             style: appTheme.writingStyle,
             cursorColor: appTheme.color.darker,
             maxLength: 60,
-            decoration: BoxDecoration(
-              color: appTheme.fillColor,
-            ),
+            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
             onChanged: (s) {
               setState(() {
                 widget.designation.designation = s;
@@ -107,9 +106,8 @@ class DesignationReparationState extends State<DesignationReparation> {
             placeholder: 'TVA'.tr(),
             style: appTheme.writingStyle,
             cursorColor: appTheme.color.darker,
-            decoration: BoxDecoration(
-              color: appTheme.fillColor,
-            ),
+            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
           ),
         ),
         smallSpace,
@@ -132,9 +130,8 @@ class DesignationReparationState extends State<DesignationReparation> {
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'^(\d+)?\.?\d{0,2}'))
             ],
-            decoration: BoxDecoration(
-              color: appTheme.fillColor,
-            ),
+            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
             onChanged: (s) {
               setState(() {
                 widget.designation.prix = double.tryParse(s) ?? 0;

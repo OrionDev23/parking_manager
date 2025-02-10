@@ -14,12 +14,7 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
 
   @override
   String getSearchQueryPerIndex(int index, String searchKey) {
-    switch (index) {
-      case 2:
-        return Query.equal('annee_util', int.tryParse(searchKey) ?? 9999);
-      default:
-        return Query.search(getAttributeForSearch(index), searchKey);
-    }
+    return Query.search(getAttributeForSearch(index), searchKey);
   }
 
   @override

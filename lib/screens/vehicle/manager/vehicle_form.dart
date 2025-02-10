@@ -4,8 +4,11 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:dzair_data_usage/langs.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart' as m;
 import 'package:flutter/services.dart';
+import 'package:flutter_chip_tags/flutter_chip_tags.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:parc_oto/admin_parameters.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/chauffeur/manager/chauffeur_table.dart';
 import 'package:parc_oto/screens/entreprise/entreprise.dart';
@@ -56,7 +59,6 @@ class _VehicleFormState extends State<VehicleForm>
   TextEditingController places = TextEditingController();
   TextEditingController poidsT = TextEditingController();
   TextEditingController charg = TextEditingController();
-  TextEditingController matrPrec = TextEditingController();
   DateTime? selectedAnnee = DateTime(2023);
   bool autreMat = false;
   int? marque;
@@ -67,8 +69,8 @@ class _VehicleFormState extends State<VehicleForm>
 
   String pays = 'DZ';
 
-  final double height = 53.px;
-  final double heightFirst = 105.px;
+  final double height = 55.px;
+  final double heightFirst = 109.px;
 
   String wilaya = "16";
 
@@ -82,12 +84,14 @@ class _VehicleFormState extends State<VehicleForm>
   TextEditingController selectedDepartment = TextEditingController();
   TextEditingController selectedDirection = TextEditingController();
   TextEditingController selectedFiliale = TextEditingController();
+  List<String> matriculesPrec=[];
 
   @override
   void initState() {
     initValues();
     super.initState();
   }
+
 
   void initValues() {
     AlgeriaList();
@@ -129,7 +133,7 @@ class _VehicleFormState extends State<VehicleForm>
       places.text = widget.vehicle!.placesAssises?.toString() ?? '';
       poidsT.text = widget.vehicle!.poidsTotal?.toString() ?? '';
       charg.text = widget.vehicle!.charegeUtile?.toString() ?? '';
-      matrPrec.text = widget.vehicle!.matriculePrec ?? '';
+      matriculesPrec.addAll(widget.vehicle!.matriculePrec??[]);
       selectedDate = widget.vehicle!.date ?? DateTime.now();
       lourd = widget.vehicle!.lourd;
       matempl.text=widget.vehicle!.matriculeConducteur??'';
@@ -161,42 +165,44 @@ class _VehicleFormState extends State<VehicleForm>
     var appTheme = context.watch<AppTheme>();
 
     return ScaffoldPage(
-        content: ListView(
-          shrinkWrap: true,
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          children: [
-            Container(
-                decoration: BoxDecoration(
-                  color: appTheme.backGroundColor,
-                  boxShadow: kElevationToShadow[3],
-                ),
-                padding: const EdgeInsets.all(10),
-                width: 1080.px,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: StaggeredGrid.count(
-                              crossAxisCount:
-                                  MediaQuery.of(context).orientation ==
-                                          Orientation.portrait
-                                      ? 1
-                                      : 12,
-                              mainAxisSpacing: 0,
-                              crossAxisSpacing: 0,
-                              children: gridChildren(appTheme)),
+        content: Center(
+          child: ListView(
+            shrinkWrap: true,
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            children: [
+              Container(
+                  decoration: BoxDecoration(
+                    color: appTheme.backGroundColor,
+                    boxShadow: kElevationToShadow[3],
+                  ),
+                  padding: const EdgeInsets.all(10),
+                  width: 1080.px,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: StaggeredGrid.count(
+                                crossAxisCount:
+                                    MediaQuery.of(context).orientation ==
+                                            Orientation.portrait
+                                        ? 1
+                                        : 12,
+                                mainAxisSpacing: 0,
+                                crossAxisSpacing: 0,
+                                children: gridChildren(appTheme)),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                )),
-          ],
+                    ],
+                  )),
+            ],
+          ),
         ),
         bottomBar: widget.readOnly?null:Padding(
           padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -222,8 +228,11 @@ class _VehicleFormState extends State<VehicleForm>
   List<Widget> gridChildren(AppTheme appTheme) {
     return [
       ...firstLine(appTheme),
+      ...getWilayaCommuneWidget(appTheme),
       ...secondLine(appTheme),
+      if(conducteurEmploye)
       ...thirdLine(appTheme),
+      if(conducteurEmploye)
       ...forthLine(appTheme),
       ...fifthLine(appTheme),
       ...sixthLine(appTheme),
@@ -232,108 +241,14 @@ class _VehicleFormState extends State<VehicleForm>
     ];
   }
 
+
   List<Widget> firstLine(AppTheme appTheme) {
     return [
+      if(chassisKey)
+        getChassisWidget(appTheme),
       StaggeredGridTile.fit(
-          crossAxisCellCount: 4,
-          child: Container(
-            height: heightFirst,
-
-            decoration: BoxDecoration(
-              border: Border(
-                top:BorderSide(
-                  color: appTheme.color,
-                ),
-                left: BorderSide(
-                  color: appTheme.color,
-                ),
-                right:  Device.orientation==Orientation.portrait?BorderSide(
-                  color: appTheme.color,
-                ):BorderSide.none
-              ),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'pays',
-                  style: formHintStyle,
-                ).tr(),
-                CountryCodePicker(
-                  enabled: !widget.readOnly,
-                  boxDecoration: BoxDecoration(
-                      color: appTheme.backGroundColor,
-                      boxShadow: kElevationToShadow[2]),
-                  padding: const EdgeInsets.all(3),
-                  searchDecoration: appTheme.inputDecoration,
-                  dialogSize: Size(40.w, 60.h),
-                  initialSelection: pays,
-                  showCountryOnly: true,
-                  showDropDownButton: true,
-                  showFlagDialog: true,
-                  showOnlyCountryWhenClosed: true,
-                  onChanged: (c) {
-                    setState(() {
-                      pays = c.code ?? 'DZ';
-                    });
-                  },
-                ),
-                Text(
-                  'wilaya',
-                  style: formHintStyle,
-                ).tr(),
-                SizedBox(
-                  height: 5.h,
-                  child: AutoSuggestBox<String>(
-                    enabled: !widget.readOnly,
-                    controller: wilayaCont,
-                    placeholder: 'wilaya'.tr(),
-                    placeholderStyle: placeStyle,
-                    cursorColor: appTheme.color.darker,
-                    style: appTheme.writingStyle,
-                    decoration: BoxDecoration(
-                      color: appTheme.fillColor,
-                    ),
-                    items: AlgeriaList.dzair!.getWilayat()!.map((wilaya) {
-                      return AutoSuggestBoxItem<String>(
-                        value: wilaya!.getWilayaCode()!,
-                        label: wilaya.getWilayaName(
-                            appTheme.locale!.languageCode.toUpperCase() == "AR"
-                                ? Language.AR
-                                : Language.FR)!,
-                      );
-                    }).toList(),
-                    onSelected: (item) {
-                      setState(() {
-                        wilaya = item.value!;
-                        wilayaCont.text = AlgeriaList.dzair!
-                                .searchWilayatByName(
-                                    item.label,
-                                    appTheme.locale!.languageCode
-                                                .toUpperCase() ==
-                                            "AR"
-                                        ? Language.AR
-                                        : Language.FR)
-                                ?.first
-                                ?.getWilayaName(Language.FR) ??
-                            '';
-                      });
-                    },
-                    onChanged: (s, r) {
-                      if (r == TextChangedReason.userInput) {
-                        setState(() => wilayaCont.text = s);
-                      }
-                    },
-                  ),
-                ),
-              ],
-            ),
-          )),
-      StaggeredGridTile.fit(
-        crossAxisCellCount: 4,
+        crossAxisCellCount: 6,
         child: Container(
-
           decoration: BoxDecoration(
             border: Border(
               top:  Device.orientation==Orientation
@@ -349,7 +264,7 @@ class _VehicleFormState extends State<VehicleForm>
             ),
           ),
           height: heightFirst,
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.symmetric(horizontal: chassisKey?0:10),
           child: Container(
             padding: EdgeInsets.zero,
             decoration: BoxDecoration(
@@ -365,7 +280,7 @@ class _VehicleFormState extends State<VehicleForm>
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Text(
                     'nummat',
-                    style: formHintStyle,
+                    style: formHintStyle.copyWith(fontSize: 12,color: Colors.red),
                   ).tr(),
                 ),
                 if (!erreurMatricule) const Spacer(),
@@ -387,10 +302,9 @@ class _VehicleFormState extends State<VehicleForm>
                           placeholder: 'XXXXXXXXXXXXXX',
                           textAlign: TextAlign.center,
                           placeholderStyle: placeStyle,
-                          decoration: BoxDecoration(
-                            color: appTheme.fillColor,
-                          ),
-                          inputFormatters: <TextInputFormatter>[
+                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
+                    inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.allow(
                                 RegExp("[0-9a-zA-Z.-]")),
                           ],
@@ -406,9 +320,8 @@ class _VehicleFormState extends State<VehicleForm>
                                 style: appTheme.writingStyle,
                                 placeholder: '123456',
                                 placeholderStyle: placeStyle,
-                                decoration: BoxDecoration(
-                                  color: appTheme.fillColor,
-                                ),
+                                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                 maxLength: 6,
                                 textAlign: TextAlign.center,
                                 inputFormatters: [
@@ -431,9 +344,8 @@ class _VehicleFormState extends State<VehicleForm>
                                 placeholder: '123',
                                 maxLength: 3,
                                 placeholderStyle: placeStyle,
-                                decoration: BoxDecoration(
-                                  color: appTheme.fillColor,
-                                ),
+                                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                 textAlign: TextAlign.center,
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly
@@ -458,9 +370,8 @@ class _VehicleFormState extends State<VehicleForm>
                                 placeholder: '12',
                                 maxLength: 2,
                                 placeholderStyle: placeStyle,
-                                decoration: BoxDecoration(
-                                  color: appTheme.fillColor,
-                                ),
+                                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                                 textAlign: TextAlign.center,
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly
@@ -502,18 +413,117 @@ class _VehicleFormState extends State<VehicleForm>
           ),
         ),
       ),
+    ];
+  }
+  List<Widget> getWilayaCommuneWidget(AppTheme appTheme){
+    return [
+    StaggeredGridTile.fit(
+        crossAxisCellCount: chassisKey?6:4,
+        child: Container(
+          height: heightFirst,
+
+          decoration: BoxDecoration(
+            border: Border(
+                top:BorderSide(
+                  color: appTheme.color,
+                ),
+                left: BorderSide(
+                  color: appTheme.color,
+                ),
+                right:  Device.orientation==Orientation.portrait?BorderSide(
+                  color: appTheme.color,
+                ):BorderSide.none
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'pays',
+                style: formHintStyle,
+              ).tr(),
+              CountryCodePicker(
+                enabled: !widget.readOnly,
+                boxDecoration: BoxDecoration(
+                    color: appTheme.backGroundColor,
+                    boxShadow: kElevationToShadow[2]),
+                padding: const EdgeInsets.all(3),
+                searchDecoration: appTheme.inputDecoration,
+                dialogSize: Size(40.w, 60.h),
+                initialSelection: pays,
+                showCountryOnly: true,
+                showDropDownButton: true,
+                showFlagDialog: true,
+                showOnlyCountryWhenClosed: true,
+                onChanged: (c) {
+                  setState(() {
+                    pays = c.code ?? 'DZ';
+                  });
+                },
+              ),
+              Text(
+                'wilaya',
+                style: formHintStyle,
+              ).tr(),
+              SizedBox(
+                height: 5.h,
+                child: AutoSuggestBox<String>(
+                  enabled: !widget.readOnly,
+                  controller: wilayaCont,
+                  placeholder: 'wilaya'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
+                  items: AlgeriaList.dzair!.getWilayat()!.map((wilaya) {
+                    return AutoSuggestBoxItem<String>(
+                      value: wilaya!.getWilayaCode()!,
+                      label: wilaya.getWilayaName(
+                          appTheme.locale!.languageCode.toUpperCase() == "AR"
+                              ? Language.AR
+                              : Language.FR)!,
+                    );
+                  }).toList(),
+                  onSelected: (item) {
+                    setState(() {
+                      wilaya = item.value!;
+                      wilayaCont.text = AlgeriaList.dzair!
+                          .searchWilayatByName(
+                          item.label,
+                          appTheme.locale!.languageCode
+                              .toUpperCase() ==
+                              "AR"
+                              ? Language.AR
+                              : Language.FR)
+                          ?.first
+                          ?.getWilayaName(Language.FR) ??
+                          '';
+                    });
+                  },
+                  onChanged: (s, r) {
+                    if (r == TextChangedReason.userInput) {
+                      setState(() => wilayaCont.text = s);
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        )),
       StaggeredGridTile.fit(
-          crossAxisCellCount: 4,
+          crossAxisCellCount: chassisKey?6:4,
           child: Container(
             decoration: BoxDecoration(
               border: Border(
-                top: Device.orientation==Orientation
-                    .portrait?BorderSide.none:BorderSide(
-                  color: appTheme.color,
-                ),
-                right:  BorderSide(
-                  color: appTheme.color,
-                ),
+                  top: Device.orientation==Orientation
+                      .portrait?BorderSide.none:BorderSide(
+                    color: appTheme.color,
+                  ),
+                  right:  BorderSide(
+                    color: appTheme.color,
+                  ),
                   left:  Device.orientation==Orientation.portrait?BorderSide(
                     color: appTheme.color,
                   ):BorderSide.none
@@ -537,18 +547,17 @@ class _VehicleFormState extends State<VehicleForm>
                     cursorColor: appTheme.color.darker,
                     style: appTheme.writingStyle,
                     placeholderStyle: placeStyle,
-                    decoration: BoxDecoration(
-                      color: appTheme.fillColor,
-                    ),
+                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                     items:
-                        AlgeriaList().getDairas(wilayaCont.text).map((daira) {
+                    AlgeriaList().getDairas(wilayaCont.text).map((daira) {
                       return AutoSuggestBoxItem<String>(
                         value: daira?.getDairaName(Language.FR) ?? '',
                         label: daira?.getDairaName(
-                                appTheme.locale?.languageCode.toUpperCase() ==
-                                        "AR"
-                                    ? Language.AR
-                                    : Language.FR) ??
+                            appTheme.locale?.languageCode.toUpperCase() ==
+                                "AR"
+                                ? Language.AR
+                                : Language.FR) ??
                             '',
                       );
                     }).toList(),
@@ -575,9 +584,8 @@ class _VehicleFormState extends State<VehicleForm>
                     placeholderStyle: placeStyle,
                     cursorColor: appTheme.color.darker,
                     style: appTheme.writingStyle,
-                    decoration: BoxDecoration(
-                      color: appTheme.fillColor,
-                    ),
+                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                     items: AlgeriaList()
                         .getCommune(wilayaCont.text)
                         .map((commune) {
@@ -588,12 +596,12 @@ class _VehicleFormState extends State<VehicleForm>
                         label: commune == null
                             ? ''
                             : commune.getCommuneName(appTheme
-                                            .locale?.languageCode
-                                            .toUpperCase() ==
-                                        "AR"
-                                    ? Language.AR
-                                    : Language.FR) ??
-                                '',
+                            .locale?.languageCode
+                            .toUpperCase() ==
+                            "AR"
+                            ? Language.AR
+                            : Language.FR) ??
+                            '',
                       );
                     }).toList(),
                     onSelected: (item) {
@@ -609,6 +617,7 @@ class _VehicleFormState extends State<VehicleForm>
               ],
             ),
           )),
+
     ];
   }
 
@@ -679,9 +688,8 @@ class _VehicleFormState extends State<VehicleForm>
                 placeholderStyle: placeStyle,
                 cursorColor: appTheme.color.darker,
                 style: appTheme.writingStyle,
-                decoration: BoxDecoration(
-                  color: appTheme.fillColor,
-                ),
+                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
               ),
             ],
           ),
@@ -725,9 +733,8 @@ class _VehicleFormState extends State<VehicleForm>
                 cursorColor: appTheme.color.darker,
                 style: appTheme.writingStyle,
                 placeholderStyle: placeStyle,
-                decoration: BoxDecoration(
-                  color: appTheme.fillColor,
-                ),
+                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(
                       RegExp(r'^(\d+)?\.?\d{0,2}'))
@@ -820,9 +827,8 @@ class _VehicleFormState extends State<VehicleForm>
                     placeholderStyle: placeStyle,
                     cursorColor: appTheme.color.darker,
                     style: appTheme.writingStyle,
-                    decoration: BoxDecoration(
-                      color: appTheme.fillColor,
-                    ),
+                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                   )),
             ],
           ),
@@ -864,9 +870,8 @@ class _VehicleFormState extends State<VehicleForm>
                     placeholderStyle: placeStyle,
                     cursorColor: appTheme.color.darker,
                     style: appTheme.writingStyle,
-                    decoration: BoxDecoration(
-                      color: appTheme.fillColor,
-                    ),
+                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                   )),
             ],
           ),
@@ -909,9 +914,8 @@ class _VehicleFormState extends State<VehicleForm>
                       placeholderStyle: placeStyle,
                       cursorColor: appTheme.color.darker,
                       style: appTheme.writingStyle,
-                      decoration: BoxDecoration(
-                        color: appTheme.fillColor,
-                      ),
+                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                     )),
               ]),
         ),
@@ -953,9 +957,8 @@ class _VehicleFormState extends State<VehicleForm>
                     placeholderStyle: placeStyle,
                     cursorColor: appTheme.color.darker,
                     style: appTheme.writingStyle,
-                    decoration: BoxDecoration(
-                      color: appTheme.fillColor,
-                    ),
+                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                   )),
             ],
           ),
@@ -1059,9 +1062,8 @@ class _VehicleFormState extends State<VehicleForm>
                     placeholderStyle: placeStyle,
                     cursorColor: appTheme.color.darker,
                     style: appTheme.writingStyle,
-                    decoration: BoxDecoration(
-                      color: appTheme.fillColor,
-                    ),
+                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                   )),
             ],
           ),
@@ -1481,51 +1483,65 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: BoxDecoration(
-                    color: appTheme.fillColor,
-                  ),
+                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                 ),
               ],
             ),
           ),
         ),
       ),
-      StaggeredGridTile.fit(
-        crossAxisCellCount: 6,
-        child: Container(
-          height: height,
-          padding: EdgeInsets.zero,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: appTheme.color,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: Column(
-              children: [
-                Text(
-                  'nchassi',
-                  style: formHintStyle,
-                ).tr(),
-                TextBox(enabled:!widget.readOnly,
-                  controller: numSer,
-                  maxLength: 30,
-                  placeholder: 'nchassi'.tr(),
-                  placeholderStyle: placeStyle,
-                  cursorColor: appTheme.color.darker,
-                  style: appTheme.writingStyle,
-                  decoration: BoxDecoration(
-                    color: appTheme.fillColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      if(!chassisKey)
+      getChassisWidget(appTheme),
     ];
   }
+
+  Widget getChassisWidget(AppTheme appTheme) {
+    return StaggeredGridTile.fit(
+      crossAxisCellCount: 6,
+      child: Container(
+        height: chassisKey?heightFirst:height,
+        padding: EdgeInsets.zero,
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: appTheme.color,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Column(
+            crossAxisAlignment: chassisKey?CrossAxisAlignment.start:CrossAxisAlignment.center,
+            children: [
+              Text(
+                'nchassi',
+                style: formHintStyle.copyWith(fontSize:chassisKey?12:10,color: Colors.red),
+              ).tr(),
+              if(chassisKey) const Spacer(),
+              TextBox(enabled: !widget.readOnly,
+                controller: numSer,
+                maxLength: 30,
+                placeholder: 'nchassi'.tr(),
+                placeholderStyle: placeStyle,
+                cursorColor: appTheme.color.darker,
+                style: appTheme.writingStyle,
+                decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor)),
+
+              ),
+              if(chassisKey)
+
+                Padding(padding: EdgeInsets.all(5),child:
+                  SizedBox(
+                    height: 34.px,
+                    child: errorChassis?Text('chassReq',style: TextStyle(color: Colors.red)).tr():null,
+                  ),),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
 
   List<Widget> seventhLine(AppTheme appTheme) {
     return [
@@ -1554,9 +1570,8 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: BoxDecoration(
-                    color: appTheme.fillColor,
-                  ),
+                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                 ),
               ],
             ),
@@ -1588,9 +1603,8 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: BoxDecoration(
-                    color: appTheme.fillColor,
-                  ),
+                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                 ),
               ],
             ),
@@ -1622,9 +1636,8 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: BoxDecoration(
-                    color: appTheme.fillColor,
-                  ),
+                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 ),
               ],
@@ -1657,9 +1670,8 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: BoxDecoration(
-                    color: appTheme.fillColor,
-                  ),
+                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 ),
               ],
@@ -1693,9 +1705,8 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: BoxDecoration(
-                    color: appTheme.fillColor,
-                  ),
+                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                 ),
               ],
             ),
@@ -1765,46 +1776,8 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: BoxDecoration(
-                    color: appTheme.fillColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      StaggeredGridTile.fit(
-        crossAxisCellCount: 6,
-        child: Container(
-          height: height,
-          padding: EdgeInsets.zero,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: appTheme.color,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: Column(
-              children: [
-                Text(
-                  'precmat',
-                  style: formHintStyle,
-                ).tr(),
-                TextBox(enabled:!widget.readOnly,
-                  controller: matrPrec,
-                  maxLength: 30,
-                  placeholder: 'precmat'.tr(),
-                  placeholderStyle: placeStyle,
-                  cursorColor: appTheme.color.darker,
-                  style: appTheme.writingStyle,
-                  decoration: BoxDecoration(
-                    color: appTheme.fillColor,
-                  ),
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z.-]")),
-                  ],
+                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+
                 ),
               ],
             ),
@@ -1845,6 +1818,53 @@ class _VehicleFormState extends State<VehicleForm>
           ),
         ),
       ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 12,
+        child: Container(
+          height: heightFirst,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: appTheme.color,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: [
+                Text(
+                  'precmat',
+                  style: formHintStyle,
+                ).tr(),
+                Flexible(
+                  child:ListView(
+                    children: [
+                      m.Material(
+                        color: appTheme.backGroundColor,
+                        child:  ChipTags(
+                          list: matriculesPrec,
+                          iconColor: appTheme.color.darkest,
+                          chipColor: appTheme.color.lightest,
+                          textColor: appTheme.writingStyle.color!,
+                          decoration: m.InputDecoration(
+                            hintText: 'entervalues'.tr(),
+                            hintStyle: placeStyle,
+                            fillColor: appTheme.backGroundColor,
+                          ),
+                          createTagOnSubmit: true,
+                        ),
+                      )
+
+                    ],
+                  ),
+                ),
+
+              ],
+            ),
+          ),
+        ),
+      ),
+
     ];
   }
 
@@ -1923,7 +1943,7 @@ class _VehicleFormState extends State<VehicleForm>
   String? documentID;
   bool uploading = false;
   bool errorUploading = false;
-
+  bool errorChassis=false;
   void confirmAndUpload() async {
     if (autreMat) {
       if (matriculeEtr.text.isEmpty || matriculeEtr.text.length < 4) {
@@ -1954,6 +1974,20 @@ class _VehicleFormState extends State<VehicleForm>
             erreurMatricule = false;
           });
         }
+      }
+    }
+    if(numSer.text.trim().isEmpty){
+      errorChassis=true;
+      if(!errorChassis){
+        setState(() {
+        });
+      }
+    }
+    else{
+      if(errorChassis){
+        setState(() {
+          errorChassis=false;
+        });
       }
     }
 
@@ -1988,7 +2022,7 @@ class _VehicleFormState extends State<VehicleForm>
         daira: dairaCont.text,
         genre: genre.toString(),
         marque: marque.toString(),
-        matriculePrec: matrPrec.text,
+        matriculePrec: matriculesPrec,
         carrosserie: caross.text,
         charegeUtile: int.tryParse(charg.text),
         createdBy: DatabaseGetter.me.value?.id,
@@ -2009,6 +2043,7 @@ class _VehicleFormState extends State<VehicleForm>
           updateVehicle(vehicle),
           uploadActivity(true, vehicle),
         ]).then((value) {
+          if(mounted){
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
             return InfoBar(
@@ -2016,20 +2051,33 @@ class _VehicleFormState extends State<VehicleForm>
               severity: InfoBarSeverity.success,
             );
           }, duration: snackbarShortDuration);
+          setState(() {
+            uploading = false;
+          });
+
+          }
         }).onError((error, stackTrace) {
-          displayInfoBar(context,
-              builder: (BuildContext context, void Function() close) {
-            return InfoBar(
-              title: const Text('echec').tr(),
-              severity: InfoBarSeverity.success,
-            );
-          }, duration: snackbarShortDuration);
+          if(mounted) {
+            displayInfoBar(context,
+                builder: (BuildContext context, void Function() close) {
+                  return InfoBar(
+                    title: const Text('echec').tr(),
+                    severity: InfoBarSeverity.success,
+                  );
+                }, duration: snackbarShortDuration);
+
+            setState(() {
+              uploading = false;
+              errorUploading=true;
+            });
+          }
         });
       } else {
         await Future.wait([
           createVehicle(vehicle),
           uploadActivity(false, vehicle),
         ]).then((value) {
+          if(mounted){
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
             return InfoBar(
@@ -2037,7 +2085,12 @@ class _VehicleFormState extends State<VehicleForm>
               severity: InfoBarSeverity.success,
             );
           }, duration: snackbarShortDuration);
+          setState(() {
+            uploading = false;
+          });
+          }
         }).onError((error, stackTrace) {
+          if(mounted){
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
             return InfoBar(
@@ -2045,6 +2098,12 @@ class _VehicleFormState extends State<VehicleForm>
               severity: InfoBarSeverity.error,
             );
           }, duration: snackbarShortDuration);
+          setState(() {
+            errorUploading=true;
+            uploading = false;
+          });
+          }
+
         });
       }
     }

@@ -496,7 +496,7 @@ class LogTableState extends State<LogTable> {
                       style: appTheme.writingStyle,
                       cursorColor: appTheme.color.darker,
                       placeholderStyle: placeStyle,
-                      decoration: BoxDecoration(color: appTheme.fillColor),
+                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
                       onSubmitted: (s) {
                         if (s.isNotEmpty) {
                           logDatasource.search(s);
