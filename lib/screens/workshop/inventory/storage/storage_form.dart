@@ -38,12 +38,12 @@ class _StorageFormState extends State<StorageForm> {
 
       children: [
         StaggeredGrid.count(
-          crossAxisCount: portrait ? 1 : 4,
+          crossAxisCount: portrait ? 1 : 6,
           mainAxisSpacing: 5,
           crossAxisSpacing: 5,
           children: [
             StaggeredGridTile.fit(
-              crossAxisCellCount: 3,
+              crossAxisCellCount: 2,
               child: Container(
                 width: 200.px,
                 height: 170.px,
@@ -153,7 +153,7 @@ class _StorageFormState extends State<StorageForm> {
             ),
             if(selectedPart!=null )
               StaggeredGridTile.fit(
-                crossAxisCellCount: 2,
+                crossAxisCellCount: 3,
                 child: Container(
                   width: 200.px,
                   height: expire?170.px:70.px,
@@ -240,7 +240,6 @@ class _StorageFormState extends State<StorageForm> {
             if(selectedPart!=null && selectedPart!.variations!=null &&
             selectedPart!.variations!.isNotEmpty)
               variationsWidget(appTheme,portrait)
-
           ],
         ),
       ],

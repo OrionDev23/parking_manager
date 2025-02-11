@@ -117,7 +117,7 @@ class Vehicle extends ParcOtoDefault {
         '$adresse $numero $nom $prenom $profession '
         '$numeroSerie $type $carrosserie $daira $energie'
         ' ${VehiclesUtilities.getMarqueName(marque)} ${VehiclesUtilities.getAnneeFromMatricule(matricule)}'
-        '$pays $matriculePrec ${VehiclesUtilities.getEtatName(etatactuel ??
+        '$pays $getMatPrecString() ${VehiclesUtilities.getEtatName(etatactuel ??
         0)} ${VehiclesUtilities.getPerimetre(perimetre)} ${VehiclesUtilities
         .getAppartenance(appartenance)} '
         '${VehiclesUtilities
@@ -126,6 +126,15 @@ class Vehicle extends ParcOtoDefault {
         .getDepartment(departement)} ${VehiclesUtilities
         .getAppartenance(appartenanceconducteur)} $matriculeConducteur '
         '${service?'service':'fonction'} $emplacement';
+  }
+
+  String getMatPrecString(){
+    String res="";
+
+    matriculePrec?.forEach((e){
+      res+="$e ";
+    });
+    return res.trim();
   }
 
   @override

@@ -70,7 +70,7 @@ class _VehicleFormState extends State<VehicleForm>
   String pays = 'DZ';
 
   final double height = 55.px;
-  final double heightFirst = 109.px;
+  final double heightFirst = 118.px;
 
   String wilaya = "16";
 
@@ -274,7 +274,6 @@ class _VehicleFormState extends State<VehicleForm>
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -283,14 +282,7 @@ class _VehicleFormState extends State<VehicleForm>
                     style: formHintStyle.copyWith(fontSize: 12,color: Colors.red),
                   ).tr(),
                 ),
-                if (!erreurMatricule) const Spacer(),
-                if (erreurMatricule)
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child:
-                        Text('erreurmat', style: TextStyle(color: Colors.red))
-                            .tr(),
-                  ),
+                const Spacer(),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 5.0),
                   child: autreMat
@@ -388,6 +380,15 @@ class _VehicleFormState extends State<VehicleForm>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    if (erreurMatricule)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                        child:
+                        Text('erreurmat', style: TextStyle(color: Colors.red))
+                            .tr(),
+                      ),
+                    if(erreurMatricule)
+                    Spacer(),
                     Checkbox(
 
                       checked: autreMat,
@@ -406,7 +407,6 @@ class _VehicleFormState extends State<VehicleForm>
                     smallSpace,
                   ],
                 ),
-                smallSpace,
                 smallSpace,
               ],
             ),
@@ -1528,11 +1528,11 @@ class _VehicleFormState extends State<VehicleForm>
                     BoxDecoration(color: appTheme.fillColor)),
 
               ),
+              if(chassisKey) const Spacer(),
               if(chassisKey)
-
-                Padding(padding: EdgeInsets.all(5),child:
+                Padding(padding: EdgeInsets.symmetric(horizontal: 5),child:
                   SizedBox(
-                    height: 34.px,
+                    height: 22.px,
                     child: errorChassis?Text('chassReq',style: TextStyle(color: Colors.red)).tr():null,
                   ),),
             ],

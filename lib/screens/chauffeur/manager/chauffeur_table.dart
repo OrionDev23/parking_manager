@@ -195,7 +195,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   SizedBox(
-                    width: 75.px,
+                    width: 80.px,
                     child: Stack(
                       children: [
                         Positioned.fill(
