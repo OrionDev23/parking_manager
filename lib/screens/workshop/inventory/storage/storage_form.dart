@@ -248,7 +248,7 @@ class _StorageFormState extends State<StorageForm> {
 
   Widget variationsWidget(AppTheme appTheme, bool portrait) {
     return StaggeredGridTile.fit(
-        crossAxisCellCount: 3,
+        crossAxisCellCount: 6,
         child: Container(
           width: 400.px,
           height:

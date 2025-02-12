@@ -62,6 +62,7 @@ class _PartsFormState extends State<PartsForm>
   bool loading = true;
   void initValues() async {
     if (widget.part != null) {
+      partID=widget.part!.id;
       name.text = widget.part!.name;
       description.text = widget.part!.description ?? '';
       prix=widget.part!.price??0;
@@ -88,22 +89,7 @@ class _PartsFormState extends State<PartsForm>
           }
         }
       }
-      variations = widget.part?.variations
-              ?.map((e) => VariationWidget(
-                    variation: e,
-                    sku: sku.text.length > 8
-                        ? sku.text.substring(0, 9)
-                        : 'XXXX-XXXX',
-                    options: [
-                      if (option1 != null) option1!,
-                      if (option2 != null) option2!,
-                      if (option3 != null) option3!,
-                      if (option4 != null) option4!,
-                    ],
-                    onPriceChanged: () => setState(() {}),
-                  ))
-              .toList() ??
-          [];
+      variations = widget.part?.variations?? [];
     }
     loading = false;
     if (mounted) {
@@ -523,7 +509,6 @@ class _PartsFormState extends State<PartsForm>
                                     option4 = null;
                                   }
                                   toggleFirstOptions();
-                                  changeSKUforAll();
 
                                   setState(() {});
                                 }
@@ -584,7 +569,6 @@ class _PartsFormState extends State<PartsForm>
                                           option1!.id != option!.id) {
                                         option4 = option;
                                       }
-                                      changeSKUforAll();
 
                                       setState(() {});
                                     }
@@ -770,7 +754,6 @@ class _PartsFormState extends State<PartsForm>
                                 color: appTheme.color.lightest),
                             onPressed: () {
                               sku.text = generateSKU();
-                              changeSKUforAll();
                               setState(() {});
                             },
                           ),
@@ -780,8 +763,6 @@ class _PartsFormState extends State<PartsForm>
                               controller: sku,
                               placeholder: 'SKU',
                               onChanged: (s) {
-                                changeSKUforAll();
-
                                 setState(() {});
                               },
                               style: appTheme.writingStyle,
@@ -898,46 +879,18 @@ class _PartsFormState extends State<PartsForm>
         ));
   }
 
-  List<VariationWidget> variations = List.empty(growable: true);
+  List<Variation> variations = List.empty(growable: true);
 
   void addDesignation() {
-    variations.add(VariationWidget(
-      key: UniqueKey(),
-      variation: Variation(
-        id: variations.isEmpty
-            ? '1'
-            : (int.parse(variations.last.variation.id) + 1).toString(),
-        name: '',
-        sku: 'XXXX',
-      ),
-      sku: sku.text.length > 8 ? sku.text.substring(0, 9) : 'XXXX-XXXX',
-      options: [
-        if (option1 != null) option1!,
-        if (option2 != null) option2!,
-        if (option3 != null) option3!,
-        if (option4 != null) option4!,
-      ],
-      onPriceChanged: () {
-        setState(() {});
-      },
+
+    variations.add(Variation(
+      id: variations.isEmpty
+          ? '1'
+          : (int.parse(variations.last.id) + 1).toString(),
+      name: '',
+      sku: 'XXXX',
     ));
     setState(() {});
-  }
-
-  void changeSKUforAll() {
-    for (int i = 0; i < variations.length; i++) {
-      variations[i] = VariationWidget(
-        key: variations[i].key,
-        variation: variations[i].variation,
-        sku: sku.text.length > 8 ? sku.text.substring(0, 9) : 'XXXX-XXXX',
-        options: [
-          if (option1 != null) option1!,
-          if (option2 != null) option2!,
-          if (option3 != null) option3!,
-          if (option4 != null) option4!,
-        ],
-      );
-    }
   }
 
   Widget designationTable(AppTheme appTheme) {
@@ -1022,7 +975,7 @@ class _PartsFormState extends State<PartsForm>
 
   bool selectedDesignationsExist() {
     for (int i = 0; i < variations.length; i++) {
-      if (variations[i].variation.selected) {
+      if (variations[i].selected) {
         return true;
       }
     }
@@ -1030,9 +983,9 @@ class _PartsFormState extends State<PartsForm>
   }
 
   void deleteAllSelected() {
-    List<VariationWidget> temp = List.from(variations);
+    List<Variation> temp = List.from(variations);
     for (int i = 0; i < temp.length; i++) {
-      if (temp[i].variation.selected) {
+      if (temp[i].selected) {
         variations.remove(temp[i]);
       }
     }
@@ -1052,19 +1005,35 @@ class _PartsFormState extends State<PartsForm>
             Row(
               children: [
                 Checkbox(
-                    checked: variations[index].variation.selected,
+                    checked: variations[index].selected,
                     onChanged: (s) {
                       setState(() {
-                        variations[index].variation.selected = s ?? false;
+                        variations[index].selected = s ?? false;
                       });
                     }),
                 smallSpace,
                 Flexible(
                   child: SizedBox(
                     height: 35.px,
-                    child: variations[index],
+                    child: VariationWidget(
+                      key: Key(variations[index].id),
+                      variation: variations[index],
+                      sku: sku.text.length > 8 ? sku.text.substring(0, 9) : 'XXXX-XXXX',
+                      options: [
+                        if (option1 != null) option1!,
+                        if (option2 != null) option2!,
+                        if (option3 != null) option3!,
+                        if (option4 != null) option4!,
+                      ],
+                      onOptionsChanged: (values) {
+                        setState(() {
+                          variations[index].optionValues = values;
+                        });
+
+                        print("selected options are : $values");
+                      },
+                    )),
                   ),
-                ),
               ],
             ),
             smallSpace,
@@ -1074,7 +1043,7 @@ class _PartsFormState extends State<PartsForm>
     });
   }
 
-  String? vehicleID;
+  String? partID;
 
   @override
   bool get wantKeepAlive => true;
@@ -1089,20 +1058,18 @@ class _PartsFormState extends State<PartsForm>
     });
     DateTime date = DateTime.now();
 
-    bool newpart = vehicleID == null;
+    bool newpart = partID == null;
 
-    vehicleID ??=
+    partID ??=
         DateTime.now().difference(DatabaseGetter.ref).inMilliseconds.toString();
     VehiclePart part = VehiclePart(
-      id: vehicleID!,
+      id: partID!,
       name: name.text,
       createdAt: widget.part?.createdAt ?? date,
       updatedAt: date,
       description: description.text,
       sku: sku.text,
-      variations: variations.map((s) {
-        return s.variation;
-      }).toList(),
+      variations: variations,
       barcode: barcode.text,
       selectedOptions: [
         if (option1 != null) option1!.id,
@@ -1130,14 +1097,14 @@ class _PartsFormState extends State<PartsForm>
       await DatabaseGetter()
           .addDocument(
               collectionId: partsID,
-              documentId: vehicleID!,
+              documentId: partID!,
               data: part.toJson())
           .then((s) {
         if (mounted) {
           displayMessage(context, 'pieceadded', InfoBarSeverity.success);
         }
       }).onError((AppwriteException e,s) {
-        vehicleID=null;
+        partID=null;
 
         if (mounted) {
           displayMessage(context, 'errupld', InfoBarSeverity.error);
@@ -1147,7 +1114,7 @@ class _PartsFormState extends State<PartsForm>
       await DatabaseGetter()
           .updateDocument(
               collectionId: partsID,
-              documentId: vehicleID!,
+              documentId: partID!,
               data: part.toJson())
           .then((s) {
         if (mounted) {

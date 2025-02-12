@@ -1,9 +1,7 @@
-import 'package:chip_list/chip_list.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../datasources/parcoto_datasource.dart';
 import '../../../../serializables/pieces/part.dart';
 import '../../../../serializables/pieces/variation.dart';
 import '../../../../theme.dart';
@@ -17,14 +15,15 @@ class VariationStorage extends StatefulWidget {
 
   final Function()? onQteChanged;
 
-  const VariationStorage(
-      {super.key,
-        this.mod=true,
-        this.selected=false,
-        required this.part,
-        this.onQteChanged,
-        this.expirationDate, required this.qte,
-        });
+  const VariationStorage({
+    super.key,
+    this.mod = true,
+    this.selected = false,
+    required this.part,
+    this.onQteChanged,
+    this.expirationDate,
+    required this.qte,
+  });
 
   @override
   VariationStorageState createState() => VariationStorageState();
@@ -37,8 +36,12 @@ class VariationStorageState extends State<VariationStorage> {
 
   DateTime? selectedDate;
 
-  int qte=1;
-
+  int qte = 1;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +54,7 @@ class VariationStorageState extends State<VariationStorage> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: Text(
-                widget.part.id,
+                '${widget.part.name} ${getVariationOptions()}',
                 style: placeStyle,
               ),
             )),
@@ -67,42 +70,29 @@ class VariationStorageState extends State<VariationStorage> {
         color: placeStyle.color,
       ),
       Flexible(
-        flex: 3,
-        child: ComboBox(items: List.generate(widget.part.variations?.length??0, (index)=>
-            ComboBoxItem(
-              onTap:(){
-                selectedVariation=widget.part.variations![index];
+          flex: 3,
+          child: ComboBox(
+              items: List.generate(
+                  widget.part.variations?.length ?? 0,
+                  (index) {
+                    return ComboBoxItem(
+                        onTap: () {
+                          selectedVariation = widget.part.variations![index];
+                          setState(() {});
+                        },
+                        value: widget.part.variations![index],
+                        child: Text(widget.part.variations![index].name),
+                      );
+                  }),
+              value: selectedVariation,
+              onChanged: (s){
                 setState(() {
-
+                  selectedVariation=s;
                 });
               },
-              value: widget.part.variations![index],
-              child: Text(widget.part.variations![index].name),
-            )))
-      ),
+
+          )),
       smallSpace,
-      VerticalDivider(
-        color: placeStyle.color,
-      ),
-      smallSpace,
-     ChipList(
-          chipListDisabled: true,
-          listOfChipNames: selectedVariation?.optionValues?.map((s,v)
-          =>MapEntry(s, v.toString())).values.toList()
-              ??[],
-          listOfChipIndicesCurrentlySelected: const [],
-          style: rowTextStyle,
-          borderRadiiList: const [5],
-          inactiveBgColorList: [appTheme.color.darkest],
-          inactiveTextColorList: [appTheme.writingStyle.color!],
-          inactiveBorderColorList: [appTheme.backGroundColor],
-          padding: EdgeInsets.zero,
-          widgetSpacing: 1,
-          showCheckmark: false,
-          shouldWrap: false,
-          wrapAlignment: WrapAlignment.start,
-          wrapCrossAlignment: WrapCrossAlignment.start,
-      ),
       VerticalDivider(
         color: placeStyle.color,
       ),
@@ -110,4 +100,14 @@ class VariationStorageState extends State<VariationStorage> {
     ];
   }
 
+
+  String getVariationOptions(){
+    String res="";
+
+    selectedVariation?.optionValues?.forEach((s,v){
+      res+="$v ";
+    });
+
+    return res;
+  }
 }
