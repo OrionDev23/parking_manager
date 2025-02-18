@@ -2,7 +2,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart' hide Trans;
+import 'package:parc_oto/screens/workshop/inventory/fournisseurs/fournisseur_table.dart';
 import 'package:parc_oto/screens/workshop/parts/parts_management/parts_table.dart';
+import 'package:parc_oto/serializables/client.dart';
+import 'package:parc_oto/serializables/pieces/storage_variations.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../../serializables/pieces/part.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +25,7 @@ class StorageForm extends StatefulWidget {
 class _StorageFormState extends State<StorageForm> {
 
   VehiclePart? selectedPart;
+  Client? selectedF;
   double qte=1;
   List<DateTime?>expirationDates=[DateTime.now().add(Duration(days: 30))];
   bool differentDate=false;
@@ -43,7 +47,70 @@ class _StorageFormState extends State<StorageForm> {
           crossAxisSpacing: 5,
           children: [
             StaggeredGridTile.fit(
-              crossAxisCellCount: 2,
+              crossAxisCellCount: 3,
+              child: Container(
+                width: 200.px,
+                height: 170.px,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: kElevationToShadow[2],
+                  color: appTheme.backGroundColor,
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'fournselect',
+                      style: appTheme.titleStyle,
+                    ).tr(),
+                    smallSpace,
+                    Flexible(
+                      flex: 1,
+                      child: ZoneBox(
+                        label: 'fournselect'.tr(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: FilledButton(
+                              child: Text(selectedF == null
+                                  ? 'nonind'.tr()
+                                  : selectedF!.nom),
+                              onPressed: () async {
+                                selectedF = await showDialog<Client?>(
+                                    context: context,
+                                    barrierDismissible: true,
+                                    builder: (context) {
+                                      return ContentDialog(
+                                        constraints:
+                                        BoxConstraints.tight(Size(700.px, 550.px)),
+                                        title: const Text('fournselect').tr(),
+                                        style: ContentDialogThemeData(
+                                            titleStyle: appTheme.writingStyle
+                                                .copyWith(fontWeight: FontWeight.bold)),
+                                        content: const FournisseurTable(
+                                          selectD: true,
+                                        ),
+                                        actions: [
+                                          Button(
+                                              child: const Text('fermer').tr(),
+                                              onPressed: () {
+                                                selectedF = null;
+                                                setState(() {});
+                                                Navigator.of(context).pop();
+                                              })
+                                        ],
+                                      );
+                                    });
+                                setState(() {});
+                              }),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            StaggeredGridTile.fit(
+              crossAxisCellCount: 3,
               child: Container(
                 width: 200.px,
                 height: 170.px,
@@ -107,7 +174,7 @@ class _StorageFormState extends State<StorageForm> {
             ),
             if(selectedPart!=null)
             StaggeredGridTile.fit(
-              crossAxisCellCount: 1,
+              crossAxisCellCount: 2,
               child: Container(
                 width: 200.px,
                 height: 170.px,
@@ -153,7 +220,7 @@ class _StorageFormState extends State<StorageForm> {
             ),
             if(selectedPart!=null )
               StaggeredGridTile.fit(
-                crossAxisCellCount: 3,
+                crossAxisCellCount: 4,
                 child: Container(
                   width: 200.px,
                   height: expire?170.px:70.px,
@@ -273,18 +340,18 @@ class _StorageFormState extends State<StorageForm> {
         ));
   }
 
-  List<VariationStorage> variations = List.empty(growable: true);
+  List<StorageVariation> variations = List.empty(growable: true);
 
-  int qteRestant=1;
+  double qteRestant=1;
   void addDesignation() {
-    variations.add(VariationStorage(
-      key: UniqueKey(),
-      part: selectedPart!,
-      qte: qteRestant,
-      onQteChanged: () {
-        setState(() {});
-      },
-    ));
+    variations.add(
+        StorageVariation(
+            id: variations.isEmpty
+                ? '1'
+                : (int.parse(variations.last.id) + 1).toString(),
+            name: '',
+            sku: 'XXXX',
+            qte: 1));
     setState(() {});
   }
 
@@ -319,9 +386,11 @@ class _StorageFormState extends State<StorageForm> {
             child: Table(
               columnWidths: const {
                 0: FlexColumnWidth(1),
-                1: FlexColumnWidth(3),
-                2: FlexColumnWidth(5),
+                1: FlexColumnWidth(5),
+                2: FlexColumnWidth(3),
                 3: FlexColumnWidth(3),
+                4: FlexColumnWidth(2),
+                5: FlexColumnWidth(3),
               },
               children: [
                 TableRow(children: [
@@ -343,6 +412,16 @@ class _StorageFormState extends State<StorageForm> {
                   TableCell(
                       child: const Text(
                         'dateexp',
+                        textAlign: TextAlign.center,
+                      ).tr()),
+                  TableCell(
+                      child: const Text(
+                        'prix',
+                        textAlign: TextAlign.center,
+                      ).tr()),
+                  TableCell(
+                      child: const Text(
+                        'qte',
                         textAlign: TextAlign.center,
                       ).tr()),
                 ]),
@@ -378,7 +457,7 @@ class _StorageFormState extends State<StorageForm> {
   }
 
   void deleteAllSelected() {
-    List<VariationStorage> temp = List.from(variations);
+    List<StorageVariation> temp = List.from(variations);
     for (int i = 0; i < temp.length; i++) {
       if (temp[i].selected) {
         variations.remove(temp[i]);
@@ -403,19 +482,28 @@ class _StorageFormState extends State<StorageForm> {
                     checked: variations[index].selected,
                     onChanged: (s) {
                       setState(() {
-                        variations[index]=VariationStorage
-                          (key:variations[index].key,
-                          qte: variations[index].qte,
-                          part: variations[index].part,
-                          selected: s??false,
-                          expirationDate: variations[index].expirationDate,);
+                        variations[index].selected=s??false;
                       });
                     }),
                 smallSpace,
                 Flexible(
                   child: SizedBox(
                     height: 35.px,
-                    child: variations[index],
+                    child: VariationStorageWidget(
+                        key: Key(variations[index].id),
+                        part: selectedPart!,
+                        variation: variations[index],
+                        onQteChanged: (s){
+                          variations[index].qte=s;
+                        },
+                       onDateChanged: (d){
+                          variations[index].expirationDate=d;
+                       },
+                      onOptionsChanged: (s){
+                          variations[index].optionValues=s;
+                      }, maxQte: qteRestant,
+
+                    ),
                   ),
                 ),
               ],

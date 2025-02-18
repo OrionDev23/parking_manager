@@ -22,8 +22,8 @@ class FournisseurTabsState extends State<FournisseurTabs> {
     late Tab tab;
     tab = Tab(
       key: UniqueKey(),
-      text: Text('nouvfourn'.tr()),
-      semanticLabel: 'nouvfourn'.tr(),
+      text: Text('nouvfournisseur'.tr()),
+      semanticLabel: 'nouvfournisseur'.tr(),
       icon: const Icon(FluentIcons.shop),
       body: const FournisseurForm(),
       onClosed: () {

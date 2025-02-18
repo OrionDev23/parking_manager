@@ -177,6 +177,9 @@ DateTime stringToTimeNN(String? json) {
 String timeToJson(DateTime? date) {
   return date?.toIso8601String() ?? DateTime.now().toIso8601String();
 }
+String? timeToJsonN(DateTime? date) {
+  return date?.toIso8601String();
+}
 
 
 List<dynamic>? listToJson(List<dynamic>? objects) {

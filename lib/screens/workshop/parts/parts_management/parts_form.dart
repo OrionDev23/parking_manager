@@ -1030,7 +1030,6 @@ class _PartsFormState extends State<PartsForm>
                           variations[index].optionValues = values;
                         });
 
-                        print("selected options are : $values");
                       },
                     )),
                   ),
