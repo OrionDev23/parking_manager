@@ -16,6 +16,7 @@ class Storage extends ParcOtoDefault{
   final String fournisseurName;
   @JsonKey(toJson:timeToJsonN,fromJson: createdAtJson)
   final DateTime? expirationDate;
+  @JsonKey(toJson: listToJsonString,)
   final List<StorageVariation> variations;
 
   Storage({required super.id,super.createdAt,super.updatedAt,this.expirationDate,required this.qte,required this.partID,required this.pieceName,required this.fournisseurID,required this.fournisseurName,required this.variations});

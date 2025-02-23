@@ -28,5 +28,5 @@ Map<String, dynamic> _$StorageToJson(Storage instance) => <String, dynamic>{
       'fournisseurID': instance.fournisseurID,
       'fournisseurName': instance.fournisseurName,
       'expirationDate': timeToJsonN(instance.expirationDate),
-      'variations': instance.variations,
+      'variations': listToJsonString(instance.variations),
     };

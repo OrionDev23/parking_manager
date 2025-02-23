@@ -36,279 +36,300 @@ class _StorageFormState extends State<StorageForm> {
     var appTheme=context.watch<AppTheme>();
     bool portrait = context.orientation == Orientation.portrait;
 
-    return ListView(
-      shrinkWrap: true,
-      padding: EdgeInsets.all(10),
-
+    return Column(
       children: [
-        StaggeredGrid.count(
-          crossAxisCount: portrait ? 1 : 6,
-          mainAxisSpacing: 5,
-          crossAxisSpacing: 5,
-          children: [
-            StaggeredGridTile.fit(
-              crossAxisCellCount: 3,
-              child: Container(
-                width: 200.px,
-                height: 170.px,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: kElevationToShadow[2],
-                  color: appTheme.backGroundColor,
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'fournselect',
-                      style: appTheme.titleStyle,
-                    ).tr(),
-                    smallSpace,
-                    Flexible(
-                      flex: 1,
-                      child: ZoneBox(
-                        label: 'fournselect'.tr(),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: FilledButton(
-                              child: Text(selectedF == null
-                                  ? 'nonind'.tr()
-                                  : selectedF!.nom),
-                              onPressed: () async {
-                                selectedF = await showDialog<Client?>(
-                                    context: context,
-                                    barrierDismissible: true,
-                                    builder: (context) {
-                                      return ContentDialog(
-                                        constraints:
-                                        BoxConstraints.tight(Size(700.px, 550.px)),
-                                        title: const Text('fournselect').tr(),
-                                        style: ContentDialogThemeData(
-                                            titleStyle: appTheme.writingStyle
-                                                .copyWith(fontWeight: FontWeight.bold)),
-                                        content: const FournisseurTable(
-                                          selectD: true,
-                                        ),
-                                        actions: [
-                                          Button(
-                                              child: const Text('fermer').tr(),
-                                              onPressed: () {
-                                                selectedF = null;
-                                                setState(() {});
-                                                Navigator.of(context).pop();
-                                              })
-                                        ],
-                                      );
-                                    });
-                                setState(() {});
-                              }),
-                        ),
+        Flexible(
+          child: ListView(
+            shrinkWrap: true,
+            padding: EdgeInsets.all(10),
+            children: [
+              StaggeredGrid.count(
+                crossAxisCount: portrait ? 1 : 6,
+                mainAxisSpacing: 5,
+                crossAxisSpacing: 5,
+                children: [
+                  StaggeredGridTile.fit(
+                    crossAxisCellCount: 3,
+                    child: Container(
+                      width: 200.px,
+                      height: 170.px,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: kElevationToShadow[2],
+                        color: appTheme.backGroundColor,
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            StaggeredGridTile.fit(
-              crossAxisCellCount: 3,
-              child: Container(
-                width: 200.px,
-                height: 170.px,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: kElevationToShadow[2],
-                  color: appTheme.backGroundColor,
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'slcprd',
-                      style: appTheme.titleStyle,
-                    ).tr(),
-                    smallSpace,
-                    Flexible(
-                      flex: 1,
-                      child: ZoneBox(
-                        label: 'slcprd'.tr(),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: FilledButton(
-                              child: Text(selectedPart == null
-                                  ? 'nonind'.tr()
-                                  : selectedPart!.name),
-                              onPressed: () async {
-                                selectedPart = await showDialog<VehiclePart>(
-                                    context: context,
-                                    barrierDismissible: true,
-                                    builder: (context) {
-                                      return ContentDialog(
-                                        constraints:
-                                        BoxConstraints.tight(Size(700.px, 550.px)),
-                                        title: const Text('slcprd').tr(),
-                                        style: ContentDialogThemeData(
-                                            titleStyle: appTheme.writingStyle
-                                                .copyWith(fontWeight: FontWeight.bold)),
-                                        content: const PartsTable(
-                                          selectD: true,
-                                        ),
-                                        actions: [
-                                          Button(
-                                              child: const Text('fermer').tr(),
-                                              onPressed: () {
-                                                selectedPart = null;
-                                                setState(() {});
-                                                Navigator.of(context).pop();
-                                              })
-                                        ],
-                                      );
-                                    });
-                                setState(() {});
-                              }),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if(selectedPart!=null)
-            StaggeredGridTile.fit(
-              crossAxisCellCount: 2,
-              child: Container(
-                width: 200.px,
-                height: 170.px,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: kElevationToShadow[2],
-                  color: appTheme.backGroundColor,
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'quantity',
-                      style: appTheme.titleStyle,
-                    ).tr(),
-                    smallSpace,
-                    Flexible(
-                      flex: 1,
-                      child: ZoneBox(
-                        label: 'quantity'.tr(),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: selectedPart!.unitType==0?NumberBox<int>(
-                            value: qte.toInt(),
-                            onChanged: (int? value) {
-                              setState(() {
-                                qte=value?.toDouble()??0;
-                              });
-                            },
-                            min: 0,
-                          )
-                          :NumberBox<double>(value: qte, onChanged: (s){
-                            setState(() {
-                              qte=s??0;
-                            });
-                          }),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if(selectedPart!=null )
-              StaggeredGridTile.fit(
-                crossAxisCellCount: 4,
-                child: Container(
-                  width: 200.px,
-                  height: expire?170.px:70.px,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: kElevationToShadow[2],
-                    color: appTheme.backGroundColor,
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                      child: Column(
                         children: [
                           Text(
-                            'dateexp',
+                            'fournselect',
                             style: appTheme.titleStyle,
                           ).tr(),
-                          Checkbox(
-                            checked: expire,
-                            onChanged: (s){
-                              setState(() {
-                                expire=s??false;
-                              });
-                            },
-                            content: Text(
-                              'toexpire'
-                            ).tr(),
+                          smallSpace,
+                          Flexible(
+                            flex: 1,
+                            child: ZoneBox(
+                              label: 'fournselect'.tr(),
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: FilledButton(
+                                    child: Text(selectedF == null
+                                        ? 'nonind'.tr()
+                                        : selectedF!.nom),
+                                    onPressed: () async {
+                                      selectedF = await showDialog<Client?>(
+                                          context: context,
+                                          barrierDismissible: true,
+                                          builder: (context) {
+                                            return ContentDialog(
+                                              constraints:
+                                              BoxConstraints.tight(Size(700.px, 550.px)),
+                                              title: const Text('fournselect').tr(),
+                                              style: ContentDialogThemeData(
+                                                  titleStyle: appTheme.writingStyle
+                                                      .copyWith(fontWeight: FontWeight.bold)),
+                                              content: const FournisseurTable(
+                                                selectD: true,
+                                              ),
+                                              actions: [
+                                                Button(
+                                                    child: const Text('fermer').tr(),
+                                                    onPressed: () {
+                                                      selectedF = null;
+                                                      setState(() {});
+                                                      Navigator.of(context).pop();
+                                                    })
+                                              ],
+                                            );
+                                          });
+                                      setState(() {});
+                                    }),
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                      if(expire)
-                      smallSpace,
-                      if(expire)
-                        Flexible(
-                        flex: 1,
-                        child: ZoneBox(
-                          label: 'dateexp'.tr(),
-                          child: Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                if(differentDate==false)
-                                DatePicker(
-                                  selected: expirationDates[0],
-                                  onChanged: (d){
-                                    if(expirationDates.isNotEmpty){
-                                      expirationDates[0]=d;
-                                    }
-                                    else{
-                                      expirationDates.add(d);
-                                    }
+                    ),
+                  ),
+                  StaggeredGridTile.fit(
+                    crossAxisCellCount: 3,
+                    child: Container(
+                      width: 200.px,
+                      height: 170.px,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: kElevationToShadow[2],
+                        color: appTheme.backGroundColor,
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            'slcprd',
+                            style: appTheme.titleStyle,
+                          ).tr(),
+                          smallSpace,
+                          Flexible(
+                            flex: 1,
+                            child: ZoneBox(
+                              label: 'slcprd'.tr(),
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: FilledButton(
+                                    child: Text(selectedPart == null
+                                        ? 'nonind'.tr()
+                                        : selectedPart!.name),
+                                    onPressed: () async {
+                                      selectedPart = await showDialog<VehiclePart>(
+                                          context: context,
+                                          barrierDismissible: true,
+                                          builder: (context) {
+                                            return ContentDialog(
+                                              constraints:
+                                              BoxConstraints.tight(Size(700.px, 550.px)),
+                                              title: const Text('slcprd').tr(),
+                                              style: ContentDialogThemeData(
+                                                  titleStyle: appTheme.writingStyle
+                                                      .copyWith(fontWeight: FontWeight.bold)),
+                                              content: const PartsTable(
+                                                selectD: true,
+                                              ),
+                                              actions: [
+                                                Button(
+                                                    child: const Text('fermer').tr(),
+                                                    onPressed: () {
+                                                      selectedPart = null;
+                                                      setState(() {});
+                                                      Navigator.of(context).pop();
+                                                    })
+                                              ],
+                                            );
+                                          });
+                                      setState(() {});
+                                    }),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if(selectedPart!=null)
+                  StaggeredGridTile.fit(
+                    crossAxisCellCount: 2,
+                    child: Container(
+                      width: 200.px,
+                      height: 170.px,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: kElevationToShadow[2],
+                        color: appTheme.backGroundColor,
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            'quantity',
+                            style: appTheme.titleStyle,
+                          ).tr(),
+                          smallSpace,
+                          Flexible(
+                            flex: 1,
+                            child: ZoneBox(
+                              label: 'quantity'.tr(),
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: selectedPart!.unitType==0?NumberBox<int>(
+                                  value: qte.toInt(),
+                                  onChanged: (int? value) {
                                     setState(() {
-
+                                      qte=value?.toDouble()??0;
+                                    });
+                                    updateQteRestant();
+              
+                                  },
+                                  min: 0,
+                                )
+                                :NumberBox<double>(value: qte, onChanged: (s){
+                                  setState(() {
+                                    qte=s??0;
+                                  });
+                                  updateQteRestant();
+                                }),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if(selectedPart!=null )
+                    StaggeredGridTile.fit(
+                      crossAxisCellCount: 4,
+                      child: Container(
+                        width: 200.px,
+                        height: expire?170.px:70.px,
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: kElevationToShadow[2],
+                          color: appTheme.backGroundColor,
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'dateexp',
+                                  style: appTheme.titleStyle,
+                                ).tr(),
+                                Checkbox(
+                                  checked: expire,
+                                  onChanged: (s){
+                                    setState(() {
+                                      expire=s??false;
                                     });
                                   },
-
+                                  content: Text(
+                                    'toexpire'
+                                  ).tr(),
                                 ),
-                                if(qte>1)
-                                      Checkbox(
-                                        checked: differentDate,
-                                        onChanged: (bool? value) {
-                                          differentDate=value??false;
+                              ],
+                            ),
+                            if(expire)
+                            smallSpace,
+                            if(expire)
+                              Flexible(
+                              flex: 1,
+                              child: ZoneBox(
+                                label: 'dateexp'.tr(),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      if(differentDate==false)
+                                      DatePicker(
+                                        selected: expirationDates[0],
+                                        onChanged: (d){
+                                          if(expirationDates.isNotEmpty){
+                                            expirationDates[0]=d;
+                                          }
+                                          else{
+                                            expirationDates.add(d);
+                                          }
                                           setState(() {
-
+              
                                           });
                                         },
-                                        content: Text(
-                                          'differentDates'
-                                        ).tr(),
-
+              
                                       ),
-                              ],
-                            )
-                          ),
+                                      if(qte>1)
+                                            Checkbox(
+                                              checked: differentDate,
+                                              onChanged: (bool? value) {
+                                                differentDate=value??false;
+                                                setState(() {
+              
+                                                });
+                                              },
+                                              content: Text(
+                                                'differentDates'
+                                              ).tr(),
+              
+                                            ),
+                                    ],
+                                  )
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            if(selectedPart!=null && selectedPart!.variations!=null &&
-            selectedPart!.variations!.isNotEmpty)
-              variationsWidget(appTheme,portrait)
-          ],
+                    ),
+                  if(selectedPart!=null && selectedPart!.variations!=null &&
+                  selectedPart!.variations!.isNotEmpty)
+                    variationsWidget(appTheme,portrait)
+                ],
+              ),],
+          ),
         ),
+
+        Container(
+          padding: const EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+            color: appTheme.backGroundColor,
+            boxShadow: kElevationToShadow[2],),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              FilledButton(
+                onPressed: confirmUpload,
+                child: const Text('confirmer').tr(),
+              ),
+            ],),),
       ],
     );
   }
@@ -352,7 +373,7 @@ class _StorageFormState extends State<StorageForm> {
             name: '',
             sku: 'XXXX',
             qte: 1));
-    setState(() {});
+    updateQteRestant();
   }
 
   Widget designationTable(AppTheme appTheme) {
@@ -371,7 +392,7 @@ class _StorageFormState extends State<StorageForm> {
                     child: const Text('delete').tr()),
                 smallSpace,
                 FilledButton(
-                    onPressed: addDesignation, child: const Text('add').tr()),
+                    onPressed: qteRestant>0?addDesignation:null, child: const Text('add').tr()),
               ],
             ),
           ),
@@ -463,7 +484,7 @@ class _StorageFormState extends State<StorageForm> {
         variations.remove(temp[i]);
       }
     }
-    setState(() {});
+    updateQteRestant();
   }
 
   List<Widget> getDesignationList(AppTheme appTheme) {
@@ -495,6 +516,7 @@ class _StorageFormState extends State<StorageForm> {
                         variation: variations[index],
                         onQteChanged: (s){
                           variations[index].qte=s;
+                          updateQteRestant();
                         },
                        onDateChanged: (d){
                           variations[index].expirationDate=d;
@@ -514,4 +536,32 @@ class _StorageFormState extends State<StorageForm> {
       );
     });
   }
+
+  void updateQteRestant(){
+    qteRestant=qte;
+    for(int i=0;i<variations.length;i++){
+      qteRestant-=variations[i].qte;
+    }
+    setState(() {
+
+    });
+  }
+
+  void confirmUpload() async{
+
+    if(selectedPart==null){
+      return;
+    }
+    if(qte<=0){
+      return;
+    }
+
+    for(int i=0;i<variations.length;i++){
+      if(variations[i].qte<=0){
+        return;
+      }
+    }
+  }
+
+
 }

@@ -157,7 +157,7 @@ class VariationStorageWidgetState extends State<VariationStorageWidget> {
             }
           },
           min: 0,
-          max: widget.maxQte.toInt(),
+          max: widget.maxQte.toInt()+qte.toInt(),
         )
             :NumberBox<double>(
             value: qte,
@@ -171,7 +171,7 @@ class VariationStorageWidgetState extends State<VariationStorageWidget> {
           }
         },
             min: 0,
-          max: widget.maxQte,
+          max: widget.maxQte+qte,
 
         ),
       )
