@@ -650,6 +650,16 @@
   "suprpart": "تمت إزالة قطعة غيار",
   "modpart": "تعديل قطعة الغيار",
   "differentDates": "تواريخ انتهاء الصلاحية مختلفة ؟",
-  "toexpire": "Does this product expire?"
+  "toexpire": "Does this product expire?",
+
+  "supstockage": "حذف العنصر من المخزن",
+  "ajoutstorage": "تمت إضافة عنصر تخزين جديد",
+  "modifstorage": "تم تعديل عنصر تخزين",
+  "supstorage": "تم حذف عنصر تخزين",
+  "modstock": "تعديل عنصر تخزين",
+  "nouvstock": "عنصر تخزين جديد",
+  "piece": "قطعة الغيار",
+  "imagesdegats": "صور الأضرار",
+  "uploaddimages": "(تحميل صور الأضرار (4 صور على الأكتر))"
 
 }

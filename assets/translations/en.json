@@ -651,6 +651,17 @@
   "suprpart": "A spare part has been removed",
   "modpart": "Modify part",
   "differentDates": "Different expiry dates ?",
-  "toexpire": "Does this product expire?"
+  "toexpire": "Does this product expire?",
+  "supstockage": "Delete entry from storage",
+  "ajoutstorage": "A new storage entry has been added",
+  "modifstorage": "A storage entry has been modified",
+  "supstorage": "A storage entry has been deleted",
+  "modstock": "Modify entry",
+  "nouvstock": "New entry",
+  "piece": "Spare",
+  "imagesdegats": "Damage images",
+  "uploaddimages": "(Upload damage images (4 images max))"
+
+
 
 }

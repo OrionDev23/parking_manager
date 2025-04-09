@@ -9,17 +9,20 @@ part 'storage.g.dart';
 @JsonSerializable()
 class Storage extends ParcOtoDefault{
 
-  final int qte;
+  final double qte;
   final String partID;
   final String pieceName;
-  final String fournisseurID;
-  final String fournisseurName;
+  final String? fournisseurID;
+  final String? fournisseurName;
   @JsonKey(toJson:timeToJsonN,fromJson: createdAtJson)
   final DateTime? expirationDate;
   @JsonKey(toJson: listToJsonString,)
-  final List<StorageVariation> variations;
+  final List<StorageVariation>? variations;
+  late final String? search;
 
-  Storage({required super.id,super.createdAt,super.updatedAt,this.expirationDate,required this.qte,required this.partID,required this.pieceName,required this.fournisseurID,required this.fournisseurName,required this.variations});
+  Storage({required super.id,super.createdAt,super.updatedAt,this.expirationDate,required this.qte,required this.partID,required this.pieceName,required this.fournisseurID,required this.fournisseurName,required this.variations}){
+    search='$partID $pieceName $fournisseurName $fournisseurID  ${expirationDate?.toIso8601String()} ${listToJson(variations)}';
+  }
 
 
   factory Storage.fromJson(Map<String, dynamic> json) =>

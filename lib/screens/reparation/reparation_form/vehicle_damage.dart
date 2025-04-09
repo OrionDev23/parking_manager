@@ -9,8 +9,9 @@ import '../../../widgets/on_tap_scale.dart';
 
 class VehicleDamage extends StatefulWidget {
   final EtatVehicle etatVehicle;
+  final int vehicleType;
 
-  const VehicleDamage({super.key, required this.etatVehicle});
+  const VehicleDamage({super.key, required this.etatVehicle, required this.vehicleType});
 
   @override
   State<VehicleDamage> createState() => _VehicleDamageState();
@@ -152,7 +153,8 @@ class _VehicleDamageState extends State<VehicleDamage> {
           child: Text('PARE-BRISE AV', style: littleStyle),
         )),
         TableCell(
-            child: Container(
+            child:
+    Container(
           color: appTheme.color.lightest,
           padding: const EdgeInsets.all(5.0),
           child: Text('PARE-BRISE AR', style: littleStyle),
@@ -215,6 +217,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
                 style: littleStyle,
               ),
               const Spacer(),
+              if(widget.vehicleType!=2)
               Checkbox(
                   checked: widget.etatVehicle.parBriseArf,
                   onChanged: (s) {
@@ -333,7 +336,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
             ],
           ),
         )),
-        TableCell(
+          TableCell(
             child: Padding(
           padding: const EdgeInsets.all(5.0),
           child: Row(
@@ -343,7 +346,8 @@ class _VehicleDamageState extends State<VehicleDamage> {
                 style: littleStyle,
               ),
               const Spacer(),
-              Checkbox(
+              if(widget.vehicleType!=2)
+                Checkbox(
                   checked: widget.etatVehicle.parBriseArc,
                   onChanged: (s) {
                     if (s == true) {
@@ -460,7 +464,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
             ],
           ),
         )),
-        TableCell(
+          TableCell(
             child: Padding(
           padding: const EdgeInsets.all(5.0),
           child: Row(
@@ -470,7 +474,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                 style: littleStyle,
               ),
               const Spacer(),
-              Checkbox(
+              if(widget.vehicleType!=2)
+
+                Checkbox(
                   checked: widget.etatVehicle.parBriseAre,
                   onChanged: (s) {
                     if (s == true) {
@@ -859,7 +865,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                 style: littleStyle,
               ),
               const Spacer(),
-              Checkbox(
+              if(widget.vehicleType!=2)
+
+                Checkbox(
                   checked: widget.etatVehicle.porteARD,
                   onChanged: (s) {
                     widget.etatVehicle.porteARD = s ?? false;
@@ -878,7 +886,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                 style: littleStyle,
               ),
               const Spacer(),
-              Checkbox(
+              if(widget.vehicleType!=2 && widget.vehicleType!=4 && widget.vehicleType!=9)
+
+                Checkbox(
                   checked: widget.etatVehicle.siegeARD,
                   onChanged: (s) {
                     widget.etatVehicle.siegeARD = s ?? false;
@@ -897,7 +907,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                 style: littleStyle,
               ),
               const Spacer(),
-              Checkbox(
+              if(widget.vehicleType!=9)
+
+                Checkbox(
                   checked: widget.etatVehicle.toit,
                   onChanged: (s) {
                     widget.etatVehicle.toit = s ?? false;
@@ -939,7 +951,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                 style: littleStyle,
               ),
               const Spacer(),
-              Checkbox(
+              if(widget.vehicleType!=2 && widget.vehicleType!=9)
+
+                Checkbox(
                   checked: widget.etatVehicle.porteARG,
                   onChanged: (s) {
                     widget.etatVehicle.porteARG = s ?? false;
@@ -958,7 +972,9 @@ class _VehicleDamageState extends State<VehicleDamage> {
                 style: littleStyle,
               ),
               const Spacer(),
-              Checkbox(
+              if(widget.vehicleType!=2 && widget.vehicleType!=9)
+
+                Checkbox(
                   checked: widget.etatVehicle.siegeARG,
                   onChanged: (s) {
                     widget.etatVehicle.siegeARG = s ?? false;
@@ -1004,7 +1020,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
           Positioned.fill(
               left: 10.px,
               right: 5.px,
-              child: Image.asset('assets/images/car.webp',
+              child: Image.asset(getVehicleImage(),
                   fit: BoxFit.fitWidth, color: appTheme.writingStyle.color)),
           ...getFeux(appTheme),
           ...getAutres(appTheme),
@@ -1018,11 +1034,24 @@ class _VehicleDamageState extends State<VehicleDamage> {
     );
   }
 
+
+  String getVehicleImage(){
+    switch(widget.vehicleType){
+      case 1:return 'assets/images/car.webp';
+      case 2:return 'assets/images/truck.webp';
+      case 4:return 'assets/images/bus.webp';
+      case 9:return 'assets/images/moto.webp';
+      default:return 'assets/images/car.webp';
+    }
+  }
+
+
+
   List<Positioned> getAutres(AppTheme appTheme) {
     return [
       ///CALANDRE
       Positioned(
-          left: 9.px,
+          left: widget.vehicleType==2?12.px:9.px,
           top: 60.px,
           child: SizedBox(
             width: lightWidth,
@@ -1051,7 +1080,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
 
       ///Capot
       Positioned(
-          left: 50.px,
+          left: widget.vehicleType==2?25.px:50.px,
           top: 60.px,
           child: SizedBox(
             width: lightWidth,
@@ -1079,7 +1108,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
 
       ///Toit
       Positioned(
-          left: 160.px,
+          left: widget.vehicleType==2?60.px:160.px,
           top: 60.px,
           child: SizedBox(
             width: lightWidth,
@@ -1105,6 +1134,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
             ),
           )),
 
+      if(widget.vehicleType!=2)
       ///Coffre
       Positioned(
           left: 263.px,
@@ -1297,8 +1327,8 @@ class _VehicleDamageState extends State<VehicleDamage> {
     return [
       ///Portes avant
       Positioned(
-          left: 130.px,
-          top: 3.px,
+          left: widget.vehicleType==2?60.px:130.px,
+          top: widget.vehicleType==2?10.px:3.px,
           child: SizedBox(
             width: lightWidth,
             height: 30.h,
@@ -1321,7 +1351,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   },
                 ),
                 SizedBox(
-                  height: 90.px,
+                  height: widget.vehicleType==2?80.px:90.px,
                 ),
                 OnTapScaleAndFade(
                   child: Container(
@@ -1343,9 +1373,10 @@ class _VehicleDamageState extends State<VehicleDamage> {
             ),
           )),
 
+      if(widget.vehicleType!=4)
       ///Sieges avant
       Positioned(
-          left: 130.px,
+          left:widget.vehicleType==2?60.px:130.px,
           top: 35.px,
           child: SizedBox(
             width: lightWidth,
@@ -1391,6 +1422,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
             ),
           )),
 
+      if(widget.vehicleType!=2 && widget.vehicleType!=4)
       ///Sieges arriere
       Positioned(
           left: 190.px,
@@ -1439,6 +1471,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
             ),
           )),
 
+      if(widget.vehicleType!=2 && widget.vehicleType!=4)
       ///Portes arriere
       Positioned(
           left: 180.px,
@@ -1635,7 +1668,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
     return [
       ///Pare-brise AV
       Positioned(
-          left: 92.px,
+          left: widget.vehicleType==2?35.px:92.px,
           top: 60.px,
           child: SizedBox(
             width: lightWidth,
@@ -1681,6 +1714,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
             ),
           )),
 
+      if(widget.vehicleType!=2)
       ///Pare-brise AR
       Positioned(
           left: 227.px,

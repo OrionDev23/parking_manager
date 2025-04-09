@@ -640,5 +640,14 @@
  "suprpart": "Une pièce détachée a été supprimée",
  "modpart": "Modifier la pièce",
  "differentDates": "Dates d'éxpiration differentes ?",
- "toexpire": "Ce produit expire ?"
+ "toexpire": "Ce produit expire ?",
+ "supstockage": "Supprimer l'entrée du stockage",
+ "ajoutstorage": "Une nouvelle entrée du stockage a été ajoutée",
+ "modifstorage": "Une entrée du stockage a été modifiée",
+ "supstorage": "Une entrée du stockage a été supprimée",
+ "modstock": "Modifier entée",
+ "nouvstock": "Nouvelle entrée",
+ "piece": "Piéce",
+ "imagesdegats": "Photos des degats",
+ "uploaddimages": "(Uploadez les photos des degats (4 images max))"
 }

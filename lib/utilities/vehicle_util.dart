@@ -219,6 +219,21 @@ class VehiclesUtilities {
     }
   }
 
+  static int getGenreNumber(String matricule){
+    if (matricule.contains('-')) {
+      var s = matricule.split('-');
+      if (s.length == 3) {
+        int type = int.parse(s[1]);
+        type = type ~/ 100;
+
+        return type;
+      } else {
+        return 1;
+      }
+    }
+    return 99;
+  }
+
   static String getGenre(String matricule) {
     if (matricule.contains('-')) {
       var s = matricule.split('-');

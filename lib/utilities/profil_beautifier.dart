@@ -189,6 +189,19 @@ List<String>? listToJsonString(List<dynamic>?objects){
   return objects?.map((s)=>jsonEncode(s.toJson())).toList();
 }
 
+String dlistToString(List<dynamic>?objects){
+  List<String>? temp=listToJsonString(objects);
+  String result="";
+  if(temp!=null){
+    for(int i=0;i<temp!.length;i++){
+      result+=temp[i]??'';
+      result+=" ";
+    }
+  }
+
+  return result;
+}
+
 List<Variation>? variationsFromList(List<dynamic>? json){
   return json
       ?.map((e) => Variation.fromJson(jsonDecode(e) as Map<String, dynamic>))

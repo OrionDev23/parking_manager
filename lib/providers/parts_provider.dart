@@ -261,4 +261,24 @@ class PartsProvider extends ChangeNotifier{
       return result;
     }
   }
+
+  Future<VehiclePart?> getPart(String? id) async {
+    if(id==null || id.isEmpty){
+      return null;
+    }
+    else{
+      if(parts.containsKey(id)){
+        return parts[id];
+      }
+      else{
+        var doc=await DatabaseGetter().getDocument(partsID, id);
+        if(doc!=null){
+          return VehiclePart.fromJson(doc.data);
+        }
+        else{
+          return null;
+        }
+      }
+    }
+  }
 }

@@ -2,6 +2,8 @@ import 'package:appwrite/appwrite.dart' hide Client;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/repair_provider.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
@@ -29,6 +31,7 @@ import '../../../serializables/reparation/reparation.dart';
 import '../../../serializables/vehicle/vehicle.dart';
 import '../../../utilities/vehicle_util.dart';
 import '../../../widgets/empty_table_widget.dart';
+import '../../../widgets/on_tap_scale.dart';
 
 class ReparationForm extends StatefulWidget {
   final Reparation? reparation;
@@ -59,17 +62,18 @@ class ReparationFormState extends State<ReparationForm>
 
   TextEditingController nchassi = TextEditingController();
   TextEditingController nmoteur = TextEditingController();
-  TextEditingController matriculeConducteur=TextEditingController();
-  TextEditingController nom=TextEditingController();
-  TextEditingController prenom=TextEditingController();
+  TextEditingController matriculeConducteur = TextEditingController();
+  TextEditingController nom = TextEditingController();
+  TextEditingController prenom = TextEditingController();
   DateTime anneeUtil = DateTime.now();
 
   double carburant = 4;
 
   TextEditingController remarqueEntretien = TextEditingController();
 
-  bool showEtat=true;
-  bool showEtretient=true;
+  bool showEtat = true;
+  bool showEtretient = true;
+  bool showImages = true;
 
   @override
   void initState() {
@@ -90,7 +94,7 @@ class ReparationFormState extends State<ReparationForm>
       remarqueEntretien.text = widget.reparation!.remarque ?? '';
       numOrdre.text = widget.reparation!.numero.toString();
       reservedOrders[widget.key!] = widget.reparation!.numero;
-      await Future.wait([getPrestatataire(), getVehicle()]);
+      await Future.wait([getPrestatataire(), getVehicle(),getImages()]);
       matricule.text = widget.reparation!.vehiculemat ?? '';
       couleur.text = widget.reparation!.couleur ?? '';
       type.text = widget.reparation!.modele ?? '';
@@ -99,9 +103,9 @@ class ReparationFormState extends State<ReparationForm>
       km.text = widget.reparation!.kilometrage?.toString() ?? '0';
       carburant = widget.reparation!.gaz?.toDouble() ?? 4;
       selectedDate = widget.reparation!.date;
-      matriculeConducteur.text=widget.reparation!.matriculeConducteur??'';
-      nom.text=widget.reparation!.nomConducteur??'';
-      prenom.text=widget.reparation!.prenomConducteur??'';
+      matriculeConducteur.text = widget.reparation!.matriculeConducteur ?? '';
+      nom.text = widget.reparation!.nomConducteur ?? '';
+      prenom.text = widget.reparation!.prenomConducteur ?? '';
       anneeUtil = DateTime(widget.reparation!.anneeUtil ??
           selectedVehicle?.anneeUtil ??
           DateTime.now().year);
@@ -130,6 +134,28 @@ class ReparationFormState extends State<ReparationForm>
           await VehicleProvider().getVehicle(widget.reparation!.vehicule!);
     }
   }
+
+
+  Future<void> getImages() async{
+
+    if (widget.reparation != null && widget.reparation!.images.isNotEmpty) {
+      List<Future<Uint8List?>> tasks=[];
+      for(int i=0;i<widget.reparation!.images.length;i++){
+        tasks.add(downloadImage(widget.reparation!.images[i].toString()));
+      }
+      images=await Future.wait(tasks);
+    }
+
+    }
+  Future<Uint8List> downloadImage(String id) async {
+
+   return await DatabaseGetter.storage!.getFileView(bucketId: 'images', fileId: "$documentID$id.jpg").onError((e,s){
+     return Future.value(Uint8List.fromList([]));
+   }).then((s){
+     return s;
+   });
+  }
+
 
   bool assigningOrederNumber = false;
 
@@ -230,9 +256,9 @@ class ReparationFormState extends State<ReparationForm>
       nchassi.text = selectedVehicle!.numeroSerie ?? '';
       matricule.text = selectedVehicle!.matricule;
       anneeUtil = DateTime(selectedVehicle!.anneeUtil ?? 2023);
-      nom.text=selectedVehicle!.nom??'';
-      prenom.text=selectedVehicle!.prenom??'';
-      matriculeConducteur.text=selectedVehicle!.matriculeConducteur??'';
+      nom.text = selectedVehicle!.nom ?? '';
+      prenom.text = selectedVehicle!.prenom ?? '';
+      matriculeConducteur.text = selectedVehicle!.matriculeConducteur ?? '';
     }
     setState(() {});
   }
@@ -241,6 +267,7 @@ class ReparationFormState extends State<ReparationForm>
   Widget build(BuildContext context) {
     super.build(context);
     var appTheme = context.watch<AppTheme>();
+    bool portrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return ScaffoldPage(
       content: Container(
         padding: const EdgeInsets.all(10),
@@ -297,8 +324,9 @@ class ReparationFormState extends State<ReparationForm>
                                         placeholderStyle: placeStyle,
                                         style: appTheme.writingStyle,
                                         cursorColor: appTheme.color.darker,
-                                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                                        decoration: WidgetStatePropertyAll(
+                                            BoxDecoration(
+                                                color: appTheme.fillColor)),
                                         inputFormatters: [
                                           FilteringTextInputFormatter.digitsOnly
                                         ],
@@ -370,15 +398,17 @@ class ReparationFormState extends State<ReparationForm>
                                   style: ContentDialogThemeData(
                                       titleStyle: appTheme.writingStyle
                                           .copyWith(
-                                          fontWeight:
-                                          FontWeight.bold)),
+                                              fontWeight: FontWeight.bold)),
                                   content: const VehicleTable(
                                     selectV: true,
                                   ),
-                                  actions: [Button(child: const Text('fermer').tr(),
-                                      onPressed: (){
-                                        Navigator.of(context).pop();
-                                      })],
+                                  actions: [
+                                    Button(
+                                        child: const Text('fermer').tr(),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        })
+                                  ],
                                 );
                               });
                           setVehicleValues();
@@ -415,15 +445,17 @@ class ReparationFormState extends State<ReparationForm>
                                   style: ContentDialogThemeData(
                                       titleStyle: appTheme.writingStyle
                                           .copyWith(
-                                          fontWeight:
-                                          FontWeight.bold)),
+                                              fontWeight: FontWeight.bold)),
                                   content: const PrestataireTable(
                                     selectD: true,
                                   ),
-                                  actions: [Button(child: const Text('fermer').tr(),
-                                      onPressed: (){
-                                        Navigator.of(context).pop();
-                                      })],
+                                  actions: [
+                                    Button(
+                                        child: const Text('fermer').tr(),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        })
+                                  ],
                                 );
                               });
                           setState(() {});
@@ -435,24 +467,48 @@ class ReparationFormState extends State<ReparationForm>
                 buildTable(appTheme),
                 smallSpace,
                 BigTitleForm(
+                  bigTitle: 'imagesdegats',
+                  littleTitle: 'uploaddimages',
+                  trailing: Row(
+                    children: [
+                      const Text('afficherquestion').tr(),
+                      smallSpace,
+                      ToggleSwitch(
+                          checked: showImages,
+                          onChanged: (s) {
+                            setState(() {
+                              showImages = s;
+                            });
+                          }),
+                    ],
+                  ),
+                ),
+                if (showImages) imagesContainer(portrait),
+                smallSpace,
+                BigTitleForm(
                   bigTitle: 'etatvehicule',
                   littleTitle: 'selectetat',
                   trailing: Row(
                     children: [
                       const Text('afficherquestion').tr(),
                       smallSpace,
-                      ToggleSwitch(checked: showEtat, onChanged: (s){
-                        setState(() {
-                          showEtat=s;
-                        });
-                      }),
+                      ToggleSwitch(
+                          checked: showEtat,
+                          onChanged: (s) {
+                            setState(() {
+                              showEtat = s;
+                            });
+                          }),
                     ],
                   ),
                 ),
-                if(showEtat)
-                VehicleDamage(etatVehicle: etatVehicle),
-                if(showEtat)
-                smallSpace,
+                if (showEtat)
+                  VehicleDamage(
+                    etatVehicle: etatVehicle,
+                    vehicleType:
+                        VehiclesUtilities.getGenreNumber(matricule.text),
+                  ),
+                if (showEtat) smallSpace,
                 BigTitleForm(
                   bigTitle: 'entretienvehicule',
                   littleTitle: 'selectentretien',
@@ -460,49 +516,51 @@ class ReparationFormState extends State<ReparationForm>
                     children: [
                       const Text('afficherquestion').tr(),
                       smallSpace,
-                      ToggleSwitch(checked: showEtretient, onChanged: (s){
-                        setState(() {
-                          showEtretient=s;
-                        });
-                      }),
+                      ToggleSwitch(
+                          checked: showEtretient,
+                          onChanged: (s) {
+                            setState(() {
+                              showEtretient = s;
+                            });
+                          }),
                     ],
                   ),
                 ),
-                if(showEtretient)
-                Container(
-                  height: 260.px,
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    border: Border.all(),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      EntretienWidget(entretienVehicle: entretienVehicle),
-                      bigSpace,
-                      SizedBox(
-                        height: 180.px,
-                        width: 400.px,
-                        child: ZoneBox(
-                          label: 'remarqueplus'.tr(),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: TextBox(
-                              controller: remarqueEntretien,
-                              placeholder: 'remarqueplus'.tr(),
-                              maxLines: 4,
-                              placeholderStyle: placeStyle,
-                              style: appTheme.writingStyle,
-                              cursorColor: appTheme.color.darker,
-                              decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                if (showEtretient)
+                  Container(
+                    height: 260.px,
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      border: Border.all(),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        EntretienWidget(entretienVehicle: entretienVehicle),
+                        bigSpace,
+                        SizedBox(
+                          height: 180.px,
+                          width: 400.px,
+                          child: ZoneBox(
+                            label: 'remarqueplus'.tr(),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: TextBox(
+                                controller: remarqueEntretien,
+                                placeholder: 'remarqueplus'.tr(),
+                                maxLines: 4,
+                                placeholderStyle: placeStyle,
+                                style: appTheme.writingStyle,
+                                cursorColor: appTheme.color.darker,
+                                decoration: WidgetStatePropertyAll(
+                                    BoxDecoration(color: appTheme.fillColor)),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
                 smallSpace,
                 const BigTitleForm(
                   bigTitle: 'travaileffect',
@@ -530,14 +588,16 @@ class ReparationFormState extends State<ReparationForm>
           children: [
             FilledButton(
                 style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(appTheme.color.lightest),
+                  backgroundColor:
+                      WidgetStatePropertyAll(appTheme.color.lightest),
                 ),
                 onPressed: uploading ? null : showPdf,
                 child: const Text('voir')),
             smallSpace,
             FilledButton(
                 style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(appTheme.color.darkest),
+                  backgroundColor:
+                      WidgetStatePropertyAll(appTheme.color.darkest),
                 ),
                 onPressed: uploading ? null : uploadForm,
                 child: const Text('save').tr())
@@ -545,6 +605,108 @@ class ReparationFormState extends State<ReparationForm>
         ),
       ),
     );
+  }
+
+  List<Uint8List?> images = [
+    Uint8List.fromList([]),
+    Uint8List.fromList([]),
+    Uint8List.fromList([]),
+    Uint8List.fromList([]),
+  ];
+
+  Widget imagesContainer(bool portrait) {
+    return StaggeredGrid.count(
+        crossAxisCount: portrait ? 1 : 2,
+        mainAxisSpacing: 0,
+        crossAxisSpacing: 0,
+        children: [
+          StaggeredGridTile.fit(
+              crossAxisCellCount: 1,
+              child: OnTapScaleAndFade(
+                onTap: () {
+                  pickImage(0);
+                },
+                child: Container(
+                  height: 200.px,
+                  decoration: BoxDecoration(
+                    border: Border.all(),
+                  ),
+                  child: images[0]==null ||images[0]!.isEmpty
+                      ? Icon(FluentIcons.add)
+                      : Image.memory(
+                          images[0]!,
+                          fit: BoxFit.fitHeight,
+                        ),
+                ),
+              )),
+          StaggeredGridTile.fit(
+              crossAxisCellCount: 1,
+              child: OnTapScaleAndFade(
+                onTap: () {
+                  pickImage(1);
+                },
+                child: Container(
+                  height: 200.px,
+                  decoration: BoxDecoration(
+                    border: Border.all(),
+                  ),
+                  child: images[1]==null ||images[1]!.isEmpty
+                      ? Icon(FluentIcons.add)
+                      : Image.memory(
+                          images[1]!,
+                          fit: BoxFit.fitHeight,
+                        ),
+                ),
+              )),
+          StaggeredGridTile.fit(
+              crossAxisCellCount: 1,
+              child: OnTapScaleAndFade(
+                onTap: () {
+                  pickImage(2);
+                },
+                child: Container(
+                  height: 200.px,
+                  decoration: BoxDecoration(
+                    border: Border.all(),
+                  ),
+                  child: images[2]==null ||images[2]!.isEmpty
+                      ? Icon(FluentIcons.add)
+                      : Image.memory(
+                          images[2]!,
+                          fit: BoxFit.fitHeight,
+                        ),
+                ),
+              )),
+          StaggeredGridTile.fit(
+              crossAxisCellCount: 1,
+              child: OnTapScaleAndFade(
+                onTap: () {
+                  pickImage(3);
+                },
+                child: Container(
+                  height: 200.px,
+                  decoration: BoxDecoration(
+                    border: Border.all(),
+                  ),
+                  child: images[3]==null ||images[3]!.isEmpty
+                      ? Icon(FluentIcons.add)
+                      : Image.memory(
+                          images[3]!,
+                          fit: BoxFit.fitHeight,
+                        ),
+                ),
+              )),
+        ]);
+  }
+
+  void pickImage(int index) async {
+    ImagePicker picker = ImagePicker();
+    XFile? image =
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    if (image != null) {
+      images[index] = await image.readAsBytes();
+      setState(() {});
+    }
   }
 
   Table buildTable(AppTheme appTheme) {
@@ -575,8 +737,8 @@ class ReparationFormState extends State<ReparationForm>
                     controller: marque,
                     placeholder: 'marque'.tr(),
                     style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                    decoration: WidgetStatePropertyAll(
+                        BoxDecoration(color: appTheme.fillColor)),
                     cursorColor: appTheme.color.darker,
                     placeholderStyle: placeStyle,
                   ),
@@ -600,8 +762,8 @@ class ReparationFormState extends State<ReparationForm>
                     controller: type,
                     placeholder: 'type'.tr(),
                     style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                    decoration: WidgetStatePropertyAll(
+                        BoxDecoration(color: appTheme.fillColor)),
                     cursorColor: appTheme.color.darker,
                     placeholderStyle: placeStyle,
                   ),
@@ -624,8 +786,8 @@ class ReparationFormState extends State<ReparationForm>
                     controller: nchassi,
                     placeholder: 'nchassi'.tr(),
                     style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                    decoration: WidgetStatePropertyAll(
+                        BoxDecoration(color: appTheme.fillColor)),
                     cursorColor: appTheme.color.darker,
                     placeholderStyle: placeStyle,
                   ),
@@ -650,7 +812,8 @@ class ReparationFormState extends State<ReparationForm>
                     //readOnly: selectedVehicle!=null,
                     placeholder: 'matricule'.tr(),
                     style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                    decoration: WidgetStatePropertyAll(
+                        BoxDecoration(color: appTheme.fillColor)),
 
                     cursorColor: appTheme.color.darker,
                     placeholderStyle: placeStyle,
@@ -681,8 +844,8 @@ class ReparationFormState extends State<ReparationForm>
                             controller: nmoteur,
                             placeholder: 'nmoteur'.tr(),
                             style: appTheme.writingStyle,
-                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                            decoration: WidgetStatePropertyAll(
+                                BoxDecoration(color: appTheme.fillColor)),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -713,8 +876,8 @@ class ReparationFormState extends State<ReparationForm>
                             controller: km,
                             placeholder: 'KM'.tr(),
                             style: appTheme.writingStyle,
-                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                            decoration: WidgetStatePropertyAll(
+                                BoxDecoration(color: appTheme.fillColor)),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -815,8 +978,8 @@ class ReparationFormState extends State<ReparationForm>
                             controller: couleur,
                             placeholder: 'color'.tr(),
                             style: appTheme.writingStyle,
-                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                            decoration: WidgetStatePropertyAll(
+                                BoxDecoration(color: appTheme.fillColor)),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -873,8 +1036,8 @@ class ReparationFormState extends State<ReparationForm>
                             controller: matriculeConducteur,
                             placeholder: 'matriculeemploye'.tr(),
                             style: appTheme.writingStyle,
-                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                            decoration: WidgetStatePropertyAll(
+                                BoxDecoration(color: appTheme.fillColor)),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -905,8 +1068,8 @@ class ReparationFormState extends State<ReparationForm>
                             controller: nom,
                             placeholder: 'nom'.tr(),
                             style: appTheme.writingStyle,
-                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                            decoration: WidgetStatePropertyAll(
+                                BoxDecoration(color: appTheme.fillColor)),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -937,8 +1100,8 @@ class ReparationFormState extends State<ReparationForm>
                             controller: prenom,
                             placeholder: 'prenom'.tr(),
                             style: appTheme.writingStyle,
-                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                            decoration: WidgetStatePropertyAll(
+                                BoxDecoration(color: appTheme.fillColor)),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -946,10 +1109,8 @@ class ReparationFormState extends State<ReparationForm>
                       ],
                     ),
                   ),
-
                 ],
               )),
-
         ]),
       ],
     );
@@ -1038,18 +1199,18 @@ class ReparationFormState extends State<ReparationForm>
           ),
           designations.isEmpty
               ? Container(
-              padding: const EdgeInsets.all(10),
-              width: 300.px,
-              height: 320.px,
-              child: const NoDataWidget())
-              :Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: appTheme.fillColor),
-              borderRadius:
-                  const BorderRadius.vertical(bottom: Radius.circular(5)),
-            ),
-            child:  Column(children: getDesignationList(appTheme)),
-          ),
+                  padding: const EdgeInsets.all(10),
+                  width: 300.px,
+                  height: 320.px,
+                  child: const NoDataWidget())
+              : Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: appTheme.fillColor),
+                    borderRadius:
+                        const BorderRadius.vertical(bottom: Radius.circular(5)),
+                  ),
+                  child: Column(children: getDesignationList(appTheme)),
+                ),
         ],
       ),
     );
@@ -1115,34 +1276,33 @@ class ReparationFormState extends State<ReparationForm>
 
   void showPdf() {
     Reparation reparation = Reparation(
-      id: '',
-      numero: int.parse(numOrdre.text),
-      date: selectedDate,
-      anneeUtil: anneeUtil.year,
-      marque: marque.text,
-      couleur: couleur.text,
-      designations: designations.map((e) => e.designation).toList(),
-      entretien: showEtretient?entretienVehicle:null,
-      etatActuel: showEtat?etatVehicle:null,
-      gaz: carburant.ceil(),
-      kilometrage: int.tryParse(km.text),
-      modele: type.text,
-      nchassi: nchassi.text,
-      nmoteur: nmoteur.text,
-      prestataire: selectedPrest?.id,
-      prestatairenom: selectedPrest?.nom,
-      vehicule: selectedVehicle?.id,
-      vehiculemat: selectedVehicle?.matricule,
-      remarque: remarqueEntretien.text,
-      matriculeConducteur: matriculeConducteur.text,
-      nomConducteur: nom.text,
-      prenomConducteur: prenom.text
-    );
+        id: '',
+        numero: int.parse(numOrdre.text),
+        date: selectedDate,
+        anneeUtil: anneeUtil.year,
+        marque: marque.text,
+        couleur: couleur.text,
+        designations: designations.map((e) => e.designation).toList(),
+        entretien: showEtretient ? entretienVehicle : null,
+        etatActuel: showEtat ? etatVehicle : null,
+        gaz: carburant.ceil(),
+        kilometrage: int.tryParse(km.text),
+        modele: type.text,
+        nchassi: nchassi.text,
+        nmoteur: nmoteur.text,
+        prestataire: selectedPrest?.id,
+        prestatairenom: selectedPrest?.nom,
+        vehicule: selectedVehicle?.id,
+        vehiculemat: selectedVehicle?.matricule,
+        remarque: remarqueEntretien.text,
+        matriculeConducteur: matriculeConducteur.text,
+        nomConducteur: nom.text,
+        prenomConducteur: prenom.text);
 
     showDialog(
         context: context,
         builder: (context) {
-          return PdfPreviewPO(reparation:reparation);
+          return PdfPreviewPO(reparation: reparation);
         });
   }
 
@@ -1157,75 +1317,76 @@ class ReparationFormState extends State<ReparationForm>
         .abs()
         .toString();
     Reparation reparation = Reparation(
-      id: documentID!,
-      marque: marque.text,
-      numero: int.parse(numOrdre.text),
-      date: selectedDate,
-      anneeUtil: anneeUtil.year,
-      couleur: couleur.text,
-      designations: designations.map((e) => e.designation).toList(),
-      entretien: showEtretient?entretienVehicle:null,
-      etatActuel: showEtat?etatVehicle:null,
-      gaz: carburant.ceil(),
-      kilometrage: int.tryParse(km.text),
-      modele: type.text,
-      nchassi: nchassi.text,
-      nmoteur: nmoteur.text,
-      prestataire: selectedPrest?.id,
-      prestatairenom: selectedPrest?.nom,
-      vehicule: selectedVehicle?.id,
-      vehiculemat: selectedVehicle?.matricule,
-      remarque: remarqueEntretien.text,
+        id: documentID!,
+        marque: marque.text,
+        numero: int.parse(numOrdre.text),
+        date: selectedDate,
+        anneeUtil: anneeUtil.year,
+        couleur: couleur.text,
+        designations: designations.map((e) => e.designation).toList(),
+        entretien: showEtretient ? entretienVehicle : null,
+        etatActuel: showEtat ? etatVehicle : null,
+        gaz: carburant.ceil(),
+        kilometrage: int.tryParse(km.text),
+        modele: type.text,
+        nchassi: nchassi.text,
+        nmoteur: nmoteur.text,
+        prestataire: selectedPrest?.id,
+        prestatairenom: selectedPrest?.nom,
+        vehicule: selectedVehicle?.id,
+        vehiculemat: selectedVehicle?.matricule,
+        remarque: remarqueEntretien.text,
         matriculeConducteur: matriculeConducteur.text,
         nomConducteur: nom.text,
-        prenomConducteur: prenom.text
-    );
+        prenomConducteur: prenom.text);
 
     if (!modif) {
       await Future.wait([
         createReparation(reparation),
         uploadActivity(modif, reparation),
       ]).then((value) {
-        if(mounted){
-        displayInfoBar(context,
-            builder: (BuildContext context, void Function() close) {
-          return InfoBar(
-            title: const Text('reparationajout').tr(),
-            severity: InfoBarSeverity.success,
-          );
-        }, duration: snackbarShortDuration);}
+        if (mounted) {
+          displayInfoBar(context,
+              builder: (BuildContext context, void Function() close) {
+            return InfoBar(
+              title: const Text('reparationajout').tr(),
+              severity: InfoBarSeverity.success,
+            );
+          }, duration: snackbarShortDuration);
+        }
       }).onError((error, stackTrace) {
-        if(mounted){
-        displayInfoBar(context,
-            builder: (BuildContext context, void Function() close) {
-          return InfoBar(
-            title: const Text('echec').tr(),
-            severity: InfoBarSeverity.error,
-          );
-        }, duration: snackbarShortDuration);}
+        if (mounted) {
+          displayInfoBar(context,
+              builder: (BuildContext context, void Function() close) {
+            return InfoBar(
+              title: const Text('echec').tr(),
+              severity: InfoBarSeverity.error,
+            );
+          }, duration: snackbarShortDuration);
+        }
       });
     } else {
       await Future.wait(
               [updateReparation(reparation), uploadActivity(modif, reparation)])
           .then((value) {
-            if(mounted) {
-              displayInfoBar(context,
-                  builder: (BuildContext context, void Function() close) {
-                    return InfoBar(
-                      title: const Text('reparationmodif').tr(),
-                      severity: InfoBarSeverity.success,
-                    );
-                  }, duration: snackbarShortDuration);
-            }
-      }).onError((error, stackTrace) {
-        if(mounted) {
+        if (mounted) {
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
-                return InfoBar(
-                  title: const Text('echec').tr(),
-                  severity: InfoBarSeverity.error,
-                );
-              });
+            return InfoBar(
+              title: const Text('reparationmodif').tr(),
+              severity: InfoBarSeverity.success,
+            );
+          }, duration: snackbarShortDuration);
+        }
+      }).onError((error, stackTrace) {
+        if (mounted) {
+          displayInfoBar(context,
+              builder: (BuildContext context, void Function() close) {
+            return InfoBar(
+              title: const Text('echec').tr(),
+              severity: InfoBarSeverity.error,
+            );
+          });
         }
       });
     }
@@ -1236,6 +1397,23 @@ class ReparationFormState extends State<ReparationForm>
       setState(() {});
     }
   }
+
+  Future<void> uploadImages() async{
+
+    List<Future>tasks=[];
+    for(int i=0;i<images.length;i++){
+      if(images[i]!=null && images[i]!.isNotEmpty){
+        tasks.add(
+          DatabaseGetter.storage!.createFile(
+              bucketId: buckedId, 
+              fileId: "$documentID$i.jpg",
+              file: InputFile.fromBytes(bytes: images[i]!, filename: "$documentID$i.jpg")));
+      }
+    }
+    await Future.wait(tasks);
+  }
+
+
 
   Future<void> updateReparation(Reparation reparation) async {
     await DatabaseGetter.database!

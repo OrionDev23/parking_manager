@@ -2,21 +2,25 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart' hide Trans;
-import 'package:parc_oto/screens/workshop/inventory/fournisseurs/fournisseur_table.dart';
-import 'package:parc_oto/screens/workshop/parts/parts_management/parts_table.dart';
-import 'package:parc_oto/serializables/client.dart';
-import 'package:parc_oto/serializables/pieces/storage_variations.dart';
+import '../fournisseurs/fournisseur_table.dart';
+import '../../parts/parts_management/parts_table.dart';
+import '../../../../serializables/client.dart';
+import '../../../../serializables/pieces/storage_variations.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import '../../../../providers/parts_provider.dart';
 import '../../../../serializables/pieces/part.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../serializables/pieces/storage.dart';
 import '../../../../theme.dart';
 import '../../../../widgets/empty_table_widget.dart';
 import '../../../../widgets/zone_box.dart';
 import 'variation_storage.dart';
 
 class StorageForm extends StatefulWidget {
-  const StorageForm({super.key});
+
+  final Storage? storage;
+  const StorageForm({super.key, this.storage});
 
   @override
   State<StorageForm> createState() => _StorageFormState();
@@ -27,9 +31,54 @@ class _StorageFormState extends State<StorageForm> {
   VehiclePart? selectedPart;
   Client? selectedF;
   double qte=1;
-  List<DateTime?>expirationDates=[DateTime.now().add(Duration(days: 30))];
+  DateTime? expirationDate=DateTime.now().add(Duration(days: 30));
   bool differentDate=false;
   bool expire=true;
+
+  String? storageID;
+
+  bool loading=true;
+
+  @override
+  void initState() {
+    initStorage();
+    super.initState();
+  }
+
+  Future<void> loadPart() async{
+    if(widget.storage!=null){
+        selectedPart=await PartsProvider().getPart(widget.storage!.partID);
+    }
+  }
+  Future<void> loadFourn() async{
+    if(widget.storage!=null && widget.storage!.fournisseurID!=null){
+      selectedF=await PartsProvider().getFournisseur(widget.storage!.fournisseurID);
+    }
+  }
+
+  void initStorage() async{
+    if(widget.storage!=null){
+      loading=true;
+      if(mounted){
+        setState(() {
+
+        });
+      }
+      storageID=widget.storage!.id;
+      qte=widget.storage!.qte;
+      expirationDate=widget.storage!.expirationDate;
+      expire=widget.storage!.expirationDate!=null;
+      if(widget.storage!.variations!=null && widget.storage!.variations!.isNotEmpty){
+        variations.addAll(widget.storage!.variations!);
+      }
+      await Future.wait([
+        loadPart(),
+        loadFourn()
+      ]);
+
+
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -272,14 +321,9 @@ class _StorageFormState extends State<StorageForm> {
                                     children: [
                                       if(differentDate==false)
                                       DatePicker(
-                                        selected: expirationDates[0],
+                                        selected: expirationDate,
                                         onChanged: (d){
-                                          if(expirationDates.isNotEmpty){
-                                            expirationDates[0]=d;
-                                          }
-                                          else{
-                                            expirationDates.add(d);
-                                          }
+                                          expirationDate=d;
                                           setState(() {
               
                                           });
@@ -405,13 +449,23 @@ class _StorageFormState extends State<StorageForm> {
             ),
             padding: const EdgeInsets.all(5),
             child: Table(
-              columnWidths: const {
+              columnWidths:
+              differentDate?
+              {
                 0: FlexColumnWidth(1),
                 1: FlexColumnWidth(5),
                 2: FlexColumnWidth(3),
-                3: FlexColumnWidth(3),
-                4: FlexColumnWidth(2),
-                5: FlexColumnWidth(3),
+                3: FlexColumnWidth(2),
+                4: FlexColumnWidth(3),
+              }
+              :const {
+                0: FlexColumnWidth(1),
+                1: FlexColumnWidth(5),
+                2: FlexColumnWidth(3),
+            3: FlexColumnWidth(3),
+            4: FlexColumnWidth(2),
+            5: FlexColumnWidth(3),
+
               },
               children: [
                 TableRow(children: [
@@ -430,6 +484,7 @@ class _StorageFormState extends State<StorageForm> {
                         'options',
                         textAlign: TextAlign.center,
                       ).tr()),
+                  if(differentDate)
                   TableCell(
                       child: const Text(
                         'dateexp',
@@ -511,7 +566,9 @@ class _StorageFormState extends State<StorageForm> {
                   child: SizedBox(
                     height: 35.px,
                     child: VariationStorageWidget(
+                        differentDate: differentDate,
                         key: Key(variations[index].id),
+                        expirationDate: expirationDate,
                         part: selectedPart!,
                         variation: variations[index],
                         onQteChanged: (s){

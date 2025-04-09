@@ -1,7 +1,8 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:parc_oto/serializables/pieces/storage_variations.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
+import '../../../../serializables/pieces/storage_variations.dart';
 
 import '../../../../serializables/pieces/part.dart';
 import '../../../../serializables/pieces/variation.dart';
@@ -10,6 +11,8 @@ import '../../../../theme.dart';
 class VariationStorageWidget extends StatefulWidget {
   final VehiclePart part;
   final StorageVariation variation;
+  final DateTime? expirationDate;
+  final bool differentDate;
   final bool mod;
   final double maxQte;
   final Function(double qte)? onQteChanged;
@@ -24,7 +27,7 @@ class VariationStorageWidget extends StatefulWidget {
     required this.maxQte,
     this.onOptionsChanged,
     this.onDateChanged,
-    required this.variation
+    required this.variation, this.expirationDate, required this.differentDate
   });
 
   @override
@@ -41,7 +44,7 @@ class VariationStorageWidgetState extends State<VariationStorageWidget> {
   double qte = 1;
   @override
   void initState() {
-    // TODO: implement initState
+    selectedDate=widget.expirationDate;
     super.initState();
   }
 
@@ -51,25 +54,27 @@ class VariationStorageWidgetState extends State<VariationStorageWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Flexible(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text(
-                textAlign: TextAlign.start,
-                widget.variation.id,
-                style: placeStyle,
-              ),
-            )),
-        Flexible(
-            flex: 10,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: Text(
-                '${widget.part.name} ${getVariationOptions()}',
-                style: placeStyle,
-              ),
-            )),
+        SizedBox(
+          width: 40.px,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              textAlign: TextAlign.start,
+              widget.variation.id,
+              style: placeStyle,
+            ),
+          ),
+        ),
+        SizedBox(
+          width: 30.w,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: Text(
+              '${widget.part.name} ${getVariationOptions()}',
+              style: placeStyle,
+            ),
+          ),
+        ),
         bigSpace,
         ...designationsDefault(appTheme),
       ],
@@ -82,7 +87,6 @@ class VariationStorageWidgetState extends State<VariationStorageWidget> {
         color: placeStyle.color,
       ),
       Flexible(
-          flex: 8,
           child: ComboBox(
               items: List.generate(
                   widget.part.variations?.length ?? 0,
@@ -113,8 +117,8 @@ class VariationStorageWidgetState extends State<VariationStorageWidget> {
         color: placeStyle.color,
       ),
       smallSpace,
+      if(widget.differentDate)
       Flexible(
-        flex: 6,
         child: DatePicker(
             selected: selectedDate,
             onChanged: (d){
@@ -128,24 +132,26 @@ class VariationStorageWidgetState extends State<VariationStorageWidget> {
 
         )
       ),
+      if(widget.differentDate)
+        smallSpace,
+      if(widget.differentDate)
+        VerticalDivider(
+        color: placeStyle.color,
+      ),
+      smallSpace,
+      SizedBox(
+        width: 60.px,
+        child: Text(
+        '${widget.part.price??0} DZD',style: placeStyle,
+        ),
+      ),
       smallSpace,
       VerticalDivider(
         color: placeStyle.color,
       ),
       smallSpace,
-      Flexible(
-          flex: 3,
-          child: Text(
-          '${widget.part.price??0} DZD',style: placeStyle,
-          ),
-      ),
-      smallSpace,
-      VerticalDivider(
-        color: placeStyle.color,
-      ),
-      smallSpace,
-      Flexible(
-        flex: 5,
+      SizedBox(
+        width: 150.px,
         child: widget.part.unitType==0?NumberBox<int>(
           value: qte.toInt(),
           onChanged: (int? value) {

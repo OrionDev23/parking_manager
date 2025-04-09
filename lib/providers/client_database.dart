@@ -36,6 +36,7 @@ const categoriesID="categories";
 const brandsID="partsbrands";
 const partsID="parts";
 const backupId="backup";
+const storageId="storage";
 const endpoint = "https://appwrite.parcoto.com/v1";
 String? project;
 
@@ -453,7 +454,9 @@ class DatabaseGetter {
       case 60: return "ajoutpart";
       case 61: return "modifpart";
       case 62: return "suprpart";
-    }
+      case 63: return "ajoutstorage";
+      case 64: return "modifstorage";
+      case 65:return "suprstorage";}
     return '';
   }
 

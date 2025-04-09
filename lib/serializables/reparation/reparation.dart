@@ -43,6 +43,8 @@ class Reparation extends ParcOtoDefault {
   String? prenomConducteur;
   String? matriculeConducteur;
 
+  List<int> images;
+
   @JsonKey(toJson: designationsToJson, fromJson: designationsFromJson)
   List<Designation>? designations;
 
@@ -68,6 +70,7 @@ class Reparation extends ParcOtoDefault {
       this.etat,
       this.etatActuel,
       this.gaz,
+        this.images=const [],
       this.kilometrage,
       this.modele,
       this.nchassi,
