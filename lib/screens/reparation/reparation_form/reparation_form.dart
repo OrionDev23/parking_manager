@@ -1413,8 +1413,6 @@ class ReparationFormState extends State<ReparationForm>
     await Future.wait(tasks);
   }
 
-
-
   Future<void> updateReparation(Reparation reparation) async {
     await DatabaseGetter.database!
         .updateDocument(
@@ -1445,4 +1443,5 @@ class ReparationFormState extends State<ReparationForm>
           docName: pdf_theme.numberFormat.format(reparation.numero));
     }
   }
+
 }
