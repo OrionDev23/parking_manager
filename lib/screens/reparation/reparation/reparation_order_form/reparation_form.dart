@@ -2,36 +2,32 @@ import 'package:appwrite/appwrite.dart' hide Client;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/providers/repair_provider.dart';
-import 'package:parc_oto/providers/vehicle_provider.dart';
-import 'package:parc_oto/screens/entreprise/entreprise.dart';
-import 'package:parc_oto/screens/prestataire/prestataire_table.dart';
-import 'package:parc_oto/screens/reparation/reparation_form/designation_reparation.dart';
-import 'package:parc_oto/screens/reparation/reparation_form/entreprise_placement.dart';
-import 'package:parc_oto/screens/reparation/reparation_form/entretien_widget.dart';
-import 'package:parc_oto/screens/reparation/reparation_form/vehicle_damage.dart';
-import 'package:parc_oto/screens/vehicle/manager/vehicles_table.dart';
-import 'package:parc_oto/serializables/client.dart';
-import 'package:parc_oto/serializables/reparation/etat_vehicle.dart';
-import 'package:parc_oto/theme.dart';
-import 'package:parc_oto/widgets/big_title_form.dart';
-import 'package:parc_oto/widgets/zone_box.dart';
+import '../../../../providers/client_database.dart';
+import '../../../../providers/repair_provider.dart';
+import '../../../../providers/vehicle_provider.dart';
+import '../../../../serializables/reparation/fiche_reception.dart';
+import '../../../entreprise/entreprise.dart';
+import '../../../prestataire/prestataire_table.dart';
+import '../../fiche_reception/entretien_widget.dart';
+import '../../../vehicle/manager/vehicles_table.dart';
+import '../../../../serializables/client.dart';
+import '../../../../serializables/reparation/etat_vehicle.dart';
+import '../../../../theme.dart';
+import '../../../../widgets/big_title_form.dart';
+import '../../../../widgets/zone_box.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:syncfusion_flutter_gauges/gauges.dart';
 
-import '../../../pdf_generation/pdf_preview_custom.dart';
-import '../../../pdf_generation/pdf_theming.dart' as pdf_theme;
-import '../../../serializables/reparation/designation.dart';
-import '../../../serializables/reparation/entretien_vehicle.dart';
-import '../../../serializables/reparation/reparation.dart';
-import '../../../serializables/vehicle/vehicle.dart';
-import '../../../utilities/vehicle_util.dart';
-import '../../../widgets/empty_table_widget.dart';
-import '../../../widgets/on_tap_scale.dart';
+import '../../../../pdf_generation/pdf_preview_custom.dart';
+import '../../../../pdf_generation/pdf_theming.dart' as pdf_theme;
+import '../../../../serializables/reparation/designation.dart';
+import '../../../../serializables/reparation/entretien_vehicle.dart';
+import '../../../../serializables/reparation/reparation.dart';
+import '../../../../serializables/vehicle/vehicle.dart';
+import '../../../../utilities/vehicle_util.dart';
+import '../../../../widgets/empty_table_widget.dart';
+import 'designation_reparation.dart';
+import 'entreprise_placement.dart';
 
 class ReparationForm extends StatefulWidget {
   final Reparation? reparation;
@@ -54,6 +50,7 @@ class ReparationFormState extends State<ReparationForm>
 
   Client? selectedPrest;
   Vehicle? selectedVehicle;
+  FicheReception? selectedFicheReception;
   TextEditingController marque = TextEditingController();
   TextEditingController type = TextEditingController();
   TextEditingController matricule = TextEditingController();
@@ -89,26 +86,13 @@ class ReparationFormState extends State<ReparationForm>
     if (widget.reparation != null) {
       documentID = widget.reparation!.id;
       assigningOrederNumber = true;
-      etatVehicle = widget.reparation!.etatActuel ?? EtatVehicle();
       entretienVehicle = widget.reparation!.entretien ?? EntretienVehicle();
       remarqueEntretien.text = widget.reparation!.remarque ?? '';
       numOrdre.text = widget.reparation!.numero.toString();
       reservedOrders[widget.key!] = widget.reparation!.numero;
-      await Future.wait([getPrestatataire(), getVehicle(),getImages()]);
       matricule.text = widget.reparation!.vehiculemat ?? '';
-      couleur.text = widget.reparation!.couleur ?? '';
-      type.text = widget.reparation!.modele ?? '';
       nchassi.text = widget.reparation!.nchassi ?? '';
-      nmoteur.text = widget.reparation!.nmoteur ?? '';
-      km.text = widget.reparation!.kilometrage?.toString() ?? '0';
-      carburant = widget.reparation!.gaz?.toDouble() ?? 4;
       selectedDate = widget.reparation!.date;
-      matriculeConducteur.text = widget.reparation!.matriculeConducteur ?? '';
-      nom.text = widget.reparation!.nomConducteur ?? '';
-      prenom.text = widget.reparation!.prenomConducteur ?? '';
-      anneeUtil = DateTime(widget.reparation!.anneeUtil ??
-          selectedVehicle?.anneeUtil ??
-          DateTime.now().year);
       designations =
           List.generate(widget.reparation!.designations?.length ?? 0, (index) {
         return DesignationReparation(
@@ -136,30 +120,11 @@ class ReparationFormState extends State<ReparationForm>
   }
 
 
-  Future<void> getImages() async{
-
-    if (widget.reparation != null && widget.reparation!.images.isNotEmpty) {
-      List<Future<Uint8List?>> tasks=[];
-      for(int i=0;i<widget.reparation!.images.length;i++){
-        tasks.add(downloadImage(widget.reparation!.images[i].toString()));
-      }
-      images=await Future.wait(tasks);
-    }
-
-    }
-  Future<Uint8List> downloadImage(String id) async {
-
-   return await DatabaseGetter.storage!.getFileView(bucketId: 'images', fileId: "$documentID$id.jpg").onError((e,s){
-     return Future.value(Uint8List.fromList([]));
-   }).then((s){
-     return s;
-   });
-  }
-
 
   bool assigningOrederNumber = false;
 
   bool errorNumOrder = false;
+  bool changedPics=false;
 
   void assignOrderNumber() async {
     assigningOrederNumber = true;
@@ -267,7 +232,6 @@ class ReparationFormState extends State<ReparationForm>
   Widget build(BuildContext context) {
     super.build(context);
     var appTheme = context.watch<AppTheme>();
-    bool portrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return ScaffoldPage(
       content: Container(
         padding: const EdgeInsets.all(10),
@@ -464,50 +428,7 @@ class ReparationFormState extends State<ReparationForm>
                     ),
                   ],
                 ),
-                buildTable(appTheme),
                 smallSpace,
-                BigTitleForm(
-                  bigTitle: 'imagesdegats',
-                  littleTitle: 'uploaddimages',
-                  trailing: Row(
-                    children: [
-                      const Text('afficherquestion').tr(),
-                      smallSpace,
-                      ToggleSwitch(
-                          checked: showImages,
-                          onChanged: (s) {
-                            setState(() {
-                              showImages = s;
-                            });
-                          }),
-                    ],
-                  ),
-                ),
-                if (showImages) imagesContainer(portrait),
-                smallSpace,
-                BigTitleForm(
-                  bigTitle: 'etatvehicule',
-                  littleTitle: 'selectetat',
-                  trailing: Row(
-                    children: [
-                      const Text('afficherquestion').tr(),
-                      smallSpace,
-                      ToggleSwitch(
-                          checked: showEtat,
-                          onChanged: (s) {
-                            setState(() {
-                              showEtat = s;
-                            });
-                          }),
-                    ],
-                  ),
-                ),
-                if (showEtat)
-                  VehicleDamage(
-                    etatVehicle: etatVehicle,
-                    vehicleType:
-                        VehiclesUtilities.getGenreNumber(matricule.text),
-                  ),
                 if (showEtat) smallSpace,
                 BigTitleForm(
                   bigTitle: 'entretienvehicule',
@@ -607,514 +528,9 @@ class ReparationFormState extends State<ReparationForm>
     );
   }
 
-  List<Uint8List?> images = [
-    Uint8List.fromList([]),
-    Uint8List.fromList([]),
-    Uint8List.fromList([]),
-    Uint8List.fromList([]),
-  ];
 
-  Widget imagesContainer(bool portrait) {
-    return StaggeredGrid.count(
-        crossAxisCount: portrait ? 1 : 2,
-        mainAxisSpacing: 0,
-        crossAxisSpacing: 0,
-        children: [
-          StaggeredGridTile.fit(
-              crossAxisCellCount: 1,
-              child: OnTapScaleAndFade(
-                onTap: () {
-                  pickImage(0);
-                },
-                child: Container(
-                  height: 200.px,
-                  decoration: BoxDecoration(
-                    border: Border.all(),
-                  ),
-                  child: images[0]==null ||images[0]!.isEmpty
-                      ? Icon(FluentIcons.add)
-                      : Image.memory(
-                          images[0]!,
-                          fit: BoxFit.fitHeight,
-                        ),
-                ),
-              )),
-          StaggeredGridTile.fit(
-              crossAxisCellCount: 1,
-              child: OnTapScaleAndFade(
-                onTap: () {
-                  pickImage(1);
-                },
-                child: Container(
-                  height: 200.px,
-                  decoration: BoxDecoration(
-                    border: Border.all(),
-                  ),
-                  child: images[1]==null ||images[1]!.isEmpty
-                      ? Icon(FluentIcons.add)
-                      : Image.memory(
-                          images[1]!,
-                          fit: BoxFit.fitHeight,
-                        ),
-                ),
-              )),
-          StaggeredGridTile.fit(
-              crossAxisCellCount: 1,
-              child: OnTapScaleAndFade(
-                onTap: () {
-                  pickImage(2);
-                },
-                child: Container(
-                  height: 200.px,
-                  decoration: BoxDecoration(
-                    border: Border.all(),
-                  ),
-                  child: images[2]==null ||images[2]!.isEmpty
-                      ? Icon(FluentIcons.add)
-                      : Image.memory(
-                          images[2]!,
-                          fit: BoxFit.fitHeight,
-                        ),
-                ),
-              )),
-          StaggeredGridTile.fit(
-              crossAxisCellCount: 1,
-              child: OnTapScaleAndFade(
-                onTap: () {
-                  pickImage(3);
-                },
-                child: Container(
-                  height: 200.px,
-                  decoration: BoxDecoration(
-                    border: Border.all(),
-                  ),
-                  child: images[3]==null ||images[3]!.isEmpty
-                      ? Icon(FluentIcons.add)
-                      : Image.memory(
-                          images[3]!,
-                          fit: BoxFit.fitHeight,
-                        ),
-                ),
-              )),
-        ]);
-  }
 
-  void pickImage(int index) async {
-    ImagePicker picker = ImagePicker();
-    XFile? image =
-        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
-    if (image != null) {
-      images[index] = await image.readAsBytes();
-      setState(() {});
-    }
-  }
 
-  Table buildTable(AppTheme appTheme) {
-    return Table(
-      defaultVerticalAlignment: TableCellVerticalAlignment.top,
-      border: TableBorder.all(),
-      columnWidths: {
-        0: FixedColumnWidth(80.px),
-        1: FixedColumnWidth(80.px),
-        2: FixedColumnWidth(80.px),
-        3: FixedColumnWidth(80.px),
-      },
-      children: [
-        TableRow(children: [
-          TableCell(
-              child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Text(
-                  'marque',
-                  style: littleStyle,
-                ).tr(),
-                const Spacer(),
-                SizedBox(
-                  width: 160.px,
-                  child: TextBox(
-                    controller: marque,
-                    placeholder: 'marque'.tr(),
-                    style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(
-                        BoxDecoration(color: appTheme.fillColor)),
-                    cursorColor: appTheme.color.darker,
-                    placeholderStyle: placeStyle,
-                  ),
-                ),
-              ],
-            ),
-          )),
-          TableCell(
-              child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Text(
-                  'type',
-                  style: littleStyle,
-                ).tr(),
-                const Spacer(),
-                SizedBox(
-                  width: 160.px,
-                  child: TextBox(
-                    controller: type,
-                    placeholder: 'type'.tr(),
-                    style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(
-                        BoxDecoration(color: appTheme.fillColor)),
-                    cursorColor: appTheme.color.darker,
-                    placeholderStyle: placeStyle,
-                  ),
-                ),
-              ],
-            ),
-          )),
-          TableCell(
-              child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Text(
-                  'nchassi',
-                  style: littleStyle,
-                ).tr(),
-                smallSpace,
-                Flexible(
-                  child: TextBox(
-                    controller: nchassi,
-                    placeholder: 'nchassi'.tr(),
-                    style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(
-                        BoxDecoration(color: appTheme.fillColor)),
-                    cursorColor: appTheme.color.darker,
-                    placeholderStyle: placeStyle,
-                  ),
-                ),
-              ],
-            ),
-          )),
-          TableCell(
-              child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Text(
-                  'matricule',
-                  style: littleStyle,
-                ).tr(),
-                smallSpace,
-                Flexible(
-                  child: TextBox(
-                    controller: matricule,
-                    enabled: selectedVehicle == null,
-                    //readOnly: selectedVehicle!=null,
-                    placeholder: 'matricule'.tr(),
-                    style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(
-                        BoxDecoration(color: appTheme.fillColor)),
-
-                    cursorColor: appTheme.color.darker,
-                    placeholderStyle: placeStyle,
-                  ),
-                ),
-              ],
-            ),
-          )),
-        ]),
-        TableRow(children: [
-          TableCell(
-              verticalAlignment: TableCellVerticalAlignment.top,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          'nmoteur',
-                          style: littleStyle,
-                        ).tr(),
-                        const Spacer(),
-                        SizedBox(
-                          width: 160.px,
-                          child: TextBox(
-                            controller: nmoteur,
-                            placeholder: 'nmoteur'.tr(),
-                            style: appTheme.writingStyle,
-                            decoration: WidgetStatePropertyAll(
-                                BoxDecoration(color: appTheme.fillColor)),
-                            cursorColor: appTheme.color.darker,
-                            placeholderStyle: placeStyle,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    height: 1.px,
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          'KM',
-                          style: littleStyle,
-                        ).tr(),
-                        const Spacer(),
-                        SizedBox(
-                          width: 160.px,
-                          child: TextBox(
-                            controller: km,
-                            placeholder: 'KM'.tr(),
-                            style: appTheme.writingStyle,
-                            decoration: WidgetStatePropertyAll(
-                                BoxDecoration(color: appTheme.fillColor)),
-                            cursorColor: appTheme.color.darker,
-                            placeholderStyle: placeStyle,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              )),
-          TableCell(
-              child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: SizedBox(
-                height: 120.px,
-                width: 180.px,
-                child: SfRadialGauge(
-                  animationDuration: 500,
-                  title: GaugeTitle(
-                    text: 'carburant'.tr(),
-                    textStyle: littleStyle,
-                    alignment: GaugeAlignment.near,
-                  ),
-                  axes: [
-                    RadialAxis(
-                      canScaleToFit: true,
-                      minimum: 0,
-                      maximum: 8,
-                      radiusFactor: 1,
-                      onAxisTapped: (s) {
-                        setState(() {
-                          carburant = s;
-                        });
-                      },
-                      ranges: [
-                        GaugeRange(
-                          startValue: 0,
-                          endValue: 0.5,
-                          label: 'E',
-                          color: appTheme.color.darkest,
-                        ),
-                        GaugeRange(
-                          startValue: 7.5,
-                          endValue: 8,
-                          label: 'F',
-                          color: appTheme.color.lightest,
-                        ),
-                      ],
-                      annotations: [
-                        GaugeAnnotation(
-                          widget: Text(
-                            '4/8',
-                            style: littleStyle,
-                          ),
-                          axisValue: 4,
-                          positionFactor: 0.7,
-                        ),
-                      ],
-                      pointers: [
-                        NeedlePointer(
-                          animationDuration: 500,
-                          needleLength: 0.4,
-                          needleColor: appTheme.color,
-                          needleStartWidth: 1.px,
-                          needleEndWidth: 5.px,
-                          knobStyle: KnobStyle(color: appTheme.color.darkest),
-                          value: carburant,
-                          enableAnimation: true,
-                          enableDragging: true,
-                        ),
-                      ],
-                      interval: 2,
-                      startAngle: 180,
-                      showFirstLabel: false,
-                      showLastLabel: false,
-                      showLabels: false,
-                      endAngle: 360,
-                    )
-                  ],
-                )),
-          )),
-          TableCell(
-              verticalAlignment: TableCellVerticalAlignment.top,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          'color',
-                          style: littleStyle,
-                        ).tr(),
-                        const Spacer(),
-                        SizedBox(
-                          width: 160.px,
-                          child: TextBox(
-                            controller: couleur,
-                            placeholder: 'color'.tr(),
-                            style: appTheme.writingStyle,
-                            decoration: WidgetStatePropertyAll(
-                                BoxDecoration(color: appTheme.fillColor)),
-                            cursorColor: appTheme.color.darker,
-                            placeholderStyle: placeStyle,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    height: 1.px,
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          'anneeutil',
-                          style: littleStyle,
-                        ).tr(),
-                        const Spacer(),
-                        SizedBox(
-                            width: 80.px,
-                            child: DatePicker(
-                              selected: anneeUtil,
-                              showDay: false,
-                              showMonth: false,
-                            ))
-                      ],
-                    ),
-                  ),
-                ],
-              )),
-          TableCell(
-              verticalAlignment: TableCellVerticalAlignment.top,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          'matriculeemploye',
-                          style: littleStyle,
-                        ).tr(),
-                        const Spacer(),
-                        SizedBox(
-                          width: 160.px,
-                          child: TextBox(
-                            controller: matriculeConducteur,
-                            placeholder: 'matriculeemploye'.tr(),
-                            style: appTheme.writingStyle,
-                            decoration: WidgetStatePropertyAll(
-                                BoxDecoration(color: appTheme.fillColor)),
-                            cursorColor: appTheme.color.darker,
-                            placeholderStyle: placeStyle,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    height: 1.px,
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          'nom',
-                          style: littleStyle,
-                        ).tr(),
-                        const Spacer(),
-                        SizedBox(
-                          width: 160.px,
-                          child: TextBox(
-                            controller: nom,
-                            placeholder: 'nom'.tr(),
-                            style: appTheme.writingStyle,
-                            decoration: WidgetStatePropertyAll(
-                                BoxDecoration(color: appTheme.fillColor)),
-                            cursorColor: appTheme.color.darker,
-                            placeholderStyle: placeStyle,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    height: 1.px,
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          'prenom',
-                          style: littleStyle,
-                        ).tr(),
-                        const Spacer(),
-                        SizedBox(
-                          width: 160.px,
-                          child: TextBox(
-                            controller: prenom,
-                            placeholder: 'prenom'.tr(),
-                            style: appTheme.writingStyle,
-                            decoration: WidgetStatePropertyAll(
-                                BoxDecoration(color: appTheme.fillColor)),
-                            cursorColor: appTheme.color.darker,
-                            placeholderStyle: placeStyle,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              )),
-        ]),
-      ],
-    );
-  }
 
   @override
   void dispose() {
@@ -1278,26 +694,16 @@ class ReparationFormState extends State<ReparationForm>
     Reparation reparation = Reparation(
         id: '',
         numero: int.parse(numOrdre.text),
+        ficheReception: selectedFicheReception?.id??'',
         date: selectedDate,
-        anneeUtil: anneeUtil.year,
-        marque: marque.text,
-        couleur: couleur.text,
         designations: designations.map((e) => e.designation).toList(),
         entretien: showEtretient ? entretienVehicle : null,
-        etatActuel: showEtat ? etatVehicle : null,
-        gaz: carburant.ceil(),
-        kilometrage: int.tryParse(km.text),
-        modele: type.text,
         nchassi: nchassi.text,
-        nmoteur: nmoteur.text,
         prestataire: selectedPrest?.id,
         prestatairenom: selectedPrest?.nom,
         vehicule: selectedVehicle?.id,
         vehiculemat: selectedVehicle?.matricule,
-        remarque: remarqueEntretien.text,
-        matriculeConducteur: matriculeConducteur.text,
-        nomConducteur: nom.text,
-        prenomConducteur: prenom.text);
+        remarque: remarqueEntretien.text, ficheReceptionNumber: selectedFicheReception?.numero??0,);
 
     showDialog(
         context: context,
@@ -1318,27 +724,16 @@ class ReparationFormState extends State<ReparationForm>
         .toString();
     Reparation reparation = Reparation(
         id: documentID!,
-        marque: marque.text,
         numero: int.parse(numOrdre.text),
         date: selectedDate,
-        anneeUtil: anneeUtil.year,
-        couleur: couleur.text,
         designations: designations.map((e) => e.designation).toList(),
         entretien: showEtretient ? entretienVehicle : null,
-        etatActuel: showEtat ? etatVehicle : null,
-        gaz: carburant.ceil(),
-        kilometrage: int.tryParse(km.text),
-        modele: type.text,
         nchassi: nchassi.text,
-        nmoteur: nmoteur.text,
         prestataire: selectedPrest?.id,
         prestatairenom: selectedPrest?.nom,
         vehicule: selectedVehicle?.id,
         vehiculemat: selectedVehicle?.matricule,
-        remarque: remarqueEntretien.text,
-        matriculeConducteur: matriculeConducteur.text,
-        nomConducteur: nom.text,
-        prenomConducteur: prenom.text);
+        remarque: remarqueEntretien.text, ficheReception: selectedFicheReception?.id??'', ficheReceptionNumber: selectedFicheReception?.numero??0,);
 
     if (!modif) {
       await Future.wait([
@@ -1367,7 +762,7 @@ class ReparationFormState extends State<ReparationForm>
       });
     } else {
       await Future.wait(
-              [updateReparation(reparation), uploadActivity(modif, reparation)])
+              [updateReparation(reparation), uploadActivity(modif, reparation),])
           .then((value) {
         if (mounted) {
           displayInfoBar(context,
@@ -1398,20 +793,6 @@ class ReparationFormState extends State<ReparationForm>
     }
   }
 
-  Future<void> uploadImages() async{
-
-    List<Future>tasks=[];
-    for(int i=0;i<images.length;i++){
-      if(images[i]!=null && images[i]!.isNotEmpty){
-        tasks.add(
-          DatabaseGetter.storage!.createFile(
-              bucketId: buckedId, 
-              fileId: "$documentID$i.jpg",
-              file: InputFile.fromBytes(bytes: images[i]!, filename: "$documentID$i.jpg")));
-      }
-    }
-    await Future.wait(tasks);
-  }
 
   Future<void> updateReparation(Reparation reparation) async {
     await DatabaseGetter.database!

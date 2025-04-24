@@ -19,6 +19,7 @@ import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import '../reparation/reparation/reparation_order_form/reparation_form.dart';
 import 'charts/pie_chart.dart';
 
 import '../../providers/counters.dart';
@@ -30,7 +31,6 @@ import '../chauffeur/document/chauf_document_tabs.dart';
 import '../prestataire/prestataire_form.dart';
 import '../prestataire/prestataire_tabs.dart';
 import '../reparation/manager/reparation_tabs.dart';
-import '../reparation/reparation_form/reparation_form.dart';
 import '../sidemenu/pane_items.dart';
 import '../vehicle/documents/document_form.dart';
 import '../vehicle/documents/document_tabs.dart';

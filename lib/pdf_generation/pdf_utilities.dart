@@ -5,6 +5,7 @@ import 'package:parc_oto/serializables/client.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
+import '../serializables/reparation/fiche_reception.dart';
 import '../serializables/reparation/reparation.dart';
 
 Widget dotsSpacer() {
@@ -25,8 +26,14 @@ Widget dotsSpacer() {
 class PdfUtilities {
   Client? p;
 
+  FicheReception? fiche;
+
   Future<void> initPrestataire(Reparation reparation) async {
     p = await RepairProvider().getPrestataire(reparation.prestataire);
+  }
+
+  Future<void> initFiche(Reparation reparation) async {
+    fiche = await RepairProvider().getFiche(reparation.ficheReception);
   }
 
   static List<Widget> getTextListFromMap(

@@ -4,8 +4,6 @@ import 'package:parc_oto/utilities/profil_beautifier.dart';
 
 import 'designation.dart';
 import 'entretien_vehicle.dart';
-import 'etat_vehicle.dart';
-
 part 'reparation.g.dart';
 
 @JsonSerializable()
@@ -14,78 +12,48 @@ class Reparation extends ParcOtoDefault {
 
   String? vehiculemat;
 
-  String? etat;
+  String ficheReception;
 
-  int? type;
+  int ficheReceptionNumber;
+
+  int? etat;
+
   String? prestataire;
   String? prestatairenom;
+
+  @JsonKey(toJson: entretienToJson, fromJson: entretienFromJson)
+  EntretienVehicle? entretien;
 
   @JsonKey(toJson: dateToIntJson, fromJson: dateFromIntJsonNonNull)
   DateTime date;
 
   int numero;
 
-  int? gaz;
-
-  int? kilometrage;
-
-  String? nmoteur;
-
   String? nchassi;
 
-  String? couleur;
 
   String? remarque;
 
-  String? marque;
-
-  String? nomConducteur;
-  String? prenomConducteur;
-  String? matriculeConducteur;
-
-  List<int> images;
-
   @JsonKey(toJson: designationsToJson, fromJson: designationsFromJson)
   List<Designation>? designations;
-
-  @JsonKey(toJson: etatVehiculeToJson, fromJson: etatFromJson)
-  EtatVehicle? etatActuel;
-
-  @JsonKey(toJson: entretienToJson, fromJson: entretienFromJson)
-  EntretienVehicle? entretien;
-
-  int? anneeUtil;
-  String? modele;
 
   Reparation(
       {required super.id,
       super.createdAt,
       super.updatedAt,
+        required this.ficheReception,
+        required this.ficheReceptionNumber,
       required this.numero,
-      this.anneeUtil,
-      this.couleur,
       required this.date,
       this.designations,
-      this.entretien,
       this.etat,
-      this.etatActuel,
-      this.gaz,
-        this.images=const [],
-      this.kilometrage,
-      this.modele,
       this.nchassi,
-      this.nmoteur,
       this.prestataire,
       this.prestatairenom,
+        this.entretien,
       this.remarque,
-      this.type,
       this.vehicule,
       this.vehiculemat,
-      this.marque,
-        this.matriculeConducteur,
-        this.prenomConducteur,
-        this.nomConducteur
-
       });
 
   factory Reparation.fromJson(Map<String, dynamic> json) =>

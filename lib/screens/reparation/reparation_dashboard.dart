@@ -13,7 +13,7 @@ import '../prestataire/prestataire_tabs.dart';
 import '../sidemenu/pane_items.dart';
 import '../sidemenu/sidemenu.dart';
 import 'manager/reparation_tabs.dart';
-import 'reparation_form/reparation_form.dart';
+import 'reparation/reparation_order_form/reparation_form.dart';
 
 class ReparationDashboard extends StatelessWidget {
   const ReparationDashboard({super.key});

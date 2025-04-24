@@ -579,7 +579,7 @@ class VehicleTableState extends State<VehicleTable> {
   }
 
   void showCostPdf() async{
-    await RepairProvider.downloadReparations();
+    await RepairProvider.downloadFicheReparations();
 
     Future.delayed(const Duration(milliseconds: 50)).then((value){
       if(mounted){
@@ -603,7 +603,7 @@ class VehicleTableState extends State<VehicleTable> {
   }
 
   void saveExcelCost() async{
-    await RepairProvider.downloadReparations();
+    await RepairProvider.downloadFicheReparations();
     Future.delayed(const Duration(milliseconds: 50)).then((value) {
       List2Excel(
         list: RepairProvider.prepareVehicRepList(RepairProvider

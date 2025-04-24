@@ -1,38 +1,40 @@
 import 'package:flutter/services.dart';
 import 'package:parc_oto/pdf_generation/pdf_theming.dart';
 import 'package:parc_oto/pdf_generation/pdf_utilities.dart';
-import 'package:parc_oto/pdf_generation/reparation/vehicle_damage_pdf.dart';
-import 'package:parc_oto/pdf_generation/reparation/vehicle_entretien_pdf.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/entreprise/entreprise.dart';
+import 'package:parc_oto/serializables/reparation/fiche_reception.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
 import '../serializables/client.dart';
 import '../serializables/reparation/reparation.dart';
 import '../utilities/num_to_word.dart';
+import 'reparation/vehicle_entretien_pdf.dart';
 
 class ReparationPdf {
   final Reparation reparation;
 
   Client? p;
 
+  FicheReception? fiche;
+
   ReparationPdf({required this.reparation});
 
   PdfUtilities pdfUtilities = PdfUtilities();
 
   Future<Uint8List> getDocument() async {
-    if (etatEmpty()) {
-      nbrPageOne += 12;
-    }
+
+    await Future.wait([
+      pdfUtilities.initPrestataire(reparation),
+      pdfUtilities.initFiche(reparation),
+      PDFTheming().initFontsAndLogos()
+    ]);
     if (entretienEmpty()) {
       nbrPageOne += 9;
     }
-    await Future.wait([
-      pdfUtilities.initPrestataire(reparation),
-      PDFTheming().initFontsAndLogos()
-    ]);
     p = pdfUtilities.p;
+    fiche=pdfUtilities.fiche;
     var doc = Document(
       theme: ThemeData.withFont(
         base: baseFont,
@@ -80,42 +82,6 @@ class ReparationPdf {
     return doc.save();
   }
 
-  bool entretienEmpty() {
-    if (reparation.entretien == null) {
-      return true;
-    } else {
-      List values = reparation.entretien!.toJson().values.toList();
-      for (int i = 0; i < values.length; i++) {
-        if (values[i] == true) {
-          return false;
-        }
-      }
-      return true;
-    }
-  }
-
-  bool etatEmpty() {
-    if (reparation.etatActuel == null) {
-      return true;
-    } else {
-      bool result = true;
-      reparation.etatActuel!.toJson().forEach((key, value) {
-        if (key == 'avdp' || key == 'avgp' || key == 'ardp' || key == 'argp') {
-          if (value != 100) {
-            result = false;
-            return;
-          }
-        } else {
-          if (value == true) {
-            result = false;
-            return;
-          }
-        }
-      });
-      return result;
-    }
-  }
-
   Widget getPageContent(int page, int nbrPages, int lastIndex) {
     return Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -127,12 +93,9 @@ class ReparationPdf {
           if (page == 0) bigSpace,
           if (page == 0) getVehicleInfo(),
           if (page == 0) bigSpace,
-          if (page == 0 && !etatEmpty())
-            VehicleDamagePDF(reparation).vehicleDamage(),
-          if (page == 0 && !etatEmpty()) bigSpace,
-          if (page == 0 && !entretienEmpty())
+          if (!entretienEmpty())
             VehicleEntretienPDF(reparation).vehicleEntretien(),
-          if (page == 0 && !entretienEmpty()) bigSpace,
+          if (!entretienEmpty()) bigSpace,
           getDesignations(page, nbrPages, lastIndex),
           if (page == nbrPages - 1) getPrixInLetter(),
           if (page == nbrPages - 1) bigSpace,
@@ -201,7 +164,7 @@ class ReparationPdf {
   }
 
   int nbrMaxMiddlePages = 43;
-  int nbrPageOne = 8;
+  int nbrPageOne = 29;
 
   int pageAdition = 7;
   int nbrLastPage = 35;
@@ -222,6 +185,19 @@ class ReparationPdf {
     }
   }
 
+  bool entretienEmpty() {
+    if (reparation.entretien == null) {
+      return true;
+    } else {
+      List values = reparation.entretien!.toJson().values.toList();
+      for (int i = 0; i < values.length; i++) {
+        if (values[i] == true) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
   Widget getDesignations(int page, int nbrPages, int lastIndex) {
     if (page == 0) {
       return getFirstPageDesignations(nbrPages);
@@ -702,7 +678,7 @@ class ReparationPdf {
                                   bottom: 5,
                                   left: 5,
                                   right: 5,
-                                  child: Text(reparation.marque ?? '', style: smallText),
+                                  child: Text(fiche?.marque ?? '', style: smallText),
                                 ),
                               ]),
                             ),
@@ -728,7 +704,7 @@ class ReparationPdf {
                                   bottom: bottom,
                                   left: 5,
                                   right: 5,
-                                  child: Text(reparation.modele ?? '', style: smallText),
+                                  child: Text(fiche?.modele ?? '', style: smallText),
                                 ),
                               ]),
                             ),
@@ -813,7 +789,7 @@ class ReparationPdf {
                                   bottom: bottom,
                                   left: 5,
                                   right: 5,
-                                  child: Text(reparation.couleur ?? '', style: smallText),
+                                  child: Text(fiche?.couleur ?? '', style: smallText),
                                 ),
                               ]),
                             ),
@@ -839,7 +815,7 @@ class ReparationPdf {
                                   bottom: bottom,
                                   left: 5,
                                   right: 5,
-                                  child: Text(reparation.kilometrage?.toString() ?? '',
+                                  child: Text(fiche?.kilometrage?.toString() ?? '',
                                       style: smallText),
                                 ),
                               ]),
@@ -867,7 +843,7 @@ class ReparationPdf {
                                     bottom: bottom,
                                     left: 5,
                                     right: 5,
-                                    child: Text(reparation.anneeUtil?.toString() ?? '',
+                                    child: Text(fiche?.anneeUtil?.toString() ?? '',
                                         style: smallText),
                                   ),
                                 ]),
@@ -902,7 +878,7 @@ class ReparationPdf {
                                     bottom: bottom,
                                     left: 5,
                                     right: 5,
-                                    child: Text('${reparation.gaz?.toString() ?? '4'}/8',
+                                    child: Text('${fiche?.gaz?.toString() ?? '4'}/8',
                                         style: smallText),
                                   ),
                                 ]),
@@ -930,7 +906,7 @@ class ReparationPdf {
                                   bottom: 5,
                                   left: 5,
                                   right: 5,
-                                  child: Text(reparation.nmoteur ?? '', style: smallText),
+                                  child: Text(fiche?.nmoteur ?? '', style: smallText),
                                 ),
                               ]),
                             ),
@@ -975,7 +951,7 @@ class ReparationPdf {
                                   bottom: bottom,
                                   left: 5,
                                   right: 5,
-                                  child: Text(reparation.matriculeConducteur ?? '',
+                                  child: Text(fiche?.matriculeConducteur ?? '',
                                       style: smallText),
                                 ),
                               ]),
@@ -1002,7 +978,7 @@ class ReparationPdf {
                                   bottom: bottom,
                                   left: 5,
                                   right: 5,
-                                  child: Text(reparation.nomConducteur ?? '',
+                                  child: Text(fiche?.nomConducteur ?? '',
                                       style: smallText),
                                 ),
                               ]),
@@ -1029,7 +1005,7 @@ class ReparationPdf {
                                   bottom: bottom,
                                   left: 5,
                                   right: 5,
-                                  child: Text(reparation.prenomConducteur ?? '',
+                                  child: Text(fiche?.prenomConducteur ?? '',
                                       style: smallText),
                                 ),
                               ]),

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:parc_oto/serializables/client.dart';
 import 'package:parc_oto/serializables/reparation/reparation.dart';
 
+import '../serializables/reparation/fiche_reception.dart';
 import '../utilities/profil_beautifier.dart';
 import 'client_database.dart';
 
@@ -25,7 +26,7 @@ class RepairProvider extends ChangeNotifier {
 
 
 
-  static Map<String,List<Reparation>> repPerVeh={};
+  static Map<String,List<FicheReception>> repPerVeh={};
 
   Future<void> refreshReparations() async{
     if(downloadingReparations){
@@ -100,15 +101,15 @@ class RepairProvider extends ChangeNotifier {
     return prestataires.length;
 
   }
-  static Future<Map<String,List<Reparation>>> downloadReparations()async {
+  static Future<Map<String,List<FicheReception>>> downloadFicheReparations()async {
 
 
     await DatabaseGetter.database!.listDocuments(
       databaseId: databaseId,
-      collectionId: reparationId,
+      collectionId: fichesreceptionId,
     ).then((value) {
       for(var doc in value.documents){
-        Reparation rep=doc.convertTo((p0) => Reparation.fromJson(p0 as
+        FicheReception rep=doc.convertTo((p0) => FicheReception.fromJson(p0 as
         Map<String,dynamic>));
         if(!repPerVeh.containsKey(rep.vehicule)){
           repPerVeh[rep.vehiculemat??'nonind']=[rep];
@@ -122,8 +123,10 @@ class RepairProvider extends ChangeNotifier {
 
     return {};
   }
+
+
   static List<Map<String,dynamic>> prepareVehicRepList(Map<String,
-      List<Reparation>> repPerVeh){
+      List<FicheReception>> repPerVeh){
     List<Map<String,dynamic>> result=[];
     for(var v in repPerVeh.entries){
       DateTime? d=getLast(v.value);
@@ -143,29 +146,29 @@ class RepairProvider extends ChangeNotifier {
     return result;
   }
 
-  static double getCost(List<Reparation> reps){
+  static double getCost(List<FicheReception> reps){
     double result=0;
     for(var r in reps){
-      result+=r.getPrixTTC();
+      result+=r.reparationCost??0;
     }
     return result;
   }
-  static DateTime? getLast(List<Reparation>reps){
+  static DateTime? getLast(List<FicheReception>reps){
     DateTime? d;
     for(var r in reps){
       if(d==null){
-        d=r.date;
+        d=r.dateEntre;
       }
       else{
-        if(d.compareTo(r.date)<0){
-          d=r.date;
+        if(d.compareTo(r.dateEntre)<0){
+          d=r.dateEntre;
         }
       }
     }
     return d;
   }
 
-  static String? getModel(List<Reparation> reps){
+  static String? getModel(List<FicheReception> reps){
     String? result;
     for(var r in reps){
       if(r.modele!=null){
@@ -176,7 +179,7 @@ class RepairProvider extends ChangeNotifier {
     return result;
   }
 
-  static String? getMatConducteur(List<Reparation> reps){
+  static String? getMatConducteur(List<FicheReception> reps){
     String? result;
     for(var r in reps){
       if(r.matriculeConducteur!=null){
@@ -187,7 +190,7 @@ class RepairProvider extends ChangeNotifier {
     return result;
   }
 
-  static String? getConducteur(List<Reparation> reps){
+  static String? getConducteur(List<FicheReception> reps){
     String? result;
     for(var r in reps){
       if(r.nomConducteur!=null || r.prenomConducteur!=null){
@@ -254,6 +257,24 @@ class RepairProvider extends ChangeNotifier {
         id: docID,
         nom: '',
         adresse: '',
+      ));
+    });
+  }
+  Future<FicheReception?> getFiche(String? docID) async {
+    if (docID == null) {
+      return null;
+    }
+    return await DatabaseGetter.database!
+        .getDocument(
+        databaseId: databaseId,
+        collectionId: fichesreceptionId,
+        documentId: docID)
+        .then((value) {
+      return value
+          .convertTo((p0) => FicheReception.fromJson(p0 as Map<String, dynamic>));
+    }).onError((error, stackTrace) {
+      return Future.value(FicheReception(
+        id: docID, numero: 0, dateEntre: DateTime.now(),
       ));
     });
   }

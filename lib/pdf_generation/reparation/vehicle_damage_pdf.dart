@@ -6,12 +6,12 @@ import 'package:pdf/widgets.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../serializables/reparation/etat_vehicle.dart';
-import '../../serializables/reparation/reparation.dart';
+import '../../serializables/reparation/fiche_reception.dart';
 import '../pdf_theming.dart';
 import '../pdf_utilities.dart';
 
 class VehicleDamagePDF {
-  final Reparation reparation;
+  final FicheReception reparation;
   late final EtatVehicle etatVehicle;
 
   VehicleDamagePDF(this.reparation) {

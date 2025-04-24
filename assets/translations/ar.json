@@ -650,7 +650,7 @@
   "suprpart": "تمت إزالة قطعة غيار",
   "modpart": "تعديل قطعة الغيار",
   "differentDates": "تواريخ انتهاء الصلاحية مختلفة ؟",
-  "toexpire": "Does this product expire?",
+  "toexpire": "هل تنتهي صلاحية هذا المنتج؟",
 
   "supstockage": "حذف العنصر من المخزن",
   "ajoutstorage": "تمت إضافة عنصر تخزين جديد",
@@ -660,6 +660,11 @@
   "nouvstock": "عنصر تخزين جديد",
   "piece": "قطعة الغيار",
   "imagesdegats": "صور الأضرار",
-  "uploaddimages": "(تحميل صور الأضرار (4 صور على الأكتر))"
+  "uploaddimages": "(تحميل صور الأضرار (4 صور على الأكتر))",
+
+
+  "ajoutfichereception": "تمت إضافة ورقة استقبال جديدة",
+  "modiffichereception": "تم تعديل ورقة الاستقبال",
+  "suprfichereception": "تم حذف ورقة استقبال"
 
 }

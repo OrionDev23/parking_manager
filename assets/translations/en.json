@@ -660,7 +660,10 @@
   "nouvstock": "New entry",
   "piece": "Spare",
   "imagesdegats": "Damage images",
-  "uploaddimages": "(Upload damage images (4 images max))"
+  "uploaddimages": "(Upload damage images (4 images max))",
+  "ajoutfichereception": "A new reception sheet has been added",
+  "modiffichereception": "A reception sheet has been modified",
+  "suprfichereception": "A reception sheet has been deleted"
 
 
 

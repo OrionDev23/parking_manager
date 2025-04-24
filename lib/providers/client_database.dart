@@ -29,6 +29,7 @@ const adminID = "admin_keys";
 const reparationId = "reparation";
 const activityId = "activity";
 const prestataireId = "prestataire";
+const fichesreceptionId="fichereception";
 const clientsID="clients";
 const fournsID="fournisseurs";
 const optionsID="options";
@@ -456,7 +457,10 @@ class DatabaseGetter {
       case 62: return "suprpart";
       case 63: return "ajoutstorage";
       case 64: return "modifstorage";
-      case 65:return "suprstorage";}
+      case 65:return "suprstorage";
+      case 66:return "ajoutfichereception";
+      case 67:return "modiffichereception";
+      case 68:return "suprfichereception";}
     return '';
   }
 

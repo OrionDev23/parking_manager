@@ -1,9 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
-import 'package:parc_oto/datasources/parcoto_datasource.dart';
-import 'package:parc_oto/datasources/reparation/reparation_webservice.dart';
-import 'package:parc_oto/screens/reparation/reparation_form/reparation_form.dart';
+import '../../screens/reparation/reparation/reparation_order_form/reparation_form.dart';
+import '../parcoto_datasource.dart';
+import 'reparation_webservice.dart';
 
 import '../../pdf_generation/pdf_preview_custom.dart';
 import '../../providers/client_database.dart';

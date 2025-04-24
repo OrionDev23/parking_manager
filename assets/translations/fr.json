@@ -649,5 +649,8 @@
  "nouvstock": "Nouvelle entrée",
  "piece": "Piéce",
  "imagesdegats": "Photos des degats",
- "uploaddimages": "(Uploadez les photos des degats (4 images max))"
+ "uploaddimages": "(Uploadez les photos des degats (4 images max))",
+ "ajoutfichereception": "Une nouvelle fiche de reception a été ajoutée",
+ "modiffichereception": "Une fiche de reception a été modifiée",
+ "suprfichereception": "Une fiche de reception a été supprimée"
 }

@@ -14,11 +14,14 @@ import 'package:printing/printing.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../serializables/reparation/fiche_reception.dart';
 import '../serializables/reparation/reparation.dart';
+import 'fiche_reception_pdf.dart';
 
 class PdfPreviewPO extends StatelessWidget {
-  final Reparation reparation;
-  const PdfPreviewPO({super.key, required this.reparation});
+  final Reparation? reparation;
+  final FicheReception? fiche;
+  const PdfPreviewPO({super.key, this.reparation,this.fiche});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +29,7 @@ class PdfPreviewPO extends StatelessWidget {
       content: PdfPreview(
         maxPageWidth: 550.px,
         shouldRepaint: true,
-        pdfFileName: 'ordre${numberFormat.format(reparation.numero)}',
+        pdfFileName: reparation!=null?'ordre${numberFormat.format(reparation!.numero)}':'fiche${numberFormat.format(fiche!.numero)}',
         initialPageFormat: PdfPageFormat.a4,
         canDebug: false,
         canChangeOrientation: false,
@@ -39,7 +42,13 @@ class PdfPreviewPO extends StatelessWidget {
           strokeWidth: 8,
         ),
         build: (PdfPageFormat format) {
-          return ReparationPdf(reparation: reparation).getDocument();
+          if(reparation!=null){
+            return ReparationPdf(reparation: reparation!).getDocument();
+
+          }
+          else{
+            return FicheReceptionPdf(fiche: fiche!).getDocument();
+          }
         },
         actions: [
           const PdfPrintAction(
@@ -63,7 +72,7 @@ class PdfPreviewPO extends StatelessWidget {
               onPressed: (context, futureFile, pageFormat) async {
                 Share.shareXFiles(
                   [XFile.fromData(await futureFile(pageFormat))],
-                  subject: 'ordre${numberFormat.format(reparation.numero)}',
+                  subject: reparation!=null?'ordre${numberFormat.format(reparation!.numero)}':'fiche${numberFormat.format(fiche!.numero)}',
                 );
               }),
           PdfPreviewAction(
@@ -89,17 +98,17 @@ class PdfPreviewPO extends StatelessWidget {
         Device.deviceType == DeviceType.ios) {
       DocumentFileSavePlus().saveFile(
           await futureFile(pageFormat),
-          'ordre${numberFormat.format(reparation.numero)}.pdf',
+          reparation!=null?'ordre${numberFormat.format(reparation!.numero)}.pdf':'fiche${numberFormat.format(fiche!.numero)}}.pdf',
           "appliation/pdf");
     } else if (kIsWeb) {
       saveFileWeb(
           await futureFile(pageFormat),
-          'ordre${numberFormat.format(reparation.numero)}'
-          '.pdf');
+          reparation!=null?'ordre${numberFormat.format(reparation!.numero)}.pdf':'fiche${numberFormat.format(fiche!.numero)}}.pdf',);
     } else {
       String? path = await FilePicker.platform.saveFile(
         dialogTitle: "save".tr(),
-        fileName: 'ordre${numberFormat.format(reparation.numero)}',
+        fileName: reparation!=null?'ordre${numberFormat.format(reparation!.numero)}.pdf':'fiche${numberFormat.format(fiche!.numero)}}.pdf',
+
         type: FileType.custom,
         allowedExtensions: ['pdf'],
       );
