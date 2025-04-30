@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
+import '../reparation/fiche_reception/manager/fiche_reception_tabs.dart';
+import '../reparation/reparation/manager/reparation_tabs.dart';
 import '../workshop/inventory/storage/storage_tabs.dart';
 import '../workshop/parts/parts_management/parts_tabs.dart';
 import '../../admin_parameters.dart';
@@ -24,7 +26,6 @@ import '../logout.dart';
 import '../logs/logging/log_management.dart';
 import '../planning/planning_manager.dart';
 import '../prestataire/prestataire_tabs.dart';
-import '../reparation/manager/reparation_tabs.dart';
 import '../reparation/reparation_dashboard.dart';
 import '../settings.dart';
 import '../../tutorials/tutorial.dart';
@@ -411,11 +412,22 @@ class PaneItemsAndFooters {
         items: [
           PaneItem(
             icon: Icon(
-              FluentIcons.list,
+              Icons.receipt_long_outlined,
               color: appTheme.color.lightest,
             ),
             title: Text(
-              'greparations',
+              'fichesreception',
+              style: paneTextStyle,
+            ).tr(),
+            body: const FicheReceptionTabs(),
+          ),
+          PaneItem(
+            icon: Icon(
+              Icons.car_repair_outlined,
+              color: appTheme.color.lightest,
+            ),
+            title: Text(
+              'orderreparations',
               style: paneTextStyle,
             ).tr(),
             body: const ReparationTabs(),

@@ -2,16 +2,18 @@ import 'package:parc_oto/serializables/reparation/entretien_vehicle.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
+import '../../serializables/reparation/fiche_reception.dart';
 import '../../serializables/reparation/reparation.dart';
 import '../pdf_theming.dart';
 import '../pdf_utilities.dart';
 
 class VehicleEntretienPDF {
-  final Reparation reparation;
+  final Reparation? reparation;
+  final FicheReception? fiche;
   late final EntretienVehicle entretienVehicle;
 
-  VehicleEntretienPDF(this.reparation) {
-    entretienVehicle = reparation.entretien ?? EntretienVehicle();
+  VehicleEntretienPDF({this.reparation,this.fiche}) {
+    entretienVehicle = reparation?.entretien ?? fiche?.entretien??EntretienVehicle();
   }
 
   Widget vehicleEntretien() {

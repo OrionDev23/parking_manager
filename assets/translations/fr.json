@@ -652,5 +652,20 @@
  "uploaddimages": "(Uploadez les photos des degats (4 images max))",
  "ajoutfichereception": "Une nouvelle fiche de reception a été ajoutée",
  "modiffichereception": "Une fiche de reception a été modifiée",
- "suprfichereception": "Une fiche de reception a été supprimée"
+ "suprfichereception": "Une fiche de reception a été supprimée",
+ "fichereception": "Fiche de réception",
+ "suprefichereception": "Supprimer la fiche",
+ "orderreparations": "Ordres de réparation",
+  "ordrereparation": "Ordre de réparation",
+ "fichesreception": "Fiches de réception",
+ "nouvfiche": "Nouvelle fiche",
+  "selectentretienprec": "(Sélectionnez ce qui a été entretenu récemment)",
+ "kilometrage": "Kilométrage",
+  "dateentre": "Date d'entrée",
+  "datesortie": "Date de sortie",
+  "selectedfiche": "Selectionnez une fiche de réception",
+  "ficherequired": "Une fiche de reception doit être selectionnée",
+  "vehiclenotfound": "Le vehicule n'existe pas",
+ "receptionajout": "Fiche de reception ajoutée!",
+ "receptionmodif": "Fiche de reception modifiée!"
 }

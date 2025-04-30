@@ -1,19 +1,17 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'reparation_gestion.dart';
-
-import '../reparation/reparation_order_form/reparation_form.dart';
-
-class ReparationTabs extends StatefulWidget {
+import '../form/fiche_reception_form.dart';
+import 'fiche_reception_gestion.dart';
+class FicheReceptionTabs extends StatefulWidget {
   final bool archive;
 
-  const ReparationTabs({super.key, this.archive = false});
+  const FicheReceptionTabs({super.key, this.archive = false});
 
   @override
-  ReparationTabsState createState() => ReparationTabsState();
+  FicheReceptionTabsState createState() => FicheReceptionTabsState();
 }
 
-class ReparationTabsState extends State<ReparationTabs> {
+class FicheReceptionTabsState extends State<FicheReceptionTabs> {
   static ValueNotifier<int> currentIndex = ValueNotifier(0);
   static ValueNotifier<int> currentIndex2 = ValueNotifier(0);
   static List<Tab> tabs = [];
@@ -23,10 +21,10 @@ class ReparationTabsState extends State<ReparationTabs> {
     late Tab tab;
     tab = Tab(
       key: UniqueKey(),
-      text: Text('nouvrepar'.tr()),
-      semanticLabel: 'nouvrepar'.tr(),
+      text: Text('nouvfiche'.tr()),
+      semanticLabel: 'nouvfiche'.tr(),
       icon: const Icon(FluentIcons.shop),
-      body: ReparationForm(
+      body: FicheReceptionForm(
         key: UniqueKey(),
       ),
       onClosed: () {
@@ -49,10 +47,10 @@ class ReparationTabsState extends State<ReparationTabs> {
       currentIndex2.value = 0;
       if (tabs2.isEmpty) {
         tabs2.add(Tab(
-          text: Text('reparations'.tr()),
+          text: Text('fichesreception'.tr()),
           closeIcon: null,
           icon: const Icon(FluentIcons.settings),
-          body: ReparationGestion(
+          body: FicheReceptionGestion(
             archive: widget.archive,
           ),
           onClosed: null,
@@ -62,10 +60,10 @@ class ReparationTabsState extends State<ReparationTabs> {
       currentIndex.value = 0;
       if (tabs.isEmpty) {
         tabs.add(Tab(
-          text: Text('reparations'.tr()),
+          text: Text('fichesreception'.tr()),
           closeIcon: null,
           icon: const Icon(FluentIcons.settings),
-          body: ReparationGestion(
+          body: FicheReceptionGestion(
             archive: widget.archive,
           ),
           onClosed: null,
@@ -92,13 +90,13 @@ class ReparationTabsState extends State<ReparationTabs> {
             onNewPressed: widget.archive
                 ? null
                 : () {
-                    setState(() {
-                      final index = tabs.length + 1;
-                      final tab = generateTab(index);
-                      tabs.add(tab);
-                      currentIndex.value = index - 1;
-                    });
-                  },
+              setState(() {
+                final index = tabs.length + 1;
+                final tab = generateTab(index);
+                tabs.add(tab);
+                currentIndex.value = index - 1;
+              });
+            },
             onReorder: (oldIndex, newIndex) {
               setState(() {
                 if (oldIndex < newIndex) {

@@ -240,6 +240,8 @@ class RepairProvider extends ChangeNotifier {
     }
     return result;
   }
+
+
   Future<Client?> getPrestataire(String? docID) async {
     if (docID == null) {
       return null;
@@ -275,6 +277,24 @@ class RepairProvider extends ChangeNotifier {
     }).onError((error, stackTrace) {
       return Future.value(FicheReception(
         id: docID, numero: 0, dateEntre: DateTime.now(),
+      ));
+    });
+  }
+  Future<Reparation?> getReparation(String? docID) async {
+    if (docID == null) {
+      return null;
+    }
+    return await DatabaseGetter.database!
+        .getDocument(
+        databaseId: databaseId,
+        collectionId: reparationId,
+        documentId: docID)
+        .then((value) {
+      return value
+          .convertTo((p0) => Reparation.fromJson(p0 as Map<String, dynamic>));
+    }).onError((error, stackTrace) {
+      return Future.value(Reparation(
+        id: docID, numero: 0, date: DateTime.now(),
       ));
     });
   }

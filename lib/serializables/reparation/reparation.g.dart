@@ -10,11 +10,12 @@ Reparation _$ReparationFromJson(Map<String, dynamic> json) => Reparation(
       id: json[r'$id'] as String,
       createdAt: createdAtJson(json[r'$createdAt'] as String),
       updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
-      ficheReception: json['ficheReception'] as String,
-      ficheReceptionNumber: (json['ficheReceptionNumber'] as num).toInt(),
+      ficheReception: json['ficheReception'] as String?,
+      ficheReceptionNumber: (json['ficheReceptionNumber'] as num?)?.toInt(),
       numero: (json['numero'] as num).toInt(),
       date: dateFromIntJsonNonNull((json['date'] as num).toInt()),
       designations: designationsFromJson(json['designations'] as List),
+      mobile: json['mobile'] as bool? ?? false,
       etat: (json['etat'] as num?)?.toInt(),
       nchassi: json['nchassi'] as String?,
       prestataire: json['prestataire'] as String?,
@@ -23,7 +24,7 @@ Reparation _$ReparationFromJson(Map<String, dynamic> json) => Reparation(
       remarque: json['remarque'] as String?,
       vehicule: json['vehicule'] as String?,
       vehiculemat: json['vehiculemat'] as String?,
-    );
+    )..search = json['search'] as String?;
 
 Map<String, dynamic> _$ReparationToJson(Reparation instance) =>
     <String, dynamic>{
@@ -39,5 +40,7 @@ Map<String, dynamic> _$ReparationToJson(Reparation instance) =>
       'numero': instance.numero,
       'nchassi': instance.nchassi,
       'remarque': instance.remarque,
+      'search': instance.search,
+      'mobile': instance.mobile,
       'designations': designationsToJson(instance.designations),
     };

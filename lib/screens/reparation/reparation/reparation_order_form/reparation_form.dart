@@ -8,8 +8,8 @@ import '../../../../providers/vehicle_provider.dart';
 import '../../../../serializables/reparation/fiche_reception.dart';
 import '../../../entreprise/entreprise.dart';
 import '../../../prestataire/prestataire_table.dart';
-import '../../fiche_reception/entretien_widget.dart';
-import '../../../vehicle/manager/vehicles_table.dart';
+import '../../fiche_reception/manager/fiche_reception_table.dart';
+import 'entretien_widget.dart';
 import '../../../../serializables/client.dart';
 import '../../../../serializables/reparation/etat_vehicle.dart';
 import '../../../../theme.dart';
@@ -44,7 +44,6 @@ class ReparationFormState extends State<ReparationForm>
 
   EntretienVehicle entretienVehicle = EntretienVehicle();
   EtatVehicle etatVehicle = EtatVehicle();
-
   TextEditingController numOrdre = TextEditingController();
   DateTime selectedDate = DateTime.now();
 
@@ -112,10 +111,22 @@ class ReparationFormState extends State<ReparationForm>
     }
   }
 
-  Future<void> getVehicle() async {
-    if (widget.reparation != null && widget.reparation!.vehicule != null) {
-      selectedVehicle =
-          await VehicleProvider().getVehicle(widget.reparation!.vehicule!);
+  Future<void> getVehicle({String? vehicleFromFiche}) async {
+    if(vehicleFromFiche!=null && selectedFicheReception!=null){
+      selectedVehicle = await VehicleProvider().getVehicle(vehicleFromFiche);
+    }
+    else{
+      if (widget.reparation != null && widget.reparation!.vehicule != null) {
+        selectedVehicle =
+        await VehicleProvider().getVehicle(widget.reparation!.vehicule!);
+      }
+    }
+
+  }
+  Future<void> getFicheReception() async {
+    if (widget.reparation != null && widget.reparation!.ficheReception != null) {
+      selectedFicheReception =
+          await RepairProvider().getFiche(widget.reparation!.ficheReception!);
     }
   }
 
@@ -209,6 +220,20 @@ class ReparationFormState extends State<ReparationForm>
     return result;
   }
 
+  void getVehicleThenSetValues() async{
+    setState(() {
+      assigningOrederNumber=true;
+    });
+    await getVehicle(vehicleFromFiche: selectedFicheReception?.vehicule);
+    if(selectedVehicle!=null){
+      setVehicleValues();
+    }
+    setState(() {
+      assigningOrederNumber=false;
+    });
+
+  }
+
   void setVehicleValues() {
     if (selectedVehicle == null) {
       marque.clear();
@@ -261,7 +286,7 @@ class ReparationFormState extends State<ReparationForm>
                         Row(
                           children: [
                             Text(
-                              'ORDRE DE REPARATION',
+                              'ordrereparation'.tr().toUpperCase(),
                               style: headerStyle,
                             ),
                             smallSpace,
@@ -341,30 +366,30 @@ class ReparationFormState extends State<ReparationForm>
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     SizedBox(
-                      width: 250.px,
+                      width: 350.px,
                       height: 50.px,
                       child: ListTile(
                         leading: Text(
-                          'vehicule',
+                          'fichereception',
                           style: boldStyle,
                         ).tr(),
                         title:
-                            Text(selectedVehicle?.matricule ?? 'nonind'.tr()),
+                            Text(selectedFicheReception!=null?NumberFormat('00000000', 'fr').format(selectedFicheReception?.numero) : 'nonind'.tr()),
                         onPressed: () async {
-                          selectedVehicle = await showDialog<Vehicle>(
+                          selectedFicheReception = await showDialog<FicheReception>(
                               context: context,
                               barrierDismissible: true,
                               builder: (context) {
                                 return ContentDialog(
                                   constraints: BoxConstraints.tight(
                                       Size(700.px, 550.px)),
-                                  title: const Text('selectvehicle').tr(),
+                                  title: const Text('selectedfiche').tr(),
                                   style: ContentDialogThemeData(
                                       titleStyle: appTheme.writingStyle
                                           .copyWith(
                                               fontWeight: FontWeight.bold)),
-                                  content: const VehicleTable(
-                                    selectV: true,
+                                  content: const FicheReceptionTable(
+                                    selectD: true,
                                   ),
                                   actions: [
                                     Button(
@@ -375,8 +400,8 @@ class ReparationFormState extends State<ReparationForm>
                                   ],
                                 );
                               });
-                          setVehicleValues();
-                        },
+                          getVehicleThenSetValues();
+                          },
                       ),
                     ),
                     smallSpace,
@@ -713,6 +738,27 @@ class ReparationFormState extends State<ReparationForm>
   }
 
   void uploadForm() async {
+    if(selectedFicheReception==null){
+      displayInfoBar(context,
+          builder: (BuildContext context, void Function() close) {
+        return InfoBar(
+          title: const Text('ficherequired').tr(),
+          severity: InfoBarSeverity.error,
+        );
+      }, duration: snackbarShortDuration);
+      return;
+    }
+    if(selectedVehicle==null){
+
+      displayInfoBar(context,
+          builder: (BuildContext context, void Function() close) {
+        return InfoBar(
+          title: const Text('vehiclenotfound').tr(),
+          severity: InfoBarSeverity.error,
+        );
+      }, duration: snackbarShortDuration);
+      return;
+    }
     setState(() {
       uploading = true;
     });

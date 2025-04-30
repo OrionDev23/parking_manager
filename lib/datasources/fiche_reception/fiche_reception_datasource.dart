@@ -1,63 +1,60 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
-import '../../screens/reparation/reparation/manager/reparation_tabs.dart';
-import '../../screens/reparation/reparation/reparation_order_form/reparation_form.dart';
+import 'package:parc_oto/screens/reparation/fiche_reception/form/fiche_reception_form.dart';
+import '../../screens/reparation/fiche_reception/manager/fiche_reception_tabs.dart';
+import 'fiche_reception_webservice.dart';
+import '../../serializables/reparation/fiche_reception.dart';
 import '../parcoto_datasource.dart';
-import 'reparation_webservice.dart';
 
 import '../../pdf_generation/pdf_preview_custom.dart';
 import '../../providers/client_database.dart';
-import '../../serializables/reparation/reparation.dart';
 import '../../widgets/on_tap_scale.dart';
 
-class ReparationDataSource extends ParcOtoDatasource<Reparation> {
+class FicheReceptionDatasource extends ParcOtoDatasource<FicheReception> {
   final bool? archive;
 
-  ReparationDataSource(
+  FicheReceptionDatasource(
       {required super.collectionID,
-      this.archive,
-      required super.current,
-      super.appTheme,
-      super.filters,
-      super.searchKey,
-      super.selectC}) {
-    repo = ReparationWebService(data, collectionID, 1);
+        this.archive,
+        required super.current,
+        super.appTheme,
+        super.filters,
+        super.searchKey,
+        super.selectC}) {
+    repo = FicheReceptionWebService(data, collectionID, 1);
   }
 
   @override
   String deleteConfirmationMessage(c) {
-    return '${'supreparation'.tr()} ${c.numero}';
+    return '${'suprefichereception'.tr()} ${c.numero}';
   }
 
   @override
-  List<DataCell> getCellsToShow(MapEntry<String, Reparation> element) {
+  List<DataCell> getCellsToShow(MapEntry<String, FicheReception> element) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
     final dateFormat2 = DateFormat('y/M/d', 'fr');
     final numberFormat = NumberFormat('00000000', 'fr');
-    final numberFormat2 =
-        NumberFormat.currency(locale: 'fr', symbol: 'DA', decimalDigits: 2);
     return [
       DataCell(SelectableText(
         numberFormat.format(element.value.numero),
         style: rowTextStyle,
       ),
-        onDoubleTap: (){
-          showPdf(element.value);
-        }
+          onDoubleTap: (){
+            showPdf(element.value);
+          }
       ),
-      DataCell(SelectableText(element.value.nchassi ?? '', style: rowTextStyle)),
-      DataCell(SelectableText(element.value.vehiculemat ?? '', style: rowTextStyle)),
-      DataCell(
-          SelectableText(element.value.ficheReceptionNumber!=null? numberFormat.format(element.value.ficheReceptionNumber): '', style: rowTextStyle)),
-      DataCell(
-          SelectableText(element.value.prestatairenom ?? '', style: rowTextStyle)),
-      DataCell(SelectableText(dateFormat2.format(element.value.date),
-          style: rowTextStyle)),
       DataCell(SelectableText(
-        numberFormat2.format(element.value.getPrixTTC()),
+        element.value.nchassi??'',
         style: rowTextStyle,
       )),
+      DataCell(SelectableText(element.value.vehiculemat ?? '', style: rowTextStyle)),
+      DataCell(
+          SelectableText(element.value.reparationNumero!=null?numberFormat.format(element.value.reparationNumero):'', style: rowTextStyle)),
+      DataCell(SelectableText(dateFormat2.format(element.value.dateEntre),
+          style: rowTextStyle)),
+      DataCell(SelectableText(element.value.dateSortie!=null?dateFormat2.format(element.value.dateSortie!):'',
+          style: rowTextStyle)),
       DataCell(SelectableText(dateFormat.format(element.value.updatedAt!),
           style: rowTextStyle)),
       if (selectC != true)
@@ -78,26 +75,26 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation> {
                               tab = f.Tab(
                                 key: UniqueKey(),
                                 text: Text(
-                                    '${"mod".tr()} ${'reparation'.tr().toLowerCase()} ${element.value.numero}'),
+                                    '${"mod".tr()} ${'fichereception'.tr().toLowerCase()} ${element.value.numero}'),
                                 semanticLabel:
-                                    '${'mod'.tr()} ${element.value.numero}',
+                                '${'mod'.tr()} ${element.value.numero}',
                                 icon: const Icon(f.FluentIcons.edit),
-                                body: ReparationForm(
-                                  reparation: element.value,
+                                body: FicheReceptionForm(
+                                  fiche: element.value,
                                   key: UniqueKey(),
                                 ),
                                 onClosed: () {
-                                  ReparationTabsState.tabs.remove(tab);
+                                  FicheReceptionTabsState.tabs.remove(tab);
 
-                                  if (ReparationTabsState.currentIndex.value >
+                                  if (FicheReceptionTabsState.currentIndex.value >
                                       0) {
-                                    ReparationTabsState.currentIndex.value--;
+                                    FicheReceptionTabsState.currentIndex.value--;
                                   }
                                 },
                               );
-                              final index = ReparationTabsState.tabs.length + 1;
-                              ReparationTabsState.tabs.add(tab);
-                              ReparationTabsState.currentIndex.value =
+                              final index = FicheReceptionTabsState.tabs.length + 1;
+                              FicheReceptionTabsState.tabs.add(tab);
+                              FicheReceptionTabsState.currentIndex.value =
                                   index - 1;
                             }),
                       if (DatabaseGetter().isAdmin())
@@ -117,17 +114,17 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation> {
                 });
               },
               child: f.Container(
-              decoration: BoxDecoration(
-                color: appTheme?.color.lightest,
-                boxShadow: kElevationToShadow[2],
-              ),
-              child: Icon(Icons.edit,color: appTheme!
-                  .color.darkest,))),
+                  decoration: BoxDecoration(
+                    color: appTheme?.color.lightest,
+                    boxShadow: kElevationToShadow[2],
+                  ),
+                  child: Icon(Icons.edit,color: appTheme!
+                      .color.darkest,))),
         )),
     ];
   }
 
-  void showPdf(Reparation reparation) {
+  void showPdf(FicheReception fiche) {
     Future.delayed(const Duration(milliseconds: 50))
         .then((value) {
           if(current.mounted){
@@ -135,7 +132,7 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation> {
                 context: current,
                 barrierDismissible: true,
                 builder: (context) {
-                  return PdfPreviewPO(reparation:reparation);
+                  return PdfPreviewPO(fiche:fiche);
                 });
           }
 

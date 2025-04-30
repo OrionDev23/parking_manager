@@ -11,12 +11,12 @@ FicheReception _$FicheReceptionFromJson(Map<String, dynamic> json) =>
       id: json[r'$id'] as String,
       createdAt: createdAtJson(json[r'$createdAt'] as String),
       updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
+      mobile: json['mobile'] as bool? ?? false,
       numero: (json['numero'] as num).toInt(),
       anneeUtil: (json['anneeUtil'] as num?)?.toInt(),
       couleur: json['couleur'] as String?,
       dateEntre: dateFromIntJsonNonNull((json['dateEntre'] as num).toInt()),
       dateSortie: dateFromIntJson((json['dateSortie'] as num?)?.toInt()),
-      etat: json['etat'] as String?,
       etatActuel: etatFromJson(json['etatActuel'] as String?),
       gaz: (json['gaz'] as num?)?.toInt(),
       images: (json['images'] as List<dynamic>?)
@@ -30,20 +30,25 @@ FicheReception _$FicheReceptionFromJson(Map<String, dynamic> json) =>
       remarque: json['remarque'] as String?,
       type: (json['type'] as num?)?.toInt(),
       vehicule: json['vehicule'] as String?,
+      entretien: entretienFromJson(json['entretien'] as String?),
       vehiculemat: json['vehiculemat'] as String?,
       marque: json['marque'] as String?,
       matriculeConducteur: json['matriculeConducteur'] as String?,
       prenomConducteur: json['prenomConducteur'] as String?,
       nomConducteur: json['nomConducteur'] as String?,
+      showImages: json['showImages'] as bool? ?? true,
+      showEntretien: json['showEntretien'] as bool? ?? true,
+      showEtat: json['showEtat'] as bool? ?? true,
       reparation: json['reparation'] as String?,
       reparationCost: (json['reparationCost'] as num?)?.toDouble(),
-    );
+    )
+      ..search = json['search'] as String?
+      ..reparationNumero = (json['reparationNumero'] as num?)?.toInt();
 
 Map<String, dynamic> _$FicheReceptionToJson(FicheReception instance) =>
     <String, dynamic>{
       'vehicule': instance.vehicule,
       'vehiculemat': instance.vehiculemat,
-      'etat': instance.etat,
       'type': instance.type,
       'dateEntre': dateToIntJson(instance.dateEntre),
       'dateSortie': dateToIntJson(instance.dateSortie),
@@ -55,13 +60,20 @@ Map<String, dynamic> _$FicheReceptionToJson(FicheReception instance) =>
       'couleur': instance.couleur,
       'remarque': instance.remarque,
       'marque': instance.marque,
+      'search': instance.search,
       'nomConducteur': instance.nomConducteur,
       'prenomConducteur': instance.prenomConducteur,
       'matriculeConducteur': instance.matriculeConducteur,
       'images': instance.images,
       'etatActuel': etatVehiculeToJson(instance.etatActuel),
+      'entretien': entretienToJson(instance.entretien),
       'anneeUtil': instance.anneeUtil,
       'modele': instance.modele,
       'reparation': instance.reparation,
+      'reparationNumero': instance.reparationNumero,
       'reparationCost': instance.reparationCost,
+      'mobile': instance.mobile,
+      'showImages': instance.showImages,
+      'showEntretien': instance.showEntretien,
+      'showEtat': instance.showEtat,
     };

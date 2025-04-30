@@ -665,6 +665,20 @@
 
   "ajoutfichereception": "تمت إضافة ورقة استقبال جديدة",
   "modiffichereception": "تم تعديل ورقة الاستقبال",
-  "suprfichereception": "تم حذف ورقة استقبال"
-
+  "suprfichereception": "تم حذف ورقة استقبال",
+  "fichereception": "ورقة الاستقبال",
+  "suprefichereception": "حذف الورقة",
+  "orderreparations": "أوامر الإصلاح",
+  "fichesreception": "أوراق الاستقبال",
+  "nouvfiche": "ورقة جديدة",
+  "selectentretienprec": "(حدد ما تم صيانته مؤخرا)",
+  "ordrereparation": "أمر الإصلاح",
+  "kilometrage": "الكيلومترات المقطوعة",
+  "dateentre": "تاريخ الدخول",
+  "datesortie": "تاريخ الخروج",
+  "selectedfiche": "اختر ورقة استقبال",
+  "ficherequired": "يجب تحديد ورقة استقبال",
+  "vehiclenotfound": "المركبة غير موجودة",
+  "receptionajout": "تمت إضافة ورقة الاستقبال!",
+  "receptionmodif": "تم تعديل ورقة الاستقبال"
 }

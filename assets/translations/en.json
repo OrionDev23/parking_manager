@@ -663,8 +663,21 @@
   "uploaddimages": "(Upload damage images (4 images max))",
   "ajoutfichereception": "A new reception sheet has been added",
   "modiffichereception": "A reception sheet has been modified",
-  "suprfichereception": "A reception sheet has been deleted"
-
-
+  "suprfichereception": "A reception sheet has been deleted",
+  "fichereception": "Reception sheet",
+  "suprefichereception": "Delete sheet",
+  "orderreparations": "Repair orders",
+  "fichesreception": "Reception sheets",
+  "nouvfiche": "New sheet",
+  "selectentretienprec": "(Select what has been maintained recently)",
+  "ordrereparation": "Repair order",
+  "kilometrage": "Kilometers traveled",
+  "dateentre": "Entry date",
+  "datesortie": "Exit date",
+  "selectedfiche": "Select a reception sheet",
+  "ficherequired": "A reception sheet must be selected",
+  "vehiclenotfound": "The vehicle does not exist",
+  "receptionajout": "Reception sheet added!",
+  "receptionmodif": "Reception sheet modified!"
 
 }

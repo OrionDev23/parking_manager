@@ -8,15 +8,13 @@ import 'package:parc_oto/screens/entreprise/entreprise.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
-import '../serializables/client.dart';
 import '../serializables/reparation/fiche_reception.dart';
 
 class FicheReceptionPdf {
   final FicheReception fiche;
+  final List<Uint8List?>? images;
 
-  Client? p;
-
-  FicheReceptionPdf({required this.fiche});
+  FicheReceptionPdf({required this.fiche,this.images});
 
   PdfUtilities pdfUtilities = PdfUtilities();
 
@@ -24,7 +22,13 @@ class FicheReceptionPdf {
     await Future.wait([
       PDFTheming().initFontsAndLogos()
     ]);
-    p = pdfUtilities.p;
+    if(images!=null){
+      pdfUtilities.images=images;
+    }
+    else{
+      await pdfUtilities.initImages(fiche);
+
+    }
     var doc = Document(
       theme: ThemeData.withFont(
         base: baseFont,
@@ -50,7 +54,7 @@ class FicheReceptionPdf {
 
 
   bool etatEmpty() {
-    if (fiche.etatActuel == null) {
+    if (fiche.etatActuel == null|| !fiche.showEtat) {
       return true;
     } else {
       bool result = true;
@@ -71,6 +75,21 @@ class FicheReceptionPdf {
     }
   }
 
+  bool imagesEmpty(){
+    if (pdfUtilities.images==null || pdfUtilities.images!.isEmpty|| !fiche.showImages) {
+      return true;
+    } else {
+      bool result = true;
+      for(int i=0;i<pdfUtilities.images!.length;i++){
+       if(pdfUtilities.images![i] != null){
+         result = false;
+         break;
+       }
+      }
+      return result;
+    }
+  }
+
   Widget getPageContent() {
     return Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -83,13 +102,84 @@ class FicheReceptionPdf {
           if (!etatEmpty())
             VehicleDamagePDF(fiche).vehicleDamage(),
           if (!etatEmpty()) bigSpace,
-
+          if (!entretienEmpty())
+            VehicleEntretienPDF(fiche:fiche).vehicleEntretien(),
+          if (!entretienEmpty()) bigSpace,
+          if(!imagesEmpty())
+            imageContainer(),
+          Spacer(),
           getRemarqueAndSignature(),
           Spacer(),
           brandingAndPaging(),
         ]);
   }
+  Widget imageContainer(){
+    double imageHeight=3*PdfPageFormat.cm;
+    if(etatEmpty()){
+      imageHeight+=3*PdfPageFormat.cm;
+    }
+    if(entretienEmpty()){
+      imageHeight+=3*PdfPageFormat.cm;
+    }
+    return Table(
+      border: TableBorder.all(
+        color: orangeDeep,
+        width: 1,
+      ),
+      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+      columnWidths: {
+        0: const FlexColumnWidth(5),
+        1: const FlexColumnWidth(5),
+      },
+      children:[
+        TableRow(
+            children: [
+              SizedBox(
+                height: imageHeight,
+                child:Center(child:pdfUtilities.images![0]!=null?
+                Image(MemoryImage(
+                    pdfUtilities.images![0]!),):Text('1')),
+              ),
+              SizedBox(
+                height: imageHeight,
+                child: Center(child:pdfUtilities.images![1]!=null?
+              Image(MemoryImage(pdfUtilities.images![1]!)):Text('2'),))
+        ]),
+        TableRow(
 
+            children: [
+              SizedBox(
+              height: imageHeight,
+              child:
+                  Center(child:
+              pdfUtilities.images![2]!=null?
+              Image(MemoryImage(
+                  pdfUtilities.images![2]!),):Text('3'),),),
+              SizedBox(
+                height: imageHeight,
+                child:Center(child:
+              pdfUtilities.images![3]!=null?
+              Image(MemoryImage(pdfUtilities.images![3]!)):Text('4'),))
+        ]),
+      ]
+    );
+
+  }
+
+
+  bool entretienEmpty() {
+    if (fiche.entretien == null || !fiche.showEntretien) {
+      return true;
+    } else {
+      List values = fiche.entretien!.toJson().values.toList();
+      for (int i = 0; i < values.length; i++) {
+        if (values[i] == true) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
 
 
   Widget getRemarqueAndSignature() {
@@ -239,7 +329,7 @@ class FicheReceptionPdf {
                                       crossAxisAlignment:
                                       CrossAxisAlignment.end,
                                       children: [
-                                        Text('Ordre #',
+                                        Text('Fiche #',
                                             style: kindaBigTextBold),
                                         dotsSpacer(),
                                         Text(

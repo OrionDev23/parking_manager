@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:parc_oto/pdf_generation/pdf_theming.dart';
 import 'package:parc_oto/providers/repair_provider.dart';
@@ -5,6 +7,7 @@ import 'package:parc_oto/serializables/client.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
+import '../providers/client_database.dart';
 import '../serializables/reparation/fiche_reception.dart';
 import '../serializables/reparation/reparation.dart';
 
@@ -26,6 +29,8 @@ Widget dotsSpacer() {
 class PdfUtilities {
   Client? p;
 
+  List<Uint8List?>? images;
+
   FicheReception? fiche;
 
   Future<void> initPrestataire(Reparation reparation) async {
@@ -36,6 +41,29 @@ class PdfUtilities {
     fiche = await RepairProvider().getFiche(reparation.ficheReception);
   }
 
+  Future<void> initImages(FicheReception? fiche) async {
+    if (fiche != null && fiche.images.isNotEmpty) {
+      List<Future<Uint8List?>> tasks = [];
+      for (int i = 0; i < fiche.images.length; i++) {
+        if (fiche.images[i] != null) {
+          tasks.add(downloadImage(fiche.id,fiche.images[i].toString()));
+        }
+      }
+      images = await Future.wait(tasks);
+
+    }
+  }
+
+
+  Future<Uint8List> downloadImage(String documentID,String id) async {
+    return await DatabaseGetter.storage!
+        .getFileView(bucketId: 'images', fileId: "$documentID$id.jpg")
+        .onError((e, s) {
+      return Future.value(Uint8List.fromList([]));
+    }).then((s) {
+      return s;
+    });
+  }
   static List<Widget> getTextListFromMap(
       Map<String, dynamic> map, int debut, int fin,
       {double width = 3.7}) {

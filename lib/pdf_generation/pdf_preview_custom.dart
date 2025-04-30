@@ -21,7 +21,8 @@ import 'fiche_reception_pdf.dart';
 class PdfPreviewPO extends StatelessWidget {
   final Reparation? reparation;
   final FicheReception? fiche;
-  const PdfPreviewPO({super.key, this.reparation,this.fiche});
+  final List<Uint8List?>? images;
+  const PdfPreviewPO({super.key, this.reparation,this.fiche,this.images});
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +48,7 @@ class PdfPreviewPO extends StatelessWidget {
 
           }
           else{
-            return FicheReceptionPdf(fiche: fiche!).getDocument();
+            return FicheReceptionPdf(fiche: fiche!,images: images).getDocument();
           }
         },
         actions: [

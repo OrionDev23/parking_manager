@@ -94,7 +94,7 @@ class ReparationPdf {
           if (page == 0) getVehicleInfo(),
           if (page == 0) bigSpace,
           if (!entretienEmpty())
-            VehicleEntretienPDF(reparation).vehicleEntretien(),
+            VehicleEntretienPDF(reparation:reparation).vehicleEntretien(),
           if (!entretienEmpty()) bigSpace,
           getDesignations(page, nbrPages, lastIndex),
           if (page == nbrPages - 1) getPrixInLetter(),

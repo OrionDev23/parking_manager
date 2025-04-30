@@ -4,36 +4,35 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../providers/client_database.dart';
-import '../../../providers/vehicle_provider.dart';
-import '../../entreprise/entreprise.dart';
-import '../../prestataire/prestataire_table.dart';
-import 'entretien_widget.dart';
-import 'vehicle_damage.dart';
-import '../../vehicle/manager/vehicles_table.dart';
-import '../../../serializables/client.dart';
-import '../../../serializables/reparation/etat_vehicle.dart';
-import '../../../theme.dart';
-import '../../../widgets/big_title_form.dart';
-import '../../../widgets/zone_box.dart';
+import 'package:parc_oto/providers/repair_provider.dart';
+import '../../../../providers/client_database.dart';
+import '../../../../providers/vehicle_provider.dart';
+import '../../../entreprise/entreprise.dart';
+import '../../reparation/manager/reparation_table.dart';
+import '../../reparation/reparation_order_form/entretien_widget.dart';
+import '../../../vehicle/manager/vehicles_table.dart';
+import '../../../../serializables/reparation/etat_vehicle.dart';
+import '../../../../theme.dart';
+import '../../../../widgets/big_title_form.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
-import '../../../pdf_generation/pdf_preview_custom.dart';
-import '../../../pdf_generation/pdf_theming.dart' as pdf_theme;
-import '../../../serializables/reparation/entretien_vehicle.dart';
-import '../../../serializables/reparation/fiche_reception.dart';
-import '../../../serializables/reparation/reparation.dart';
-import '../../../serializables/vehicle/vehicle.dart';
-import '../../../utilities/vehicle_util.dart';
-import '../../../widgets/on_tap_scale.dart';
-import '../reparation/reparation_order_form/entreprise_placement.dart';
+import '../../../../pdf_generation/pdf_preview_custom.dart';
+import '../../../../pdf_generation/pdf_theming.dart' as pdf_theme;
+import '../../../../serializables/reparation/entretien_vehicle.dart';
+import '../../../../serializables/reparation/fiche_reception.dart';
+import '../../../../serializables/reparation/reparation.dart';
+import '../../../../serializables/vehicle/vehicle.dart';
+import '../../../../utilities/vehicle_util.dart';
+import '../../../../widgets/on_tap_scale.dart';
+import '../../reparation/reparation_order_form/entreprise_placement.dart';
+import 'vehicle_damage.dart';
 
 class FicheReceptionForm extends StatefulWidget {
-  final FicheReception? reparation;
+  final FicheReception? fiche;
 
-  const FicheReceptionForm({required super.key, this.reparation});
+  const FicheReceptionForm({required super.key, this.fiche});
 
   @override
   State<FicheReceptionForm> createState() => FicheReceptionFormState();
@@ -41,16 +40,17 @@ class FicheReceptionForm extends StatefulWidget {
 
 class FicheReceptionFormState extends State<FicheReceptionForm>
     with AutomaticKeepAliveClientMixin<FicheReceptionForm> {
-  static Map<Key, int> reservedOrders = {};
+  static Map<Key, int> reservedFiches = {};
 
   EntretienVehicle entretienVehicle = EntretienVehicle();
   EtatVehicle etatVehicle = EtatVehicle();
 
   TextEditingController numOrdre = TextEditingController();
-  DateTime selectedDate = DateTime.now();
+  DateTime dateEntre = DateTime.now();
+  DateTime? dateSortie;
 
-  Client? selectedPrest;
   Vehicle? selectedVehicle;
+  Reparation? selectedReparation;
   TextEditingController marque = TextEditingController();
   TextEditingController type = TextEditingController();
   TextEditingController matricule = TextEditingController();
@@ -74,126 +74,136 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
 
   @override
   void initState() {
-    if (widget.reparation != null) {
+    if (widget.fiche != null) {
       initValues();
     } else {
-      assignOrderNumber();
+      assignFicheNumber();
     }
     super.initState();
   }
 
   void initValues() async {
-    if (widget.reparation != null) {
-      documentID = widget.reparation!.id;
-      assigningOrederNumber = true;
-      etatVehicle = widget.reparation!.etatActuel ?? EtatVehicle();
-      remarqueEntretien.text = widget.reparation!.remarque ?? '';
-      numOrdre.text = widget.reparation!.numero.toString();
-      reservedOrders[widget.key!] = widget.reparation!.numero;
-      matricule.text = widget.reparation!.vehiculemat ?? '';
-      couleur.text = widget.reparation!.couleur ?? '';
-      type.text = widget.reparation!.modele ?? '';
-      nchassi.text = widget.reparation!.nchassi ?? '';
-      nmoteur.text = widget.reparation!.nmoteur ?? '';
-      km.text = widget.reparation!.kilometrage?.toString() ?? '0';
-      carburant = widget.reparation!.gaz?.toDouble() ?? 4;
-      selectedDate = widget.reparation!.dateEntre;
-      matriculeConducteur.text = widget.reparation!.matriculeConducteur ?? '';
-      nom.text = widget.reparation!.nomConducteur ?? '';
-      prenom.text = widget.reparation!.prenomConducteur ?? '';
-      anneeUtil = DateTime(widget.reparation!.anneeUtil ??
+    if (widget.fiche != null) {
+      documentID = widget.fiche!.id;
+      assigningFicheNumber = true;
+      await Future.wait([getVehicle(), getReparation(), getImages()]);
+
+      if (mounted) {
+        setState(() {});
+      }
+      etatVehicle = widget.fiche!.etatActuel ?? EtatVehicle();
+      entretienVehicle = widget.fiche!.entretien ?? EntretienVehicle();
+      remarqueEntretien.text = widget.fiche!.remarque ?? '';
+      numOrdre.text = widget.fiche!.numero.toString();
+      reservedFiches[widget.key!] = widget.fiche!.numero;
+      matricule.text = widget.fiche!.vehiculemat ?? '';
+      couleur.text = widget.fiche!.couleur ?? '';
+      type.text = widget.fiche!.modele ?? '';
+      nchassi.text = widget.fiche!.nchassi ?? '';
+      nmoteur.text = widget.fiche!.nmoteur ?? '';
+      km.text = widget.fiche!.kilometrage?.toString() ?? '0';
+      carburant = widget.fiche!.gaz?.toDouble() ?? 4;
+      dateEntre = widget.fiche!.dateEntre;
+      matriculeConducteur.text = widget.fiche!.matriculeConducteur ?? '';
+      nom.text = widget.fiche!.nomConducteur ?? '';
+      prenom.text = widget.fiche!.prenomConducteur ?? '';
+      anneeUtil = DateTime(widget.fiche!.anneeUtil ??
           selectedVehicle?.anneeUtil ??
           DateTime.now().year);
       setState(() {
-        assigningOrederNumber = false;
+        assigningFicheNumber = false;
       });
     }
   }
 
   Future<void> getVehicle() async {
-    if (widget.reparation != null && widget.reparation!.vehicule != null) {
+    if (widget.fiche != null && widget.fiche!.vehicule != null) {
       selectedVehicle =
-      await VehicleProvider().getVehicle(widget.reparation!.vehicule!);
+          await VehicleProvider().getVehicle(widget.fiche!.vehicule!);
     }
   }
 
+  Future<void> getReparation() async {
+    if (widget.fiche != null && widget.fiche!.reparation != null) {
+      selectedReparation =
+          await RepairProvider().getReparation(widget.fiche!.reparation!);
+    }
+  }
 
-  Future<void> getImages() async{
-
-    if (widget.reparation != null && widget.reparation!.images.isNotEmpty) {
-      List<Future<Uint8List?>> tasks=[];
-      for(int i=0;i<widget.reparation!.images.length;i++){
-        if(widget.reparation!.images[i]!=null){
-          tasks.add(downloadImage(widget.reparation!.images[i].toString()));
-
+  Future<void> getImages() async {
+    if (widget.fiche != null && widget.fiche!.images.isNotEmpty) {
+      List<Future<Uint8List?>> tasks = [];
+      for (int i = 0; i < widget.fiche!.images.length; i++) {
+        if (widget.fiche!.images[i] != null) {
+          tasks.add(downloadImage(widget.fiche!.images[i].toString()));
         }
       }
-      images=await Future.wait(tasks);
+      images = await Future.wait(tasks);
     }
-
   }
-  Future<Uint8List> downloadImage(String id) async {
 
-    return await DatabaseGetter.storage!.getFileView(bucketId: 'images', fileId: "$documentID$id.jpg").onError((e,s){
+  Future<Uint8List> downloadImage(String id) async {
+    return await DatabaseGetter.storage!
+        .getFileView(bucketId: 'images', fileId: "$documentID$id.jpg")
+        .onError((e, s) {
       return Future.value(Uint8List.fromList([]));
-    }).then((s){
+    }).then((s) {
       return s;
     });
   }
 
+  bool assigningFicheNumber = false;
 
-  bool assigningOrederNumber = false;
+  bool errorNumFiche = false;
+  bool changedPics = false;
 
-  bool errorNumOrder = false;
-  bool changedPics=false;
-
-  void assignOrderNumber() async {
-    assigningOrederNumber = true;
+  void assignFicheNumber() async {
+    assigningFicheNumber = true;
     if (mounted) {
       setState(() {});
     }
     await DatabaseGetter.database!.listDocuments(
         databaseId: databaseId,
-        collectionId: reparationId,
+        collectionId: fichesreceptionId,
         queries: [
           Query.orderDesc('numero'),
           Query.limit(1),
         ]).then((value) {
       if (value.documents.length == 1) {
         numOrdre.text = (value.documents[0]
-            .convertTo(
-                (p0) => Reparation.fromJson(p0 as Map<String, dynamic>))
-            .numero +
-            1)
+                    .convertTo((p0) =>
+                        FicheReception.fromJson(p0 as Map<String, dynamic>))
+                    .numero +
+                1)
             .toString();
       } else {
-        numOrdre.text = (reservedOrders.length + 1).toString();
+        numOrdre.text = (reservedFiches.length + 1).toString();
       }
 
-      while (testIfReservedContained(int.parse(numOrdre.text))) {
+      while (testIfReservedContainedFiches(int.parse(numOrdre.text))) {
         numOrdre.text = (int.parse(numOrdre.text) + 1).toString();
       }
-      reservedOrders[widget.key!] = (int.parse(numOrdre.text));
+      reservedFiches[widget.key!] = (int.parse(numOrdre.text));
     });
 
-    assigningOrederNumber = false;
+    assigningFicheNumber = false;
     if (mounted) {
       setState(() {});
     }
   }
 
-  Future<bool> testIfOrderNumberExists() async {
+  Future<bool> testIfFichesNumberExists() async {
     bool result = false;
 
-    if (testIfReservedContained(int.parse(numOrdre.text))) {
+    if (testIfReservedContainedFiches(int.parse(numOrdre.text))) {
       setState(() {
-        errorNumOrder = true;
+        errorNumFiche = true;
       });
       result = true;
     } else {
       result = await DatabaseGetter.database!.listDocuments(
           databaseId: databaseId,
-          collectionId: reparationId,
+          collectionId: fichesreceptionId,
           queries: [
             Query.orderDesc('numero'),
             Query.equal('numero', int.parse(numOrdre.text)),
@@ -201,12 +211,12 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
           ]).then((value) {
         if (value.documents.length == 1) {
           setState(() {
-            errorNumOrder = true;
+            errorNumFiche = true;
           });
           return true;
         } else {
           setState(() {
-            errorNumOrder = false;
+            errorNumFiche = false;
           });
           return false;
         }
@@ -218,9 +228,9 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
     return result;
   }
 
-  bool testIfReservedContained(int value) {
+  bool testIfReservedContainedFiches(int value) {
     bool result = false;
-    reservedOrders.forEach((key, v) {
+    reservedFiches.forEach((key, v) {
       if (value == v && key != widget.key) {
         result = true;
         return;
@@ -274,16 +284,16 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        if (errorNumOrder)
+                        if (errorNumFiche)
                           Text(
                             'numprorder',
                             style: TextStyle(color: Colors.red),
                           ).tr(),
-                        if (errorNumOrder) smallSpace,
+                        if (errorNumFiche) smallSpace,
                         Row(
                           children: [
                             Text(
-                              'ORDRE DE REPARATION',
+                              'fichereception'.tr().toUpperCase(),
                               style: headerStyle,
                             ),
                             smallSpace,
@@ -305,7 +315,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                                     Flexible(
                                       child: TextBox(
                                         controller: numOrdre,
-                                        enabled: widget.reparation == null,
+                                        enabled: widget.fiche == null,
                                         placeholder: 'num'.tr(),
                                         placeholderStyle: placeStyle,
                                         style: appTheme.writingStyle,
@@ -318,8 +328,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                                         ],
                                         onChanged: (s) async {
                                           if (s.isNotEmpty) {
-                                            if (!await testIfOrderNumberExists()) {
-                                              reservedOrders[widget.key!] =
+                                            if (!await testIfFichesNumberExists()) {
+                                              reservedFiches[widget.key!] =
                                                   int.parse(s);
                                               setState(() {});
                                             }
@@ -341,7 +351,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      'date',
+                      'dateentre',
                       style: boldStyle,
                     ).tr(),
                     smallSpace,
@@ -349,10 +359,29 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       width: 200.px,
                       height: 30.px,
                       child: DatePicker(
-                        selected: selectedDate,
+                        selected: dateEntre,
                         onChanged: (s) {
                           setState(() {
-                            selectedDate = s;
+                            dateEntre = s;
+                          });
+                        },
+                      ),
+                    ),
+                    bigSpace,
+                    Text(
+                      'datesortie',
+                      style: boldStyle,
+                    ).tr(),
+                    smallSpace,
+                    SizedBox(
+                      width: 200.px,
+                      height: 30.px,
+                      child: DatePicker(
+                        selected: dateSortie,
+                        startDate: dateEntre,
+                        onChanged: (s) {
+                          setState(() {
+                            dateSortie = s;
                           });
                         },
                       ),
@@ -371,7 +400,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                           style: boldStyle,
                         ).tr(),
                         title:
-                        Text(selectedVehicle?.matricule ?? 'nonind'.tr()),
+                            Text(selectedVehicle?.matricule ?? 'nonind'.tr()),
                         onPressed: () async {
                           selectedVehicle = await showDialog<Vehicle>(
                               context: context,
@@ -384,7 +413,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                                   style: ContentDialogThemeData(
                                       titleStyle: appTheme.writingStyle
                                           .copyWith(
-                                          fontWeight: FontWeight.bold)),
+                                              fontWeight: FontWeight.bold)),
                                   content: const VehicleTable(
                                     selectV: true,
                                   ),
@@ -415,24 +444,25 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       height: 50.px,
                       child: ListTile(
                         leading: Text(
-                          'prestataire',
+                          'reparation',
                           style: boldStyle,
                         ).tr(),
-                        title: Text(selectedPrest?.nom ?? 'nonind'.tr()),
+                        title:
+                        Text(selectedReparation?.numero==null?'nonind'.tr():NumberFormat("000000").format(selectedReparation!.numero)),
                         onPressed: () async {
-                          selectedPrest = await showDialog<Client>(
+                          selectedReparation = await showDialog<Reparation>(
                               context: context,
                               barrierDismissible: true,
                               builder: (context) {
                                 return ContentDialog(
                                   constraints: BoxConstraints.tight(
                                       Size(700.px, 550.px)),
-                                  title: const Text('selectprestataire').tr(),
+                                  title: const Text('selectreparation').tr(),
                                   style: ContentDialogThemeData(
                                       titleStyle: appTheme.writingStyle
                                           .copyWith(
                                           fontWeight: FontWeight.bold)),
-                                  content: const PrestataireTable(
+                                  content: const ReparationTable(
                                     selectD: true,
                                   ),
                                   actions: [
@@ -444,10 +474,17 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                                   ],
                                 );
                               });
-                          setState(() {});
                         },
                       ),
                     ),
+                    smallSpace,
+                    if (selectedReparation != null)
+                      IconButton(
+                          icon: const Icon(FluentIcons.cancel),
+                          onPressed: () {
+                            selectedReparation = null;
+                            setVehicleValues();
+                          }),
                   ],
                 ),
                 buildTable(appTheme),
@@ -492,12 +529,12 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                   VehicleDamage(
                     etatVehicle: etatVehicle,
                     vehicleType:
-                    VehiclesUtilities.getGenreNumber(matricule.text),
+                        VehiclesUtilities.getGenreNumber(matricule.text),
                   ),
                 if (showEtat) smallSpace,
                 BigTitleForm(
                   bigTitle: 'entretienvehicule',
-                  littleTitle: 'selectentretien',
+                  littleTitle: 'selectentretienprec',
                   trailing: Row(
                     children: [
                       const Text('afficherquestion').tr(),
@@ -519,43 +556,12 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                     decoration: BoxDecoration(
                       border: Border.all(),
                     ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        EntretienWidget(entretienVehicle: entretienVehicle),
-                        bigSpace,
-                        SizedBox(
-                          height: 180.px,
-                          width: 400.px,
-                          child: ZoneBox(
-                            label: 'remarqueplus'.tr(),
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: TextBox(
-                                controller: remarqueEntretien,
-                                placeholder: 'remarqueplus'.tr(),
-                                maxLines: 4,
-                                placeholderStyle: placeStyle,
-                                style: appTheme.writingStyle,
-                                cursorColor: appTheme.color.darker,
-                                decoration: WidgetStatePropertyAll(
-                                    BoxDecoration(color: appTheme.fillColor)),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    child: EntretienWidget(entretienVehicle: entretienVehicle),
                   ),
-                smallSpace,
-                const BigTitleForm(
-                  bigTitle: 'travaileffect',
-                  littleTitle: 'ajoutertaches',
-                ),
               ],
             ),
           ),
-          if (assigningOrederNumber)
+          if (assigningFicheNumber)
             Positioned(
               top: 40.h,
               left: 40.w,
@@ -574,7 +580,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
             FilledButton(
                 style: ButtonStyle(
                   backgroundColor:
-                  WidgetStatePropertyAll(appTheme.color.lightest),
+                      WidgetStatePropertyAll(appTheme.color.lightest),
                 ),
                 onPressed: uploading ? null : showPdf,
                 child: const Text('voir')),
@@ -582,7 +588,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
             FilledButton(
                 style: ButtonStyle(
                   backgroundColor:
-                  WidgetStatePropertyAll(appTheme.color.darkest),
+                      WidgetStatePropertyAll(appTheme.color.darkest),
                 ),
                 onPressed: uploading ? null : uploadForm,
                 child: const Text('save').tr())
@@ -616,12 +622,12 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                   decoration: BoxDecoration(
                     border: Border.all(),
                   ),
-                  child: images[0]==null ||images[0]!.isEmpty
+                  child: images[0] == null || images[0]!.isEmpty
                       ? Icon(FluentIcons.add)
                       : Image.memory(
-                    images[0]!,
-                    fit: BoxFit.fitHeight,
-                  ),
+                          images[0]!,
+                          fit: BoxFit.fitHeight,
+                        ),
                 ),
               )),
           StaggeredGridTile.fit(
@@ -635,12 +641,12 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                   decoration: BoxDecoration(
                     border: Border.all(),
                   ),
-                  child: images[1]==null ||images[1]!.isEmpty
+                  child: images[1] == null || images[1]!.isEmpty
                       ? Icon(FluentIcons.add)
                       : Image.memory(
-                    images[1]!,
-                    fit: BoxFit.fitHeight,
-                  ),
+                          images[1]!,
+                          fit: BoxFit.fitHeight,
+                        ),
                 ),
               )),
           StaggeredGridTile.fit(
@@ -654,12 +660,12 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                   decoration: BoxDecoration(
                     border: Border.all(),
                   ),
-                  child: images[2]==null ||images[2]!.isEmpty
+                  child: images[2] == null || images[2]!.isEmpty
                       ? Icon(FluentIcons.add)
                       : Image.memory(
-                    images[2]!,
-                    fit: BoxFit.fitHeight,
-                  ),
+                          images[2]!,
+                          fit: BoxFit.fitHeight,
+                        ),
                 ),
               )),
           StaggeredGridTile.fit(
@@ -673,12 +679,12 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                   decoration: BoxDecoration(
                     border: Border.all(),
                   ),
-                  child: images[3]==null ||images[3]!.isEmpty
+                  child: images[3] == null || images[3]!.isEmpty
                       ? Icon(FluentIcons.add)
                       : Image.memory(
-                    images[3]!,
-                    fit: BoxFit.fitHeight,
-                  ),
+                          images[3]!,
+                          fit: BoxFit.fitHeight,
+                        ),
                 ),
               )),
         ]);
@@ -687,10 +693,10 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
   void pickImage(int index) async {
     ImagePicker picker = ImagePicker();
     XFile? image =
-    await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
     if (image != null) {
       images[index] = await image.readAsBytes();
-      changedPics=true;
+      changedPics = true;
       setState(() {});
     }
   }
@@ -709,105 +715,105 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
         TableRow(children: [
           TableCell(
               child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: Row(
-                  children: [
-                    Text(
-                      'marque',
-                      style: littleStyle,
-                    ).tr(),
-                    const Spacer(),
-                    SizedBox(
-                      width: 160.px,
-                      child: TextBox(
-                        controller: marque,
-                        placeholder: 'marque'.tr(),
-                        style: appTheme.writingStyle,
-                        decoration: WidgetStatePropertyAll(
-                            BoxDecoration(color: appTheme.fillColor)),
-                        cursorColor: appTheme.color.darker,
-                        placeholderStyle: placeStyle,
-                      ),
-                    ),
-                  ],
+            padding: const EdgeInsets.all(5),
+            child: Row(
+              children: [
+                Text(
+                  'marque',
+                  style: littleStyle,
+                ).tr(),
+                const Spacer(),
+                SizedBox(
+                  width: 160.px,
+                  child: TextBox(
+                    controller: marque,
+                    placeholder: 'marque'.tr(),
+                    style: appTheme.writingStyle,
+                    decoration: WidgetStatePropertyAll(
+                        BoxDecoration(color: appTheme.fillColor)),
+                    cursorColor: appTheme.color.darker,
+                    placeholderStyle: placeStyle,
+                  ),
                 ),
-              )),
+              ],
+            ),
+          )),
           TableCell(
               child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: Row(
-                  children: [
-                    Text(
-                      'type',
-                      style: littleStyle,
-                    ).tr(),
-                    const Spacer(),
-                    SizedBox(
-                      width: 160.px,
-                      child: TextBox(
-                        controller: type,
-                        placeholder: 'type'.tr(),
-                        style: appTheme.writingStyle,
-                        decoration: WidgetStatePropertyAll(
-                            BoxDecoration(color: appTheme.fillColor)),
-                        cursorColor: appTheme.color.darker,
-                        placeholderStyle: placeStyle,
-                      ),
-                    ),
-                  ],
+            padding: const EdgeInsets.all(5),
+            child: Row(
+              children: [
+                Text(
+                  'type',
+                  style: littleStyle,
+                ).tr(),
+                const Spacer(),
+                SizedBox(
+                  width: 160.px,
+                  child: TextBox(
+                    controller: type,
+                    placeholder: 'type'.tr(),
+                    style: appTheme.writingStyle,
+                    decoration: WidgetStatePropertyAll(
+                        BoxDecoration(color: appTheme.fillColor)),
+                    cursorColor: appTheme.color.darker,
+                    placeholderStyle: placeStyle,
+                  ),
                 ),
-              )),
+              ],
+            ),
+          )),
           TableCell(
               child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: Row(
-                  children: [
-                    Text(
-                      'nchassi',
-                      style: littleStyle,
-                    ).tr(),
-                    smallSpace,
-                    Flexible(
-                      child: TextBox(
-                        controller: nchassi,
-                        placeholder: 'nchassi'.tr(),
-                        style: appTheme.writingStyle,
-                        decoration: WidgetStatePropertyAll(
-                            BoxDecoration(color: appTheme.fillColor)),
-                        cursorColor: appTheme.color.darker,
-                        placeholderStyle: placeStyle,
-                      ),
-                    ),
-                  ],
+            padding: const EdgeInsets.all(5),
+            child: Row(
+              children: [
+                Text(
+                  'nchassi',
+                  style: littleStyle,
+                ).tr(),
+                smallSpace,
+                Flexible(
+                  child: TextBox(
+                    controller: nchassi,
+                    placeholder: 'nchassi'.tr(),
+                    style: appTheme.writingStyle,
+                    decoration: WidgetStatePropertyAll(
+                        BoxDecoration(color: appTheme.fillColor)),
+                    cursorColor: appTheme.color.darker,
+                    placeholderStyle: placeStyle,
+                  ),
                 ),
-              )),
+              ],
+            ),
+          )),
           TableCell(
               child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: Row(
-                  children: [
-                    Text(
-                      'matricule',
-                      style: littleStyle,
-                    ).tr(),
-                    smallSpace,
-                    Flexible(
-                      child: TextBox(
-                        controller: matricule,
-                        enabled: selectedVehicle == null,
-                        //readOnly: selectedVehicle!=null,
-                        placeholder: 'matricule'.tr(),
-                        style: appTheme.writingStyle,
-                        decoration: WidgetStatePropertyAll(
-                            BoxDecoration(color: appTheme.fillColor)),
+            padding: const EdgeInsets.all(5),
+            child: Row(
+              children: [
+                Text(
+                  'matricule',
+                  style: littleStyle,
+                ).tr(),
+                smallSpace,
+                Flexible(
+                  child: TextBox(
+                    controller: matricule,
+                    enabled: selectedVehicle == null,
+                    //readOnly: selectedVehicle!=null,
+                    placeholder: 'matricule'.tr(),
+                    style: appTheme.writingStyle,
+                    decoration: WidgetStatePropertyAll(
+                        BoxDecoration(color: appTheme.fillColor)),
 
-                        cursorColor: appTheme.color.darker,
-                        placeholderStyle: placeStyle,
-                      ),
-                    ),
-                  ],
+                    cursorColor: appTheme.color.darker,
+                    placeholderStyle: placeStyle,
+                  ),
                 ),
-              )),
+              ],
+            ),
+          )),
         ]),
         TableRow(children: [
           TableCell(
@@ -852,7 +858,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                     child: Row(
                       children: [
                         Text(
-                          'KM',
+                          'kilometrage',
                           style: littleStyle,
                         ).tr(),
                         const Spacer(),
@@ -860,8 +866,11 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                           width: 160.px,
                           child: TextBox(
                             controller: km,
-                            placeholder: 'KM'.tr(),
+                            placeholder: 'KM',
                             style: appTheme.writingStyle,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
                             decoration: WidgetStatePropertyAll(
                                 BoxDecoration(color: appTheme.fillColor)),
                             cursorColor: appTheme.color.darker,
@@ -875,75 +884,75 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
               )),
           TableCell(
               child: Padding(
-                padding: const EdgeInsets.all(5),
-                child: SizedBox(
-                    height: 120.px,
-                    width: 180.px,
-                    child: SfRadialGauge(
-                      animationDuration: 500,
-                      title: GaugeTitle(
-                        text: 'carburant'.tr(),
-                        textStyle: littleStyle,
-                        alignment: GaugeAlignment.near,
-                      ),
-                      axes: [
-                        RadialAxis(
-                          canScaleToFit: true,
-                          minimum: 0,
-                          maximum: 8,
-                          radiusFactor: 1,
-                          onAxisTapped: (s) {
-                            setState(() {
-                              carburant = s;
-                            });
-                          },
-                          ranges: [
-                            GaugeRange(
-                              startValue: 0,
-                              endValue: 0.5,
-                              label: 'E',
-                              color: appTheme.color.darkest,
-                            ),
-                            GaugeRange(
-                              startValue: 7.5,
-                              endValue: 8,
-                              label: 'F',
-                              color: appTheme.color.lightest,
-                            ),
-                          ],
-                          annotations: [
-                            GaugeAnnotation(
-                              widget: Text(
-                                '4/8',
-                                style: littleStyle,
-                              ),
-                              axisValue: 4,
-                              positionFactor: 0.7,
-                            ),
-                          ],
-                          pointers: [
-                            NeedlePointer(
-                              animationDuration: 500,
-                              needleLength: 0.4,
-                              needleColor: appTheme.color,
-                              needleStartWidth: 1.px,
-                              needleEndWidth: 5.px,
-                              knobStyle: KnobStyle(color: appTheme.color.darkest),
-                              value: carburant,
-                              enableAnimation: true,
-                              enableDragging: true,
-                            ),
-                          ],
-                          interval: 2,
-                          startAngle: 180,
-                          showFirstLabel: false,
-                          showLastLabel: false,
-                          showLabels: false,
-                          endAngle: 360,
-                        )
+            padding: const EdgeInsets.all(5),
+            child: SizedBox(
+                height: 120.px,
+                width: 180.px,
+                child: SfRadialGauge(
+                  animationDuration: 500,
+                  title: GaugeTitle(
+                    text: 'carburant'.tr(),
+                    textStyle: littleStyle,
+                    alignment: GaugeAlignment.near,
+                  ),
+                  axes: [
+                    RadialAxis(
+                      canScaleToFit: true,
+                      minimum: 0,
+                      maximum: 8,
+                      radiusFactor: 1,
+                      onAxisTapped: (s) {
+                        setState(() {
+                          carburant = s;
+                        });
+                      },
+                      ranges: [
+                        GaugeRange(
+                          startValue: 0,
+                          endValue: 0.5,
+                          label: 'E',
+                          color: appTheme.color.darkest,
+                        ),
+                        GaugeRange(
+                          startValue: 7.5,
+                          endValue: 8,
+                          label: 'F',
+                          color: appTheme.color.lightest,
+                        ),
                       ],
-                    )),
-              )),
+                      annotations: [
+                        GaugeAnnotation(
+                          widget: Text(
+                            '4/8',
+                            style: littleStyle,
+                          ),
+                          axisValue: 4,
+                          positionFactor: 0.7,
+                        ),
+                      ],
+                      pointers: [
+                        NeedlePointer(
+                          animationDuration: 500,
+                          needleLength: 0.4,
+                          needleColor: appTheme.color,
+                          needleStartWidth: 1.px,
+                          needleEndWidth: 5.px,
+                          knobStyle: KnobStyle(color: appTheme.color.darkest),
+                          value: carburant,
+                          enableAnimation: true,
+                          enableDragging: true,
+                        ),
+                      ],
+                      interval: 2,
+                      startAngle: 180,
+                      showFirstLabel: false,
+                      showLastLabel: false,
+                      showLabels: false,
+                      endAngle: 360,
+                    )
+                  ],
+                )),
+          )),
           TableCell(
               verticalAlignment: TableCellVerticalAlignment.top,
               child: Column(
@@ -1104,7 +1113,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
 
   @override
   void dispose() {
-    reservedOrders.remove(widget.key);
+    reservedFiches.remove(widget.key);
     super.dispose();
   }
 
@@ -1119,23 +1128,28 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
     FicheReception fiche = FicheReception(
         id: '',
         numero: int.parse(numOrdre.text),
-        dateEntre: selectedDate,
+        dateEntre: dateEntre,
         anneeUtil: anneeUtil.year,
         marque: marque.text,
         couleur: couleur.text,
         etatActuel: showEtat ? etatVehicle : null,
+        entretien: showEtretient ? entretienVehicle : null,
         gaz: carburant.ceil(),
         kilometrage: int.tryParse(km.text),
         modele: type.text,
         nchassi: nchassi.text,
         nmoteur: nmoteur.text,
         vehicule: selectedVehicle?.id,
-        images: changedPics?[
-          images[0]!=null?0:null,
-          images[1]!=null?1:null,
-          images[2]!=null?2:null,
-          images[3]!=null?3:null,
-        ]:widget.reparation!=null?widget.reparation!.images:[null,null,null,null],
+        images: changedPics
+            ? [
+                images[0] != null ? 0 : null,
+                images[1] != null ? 1 : null,
+                images[2] != null ? 2 : null,
+                images[3] != null ? 3 : null,
+              ]
+            : widget.fiche != null
+                ? widget.fiche!.images
+                : [null, null, null, null],
         vehiculemat: selectedVehicle?.matricule,
         remarque: remarqueEntretien.text,
         matriculeConducteur: matriculeConducteur.text,
@@ -1145,7 +1159,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
     showDialog(
         context: context,
         builder: (context) {
-          return PdfPreviewPO(fiche: fiche);
+          return PdfPreviewPO(fiche: fiche,images: images,);
         });
   }
 
@@ -1163,26 +1177,34 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
         id: documentID!,
         marque: marque.text,
         numero: int.parse(numOrdre.text),
-        dateEntre: selectedDate,
+        dateEntre: dateEntre,
         anneeUtil: anneeUtil.year,
         couleur: couleur.text,
         etatActuel: showEtat ? etatVehicle : null,
+        entretien: showEtretient ? entretienVehicle : null,
         gaz: carburant.ceil(),
         kilometrage: int.tryParse(km.text),
         modele: type.text,
         nchassi: nchassi.text,
         nmoteur: nmoteur.text,
+        showImages: showImages,
+        showEntretien: showEtretient,
+        showEtat: showEtat,
         vehicule: selectedVehicle?.id,
         vehiculemat: selectedVehicle?.matricule,
         remarque: remarqueEntretien.text,
         matriculeConducteur: matriculeConducteur.text,
         nomConducteur: nom.text,
-        images: changedPics?[
-          images[0]!=null?0:null,
-          images[1]!=null?1:null,
-          images[2]!=null?2:null,
-          images[3]!=null?3:null,
-        ]:widget.reparation!=null?widget.reparation!.images:[null,null,null,null],
+        images: changedPics
+            ? [
+                images[0] != null ? 0 : null,
+                images[1] != null ? 1 : null,
+                images[2] != null ? 2 : null,
+                images[3] != null ? 3 : null,
+              ]
+            : widget.fiche != null
+                ? widget.fiche!.images
+                : [null, null, null, null],
         prenomConducteur: prenom.text);
 
     if (!modif) {
@@ -1194,45 +1216,47 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
         if (mounted) {
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
-                return InfoBar(
-                  title: const Text('reparationajout').tr(),
-                  severity: InfoBarSeverity.success,
-                );
-              }, duration: snackbarShortDuration);
+            return InfoBar(
+              title: const Text('receptionajout').tr(),
+              severity: InfoBarSeverity.success,
+            );
+          }, duration: snackbarShortDuration);
         }
       }).onError((error, stackTrace) {
         if (mounted) {
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
-                return InfoBar(
-                  title: const Text('echec').tr(),
-                  severity: InfoBarSeverity.error,
-                );
-              }, duration: snackbarShortDuration);
+            return InfoBar(
+              title: const Text('echec').tr(),
+              severity: InfoBarSeverity.error,
+            );
+          }, duration: snackbarShortDuration);
         }
       });
     } else {
-      await Future.wait(
-          [updateFiche(fiche), uploadActivity(modif, fiche),uploadImages()])
-          .then((value) {
+      await Future.wait([
+        updateFiche(fiche),
+        uploadActivity(modif, fiche),
+        uploadImages()
+      ]).then((value) {
         if (mounted) {
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
-                return InfoBar(
-                  title: const Text('reparationmodif').tr(),
-                  severity: InfoBarSeverity.success,
-                );
-              }, duration: snackbarShortDuration);
+            return InfoBar(
+              title: const Text('receptionmodif').tr(),
+              severity: InfoBarSeverity.success,
+            );
+          }, duration: snackbarShortDuration);
         }
       }).onError((error, stackTrace) {
         if (mounted) {
           displayInfoBar(context,
               builder: (BuildContext context, void Function() close) {
-                return InfoBar(
-                  title: const Text('echec').tr(),
-                  severity: InfoBarSeverity.error,
-                );
-              });
+            return InfoBar(
+              title: const Text('echec').tr(),
+              severity: InfoBarSeverity.error,
+            );
+          });
         }
       });
     }
@@ -1244,51 +1268,47 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
     }
   }
 
-  Future<void> uploadImages() async{
-
-    if(changedPics){
-      List<Future>tasks=[];
-      for(int i=0;i<images.length;i++){
-        if(images[i]!=null && images[i]!.isNotEmpty){
-          if(widget.reparation!=null && widget.reparation?.images[i]!=null){
-            await DatabaseGetter.storage!.deleteFile(
-                bucketId: buckedId, fileId: "$documentID$i.jpg").onError((s,d){
-              tasks.add(
-                  DatabaseGetter.storage!.createFile(
-                      bucketId: buckedId,
-                      fileId: "$documentID$i.jpg",
-                      file: InputFile.fromBytes(bytes: images[i]!, filename: "$documentID$i.jpg")));
-            }).then((s){
-              tasks.add(
-                  DatabaseGetter.storage!.createFile(
-                      bucketId: buckedId,
-                      fileId: "$documentID$i.jpg",
-                      file: InputFile.fromBytes(bytes: images[i]!, filename: "$documentID$i.jpg")));
+  Future<void> uploadImages() async {
+    if (changedPics) {
+      List<Future> tasks = [];
+      for (int i = 0; i < images.length; i++) {
+        if (images[i] != null && images[i]!.isNotEmpty) {
+          if (widget.fiche != null && widget.fiche?.images[i] != null) {
+            await DatabaseGetter.storage!
+                .deleteFile(bucketId: buckedId, fileId: "$documentID$i.jpg")
+                .onError((s, d) {
+              tasks.add(DatabaseGetter.storage!.createFile(
+                  bucketId: buckedId,
+                  fileId: "$documentID$i.jpg",
+                  file: InputFile.fromBytes(
+                      bytes: images[i]!, filename: "$documentID$i.jpg")));
+            }).then((s) {
+              tasks.add(DatabaseGetter.storage!.createFile(
+                  bucketId: buckedId,
+                  fileId: "$documentID$i.jpg",
+                  file: InputFile.fromBytes(
+                      bytes: images[i]!, filename: "$documentID$i.jpg")));
             });
-
+          } else {
+            tasks.add(DatabaseGetter.storage!.createFile(
+                bucketId: buckedId,
+                fileId: "$documentID$i.jpg",
+                file: InputFile.fromBytes(
+                    bytes: images[i]!, filename: "$documentID$i.jpg")));
           }
-          else{
-            tasks.add(
-                DatabaseGetter.storage!.createFile(
-                    bucketId: buckedId,
-                    fileId: "$documentID$i.jpg",
-                    file: InputFile.fromBytes(bytes: images[i]!, filename: "$documentID$i.jpg")));
-          }
-
         }
       }
       await Future.wait(tasks);
     }
-
   }
 
   Future<void> updateFiche(FicheReception fiche) async {
     await DatabaseGetter.database!
         .updateDocument(
-        databaseId: databaseId,
-        collectionId: fichesreceptionId,
-        documentId: documentID!,
-        data: fiche.toJson())
+            databaseId: databaseId,
+            collectionId: fichesreceptionId,
+            documentId: documentID!,
+            data: fiche.toJson())
         .then((value) {})
         .onError((AppwriteException error, stackTrace) {
       setState(() {});
@@ -1312,5 +1332,4 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
           docName: pdf_theme.numberFormat.format(fiche.numero));
     }
   }
-
 }

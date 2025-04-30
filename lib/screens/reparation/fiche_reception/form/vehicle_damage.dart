@@ -4,14 +4,13 @@ import 'package:parc_oto/serializables/reparation/etat_vehicle.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-import '../../../theme.dart';
-import '../../../widgets/on_tap_scale.dart';
+import '../../../../theme.dart';
+import '../../../../widgets/on_tap_scale.dart';
 
 class VehicleDamage extends StatefulWidget {
   final EtatVehicle etatVehicle;
   final int vehicleType;
-
-  const VehicleDamage({super.key, required this.etatVehicle, required this.vehicleType});
+  const VehicleDamage({super.key, required this.etatVehicle, required this.vehicleType,});
 
   @override
   State<VehicleDamage> createState() => _VehicleDamageState();
