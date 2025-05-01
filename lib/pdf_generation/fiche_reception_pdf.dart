@@ -54,6 +54,9 @@ class FicheReceptionPdf {
 
 
   bool etatEmpty() {
+    if(fiche.showEtat){
+      return false;
+    }
     if (fiche.etatActuel == null|| !fiche.showEtat) {
       return true;
     } else {
@@ -76,6 +79,9 @@ class FicheReceptionPdf {
   }
 
   bool imagesEmpty(){
+    if(fiche.showImages){
+      return false;
+    }
     if (pdfUtilities.images==null || pdfUtilities.images!.isEmpty|| !fiche.showImages) {
       return true;
     } else {
@@ -109,7 +115,7 @@ class FicheReceptionPdf {
             imageContainer(),
           Spacer(),
           getRemarqueAndSignature(),
-          Spacer(),
+          smallSpace,
           brandingAndPaging(),
         ]);
   }
@@ -119,66 +125,84 @@ class FicheReceptionPdf {
       imageHeight+=3*PdfPageFormat.cm;
     }
     if(entretienEmpty()){
-      imageHeight+=3*PdfPageFormat.cm;
+      imageHeight+=2.5*PdfPageFormat.cm;
     }
-    return Table(
-      border: TableBorder.all(
-        color: orangeDeep,
-        width: 1,
+    if(imagesEmpty()){
+      return SizedBox();
+    }
+    return Container(
+      padding: EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        border: Border.all(),
+        borderRadius: BorderRadius.circular(5),
       ),
-      defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-      columnWidths: {
-        0: const FlexColumnWidth(5),
-        1: const FlexColumnWidth(5),
-      },
-      children:[
-        TableRow(
-            children: [
-              SizedBox(
-                height: imageHeight,
-                child:Center(child:pdfUtilities.images![0]!=null?
-                Image(MemoryImage(
-                    pdfUtilities.images![0]!),):Text('1')),
-              ),
-              SizedBox(
-                height: imageHeight,
-                child: Center(child:pdfUtilities.images![1]!=null?
-              Image(MemoryImage(pdfUtilities.images![1]!)):Text('2'),))
-        ]),
-        TableRow(
+      child: Table(
+          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          columnWidths: {
+            0: const FlexColumnWidth(5),
+            1: const FlexColumnWidth(5),
+            2: const FlexColumnWidth(5),
+          },
+          children:[
+            TableRow(
+              children: [
+                Text('Photos des dégats', style: kindaBigTextBold),
+              ],
+            ),
+            TableRow(
+                children: [
+                  SizedBox(
+                    height: imageHeight,
+                    child:Center(child:pdfUtilities.images!.isNotEmpty && pdfUtilities.images![0]!=null && pdfUtilities.images![0]!.isNotEmpty?
+                    Image(MemoryImage(
+                        pdfUtilities.images![0]!),):Text('1')),
+                  ),
+                  SizedBox(
+                      height: imageHeight,
+                      child: Center(child:pdfUtilities.images!.isNotEmpty && pdfUtilities.images![1]!=null&& pdfUtilities.images![1]!.isNotEmpty?
+                      Image(MemoryImage(pdfUtilities.images![1]!)):Text('2'),))
+                ]),
+            TableRow(
 
-            children: [
-              SizedBox(
-              height: imageHeight,
-              child:
-                  Center(child:
-              pdfUtilities.images![2]!=null?
-              Image(MemoryImage(
-                  pdfUtilities.images![2]!),):Text('3'),),),
-              SizedBox(
-                height: imageHeight,
-                child:Center(child:
-              pdfUtilities.images![3]!=null?
-              Image(MemoryImage(pdfUtilities.images![3]!)):Text('4'),))
-        ]),
-      ]
+                children: [
+                  SizedBox(
+                    height: imageHeight,
+                    child:
+                    Center(child:
+                    pdfUtilities.images!.isNotEmpty &&pdfUtilities.images![2]!=null&& pdfUtilities.images![2]!.isNotEmpty?
+                    Image(MemoryImage(
+                        pdfUtilities.images![2]!),):Text('3'),),),
+                  SizedBox(
+                      height: imageHeight,
+                      child:Center(child:
+                      pdfUtilities.images!.isNotEmpty &&pdfUtilities.images![3]!=null&& pdfUtilities.images![3]!.isNotEmpty?
+                      Image(MemoryImage(pdfUtilities.images![3]!)):Text('4'),))
+                ]),
+          ]
+      )
     );
 
   }
 
 
   bool entretienEmpty() {
-    if (fiche.entretien == null || !fiche.showEntretien) {
-      return true;
-    } else {
-      List values = fiche.entretien!.toJson().values.toList();
-      for (int i = 0; i < values.length; i++) {
-        if (values[i] == true) {
-          return false;
-        }
-      }
-      return true;
+    if(fiche.showEntretien){
+      return false;
     }
+    else{
+      if (fiche.entretien == null || !fiche.showEntretien) {
+        return true;
+      } else {
+        List values = fiche.entretien!.toJson().values.toList();
+        for (int i = 0; i < values.length; i++) {
+          if (values[i] == true) {
+            return false;
+          }
+        }
+        return true;
+      }
+    }
+
   }
 
 

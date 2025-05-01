@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/admin_parameters.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/repair_provider.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
@@ -82,13 +83,21 @@ class VehicleTableState extends State<VehicleTable> {
     super.initState();
   }
 
-  int sortColumn = 0;
+  int sortColumn = conducteurEmploye?11:6;
 
   double large=250.px;
   double medium=150.px;
   double small=80.px;
 
   void initColumns() {
+    if(conducteurEmploye){
+      initColumnsEmploye();}
+    else{
+      initColumnsNonEmploye();
+    }
+  }
+
+  void initColumnsNonEmploye(){
     columns = [
       DataColumn2(
         label: Padding(
@@ -102,7 +111,136 @@ class VehicleTableState extends State<VehicleTable> {
         onSort: (s, c) {
           sortColumn = 0;
           assending = !assending;
-          vehicleDataSource.sort(7, assending);
+          vehicleDataSource.sort(sortColumn, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'nchassi',
+            style: tstyle,
+          ).tr(),
+        ),
+        fixedWidth: medium,
+        onSort: (s, c) {
+          sortColumn = 1;
+          assending = !assending;
+          vehicleDataSource.sort(sortColumn, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'matricule',
+            style: tstyle,
+          ).tr(),
+        ),
+        fixedWidth: medium,
+        onSort: (s, c) {
+          sortColumn = 2;
+          assending = !assending;
+          vehicleDataSource.sort(sortColumn, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'type',
+            style: tstyle,
+          ).tr(),
+        ),
+        fixedWidth: large,
+        onSort: (s, c) {
+          sortColumn = 3;
+          assending = !assending;
+
+          vehicleDataSource.sort(sortColumn, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        numeric: true,
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'etat',
+            style: tstyle,
+          ).tr(),
+        ),
+        fixedWidth: small,
+        onSort: (s, c) {
+          sortColumn = 4;
+          assending = !assending;
+
+          vehicleDataSource.sort(sortColumn, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        numeric: true,
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'perimetre',
+            style: tstyle,
+          ).tr(),
+        ),
+        fixedWidth: small,
+        onSort: (s, c) {
+          sortColumn = 5;
+          assending = !assending;
+
+          vehicleDataSource.sort(sortColumn, assending);
+          setState(() {});
+        },
+      ),
+      DataColumn2(
+        numeric: true,
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'dateModif',
+            style: tstyle,
+          ).tr(),
+        ),
+        fixedWidth: large,
+        onSort: (s, c) {
+          sortColumn = 6;
+          assending = !assending;
+          vehicleDataSource.sort(sortColumn, assending);
+          setState(() {});
+        },
+      ),
+      if (widget.selectV != true)
+        DataColumn2(
+          label: const Text(''),
+          size: ColumnSize.M,
+          fixedWidth: medium,
+          onSort: null,
+        ),
+    ];
+  }
+  void initColumnsEmploye(){
+    columns = [
+      DataColumn2(
+        label: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+          child: Text(
+            'N',
+            style: tstyle,
+          ).tr(),
+        ),
+        fixedWidth: small,
+        onSort: (s, c) {
+          sortColumn = 0;
+          assending = !assending;
+          vehicleDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -118,7 +256,7 @@ class VehicleTableState extends State<VehicleTable> {
         onSort: (s, c) {
           sortColumn = 1;
           assending = !assending;
-          vehicleDataSource.sort(0, assending);
+          vehicleDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -135,7 +273,7 @@ class VehicleTableState extends State<VehicleTable> {
           sortColumn = 2;
           assending = !assending;
 
-          vehicleDataSource.sort(1, assending);
+          vehicleDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -153,7 +291,7 @@ class VehicleTableState extends State<VehicleTable> {
           sortColumn = 3;
           assending = !assending;
 
-          vehicleDataSource.sort(3, assending);
+          vehicleDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -171,7 +309,7 @@ class VehicleTableState extends State<VehicleTable> {
           sortColumn = 4;
           assending = !assending;
 
-          vehicleDataSource.sort(5, assending);
+          vehicleDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -189,7 +327,7 @@ class VehicleTableState extends State<VehicleTable> {
           sortColumn = 5;
           assending = !assending;
 
-          vehicleDataSource.sort(6, assending);
+          vehicleDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -207,7 +345,7 @@ class VehicleTableState extends State<VehicleTable> {
           sortColumn = 6;
           assending = !assending;
 
-          vehicleDataSource.sort(8, assending);
+          vehicleDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -225,7 +363,7 @@ class VehicleTableState extends State<VehicleTable> {
           sortColumn = 7;
           assending = !assending;
 
-          vehicleDataSource.sort(9, assending);
+          vehicleDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -243,7 +381,7 @@ class VehicleTableState extends State<VehicleTable> {
           sortColumn = 8;
           assending = !assending;
 
-          vehicleDataSource.sort(10, assending);
+          vehicleDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -261,7 +399,7 @@ class VehicleTableState extends State<VehicleTable> {
           sortColumn = 9;
           assending = !assending;
 
-          vehicleDataSource.sort(11, assending);
+          vehicleDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -279,7 +417,7 @@ class VehicleTableState extends State<VehicleTable> {
           sortColumn = 10;
           assending = !assending;
 
-          vehicleDataSource.sort(12, assending);
+          vehicleDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -296,7 +434,7 @@ class VehicleTableState extends State<VehicleTable> {
         onSort: (s, c) {
           sortColumn = 11;
           assending = !assending;
-          vehicleDataSource.sort(4, assending);
+          vehicleDataSource.sort(sortColumn, assending);
           setState(() {});
         },
       ),
@@ -355,7 +493,7 @@ class VehicleTableState extends State<VehicleTable> {
                   filterNow = false;
                 }
                 return DataTableParc(
-                  horizontalScroll: true,
+                  horizontalScroll: conducteurEmploye,
                   header: Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 5.0, horizontal: 10),
@@ -549,8 +687,8 @@ class VehicleTableState extends State<VehicleTable> {
               list: vehicleDataSource.getJsonData(
                   VehicleProvider.vehicles.entries.toList()),
               orientation: PageOrientation.landscape,
-              keysToInclude: const ['matricule','type','apparten'
-                  'ance','nom','prenom','direction'],
+              keysToInclude: conducteurEmploye?const ['matricule','type','apparten'
+                  'ance','nom','prenom','direction']:const ['numeroSerie','matricule','type','etatactuel'],
               name: 'Liste des véhicules',
             );
           });}
@@ -570,9 +708,9 @@ class VehicleTableState extends State<VehicleTable> {
       List2Excel(
               list: vehicleDataSource.getJsonData(VehicleProvider.vehicles
                   .entries.toList()),
-              keysToInclude: const ['matricule','type','apparten'
+              keysToInclude: conducteurEmploye?const ['matricule','type','apparten'
                   'ance','matriculeConducteur','nom','prenom','direction','departement',
-                'etatactuel','appartenanceconducteur','service','decision','perimetre','emplacement'],
+                'etatactuel','appartenanceconducteur','service','decision','perimetre','emplacement']:const['numeroSerie','matricule','type','etatactuel','perimetre','emplacement'],
               title: 'Liste des véhicules',
             ).getExcel();
           });
@@ -593,8 +731,8 @@ class VehicleTableState extends State<VehicleTable> {
               list: RepairProvider.prepareVehicRepList(RepairProvider
                   .repPerVeh),
               orientation: PageOrientation.landscape,
-              keysToInclude: const ['vehicule','modele','mat. conducteur','nom conducteur','nbr. rep','cost','dern. '
-            'rep'],
+              keysToInclude: conducteurEmploye?const ['vehicule','modele','mat. conducteur','nom conducteur','nbr. rep','cost','dern. '
+            'rep']:const['vehicule','modele','nbr. rep','cost','dern. rep'],
               name: 'Couts par vehicule',
             );
           });}
@@ -608,8 +746,8 @@ class VehicleTableState extends State<VehicleTable> {
       List2Excel(
         list: RepairProvider.prepareVehicRepList(RepairProvider
             .repPerVeh),
-        keysToInclude: const ['vehicule','modele','mat. conducteur','nom conducteur','nbr. rep','cost','dern. '
-            'rep'],
+        keysToInclude: conducteurEmploye?const ['vehicule','modele','mat. conducteur','nom conducteur','nbr. rep','cost','dern. '
+            'rep']:const['vehicule','modele','nbr. rep','cost','dern. rep'],
         title: 'Couts par vehicule',
       ).getExcel();
     });

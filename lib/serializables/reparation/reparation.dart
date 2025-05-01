@@ -36,6 +36,7 @@ class Reparation extends ParcOtoDefault {
   String? remarque;
 
   String? search;
+  bool showEntretien;
   bool mobile;
 
   @JsonKey(toJson: designationsToJson, fromJson: designationsFromJson)
@@ -47,6 +48,7 @@ class Reparation extends ParcOtoDefault {
     super.updatedAt,
     this.ficheReception,
     this.ficheReceptionNumber,
+    this.showEntretien=true,
     required this.numero,
     required this.date,
     this.designations,

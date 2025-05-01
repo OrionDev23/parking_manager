@@ -164,7 +164,7 @@ class ReparationPdf {
   }
 
   int nbrMaxMiddlePages = 43;
-  int nbrPageOne = 29;
+  int nbrPageOne = 20;
 
   int pageAdition = 7;
   int nbrLastPage = 35;
@@ -186,6 +186,9 @@ class ReparationPdf {
   }
 
   bool entretienEmpty() {
+    if(reparation.showEntretien){
+      return false;
+    }
     if (reparation.entretien == null) {
       return true;
     } else {

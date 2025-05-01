@@ -680,5 +680,16 @@
   "ficherequired": "يجب تحديد ورقة استقبال",
   "vehiclenotfound": "المركبة غير موجودة",
   "receptionajout": "تمت إضافة ورقة الاستقبال!",
-  "receptionmodif": "تم تعديل ورقة الاستقبال"
+  "receptionmodif": "تم تعديل ورقة الاستقبال",
+  "descriptiondegats": "وصف الأضرار",
+  "charactersremaining": "({nbr}) الأحرف المتبقية",
+
+  "dispo": "متوفرة",
+  "panne": "معطلة",
+  "enreparation": "في الإصلاح",
+  "enmission": "في مهمة",
+
+
+  "auparking": "في موقف المركبات",
+  "horsparking": "خارج موقف المركبات"
 }

@@ -16,6 +16,7 @@ Reparation _$ReparationFromJson(Map<String, dynamic> json) => Reparation(
       date: dateFromIntJsonNonNull((json['date'] as num).toInt()),
       designations: designationsFromJson(json['designations'] as List),
       mobile: json['mobile'] as bool? ?? false,
+      showEntretien: json['showEntretien'] as bool? ?? true,
       etat: (json['etat'] as num?)?.toInt(),
       nchassi: json['nchassi'] as String?,
       prestataire: json['prestataire'] as String?,
@@ -42,5 +43,6 @@ Map<String, dynamic> _$ReparationToJson(Reparation instance) =>
       'remarque': instance.remarque,
       'search': instance.search,
       'mobile': instance.mobile,
+          'showEntretien':instance.showEntretien,
       'designations': designationsToJson(instance.designations),
     };

@@ -2,6 +2,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
+import 'package:parc_oto/admin_parameters.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -29,6 +30,18 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
 
   @override
   List<DataCell> getCellsToShow(MapEntry<String, Vehicle> element) {
+
+    if(conducteurEmploye){
+      return getCellsToShowEmploye(element);
+
+    }
+    else{
+      return getCellsToShowNonEmploye(element);
+    }
+  }
+
+
+  List<DataCell> getCellsToShowEmploye(MapEntry<String,Vehicle> element){
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
     return [
       DataCell(Text(
@@ -40,7 +53,7 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
         element.value.matricule,
         style: rowTextStyle,
       ),
-      onDoubleTap: ()=>viewVehicule(element),
+        onDoubleTap: ()=>viewVehicule(element),
       ),
       DataCell(Row(
         children: [
@@ -68,8 +81,8 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
       ),
       ),
       DataCell(Text(
-              VehiclesUtilities.getEtatName(element.value.etatactuel ?? 0),
-              style: rowTextStyle)
+          VehiclesUtilities.getEtatName(element.value.etatactuel ?? 0),
+          style: rowTextStyle)
           .tr()),
       DataCell(Text(
           VehiclesUtilities.getPerimetre(element.value.perimetre),
@@ -109,35 +122,139 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
         DataCell(
           DatabaseGetter().isAdmin() || DatabaseGetter().isManager()
               ? f.FlyoutTarget(
-                  controller: element.value.controller,
-                  child: f.Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      OnTapScaleAndFade(
-                          onTap: (){viewVehicule(element);},
-                          child: f.Container(
-                              decoration: BoxDecoration(
-                                color: appTheme?.color.lightest,
-                                boxShadow: kElevationToShadow[2],
-                              ),
-                              child: Icon(Icons
-                                  .remove_red_eye_outlined,color: appTheme!
-                                  .color.darkest,
-                              ))),
-                      smallSpace,
-                      OnTapScaleAndFade(
-                          onTap: ()=>showEditStuff(element),
-                          child: f.Container(
-                              decoration: BoxDecoration(
-                                color: appTheme?.color.lightest,
-                                boxShadow: kElevationToShadow[2],
-                              ),
-                              child: Icon(Icons.edit,color: appTheme!
-                                  .color.darkest,))
-                      ),
-                    ],
+            controller: element.value.controller,
+            child: f.Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                OnTapScaleAndFade(
+                    onTap: (){viewVehicule(element);},
+                    child: f.Container(
+                        decoration: BoxDecoration(
+                          color: appTheme?.color.lightest,
+                          boxShadow: kElevationToShadow[2],
+                        ),
+                        child: Icon(Icons
+                            .remove_red_eye_outlined,color: appTheme!
+                            .color.darkest,
+                        ))),
+                smallSpace,
+                OnTapScaleAndFade(
+                    onTap: ()=>showEditStuff(element),
+                    child: f.Container(
+                        decoration: BoxDecoration(
+                          color: appTheme?.color.lightest,
+                          boxShadow: kElevationToShadow[2],
+                        ),
+                        child: Icon(Icons.edit,color: appTheme!
+                            .color.darkest,))
+                ),
+              ],
+            ),
+          )
+              : OnTapScaleAndFade(
+              onTap: (){viewVehicule(element);},
+              child: f.Container(
+                  decoration: BoxDecoration(
+                    color: appTheme?.color.lightest,
+                    boxShadow: kElevationToShadow[2],
                   ),
-                )
+                  child: Icon(Icons.remove_red_eye_outlined,color:
+                  appTheme!
+                      .color.darkest,))),
+        ),
+    ];
+  }
+
+  List<DataCell> getCellsToShowNonEmploye(MapEntry<String,Vehicle> element){
+    final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
+    return [
+      DataCell(Text(
+        element.value.id,
+        style: rowTextStyle,
+      ), onDoubleTap: ()=>viewVehicule(element),
+      ),
+      DataCell(SelectableText(
+        element.value.numeroSerie??'',
+        style: rowTextStyle,
+
+      ),
+    onDoubleTap: ()=>viewVehicule(element),
+      ),
+      DataCell(SelectableText(
+        element.value.matricule,
+        style: rowTextStyle,
+      ),
+        onDoubleTap: ()=>viewVehicule(element),
+      ),
+      DataCell(Row(
+        children: [
+          Image.asset(
+            element.value.marque == null ||
+                element.value.marque!.isEmpty ||
+                element.value.marque!.contains('null') || element.value
+                .marque=='-1'
+                ? 'assets/images/marques/default.webp'
+                : 'assets/images/marques/${element.value.marque ?? 'default'}.webp',
+            width: 3.5.h,
+            height: 3.5.h,
+          ),
+          const SizedBox(
+            width: 2,
+          ),
+          Expanded(
+              child: Text(
+                element.value.type ?? '',
+                style: rowTextStyle,
+                softWrap: true,
+                overflow: TextOverflow.ellipsis,
+              )),
+        ],
+      ),
+      ),
+      DataCell(Text(
+          VehiclesUtilities.getEtatName(element.value.etatactuel ?? 0),
+          style: rowTextStyle)
+          .tr()),
+      DataCell(Text(
+          VehiclesUtilities.getPerimetre(element.value.perimetre),
+          style: rowTextStyle)
+          .tr()),
+
+      DataCell(
+          Text(dateFormat.format(element.value.updatedAt!), style: rowTextStyle)),
+      if (selectC != true)
+        DataCell(
+          DatabaseGetter().isAdmin() || DatabaseGetter().isManager()
+              ? f.FlyoutTarget(
+            controller: element.value.controller,
+            child: f.Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                OnTapScaleAndFade(
+                    onTap: (){viewVehicule(element);},
+                    child: f.Container(
+                        decoration: BoxDecoration(
+                          color: appTheme?.color.lightest,
+                          boxShadow: kElevationToShadow[2],
+                        ),
+                        child: Icon(Icons
+                            .remove_red_eye_outlined,color: appTheme!
+                            .color.darkest,
+                        ))),
+                smallSpace,
+                OnTapScaleAndFade(
+                    onTap: ()=>showEditStuff(element),
+                    child: f.Container(
+                        decoration: BoxDecoration(
+                          color: appTheme?.color.lightest,
+                          boxShadow: kElevationToShadow[2],
+                        ),
+                        child: Icon(Icons.edit,color: appTheme!
+                            .color.darkest,))
+                ),
+              ],
+            ),
+          )
               : OnTapScaleAndFade(
               onTap: (){viewVehicule(element);},
               child: f.Container(
@@ -238,69 +355,13 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
             f.MenuFlyoutSubItem(
               text: const Text('chstates').tr(),
               items: (BuildContext context) {
-                return [
-                  f.MenuFlyoutItem(
-                      text: const Text('gstate').tr(),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        showStateForm(element.value, 0);
-                      }),
-                  f.MenuFlyoutItem(
-                      text: const Text('bstate').tr(),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-
-                        showStateForm(element.value, 1);
-                      }),
-                  f.MenuFlyoutItem(
-                      text: const Text('rstate').tr(),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-
-                        showStateForm(element.value, 2);
-                      }),
-                  f.MenuFlyoutItem(
-                      text: const Text('ostate').tr(),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-
-                        showStateForm(element.value, 3);
-                      }),
-                  f.MenuFlyoutItem(
-                      text: const Text('restate').tr(),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-
-                        showStateForm(element.value, 4);
-                      }),
-                ];
+                return conducteurEmploye?getEtatItemsEmploye(context, element):getEtatItemsNonEmploye(context, element);
               },
             ),
             f.MenuFlyoutSubItem(
               text: const Text('perimetre').tr(),
               items: (BuildContext context){
-                return [
-                  f.MenuFlyoutItem(
-                      text: const Text('buisiness').tr(),
-                      onPressed: () {
-                        changePerimeter(element,0);
-
-                      }
-                  ),
-                  f.MenuFlyoutItem(
-                      text: const Text('hors perimetre').tr(),
-                      onPressed: () {
-                        changePerimeter(element,1);
-
-                      }
-                  ),
-                  f.MenuFlyoutItem(
-                      text: const Text('industrie').tr(),
-                      onPressed: () {
-                        changePerimeter(element,2);
-                      }
-                  ),
-                ];
+                return conducteurEmploye?getPerimetreEmploye(context, element):getPerimetreNonEmploye(context, element);
               }
             ),
           ],
@@ -308,6 +369,122 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
       });
 
   }
+
+
+  List<f.MenuFlyoutItem> getEtatItemsEmploye(BuildContext context,MapEntry<String,Vehicle> element){
+    return [
+      f.MenuFlyoutItem(
+          text: const Text('gstate').tr(),
+          onPressed: () {
+            Navigator.of(context).pop();
+            showStateForm(element.value, 0);
+          }),
+      f.MenuFlyoutItem(
+          text: const Text('bstate').tr(),
+          onPressed: () {
+            Navigator.of(context).pop();
+
+            showStateForm(element.value, 1);
+          }),
+      f.MenuFlyoutItem(
+          text: const Text('rstate').tr(),
+          onPressed: () {
+            Navigator.of(context).pop();
+
+            showStateForm(element.value, 2);
+          }),
+      f.MenuFlyoutItem(
+          text: const Text('ostate').tr(),
+          onPressed: () {
+            Navigator.of(context).pop();
+
+            showStateForm(element.value, 3);
+          }),
+      f.MenuFlyoutItem(
+          text: const Text('restate').tr(),
+          onPressed: () {
+            Navigator.of(context).pop();
+
+            showStateForm(element.value, 4);
+          }),
+    ];
+  }
+  List<f.MenuFlyoutItem> getEtatItemsNonEmploye(BuildContext context,MapEntry<String,Vehicle> element){
+    return [
+      f.MenuFlyoutItem(
+          text: const Text('dispo').tr(),
+          onPressed: () {
+            Navigator.of(context).pop();
+            showStateForm(element.value, 5);
+          }),
+      f.MenuFlyoutItem(
+          text: const Text('panne').tr(),
+          onPressed: () {
+            Navigator.of(context).pop();
+
+            showStateForm(element.value, 6);
+          }),
+      f.MenuFlyoutItem(
+          text: const Text('enreparation').tr(),
+          onPressed: () {
+            Navigator.of(context).pop();
+
+            showStateForm(element.value, 7);
+          }),
+      f.MenuFlyoutItem(
+          text: const Text('enmission').tr(),
+          onPressed: () {
+            Navigator.of(context).pop();
+
+            showStateForm(element.value, 8);
+          }),
+    ];
+  }
+
+  List<f.MenuFlyoutItem> getPerimetreEmploye(BuildContext context,MapEntry<String,Vehicle> element){
+    return [
+      f.MenuFlyoutItem(
+          text: const Text('buisiness').tr(),
+          onPressed: () {
+            changePerimeter(element,0);
+
+          }
+      ),
+      f.MenuFlyoutItem(
+          text: const Text('hors perimetre').tr(),
+          onPressed: () {
+            changePerimeter(element,1);
+
+          }
+      ),
+      f.MenuFlyoutItem(
+          text: const Text('industrie').tr(),
+          onPressed: () {
+            changePerimeter(element,2);
+          }
+      ),
+    ];
+  }
+  List<f.MenuFlyoutItem> getPerimetreNonEmploye(BuildContext context,MapEntry<String,Vehicle> element){
+    return [
+      f.MenuFlyoutItem(
+          text: const Text('auparking').tr(),
+          onPressed: () {
+            changePerimeter(element,3);
+
+          }
+      ),
+      f.MenuFlyoutItem(
+          text: const Text('horsparking').tr(),
+          onPressed: () {
+            changePerimeter(element,4);
+
+          }
+      ),
+    ];
+  }
+
+
 
   void changePerimeter(MapEntry<String,Vehicle> element,int
   perimeter) async{

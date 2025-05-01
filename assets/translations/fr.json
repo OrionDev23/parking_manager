@@ -312,6 +312,8 @@
  "rstate": "Garage",
  "ostate": "En Marche",
  "restate": "Réforme",
+
+
  "documents": "Documents",
  "suprdoc": "Supprimer le document",
  "reparations": "Réparations",
@@ -667,5 +669,17 @@
   "ficherequired": "Une fiche de reception doit être selectionnée",
   "vehiclenotfound": "Le vehicule n'existe pas",
  "receptionajout": "Fiche de reception ajoutée!",
- "receptionmodif": "Fiche de reception modifiée!"
+ "receptionmodif": "Fiche de reception modifiée!",
+ "descriptiondegats": "Déscription des dégats",
+ "charactersremaining": "{nbr} caractères restants",
+
+
+ "dispo": "Disponible",
+ "panne": "En panne",
+ "enreparation": "En Réparation",
+ "enmission": "En mission",
+
+
+ "auparking": "Au parking",
+ "horsparking": "Hors parking"
 }

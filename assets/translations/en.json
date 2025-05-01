@@ -678,6 +678,16 @@
   "ficherequired": "A reception sheet must be selected",
   "vehiclenotfound": "The vehicle does not exist",
   "receptionajout": "Reception sheet added!",
-  "receptionmodif": "Reception sheet modified!"
+  "receptionmodif": "Reception sheet modified!",
+  "descriptiondegats": "Description of damage",
+  "charactersremaining": "{nbr} remaining characters",
 
+
+  "dispo": "Available",
+  "panne": "Broken-down",
+  "enreparation": "In Repair",
+  "enmission": "On assignment",
+
+  "auparking": "In the parking lot",
+  "horsparking": "Out of the parking lot"
 }

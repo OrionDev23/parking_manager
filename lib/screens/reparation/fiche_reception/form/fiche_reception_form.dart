@@ -489,6 +489,48 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                 ),
                 buildTable(appTheme),
                 smallSpace,
+                Container(
+                  height: 100.px,
+                  padding: EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'descriptiondegats',
+                        style: littleStyle,
+                      ).tr(),
+                      smallSpace,
+                      Flexible(
+                        child: TextBox(
+                          controller: remarqueEntretien,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          placeholder: 'descriptiondegats'.tr(),
+                          placeholderStyle: placeStyle.copyWith(),
+                          textAlignVertical: TextAlignVertical.top,
+                          suffix: Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Text('charactersremaining',style:placeStyle).tr(namedArgs: {
+                              'nbr':(100-remarqueEntretien.text.length).toString()
+                            }),
+                          ),
+                          maxLines: 4,
+                          maxLength: 100,
+                          onChanged: (s){
+                            setState(() {
+
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                smallSpace,
                 BigTitleForm(
                   bigTitle: 'imagesdegats',
                   littleTitle: 'uploaddimages',
@@ -1132,8 +1174,11 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
         anneeUtil: anneeUtil.year,
         marque: marque.text,
         couleur: couleur.text,
-        etatActuel: showEtat ? etatVehicle : null,
-        entretien: showEtretient ? entretienVehicle : null,
+        etatActuel: etatVehicle,
+        showEtat: showEtat,
+        showEntretien: showEtretient,
+        showImages: showImages,
+        entretien: entretienVehicle,
         gaz: carburant.ceil(),
         kilometrage: int.tryParse(km.text),
         modele: type.text,
@@ -1180,8 +1225,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
         dateEntre: dateEntre,
         anneeUtil: anneeUtil.year,
         couleur: couleur.text,
-        etatActuel: showEtat ? etatVehicle : null,
-        entretien: showEtretient ? entretienVehicle : null,
+        etatActuel: etatVehicle,
+        entretien: entretienVehicle,
         gaz: carburant.ceil(),
         kilometrage: int.tryParse(km.text),
         modele: type.text,

@@ -1,3 +1,5 @@
+import 'package:parc_oto/admin_parameters.dart';
+
 import '../screens/entreprise/entreprise.dart';
 
 const marqueMax = 71;
@@ -290,8 +292,19 @@ class VehiclesUtilities {
         return 'ostate';
       case 4:
         return 'restate';
+
+      case 5:
+        return "dispo";
+      case 6:
+        return "panne";
+      case 7:
+        return "enreparation";
+      case 8:
+        return "enmission";
+
+
       default:
-        return 'gstate';
+        return conducteurEmploye?'gstate':'dispo';
     }
   }
 
@@ -300,7 +313,11 @@ class VehiclesUtilities {
       case 0:return 'buisiness';
       case 1:return 'hors perimetre';
       case 2:return 'industrie';
-      default:return 'buisiness';
+      case 3:return 'auparking';
+      case 4: return 'horsparking';
+      default:return conducteurEmploye?'buisiness':'auparking';
+
+
     }
   }
 

@@ -472,12 +472,17 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
             color: appTheme.color.darker,
           ),
           content: StateBars(
-            labels: [
+            labels: conducteurEmploye?[
               MapEntry('gstate', DatabaseCounters().countVehicles(etat: 0)),
               MapEntry('bstate', DatabaseCounters().countVehicles(etat: 1)),
               MapEntry('rstate', DatabaseCounters().countVehicles(etat: 2)),
               MapEntry('ostate', DatabaseCounters().countVehicles(etat: 3)),
               MapEntry('restate', DatabaseCounters().countVehicles(etat: 4)),
+            ]:[
+              MapEntry('dispo', DatabaseCounters().countVehicles(etat: 5)),
+              MapEntry('panne', DatabaseCounters().countVehicles(etat: 6)),
+              MapEntry('enreparation', DatabaseCounters().countVehicles(etat: 7)),
+              MapEntry('enmission', DatabaseCounters().countVehicles(etat: 8)),
             ],
           ),
           onTap: () {
@@ -523,26 +528,45 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
             color: appTheme.color.darker,
           ),
           content: StateCategoryBars(
-            labels: List.generate(5, (index) => MapEntry(VehiclesUtilities
-                .getEtatName(index),[
+            labels: List.generate(conducteurEmploye?5:4, (index) => MapEntry(VehiclesUtilities
+                .getEtatName(conducteurEmploye?index:index+5),[
+                  if(conducteurEmploye)
               MapEntry(VehiclesUtilities
                   .getPerimetre(0), DatabaseCounters()
                   .countVehiclesWithCondition([
                 Query.equal('etatactuel', index),
                 Query.equal('perimetre', 0)
               ])),
-              MapEntry(VehiclesUtilities
+              if(conducteurEmploye)
+
+                MapEntry(VehiclesUtilities
                   .getPerimetre(1), DatabaseCounters()
                   .countVehiclesWithCondition([
                 Query.equal('etatactuel', index),
                 Query.equal('perimetre', 1)
               ])),
-              MapEntry(VehiclesUtilities
+              if(conducteurEmploye)
+
+                MapEntry(VehiclesUtilities
                   .getPerimetre(2), DatabaseCounters()
                   .countVehiclesWithCondition([
                 Query.equal('etatactuel', index),
                 Query.equal('perimetre', 2)
               ])),
+              if(!conducteurEmploye)
+                MapEntry(VehiclesUtilities
+                    .getPerimetre(3), DatabaseCounters()
+                    .countVehiclesWithCondition([
+                  Query.equal('etatactuel', index),
+                  Query.equal('perimetre', 3)
+                ])),
+              if(!conducteurEmploye)
+                MapEntry(VehiclesUtilities
+                    .getPerimetre(4), DatabaseCounters()
+                    .countVehiclesWithCondition([
+                  Query.equal('etatactuel', index),
+                  Query.equal('perimetre', 4)
+                ])),
             ],)),
           ),
           onTap: () {

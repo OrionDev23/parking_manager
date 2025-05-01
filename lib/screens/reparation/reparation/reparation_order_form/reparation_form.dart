@@ -67,9 +67,7 @@ class ReparationFormState extends State<ReparationForm>
 
   TextEditingController remarqueEntretien = TextEditingController();
 
-  bool showEtat = true;
   bool showEtretient = true;
-  bool showImages = true;
 
   @override
   void initState() {
@@ -454,7 +452,6 @@ class ReparationFormState extends State<ReparationForm>
                   ],
                 ),
                 smallSpace,
-                if (showEtat) smallSpace,
                 BigTitleForm(
                   bigTitle: 'entretienvehicule',
                   littleTitle: 'selectentretien',
@@ -722,8 +719,9 @@ class ReparationFormState extends State<ReparationForm>
         ficheReception: selectedFicheReception?.id??'',
         date: selectedDate,
         designations: designations.map((e) => e.designation).toList(),
-        entretien: showEtretient ? entretienVehicle : null,
+        entretien: entretienVehicle,
         nchassi: nchassi.text,
+        showEntretien: showEtretient,
         prestataire: selectedPrest?.id,
         prestatairenom: selectedPrest?.nom,
         vehicule: selectedVehicle?.id,
@@ -773,7 +771,8 @@ class ReparationFormState extends State<ReparationForm>
         numero: int.parse(numOrdre.text),
         date: selectedDate,
         designations: designations.map((e) => e.designation).toList(),
-        entretien: showEtretient ? entretienVehicle : null,
+        entretien: entretienVehicle,
+        showEntretien: showEtretient,
         nchassi: nchassi.text,
         prestataire: selectedPrest?.id,
         prestatairenom: selectedPrest?.nom,
