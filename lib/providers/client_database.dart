@@ -10,6 +10,7 @@ import '../screens/entreprise/entreprise.dart';
 import '../screens/sidemenu/sidemenu.dart';
 import '../serializables/entreprise.dart';
 import '../serializables/parc_user.dart';
+import 'activities.dart';
 
 const databaseId = "6531ad112080ae3b14a7";
 const userid = "users";
@@ -337,131 +338,10 @@ class DatabaseGetter {
   }
 
   String getActivityType(int type) {
-    switch (type) {
-      case 0:
-        return "ajoutvehicule";
-      case 1:
-        return "modifvehicule";
-      case 2:
-        return "suprvehicule";
-      case 3:
-        return "ajoutmarque";
-      case 4:
-        return "ajoutetatvehicule";
-      case 5:
-        return "modifetatvehicule";
-      case 6:
-        return "suppretatvehicule";
-      case 7:
-        return "ajoutdocvehicule";
-      case 8:
-        return "modifdocvehicule";
-      case 9:
-        return "suprdocvehicule";
-      case 10:
-        return "ajoutordre";
-      case 11:
-        return "modifordre";
-      case 12:
-        return "suprordre";
-      case 13:
-        return "nouvprestataire";
-      case 14:
-        return "modifprestataire";
-      case 15:
-        return "suprprestataire";
-      case 16:
-        return "ajoutconducteur";
-      case 17:
-        return "modifconducteur";
-      case 18:
-        return "suprconducteur";
-      case 19:
-        return "archivconducteur";
-      case 20:
-        return "ajoutetatconducteur";
-      case 21:
-        return "modifetatconducteur";
-      case 22:
-        return "suppretatconducteur";
-      case 23:
-        return "ajoutdocconducteur";
-      case 24:
-        return "modifdocconducteur";
-      case 25:
-        return "suprdocconducteur";
-      case 26:
-        return "ajoutplanning";
-      case 27:
-        return "modifplanning";
-      case 28:
-        return "supplanning";
-      case 29:
-        return "ajoutentreprise";
-      case 30:
-        return "modifentreprise";
-      case 31:
-        return "suprentreprise";
-      case 32:
-        return "ajoututilisateur";
-      case 33:
-        return "modifutilisateur";
-      case 34:
-        return "suprutilisateur";
-      case 35:
-        return "changePermi";
-      case 36:
-        return "ajoutclient";
-      case 37:
-        return "modclient";
-      case 38:
-        return "supprimerclient";
-      case 39:
-        return "ajoutfacture";
-      case 40:
-        return "modfacture";
-      case 41:
-        return "supfacture";
-      case 42:
-        return "ajoutcheck";
-      case 43:
-        return "modcheck";
-      case 44:
-        return "supcheck";
-      case 45:
-        return "ajoutbon";
-      case 46:
-        return "modbon";
-      case 47:
-        return "superbon";
-      case 48:
-        return "ajoutfourn";
-      case 49:
-        return "modfourn";
-      case 50:
-        return "supfourn";
-      case 51:
-        return "ajoutoption";
-      case 52:
-        return "modifoption";
-      case 53:
-        return "suproption";
-      case 54: return "ajoutcategory";
-      case 55: return "modifcategory";
-      case 56: return "suprcategory";
-      case 57: return "ajoutbrand";
-      case 58: return "modifbrand";
-      case 59: return "suprbrand";
-      case 60: return "ajoutpart";
-      case 61: return "modifpart";
-      case 62: return "suprpart";
-      case 63: return "ajoutstorage";
-      case 64: return "modifstorage";
-      case 65:return "suprstorage";
-      case 66:return "ajoutfichereception";
-      case 67:return "modiffichereception";
-      case 68:return "suprfichereception";}
-    return '';
+      if(activityList.length>type){
+        return activityList[type];
+      }
+      return '';
   }
 
   Future<void> addDocument(

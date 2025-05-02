@@ -681,5 +681,17 @@
 
 
  "auparking": "Au parking",
- "horsparking": "Hors parking"
+ "horsparking": "Hors parking",
+
+ "scanvehicle": "Scanner un vehicule",
+ "scandescription": "Scanner le matricule d'un vehicule et enregistrer son entrée ou sortie au/du parking ou garage",
+ "scan": "Scanner",
+ "receptionsactive": "Véhicules sur Site",
+ "receptionsactivesdescription": "Liste des véhicules à l'interieur du parking ou garage",
+ "historique": "Historique",
+ "historiquedescription": "Historique des vehicules entrés ou sorties du parking et du garage",
+ "entryparking": "Entrée du vehicule au parking",
+ "exitparking": "Sortie du vehicule du parking",
+ "entergaragen": "Entrée du vehicule au garage",
+ "exitgarage": "Sortie du vehicule du garage"
 }

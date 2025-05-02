@@ -78,7 +78,7 @@ class VehicleTableState extends State<VehicleTable> {
       filterVehicule.value = null;
     }
     initColumns();
-    sortColumn=columns.length-2;
+    sortColumn=columns.length-1;
 
     super.initState();
   }
@@ -493,7 +493,7 @@ class VehicleTableState extends State<VehicleTable> {
                   filterNow = false;
                 }
                 return DataTableParc(
-                  horizontalScroll: conducteurEmploye,
+                  horizontalScroll: true,
                   header: Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 5.0, horizontal: 10),

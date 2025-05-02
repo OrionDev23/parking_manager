@@ -689,5 +689,15 @@
   "enmission": "On assignment",
 
   "auparking": "In the parking lot",
-  "horsparking": "Out of the parking lot"
+  "horsparking": "Out of the parking lot",
+  "scanvehicle": "Scan a vehicle",
+  "scandescription": "Scan a vehicle's registration number and register its entry or exit to/from the parking lot or garage",
+  "scan": "Scan",
+  "receptionsactive": "Vehicles On Site",
+  "receptionsactivesdescription": "List of vehicles inside the parking lot or garage",
+
+  "entryparking": "Vehicle entering the parking lot",
+  "exitparking": "Vehicle exiting the parking lot",
+  "entergaragen": "Vehicle entering the garage",
+  "exitgarage": "Vehicle exiting the garage"
 }

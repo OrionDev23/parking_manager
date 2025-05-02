@@ -1,6 +1,10 @@
 import 'dart:math' as math;
 
+import 'package:parc_oto/utilities/bus_svg.dart';
 import 'package:parc_oto/utilities/car_svg.dart';
+import 'package:parc_oto/utilities/moto_svg.dart';
+import 'package:parc_oto/utilities/truck_svg.dart';
+import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -343,6 +347,22 @@ class VehicleDamagePDF {
     );
   }
 
+
+  String getSvg(){
+    switch(VehiclesUtilities.getGenreNumber(reparation.vehiculemat)){
+      case 1:
+        return CarSvg.svg;
+      case 2:
+        return trucksvg;
+      case 4:
+        return busSVG;
+      case 9:
+        return motoSvg;
+      default:
+        return CarSvg.svg;
+    }
+  }
+
   Widget carDrawing() {
     double scale = 0.4;
     lightHeight = (25 - dx).px;
@@ -363,7 +383,7 @@ class VehicleDamagePDF {
                       left: 10.px,
                       right: 5.px,
                       child: SvgImage(
-                        svg: CarSvg.svg,
+                        svg: getSvg(),
                         fit: BoxFit.fitWidth,
                       )),
 
