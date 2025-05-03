@@ -6,7 +6,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/screens/backup/backup_table.dart';
 import 'package:parc_oto/widgets/button_container.dart';
 import 'package:parc_oto/widgets/page_header.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../theme.dart';
 import 'backup_restore.dart';
@@ -26,26 +25,20 @@ class _BackupManagerState extends State<BackupManager> {
         text: 'backup'.tr(),
         trailing: Row(
           children: [
-            SizedBox(
-              width: 200.px,
-              child: ButtonContainer(
-                icon: FluentIcons.import,
-                text: 'importfile'.tr(),
-                showBottom: false,
-                showCounter: false,
-                action: pickingFile?null:showImportScreen,
-              ),
+            ButtonContainer(
+              icon: FluentIcons.import,
+              text: 'importfile'.tr(),
+              showBottom: false,
+              showCounter: false,
+              action: pickingFile?null:showImportScreen,
             ),
             smallSpace,
-            SizedBox(
-              width: 200.px,
-              child: ButtonContainer(
-                icon: FluentIcons.save_all,
-                text: 'save'.tr(),
-                showBottom: false,
-                showCounter: false,
-                action: showSaveScreen,
-              ),
+            ButtonContainer(
+              icon: FluentIcons.save_all,
+              text: 'save'.tr(),
+              showBottom: false,
+              showCounter: false,
+              action: showSaveScreen,
             ),
           ],
         ),

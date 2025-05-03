@@ -282,7 +282,7 @@ class _BackupTableState extends State<BackupTable> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               SizedBox(
-                width: 75.px,
+                width: 85.px,
                 child: Stack(
                   children: [
                     Positioned.fill(

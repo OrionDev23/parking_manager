@@ -82,7 +82,7 @@ class _ButtonContainerState extends State<ButtonContainer> {
           ),
           boxShadow: kElevationToShadow[4],
         ),
-        width: 220.px,
+        width: 240.px,
         height: 80.px,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
