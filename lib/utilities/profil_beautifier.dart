@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:parc_oto/serializables/parc_user.dart';
 import 'package:parc_oto/serializables/pieces/variation.dart';
 import 'package:parc_oto/serializables/reparation/etat_vehicle.dart';
+import 'package:parc_oto/serializables/reparation/etat_vehicle_gts.dart';
 import 'package:parc_oto/serializables/vehicle/genre_vehicule.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -84,7 +85,7 @@ List<String>? designationsToJson(List<Designation>? list) {
   return list?.map((e) => jsonEncode(e.toJson())).toList();
 }
 
-String? etatVehiculeToJson(EtatVehicle? etat) {
+String? etatVehiculeToJson(EtatVehicleInterface? etat) {
   return jsonEncode(etat?.toJson());
 }
 
@@ -92,9 +93,19 @@ String? entretienToJson(EntretienVehicle? entretienVehicle) {
   return jsonEncode(entretienVehicle?.toJson());
 }
 
-EtatVehicle? etatFromJson(String? json) {
-  return json == null || json=='null'? null : EtatVehicle.fromJson(jsonDecode
-    (json));
+EtatVehicleInterface? etatFromJson(String? json) {
+  if(json==null || json=='null'){
+    return null;
+  }
+  else{
+    Map<String,dynamic> data=jsonDecode(json);
+    if(data.containsKey('intCab')){
+      return EtatVehicleGTS.fromJson(data);
+    }
+    else{
+      return EtatVehicle.fromJson(data);
+    }
+  }
 }
 
 EntretienVehicle? entretienFromJson(String? json) {

@@ -19,7 +19,7 @@ class VehicleDamagePDF {
   late final EtatVehicle etatVehicle;
 
   VehicleDamagePDF(this.reparation) {
-    etatVehicle = reparation.etatActuel ?? EtatVehicle();
+    etatVehicle = reparation.etatActuel as EtatVehicle;
   }
 
   double lightHeight = 0;
@@ -413,7 +413,7 @@ class VehicleDamagePDF {
               children: [
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.calandre == true
+                  child: etatVehicle.calandre == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -432,7 +432,7 @@ class VehicleDamagePDF {
               children: [
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.capot == true
+                  child: etatVehicle.capot == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -451,7 +451,7 @@ class VehicleDamagePDF {
               children: [
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.toit == true
+                  child: etatVehicle.toit == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -470,7 +470,7 @@ class VehicleDamagePDF {
               children: [
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.coffre == true
+                  child: etatVehicle.coffre == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -493,7 +493,7 @@ class VehicleDamagePDF {
               children: [
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.aileAVD == true
+                  child: etatVehicle.aileAVD == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -502,7 +502,7 @@ class VehicleDamagePDF {
                 ),
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.aileAVG == true
+                  child: etatVehicle.aileAVG == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -521,7 +521,7 @@ class VehicleDamagePDF {
               children: [
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.aileARD == true
+                  child: etatVehicle.aileARD == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -530,7 +530,7 @@ class VehicleDamagePDF {
                 ),
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.aileARG == true
+                  child: etatVehicle.aileARG == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -553,7 +553,7 @@ class VehicleDamagePDF {
               children: [
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.pareChocAV == true
+                  child: etatVehicle.pareChocAV == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -572,7 +572,7 @@ class VehicleDamagePDF {
               children: [
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.pareChocAR == true
+                  child: etatVehicle.pareChocAR == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -595,7 +595,7 @@ class VehicleDamagePDF {
               children: [
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.porteAVD == true
+                  child: etatVehicle.porteAVD == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -604,7 +604,7 @@ class VehicleDamagePDF {
                 ),
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.porteAVG == true
+                  child: etatVehicle.porteAVG == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -623,7 +623,7 @@ class VehicleDamagePDF {
               children: [
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.siegeAVD == true
+                  child: etatVehicle.siegeAVD == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -632,7 +632,7 @@ class VehicleDamagePDF {
                 ),
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.siegeAVG == true
+                  child: etatVehicle.siegeAVG == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -651,7 +651,7 @@ class VehicleDamagePDF {
               children: [
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.siegeARD == true
+                  child: etatVehicle.siegeARD == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -660,7 +660,7 @@ class VehicleDamagePDF {
                 ),
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.siegeARG == true
+                  child: etatVehicle.siegeARG == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -679,7 +679,7 @@ class VehicleDamagePDF {
               children: [
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.porteARD == true
+                  child: etatVehicle.porteARD == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -688,7 +688,7 @@ class VehicleDamagePDF {
                 ),
                 SizedBox(
                   height: lightHeight,
-                  child: reparation.etatActuel?.porteARG == true
+                  child: etatVehicle.porteARG == true
                       ? Icon(IconData(iconCodePoint), color: orangeDeep)
                       : null,
                 ),
@@ -852,7 +852,7 @@ class VehicleDamagePDF {
                 SizedBox(
                   height: lightHeight,
                   child: getLightIntensityFromPourc(
-                    reparation.etatActuel?.avdp ?? 100,
+                    etatVehicle.avdp ,
                   ),
                 ),
                 SizedBox(
@@ -861,7 +861,7 @@ class VehicleDamagePDF {
                 SizedBox(
                   height: lightHeight,
                   child: getLightIntensityFromPourc(
-                    reparation.etatActuel?.avgp ?? 100,
+                    etatVehicle.avgp ,
                   ),
                 ),
               ],
@@ -880,7 +880,7 @@ class VehicleDamagePDF {
                 SizedBox(
                   height: lightHeight,
                   child: getLightIntensityFromPourc(
-                    reparation.etatActuel?.ardp ?? 100,
+                    etatVehicle.ardp ,
                   ),
                 ),
                 SizedBox(

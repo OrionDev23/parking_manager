@@ -64,10 +64,14 @@ class _BackupManagerState extends State<BackupManager> {
           .then((value) {
         if(value!=null){
           var bytes=value.files.first.bytes;
+
           Future.delayed(const Duration(milliseconds: 30)).then((value) {
-            showDialog(context: context, builder: (con){
-              return BackupRestore(backupFile: bytes);
-            });
+            if(mounted){
+              showDialog(context: context, builder: (con){
+                return BackupRestore(backupFile: bytes);
+              });
+            }
+
           });
         }
       });
@@ -82,13 +86,16 @@ class _BackupManagerState extends State<BackupManager> {
   void showSaveScreen() {
 
     Future.delayed(const Duration(milliseconds: 30)).then((value) {
-      showDialog(
-          context: context,
-          barrierDismissible: false,
-          dismissWithEsc: false,
-          builder: (c) {
-            return const BackupSelection();
-          });
+      if(mounted) {
+        showDialog(
+            context: context,
+            barrierDismissible: false,
+            dismissWithEsc: false,
+            builder: (c) {
+              return const BackupSelection();
+            });
+      }
+
     });
   }
 }

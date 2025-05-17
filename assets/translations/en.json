@@ -699,5 +699,8 @@
   "entryparking": "Vehicle entering the parking lot",
   "exitparking": "Vehicle exiting the parking lot",
   "entergaragen": "Vehicle entering the garage",
-  "exitgarage": "Vehicle exiting the garage"
+  "exitgarage": "Vehicle exiting the garage",
+
+  "GtsTheme.gtsDark": "GTS Dark",
+  "GtsTheme.gtsLight": "GTS Light"
 }

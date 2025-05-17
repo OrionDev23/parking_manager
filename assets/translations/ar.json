@@ -701,5 +701,9 @@
   "entryparking": "مركبة تدخل إلى موقف السيارات",
   "exitparking": "مركبة تخرج من موقف السيارات",
   "entergaragen": "دخول السيارة إلى المرآب",
-  "exitgarage": "خروج المركبة من المرآب"
+  "exitgarage": "خروج المركبة من المرآب",
+
+
+  "GtsTheme.gtsDark": "GTS Dark",
+  "GtsTheme.gtsLight": "GTS Light"
 }

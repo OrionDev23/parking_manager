@@ -268,9 +268,9 @@ class FicheReceptionPdf {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Image(entrepriseLogo!,
-                width: PdfPageFormat.cm * 3,
-                height: PdfPageFormat.cm * 3,
-                fit: BoxFit.fitWidth,
+                width: PdfPageFormat.cm * 2.8,
+                height: PdfPageFormat.cm * 2.8,
+                fit: BoxFit.contain,
                 alignment: Alignment.topCenter),
             Container(
               padding: const EdgeInsets.all(5),

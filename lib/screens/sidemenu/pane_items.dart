@@ -3,6 +3,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import '../reparation/fiche_reception/manager/fiche_reception_tabs.dart';
 import '../reparation/reparation/manager/reparation_tabs.dart';
+import '../settings_gts.dart';
 import '../workshop/inventory/storage/storage_tabs.dart';
 import '../workshop/parts/parts_management/parts_tabs.dart';
 import '../../admin_parameters.dart';
@@ -349,7 +350,7 @@ class PaneItemsAndFooters {
         'parametres',
         style: paneTextStyle,
       ).tr(),
-      body: Settings(prefs),
+      body: gts?SettingsGTS(prefs):Settings(prefs),
     );
     entreprise = PaneItemExpander(
         icon: Icon(

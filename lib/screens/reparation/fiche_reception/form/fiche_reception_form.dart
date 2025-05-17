@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:parc_oto/providers/repair_provider.dart';
+import 'package:parc_oto/serializables/reparation/etat_vehicle_gts.dart';
+import '../../../../admin_parameters.dart';
 import '../../../../providers/client_database.dart';
 import '../../../../providers/vehicle_provider.dart';
 import '../../../entreprise/entreprise.dart';
@@ -28,6 +30,7 @@ import '../../../../utilities/vehicle_util.dart';
 import '../../../../widgets/on_tap_scale.dart';
 import '../../reparation/reparation_order_form/entreprise_placement.dart';
 import 'vehicle_damage.dart';
+import 'vehicle_damage_gts.dart';
 
 class FicheReceptionForm extends StatefulWidget {
   final FicheReception? fiche;
@@ -43,7 +46,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
   static Map<Key, int> reservedFiches = {};
 
   EntretienVehicle entretienVehicle = EntretienVehicle();
-  EtatVehicle etatVehicle = EtatVehicle();
+  EtatVehicleInterface etatVehicle = gts?EtatVehicleGTS():EtatVehicle();
 
   TextEditingController numOrdre = TextEditingController();
   DateTime dateEntre = DateTime.now();
@@ -388,6 +391,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                     ),
                   ],
                 ),
+                smallSpace,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -568,10 +572,14 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                   ),
                 ),
                 if (showEtat)
-                  VehicleDamage(
-                    etatVehicle: etatVehicle,
+                  gts?VehicleDamageGts(
+                    etatVehicle: etatVehicle as EtatVehicleGTS,
                     vehicleType:
                         VehiclesUtilities.getGenreNumber(matricule.text),
+                  ):VehicleDamage(
+                    etatVehicle: etatVehicle as EtatVehicle,
+                    vehicleType:
+                    VehiclesUtilities.getGenreNumber(matricule.text),
                   ),
                 if (showEtat) smallSpace,
                 BigTitleForm(

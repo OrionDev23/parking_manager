@@ -10,3 +10,4 @@ bool showImportConducteur=true;
 const showImportVehicles = true;
 const conducteurEmploye = false;
 const chassisKey=true;
+bool gts=true;

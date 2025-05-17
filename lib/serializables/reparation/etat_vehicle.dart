@@ -1,8 +1,14 @@
 import 'package:json_annotation/json_annotation.dart';
 part 'etat_vehicle.g.dart';
 
+abstract class EtatVehicleInterface{
+
+   Map<String, dynamic> toJson();
+}
+
+
 @JsonSerializable()
-class EtatVehicle {
+class EtatVehicle extends EtatVehicleInterface{
   double avdp = 100;
   double avgp = 100;
   double ardp = 100;
@@ -81,5 +87,7 @@ class EtatVehicle {
   factory EtatVehicle.fromJson(Map<String, dynamic> json) =>
       _$EtatVehicleFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$EtatVehicleToJson(this);
 }
+

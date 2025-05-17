@@ -39,7 +39,7 @@ const brandsID="partsbrands";
 const partsID="parts";
 const backupId="backup";
 const storageId="storage";
-const endpoint = "https://appwrite.parcoto.com/v1";
+const endpoint = "https://fra.cloud.appwrite.io/v1";
 String? project;
 
 String? secretKey;

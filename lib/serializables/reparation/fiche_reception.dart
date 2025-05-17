@@ -30,7 +30,7 @@ class FicheReception extends ParcOtoDefault {
   String? matriculeConducteur;
   List<int?> images;
   @JsonKey(toJson: etatVehiculeToJson, fromJson: etatFromJson)
-  EtatVehicle? etatActuel;
+  EtatVehicleInterface? etatActuel;
   @JsonKey(toJson: entretienToJson, fromJson: entretienFromJson)
   EntretienVehicle? entretien;
   int? anneeUtil;

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart' as m;
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import 'admin_parameters.dart';
 import 'main.dart';
 import 'utilities/theme_colors.dart';
 
@@ -227,12 +228,13 @@ class AppTheme extends ChangeNotifier {
 
   AppTheme() {
     final savedSettings = prefs;
-    mode = savedSettings.getInt('themeMode') == 0
+    mode = gts?savedSettings.getInt('themeMode') == 0?ThemeMode.dark:ThemeMode.light
+    :savedSettings.getInt('themeMode') == 0
         ? ThemeMode.system
         : savedSettings.getInt('themeMode') == 1
             ? ThemeMode.light
             : ThemeMode.dark;
-    color = savedSettings.get('color') == null
+    color = gts?Colors.red:savedSettings.get('color') == null
         ? systemAccentColor
         : getColor(savedSettings.get('color')!);
     displayMode = savedSettings.getInt('display') == null
@@ -273,7 +275,7 @@ class AppTheme extends ChangeNotifier {
     );
 
     backGroundColor = mode == ThemeMode.dark
-        ? Colors.grey
+        ? gts?Colors.grey[180]:Colors.grey
         : mode == ThemeMode.light
             ? Colors.white
             : ThemeMode.system == ThemeMode.light

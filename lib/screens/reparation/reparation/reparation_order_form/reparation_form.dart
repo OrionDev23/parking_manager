@@ -360,6 +360,7 @@ class ReparationFormState extends State<ReparationForm>
                     ),
                   ],
                 ),
+                smallSpace,
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
