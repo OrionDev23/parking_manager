@@ -114,7 +114,7 @@ class PlanningDatasource extends CalendarDataSource<Planning> {
         ]).then((value) {
       for (var element in value.rows) {
         data[element.$id] = element
-            .convertTo((p0) => Planning.fromJson(p0 as Map<String, dynamic>));
+            .convertTo((p0) => Planning.fromJson(p0));
       }
       if (value.rows.isNotEmpty) {
         var newOnes = addAppointements();
