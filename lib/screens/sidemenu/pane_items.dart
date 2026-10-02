@@ -521,7 +521,6 @@ class PaneItemsAndFooters {
     }
     footerItems = [
       PaneItemSeparator(),
-      if (canManageAccess && PanesListState.signedIn.value) accessManagement,
       if (authService.session?.hasPermission('company.manage') == true && PanesListState.signedIn.value) entreprise,
       if (authService.session?.hasPermission('backup.manage') == true && PanesListState.signedIn.value) backup,
       if (PanesListState.signedIn.value) logout,
