@@ -22,7 +22,11 @@ import 'package:window_manager/window_manager.dart';
 import 'providers/client_database.dart';
 import 'core/auth/auth_service.dart';
 import 'core/auth/legacy_appwrite_auth_service.dart';
+import 'core/services/company_service.dart';
+import 'core/services/user_profile_service.dart';
 import 'core/services/vehicle_services.dart';
+import 'data/remote/company/legacy_appwrite_company_repository.dart';
+import 'data/remote/users/legacy_appwrite_user_profile_repository.dart';
 import 'theme.dart';
 
 const appTitle = "ParcOto";
@@ -30,6 +34,8 @@ late final PackageInfo packageInfo;
 late final SharedPreferences prefs;
 late final VehicleServices vehicleServices;
 late final AuthService authService;
+late final UserProfileService userProfileService;
+late final CompanyService companyService;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -64,6 +70,12 @@ void launchApp() async {
   prefs = await SharedPreferences.getInstance();
   DatabaseGetter();
   authService = LegacyAppwriteAuthService(preferences: prefs);
+  userProfileService = const UserProfileService(
+    repository: LegacyAppwriteUserProfileRepository(),
+  );
+  companyService = const CompanyService(
+    repository: LegacyAppwriteCompanyRepository(),
+  );
   vehicleServices = await VehicleServices.create(
     preferences: prefs,
     companyId: project ?? 'local',
