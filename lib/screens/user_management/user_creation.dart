@@ -460,10 +460,10 @@ class _UserFormState extends State<UserForm> {
 
   Future<void> uploadUserInDB(ParcUser newme) async {
     if (widget.user == null) {
-      await Databases(client!).createDocument(
+      await TablesDB(client!).createRow(
               databaseId: databaseId,
-              collectionId: userid,
-              documentId: newme.id,
+              tableId: userid,
+              rowId: newme.id,
               permissions: [
                 Permission.update(Role.user(newme.id)),
                 Permission.delete(Role.user(newme.id)),
@@ -477,11 +477,11 @@ class _UserFormState extends State<UserForm> {
         );}
       });
     } else {
-      await Databases(client!)
-          .updateDocument(
+      await TablesDB(client!)
+          .updateRow(
               databaseId: databaseId,
-              collectionId: userid,
-              documentId: userID!,
+              tableId: userid,
+              rowId: userID!,
               data: newme.toJson())
           .then((value) {
             if(mounted){
