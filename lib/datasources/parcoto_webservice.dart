@@ -30,7 +30,7 @@ abstract class ParcOtoWebService<T> {
       for (var element in value.rows) {
         if (!testIfElementContained(element.$id)) {
           data.add(MapEntry(element.$id, element.convertTo<T>((p0) {
-            return fromJsonFunction(p0 as Map<String, dynamic>);
+            return fromJsonFunction(p0);
           })));
         }
         else{
