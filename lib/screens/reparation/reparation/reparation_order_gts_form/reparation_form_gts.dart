@@ -140,7 +140,7 @@ class ReparationFormGtsState extends State<ReparationFormGts>
       if (value.rows.length == 1) {
         numOrdre.text = (value.rows[0]
                     .convertTo(
-                        (p0) => Reparation.fromJson(p0 as Map<String, dynamic>))
+                        (p0) => Reparation.fromJson(p0))
                     .numero +
                 1)
             .toString();
