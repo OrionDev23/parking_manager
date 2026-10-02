@@ -64,7 +64,7 @@ class TableStats extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              if (additionalWidget != null) additionalWidget!,
+              ?additionalWidget,
               if (additionalWidget != null) smallSpace,
               FilledButton(
                   onPressed: onTap, child: const Text('voirplus').tr()),
