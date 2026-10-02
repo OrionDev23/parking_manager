@@ -264,7 +264,7 @@ class DatabaseGetter {
                 rowId: "1")
             .then((value) {
           MyEntrepriseState.p = value.convertTo(
-              (p0) => Entreprise.fromJson(p0 as Map<String, dynamic>));
+              (p0) => Entreprise.fromJson(p0));
         });
       } catch (e) {
         //
@@ -306,7 +306,7 @@ class DatabaseGetter {
             databaseId: databaseId, tableId: userid, rowId: docID)
         .then((value) {
       return value
-          .convertTo((p0) => ParcUser.fromJson(p0 as Map<String, dynamic>));
+          .convertTo((p0) => ParcUser.fromJson(p0));
     }).onError((error, stackTrace) {
       return Future.value(ParcUser(
         id: docID,
