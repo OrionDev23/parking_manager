@@ -5,16 +5,19 @@ import '../device/shared_preferences_device_identity.dart';
 import '../sync/sqlite_sync_queue.dart';
 import '../../data/local/vehicles/sqlite_vehicle_source.dart';
 import '../../data/repositories/vehicle_repository_impl.dart';
+import '../../domain/entities/vehicle.dart' as domain;
 import '../../domain/repositories/vehicle_repository.dart';
 import '../tenancy/company_context.dart';
 
 class VehicleServices {
   final LocalDatabase localDatabase;
   final VehicleRepository repository;
+  final SqliteVehicleSource localSource;
 
   VehicleServices._({
     required this.localDatabase,
     required this.repository,
+    required this.localSource,
   });
 
   static Future<VehicleServices> create({
@@ -34,6 +37,7 @@ class VehicleServices {
 
     return VehicleServices._(
       localDatabase: localDatabase,
+      localSource: localSource,
       repository: VehicleRepositoryImpl(
         local: localSource,
         syncQueue: syncQueue,
@@ -42,6 +46,8 @@ class VehicleServices {
       ),
     );
   }
+
+  Future<void> seedLocal(domain.Vehicle vehicle) => localSource.upsertVehicle(vehicle);
 
   Future<void> dispose() => localDatabase.close();
 }
