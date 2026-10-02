@@ -15,12 +15,12 @@ import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
 import 'package:parc_oto/screens/dashboard/charts/state_category_bar.dart';
 import 'package:parc_oto/screens/entreprise/entreprise.dart';
 import 'package:parc_oto/screens/logs/logging/log_table.dart';
+import 'package:parc_oto/screens/reparation/fiche_reception/form/fiche_reception_form.dart';
+import 'package:parc_oto/screens/reparation/fiche_reception/manager/fiche_reception_tabs.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import '../reparation/reparation/manager/reparation_tabs.dart';
-import '../reparation/reparation/reparation_order_form/reparation_form.dart';
 import 'charts/pie_chart.dart';
 
 import '../../providers/counters.dart';
@@ -239,23 +239,23 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
             late Tab tab;
             tab = Tab(
               key: UniqueKey(),
-              text: Text('nouvrepar'.tr()),
-              semanticLabel: 'nouvrepar'.tr(),
+              text: Text('nouvfiche'.tr()),
+              semanticLabel: 'nouvfiche'.tr(),
               icon: const Icon(FluentIcons.document),
-              body: ReparationForm(
+              body: FicheReceptionForm(
                 key: UniqueKey(),
               ),
               onClosed: () {
-                ReparationTabsState.tabs.remove(tab);
+                FicheReceptionTabsState.tabs.remove(tab);
 
-                if (ReparationTabsState.currentIndex.value > 0) {
-                  ReparationTabsState.currentIndex.value--;
+                if (FicheReceptionTabsState.currentIndex.value > 0) {
+                  FicheReceptionTabsState.currentIndex.value--;
                 }
               },
             );
-            final index = ReparationTabsState.tabs.length + 1;
-            ReparationTabsState.tabs.add(tab);
-            ReparationTabsState.currentIndex.value = index - 1;
+            final index = FicheReceptionTabsState.tabs.length + 1;
+            FicheReceptionTabsState.tabs.add(tab);
+            FicheReceptionTabsState.currentIndex.value = index - 1;
           });
         },
       ),
@@ -269,17 +269,17 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         action: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.reparations) +
-              PaneItemsAndFooters.vehicles.items.length+2;
+              PaneItemsAndFooters.vehicles.items.length+3;
         },
         actionList: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
                   .indexOf(PaneItemsAndFooters.reparations) +
-              PaneItemsAndFooters.vehicles.items.length+2;
+              PaneItemsAndFooters.vehicles.items.length+3;
         },
         actionNouveau: () {
           PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.reparations) +
-              6;
+              .indexOf(PaneItemsAndFooters.reparations) +
+              PaneItemsAndFooters.vehicles.items.length+3;
           Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
             late Tab tab;
             tab = Tab(

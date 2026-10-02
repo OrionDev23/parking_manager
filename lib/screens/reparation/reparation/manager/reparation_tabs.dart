@@ -1,6 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import '../../../../admin_parameters.dart';
 import '../reparation_order_form/reparation_form.dart';
+import '../reparation_order_gts_form/reparation_form_gts.dart';
 import 'reparation_gestion.dart';
 class ReparationTabs extends StatefulWidget {
   final bool archive;
@@ -24,7 +26,7 @@ class ReparationTabsState extends State<ReparationTabs> {
       text: Text('nouvrepar'.tr()),
       semanticLabel: 'nouvrepar'.tr(),
       icon: const Icon(FluentIcons.shop),
-      body: ReparationForm(
+      body: gts?ReparationFormGts(key: UniqueKey(),):ReparationForm(
         key: UniqueKey(),
       ),
       onClosed: () {

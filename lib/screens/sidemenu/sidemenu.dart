@@ -219,6 +219,7 @@ class PanesListState extends State<PanesList>
                             )),
                       );
                     }(),
+                    backgroundColor: widget.appTheme.mode==ThemeMode.dark?Colors.grey[220]:Colors.white,
                   ),
                   pane: NavigationPane(
                     selected: value,
@@ -233,6 +234,7 @@ class PanesListState extends State<PanesList>
                     items: PaneItemsAndFooters.originalItems,
                     footerItems: PaneItemsAndFooters.footerItems,
                   ),
+
                 );
               });
         });

@@ -6,6 +6,7 @@ import 'package:parc_oto/serializables/parc_user.dart';
 import 'package:parc_oto/serializables/pieces/variation.dart';
 import 'package:parc_oto/serializables/reparation/etat_vehicle.dart';
 import 'package:parc_oto/serializables/reparation/etat_vehicle_gts.dart';
+import 'package:parc_oto/serializables/reparation/task_group.dart';
 import 'package:parc_oto/serializables/vehicle/genre_vehicule.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -84,6 +85,9 @@ DateTime? updatedAtJson(String json) {
 List<String>? designationsToJson(List<Designation>? list) {
   return list?.map((e) => jsonEncode(e.toJson())).toList();
 }
+List<String>? tasksToJson(List<TaskGroup>? list) {
+  return list?.map((e) => jsonEncode(e.toJson())).toList();
+}
 
 String? etatVehiculeToJson(EtatVehicleInterface? etat) {
   return jsonEncode(etat?.toJson());
@@ -117,7 +121,11 @@ List<Designation>? designationsFromJson(List<dynamic> json) {
       .map((e) => Designation.fromJson(jsonDecode(e) as Map<String, dynamic>))
       .toList();
 }
-
+List<TaskGroup>? tasksFromJson(List<dynamic> json) {
+  return json
+      .map((e) => TaskGroup.fromJson(jsonDecode(e) as Map<String, dynamic>))
+      .toList();
+}
 Appointment appointmentFromJson(String json) {
   Map<String, dynamic> map = jsonDecode(json);
   return Appointment(

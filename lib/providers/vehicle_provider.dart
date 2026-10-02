@@ -31,13 +31,13 @@ class VehicleProvider extends ChangeNotifier {
     }
     downloadingVehicles=true;
     vehicles.clear();
-   await DatabaseGetter.database!.listDocuments(
+   await DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: vehiculeid,queries: [
+        tableId: vehiculeid,queries: [
       Query.limit(DatabaseGetter.limits['vehicles']??500)
     ]).then((value) {
-      for(int i=0;i<value.documents.length;i++){
-        vehicles[value.documents[i].$id]=value.documents[i].convertTo(
+      for(int i=0;i<value.rows.length;i++){
+        vehicles[value.rows[i].$id]=value.rows[i].convertTo(
                 (p0) => Vehicle.fromJson(p0 as Map<String,dynamic>));
       }
       downloadedVehicles=true;
@@ -56,11 +56,11 @@ class VehicleProvider extends ChangeNotifier {
     }
     downloadingDocuments=true;
     documentsVehicules.clear();
-   await DatabaseGetter.database!.listDocuments(
+   await DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: vehicDoc,queries: [Query.limit(5000)]).then((value) {
-      for(int i=0;i<value.documents.length;i++){
-        documentsVehicules[value.documents[i].$id]=value.documents[i].convertTo(
+        tableId: vehicDoc,queries: [Query.limit(5000)]).then((value) {
+      for(int i=0;i<value.rows.length;i++){
+        documentsVehicules[value.rows[i].$id]=value.rows[i].convertTo(
                 (p0) => DocumentVehicle.fromJson(p0 as Map<String,dynamic>));
       }
       downloadedDocuments=true;
@@ -79,11 +79,11 @@ class VehicleProvider extends ChangeNotifier {
     }
     downloadingStates=true;
     etats.clear();
-   await DatabaseGetter.database!.listDocuments(
+   await DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: etatId,queries: [Query.limit(5000)]).then((value) {
-      for(int i=0;i<value.documents.length;i++){
-        etats[value.documents[i].$id]=value.documents[i].convertTo(
+        tableId: etatId,queries: [Query.limit(5000)]).then((value) {
+      for(int i=0;i<value.rows.length;i++){
+        etats[value.rows[i].$id]=value.rows[i].convertTo(
                 (p0) => Etat.fromJson(p0 as Map<String,dynamic>));
       }
       downloadedStates=true;
@@ -168,16 +168,16 @@ class VehicleProvider extends ChangeNotifier {
       }
     }
     else{
-    await DatabaseGetter.database!.listDocuments(
+    await DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: vehicDoc,
+        tableId: vehicDoc,
         queries: [
           Query.lessThanEqual('date_expiration', dateToIntJson(expiration)),
           if (removedVehiDocs.isNotEmpty)
             ...removedVehiDocs.map((e) => Query.notEqual(r'$id', e))
         ]).then((value) {
-      for (int i = 0; i < value.documents.length; i++) {
-        result.add(value.documents[i].convertTo(
+      for (int i = 0; i < value.rows.length; i++) {
+        result.add(value.rows[i].convertTo(
                 (p0) => DocumentVehicle.fromJson(p0 as Map<String, dynamic>)));
       }
     }).onError((error, stackTrace) {
@@ -195,8 +195,8 @@ class VehicleProvider extends ChangeNotifier {
     }
     else{
       return await DatabaseGetter.database!
-          .getDocument(
-          databaseId: databaseId, collectionId: vehiculeid, documentId: docID)
+          .getRow(
+          databaseId: databaseId, tableId: vehiculeid, rowId: docID)
           .then((value) {
         return value
             .convertTo((p0) => Vehicle.fromJson(p0 as Map<String, dynamic>));

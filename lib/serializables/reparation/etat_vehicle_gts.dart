@@ -1,3 +1,4 @@
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import 'etat_vehicle.dart';
@@ -19,7 +20,7 @@ class EtatVehicleGTS extends EtatVehicleInterface{
   bool plaqueAvant;
   bool marchePieds;
   bool rouePnAvant;
-  bool reservoir;
+  bool reser;
   String exterieurAvCom;
 
   //Exterieur arriere
@@ -28,15 +29,41 @@ class EtatVehicleGTS extends EtatVehicleInterface{
   bool plaqueArriere=false;
   bool feuxSign;
   bool rouePnArriere;
-  bool rouesecours;
+  bool roueSecours;
   String exterieurArCom;
 
   bool showOnList;
+  @JsonKey(includeFromJson: false,includeToJson: false)
+  final TextEditingController cabineController=TextEditingController();
+  @JsonKey(includeFromJson: false,includeToJson: false)
+  final TextEditingController extAvController=TextEditingController();
+  @JsonKey(includeFromJson: false,includeToJson: false)
+  final TextEditingController extArController=TextEditingController();
 
-  EtatVehicleGTS({this.intCab=false,this.balEss=false,this.parBrise=false,this.retroVis=false,this.marchePieds=false,
-  this.pareChoAv=false,this.optiqueSign=false,this.plaqueAvant=false,this.rouePnAvant=false,this.reservoir=false,
-    this.calottes=false,this.pareChoAr=false,this.plaqueArriere=false,
-  this.feuxSign=false,this.rouePnArriere=false,this.rouesecours=false,this.exterieurArCom="",this.exterieurAvCom="",this.cabineCom="",this.showOnList=true});
+  EtatVehicleGTS(
+      {this.intCab=false,
+        this.balEss=false,
+        this.parBrise=false,
+        this.retroVis=false,
+        this.cabineCom="",
+
+        this.pareChoAv=false,
+        this.optiqueSign=false,
+        this.plaqueAvant=false,
+        this.marchePieds=false,
+        this.rouePnAvant=false,
+        this.reser=false,
+        this.exterieurAvCom="",
+
+        this.calottes=false,
+        this.pareChoAr=false,
+        this.plaqueArriere=false,
+        this.feuxSign=false,
+        this.rouePnArriere=false,
+        this.roueSecours=false,
+        this.exterieurArCom="",
+
+        this.showOnList=true});
 
   factory EtatVehicleGTS.fromJson(Map<String, dynamic> json) =>
       _$EtatVehicleGTSFromJson(json);

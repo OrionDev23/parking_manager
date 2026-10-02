@@ -24,11 +24,11 @@ class PlanningProvider extends ChangeNotifier {
     }
     downloadingPlanning=true;
     plannings.clear();
-    await DatabaseGetter.database!.listDocuments(
+    await DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: planningID,queries: [Query.limit(5000)]).then((value) {
-      for(int i=0;i<value.documents.length;i++){
-        plannings[value.documents[i].$id]=value.documents[i].convertTo(
+        tableId: planningID,queries: [Query.limit(5000)]).then((value) {
+      for(int i=0;i<value.rows.length;i++){
+        plannings[value.rows[i].$id]=value.rows[i].convertTo(
                 (p0) => Planning.fromJson(p0 as Map<String,dynamic>));
       }
       downloadedPlanning=true;
@@ -73,16 +73,16 @@ class PlanningProvider extends ChangeNotifier {
       }
     }
     else{
-    await DatabaseGetter.database!.listDocuments(
+    await DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: planningID,
+        tableId: planningID,
         queries: [
           Query.lessThanEqual('startTime', dateToIntJson(expiration)),
           if (removedPlanDocs.isNotEmpty)
             ...removedPlanDocs.map((e) => Query.notEqual(r'$id', e))
         ]).then((value) {
-      for (int i = 0; i < value.documents.length; i++) {
-        result.add(value.documents[i]
+      for (int i = 0; i < value.rows.length; i++) {
+        result.add(value.rows[i]
             .convertTo((p0) => Planning.fromJson(p0 as Map<String, dynamic>)));
       }
     }).onError((error, stackTrace) {

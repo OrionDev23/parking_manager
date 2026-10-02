@@ -81,10 +81,10 @@ class MyEntrepriseState extends State<MyEntreprise> {
     }
     try {
       await DatabaseGetter.database!
-          .getDocument(
+          .getRow(
               databaseId: databaseId,
-              collectionId: entrepriseid,
-              documentId: "1")
+              tableId: entrepriseid,
+              rowId: "1")
           .then((value) {
         p = value
             .convertTo((p0) => Entreprise.fromJson(p0 as Map<String, dynamic>));
@@ -1032,10 +1032,10 @@ class MyEntrepriseState extends State<MyEntreprise> {
     );
     if (p != null) {
       await DatabaseGetter.database!
-          .updateDocument(
+          .updateRow(
               databaseId: databaseId,
-              collectionId: entrepriseid,
-              documentId: p!.id,
+              tableId: entrepriseid,
+              rowId: p!.id,
               data: prest.toJson())
           .then((value) {
         p = prest;
@@ -1045,10 +1045,10 @@ class MyEntrepriseState extends State<MyEntreprise> {
     }
     else {
       await DatabaseGetter.database!
-          .createDocument(
+          .createRow(
               databaseId: databaseId,
-              collectionId: entrepriseid,
-              documentId: '1',
+              tableId: entrepriseid,
+              rowId: '1',
               data: prest.toJson())
           .then((value) {
         p = prest;

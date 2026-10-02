@@ -1,5 +1,4 @@
-List<String> activityList=[
-"ajoutvehicule" ,
+List<String> activityList=["ajoutvehicule" ,
 "modifvehicule" ,
  "suprvehicule" ,
  "ajoutmarque" ,

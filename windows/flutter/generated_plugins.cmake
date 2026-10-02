@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
+  desktop_webview_window
   file_selector_windows
   media_kit_libs_windows_video
   media_kit_video
@@ -12,7 +13,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   share_plus
   system_theme
   url_launcher_windows
-  volume_controller
   window_manager
   window_to_front
 )

@@ -6,6 +6,7 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../../../admin_parameters.dart';
 import '../../../../theme.dart';
 import '../../../data_table_parcoto.dart';
 
@@ -167,6 +168,7 @@ class ReparationTableState extends State<ReparationTable> {
           setState(() {});
         },
       ),
+      if(!gts)
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),

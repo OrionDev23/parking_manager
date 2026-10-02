@@ -26,7 +26,7 @@ class BigTitleForm extends StatelessWidget {
       height: 7.h,
       width: 80.w,
       decoration: BoxDecoration(
-        color: appTheme.color.lightest,
+        color: appTheme.color.dark,
         border: Border.all(),
       ),
       padding: const EdgeInsets.all(10),

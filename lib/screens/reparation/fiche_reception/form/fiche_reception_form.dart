@@ -4,11 +4,13 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:parc_oto/providers/repair_provider.dart';
-import 'package:parc_oto/serializables/reparation/etat_vehicle_gts.dart';
+import '../../../../providers/repair_provider.dart';
+import '../../../../serializables/conducteur/conducteur.dart';
+import '../../../../serializables/reparation/etat_vehicle_gts.dart';
 import '../../../../admin_parameters.dart';
 import '../../../../providers/client_database.dart';
 import '../../../../providers/vehicle_provider.dart';
+import '../../../chauffeur/manager/chauffeur_table.dart';
 import '../../../entreprise/entreprise.dart';
 import '../../reparation/manager/reparation_table.dart';
 import '../../reparation/reparation_order_form/entretien_widget.dart';
@@ -53,6 +55,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
   DateTime? dateSortie;
 
   Vehicle? selectedVehicle;
+  Conducteur? selectedConducteur;
   Reparation? selectedReparation;
   TextEditingController marque = TextEditingController();
   TextEditingController type = TextEditingController();
@@ -165,15 +168,15 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
     if (mounted) {
       setState(() {});
     }
-    await DatabaseGetter.database!.listDocuments(
+    await DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: fichesreceptionId,
+        tableId: fichesreceptionId,
         queries: [
           Query.orderDesc('numero'),
           Query.limit(1),
         ]).then((value) {
-      if (value.documents.length == 1) {
-        numOrdre.text = (value.documents[0]
+      if (value.rows.length == 1) {
+        numOrdre.text = (value.rows[0]
                     .convertTo((p0) =>
                         FicheReception.fromJson(p0 as Map<String, dynamic>))
                     .numero +
@@ -204,15 +207,15 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
       });
       result = true;
     } else {
-      result = await DatabaseGetter.database!.listDocuments(
+      result = await DatabaseGetter.database!.listRows(
           databaseId: databaseId,
-          collectionId: fichesreceptionId,
+          tableId: fichesreceptionId,
           queries: [
             Query.orderDesc('numero'),
             Query.equal('numero', int.parse(numOrdre.text)),
             Query.limit(1),
           ]).then((value) {
-        if (value.documents.length == 1) {
+        if (value.rows.length == 1) {
           setState(() {
             errorNumFiche = true;
           });
@@ -255,11 +258,31 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
       nchassi.text = selectedVehicle!.numeroSerie ?? '';
       matricule.text = selectedVehicle!.matricule;
       anneeUtil = DateTime(selectedVehicle!.anneeUtil ?? 2023);
-      nom.text = selectedVehicle!.nom ?? '';
-      prenom.text = selectedVehicle!.prenom ?? '';
-      matriculeConducteur.text = selectedVehicle!.matriculeConducteur ?? '';
+      if(selectedConducteur==null){
+        nom.text = selectedVehicle!.nom ?? '';
+        prenom.text = selectedVehicle!.prenom ?? '';
+        matriculeConducteur.text = selectedVehicle!.matriculeConducteur ?? '';
+      }
+
     }
     setState(() {});
+  }
+
+  void setConducteurValues(){
+    if (selectedConducteur == null) {
+      nom.clear();
+      prenom.clear();
+      matriculeConducteur.clear();
+    }
+    else{
+      nom.text = selectedConducteur!.name ;
+      prenom.text = selectedConducteur!.prenom ;
+      matriculeConducteur.text = selectedConducteur!.matricule;
+
+    }
+    setState(() {
+
+    });
   }
 
   @override
@@ -357,38 +380,78 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       'dateentre',
                       style: boldStyle,
                     ).tr(),
-                    smallSpace,
+                    bigSpace,
                     SizedBox(
                       width: 200.px,
                       height: 30.px,
                       child: DatePicker(
-                        selected: dateEntre,
+                        selected: DateTime(dateEntre.year,dateEntre.month,dateEntre.day,dateEntre.hour,dateEntre.minute,dateEntre.second),
                         onChanged: (s) {
                           setState(() {
-                            dateEntre = s;
+                            dateEntre = DateTime(s.year,s.month,s.day,dateEntre.hour,dateEntre.minute,dateEntre.second);
                           });
                         },
                       ),
                     ),
-                    bigSpace,
+                    smallSpace,
+                    Text('at',style: boldStyle,).tr(),
+                    smallSpace,
+                    SizedBox(
+                      width: 200.px,
+                      height: 30.px,
+                      child: TimePicker(
+                        selected: DateTime(dateEntre.year,dateEntre.month,dateEntre.day,dateEntre.hour,dateEntre.minute,dateEntre.second),
+                        onChanged: (s) {
+                          setState(() {
+                            dateEntre = DateTime(dateEntre.year,dateEntre.month,dateEntre.day,s.hour,s.minute,s.second);
+                          });
+                        },
+                        hourFormat: HourFormat.HH,
+                      ),
+                    ),
+
+                  ],
+                ),
+                smallSpace,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
                     Text(
                       'datesortie',
                       style: boldStyle,
                     ).tr(),
-                    smallSpace,
+                    bigSpace,
                     SizedBox(
                       width: 200.px,
                       height: 30.px,
                       child: DatePicker(
-                        selected: dateSortie,
+                        selected:dateSortie==null?dateSortie: DateTime(dateSortie!.year,dateSortie!.month,dateSortie!.day,dateSortie!.hour,dateSortie!.minute,dateSortie!.second),
                         startDate: dateEntre,
                         onChanged: (s) {
                           setState(() {
-                            dateSortie = s;
+                            dateSortie = dateSortie==null?s:DateTime(s.year,s.month,s.day,dateSortie!.hour,dateSortie!.minute,dateSortie!.second);
                           });
                         },
                       ),
                     ),
+                    smallSpace,
+                    Text('at',style: boldStyle,).tr(),
+                    smallSpace,
+                    SizedBox(
+                      width: 200.px,
+                      height: 30.px,
+                      child: TimePicker(
+                        selected:dateSortie==null?dateSortie: DateTime(dateSortie!.year,dateSortie!.month,dateSortie!.day,dateSortie!.hour,dateSortie!.minute,dateSortie!.second),
+                        onChanged: (s) {
+                          setState(() {
+                            dateSortie = dateSortie==null?s:DateTime(dateSortie!.year,dateSortie!.month,dateSortie!.day,s.hour,s.minute,s.second);
+                          });
+                        },
+                        hourFormat: HourFormat.HH,
+
+                      ),
+                    ),
+
                   ],
                 ),
                 smallSpace,
@@ -444,11 +507,11 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                           }),
                     const Spacer(),
                     SizedBox(
-                      width: 250.px,
+                      width: 545.px,
                       height: 50.px,
                       child: ListTile(
                         leading: Text(
-                          'reparation',
+                          'ordrereparation',
                           style: boldStyle,
                         ).tr(),
                         title:
@@ -487,7 +550,62 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                           icon: const Icon(FluentIcons.cancel),
                           onPressed: () {
                             selectedReparation = null;
-                            setVehicleValues();
+                            setState(() {
+
+                            });
+                          }),
+                  ],
+                ),
+                smallSpace,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 250.px,
+                      height: 50.px,
+                      child: ListTile(
+                        leading: Text(
+                          'chauffeur',
+                          style: boldStyle,
+                        ).tr(),
+                        title:
+                        Text(selectedConducteur?.getName() ?? 'nonind'.tr()),
+                        onPressed: () async {
+                          selectedConducteur = await showDialog<Conducteur>(
+                              context: context,
+                              barrierDismissible: true,
+                              builder: (context) {
+                                return ContentDialog(
+                                  constraints: BoxConstraints.tight(
+                                      Size(700.px, 550.px)),
+                                  title: const Text('selectchauffeur').tr(),
+                                  style: ContentDialogThemeData(
+                                      titleStyle: appTheme.writingStyle
+                                          .copyWith(
+                                          fontWeight: FontWeight.bold)),
+                                  content: const ChauffeurTable(
+                                    selectD: true,
+                                  ),
+                                  actions: [
+                                    Button(
+                                        child: const Text('fermer').tr(),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        })
+                                  ],
+                                );
+                              });
+                          setConducteurValues();
+                        },
+                      ),
+                    ),
+                    smallSpace,
+                    if (selectedConducteur != null)
+                      IconButton(
+                          icon: const Icon(FluentIcons.cancel),
+                          onPressed: () {
+                            selectedConducteur = null;
+                            setConducteurValues();
                           }),
                   ],
                 ),
@@ -1357,10 +1475,10 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
 
   Future<void> updateFiche(FicheReception fiche) async {
     await DatabaseGetter.database!
-        .updateDocument(
+        .updateRow(
             databaseId: databaseId,
-            collectionId: fichesreceptionId,
-            documentId: documentID!,
+            tableId: fichesreceptionId,
+            rowId: documentID!,
             data: fiche.toJson())
         .then((value) {})
         .onError((AppwriteException error, stackTrace) {
@@ -1369,10 +1487,10 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
   }
 
   Future<void> createFiche(FicheReception fiche) async {
-    await DatabaseGetter.database!.createDocument(
+    await DatabaseGetter.database!.createRow(
         databaseId: databaseId,
-        collectionId: fichesreceptionId,
-        documentId: documentID!,
+        tableId: fichesreceptionId,
+        rowId: documentID!,
         data: fiche.toJson());
   }
 

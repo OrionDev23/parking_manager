@@ -20,8 +20,8 @@ class UsersWebservice
     while (!DatabaseGetter.secretKeySet) {
       await Future.delayed(const Duration(milliseconds: 300));
     }
-    client.setProject(project)
-      ..setKey(secretKey)
+    client.setProject(project!)
+      ..setKey(secretKey!)
       ..setEndpoint(endpoint);
   }
 

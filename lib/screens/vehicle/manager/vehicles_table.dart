@@ -717,6 +717,12 @@ class VehicleTableState extends State<VehicleTable> {
   }
 
   void showCostPdf() async{
+    if(!VehicleProvider.downloadedVehicles){
+      VehicleProvider();
+      while(!VehicleProvider.downloadedVehicles){
+        await Future.delayed(const Duration(milliseconds: 300));
+      }
+    }
     await RepairProvider.downloadFicheReparations();
 
     Future.delayed(const Duration(milliseconds: 50)).then((value){
@@ -728,12 +734,12 @@ class VehicleTableState extends State<VehicleTable> {
             return PdfPreviewListing(
               firstPageLimit: 30,
               midPagesLimit: 35,
-              list: RepairProvider.prepareVehicRepList(RepairProvider
-                  .repPerVeh),
+              list: RepairProvider.prepareListVehicleImmob(RepairProvider
+                  .repPerVeh,VehicleProvider.vehicles.values.toList(growable: false)),
               orientation: PageOrientation.landscape,
               keysToInclude: conducteurEmploye?const ['vehicule','modele','mat. conducteur','nom conducteur','nbr. rep','cost','dern. '
-            'rep']:const['vehicule','modele','nbr. rep','cost','dern. rep'],
-              name: 'Couts par vehicule',
+            'rep']:['vehicule','modele','nbr. rep',gts?'immob':'cost','dern. rep'],
+              name: gts?'Immobilisation des véhicules':"Couts par véhicule",
             );
           });}
     });
@@ -741,14 +747,20 @@ class VehicleTableState extends State<VehicleTable> {
   }
 
   void saveExcelCost() async{
+    if(!VehicleProvider.downloadedVehicles){
+      VehicleProvider();
+      while(!VehicleProvider.downloadedVehicles){
+        await Future.delayed(const Duration(milliseconds: 300));
+      }
+    }
     await RepairProvider.downloadFicheReparations();
     Future.delayed(const Duration(milliseconds: 50)).then((value) {
       List2Excel(
-        list: RepairProvider.prepareVehicRepList(RepairProvider
-            .repPerVeh),
+        list: RepairProvider.prepareListVehicleImmob(RepairProvider
+            .repPerVeh,VehicleProvider.vehicles.values.toList(growable: false)),
         keysToInclude: conducteurEmploye?const ['vehicule','modele','mat. conducteur','nom conducteur','nbr. rep','cost','dern. '
-            'rep']:const['vehicule','modele','nbr. rep','cost','dern. rep'],
-        title: 'Couts par vehicule',
+            'rep']:['vehicule','modele','nbr. rep',gts?'immob':'cost','dern. rep'],
+        title: gts?'Immobilisation des véhicules':"Couts par véhicule",
       ).getExcel();
     });
 

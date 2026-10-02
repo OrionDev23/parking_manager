@@ -78,8 +78,8 @@ class StateFormState extends State<StateForm> {
   Future<void> downloadVehicle(String id) async {
     loadingVehicle = true;
     await DatabaseGetter.database!
-        .getDocument(
-            databaseId: databaseId, collectionId: vehiculeid, documentId: id)
+        .getRow(
+            databaseId: databaseId, tableId: vehiculeid, rowId: id)
         .then((value) {
       if (value.data.isNotEmpty) {
         selectedVehicle = value
@@ -96,8 +96,8 @@ class StateFormState extends State<StateForm> {
   Future<void> downloadReparation(String id) async {
     loadingReparation = true;
     await DatabaseGetter.database!
-        .getDocument(
-            databaseId: databaseId, collectionId: reparationId, documentId: id)
+        .getRow(
+            databaseId: databaseId, tableId: reparationId, rowId: id)
         .then((value) {
       if (value.data.isNotEmpty) {
         selectedReparation = value
@@ -423,10 +423,10 @@ class StateFormState extends State<StateForm> {
     );
     await updateOrCreate(etat).then((value) {
       if (affectNow || widget.vehicle != null) {
-        DatabaseGetter.database!.updateDocument(
+        DatabaseGetter.database!.updateRow(
             databaseId: databaseId,
-            collectionId: vehiculeid,
-            documentId: selectedVehicle?.id ??
+            tableId: vehiculeid,
+            rowId: selectedVehicle?.id ??
                 widget.vehicle?.id ??
                 widget.etat?.vehicle ??
                 '',
@@ -461,19 +461,19 @@ class StateFormState extends State<StateForm> {
 
   Future<void> updateOrCreate(Etat etat) async {
     if (widget.etat != null) {
-      await DatabaseGetter.database!.updateDocument(
+      await DatabaseGetter.database!.updateRow(
         databaseId: databaseId,
-        collectionId: etatId,
-        documentId: documentID!,
+        tableId: etatId,
+        rowId: documentID!,
         data: etat.toJson(),
       );
 
       DatabaseGetter().ajoutActivity(5, documentID!, docName: etat.vehicleMat);
     } else {
-      await DatabaseGetter.database!.createDocument(
+      await DatabaseGetter.database!.createRow(
         databaseId: databaseId,
-        collectionId: etatId,
-        documentId: documentID!,
+        tableId: etatId,
+        rowId: documentID!,
         data: etat.toJson(),
       );
       DatabaseGetter().ajoutActivity(4, documentID!, docName: etat.vehicleMat);

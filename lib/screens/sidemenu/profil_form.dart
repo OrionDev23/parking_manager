@@ -274,10 +274,10 @@ class _ProfilFormState extends State<ProfilForm> {
       );
       if (widget.user == null) {
         await DatabaseGetter.database!
-            .createDocument(
+            .createRow(
                 databaseId: databaseId,
-                collectionId: userid,
-                documentId: userID,
+                tableId: userid,
+                rowId: userID,
                 data: newme.toJson())
             .then((value) {
           DatabaseGetter.me.value = newme;
@@ -290,10 +290,10 @@ class _ProfilFormState extends State<ProfilForm> {
         });
       } else {
         await DatabaseGetter.database!
-            .updateDocument(
+            .updateRow(
                 databaseId: databaseId,
-                collectionId: userid,
-                documentId: userID,
+                tableId: userid,
+                rowId: userID,
                 data: newme.toJson())
             .then((value) {
           DatabaseGetter.me.value = newme;

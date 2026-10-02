@@ -32,9 +32,9 @@ class _BrandContainerState extends State<BrandContainer> {
   }
 
   void getCount() async {
-    await DatabaseGetter.database!.listDocuments(
+    await DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: vehiculeid,
+        tableId: vehiculeid,
         queries: [
           Query.equal('marque', widget.id.toString()),
           Query.limit(1),

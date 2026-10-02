@@ -243,16 +243,16 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
           chauffeur: c.id,
           chauffeurNom: '${c.name} ${c.prenom}');
       await DatabaseGetter.database!
-          .createDocument(
+          .createRow(
               databaseId: databaseId,
-              collectionId: chaufDispID,
-              documentId: etatID,
+              tableId: chaufDispID,
+              rowId: etatID,
               data: disp.toJson())
           .then((value) async {
-        await DatabaseGetter.database!.updateDocument(
+        await DatabaseGetter.database!.updateRow(
             databaseId: databaseId,
-            collectionId: chauffeurid,
-            documentId: c.id,
+            tableId: chauffeurid,
+            rowId: c.id,
             data: {
               'etatactuel': etatID,
               'etat': etat,

@@ -199,10 +199,10 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
   void deleteRow(dynamic c) async {
     await Future.wait([
       DatabaseGetter.database!
-          .deleteDocument(
+          .deleteRow(
               databaseId: databaseId,
-              collectionId: collectionID,
-              documentId: c.id)
+              tableId: collectionID,
+              rowId: c.id)
           .then((value) {
         data.remove(MapEntry(c.id, c));
         refreshDatasource();

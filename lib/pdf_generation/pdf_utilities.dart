@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:parc_oto/pdf_generation/pdf_theming.dart';
 import 'package:parc_oto/providers/repair_provider.dart';
@@ -99,6 +100,48 @@ class PdfUtilities {
                               color: orangeDeep,
                               size: 6,
                             )
+                          : null,
+                    ),
+                ])));
+      }
+    });
+    return result
+        .getRange(debut, fin < result.length ? fin : result.length)
+        .toList();
+  }
+
+  static List<Widget> getTextListFromMapGts(
+      Map<String, dynamic> map, int debut, int fin,
+      {double width = 12.5}) {
+    List<Widget> result = List.empty(growable: true);
+    map.forEach((key, value) {
+      if (key != 'showOnList') {
+        result.add(SizedBox(
+            width: width * PdfPageFormat.cm,
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    key.tr(),
+                    style: smallText.copyWith(
+                      fontSize: 9,
+                    ),
+                  ),
+                  dotsSpacer(),
+                  if (value is bool)
+                    Container(
+                      width: 7,
+                      height: 7,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: orange),
+                      ),
+                      child: value
+                          ? Icon(
+                        IconData(checkCodePoint, matchTextDirection: true),
+                        color: orangeDeep,
+                        size: 6,
+                      )
                           : null,
                     ),
                 ])));

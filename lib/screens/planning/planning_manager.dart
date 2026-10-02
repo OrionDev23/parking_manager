@@ -97,10 +97,10 @@ class _PlanningManagerState extends State<PlanningManager> {
   void deleteAppointement() {
     if (selectedPlanning != null) {
       DatabaseGetter.database!
-          .deleteDocument(
+          .deleteRow(
               databaseId: databaseId,
-              collectionId: planningID,
-              documentId: selectedPlanning!.id)
+              tableId: planningID,
+              rowId: selectedPlanning!.id)
           .then((value) {
         datasource.appointments?.remove(selectedPlanning);
         datasource.notifyListeners(

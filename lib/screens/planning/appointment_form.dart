@@ -425,10 +425,10 @@ class _AppointmentFormState extends State<AppointmentForm> {
         createdBy: DatabaseGetter.me.value?.id,
         isAllDay: _isAllDay,
         type: _selectedCategorie);
-    await DatabaseGetter.database!.createDocument(
+    await DatabaseGetter.database!.createRow(
         databaseId: databaseId,
-        collectionId: planningID,
-        documentId: documentID!,
+        tableId: planningID,
+        rowId: documentID!,
         data: planning.toJson(),
         permissions: [
           Permission.delete(Role.user(DatabaseGetter.me.value!.id)),

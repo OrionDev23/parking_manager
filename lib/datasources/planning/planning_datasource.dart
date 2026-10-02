@@ -102,9 +102,9 @@ class PlanningDatasource extends CalendarDataSource<Planning> {
 
   @override
   Future<void> handleLoadMore(DateTime startDate, DateTime endDate) async {
-    await DatabaseGetter.database!.listDocuments(
+    await DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: planningID,
+        tableId: planningID,
         queries: [
           Query.orderAsc('startTime'),
           Query.greaterThanEqual('startTime',
@@ -112,11 +112,11 @@ class PlanningDatasource extends CalendarDataSource<Planning> {
           Query.lessThanEqual(
               'endTime', endDate.difference(DatabaseGetter.ref).inMilliseconds),
         ]).then((value) {
-      for (var element in value.documents) {
+      for (var element in value.rows) {
         data[element.$id] = element
             .convertTo((p0) => Planning.fromJson(p0 as Map<String, dynamic>));
       }
-      if (value.documents.isNotEmpty) {
+      if (value.rows.isNotEmpty) {
         var newOnes = addAppointements();
         appointments!.addAll(newOnes);
         notifyListeners(CalendarDataSourceAction.reset, newOnes);

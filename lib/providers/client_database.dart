@@ -54,7 +54,7 @@ class DatabaseGetter {
   static Storage? storage;
   static final DateTime ref = DateTime(2023, 11, 01, 12, 13, 15);
 
-  static Databases? database;
+  static TablesDB? database;
 
   static ValueNotifier<ParcUser?> me = ValueNotifier(null);
 
@@ -63,9 +63,9 @@ class DatabaseGetter {
     if(project!=null){
       client = Client()
         ..setEndpoint(endpoint)
-        ..setProject(project);
+        ..setProject(project!);
       account = Account(client!);
-      database = Databases(client!);
+      database = TablesDB(client!);
       storage = Storage(client!);
       getLimits();
 
@@ -116,19 +116,19 @@ class DatabaseGetter {
     if (!settingSecretKey && !secretKeySet) {
       settingSecretKey = true;
       await database!
-          .getDocument(
+          .getRow(
               databaseId: databaseId,
-              collectionId: adminID,
-              documentId: 'admin')
+              tableId: adminID,
+              rowId: 'admin')
           .then((value) async{
         secretKey = value.data['key'];
         secretKeySet = true;
 
         await database!
-            .getDocument(
+            .getRow(
             databaseId: databaseId,
-            collectionId: adminID,
-            documentId: 'cryptkey')
+            tableId: adminID,
+            rowId: 'cryptkey')
             .then((value){
           String s=value.data['key'];
 
@@ -169,10 +169,10 @@ class DatabaseGetter {
             return;
           }
         await database!
-            .getDocument(
+            .getRow(
                 databaseId: databaseId,
-                collectionId: userid,
-                documentId: user!.$id)
+                tableId: userid,
+                rowId: user!.$id)
             .then((result) {
           me.value = ParcUser.fromJson(result.data);
         }).catchError((error) {
@@ -213,10 +213,10 @@ class DatabaseGetter {
   Future<void> getLimits() async{
     if(!gotLimit){
       await database!
-          .getDocument(
+          .getRow(
           databaseId: databaseId,
-          collectionId: limitsID,
-          documentId: '1')
+          tableId: limitsID,
+          rowId: '1')
           .then((value) {
 
         if(value.data.containsKey('vehicles')){
@@ -241,10 +241,10 @@ class DatabaseGetter {
     }
     else{
       await database!
-          .getDocument(
+          .getRow(
           databaseId: databaseId,
-          collectionId: trialID,
-          documentId: '1')
+          tableId: trialID,
+          rowId: '1')
           .then((value) {
         trialDate = DateTime.tryParse(value.data['date']);
       }).onError((AppwriteException error, stackTrace) {
@@ -258,10 +258,10 @@ class DatabaseGetter {
       MyEntrepriseState.downloading = true;
       try {
         await database!
-            .getDocument(
+            .getRow(
                 databaseId: databaseId,
-                collectionId: entrepriseid,
-                documentId: "1")
+                tableId: entrepriseid,
+                rowId: "1")
             .then((value) {
           MyEntrepriseState.p = value.convertTo(
               (p0) => Entreprise.fromJson(p0 as Map<String, dynamic>));
@@ -285,10 +285,10 @@ class DatabaseGetter {
   }
 
   void uploadUser(ParcUser u) {
-    database!.createDocument(
+    database!.createRow(
         databaseId: databaseId,
-        collectionId: userid,
-        documentId: u.id,
+        tableId: userid,
+        rowId: u.id,
         data: me.value!.toJson(),
         permissions: [
           Permission.read(Role.users()),
@@ -302,8 +302,8 @@ class DatabaseGetter {
 
   Future<ParcUser?> getUserFromID(String docID) async {
     return await database!
-        .getDocument(
-            databaseId: databaseId, collectionId: userid, documentId: docID)
+        .getRow(
+            databaseId: databaseId, tableId: userid, rowId: docID)
         .then((value) {
       return value
           .convertTo((p0) => ParcUser.fromJson(p0 as Map<String, dynamic>));
@@ -330,10 +330,10 @@ class DatabaseGetter {
       createdBy: me.value?.id,
     );
 
-    await database!.createDocument(
+    await database!.createRow(
         databaseId: databaseId,
-        collectionId: activityId,
-        documentId: activity.id,
+        tableId: activityId,
+        rowId: activity.id,
         data: activity.toJson());
   }
 
@@ -348,42 +348,42 @@ class DatabaseGetter {
       {required String collectionId,
         required String documentId,
         required Map<String, dynamic> data}) async {
-    await database?.createDocument(
+    await database?.createRow(
         databaseId: databaseId,
-        collectionId: collectionId,documentId: documentId,data:data);
+        tableId:  collectionId,rowId: documentId,data:data);
   }
   Future<void> updateDocument(
       {required String collectionId,
         required String documentId,
         required Map<String, dynamic> data}) async {
-    await database?.updateDocument(
-        databaseId: databaseId,collectionId:
-        collectionId,documentId: documentId,data:data);
+    await database?.updateRow(
+        databaseId: databaseId,tableId:
+        collectionId,rowId: documentId,data:data);
   }
 
-  Future<Document?> getDocument(String collectionId,String documentId) async{
+  Future<Row?> getDocument(String collectionId,String documentId) async{
 
-    return database?.getDocument(
+    return database?.getRow(
         databaseId: databaseId,
-        collectionId: collectionId,
-        documentId: documentId);
+        tableId: collectionId,
+        rowId: documentId);
   }
 
 
-  Future<List<Document>> listDocuments(String path) async {
-    List<Document> result = List.empty(growable: true);
+  Future<List<Row>> listDocuments(String path) async {
+    List<Row> result = List.empty(growable: true);
     int nextPageToken = 0;
     bool hasNextPage = true;
     while (hasNextPage) {
       await database
-          ?.listDocuments(databaseId: databaseId,collectionId: path,queries: [
+          ?.listRows(databaseId: databaseId,tableId: path,queries: [
             Query.limit(5000),
             Query.offset(nextPageToken)
       ])
           .then((value) {
         hasNextPage = value.total>=5000;
         nextPageToken += 5000;
-        result.addAll(value.documents);
+        result.addAll(value.rows);
       });
     }
 

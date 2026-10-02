@@ -13,9 +13,12 @@ final numberFormat = NumberFormat('00000000', 'fr');
 final numberFormat2 = NumberFormat('00', 'fr');
 final numberFormat3 =
     NumberFormat.currency(locale: 'fr', symbol: '%', decimalDigits: 2);
+final numberFormat4 =
+    NumberFormat.currency(locale: 'fr', decimalDigits: 2);
 final prixFormat =
     NumberFormat.currency(locale: 'fr', symbol: 'DA', decimalDigits: 2);
 final dateFormat = DateFormat('dd MMMM yyyy', 'fr');
+final dateFormatHH = DateFormat('dd MMMM yyyy à HH:mm', 'fr');
 final smallSpace =
     SizedBox(width: PdfPageFormat.cm * 0.1, height: PdfPageFormat.cm * 0.1);
 final bigSpace =
@@ -32,6 +35,7 @@ PdfColor orangeLight = PdfColors.orange300;
 PdfColor orangeDeep = PdfColors.orange900;
 
 int iconCodePoint = 0xe5cd;
+int checkCodePoint = 0xe5ca;
 
 MemoryImage? entrepriseLogo;
 MemoryImage? poLogo;

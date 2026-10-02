@@ -1,5 +1,5 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/models.dart';
+import 'package:appwrite/models.dart' hide Row;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
@@ -692,10 +692,10 @@ class ChauffeurFormState extends State<ChauffeurForm> {
     );
     if (widget.chauf != null) {
       await DatabaseGetter.database!
-          .updateDocument(
+          .updateRow(
               databaseId: databaseId,
-              collectionId: chauffeurid,
-              documentId: chaufID!,
+              tableId: chauffeurid,
+              rowId: chaufID!,
               data: chauf.toJson())
           .then((value) {
         DatabaseGetter().ajoutActivity(17, chaufID!,
@@ -704,10 +704,10 @@ class ChauffeurFormState extends State<ChauffeurForm> {
       });
     } else {
       await DatabaseGetter.database!
-          .createDocument(
+          .createRow(
               databaseId: databaseId,
-              collectionId: chauffeurid,
-              documentId: chaufID!,
+              tableId: chauffeurid,
+              rowId: chaufID!,
               data: chauf.toJson())
           .then((value) {
         DatabaseGetter().ajoutActivity(16, chaufID!,
@@ -718,7 +718,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
     }
   }
 
-  Future<Document?> uploadEtat() async {
+  Future<Row?> uploadEtat() async {
     if (disp == null || disp!.type != etat) {
       if (disp?.id == etatID ||
           etatID == null ||
@@ -736,15 +736,15 @@ class ChauffeurFormState extends State<ChauffeurForm> {
           chauffeur: chaufID!,
           chauffeurNom: '${nom.text} ${prenom.text}');
       return await DatabaseGetter.database!
-          .createDocument(
+          .createRow(
               databaseId: databaseId,
-              collectionId: chaufDispID,
-              documentId: etatID!,
+              tableId: chaufDispID,
+              rowId: etatID!,
               data: disp!.toJson())
           .then((value) {
         DatabaseGetter()
             .ajoutActivity(20, etatID!, docName: disp?.chauffeurNom);
-        return value;
+        return value as Row;
       });
     } else {
       return null;

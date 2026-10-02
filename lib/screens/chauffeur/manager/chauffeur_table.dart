@@ -497,9 +497,9 @@ class ChauffeurTableState extends State<ChauffeurTable> {
 
 
   void showPdf() {
-    DatabaseGetter.database!.listDocuments(
+    DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: chauffeurid,queries: [
+        tableId: chauffeurid,queries: [
       Query.limit(DatabaseGetter.limits['vehicles']??500)
     ]).then((value){
         Future.delayed(const Duration(milliseconds: 50))
@@ -513,7 +513,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
                   firstPageLimit: 30,
                   midPagesLimit: 35,
                   list: conducteurDataSource.getJsonData(
-                      value.documents),
+                      value.rows),
                   orientation: PageOrientation.landscape,
                   keysToInclude: const [
                     'matricule',
@@ -535,15 +535,15 @@ class ChauffeurTableState extends State<ChauffeurTable> {
 
 
   void saveExcell(){
-    DatabaseGetter.database!.listDocuments(
+    DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: chauffeurid,queries: [
+        tableId: chauffeurid,queries: [
       Query.limit(DatabaseGetter.limits['vehicles']??500),
       Query.notEqual('etat', 3),
     ]).then((value){
 
       List2Excel(
-        list: conducteurDataSource.getJsonData(value.documents),
+        list: conducteurDataSource.getJsonData(value.rows),
         keysToInclude: const ['matricule','nom','prenom','filliale','direction','etat','vehicules'],
         title: 'Liste des conducteurs',
       )

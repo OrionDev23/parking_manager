@@ -4,9 +4,11 @@ import 'package:parc_oto/pdf_generation/pdf_utilities.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/entreprise/entreprise.dart';
 import 'package:parc_oto/serializables/reparation/fiche_reception.dart';
+import 'package:parc_oto/serializables/reparation/task_group.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
+import '../admin_parameters.dart';
 import '../serializables/client.dart';
 import '../serializables/reparation/reparation.dart';
 import '../utilities/num_to_word.dart';
@@ -33,6 +35,9 @@ class ReparationPdf {
     if (entretienEmpty()) {
       nbrPageOne += 9;
     }
+    if(gts){
+      nbrPageOne+=4;
+    }
     p = pdfUtilities.p;
     fiche=pdfUtilities.fiche;
     var doc = Document(
@@ -50,8 +55,15 @@ class ReparationPdf {
     int nbrPages = getNumberOfPages();
 
     int lastIndex = 0;
-    int nbrTotal = reparation.designations?.length ?? 0;
-
+    int nbrTotal=0;
+    if(reparation.designations!=null){
+      nbrTotal=reparation.designations!.length;
+    }
+    else if(reparation.tasks!=null){
+      for(int pm=0;pm<reparation.tasks!.length;pm++){
+        nbrTotal+=reparation.tasks![pm].tasks.length;
+      }
+    }
     List<Widget> pages = List.empty(growable: true);
     for (int i = 0; i < nbrPages; i++) {
       pages.add(getPageContent(i, nbrPages, lastIndex));
@@ -96,9 +108,12 @@ class ReparationPdf {
           if (!entretienEmpty())
             VehicleEntretienPDF(reparation:reparation).vehicleEntretien(),
           if (!entretienEmpty()) bigSpace,
+          if(reparation.tasks==null && reparation.designations!=null)
           getDesignations(page, nbrPages, lastIndex),
-          if (page == nbrPages - 1) getPrixInLetter(),
-          if (page == nbrPages - 1) bigSpace,
+          if(reparation.designations==null && reparation.tasks!=null)
+            getTasks(page, nbrPages, lastIndex),
+          if (page == nbrPages - 1 && reparation.designations!=null) getPrixInLetter(),
+          smallSpace,
           if (page == nbrPages - 1) getRemarqueAndSignature(),
           Spacer(),
           brandingAndPaging(page, nbrPages),
@@ -170,7 +185,15 @@ class ReparationPdf {
   int nbrLastPage = 35;
 
   int getNumberOfPages() {
-    int nbr = reparation.designations?.length ?? 0;
+    int nbr=0;
+    if (reparation.designations != null) {
+      nbr = reparation.designations?.length ?? 0;
+    }
+    else if(reparation.tasks!=null){
+      for(int pm=0;pm<reparation.tasks!.length;pm++){
+        nbr+=reparation.tasks![pm].tasks.length;
+      }
+    }
     if (nbr <= (nbrPageOne + nbrLastPage + pageAdition)) {
       if (nbr <= nbrPageOne) {
         return 1;
@@ -201,6 +224,10 @@ class ReparationPdf {
       return true;
     }
   }
+
+
+
+
   Widget getDesignations(int page, int nbrPages, int lastIndex) {
     if (page == 0) {
       return getFirstPageDesignations(nbrPages);
@@ -458,6 +485,40 @@ class ReparationPdf {
   }
 
   Widget getRemarqueAndSignature() {
+    if(gts){
+      return Container(
+        width: 20 * PdfPageFormat.cm,
+        height: 2 * PdfPageFormat.cm,
+        child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                  width: 9 * PdfPageFormat.cm,
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                    Text('SIGNATURE RÉCEPTIONNAIRE', style: smallTextBold),
+                    Text(
+                        (DatabaseGetter.me.value?.name ?? '').toUpperCase(),
+                        style: smallText),
+                  ])),
+              Spacer(),
+              SizedBox(
+                width: 9 * PdfPageFormat.cm,
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text('SIGNATURE CLIENT', style: smallTextBold),
+                      Text(
+                          '${fiche?.nomConducteur ?? ""} ${fiche?.prenomConducteur ?? ""}'
+                              .toUpperCase(),
+                          style: smallText),
+                    ]),
+              ),
+            ])
+      );
+    }
     return Container(
       width: 20 * PdfPageFormat.cm,
       height: 2 * PdfPageFormat.cm,
@@ -1075,4 +1136,155 @@ class ReparationPdf {
           ]),
     );
   }
+
+  Widget getTasks(int page,int nbrPages,int lastIndex){
+
+    List<TaskGroup> tasksValues=separateGroup();
+
+    if (page == 0) {
+      return getFirstPageTasks(nbrPages,tasksValues);
+    } else if (page == nbrPages - 1) {
+      return getLastPageTasks(nbrPages, lastIndex,tasksValues);
+    } else {
+      return getMiddlePageTasks(nbrPages, page, lastIndex,tasksValues);
+    }
+  }
+
+
+  List<TaskGroup> separateGroup(){
+    List<TaskGroup> separatedList=[];
+    for(int i=0;i<reparation.tasks!.length;i++){
+      for(int j=0;j<reparation.tasks![i].tasks.length;j++){
+        separatedList.add(TaskGroup(numero: reparation.tasks![i].numero,time: reparation.tasks![i].time,tasks: [reparation.tasks![i].tasks[j]]),);
+      }
+    }
+    return separatedList;
+  }
+  Widget tasksHeader() {
+    return Container(
+      height: PdfPageFormat.cm * 0.75,
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: orange,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(5)),
+      ),
+      child: Row(children: [
+        SizedBox(
+          width: PdfPageFormat.cm * 3.5,
+          child: Text(
+            'Numéro',
+            style: smallTextBold,
+          ),
+        ),
+        SizedBox(
+          width: PdfPageFormat.cm * 8,
+          child: Text('Descriptif', style: smallTextBold),
+        ),
+        SizedBox(
+          width: PdfPageFormat.cm * 4,
+          child:
+          Text('', style: smallTextBold, textAlign: TextAlign.end),
+        ),
+      ]),
+    );
+  }
+
+  Widget getOneTaskLine(int taskGroupIndex, int page, int nbrPages,List<TaskGroup> separatedTasks) {
+    bool sameAsLast=taskGroupIndex>0 && taskGroupIndex<separatedTasks.length?separatedTasks[taskGroupIndex-1].numero==separatedTasks[taskGroupIndex].numero:false;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      child: Container(
+        height: PdfPageFormat.cm * 0.5,
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4.5),
+        decoration: const BoxDecoration(
+            border: Border(
+              bottom: BorderSide(style: BorderStyle.dotted),
+            )),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children:
+              (separatedTasks.length) <= taskGroupIndex ||
+              (page == nbrPages - 2 &&
+                  taskGroupIndex == separatedTasks.length - 1)
+              ? []
+              : [
+            SizedBox(
+              width: PdfPageFormat.cm * 3.5,
+              child: Text(sameAsLast?'':separatedTasks[taskGroupIndex].numero,
+                  style: smallText, textAlign: TextAlign.start),
+            ),
+            SizedBox(
+              width: PdfPageFormat.cm * 8,
+              child: Text(separatedTasks[taskGroupIndex].tasks.first,
+                  style: smallText),
+            ),
+            SizedBox(
+              width: PdfPageFormat.cm * 4,
+              child: Text(
+                  numberFormat2
+                      .format(separatedTasks[taskGroupIndex].time),
+                  style: smallText,
+                  textAlign: TextAlign.start),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  Widget getFirstPageTasks(nbrPages,List<TaskGroup> tasksValues){
+    int nbrLines = nbrPages == 1 ? nbrPageOne : nbrPageOne + pageAdition;
+    double height = nbrLines * 0.5 + 0.75 + 0.5;
+
+    return SizedBox(
+      height: PdfPageFormat.cm * height,
+      width: PdfPageFormat.cm * 21 - smallSpace.width!.toDouble(),
+      child: SizedBox(
+          height: PdfPageFormat.cm * 10,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            tasksHeader(),
+            ...List.generate(nbrLines, (index) {
+              return getOneTaskLine(index, 0, nbrPages,tasksValues);
+            }),
+          ])),
+    );
+  }
+
+  Widget getLastPageTasks(int nbrPages, int lastIndex,List<TaskGroup> tasksValues) {
+    double height = (nbrLastPage + 3) * 0.5 + 0.75 + 0.5;
+
+    return SizedBox(
+      height: PdfPageFormat.cm * height,
+      width: PdfPageFormat.cm * 21 - smallSpace.width!.toDouble(),
+      child: SizedBox(
+          height: PdfPageFormat.cm * 10,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            designationHeader(),
+            ...List.generate(nbrLastPage, (index) {
+              return getOneTaskLine(
+                  index + lastIndex, nbrPages - 1, nbrPages,tasksValues);
+            }),
+            getTotal(),
+          ])),
+    );
+  }
+  Widget getMiddlePageTasks(int nbrPages, int page, int lastIndex,List<TaskGroup> tasksValues) {
+    double height = (nbrMaxMiddlePages) * 0.5 + 0.75 + 0.5;
+
+    return SizedBox(
+      height: PdfPageFormat.cm * height,
+      width: PdfPageFormat.cm * 21 - smallSpace.width!.toDouble(),
+      child: SizedBox(
+          height: PdfPageFormat.cm * 10,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            designationHeader(),
+            ...List.generate(nbrMaxMiddlePages, (index) {
+              return getOneTaskLine(lastIndex + index, page, nbrPages,tasksValues);
+            }),
+          ])),
+    );
+  }
+
+
 }

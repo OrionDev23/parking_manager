@@ -46,9 +46,9 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
   }
 
   void getCount() async {
-    await DatabaseGetter.database!.listDocuments(
+    await DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: vehiculeid,
+        tableId: vehiculeid,
         queries: [
           Query.equal(widget.fieldToSearch, widget.name.replaceAll(' ', '').toUpperCase()),
           Query.limit(1),
@@ -166,10 +166,10 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
       MyEntrepriseState.p!.departments!.remove(widget.name);
     }
     await DatabaseGetter.database!
-        .updateDocument(
+        .updateRow(
         databaseId: databaseId,
-        collectionId: entrepriseid,
-        documentId: MyEntrepriseState.p!.id,
+        tableId: entrepriseid,
+        rowId: MyEntrepriseState.p!.id,
         data: {
           if(widget.type==1)
             'directions':MyEntrepriseState.p!.directions,

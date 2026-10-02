@@ -702,5 +702,31 @@
   "exitgarage": "Vehicle exiting the garage",
 
   "GtsTheme.gtsDark": "GTS Dark",
-  "GtsTheme.gtsLight": "GTS Light"
+  "GtsTheme.gtsLight": "GTS Light",
+  "cabine": "Cabin",
+  "intcabine": "Cabin interior",
+
+  "balais": "Wiper and washer blades",
+  "parebrise": "Windshields, windows and visors",
+  "retro":"Mirrors, fairings and deflectors",
+  "extavant": "Front exterior",
+  "parechoc": "Bumper, grille and side skirt",
+  "optique": "Front optics and signalling",
+  "plaqueavant": "Front license plate",
+  "marchepieds": "Running boards, headlamps, front mud flap",
+  "rouesavant": "Front wheels and tires",
+  "reservoir": "Diesel and other tanks",
+  "extarr": "Rear exterior",
+  "calotte": "Hoods, splash guards and rear mud flaps",
+  "parechocarr": "Rear bumper, underride bars",
+  "plaquearr": "Rear license plate",
+  "feuxarr": "Rear lights and signals",
+  "rouesarr": "Rear wheels and tires",
+  "rouesecours": "Presence of spare wheel",
+  "commentaires": "Comments",
+  "at": "at",
+  "addgroup": "New group",
+  "addtask": "New task",
+  "numero": "Number"
+
 }

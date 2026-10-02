@@ -2,12 +2,15 @@ import 'package:appwrite/appwrite.dart';
 import 'package:parc_oto/datasources/parcoto_webservice.dart';
 import 'package:parc_oto/serializables/reparation/reparation.dart';
 
+import '../../admin_parameters.dart';
+
 class ReparationWebService extends ParcOtoWebService<Reparation> {
   ReparationWebService(super.data, super.collectionID, super.columnForSearch);
 
   @override
   fromJsonFunction(Map<String, dynamic> json) {
-    return Reparation.fromJson(json);
+
+      return Reparation.fromJson(json);
   }
 
   @override
@@ -91,12 +94,22 @@ class ReparationWebService extends ParcOtoWebService<Reparation> {
   int Function(
           MapEntry<String, Reparation> p1, MapEntry<String, Reparation> p2)?
       getComparisonFunction(int column, bool ascending) {
+    if(gts) {
+      return getComparisonFunctionGts(column, ascending);
+    }
+    else{
+      return getComparisonFunctionNormal(column, ascending);
+    }
+  }
+
+
+  int Function(MapEntry<String,Reparation>,MapEntry<String,Reparation>) getComparisonFunctionNormal(int column, bool ascending,) {
     int coef = ascending ? 1 : -1;
     switch (column) {
-      //matricule
+    //matricule
       case 0:
         return (d1, d2) => coef * d1.value.numero.compareTo(d2.value.numero);
-      //marque
+    //marque
       case 1:
         return (d1, d2) {
           if (d1.value.nchassi == null && d2.value.nchassi == null) {
@@ -106,15 +119,15 @@ class ReparationWebService extends ParcOtoWebService<Reparation> {
               (d1.value.nchassi ?? '')
                   .compareTo((d2.value.nchassi ?? ''));
         };
-        case 2:
-      return (d1, d2) {
-        if (d1.value.vehiculemat == null && d2.value.vehiculemat == null) {
-          return 0;
-        }
-        return coef *
-            (d1.value.vehiculemat ?? '')
-                .compareTo((d2.value.vehiculemat ?? ''));
-      };
+      case 2:
+        return (d1, d2) {
+          if (d1.value.vehiculemat == null && d2.value.vehiculemat == null) {
+            return 0;
+          }
+          return coef *
+              (d1.value.vehiculemat ?? '')
+                  .compareTo((d2.value.vehiculemat ?? ''));
+        };
       case 3:
         return (d1, d2) {
           if (d1.value.ficheReceptionNumber == null && d2.value.ficheReceptionNumber == null) {
@@ -142,10 +155,66 @@ class ReparationWebService extends ParcOtoWebService<Reparation> {
         return (d1, d2) {
           return coef * d1.value.getPrixTTC().compareTo(d2.value.getPrixTTC());
         };
-      //date modif
+    //date modif
       case 7:
         return (d1, d2) =>
-            coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
+        coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
+      default:
+        return (d1, d2) => coef * d1.value.numero.compareTo(d2.value.numero);
+    }
+  }
+  int Function(MapEntry<String,Reparation>,MapEntry<String,Reparation>) getComparisonFunctionGts(int column, bool ascending,) {
+    int coef = ascending ? 1 : -1;
+    switch (column) {
+    //matricule
+      case 0:
+        return (d1, d2) => coef * d1.value.numero.compareTo(d2.value.numero);
+    //marque
+      case 1:
+        return (d1, d2) {
+          if (d1.value.nchassi == null && d2.value.nchassi == null) {
+            return 0;
+          }
+          return coef *
+              (d1.value.nchassi ?? '')
+                  .compareTo((d2.value.nchassi ?? ''));
+        };
+      case 2:
+        return (d1, d2) {
+          if (d1.value.vehiculemat == null && d2.value.vehiculemat == null) {
+            return 0;
+          }
+          return coef *
+              (d1.value.vehiculemat ?? '')
+                  .compareTo((d2.value.vehiculemat ?? ''));
+        };
+      case 3:
+        return (d1, d2) {
+          if (d1.value.ficheReceptionNumber == null && d2.value.ficheReceptionNumber == null) {
+            return 0;
+          }
+          return coef *
+              (d1.value.ficheReceptionNumber ?? 0)
+                  .compareTo((d2.value.ficheReceptionNumber ?? 0));
+        };
+      case 4:
+        return (d1, d2) {
+          if (d1.value.prestatairenom == null &&
+              d2.value.prestatairenom == null) {
+            return 0;
+          }
+          return coef *
+              (d1.value.prestatairenom ?? '')
+                  .compareTo((d2.value.prestatairenom ?? ''));
+        };
+      case 5:
+        return (d1, d2) {
+          return coef * d1.value.date.compareTo(d2.value.date);
+        };
+    //date modif
+      case 6:
+        return (d1, d2) =>
+        coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
       default:
         return (d1, d2) => coef * d1.value.numero.compareTo(d2.value.numero);
     }

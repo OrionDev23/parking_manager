@@ -22,9 +22,9 @@ class DatabaseCounters {
       bool cont = true;
 
       while (cont) {
-        await DatabaseGetter.database!.listDocuments(
+        await DatabaseGetter.database!.listRows(
             databaseId: databaseId,
-            collectionId: vehiculeid,
+            tableId: vehiculeid,
             queries: [
               if (etat != -1) Query.equal('etatactuel', etat),
               Query.limit(1),
@@ -51,9 +51,9 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await DatabaseGetter.database!.listDocuments(
+      await DatabaseGetter.database!.listRows(
           databaseId: databaseId,
-          collectionId: vehiculeid,
+          tableId: vehiculeid,
           queries: [
             ...queries,
             Query.limit(1),
@@ -75,9 +75,9 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await DatabaseGetter.database!.listDocuments(
+      await DatabaseGetter.database!.listRows(
           databaseId: databaseId,
-          collectionId: chauffeurid,
+          tableId: chauffeurid,
           queries: [
             ...queries,
             Query.limit(1),
@@ -98,9 +98,9 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await DatabaseGetter.database!.listDocuments(
+      await DatabaseGetter.database!.listRows(
           databaseId: databaseId,
-          collectionId: chauffeurid,
+          tableId: chauffeurid,
           queries: [
             if (etat != -1) Query.equal('etat', etat),
             if (etat == -1) Query.notEqual('etat', 3),
@@ -123,9 +123,9 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await DatabaseGetter.database!.listDocuments(
+      await DatabaseGetter.database!.listRows(
           databaseId: databaseId,
-          collectionId: vehicDoc,
+          tableId: vehicDoc,
           queries: [
             Query.limit(1),
             Query.offset(result),
@@ -148,9 +148,9 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await DatabaseGetter.database!.listDocuments(
+      await DatabaseGetter.database!.listRows(
           databaseId: databaseId,
-          collectionId: chaufDoc,
+          tableId: chaufDoc,
           queries: [
             Query.limit(1),
             Query.offset(result),
@@ -173,9 +173,9 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await DatabaseGetter.database!.listDocuments(
+      await DatabaseGetter.database!.listRows(
           databaseId: databaseId,
-          collectionId: planningID,
+          tableId: planningID,
           queries: [
             Query.limit(1),
             Query.offset(result),
@@ -198,9 +198,9 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await DatabaseGetter.database!.listDocuments(
+      await DatabaseGetter.database!.listRows(
           databaseId: databaseId,
-          collectionId: activityId,
+          tableId: activityId,
           queries: [
             Query.limit(1),
             Query.offset(result),
@@ -223,9 +223,9 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await DatabaseGetter.database!.listDocuments(
+      await DatabaseGetter.database!.listRows(
           databaseId: databaseId,
-          collectionId: reparationId,
+          tableId: reparationId,
           queries: [
             Query.limit(1),
             Query.offset(result),
@@ -248,9 +248,9 @@ class DatabaseCounters {
     bool cont = true;
 
     while (cont) {
-      await DatabaseGetter.database!.listDocuments(
+      await DatabaseGetter.database!.listRows(
           databaseId: databaseId,
-          collectionId: prestataireId,
+          tableId: prestataireId,
           queries: [
             Query.limit(1),
             Query.offset(result),

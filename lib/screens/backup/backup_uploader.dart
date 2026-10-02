@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/models.dart';
+import 'package:appwrite/models.dart' hide Row;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -156,7 +156,7 @@ class BackupUploaderState extends State<BackupUploader> {
             mimeType: '',
             sizeOriginal: 10,
             chunksTotal: 10,
-            chunksUploaded: 10));
+            chunksUploaded: 10, encryption: false, compression: 'none'));
       }).then((value) {
         setState(() {
           progress = 80;
@@ -171,10 +171,10 @@ class BackupUploaderState extends State<BackupUploader> {
   }
 
   void updateDb() async {
-    await DatabaseGetter.database!.createDocument(
+    await DatabaseGetter.database!.createRow(
         databaseId: databaseId,
-        collectionId: backupId,
-        documentId: id!,
+        tableId: backupId,
+        rowId: id!,
         data: Backup(
           id: id!,
           vehicles: widget.vehicCount,

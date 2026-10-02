@@ -77,7 +77,7 @@ class VehiclesUtilities {
     if(vehiculeBrands.length>m){
       return vehiculeBrands[m];
     }
-    return "nind";
+    return "";
   }
 
   static int getGenreNumber(String? matricule){

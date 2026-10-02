@@ -4,7 +4,9 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../../../widgets/button_container.dart';
 import '../../../../../widgets/page_header.dart';
+import '../../../../admin_parameters.dart';
 import '../reparation_order_form/reparation_form.dart';
+import '../reparation_order_gts_form/reparation_form_gts.dart';
 import 'reparation_table.dart';
 import 'reparation_tabs.dart';
 
@@ -57,7 +59,7 @@ class ReparationGestionState extends State<ReparationGestion> {
       text: Text('nouvrepar'.tr()),
       semanticLabel: 'nouvrepar'.tr(),
       icon: const Icon(FluentIcons.document),
-      body: ReparationForm(
+      body: gts?ReparationFormGts(key:UniqueKey()):ReparationForm(
         key: UniqueKey(),
       ),
       onClosed: () {

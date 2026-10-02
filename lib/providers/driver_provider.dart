@@ -29,13 +29,13 @@ class DriverProvider extends ChangeNotifier {
     }
     downloadingConducteurs=true;
     conducteurs.clear();
-    await DatabaseGetter.database!.listDocuments(
+    await DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: chauffeurid,queries: [
+        tableId: chauffeurid,queries: [
       Query.limit(DatabaseGetter.limits['vehicles']??500)
     ]).then((value) {
-      for(int i=0;i<value.documents.length;i++){
-        conducteurs[value.documents[i].$id]=value.documents[i].convertTo(
+      for(int i=0;i<value.rows.length;i++){
+        conducteurs[value.rows[i].$id]=value.rows[i].convertTo(
                 (p0) => Conducteur.fromJson(p0 as Map<String,dynamic>));
       }
       downloadedConducteurs=true;
@@ -54,11 +54,11 @@ class DriverProvider extends ChangeNotifier {
     }
     downloadingDocuments=true;
     documentConducteurs.clear();
-    await DatabaseGetter.database!.listDocuments(
+    await DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: chaufDoc,queries: [Query.limit(5000)]).then((value) {
-      for(int i=0;i<value.documents.length;i++){
-        documentConducteurs[value.documents[i].$id]=value.documents[i].convertTo(
+        tableId: chaufDoc,queries: [Query.limit(5000)]).then((value) {
+      for(int i=0;i<value.rows.length;i++){
+        documentConducteurs[value.rows[i].$id]=value.rows[i].convertTo(
                 (p0) => DocumentChauffeur.fromJson(p0 as Map<String,dynamic>));
       }
       downloadedDocuments=true;
@@ -77,11 +77,11 @@ class DriverProvider extends ChangeNotifier {
     }
     downloadingDisp=true;
     disponibiliteConducteurs.clear();
-    await DatabaseGetter.database!.listDocuments(
+    await DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: chaufDispID,queries: [Query.limit(5000)]).then((value) {
-      for(int i=0;i<value.documents.length;i++){
-        disponibiliteConducteurs[value.documents[i].$id]=value.documents[i].convertTo(
+        tableId: chaufDispID,queries: [Query.limit(5000)]).then((value) {
+      for(int i=0;i<value.rows.length;i++){
+        disponibiliteConducteurs[value.rows[i].$id]=value.rows[i].convertTo(
                 (p0) => DisponibiliteChauffeur.fromJson(p0 as Map<String,dynamic>));
       }
       downloadedDisp=true;
@@ -161,16 +161,16 @@ class DriverProvider extends ChangeNotifier {
       }
     }
     else{
-      await DatabaseGetter.database!.listDocuments(
+      await DatabaseGetter.database!.listRows(
           databaseId: databaseId,
-          collectionId: chaufDoc,
+          tableId: chaufDoc,
           queries: [
             Query.lessThanEqual('date_expiration', dateToIntJson(expiration)),
             if (removedCondDocs.isNotEmpty)
               ...removedCondDocs.map((e) => Query.notEqual(r'$id', e))
           ]).then((value) {
-        for (int i = 0; i < value.documents.length; i++) {
-          result.add(value.documents[i].convertTo(
+        for (int i = 0; i < value.rows.length; i++) {
+          result.add(value.rows[i].convertTo(
                   (p0) => DocumentChauffeur.fromJson(p0 as Map<String, dynamic>)));
         }
       }).onError((AppwriteException error, stackTrace) {

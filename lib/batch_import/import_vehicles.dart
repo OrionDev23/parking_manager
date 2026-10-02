@@ -554,9 +554,9 @@ class _ImportVehiclesState extends State<ImportVehicles> {
       });
       Client client = Client()
         ..setEndpoint(endpoint)
-        ..setProject(project)
-        ..setKey(secretKey);
-      Databases databases = Databases(client);
+        ..setProject(project!)
+        ..setKey(secretKey!);
+      TablesDB databases = TablesDB(client);
       List<Future> tasks = [];
       importedVehicles.forEach((key, value) {
         if (value.selected) {
@@ -571,12 +571,12 @@ class _ImportVehiclesState extends State<ImportVehicles> {
     }
   }
 
-  Future<void> uploadVehicle(Vehicle v, Databases db) async {
+  Future<void> uploadVehicle(Vehicle v, TablesDB db) async {
     await db
-        .createDocument(
+        .createRow(
             databaseId: databaseId,
-            collectionId: vehiculeid,
-            documentId: v.id,
+            tableId: vehiculeid,
+            rowId: v.id,
             data: v.toJson())
         .then((value) {
       setState(() {

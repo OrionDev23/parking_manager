@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
+import '../clients/client_tabs.dart';
 import '../reparation/fiche_reception/manager/fiche_reception_tabs.dart';
 import '../reparation/reparation/manager/reparation_tabs.dart';
 import '../settings_gts.dart';
@@ -9,7 +10,6 @@ import '../workshop/parts/parts_management/parts_tabs.dart';
 import '../../admin_parameters.dart';
 import '../../main.dart';
 import 'sidemenu.dart';
-import '../workshop/my_repair.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/client_database.dart';
@@ -73,6 +73,7 @@ class PaneItemsAndFooters {
 
   initPanes() {
     dashboard = PaneItem(
+        key: Key("dashboard"),
         icon: Icon(
           FluentIcons.home,
           color: appTheme.color.lightest,
@@ -83,6 +84,7 @@ class PaneItemsAndFooters {
           style: paneTextStyle,
         ).tr());
     usermanagement = PaneItem(
+        key: Key("usermngmt"),
         title: Text(
           'usermanagement',
           style: paneTextStyle,
@@ -93,8 +95,9 @@ class PaneItemsAndFooters {
         ),
         body: const UserManagement());
     vehicles = PaneItemExpander(
+        key: Key("vehicles"),
         icon: Icon(
-          FluentIcons.car,
+          gts?Icons.local_shipping_outlined:Icons.directions_car,
           color: appTheme.color.lightest,
         ),
         title: Text(
@@ -148,6 +151,8 @@ class PaneItemsAndFooters {
         ],
         body: const VehicleDashboard());
     chauffeurs = PaneItemExpander(
+        key: Key("chauffeurs"),
+
         icon: Icon(
           FluentIcons.people,
           color: appTheme.color.lightest,
@@ -216,17 +221,6 @@ class PaneItemsAndFooters {
         style: paneTextStyle,
       ).tr(),
       items: [
-        PaneItem(
-          icon: Icon(
-            FluentIcons.repair,
-            color: appTheme.color.lightest,
-          ),
-          title: Text(
-            'localrepair',
-            style: paneTextStyle,
-          ).tr(),
-          body: const SelfRepair(),
-        ),
         PaneItemHeader(
             header: Text('inventaire',style: paneTextStyle,).tr()
         ),
@@ -302,6 +296,8 @@ class PaneItemsAndFooters {
       ],
     );
     evenements = PaneItem(
+        key: Key("events"),
+
         icon: Icon(
           FluentIcons.database_activity,
           color: appTheme.color.lightest,
@@ -312,6 +308,8 @@ class PaneItemsAndFooters {
         ).tr(),
         body: const LogActivityManagement());
     planner = PaneItem(
+        key: Key("planner"),
+
         icon: Icon(
           FluentIcons.event,
           color: appTheme.color.lightest,
@@ -322,6 +320,8 @@ class PaneItemsAndFooters {
         ).tr(),
         body: const PlanningManager());
     login = PaneItem(
+        key: Key("login"),
+
         icon: Icon(
           FluentIcons.signin,
           color: appTheme.color.lightest,
@@ -332,6 +332,7 @@ class PaneItemsAndFooters {
         ).tr(),
         body: const LoginScreen());
     logout = PaneItem(
+        key: Key("logout"),
         icon: Icon(
           FluentIcons.sign_out,
           color: appTheme.color.lightest,
@@ -342,6 +343,8 @@ class PaneItemsAndFooters {
         ).tr(),
         body: const LogoutScreen());
     parametres = PaneItem(
+      key: Key("settings"),
+
       icon: Icon(
         FluentIcons.settings,
         color: appTheme.color.lightest,
@@ -353,6 +356,8 @@ class PaneItemsAndFooters {
       body: gts?SettingsGTS(prefs):Settings(prefs),
     );
     entreprise = PaneItemExpander(
+        key: Key("company"),
+
         icon: Icon(
           FluentIcons.build_definition,
           color: appTheme.color.lightest,
@@ -402,6 +407,8 @@ class PaneItemsAndFooters {
           ),
         ]);
     reparations = PaneItemExpander(
+        key: Key("repairs"),
+
         icon: Icon(
           FluentIcons.repair,
           color: appTheme.color.lightest,
@@ -444,9 +451,22 @@ class PaneItemsAndFooters {
             ).tr(),
             body: const PrestataireTabs(),
           ),
+          PaneItem(
+            icon: Icon(
+              Icons.people_alt_outlined,
+              color: appTheme.color.lightest,
+            ),
+            title: Text(
+              'clients',
+              style: paneTextStyle,
+            ).tr(),
+            body: const ClientTabs(),
+          ),
         ],
         body: const ReparationDashboard());
     backup = PaneItem(
+      key: Key("backup"),
+
       icon: Icon(
         FluentIcons.save,
         color: appTheme.color.lightest,
@@ -458,6 +478,8 @@ class PaneItemsAndFooters {
       body: const BackupManager(),
     );
     tutorial = PaneItem(
+        key: Key("tutorials"),
+
         icon: Icon(
           FluentIcons.guid,
           color: appTheme.color.lightest,
@@ -486,7 +508,6 @@ class PaneItemsAndFooters {
         login,
       ];
     }
-
     footerItems = [
       PaneItemSeparator(),
       if (isAdmin && PanesListState.signedIn.value) entreprise,
@@ -496,6 +517,7 @@ class PaneItemsAndFooters {
       if (PanesListState.signedIn.value) tutorial,
     ];
   }
+
 
   static List<NavigationPaneItem> originalItems = List.empty(growable: true);
   static List<NavigationPaneItem> footerItems = List.empty(growable: true);

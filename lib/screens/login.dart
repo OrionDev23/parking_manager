@@ -1,5 +1,5 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/models.dart';
+import 'package:appwrite/models.dart' hide Row;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
@@ -243,6 +243,13 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
       project=projectName.text;
       DatabaseGetter();
       Future.delayed(const Duration(milliseconds: 300)).then((value) async{
+
+        try{
+          await DatabaseGetter.account!.deleteSessions();
+        }
+        catch(e){
+          //ignore
+        }
         await DatabaseGetter.account!.createEmailPasswordSession(
             email: email.text,
             password: password.text)

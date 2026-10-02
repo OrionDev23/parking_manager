@@ -22,11 +22,11 @@ class LogProvider extends ChangeNotifier {
     }
     downloadingActivities=true;
     activities.clear();
-    await DatabaseGetter.database!.listDocuments(
+    await DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: activityId,queries: [Query.limit(5000)]).then((value) {
-      for(int i=0;i<value.documents.length;i++){
-        activities[value.documents[i].$id]=value.documents[i].convertTo(
+        tableId: activityId,queries: [Query.limit(5000)]).then((value) {
+      for(int i=0;i<value.rows.length;i++){
+        activities[value.rows[i].$id]=value.rows[i].convertTo(
                 (p0) => Activity.fromJson(p0 as Map<String,dynamic>));
       }
       downloadedActivities=true;

@@ -166,8 +166,8 @@ class MyApp extends StatelessWidget {
             locale: appTheme.locale,
             builder: (context, child) {
               return NavigationPaneTheme(
-                data: const NavigationPaneThemeData(
-                  backgroundColor: null,
+                data: NavigationPaneThemeData(
+                  backgroundColor: appTheme.mode==ThemeMode.dark?Colors.grey[220]:Colors.white,
                 ),
                 child: child!,
               );

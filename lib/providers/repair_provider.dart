@@ -1,10 +1,13 @@
 import 'package:appwrite/appwrite.dart' hide Client;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
+import 'package:parc_oto/pdf_generation/pdf_theming.dart';
 import 'package:parc_oto/serializables/client.dart';
 import 'package:parc_oto/serializables/reparation/reparation.dart';
+import 'package:parc_oto/utilities/vehicle_util.dart';
 
 import '../serializables/reparation/fiche_reception.dart';
+import '../serializables/vehicle/vehicle.dart';
 import '../utilities/profil_beautifier.dart';
 import 'client_database.dart';
 
@@ -34,11 +37,11 @@ class RepairProvider extends ChangeNotifier {
     }
     downloadingReparations=true;
     reparations.clear();
-    await DatabaseGetter.database!.listDocuments(
+    await DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: reparationId,queries: [Query.limit(5000)]).then((value) {
-      for(int i=0;i<value.documents.length;i++){
-        reparations[value.documents[i].$id]=value.documents[i].convertTo(
+        tableId: reparationId,queries: [Query.limit(5000)]).then((value) {
+      for(int i=0;i<value.rows.length;i++){
+        reparations[value.rows[i].$id]=value.rows[i].convertTo(
                 (p0) => Reparation.fromJson(p0 as Map<String,dynamic>));
       }
       downloadedReparations=true;
@@ -57,11 +60,11 @@ class RepairProvider extends ChangeNotifier {
     }
     downloadingPrestataires=true;
     prestataires.clear();
-    await DatabaseGetter.database!.listDocuments(
+    await DatabaseGetter.database!.listRows(
         databaseId: databaseId,
-        collectionId: reparationId,queries: [Query.limit(5000)]).then((value) {
-      for(int i=0;i<value.documents.length;i++){
-        prestataires[value.documents[i].$id]=value.documents[i].convertTo(
+        tableId: reparationId,queries: [Query.limit(5000)]).then((value) {
+      for(int i=0;i<value.rows.length;i++){
+        prestataires[value.rows[i].$id]=value.rows[i].convertTo(
                 (p0) => Client.fromJson(p0 as Map<String,dynamic>));
       }
       downloadedPrestataires=true;
@@ -104,11 +107,11 @@ class RepairProvider extends ChangeNotifier {
   static Future<Map<String,List<FicheReception>>> downloadFicheReparations()async {
 
 
-    await DatabaseGetter.database!.listDocuments(
+    await DatabaseGetter.database!.listRows(
       databaseId: databaseId,
-      collectionId: fichesreceptionId,
+      tableId: fichesreceptionId,
     ).then((value) {
-      for(var doc in value.documents){
+      for(var doc in value.rows){
         FicheReception rep=doc.convertTo((p0) => FicheReception.fromJson(p0 as
         Map<String,dynamic>));
         if(!repPerVeh.containsKey(rep.vehicule)){
@@ -123,6 +126,8 @@ class RepairProvider extends ChangeNotifier {
 
     return {};
   }
+
+
 
 
   static List<Map<String,dynamic>> prepareVehicRepList(Map<String,
@@ -146,6 +151,30 @@ class RepairProvider extends ChangeNotifier {
     return result;
   }
 
+  static List<Map<String,dynamic>> prepareListVehicleImmob(Map<String,
+      List<FicheReception>> repPerVeh,List<Vehicle> vehicles){
+
+    List<Map<String,dynamic>> result=[];
+
+    for(int i=0;i<vehicles.length;i++){
+      DateTime? d=repPerVeh.containsKey(vehicles[i].matricule)?getLast(repPerVeh[vehicles[i].matricule]!):null;
+
+      double immobil=repPerVeh.containsKey(vehicles[i].matricule)?getImmobilisation(repPerVeh[vehicles[i].matricule]!):0;
+      result.add({
+        'vehicule':vehicles[i].matricule,
+        'modele':"${VehiclesUtilities.getMarqueName(vehicles[i].marque)} ${vehicles[i].type=="nonind"?"":vehicles[i].type ?? ""}",
+        'nbr. rep':repPerVeh.containsKey(vehicles[i].matricule)?repPerVeh[vehicles[i].matricule]!.length:0,
+        'immob':immobil==0?"0 jours (0 heures)":"${numberFormat2.format(immobil/24)} jours ($immobil heures",
+        'dern. rep':d==null?'':DateFormat('EEE, d/M/y').format(d)
+      });
+    }
+    result.sort((a,b){
+      return -a['immob'].compareTo(b['immob']);
+    });
+
+    return result;
+  }
+
   static double getCost(List<FicheReception> reps){
     double result=0;
     for(var r in reps){
@@ -153,6 +182,17 @@ class RepairProvider extends ChangeNotifier {
     }
     return result;
   }
+
+  static double getImmobilisation(List<FicheReception> reps,){
+    double result=0;
+    for(var r in reps){
+      result+=(r.dateSortie??DateTime.now()).difference(r.dateEntre).inHours;
+    }
+    return result;
+  }
+
+
+
   static DateTime? getLast(List<FicheReception>reps){
     DateTime? d;
     for(var r in reps){
@@ -221,15 +261,15 @@ class RepairProvider extends ChangeNotifier {
       }
     }
     else{
-      await DatabaseGetter.database!.listDocuments(
+      await DatabaseGetter.database!.listRows(
           databaseId: databaseId,
-          collectionId: reparationId,
+          tableId: reparationId,
           queries: [
             Query.greaterThanEqual('date', dateToIntJson(start)),
             Query.lessThanEqual('date', dateToIntJson(end)),
           ]).then((value) {
-        for (int i = 0; i < value.documents.length; i++) {
-          result.add(value.documents[i].convertTo(
+        for (int i = 0; i < value.rows.length; i++) {
+          result.add(value.rows[i].convertTo(
                   (p0) => Reparation.fromJson(p0 as Map<String, dynamic>)));
         }
       }).onError((error, stackTrace) {
@@ -247,10 +287,10 @@ class RepairProvider extends ChangeNotifier {
       return null;
     }
     return await DatabaseGetter.database!
-        .getDocument(
+        .getRow(
         databaseId: databaseId,
-        collectionId: prestataireId,
-        documentId: docID)
+        tableId: prestataireId,
+        rowId: docID)
         .then((value) {
       return value
           .convertTo((p0) => Client.fromJson(p0 as Map<String, dynamic>));
@@ -267,10 +307,10 @@ class RepairProvider extends ChangeNotifier {
       return null;
     }
     return await DatabaseGetter.database!
-        .getDocument(
+        .getRow(
         databaseId: databaseId,
-        collectionId: fichesreceptionId,
-        documentId: docID)
+        tableId: fichesreceptionId,
+        rowId: docID)
         .then((value) {
       return value
           .convertTo((p0) => FicheReception.fromJson(p0 as Map<String, dynamic>));
@@ -285,10 +325,10 @@ class RepairProvider extends ChangeNotifier {
       return null;
     }
     return await DatabaseGetter.database!
-        .getDocument(
+        .getRow(
         databaseId: databaseId,
-        collectionId: reparationId,
-        documentId: docID)
+        tableId: reparationId,
+        rowId: docID)
         .then((value) {
       return value
           .convertTo((p0) => Reparation.fromJson(p0 as Map<String, dynamic>));

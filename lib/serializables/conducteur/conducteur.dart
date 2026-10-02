@@ -63,6 +63,10 @@ class Conducteur extends ParcOtoDefault {
           '${dateNaissance?.toIso8601String()??''} $telephone $profession ${service?'service':'fonction'}';
   }
 
+  String getName(){
+    return "$name $prenom";
+  }
+
   factory Conducteur.fromJson(Map<String, dynamic> json) =>
       _$ConducteurFromJson(json);
 

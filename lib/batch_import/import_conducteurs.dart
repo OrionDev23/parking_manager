@@ -354,9 +354,9 @@ class _ImportConducteursState extends State<ImportConducteurs> {
       });
       Client client = Client()
         ..setEndpoint(endpoint)
-        ..setProject(project)
-        ..setKey(secretKey);
-      Databases databases = Databases(client);
+        ..setProject(project!)
+        ..setKey(secretKey!);
+      TablesDB databases = TablesDB(client);
       List<Future> tasks = [];
       importedConducteurs.forEach((key, value) {
         if (value.selected) {
@@ -371,12 +371,12 @@ class _ImportConducteursState extends State<ImportConducteurs> {
     }
   }
 
-  Future<void> uploadConducteur(Conducteur c, Databases db) async {
+  Future<void> uploadConducteur(Conducteur c, TablesDB db) async {
     await db
-        .createDocument(
+        .createRow(
             databaseId: databaseId,
-            collectionId: chauffeurid,
-            documentId: c.id,
+            tableId: chauffeurid,
+            rowId: c.id,
             data: c.toJson())
         .then((value) {
       setState(() {

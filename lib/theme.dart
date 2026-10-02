@@ -221,7 +221,7 @@ class AppTheme extends ChangeNotifier {
   Locale? get locale => _locale;
 
   set locale(Locale? locale) {
-    DatabaseGetter.client?.setLocale(locale?.languageCode);
+    DatabaseGetter.client?.setLocale(locale!.languageCode);
     _locale = locale;
     notifyListeners();
   }
@@ -321,14 +321,14 @@ AccentColor get systemAccentColor {
           defaultTargetPlatform == TargetPlatform.android) &&
       !kIsWeb) {
     return AccentColor.swatch({
-      'darkest': ThemeColors.orange.darkest,
-      'darker': ThemeColors.orange.darker,
-      'dark': ThemeColors.orange.dark,
-      'normal': ThemeColors.orange,
-      'light': ThemeColors.orange.light,
-      'lighter': ThemeColors.orange.lighter,
-      'lightest': ThemeColors.orange.lightest,
+      'darkest': ThemeColors.red.darkest,
+      'darker': ThemeColors.red.darker,
+      'dark': ThemeColors.red.dark,
+      'normal': ThemeColors.red,
+      'light': ThemeColors.red.light,
+      'lighter': ThemeColors.red.lighter,
+      'lightest': ThemeColors.red.lightest,
     });
   }
-  return Colors.orange;
+  return Colors.red;
 }

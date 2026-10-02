@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:parc_oto/serializables/parc_oto_serializable.dart';
+import 'package:parc_oto/serializables/reparation/task_group.dart';
 import 'package:parc_oto/utilities/profil_beautifier.dart';
 
 import 'designation.dart';
@@ -41,6 +42,8 @@ class Reparation extends ParcOtoDefault {
 
   @JsonKey(toJson: designationsToJson, fromJson: designationsFromJson)
   List<Designation>? designations;
+  @JsonKey(toJson: tasksToJson, fromJson: tasksFromJson)
+  List<TaskGroup>? tasks;
 
   Reparation({
     required super.id,
@@ -61,6 +64,7 @@ class Reparation extends ParcOtoDefault {
     this.remarque,
     this.vehicule,
     this.vehiculemat,
+    this.tasks,
   }) {
     search = "$id "
         "$ficheReceptionNumber "

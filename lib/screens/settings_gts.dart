@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../theme.dart';
-import '../utilities/theme_colors.dart';
 import '../widgets/page.dart';
 import '../widgets/page_header.dart';
 
@@ -134,38 +133,4 @@ class SettingsGTS extends ScrollablePage {
     ];
   }
 
-  Widget _buildColorBlock(AppTheme appTheme, AccentColor color, int index) {
-    return Padding(
-      padding: const EdgeInsets.all(2.0),
-      child: Button(
-        onPressed: () {
-          prefs.setInt('color', index);
-          appTheme.color = color;
-        },
-        style: ButtonStyle(
-          padding: ButtonState.all(EdgeInsets.zero),
-          backgroundColor: ButtonState.resolveWith((states) {
-            if (states.isPressing) {
-              return color.light;
-            } else if (states.isHovering) {
-              return color.lighter;
-            }
-            return color;
-          }),
-        ),
-        child: Container(
-          height: 40,
-          width: 40,
-          alignment: AlignmentDirectional.center,
-          child: appTheme.color == color
-              ? Icon(
-            FluentIcons.check_mark,
-            color: color.basedOnLuminance(),
-            size: 22.0,
-          )
-              : null,
-        ),
-      ),
-    );
-  }
 }

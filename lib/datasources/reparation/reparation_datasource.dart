@@ -1,8 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/material.dart';
+import '../../admin_parameters.dart';
 import '../../screens/reparation/reparation/manager/reparation_tabs.dart';
 import '../../screens/reparation/reparation/reparation_order_form/reparation_form.dart';
+import '../../screens/reparation/reparation/reparation_order_gts_form/reparation_form_gts.dart';
 import '../parcoto_datasource.dart';
 import 'reparation_webservice.dart';
 
@@ -54,6 +56,7 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation> {
           SelectableText(element.value.prestatairenom ?? '', style: rowTextStyle)),
       DataCell(SelectableText(dateFormat2.format(element.value.date),
           style: rowTextStyle)),
+      if(!gts)
       DataCell(SelectableText(
         numberFormat2.format(element.value.getPrixTTC()),
         style: rowTextStyle,
@@ -82,7 +85,9 @@ class ReparationDataSource extends ParcOtoDatasource<Reparation> {
                                 semanticLabel:
                                     '${'mod'.tr()} ${element.value.numero}',
                                 icon: const Icon(f.FluentIcons.edit),
-                                body: ReparationForm(
+                                body: gts?ReparationFormGts(
+                                  reparation: element.value,
+                                  key: UniqueKey(),):ReparationForm(
                                   reparation: element.value,
                                   key: UniqueKey(),
                                 ),

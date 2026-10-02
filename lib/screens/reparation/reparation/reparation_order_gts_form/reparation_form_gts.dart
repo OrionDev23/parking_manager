@@ -2,6 +2,8 @@ import 'package:appwrite/appwrite.dart' hide Client;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
+import 'package:parc_oto/screens/reparation/reparation/reparation_order_gts_form/task_group_widget.dart';
+import 'package:parc_oto/serializables/reparation/task_group.dart';
 import '../../../../providers/client_database.dart';
 import '../../../../providers/repair_provider.dart';
 import '../../../../providers/vehicle_provider.dart';
@@ -9,41 +11,33 @@ import '../../../../serializables/reparation/fiche_reception.dart';
 import '../../../entreprise/entreprise.dart';
 import '../../../prestataire/prestataire_table.dart';
 import '../../fiche_reception/manager/fiche_reception_table.dart';
-import 'entretien_widget.dart';
 import '../../../../serializables/client.dart';
-import '../../../../serializables/reparation/etat_vehicle.dart';
 import '../../../../theme.dart';
 import '../../../../widgets/big_title_form.dart';
-import '../../../../widgets/zone_box.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../../pdf_generation/pdf_preview_custom.dart';
 import '../../../../pdf_generation/pdf_theming.dart' as pdf_theme;
-import '../../../../serializables/reparation/designation.dart';
-import '../../../../serializables/reparation/entretien_vehicle.dart';
 import '../../../../serializables/reparation/reparation.dart';
 import '../../../../serializables/vehicle/vehicle.dart';
 import '../../../../utilities/vehicle_util.dart';
 import '../../../../widgets/empty_table_widget.dart';
-import 'designation_reparation.dart';
-import 'entreprise_placement.dart';
+import '../reparation_order_form/entreprise_placement.dart';
 
-class ReparationForm extends StatefulWidget {
+class ReparationFormGts extends StatefulWidget {
   final Reparation? reparation;
 
-  const ReparationForm({required super.key, this.reparation});
+  const ReparationFormGts({required super.key, this.reparation});
 
   @override
-  State<ReparationForm> createState() => ReparationFormState();
+  State<ReparationFormGts> createState() => ReparationFormGtsState();
 }
 
-class ReparationFormState extends State<ReparationForm>
-    with AutomaticKeepAliveClientMixin<ReparationForm> {
+class ReparationFormGtsState extends State<ReparationFormGts>
+    with AutomaticKeepAliveClientMixin<ReparationFormGts> {
   static Map<Key, int> reservedOrders = {};
 
-  EntretienVehicle entretienVehicle = EntretienVehicle();
-  EtatVehicle etatVehicle = EtatVehicle();
   TextEditingController numOrdre = TextEditingController();
   DateTime selectedDate = DateTime.now();
 
@@ -66,9 +60,6 @@ class ReparationFormState extends State<ReparationForm>
   double carburant = 4;
 
   TextEditingController remarqueEntretien = TextEditingController();
-
-  bool showEtretient = true;
-
   @override
   void initState() {
     if (widget.reparation != null) {
@@ -83,7 +74,6 @@ class ReparationFormState extends State<ReparationForm>
     if (widget.reparation != null) {
       documentID = widget.reparation!.id;
       assigningOrederNumber = true;
-      entretienVehicle = widget.reparation!.entretien ?? EntretienVehicle();
       remarqueEntretien.text = widget.reparation!.remarque ?? '';
       numOrdre.text = widget.reparation!.numero.toString();
       reservedOrders[widget.key!] = widget.reparation!.numero;
@@ -91,10 +81,10 @@ class ReparationFormState extends State<ReparationForm>
       nchassi.text = widget.reparation!.nchassi ?? '';
       selectedDate = widget.reparation!.date;
       designations =
-          List.generate(widget.reparation!.designations?.length ?? 0, (index) {
-        return DesignationReparation(
+          List.generate(widget.reparation!.tasks?.length ?? 0, (index) {
+        return TaskGroupWidget(
             key: UniqueKey(),
-            designation: widget.reparation!.designations![index]);
+            taskGroup: widget.reparation!.tasks![index]);
       });
       setState(() {
         assigningOrederNumber = false;
@@ -453,59 +443,6 @@ class ReparationFormState extends State<ReparationForm>
                   ],
                 ),
                 smallSpace,
-                BigTitleForm(
-                  bigTitle: 'entretienvehicule',
-                  littleTitle: 'selectentretien',
-                  trailing: Row(
-                    children: [
-                      const Text('afficherquestion').tr(),
-                      smallSpace,
-                      ToggleSwitch(
-                          checked: showEtretient,
-                          onChanged: (s) {
-                            setState(() {
-                              showEtretient = s;
-                            });
-                          }),
-                    ],
-                  ),
-                ),
-                if (showEtretient)
-                  Container(
-                    height: 260.px,
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      border: Border.all(),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        EntretienWidget(entretienVehicle: entretienVehicle),
-                        bigSpace,
-                        SizedBox(
-                          height: 180.px,
-                          width: 400.px,
-                          child: ZoneBox(
-                            label: 'remarqueplus'.tr(),
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: TextBox(
-                                controller: remarqueEntretien,
-                                placeholder: 'remarqueplus'.tr(),
-                                maxLines: 4,
-                                placeholderStyle: placeStyle,
-                                style: appTheme.writingStyle,
-                                cursorColor: appTheme.color.darker,
-                                decoration: WidgetStatePropertyAll(
-                                    BoxDecoration(color: appTheme.fillColor)),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                smallSpace,
                 const BigTitleForm(
                   bigTitle: 'travaileffect',
                   littleTitle: 'ajoutertaches',
@@ -564,18 +501,20 @@ class ReparationFormState extends State<ReparationForm>
   @override
   bool get wantKeepAlive => true;
 
-  List<DesignationReparation> designations = List.empty(growable: true);
+  List<TaskGroupWidget> designations = List.empty(growable: true);
 
   void addDesignation() {
-    designations.add(DesignationReparation(
-        key: UniqueKey(), designation: Designation(designation: '')));
+    designations.add(TaskGroupWidget(key:UniqueKey(),taskGroup: TaskGroup(numero: '',tasks: [''],time: 0,)));
     setState(() {});
   }
 
   Widget designationTable(AppTheme appTheme) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(),
+        border: Border(
+          top: BorderSide(color: appTheme.color.darkest),
+          bottom: BorderSide(color: appTheme.color.darkest),
+        ),
       ),
       padding: const EdgeInsets.all(10),
       child: Column(
@@ -591,47 +530,44 @@ class ReparationFormState extends State<ReparationForm>
                     child: const Text('delete').tr()),
                 smallSpace,
                 FilledButton(
-                    onPressed: addDesignation, child: const Text('add').tr()),
+                    onPressed: addDesignation, child: const Text('addgroup').tr()),
               ],
             ),
           ),
           smallSpace,
           Container(
             decoration: BoxDecoration(
-              color: appTheme.color.lightest,
+              color: appTheme.color.darkest,
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(5)),
             ),
             padding: const EdgeInsets.all(5),
             child: Table(
               columnWidths: const {
-                0: FlexColumnWidth(3),
-                1: FlexColumnWidth(),
-                2: FlexColumnWidth(),
-                3: FlexColumnWidth(),
+                0: FlexColumnWidth(1),
+                1: FlexColumnWidth(3),
+                2: FlexColumnWidth(9),
+                3: FlexColumnWidth(3),
               },
               children: [
                 TableRow(children: [
+
+                  TableCell(child: SizedBox()),
+                  TableCell(
+                      child: const Text(
+                    'numero',
+                    textAlign: TextAlign.start,
+                  ).tr()),
                   TableCell(
                       child: const Text(
                     'desi',
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.start,
                   ).tr()),
                   TableCell(
                       child: const Text(
-                    'qte',
+                    '',
                     textAlign: TextAlign.center,
-                  ).tr()),
-                  TableCell(
-                      child: const Text(
-                    'TVA',
-                    textAlign: TextAlign.center,
-                  ).tr()),
-                  TableCell(
-                      child: const Text(
-                    'prix',
-                    textAlign: TextAlign.center,
-                  ).tr()),
+                  )),
                 ]),
               ],
             ),
@@ -657,7 +593,7 @@ class ReparationFormState extends State<ReparationForm>
 
   bool selectedDesignationsExist() {
     for (int i = 0; i < designations.length; i++) {
-      if (designations[i].designation.selected) {
+      if (designations[i].taskGroup.selected) {
         return true;
       }
     }
@@ -665,9 +601,9 @@ class ReparationFormState extends State<ReparationForm>
   }
 
   void deleteAllSelected() {
-    List<DesignationReparation> temp = List.from(designations);
+    List<TaskGroupWidget> temp = List.from(designations);
     for (int i = 0; i < temp.length; i++) {
-      if (temp[i].designation.selected) {
+      if (temp[i].taskGroup.selected) {
         designations.remove(temp[i]);
       }
     }
@@ -682,27 +618,26 @@ class ReparationFormState extends State<ReparationForm>
           color: index % 2 == 0 ? appTheme.fillColor : null,
         ),
         clipBehavior: Clip.antiAlias,
-        child: Column(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            Column(
               children: [
+                SizedBox(height: 65.px,),
+
                 Checkbox(
-                    checked: designations[index].designation.selected,
+                    checked: designations[index].taskGroup.selected,
                     onChanged: (s) {
                       setState(() {
-                        designations[index].designation.selected = s ?? false;
+                        designations[index].taskGroup.selected = s ?? false;
                       });
                     }),
-                smallSpace,
-                Flexible(
-                  child: SizedBox(
-                    height: 35.px,
-                    child: designations[index],
-                  ),
-                ),
               ],
             ),
             smallSpace,
+            Flexible(
+              child: designations[index],
+            ),
           ],
         ),
       );
@@ -719,15 +654,15 @@ class ReparationFormState extends State<ReparationForm>
         numero: int.parse(numOrdre.text),
         ficheReception: selectedFicheReception?.id??'',
         date: selectedDate,
-        designations: designations.map((e) => e.designation).toList(),
-        entretien: entretienVehicle,
+        tasks: designations.map((e) => e.taskGroup).toList(),
         nchassi: nchassi.text,
-        showEntretien: showEtretient,
-        prestataire: selectedPrest?.id,
+      showEntretien: false,
+
+      prestataire: selectedPrest?.id,
         prestatairenom: selectedPrest?.nom,
         vehicule: selectedVehicle?.id,
         vehiculemat: selectedVehicle?.matricule,
-        remarque: remarqueEntretien.text, ficheReceptionNumber: selectedFicheReception?.numero??0,);
+       ficheReceptionNumber: selectedFicheReception?.numero??0,);
 
     showDialog(
         context: context,
@@ -771,15 +706,14 @@ class ReparationFormState extends State<ReparationForm>
         id: documentID!,
         numero: int.parse(numOrdre.text),
         date: selectedDate,
-        designations: designations.map((e) => e.designation).toList(),
-        entretien: entretienVehicle,
-        showEntretien: showEtretient,
+        tasks: designations.map((e) => e.taskGroup).toList(),
         nchassi: nchassi.text,
+        showEntretien: false,
         prestataire: selectedPrest?.id,
         prestatairenom: selectedPrest?.nom,
         vehicule: selectedVehicle?.id,
         vehiculemat: selectedVehicle?.matricule,
-        remarque: remarqueEntretien.text, ficheReception: selectedFicheReception?.id??'', ficheReceptionNumber: selectedFicheReception?.numero??0,);
+      ficheReception: selectedFicheReception?.id??'', ficheReceptionNumber: selectedFicheReception?.numero??0,);
 
     if (!modif) {
       await Future.wait([

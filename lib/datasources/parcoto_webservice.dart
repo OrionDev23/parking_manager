@@ -27,7 +27,7 @@ abstract class ParcOtoWebService<T> {
     return getSearchResult(
             searchKey, filters ?? {}, count, startingAt, sortedBy, sortedAsc)
         .then((value) {
-      for (var element in value.documents) {
+      for (var element in value.rows) {
         if (!testIfElementContained(element.$id)) {
           data.add(MapEntry(element.$id, element.convertTo<T>((p0) {
             return fromJsonFunction(p0 as Map<String, dynamic>);
@@ -41,7 +41,7 @@ abstract class ParcOtoWebService<T> {
       result.sort(getComparisonFunction(sortedBy, sortedAsc));
 
       return ParcOtoWebServiceResponse<T>(
-          value.total, result.skip(startingAt).take(value.documents.length)
+          value.total, result.skip(startingAt).take(value.rows.length)
           .toList());
     }).onError((error, stackTrace) {
       if (kDebugMode) {
@@ -59,7 +59,7 @@ abstract class ParcOtoWebService<T> {
 
   T fromJsonFunction(Map<String, dynamic> json);
 
-  Future<DocumentList> getSearchResult(
+  Future<RowList> getSearchResult(
     String? searchKey,
     Map<String, String> filters,
     int count,
@@ -68,22 +68,22 @@ abstract class ParcOtoWebService<T> {
     bool sortedAsc,
   ) async {
     if (searchKey != null && searchKey.isNotEmpty) {
-      late DocumentList d;
+      late RowList d;
       for (int i = 0; i < columnForSearch; i++) {
-        d = await DatabaseGetter.database!.listDocuments(
+        d = await DatabaseGetter.database!.listRows(
             databaseId: databaseId,
-            collectionId: collectionID,
+            tableId: collectionID,
             queries: getQueriesForSearch(
                 searchKey, filters, count, startingAt, sortedBy, sortedAsc, i));
-        if (d.documents.isNotEmpty) {
+        if (d.rows.isNotEmpty) {
           break;
         }
       }
       return d;
     } else {
-      return await DatabaseGetter.database!.listDocuments(
+      return await DatabaseGetter.database!.listRows(
           databaseId: databaseId,
-          collectionId: collectionID,
+          tableId: collectionID,
           queries: getQueries(filters, count, startingAt, sortedBy, sortedAsc));
     }
   }

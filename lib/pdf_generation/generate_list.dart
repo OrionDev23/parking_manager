@@ -206,7 +206,9 @@ class List2PDF {
             ),
           ),
         );
-      } else if (keysToInclude[i].toUpperCase().contains('DIRECTION')) {
+      }
+      else if (keysToInclude[i].toUpperCase().contains('DIRECTION'))
+      {
         wids.add(
           Padding(
             padding: index == list.length - 1 && nbrLines <= 4
@@ -220,7 +222,8 @@ class List2PDF {
             ),
           ),
         );
-      } else if (keysToInclude[i].toUpperCase().contains('APPARTENANCE')) {
+      }
+      else if (keysToInclude[i].toUpperCase().contains('APPARTENANCE')) {
         wids.add(
           Padding(
             padding: index == list.length - 1 && nbrLines <= 4
@@ -349,7 +352,7 @@ class List2PDF {
             Image(entrepriseLogo!,
                 width: PdfPageFormat.cm * 3,
                 height: PdfPageFormat.cm * 3,
-                fit: BoxFit.fitWidth,
+                fit: BoxFit.contain,
                 alignment: Alignment.topCenter),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 0, 20),

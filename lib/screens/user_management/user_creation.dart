@@ -1,6 +1,6 @@
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:dart_appwrite/dart_appwrite.dart';
-import 'package:dart_appwrite/models.dart';
+import 'package:dart_appwrite/models.dart' hide Row;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
@@ -408,8 +408,8 @@ class _UserFormState extends State<UserForm> {
           .inMilliseconds.abs().toString();
       client = Client()
         ..setEndpoint(endpoint)
-        ..setProject(project)
-        ..setKey(secretKey);
+        ..setProject(project!)
+        ..setKey(secretKey!);
       await addUserToUsersList().then((value) async {
         ParcUser newme = ParcUser(
           email: email.text,

@@ -2111,10 +2111,10 @@ class _VehicleFormState extends State<VehicleForm>
 
   Future<void> updateVehicle(Vehicle vehicle) async {
     await DatabaseGetter.database!
-        .updateDocument(
+        .updateRow(
           databaseId: databaseId,
-          collectionId: vehiculeid,
-          documentId: documentID!,
+          tableId: vehiculeid,
+          rowId: documentID!,
           data: vehicle.toJson(),
         )
         .then((value) {})
@@ -2128,10 +2128,10 @@ class _VehicleFormState extends State<VehicleForm>
 
   Future<void> createVehicle(Vehicle vehicle) async {
     await DatabaseGetter.database!
-        .createDocument(
+        .createRow(
           databaseId: databaseId,
-          collectionId: vehiculeid,
-          documentId: documentID!,
+          tableId: vehiculeid,
+          rowId: documentID!,
           data: vehicle.toJson(),
         )
         .then((value) {})

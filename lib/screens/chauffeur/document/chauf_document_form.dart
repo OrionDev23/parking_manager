@@ -58,8 +58,8 @@ class CDocumentFormState extends State<CDocumentForm>
   void downloadChauffeur(String id) async {
     loadingConducteur = true;
     await DatabaseGetter.database!
-        .getDocument(
-            databaseId: databaseId, collectionId: chauffeurid, documentId: id)
+        .getRow(
+            databaseId: databaseId, tableId: chauffeurid, rowId: id)
         .then((value) {
       if (value.data.isNotEmpty) {
         selectedConducteur = value
@@ -269,18 +269,18 @@ class CDocumentFormState extends State<CDocumentForm>
           dateExpiration: selectedDate,
           createdBy: DatabaseGetter.me.value?.id);
       if (widget.dc != null) {
-        await DatabaseGetter.database!.updateDocument(
+        await DatabaseGetter.database!.updateRow(
             databaseId: databaseId,
-            collectionId: chaufDoc,
-            documentId: documentID!,
+            tableId: chaufDoc,
+            rowId: documentID!,
             data: dv.toJson());
         DatabaseGetter()
             .ajoutActivity(24, documentID!, docName: dv.chauffeurNom);
       } else {
-        await DatabaseGetter.database!.createDocument(
+        await DatabaseGetter.database!.createRow(
             databaseId: databaseId,
-            collectionId: chaufDoc,
-            documentId: documentID!,
+            tableId: chaufDoc,
+            rowId: documentID!,
             data: dv.toJson());
         DatabaseGetter()
             .ajoutActivity(23, documentID!, docName: dv.chauffeurNom);

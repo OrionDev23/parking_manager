@@ -488,10 +488,10 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
 
   void changePerimeter(MapEntry<String,Vehicle> element,int
   perimeter) async{
-      await DatabaseGetter.database?.updateDocument(
+      await DatabaseGetter.database?.updateRow(
           databaseId: databaseId,
-          collectionId: vehiculeid,
-          documentId: element.key,
+          tableId: vehiculeid,
+          rowId: element.key,
           data: {
             'perimetre':perimeter
           }

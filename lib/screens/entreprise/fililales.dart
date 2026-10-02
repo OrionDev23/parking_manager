@@ -436,10 +436,10 @@ class MesFillialesState extends State<MesFilliales> {
     }
     Navigator.of(context).pop();
     await DatabaseGetter.database!
-        .updateDocument(
+        .updateRow(
         databaseId: databaseId,
-        collectionId: entrepriseid,
-        documentId: MyEntrepriseState.p!.id,
+        tableId: entrepriseid,
+        rowId: MyEntrepriseState.p!.id,
         data: {
           if(widget.type==1)
           'directions':MyEntrepriseState.p!.directions,
