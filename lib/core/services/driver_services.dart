@@ -2,6 +2,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/local/drivers/sqlite_driver_source.dart';
 import '../../data/repositories/driver_repository_impl.dart';
+import '../../data/remote/drivers/appwrite_driver_source.dart';
+import '../backend/appwrite_backend.dart';
+import '../backend/backend_config.dart';
 import '../../domain/entities/driver.dart' as domain;
 import '../../domain/repositories/driver_repository.dart';
 import '../database/local_database.dart';
@@ -36,6 +39,20 @@ class DriverServices {
       localDatabase,
       companyId: companyId,
     );
+    final backend = AppwriteBackend(
+      BackendConfig(
+        type: BackendType.appwrite,
+        endpoint: 'https://cloud.appwrite.io/v1',
+        projectId: companyId,
+      ),
+    );
+    await backend.initialize();
+    final remoteSource = AppwriteDriverSource(
+      backend: backend,
+      companyContext: CompanyContext(companyId: companyId),
+      databaseId: '6531ad112080ae3b14a7',
+      tableId: '6537d87b492c80f255e8',
+    );
 
     return DriverServices._(
       localDatabase: localDatabase,
@@ -45,6 +62,7 @@ class DriverServices {
         syncQueue: syncQueue,
         deviceIdentity: deviceIdentity,
         companyContext: CompanyContext(companyId: companyId),
+        remote: remoteSource,
       ),
     );
   }
