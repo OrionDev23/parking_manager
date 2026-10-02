@@ -135,7 +135,14 @@ class MyApp extends StatelessWidget {
           else{
             tstyle=tstyle.copyWith(fontSize: 10.sp);
           }
-          return FluentApp.router(
+          return Localizations(
+            locale: appTheme.locale,
+            delegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            child: FluentApp.router(
             key: navigatorKey,
             title: appTitle,
             themeMode: appTheme.mode,
@@ -175,23 +182,15 @@ class MyApp extends StatelessWidget {
             ],
             locale: appTheme.locale,
             builder: (context, child) {
-              return Localizations.override(
-                context: context,
-                locale: appTheme.locale,
-                delegates: const [
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                child: NavigationPaneTheme(
-                  data: NavigationPaneThemeData(
-                    backgroundColor: appTheme.mode==ThemeMode.dark?Colors.grey[220]:Colors.white,
-                  ),
-                  child: child!,
+              return NavigationPaneTheme(
+                data: NavigationPaneThemeData(
+                  backgroundColor: appTheme.mode==ThemeMode.dark?Colors.grey[220]:Colors.white,
                 ),
+                child: child!,
               );
             },
             routerConfig: Routes(appTheme).router,
+          ),
           );
         },
       );
