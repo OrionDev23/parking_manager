@@ -97,6 +97,7 @@ class PanesListState extends State<PanesList>
         case InternetStatus.connected:
           if (noConnection) {
             Future.delayed(const Duration(milliseconds: 10)).whenComplete(() {
+              if (!mounted) return;
               displayInfoBar(context,
                   builder: (BuildContext context, void Function() close) {
                 return InfoBar(
@@ -113,6 +114,7 @@ class PanesListState extends State<PanesList>
         case InternetStatus.disconnected:
           if (!noConnection) {
             Future.delayed(const Duration(milliseconds: 10)).whenComplete(() {
+              if (!mounted) return;
               displayInfoBar(context,
                   builder: (BuildContext context, void Function() close) {
                 return InfoBar(
