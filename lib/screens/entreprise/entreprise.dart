@@ -8,6 +8,8 @@ import 'package:flutter/foundation.dart';
 import 'package:parc_oto/batch_import/import_appartenance.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import '../../core/services/company_service.dart';
+import '../../domain/entities/company.dart';
 import '../../providers/client_database.dart';
 import '../../serializables/entreprise.dart';
 import '../../theme.dart';
@@ -80,17 +82,27 @@ class MyEntrepriseState extends State<MyEntreprise> {
       setState(() {});
     }
     try {
-      await DatabaseGetter.database!
-          .getRow(
-              databaseId: databaseId,
-              tableId: entrepriseid,
-              rowId: "1")
-          .then((value) {
-        p = value
-            .convertTo((p0) => Entreprise.fromJson(p0));
+      final company = await companyService.getCurrent();
+      if (company != null) {
+        p = Entreprise(
+          id: company.id,
+          nom: company.name,
+          adresse: company.address,
+          telephone: company.phone,
+          email: company.email,
+          description: company.description,
+          nif: company.nif,
+          nis: company.nis,
+          rc: company.rc,
+          art: company.art,
+          logo: company.logo,
+          filiales: List<String>.from(company.subsidiaries),
+          directions: List<String>.from(company.directions),
+          departments: List<String>.from(company.departments),
+        );
         downloadLogo();
         initValues();
-      });
+      }
       setState(() {
         downloading = false;
       });
@@ -1022,30 +1034,41 @@ class MyEntrepriseState extends State<MyEntreprise> {
       search: '${nom.text} ${nif.text} ${nis.text} ${rc.text} ${email.text} '
           '${telephone.text} ${adresse.text} ${descr.text} 1 $logoid ${art.text}',
     );
-    if (p != null) {
-      await DatabaseGetter.database!
-          .updateRow(
-              databaseId: databaseId,
-              tableId: entrepriseid,
-              rowId: p!.id,
-              data: prest.toJson())
-          .then((value) {
-        p = prest;
-          }).onError((AppwriteException error, stackTrace) {
-       // print(error.message);
-      });
-    }
-    else {
-      await DatabaseGetter.database!
-          .createRow(
-              databaseId: databaseId,
-              tableId: entrepriseid,
-              rowId: '1',
-              data: prest.toJson())
-          .then((value) {
-        p = prest;
-      });
-    }
+    final updated = await companyService.update(
+      Company(
+        id: prest.id,
+        name: prest.nom,
+        address: prest.adresse,
+        phone: prest.telephone,
+        email: prest.email,
+        description: prest.description,
+        nif: prest.nif,
+        nis: prest.nis,
+        rc: prest.rc,
+        art: prest.art,
+        logo: prest.logo,
+        subsidiaries: List<String>.from(prest.filiales ?? const []),
+        directions: List<String>.from(prest.directions ?? const []),
+        departments: List<String>.from(prest.departments ?? const []),
+      ),
+    );
+
+    p = Entreprise(
+      id: updated.id,
+      nom: updated.name,
+      adresse: updated.address,
+      telephone: updated.phone,
+      email: updated.email,
+      description: updated.description,
+      nif: updated.nif,
+      nis: updated.nis,
+      rc: updated.rc,
+      art: updated.art,
+      logo: updated.logo,
+      filiales: List<String>.from(updated.subsidiaries),
+      directions: List<String>.from(updated.directions),
+      departments: List<String>.from(updated.departments),
+    );
   }
 
   Future<void> uploadLogo() async {
