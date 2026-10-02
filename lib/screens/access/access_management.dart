@@ -326,14 +326,22 @@ class _TeamEditorState extends State<_TeamEditor> {
           child: const Text('Annuler'),
         ),
         FilledButton(
-          onPressed: isLocked || _name.text.trim().isEmpty ? null : () => Navigator.pop(context, AccessTeam(
-            id: widget.team?.id ?? '',
-            companyId: widget.team?.companyId ?? '',
-            name: _name.text.trim(),
-            description: _description.text.trim().isEmpty ? null : _description.text.trim(),
-            permissions: _selected,
-            isSystem: widget.team?.isSystem ?? false,
-          )),
+          onPressed: isLocked || _name.text.trim().isEmpty
+              ? null
+              : () => Navigator.pop(
+                    context,
+                    AccessTeam(
+                      id: widget.team?.id ?? '',
+                      companyId: widget.team?.companyId ?? '',
+                      name: _name.text.trim(),
+                      description: _description.text.trim().isEmpty
+                          ? null
+                          : _description.text.trim(),
+                      permissions: _selected,
+                      isSystem: widget.team?.isSystem ?? false,
+                    ),
+                  ),
+          child: const Text('Enregistrer'),
         ),
       ],
     );
