@@ -129,7 +129,7 @@ class RestoreDatabase {
     await databases.createRow(databaseId: databaseId, tableId:
     collectionID, rowId: docID, data: data).onError((AppwriteException e,
         stackTrace){
-      return Future.value(Row($id: '', $tableId: '', $databaseId: '', $createdAt: '', $updatedAt: '', $permissions: [], data: {}, $sequence: 1));
+      return Future.value(Row($id: '', $tableId: '', $databaseId: '', $createdAt: '', $updatedAt: '', $permissions: [], data: {}, $sequence: '1'));
     });
   }
 
@@ -176,7 +176,7 @@ class RestoreDatabase {
       return await databases.updateRow(databaseId: databaseId,
           tableId:
       collectionID, rowId: docID, data: data).onError((AppwriteException e,stacktrace){
-        return Future.value(Row($id: '', $tableId: '', $databaseId: '', $createdAt: '', $updatedAt: '', $permissions: [], data: {}, $sequence: 1));
+        return Future.value(Row($id: '', $tableId: '', $databaseId: '', $createdAt: '', $updatedAt: '', $permissions: [], data: {}, $sequence: '1'));
       });
     });
   }
