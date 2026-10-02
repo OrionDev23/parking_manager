@@ -1,5 +1,3 @@
-import 'dart:io' as f;
-
 import 'package:dart_appwrite/dart_appwrite.dart';
 import 'package:dzair_data_usage/langs.dart' as l;
 import 'package:easy_localization/easy_localization.dart';
