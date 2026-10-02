@@ -99,7 +99,14 @@ class LegacyAppwriteAuthService implements AuthService {
         throw StateError('Appwrite account is not initialized.');
       }
 
-      await account.deleteSessions();
+      // There may be no active session yet. Appwrite returns
+      // general_unauthorized_scope in that case, so this cleanup is best-effort.
+      try {
+        await account.deleteSessions();
+      } on AppwriteException {
+        // No existing session: continue with the actual login.
+      }
+
       await account.createEmailPasswordSession(
         email: email.trim(),
         password: password,
