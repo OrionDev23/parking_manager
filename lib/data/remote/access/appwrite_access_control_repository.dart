@@ -168,6 +168,12 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
         tableId: 'access_users',
         rowId: access.userId,
         data: data,
+        permissions: [
+          'read("user:${access.userId}")',
+          'read("team:1")',
+          'update("team:1")',
+          'delete("team:1")',
+        ],
       );
     }
     return access;
