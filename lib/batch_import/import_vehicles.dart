@@ -48,10 +48,7 @@ class _ImportVehiclesState extends State<ImportVehicles> {
         loading = true;
       });
     }
-    Uint8List? bytes = widget.file.bytes;
-    if (!kIsWeb && bytes == null && widget.file.path != null) {
-      bytes = await f.File(widget.file.path!).readAsBytes();
-    }
+    final Uint8List bytes = await ${path.includes('import_appartenance')?'file':'widget.file'}.readAsBytes();
     if (bytes != null) {
       setState(() {
         progressLoadingFile = 10;
