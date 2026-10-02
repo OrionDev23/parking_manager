@@ -20,6 +20,8 @@ import 'package:video_player_media_kit/video_player_media_kit.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'providers/client_database.dart';
+import 'core/auth/auth_service.dart';
+import 'core/auth/legacy_appwrite_auth_service.dart';
 import 'core/services/vehicle_services.dart';
 import 'theme.dart';
 
@@ -27,6 +29,7 @@ const appTitle = "ParcOto";
 late final PackageInfo packageInfo;
 late final SharedPreferences prefs;
 late final VehicleServices vehicleServices;
+late final AuthService authService;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,6 +63,7 @@ void displayMessage(BuildContext context,String msg,InfoBarSeverity severity){
 void launchApp() async {
   prefs = await SharedPreferences.getInstance();
   DatabaseGetter();
+  authService = LegacyAppwriteAuthService(preferences: prefs);
   vehicleServices = await VehicleServices.create(
     preferences: prefs,
     companyId: project ?? 'local',
