@@ -19,6 +19,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../serializables/vehicle/vehicle.dart';
 import '../../../data/mappers/vehicle_mapper.dart';
+import '../../../main.dart';
 import '../../../theme.dart';
 import '../../../utilities/algeria_lists.dart';
 import '../../../widgets/select_dialog/select_dialog.dart';
