@@ -39,11 +39,11 @@ class BigTitleForm extends StatelessWidget {
             style: headerStyle,
           ).tr(),
           smallSpace,
-          ?Text(littleTitle ?? '').tr(),
+          if (littleTitle != null)
+            ?Text(littleTitle!).tr(),
           if(trailing!=null)
             const   Spacer(),
-          if(trailing!=null)
-            trailing!,
+          ?trailing,
         ],
       ),
     );
