@@ -8,7 +8,6 @@ import 'package:flutter/foundation.dart';
 import 'package:parc_oto/batch_import/import_appartenance.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import '../../core/services/company_service.dart';
 import '../../domain/entities/company.dart';
 import '../../main.dart';
 import '../../providers/client_database.dart';
