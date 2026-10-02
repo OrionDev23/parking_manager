@@ -1020,10 +1020,10 @@ class _PartsFormState extends State<PartsForm>
                       variation: variations[index],
                       sku: sku.text.length > 8 ? sku.text.substring(0, 9) : 'XXXX-XXXX',
                       options: [
-                        if (option1 != null) option1!,
-                        if (option2 != null) option2!,
-                        if (option3 != null) option3!,
-                        if (option4 != null) option4!,
+                        ?option1,
+                        ?option2,
+                        ?option3,
+                        ?option4,
                       ],
                       onOptionsChanged: (values) {
                         setState(() {
