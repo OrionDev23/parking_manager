@@ -252,16 +252,14 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
       });
 
       try {
-        final session = await authService.signIn(
+        await authService.signIn(
           email: email.text,
           password: password.text,
           projectId: projectName.text.trim(),
         );
 
-        if (session != null) {
-          PanesListState.signedIn.value = true;
-          signedIn = true;
-        }
+        PanesListState.signedIn.value = true;
+        signedIn = true;
       } on AppwriteException catch (e) {
         error = e.type?.tr() ?? e.message ?? 'connexionerror'.tr();
         signedIn = false;
