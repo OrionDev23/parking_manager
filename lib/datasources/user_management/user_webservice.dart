@@ -7,7 +7,7 @@ import 'package:parc_oto/datasources/parcoto_webservice.dart';
 import '../../providers/client_database.dart';
 
 class UsersWebservice
-    extends ParcOtoWebServiceUsers<String, MapEntry<User, List<Membership>?>> {
+    extends ParcOtoWebServiceUsers<String, MapEntry<User, List<String>?>> {
   final Client client = Client();
   late final Future<void> _ready;
 
@@ -47,21 +47,23 @@ class UsersWebservice
       ..setEndpoint(endpoint);
   }
 
-  final Map<String, MapEntry<User, List<Membership>?>> users = {};
+  final Map<String, MapEntry<User, List<String>?>> users = {};
 
-  Future<void> loadTeam(User user) async {
-    try {
-      final memberships = await Users(client).listMemberships(
-        userId: user.$id,
-      );
-      users[user.$id] = MapEntry(user, memberships.memberships);
-    } on AppwriteException {
-      users[user.$id] = MapEntry(user, null);
-    }
+  Future<void> loadTeams(User user, Map<String, String> teamNames, Map<String, List<String>> accessByUser) async {
+    final teamNamesForUser = accessByUser[user.$id]
+            ?.map((id) => teamNames[id])
+            .whereType<String>()
+            .toList() ??
+        <String>[];
+
+    users[user.$id] = MapEntry(
+      user,
+      teamNamesForUser,
+    );
   }
 
   @override
-  Future<Map<String, MapEntry<User, List<Membership>?>>> getSearchResult(
+  Future<Map<String, MapEntry<User, List<String>?>>> getSearchResult(
       String? searchKey) async {
     await _ready;
 
@@ -73,24 +75,51 @@ class UsersWebservice
       search: searchKey?.trim().isEmpty == true ? null : searchKey?.trim(),
     );
 
-    // Membership loading is independent for each user. Keep it parallel so
-    // the table does not become noticeably slower as the number of users grows.
-    await Future.wait(result.users.map(loadTeam));
+    // Read ParcOto's own access model in two queries instead of doing one
+    // Appwrite Teams membership request per user. This is both faster and,
+    // more importantly, makes the UI display the new customizable teams.
+    final database = DatabaseGetter.database;
+    if (database == null) {
+      throw StateError('La base Appwrite n’est pas initialisée.');
+    }
 
-    return Map<String, MapEntry<User, List<Membership>>>.fromEntries(
-      users.entries.map(
-        (entry) => MapEntry(
-          entry.key,
-          entry.value,
-        ),
+    final accessTeams = await database.listRows(
+      databaseId: databaseId,
+      tableId: 'access_teams',
+      queries: const [Query.limit(500)],
+    );
+    final accessUsers = await database.listRows(
+      databaseId: databaseId,
+      tableId: 'access_users',
+      queries: const [Query.limit(500)],
+    );
+
+    final teamNames = <String, String>{
+      for (final row in accessTeams.rows)
+        row.$id: row.data['name']?.toString() ?? row.$id,
+    };
+    final accessByUser = <String, List<String>>{};
+    for (final row in accessUsers.rows) {
+      final userId = row.data['userId']?.toString() ?? row.$id;
+      final ids = row.data['teamIds'];
+      if (ids is List) {
+        accessByUser[userId] = ids.map((id) => id.toString()).toList();
+      }
+    }
+
+    await Future.wait(
+      result.users.map(
+        (user) => loadTeams(user, teamNames, accessByUser),
       ),
     );
+
+    return users;
   }
 
   @override
   int Function(
-      MapEntry<String, MapEntry<User, List<Membership>?>> p1,
-      MapEntry<String, MapEntry<User, List<Membership>?>> p2)? getComparisonFunction(
+      MapEntry<String, MapEntry<User, List<String>?>> p1,
+      MapEntry<String, MapEntry<User, List<String>?>> p2)? getComparisonFunction(
       int column, bool ascending) {
     final coef = ascending ? 1 : -1;
     switch (column) {
@@ -106,11 +135,11 @@ class UsersWebservice
         return (d1, d2) =>
             coef *
             (d1.value.value?.isNotEmpty == true
-                    ? d1.value.value!.first.teamName
+                    ? d1.value.value!.first
                     : '')
                 .compareTo(
               d2.value.value?.isNotEmpty == true
-                  ? d2.value.value!.first.teamName
+                  ? d2.value.value!.first
                   : '',
             );
       case 4:
