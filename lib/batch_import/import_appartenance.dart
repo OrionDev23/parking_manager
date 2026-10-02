@@ -19,10 +19,7 @@ class ImportAppartenance {
 
   Future<List<String>> loadFile() async {
 
-    Uint8List? bytes = file.bytes;
-    if (!kIsWeb && bytes == null && file.path != null) {
-      bytes = await f.File(file.path!).readAsBytes();
-    }
+    final Uint8List bytes = await ${path.includes('import_appartenance')?'file':'widget.file'}.readAsBytes();
     if (bytes != null) {
       var excel = Excel.decodeBytes(bytes);
       for (var table in excel.tables.keys) {
