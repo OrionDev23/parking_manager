@@ -53,6 +53,11 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
       tableId: 'access_teams',
       rowId: id,
       data: _teamToMap(team),
+      permissions: const [
+        'read("users")',
+        'update("team:1")',
+        'delete("team:1")',
+      ],
     );
     return AccessTeam(
       id: id,
@@ -149,6 +154,12 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
         tableId: 'access_users',
         rowId: access.userId,
         data: data,
+        permissions: [
+          'read("user:" + access.userId + ")',
+          'read("team:1")',
+          'update("team:1")',
+          'delete("team:1")',
+        ],
       );
     } on AppwriteException catch (error) {
       if (error.code != 404) rethrow;
