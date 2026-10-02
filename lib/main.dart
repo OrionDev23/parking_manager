@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:parc_oto/router.dart';
@@ -109,9 +109,7 @@ class MyApp extends StatelessWidget {
     results.addAll([
       CountryLocalizations.delegate,
       FluentLocalizations.delegate,
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
+      ...GlobalMaterialLocalizations.delegates,
       SfGlobalLocalizations.delegate
     ]);
     return results;
@@ -137,11 +135,7 @@ class MyApp extends StatelessWidget {
           }
           return Localizations(
             locale: appTheme.locale ?? const Locale('fr'),
-            delegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
+            delegates: GlobalMaterialLocalizations.delegates,
             child: FluentApp.router(
             key: navigatorKey,
             title: appTitle,
