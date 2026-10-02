@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_function_literals_in_foreach_calls
+
 import 'dart:async';
 
 /// Flattens the items emitted by the given streams into a single Stream
