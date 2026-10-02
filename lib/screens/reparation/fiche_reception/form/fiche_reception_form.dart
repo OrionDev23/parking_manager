@@ -178,7 +178,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
       if (value.rows.length == 1) {
         numOrdre.text = (value.rows[0]
                     .convertTo((p0) =>
-                        FicheReception.fromJson(p0 as Map<String, dynamic>))
+                        FicheReception.fromJson(p0))
                     .numero +
                 1)
             .toString();
