@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../core/services/company_service.dart';
 import '../../domain/entities/company.dart';
+import '../../main.dart';
 import '../../providers/client_database.dart';
 import '../../serializables/entreprise.dart';
 import '../../theme.dart';
