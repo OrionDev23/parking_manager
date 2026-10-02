@@ -153,73 +153,73 @@ class PanesListState extends State<PanesList>
                     animation: d,
                     child: w,
                   ),
-                  appBar: NavigationAppBar(
-                    automaticallyImplyLeading: false,
+                  titleBar: Container(
                     height: 65.px,
-                    title: () {
-                      return DragToMoveArea(
-                        child: Align(
-                            alignment: AlignmentDirectional.centerStart,
-                            child: Row(
-                              children: [
-                                Image.asset(
-                                  'assets/images/logo.webp',
-                                  width: 80.px,
-                                  height: 80.px,
+                    color: widget.appTheme.mode == ThemeMode.dark
+                        ? Colors.grey[220]
+                        : Colors.white,
+                    child: DragToMoveArea(
+                      child: Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              'assets/images/logo.webp',
+                              width: 80.px,
+                              height: 80.px,
+                            ),
+                            smallSpace,
+                            Text('v${packageInfo.version}'),
+                            if (DatabaseGetter.trialDate != null &&
+                                DatabaseGetter.me.value != null)
+                              bigSpace,
+                            if (DatabaseGetter.trialDate != null)
+                              const Text('daysremain').tr(namedArgs: {
+                                'days': DatabaseGetter.trialDate!
+                                    .difference(DateTime.now())
+                                    .inDays
+                                    .toString()
+                              }),
+                            if (demo && !portrait) bigSpace,
+                            if (demo && !portrait)
+                              Text(
+                                'demofor'.tr().toUpperCase(),
+                                style: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.red,
+                                  fontSize: 14,
                                 ),
-                                smallSpace,
-                                Text('v${packageInfo.version}'),
-                                if (DatabaseGetter.trialDate != null &&
-                                    DatabaseGetter.me.value != null)
-                                  bigSpace,
-                                if (DatabaseGetter.trialDate != null)
-                                  const Text('daysremain').tr(namedArgs: {
-                                    'days': DatabaseGetter.trialDate!
-                                        .difference(DateTime.now())
-                                        .inDays
-                                        .toString()
-                                  }),
-                                if (demo && !portrait) bigSpace,
-                                if (demo && !portrait)
-                                  Text(
-                                    'demofor'.tr().toUpperCase(),
-                                    style: TextStyle(
-                                      fontStyle: FontStyle.italic,
-                                      color: Colors.red,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                if (brandt && !portrait) smallSpace,
-                                if (brandt && !portrait)
-                                  Image.asset(
-                                    'assets/images/brandt.png',
-                                    width: 60.px,
-                                    height: 60.px,
-                                  ),
-                                const Spacer(),
-                                if (!loading &&
-                                    signedIn.value &&
-                                    DatabaseGetter.trialDate != null)
-                                  const NotifList(),
-                                if (!loading &&
-                                    signedIn.value &&
-                                    DatabaseGetter.trialDate != null)
-                                  const SizedBox(width: 10),
-                                if (!loading &&
-                                    signedIn.value &&
-                                    DatabaseGetter.trialDate != null)
-                                  const ProfilNameTopBar(),
-                                smallSpace,
-                                if (!kIsWeb)
-                                  if (Platform.isMacOS ||
-                                      Platform.isLinux ||
-                                      Platform.isWindows)
-                                    const WindowButtons(),
-                              ],
-                            )),
-                      );
-                    }(),
-                    backgroundColor: widget.appTheme.mode==ThemeMode.dark?Colors.grey[220]:Colors.white,
+                              ),
+                            if (brandt && !portrait) smallSpace,
+                            if (brandt && !portrait)
+                              Image.asset(
+                                'assets/images/brandt.png',
+                                width: 60.px,
+                                height: 60.px,
+                              ),
+                            const Spacer(),
+                            if (!loading &&
+                                signedIn.value &&
+                                DatabaseGetter.trialDate != null)
+                              const NotifList(),
+                            if (!loading &&
+                                signedIn.value &&
+                                DatabaseGetter.trialDate != null)
+                              const SizedBox(width: 10),
+                            if (!loading &&
+                                signedIn.value &&
+                                DatabaseGetter.trialDate != null)
+                              const ProfilNameTopBar(),
+                            smallSpace,
+                            if (!kIsWeb)
+                              if (Platform.isMacOS ||
+                                  Platform.isLinux ||
+                                  Platform.isWindows)
+                                const WindowButtons(),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                   pane: NavigationPane(
                     selected: value,
