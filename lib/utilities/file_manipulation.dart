@@ -24,7 +24,7 @@ async {
         file,
         '$title.$extension');
   } else {
-    String? path = await FilePicker.platform.saveFile(
+    String? path = await FilePicker.saveFile(
       dialogTitle: "save".tr(),
       fileName: '$title.$extension',
       type: FileType.custom,
