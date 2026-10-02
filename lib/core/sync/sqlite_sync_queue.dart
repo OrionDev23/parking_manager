@@ -26,7 +26,7 @@ class SqliteSyncQueue implements SyncQueue {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO NOTHING''', [operation.id, operation.companyId, operation.deviceId, operation.entity,
       operation.entityId, _type(operation.type), jsonEncode(operation.payload), operation.createdAt.toIso8601String(),
-      _status(operation.status).name, operation.attempts]);
+      operation.status.name, operation.attempts]);
   }
 
   @override
