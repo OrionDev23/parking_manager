@@ -175,11 +175,20 @@ class MyApp extends StatelessWidget {
             ],
             locale: appTheme.locale,
             builder: (context, child) {
-              return NavigationPaneTheme(
-                data: NavigationPaneThemeData(
-                  backgroundColor: appTheme.mode==ThemeMode.dark?Colors.grey[220]:Colors.white,
+              return Localizations.override(
+                context: context,
+                locale: appTheme.locale,
+                delegates: const [
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                child: NavigationPaneTheme(
+                  data: NavigationPaneThemeData(
+                    backgroundColor: appTheme.mode==ThemeMode.dark?Colors.grey[220]:Colors.white,
+                  ),
+                  child: child!,
                 ),
-                child: child!,
               );
             },
             routerConfig: Routes(appTheme).router,
