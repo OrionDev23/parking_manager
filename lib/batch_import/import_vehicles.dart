@@ -407,6 +407,8 @@ class _ImportVehiclesState extends State<ImportVehicles> {
 
             case DateTimeCellValue():
               break;
+            case CellErrorValue():
+              break;
           }
         }
       }
