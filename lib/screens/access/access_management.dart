@@ -64,7 +64,7 @@ class _AccessManagementState extends State<AccessManagement> {
       context: context,
       builder: (_) => ContentDialog(
         title: const Text('Supprimer l’équipe'),
-        content: Text('Supprimer « \${team.name} » ?'),
+        content: Text('Supprimer « ${team.name} » ?'),
         actions: [
           Button(child: const Text('Annuler'), onPressed: () => Navigator.pop(context, false)),
           FilledButton(child: const Text('Supprimer'), onPressed: () => Navigator.pop(context, true)),
@@ -123,7 +123,7 @@ class _AccessManagementState extends State<AccessManagement> {
                           Text(
                             team.description?.isNotEmpty == true
                                 ? team.description!
-                                : '\${team.permissions.length} permission(s)',
+                                : '${team.permissions.length} permission(s)',
                             style: FluentTheme.of(context).typography.caption,
                           ),
                         ])),
@@ -258,7 +258,7 @@ class _TeamEditorState extends State<_TeamEditor> {
             Icon(FluentIcons.permissions, size: 14,
                 color: FluentTheme.of(context).accentColor),
             const SizedBox(width: 6),
-            Text('\${_selected.length} / \${total} permissions sélectionnées',
+            Text('${_selected.length} / $total permissions sélectionnées',
                 style: FluentTheme.of(context).typography.caption),
           ]),
           const SizedBox(height: 8),
@@ -276,7 +276,7 @@ class _TeamEditorState extends State<_TeamEditor> {
                   header: Row(children: [
                     Expanded(child: Text(_moduleLabel(entry.key),
                         style: FluentTheme.of(context).typography.subtitle)),
-                    Text('\${selectedCount}/\${permissions.length}',
+                    Text('$selectedCount/${permissions.length}',
                         style: FluentTheme.of(context).typography.caption),
                   ]),
                   content: Padding(
