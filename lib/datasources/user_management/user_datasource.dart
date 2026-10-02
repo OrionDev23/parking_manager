@@ -6,7 +6,6 @@ import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:parc_oto/datasources/user_management/user_webservice.dart';
-import 'package:parc_oto/theme.dart';
 
 import '../../providers/client_database.dart';
 import '../../screens/user_management/user_creation.dart';
@@ -111,15 +110,18 @@ class UsersManagementDatasource
                       onPressed: () {
                         Navigator.of(context).pop();
                         Future.delayed(const Duration(milliseconds: 50)).then(
-                          (_) => f.showDialog(
-                            context: current,
+                          (_) {
+                            if (!current.mounted) return;
+                            f.showDialog(
+                              context: current,
                             builder: (_) => UserAccessEditor(
                               userId: element.value.key.$id,
                               userName: element.value.key.name.isEmpty
                                   ? element.value.key.email
                                   : element.value.key.name,
-                            ),
-                          ),
+                              ),
+                            );
+                          },
                         );
                       },
                     ),
