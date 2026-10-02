@@ -113,7 +113,7 @@ class _EmptyListWidgetState extends State<EmptyWidget>
     super.initState();
   }
 
-  animationListner() {
+  void animationListner() {
     if (_imageController == null) {
       return;
     }
