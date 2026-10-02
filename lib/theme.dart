@@ -302,7 +302,7 @@ class AppTheme extends ChangeNotifier {
       case 0:
         return PaneDisplayMode.top;
       case 1:
-        return PaneDisplayMode.open;
+        return PaneDisplayMode.expanded;
       case 2:
         return PaneDisplayMode.compact;
       case 3:
