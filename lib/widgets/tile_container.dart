@@ -31,7 +31,7 @@ class _TileContainerState extends State<TileContainer> {
         PanesListState.index.value = widget.index;
       },
       child: Card(
-        backgroundColor: appTheme.color.withOpacity(0.1),
+        backgroundColor: appTheme.color.withValues(alpha: 0.1),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
