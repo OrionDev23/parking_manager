@@ -71,10 +71,7 @@ class PdfPreviewPO extends StatelessWidget {
                 color: Colors.white,
               ),
               onPressed: (context, futureFile, pageFormat) async {
-                Share.shareXFiles(
-                  [XFile.fromData(await futureFile(pageFormat))],
-                  subject: reparation!=null?'ordre${numberFormat.format(reparation!.numero)}':'fiche${numberFormat.format(fiche!.numero)}',
-                );
+                SharePlus.instance.share(ShareParams(files: [XFile.fromData(await futureFile(pageFormat))], subject: reparation!=null?'ordre${numberFormat.format(reparation!.numero)}':'fiche${numberFormat.format(fiche!.numero)}'));
               }),
           PdfPreviewAction(
             icon: const Text(
