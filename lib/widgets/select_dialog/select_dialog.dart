@@ -1,3 +1,5 @@
+// ignore_for_file: no_logic_in_create_state
+
 library;
 
 import 'package:easy_localization/easy_localization.dart';
