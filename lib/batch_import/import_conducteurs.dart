@@ -15,7 +15,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../utilities/vehicle_util.dart';
 
 class ImportConducteurs extends StatefulWidget {
-  final FilePickerResult file;
+  final PlatformFile file;
 
   const ImportConducteurs({super.key, required this.file});
 
@@ -46,11 +46,9 @@ class _ImportConducteursState extends State<ImportConducteurs> {
         loading = true;
       });
     }
-    Uint8List? bytes = widget.file.files.first.bytes;
-    if (kIsWeb) {
-      bytes = widget.file.files.first.bytes;
-    } else {
-      bytes = await f.File(widget.file.files.single.path!).readAsBytes();
+    Uint8List? bytes = widget.file.bytes;
+    if (!kIsWeb && bytes == null && widget.file.path != null) {
+      bytes = await f.File(widget.file.path!).readAsBytes();
     }
     if (bytes != null) {
       setState(() {
