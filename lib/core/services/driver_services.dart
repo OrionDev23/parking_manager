@@ -5,6 +5,7 @@ import '../../data/repositories/driver_repository_impl.dart';
 import '../../data/remote/drivers/appwrite_driver_source.dart';
 import '../backend/appwrite_backend.dart';
 import '../backend/backend_config.dart';
+import '../backend/backend_type.dart';
 import '../../domain/entities/driver.dart' as domain;
 import '../../domain/repositories/driver_repository.dart';
 import '../database/local_database.dart';
