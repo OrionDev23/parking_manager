@@ -155,6 +155,9 @@ class BackupUploaderState extends State<BackupUploader> {
             signature: '',
             mimeType: '',
             sizeOriginal: 10,
+            sizeActual: 10,
+            folder: '',
+            key: '',
             chunksTotal: 10,
             chunksUploaded: 10, encryption: false, compression: 'none'));
       }).then((value) {
