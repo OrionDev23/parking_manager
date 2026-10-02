@@ -106,7 +106,7 @@ class PdfPreviewPO extends StatelessWidget {
           await futureFile(pageFormat),
           reparation!=null?'ordre${numberFormat.format(reparation!.numero)}.pdf':'fiche${numberFormat.format(fiche!.numero)}}.pdf',);
     } else {
-      String? path = await FilePicker.platform.saveFile(
+      String? path = await FilePicker.saveFile(
         dialogTitle: "save".tr(),
         fileName: reparation!=null?'ordre${numberFormat.format(reparation!.numero)}.pdf':'fiche${numberFormat.format(fiche!.numero)}}.pdf',
 
