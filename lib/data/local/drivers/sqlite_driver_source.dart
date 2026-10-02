@@ -31,8 +31,8 @@ class SqliteDriverSource implements LocalDriverSource {
   Future<List<Driver>> getDrivers({
     String? search, int? limit, int offset = 0, bool includeArchived = false,
   }) async {
-    final query = StringBuffer('SELECT * FROM drivers WHERE company_id = ?');
-    final args = <Object?>[localDatabase.companyId];
+    final query = StringBuffer('SELECT * FROM drivers');
+    final args = <Object?>[];
     if (!includeArchived) query.write(' AND state != 3');
     if (search != null && search.trim().isNotEmpty) {
       query.write(' AND (first_name LIKE ? OR last_name LIKE ? OR registration LIKE ? OR email LIKE ? OR phone LIKE ?)');
@@ -50,8 +50,8 @@ class SqliteDriverSource implements LocalDriverSource {
   @override
   Future<Driver?> getDriver(String id) async {
     final rows = _db.select(
-      'SELECT * FROM drivers WHERE id = ? AND company_id = ? LIMIT 1',
-      [id, localDatabase.companyId],
+      'SELECT * FROM drivers WHERE id = ? LIMIT 1',
+      [id],
     );
     return rows.isEmpty ? null : _fromRow(rows.first);
   }
