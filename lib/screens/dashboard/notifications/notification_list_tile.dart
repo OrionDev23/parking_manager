@@ -147,6 +147,7 @@ class _NotificationTileState extends State<NotificationTile> {
       }
       Navigator.pop(context);
     }).onError((error, stackTrace) {
+      if (!mounted) return;
       Navigator.pop(context);
 
       if (kDebugMode) {
