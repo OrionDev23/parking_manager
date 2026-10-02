@@ -24,16 +24,13 @@ async {
         file,
         '$title.$extension');
   } else {
-    String? path = await FilePicker.saveFile(
+    await FilePicker.saveFile(
       dialogTitle: "save".tr(),
       fileName: '$title.$extension',
+      bytes: file,
       type: FileType.custom,
       allowedExtensions: [extension],
     );
-    if (path != null) {
-      File f = File(path);
-      f.writeAsBytes(file, mode: FileMode.write);
-    }
   }
 }
 
