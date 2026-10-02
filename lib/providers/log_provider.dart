@@ -27,7 +27,7 @@ class LogProvider extends ChangeNotifier {
         tableId: activityId,queries: [Query.limit(5000)]).then((value) {
       for(int i=0;i<value.rows.length;i++){
         activities[value.rows[i].$id]=value.rows[i].convertTo(
-                (p0) => Activity.fromJson(p0 as Map<String,dynamic>));
+                (p0) => Activity.fromJson(p0));
       }
       downloadedActivities=true;
 
