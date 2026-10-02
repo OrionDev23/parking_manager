@@ -95,7 +95,7 @@ class _AccessManagementState extends State<AccessManagement> {
               : ListView.separated(
                   padding: const EdgeInsets.all(24),
                   itemCount: _teams.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (_, index) {
                     final team = _teams[index];
                     return Card(
@@ -190,7 +190,9 @@ class _TeamEditorState extends State<_TeamEditor> {
     for (final permission in PermissionCatalog.all) {
       if (query.isNotEmpty &&
           !permission.label.toLowerCase().contains(query) &&
-          !permission.id.toLowerCase().contains(query)) continue;
+          !permission.id.toLowerCase().contains(query)) {
+        continue;
+      }
       result.putIfAbsent(permission.module, () => []).add(permission);
     }
     return result;
@@ -204,7 +206,11 @@ class _TeamEditorState extends State<_TeamEditor> {
 
   void _setCategory(List<Permission> permissions, bool value) => setState(() {
     final ids = permissions.map((p) => p.id);
-    if (value) { _selected.addAll(ids); } else { _selected.removeAll(ids); }
+    if (value) {
+      _selected.addAll(ids);
+    } else {
+      _selected.removeAll(ids);
+    }
   });
 
   @override
@@ -264,7 +270,7 @@ class _TeamEditorState extends State<_TeamEditor> {
           const SizedBox(height: 8),
           Expanded(child: ListView.separated(
             itemCount: grouped.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (_, index) {
               final entry = grouped.entries.elementAt(index);
               final permissions = entry.value;
@@ -315,9 +321,11 @@ class _TeamEditorState extends State<_TeamEditor> {
         ]),
       ),
       actions: [
-        Button(child: const Text('Annuler'), onPressed: () => Navigator.pop(context)),
+        Button(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Annuler'),
+        ),
         FilledButton(
-          child: const Text('Enregistrer'),
           onPressed: isLocked || _name.text.trim().isEmpty ? null : () => Navigator.pop(context, AccessTeam(
             id: widget.team?.id ?? '',
             companyId: widget.team?.companyId ?? '',
