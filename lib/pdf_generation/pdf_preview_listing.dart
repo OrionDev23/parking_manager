@@ -74,10 +74,7 @@ class PdfPreviewListing extends StatelessWidget {
                 color: Colors.white,
               ),
               onPressed: (context, futureFile, pageFormat) async {
-                Share.shareXFiles(
-                  [XFile.fromData(await futureFile(pageFormat))],
-                  subject: name,
-                );
+                SharePlus.instance.share(ShareParams(files: [XFile.fromData(await futureFile(pageFormat))], subject: name));
               }),
           PdfPreviewAction(
             icon: const Text(
