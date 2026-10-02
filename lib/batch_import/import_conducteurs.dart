@@ -217,6 +217,8 @@ class _ImportConducteursState extends State<ImportConducteurs> {
 
             case DateTimeCellValue():
               break;
+            case CellErrorValue():
+              break;
           }
         }
       }
