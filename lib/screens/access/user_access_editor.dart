@@ -21,7 +21,6 @@ class UserAccessEditor extends StatefulWidget {
 }
 
 class _UserAccessEditorState extends State<UserAccessEditor> {
-  UserAccess? _access;
   List<AccessTeam> _teams = const [];
   bool _loading = true;
   String? _error;
@@ -48,7 +47,6 @@ class _UserAccessEditorState extends State<UserAccessEditor> {
       final teams = await accessControlService.getTeams(companyId);
 
       if (!mounted) return;
-      _access = access;
       _teamIds
         ..clear()
         ..addAll(access.teamIds);
