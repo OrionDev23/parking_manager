@@ -223,12 +223,12 @@ class _UserAccessEditorState extends State<UserAccessEditor> {
       ),
       actions: [
         Button(
-          child: const Text('Annuler'),
           onPressed: () => Navigator.pop(context),
+          child: const Text('Annuler'),
         ),
         FilledButton(
-          child: const Text('Enregistrer'),
           onPressed: _save,
+          child: const Text('Enregistrer'),
         ),
       ],
     );
