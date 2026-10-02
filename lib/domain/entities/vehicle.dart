@@ -58,6 +58,26 @@ class Vehicle {
     required this.createdAt, required this.updatedAt,
   });
 
+  Vehicle copyWith({
+    int? perimeter,
+    int? currentState,
+    String? state,
+    bool? decision,
+    String? location,
+    String? driverRegistration,
+  }) {
+    return Vehicle.fromMap({
+      ...toMap(),
+      'perimeter': perimeter ?? this.perimeter,
+      'currentState': currentState ?? this.currentState,
+      'state': state ?? this.state,
+      'decision': decision ?? this.decision,
+      'location': location ?? this.location,
+      'driverRegistration': driverRegistration ?? this.driverRegistration,
+      'updatedAt': DateTime.now().toUtc().toIso8601String(),
+    });
+  }
+
   Map<String, dynamic> toMap() => {
     'id': id, 'companyId': companyId, 'siteId': siteId, 'registration': registration,
     'foreignRegistration': foreignRegistration, 'wilaya': wilaya, 'commune': commune,
