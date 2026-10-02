@@ -133,10 +133,7 @@ class MyApp extends StatelessWidget {
           else{
             tstyle=tstyle.copyWith(fontSize: 10.sp);
           }
-          return Localizations(
-            locale: appTheme.locale ?? const Locale('fr'),
-            delegates: GlobalMaterialLocalizations.delegates,
-            child: FluentApp.router(
+          return FluentApp.router(
             key: navigatorKey,
             title: appTitle,
             themeMode: appTheme.mode,
@@ -184,7 +181,6 @@ class MyApp extends StatelessWidget {
               );
             },
             routerConfig: Routes(appTheme).router,
-          ),
           );
         },
       );
