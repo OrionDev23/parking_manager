@@ -1,7 +1,5 @@
 import 'package:dart_appwrite/dart_appwrite.dart';
 import 'package:dart_appwrite/models.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/foundation.dart';
 import 'package:parc_oto/datasources/parcoto_webservice.dart';
 
 import '../../providers/client_database.dart';
@@ -49,7 +47,11 @@ class UsersWebservice
 
   final Map<String, MapEntry<User, List<String>?>> users = {};
 
-  Future<void> loadTeams(User user, Map<String, String> teamNames, Map<String, List<String>> accessByUser) async {
+  Future<void> loadTeams(
+    User user,
+    Map<String, String> teamNames,
+    Map<String, List<String>> accessByUser,
+  ) async {
     final teamNamesForUser = accessByUser[user.$id]
             ?.map((id) => teamNames[id])
             .whereType<String>()
