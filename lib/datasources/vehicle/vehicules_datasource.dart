@@ -31,6 +31,51 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
   }
 
   @override
+  Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
+    final vehicles = await vehicleServices.repository.getVehicles(
+      search: searchKey,
+    );
+
+    final filtered = vehicles.where((vehicle) {
+      if (filters == null || filters!.isEmpty) return true;
+
+      final yearMin = int.tryParse(filters!['yearmin'] ?? '');
+      final yearMax = int.tryParse(filters!['yearmax'] ?? '');
+      final genre = filters!['genre'];
+      final marque = filters!['marque'];
+
+      if (yearMin != null && (vehicle.usageYear ?? 0) < yearMin) return false;
+      if (yearMax != null && (vehicle.usageYear ?? 9999) > yearMax) return false;
+      if (genre != null && vehicle.genre != genre) return false;
+      if (marque != null && vehicle.brand != marque) return false;
+      return true;
+    }).toList();
+
+    data = filtered
+        .map((vehicle) {
+          final legacy = VehicleMapper.toLegacy(vehicle);
+          return MapEntry(legacy.id, legacy);
+        })
+        .toList();
+
+    final comparator = VehiculesWebService(
+      data,
+      collectionID,
+      1,
+    ).getComparisonFunction(sortColumn, sortAscending);
+
+    data.sort(comparator);
+
+    final rows = data
+        .skip(startIndex)
+        .take(count)
+        .map((element) => rowDisplay(startIndex, count, element))
+        .toList();
+
+    return AsyncRowsResponse(data.length, rows);
+  }
+
+  @override
   List<DataCell> getCellsToShow(MapEntry<String, Vehicle> element) {
 
     if(conducteurEmploye){
