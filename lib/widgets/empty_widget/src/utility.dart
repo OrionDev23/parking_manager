@@ -13,7 +13,7 @@ class EmptyWidgetUtility {
     return MediaQuery.of(context).size.height;
   }
 
-  static double getDimention(context, double unit) {
+  static double getDimention(BuildContext context, double unit) {
     if (fullWidth(context) <= 360.0) {
       return unit / 1.3;
     } else {
