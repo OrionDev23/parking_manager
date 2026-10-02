@@ -37,7 +37,7 @@ class SqliteDriverSource implements LocalDriverSource {
     if (!includeArchived) query.write(' AND state != 3');
     if (search != null && search.trim().isNotEmpty) {
       query.write(' AND (first_name LIKE ? OR last_name LIKE ? OR registration LIKE ? OR email LIKE ? OR phone LIKE ?)');
-      final value = '%' + search.trim() + '%';
+      final value = '%${'${search.trim()}'}%';
       args.addAll([value, value, value, value, value]);
     }
     query.write(' ORDER BY updated_at DESC');
