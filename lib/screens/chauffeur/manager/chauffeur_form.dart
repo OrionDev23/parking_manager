@@ -521,7 +521,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                   return SizedBox(
                     height: tilesHeight,
                     child: ListTile(
-                      tileColor: WidgetStatePropertyAll<Color>(appTheme.fillColor),
+                      tileColor: WidgetStateColor.resolveWith((states) => appTheme.fillColor),
                       title: Text(
                         vehicules[index],
                         softWrap: true,
