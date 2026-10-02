@@ -52,15 +52,23 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
 
   }
 
-  void checkUser() async {
+  Future<void> checkUser() async {
+    if (checking) return;
     checking = true;
-    await DatabaseGetter().getUser();
-    if (DatabaseGetter.user != null) {
-      PanesListState.signedIn.value = true;
-    }
-    checking = false;
-    if (mounted) {
-      setState(() {});
+    if (mounted) setState(() {});
+
+    try {
+      final session = await authService.restoreSession();
+      if (session != null) {
+        PanesListState.signedIn.value = true;
+        signedIn = true;
+      }
+    } catch (_) {
+      PanesListState.signedIn.value = false;
+      signedIn = false;
+    } finally {
+      checking = false;
+      if (mounted) setState(() {});
     }
   }
 
@@ -234,43 +242,36 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
 
   String error = "";
 
-  void signIn() async {
-    if (validEmail && password.text.isNotEmpty && projectName.text
-      .trim().isNotEmpty) {
+  Future<void> signIn() async {
+    if (validEmail &&
+        password.text.isNotEmpty &&
+        projectName.text.trim().isNotEmpty) {
       setState(() {
         checking = true;
+        error = '';
       });
-      project=projectName.text;
-      DatabaseGetter();
-      Future.delayed(const Duration(milliseconds: 300)).then((value) async{
 
-        try{
-          await DatabaseGetter.account!.deleteSessions();
-        }
-        catch(e){
-          //ignore
-        }
-        await DatabaseGetter.account!.createEmailPasswordSession(
-            email: email.text,
-            password: password.text)
-            .then((value) async {
-          prefs.setString('project', projectName.text);
-          DatabaseGetter();
+      try {
+        final session = await authService.signIn(
+          email: email.text,
+          password: password.text,
+          projectId: projectName.text.trim(),
+        );
 
-          await DatabaseGetter().getUser();
+        if (session != null) {
           PanesListState.signedIn.value = true;
-          setState(() {
-            signedIn = true;
-          });
-        }).onError<AppwriteException>((e, s) {
-          error = e.type!.tr();
-          setState(() {
-            checking = false;
-            signedIn = false;
-          });
-        });
-      });
-
+          signedIn = true;
+        }
+      } on AppwriteException catch (e) {
+        error = e.type?.tr() ?? e.message ?? 'connexionerror'.tr();
+        signedIn = false;
+      } catch (e) {
+        error = e.toString();
+        signedIn = false;
+      } finally {
+        checking = false;
+        if (mounted) setState(() {});
+      }
     } else if (password.text.isEmpty) {
       setState(() {
         error = "emptypassword".tr();
