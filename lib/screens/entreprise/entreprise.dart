@@ -686,7 +686,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     height: tilesHeight,
                     child: ListTile(
                       tileColor:
-                      WidgetStatePropertyAll<Color>(appTheme.fillColor),
+                      WidgetStateColor.resolveWith((states) => appTheme.fillColor),
                       title: Text(
                         filliales[index],
                         softWrap: true,
@@ -790,7 +790,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     height: tilesHeight,
                     child: ListTile(
                       tileColor:
-                      WidgetStatePropertyAll<Color>(appTheme.fillColor),
+                      WidgetStateColor.resolveWith((states) => appTheme.fillColor),
                       title: Text(
                         directions[index],
                         softWrap: true,
@@ -894,7 +894,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     height: tilesHeight,
                     child: ListTile(
                       tileColor:
-                      WidgetStatePropertyAll<Color>(appTheme.fillColor),
+                      WidgetStateColor.resolveWith((states) => appTheme.fillColor),
                       title: Text(
                         departments[index],
                         softWrap: true,
