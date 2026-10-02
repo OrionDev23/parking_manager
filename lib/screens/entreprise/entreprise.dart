@@ -923,7 +923,6 @@ class MyEntrepriseState extends State<MyEntreprise> {
     PlatformFile? pickedFile = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
-      allowMultiple: false,
     );
     if (pickedFile != null) {
       departments.addAll(await ImportAppartenance(file: pickedFile,type:2)
@@ -938,7 +937,6 @@ class MyEntrepriseState extends State<MyEntreprise> {
     PlatformFile? pickedFile = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
-      allowMultiple: false,
     );
     if (pickedFile != null) {
       directions.addAll(await ImportAppartenance(file: pickedFile,type:1)
@@ -951,7 +949,6 @@ class MyEntrepriseState extends State<MyEntreprise> {
     PlatformFile? pickedFile = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
-      allowMultiple: false,
     );
     if (pickedFile != null) {
       filliales.addAll(await ImportAppartenance(file: pickedFile,type:0)
