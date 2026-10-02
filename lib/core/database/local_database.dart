@@ -10,7 +10,7 @@ class LocalDatabase {
     if (_database != null) return;
     final directory = await getApplicationSupportDirectory();
     await Directory(directory.path).create(recursive: true);
-    final file = File('\${directory.path}\${Platform.pathSeparator}parcoto.db');
+    final file = File('${directory.path}${Platform.pathSeparator}parcoto.db');
     final db = sqlite3.open(file.path);
     _database = db;
     _migrate(db);
