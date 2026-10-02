@@ -31,6 +31,7 @@ import '../reparation/reparation_dashboard.dart';
 import '../settings.dart';
 import '../../tutorials/tutorial.dart';
 import '../user_management/user_management.dart';
+import '../access/access_management.dart';
 import '../vehicle/brand/brand_list.dart';
 import '../vehicle/documents/document_tabs.dart';
 import '../vehicle/manager/vehicle_tabs.dart';
@@ -51,6 +52,7 @@ class PaneItemsAndFooters {
 
   static late PaneItem dashboard;
   static late PaneItem usermanagement;
+  static late PaneItem accessManagement;
   static late PaneItemExpander vehicles;
   static late PaneItemExpander reparations;
   static late PaneItemExpander chauffeurs;
@@ -83,6 +85,14 @@ class PaneItemsAndFooters {
           'home',
           style: paneTextStyle,
         ).tr());
+    accessManagement = PaneItem(
+        key: const Key("access"),
+        title: const Text('Équipes et accès'),
+        icon: Icon(
+          FluentIcons.security_group,
+          color: appTheme.color.lightest,
+        ),
+        body: const AccessManagement());
     usermanagement = PaneItem(
         key: Key("usermngmt"),
         title: Text(
@@ -489,13 +499,14 @@ class PaneItemsAndFooters {
           style: paneTextStyle,
         ).tr(),
         body: const Tutorial());
-    bool isAdmin = DatabaseGetter().isAdmin();
-    bool isManager = DatabaseGetter().isManager();
+    final canManageUsers = authService.session?.hasPermission('users.manage') ?? false;
+    final canManageAccess = authService.session?.hasPermission('permissions.manage') ?? false;
 
     if (PanesListState.signedIn.value) {
       originalItems = [
         if (PanesListState.signedIn.value)dashboard,
-        if (isAdmin) usermanagement,
+        if (canManageUsers) usermanagement,
+        if (canManageAccess) accessManagement,
         if (PanesListState.signedIn.value)vehicles,
         if (PanesListState.signedIn.value)reparations,
         if (showAtelier) atelier,
@@ -510,8 +521,9 @@ class PaneItemsAndFooters {
     }
     footerItems = [
       PaneItemSeparator(),
-      if (isAdmin && PanesListState.signedIn.value) entreprise,
-      if (isAdmin && PanesListState.signedIn.value) backup,
+      if (canManageAccess && PanesListState.signedIn.value) accessManagement,
+      if (authService.session?.hasPermission('company.manage') == true && PanesListState.signedIn.value) entreprise,
+      if (authService.session?.hasPermission('backup.manage') == true && PanesListState.signedIn.value) backup,
       if (PanesListState.signedIn.value) logout,
       parametres,
       if (PanesListState.signedIn.value) tutorial,
