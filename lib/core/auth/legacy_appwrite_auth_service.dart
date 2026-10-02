@@ -144,14 +144,9 @@ class LegacyAppwriteAuthService implements AuthService {
 
   Role _resolvedRole = Role.user;
 
-  AuthSession _buildSession(String projectId) {
-    return _buildSessionWithRole(projectId, _resolvedRole);
-  }
-
   AuthSession _buildSessionWithRole(String projectId, Role role) {
     final user = DatabaseGetter.user!;
     final profile = DatabaseGetter.me.value!;
-    final role = _resolvedRole;
 
     final trialDate = DatabaseGetter.trialDate;
     final limits = DatabaseGetter.limits;
