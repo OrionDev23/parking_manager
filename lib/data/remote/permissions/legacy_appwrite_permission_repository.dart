@@ -1,4 +1,4 @@
-import 'package:appwrite/appwrite.dart';
+import 'package:appwrite/appwrite.dart' hide Role;
 
 import '../../../admin_parameters.dart';
 import '../../../providers/client_database.dart';
