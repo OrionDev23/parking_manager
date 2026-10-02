@@ -93,7 +93,7 @@ class UsersWebservice
     final accessUsers = await database.listRows(
       databaseId: databaseId,
       tableId: 'access_users',
-      queries: const [Query.limit(500)],
+      queries: [Query.limit(500)],
     );
 
     final teamNames = <String, String>{
