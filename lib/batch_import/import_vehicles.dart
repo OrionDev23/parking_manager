@@ -3,7 +3,7 @@ import 'dart:io' as f;
 import 'package:dart_appwrite/dart_appwrite.dart';
 import 'package:dzair_data_usage/langs.dart' as l;
 import 'package:easy_localization/easy_localization.dart';
-import 'package:excel/excel.dart';
+import 'package:excel_plus/excel_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
