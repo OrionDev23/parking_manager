@@ -60,7 +60,7 @@ class DocumentFormState extends State<DocumentForm>
         .then((value) {
       if (value.data.isNotEmpty) {
         selectedVehicle = value
-            .convertTo((p0) => Vehicle.fromJson(p0 as Map<String, dynamic>));
+            .convertTo((p0) => Vehicle.fromJson(p0));
       }
     });
     if (mounted) {
