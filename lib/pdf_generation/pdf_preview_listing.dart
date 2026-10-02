@@ -113,7 +113,7 @@ class PdfPreviewListing extends StatelessWidget {
           await futureFile(pageFormat),
           '$name.pdf');
     } else {
-      String? path = await FilePicker.platform.saveFile(
+      String? path = await FilePicker.saveFile(
         dialogTitle: "save".tr(),
         fileName: '$name.pdf',
         type: FileType.custom,
