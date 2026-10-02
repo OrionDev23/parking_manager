@@ -22,4 +22,18 @@ class UserAccess {
     effective.removeAll(deniedPermissions);
     return effective;
   }
+
+  UserAccess copyWith({
+    Set<String>? teamIds,
+    Set<String>? grantedPermissions,
+    Set<String>? deniedPermissions,
+  }) {
+    return UserAccess(
+      userId: userId,
+      companyId: companyId,
+      teamIds: teamIds ?? this.teamIds,
+      grantedPermissions: grantedPermissions ?? this.grantedPermissions,
+      deniedPermissions: deniedPermissions ?? this.deniedPermissions,
+    );
+  }
 }
