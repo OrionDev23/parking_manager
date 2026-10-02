@@ -5,6 +5,7 @@ import '../main.dart';
 import '../serializables/conducteur/disponibilite_chauffeur.dart';
 import '../serializables/conducteur/document_chauffeur.dart';
 import '../serializables/conducteur/conducteur.dart';
+import '../domain/entities/driver.dart';
 import '../utilities/profil_beautifier.dart';
 import 'client_database.dart';
 
@@ -28,26 +29,47 @@ class DriverProvider extends ChangeNotifier {
       return;
     }
     downloadingConducteurs=true;
-    conducteurs.clear();
-    await DatabaseGetter.database!.listRows(
-        databaseId: databaseId,
-        tableId: chauffeurid,queries: [
-      Query.limit(DatabaseGetter.limits['vehicles']??500)
-    ]).then((value) {
-      for(int i=0;i<value.rows.length;i++){
-        conducteurs[value.rows[i].$id]=value.rows[i].convertTo(
-                (p0) => Conducteur.fromJson(p0));
-      }
-      downloadedConducteurs=true;
-
-    }).onError((error, stackTrace) {
-      downloadedConducteurs=false;
-
-    });
+    try {
+      final drivers = await driverServices.repository.getDrivers();
+      conducteurs
+        ..clear()
+        ..addEntries(
+          drivers.map(
+            (driver) => MapEntry(driver.id, _toLegacyConducteur(driver)),
+          ),
+        );
+      downloadedConducteurs = true;
+    } catch (_) {
+      downloadedConducteurs = false;
+    }
     downloadingConducteurs=false;
     notifyListeners();
 
   }
+  static Conducteur _toLegacyConducteur(Driver driver) {
+    return Conducteur(
+      id: driver.id,
+      name: driver.lastName,
+      prenom: driver.firstName,
+      matricule: driver.registration,
+      vehicules: driver.vehicleIds,
+      filliale: driver.subsidiary,
+      direction: driver.direction,
+      departement: driver.department,
+      profession: driver.profession,
+      etat: driver.state,
+      etatactuel: driver.currentStateId,
+      createdBy: driver.createdBy,
+      adresse: driver.address,
+      email: driver.email,
+      dateNaissance: driver.birthDate,
+      service: driver.service,
+      telephone: driver.phone,
+      createdAt: driver.createdAt,
+      updatedAt: driver.updatedAt,
+    );
+  }
+
   Future<void> refreshDocuments() async{
     if(downloadingDocuments){
       return;
