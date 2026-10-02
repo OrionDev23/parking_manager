@@ -103,6 +103,39 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
       return access;
     } on AppwriteException catch (error) {
       if (error.code != 404) rethrow;
+
+      // Transitional compatibility: existing installations still use
+      // Appwrite Teams. A user without an access_users row keeps the
+      // legacy access until an explicit Parcoto access profile is created.
+      final client = DatabaseGetter.client;
+      if (client != null) {
+        final teams = await Teams(client).list();
+        final names = teams.teams.map((team) => team.name.toLowerCase()).toSet();
+
+        if (names.contains('admins')) {
+          return UserAccess(
+            userId: userId,
+            companyId: companyId,
+            grantedPermissions: PermissionCatalog.all.map((e) => e.id).toSet(),
+          );
+        }
+
+        if (names.contains('managers')) {
+          return UserAccess(
+            userId: userId,
+            companyId: companyId,
+            grantedPermissions: {
+              for (final permission in PermissionCatalog.all)
+                if (permission.module != 'users' &&
+                    permission.module != 'teams' &&
+                    permission.module != 'permissions' &&
+                    permission.module != 'backup')
+                  permission.id,
+            },
+          );
+        }
+      }
+
       return UserAccess(userId: userId, companyId: companyId);
     }
   }
