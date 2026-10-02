@@ -46,8 +46,8 @@ class _ImportConducteursState extends State<ImportConducteurs> {
         loading = true;
       });
     }
-    final Uint8List bytes = await ${path.includes('import_appartenance')?'file':'widget.file'}.readAsBytes();
-    if (bytes != null) {
+    final Uint8List bytes = await widget.file.readAsBytes();
+    {
       setState(() {
         progressLoadingFile = 10;
       });
