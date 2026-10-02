@@ -12,7 +12,6 @@ import '../../main.dart';
 import 'sidemenu.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-import '../../providers/client_database.dart';
 import '../../theme.dart';
 import '../backup/backup_manager.dart';
 import '../chauffeur/conducteur_dashboard.dart';
