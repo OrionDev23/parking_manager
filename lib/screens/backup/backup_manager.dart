@@ -48,34 +48,38 @@ class _BackupManagerState extends State<BackupManager> {
   }
 
 
-  bool pickingFile=false;
-  void showImportScreen() async{
-    if(!pickingFile){
-      setState(() {
-        pickingFile=true;
-      });
+  bool pickingFile = false;
+
+  Future<void> showImportScreen() async {
+    if (pickingFile) return;
+
+    setState(() {
+      pickingFile = true;
+    });
+
+    try {
       final value = await FilePicker.pickFile(
         dialogTitle: 'importfile'.tr(),
         type: FileType.custom,
         allowedExtensions: ['gz'],
       );
-      if (value != null) {
+
+      if (value != null && mounted) {
         final bytes = await value.readAsBytes();
-        if (mounted) {
-          showDialog(
-            context: context,
-            builder: (con) => BackupRestore(backupFile: bytes),
-          );
-        }
+        if (!mounted) return;
+
+        await showDialog(
+          context: context,
+          builder: (con) => BackupRestore(backupFile: bytes),
+        );
       }
-        }
-      });
-      setState(() {
-        pickingFile=false;
-      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          pickingFile = false;
+        });
+      }
     }
-
-
   }
 
   void showSaveScreen() {
