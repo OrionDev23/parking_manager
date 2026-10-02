@@ -42,7 +42,7 @@ class RepairProvider extends ChangeNotifier {
         tableId: reparationId,queries: [Query.limit(5000)]).then((value) {
       for(int i=0;i<value.rows.length;i++){
         reparations[value.rows[i].$id]=value.rows[i].convertTo(
-                (p0) => Reparation.fromJson(p0 as Map<String,dynamic>));
+                (p0) => Reparation.fromJson(p0));
       }
       downloadedReparations=true;
 
@@ -65,7 +65,7 @@ class RepairProvider extends ChangeNotifier {
         tableId: reparationId,queries: [Query.limit(5000)]).then((value) {
       for(int i=0;i<value.rows.length;i++){
         prestataires[value.rows[i].$id]=value.rows[i].convertTo(
-                (p0) => Client.fromJson(p0 as Map<String,dynamic>));
+                (p0) => Client.fromJson(p0));
       }
       downloadedPrestataires=true;
 
@@ -270,7 +270,7 @@ class RepairProvider extends ChangeNotifier {
           ]).then((value) {
         for (int i = 0; i < value.rows.length; i++) {
           result.add(value.rows[i].convertTo(
-                  (p0) => Reparation.fromJson(p0 as Map<String, dynamic>)));
+                  (p0) => Reparation.fromJson(p0)));
         }
       }).onError((error, stackTrace) {
         if (kDebugMode) {
@@ -293,7 +293,7 @@ class RepairProvider extends ChangeNotifier {
         rowId: docID)
         .then((value) {
       return value
-          .convertTo((p0) => Client.fromJson(p0 as Map<String, dynamic>));
+          .convertTo((p0) => Client.fromJson(p0));
     }).onError((error, stackTrace) {
       return Future.value(Client(
         id: docID,
@@ -313,7 +313,7 @@ class RepairProvider extends ChangeNotifier {
         rowId: docID)
         .then((value) {
       return value
-          .convertTo((p0) => FicheReception.fromJson(p0 as Map<String, dynamic>));
+          .convertTo((p0) => FicheReception.fromJson(p0));
     }).onError((error, stackTrace) {
       return Future.value(FicheReception(
         id: docID, numero: 0, dateEntre: DateTime.now(),
@@ -331,7 +331,7 @@ class RepairProvider extends ChangeNotifier {
         rowId: docID)
         .then((value) {
       return value
-          .convertTo((p0) => Reparation.fromJson(p0 as Map<String, dynamic>));
+          .convertTo((p0) => Reparation.fromJson(p0));
     }).onError((error, stackTrace) {
       return Future.value(Reparation(
         id: docID, numero: 0, date: DateTime.now(),
