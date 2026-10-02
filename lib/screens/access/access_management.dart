@@ -205,17 +205,30 @@ class _TeamEditorState extends State<_TeamEditor> {
         height: 600,
         child: Column(
           children: [
-            TextBox(
-              controller: _name,
-              header: 'Nom',
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Nom'),
+                const SizedBox(height: 6),
+                TextBox(
+                  controller: _name,
               enabled: !(widget.team?.isSystem ?? false),
+                  enabled: !(widget.team?.isSystem ?? false),
+                ),
+              ],
             ),
             const SizedBox(height: 12),
-            TextBox(
-              controller: _description,
-              header: 'Description',
-              maxLines: 2,
-              enabled: !(widget.team?.isSystem ?? false),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Description'),
+                const SizedBox(height: 6),
+                TextBox(
+                  controller: _description,
+                  maxLines: 2,
+                  enabled: !(widget.team?.isSystem ?? false),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             Expanded(
