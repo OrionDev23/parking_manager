@@ -212,7 +212,6 @@ class _TeamEditorState extends State<_TeamEditor> {
                 const SizedBox(height: 6),
                 TextBox(
                   controller: _name,
-              enabled: !(widget.team?.isSystem ?? false),
                   enabled: !(widget.team?.isSystem ?? false),
                 ),
               ],
