@@ -54,16 +54,14 @@ class _BackupManagerState extends State<BackupManager> {
       setState(() {
         pickingFile=true;
       });
-      await FilePicker.platform
-          .pickFiles(
+      await FilePicker.pickFile(
           dialogTitle: 'importfile'.tr(),
           type: FileType.custom,
-          withData: true,
           allowedExtensions: ['gz']
       )
           .then((value) {
         if(value!=null){
-          var bytes=value.files.first.bytes;
+          var bytes=value.bytes;
 
           Future.delayed(const Duration(milliseconds: 30)).then((value) {
             if(mounted){
