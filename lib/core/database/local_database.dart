@@ -45,6 +45,18 @@ class LocalDatabase {
     }
   }
 
+    if (version < 3) {
+      db.execute('''CREATE TABLE drivers (
+        id TEXT PRIMARY KEY, company_id TEXT NOT NULL, site_id TEXT,
+        first_name TEXT NOT NULL, last_name TEXT NOT NULL, registration TEXT NOT NULL,
+        email TEXT, phone TEXT, state INTEGER NOT NULL, created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL, payload TEXT
+      )''');
+      db.execute('CREATE INDEX idx_drivers_company ON drivers(company_id)');
+      db.execute('CREATE INDEX idx_drivers_registration ON drivers(registration)');
+      db.execute("INSERT INTO schema_migrations(version, applied_at) VALUES (3, datetime('now'))");
+    }
+
   Future<void> close() async {
     _database?.close();
     _database = null;
