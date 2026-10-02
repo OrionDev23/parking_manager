@@ -83,7 +83,7 @@ class StateFormState extends State<StateForm> {
         .then((value) {
       if (value.data.isNotEmpty) {
         selectedVehicle = value
-            .convertTo((p0) => Vehicle.fromJson(p0 as Map<String, dynamic>));
+            .convertTo((p0) => Vehicle.fromJson(p0));
       }
     });
     if (mounted) {
@@ -101,7 +101,7 @@ class StateFormState extends State<StateForm> {
         .then((value) {
       if (value.data.isNotEmpty) {
         selectedReparation = value
-            .convertTo((p0) => Reparation.fromJson(p0 as Map<String, dynamic>));
+            .convertTo((p0) => Reparation.fromJson(p0));
       }
     });
     if (mounted) {
