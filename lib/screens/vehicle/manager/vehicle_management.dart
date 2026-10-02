@@ -94,7 +94,9 @@ class VehicleManagementState extends State<VehicleManagement>
     );
     if (pickedFile != null && mounted) {
       Future.delayed(const Duration(milliseconds: 50))
-          .then((value) => showDialog(
+          .then((value) {
+            if (!mounted) return;
+            return showDialog(
               context: context,
               barrierDismissible: true,
               builder: (c) {
