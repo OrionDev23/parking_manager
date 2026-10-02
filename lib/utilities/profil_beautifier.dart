@@ -183,7 +183,7 @@ String listToString(List<String>? words){
 
 
 int colorToInt(Color? color) {
-  return color?.value ?? 0x00000000;
+  return color?.toARGB32() ?? 0x00000000;
 }
 
 DateTime? stringtoTime(String? json) {
