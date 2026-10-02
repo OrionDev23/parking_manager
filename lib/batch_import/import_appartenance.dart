@@ -127,6 +127,8 @@ class ImportAppartenance {
 
             case DateTimeCellValue():
               break;
+            case CellErrorValue():
+              break;
           }
         }
       }
