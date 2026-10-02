@@ -1,6 +1,6 @@
-import 'package:appwrite/appwrite.dart';
 import 'dart:async';
 
+import 'package:appwrite/appwrite.dart' hide Role;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../providers/client_database.dart';
@@ -146,7 +146,7 @@ class LegacyAppwriteAuthService implements AuthService {
     final trialDate = DatabaseGetter.trialDate;
     final limits = DatabaseGetter.limits;
     final license = License(
-      id: projectId + '_' + user.$id,
+      id: '${projectId}_${user.$id}',
       companyId: projectId,
       edition: edition,
       expiresAt: trialDate,
