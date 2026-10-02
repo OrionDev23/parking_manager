@@ -151,7 +151,7 @@ String appointmentToJson(Appointment? a) {
       'isAllDay': a.isAllDay,
       'id': a.id,
       'subject': a.subject,
-      'color': a.color.value,
+      'color': a.color.toARGB32(),
       'notes': a.notes,
       'location': a.location,
       'resourceIds': jsonEncode(a.resourceIds),
@@ -163,7 +163,7 @@ String appointmentToJson(Appointment? a) {
 Color colorFromInt(int? color) {
   if (color == null) {
     return Color((math.Random().nextDouble() * 0xFFFFFF).toInt())
-        .withOpacity(1.0);
+        .withValues(alpha: 1.0);
   } else {
     return Color(color);
   }
@@ -212,8 +212,8 @@ String dlistToString(List<dynamic>?objects){
   List<String>? temp=listToJsonString(objects);
   String result="";
   if(temp!=null){
-    for(int i=0;i<temp!.length;i++){
-      result+=temp[i]??'';
+    for(int i=0;i<temp.length;i++){
+      result+=temp[i];
       result+=" ";
     }
   }
