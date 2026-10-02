@@ -509,7 +509,7 @@ class _BackupRestoreState extends State<BackupRestore> {
 
       }
       else if(deleteAllData){
-        print('normalement tsupprimi');
+        // Data deletion is intentionally silent.
         await restoreDatabase.deleteThenAddData();
 
       }
@@ -518,6 +518,7 @@ class _BackupRestoreState extends State<BackupRestore> {
       }
 
       Future.delayed(const Duration(milliseconds: 20)).then((s){
+        if (!mounted) return;
         context.pop();
 
         displayInfoBar(context,
