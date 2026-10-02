@@ -63,7 +63,7 @@ class CDocumentFormState extends State<CDocumentForm>
         .then((value) {
       if (value.data.isNotEmpty) {
         selectedConducteur = value
-            .convertTo((p0) => Conducteur.fromJson(p0 as Map<String, dynamic>));
+            .convertTo((p0) => Conducteur.fromJson(p0));
       }
     });
     if (mounted) {
