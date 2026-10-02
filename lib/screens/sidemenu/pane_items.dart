@@ -511,8 +511,8 @@ class PaneItemsAndFooters {
         if (PanesListState.signedIn.value)reparations,
         if (showAtelier) atelier,
         if (PanesListState.signedIn.value)chauffeurs,
-        if (isAdmin || isManager) planner,
-        if (isAdmin || isManager) evenements,
+        if (authService.session?.hasPermission('planning.manage') == true) planner,
+        if (authService.session?.hasPermission('activity.view') == true) evenements,
       ];
     } else {
       originalItems = [
