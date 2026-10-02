@@ -20,7 +20,7 @@ class AppwriteVehicleSource implements RemoteVehicleSource {
     required this.tableId,
   });
 
-  Vehicle _fromRow(Row row) {
+  Vehicle _fromRow(dynamic row) {
     final data = Map<String, dynamic>.from(row.data);
     final payload = data['payload'];
     if (payload is String) {
@@ -64,7 +64,7 @@ class AppwriteVehicleSource implements RemoteVehicleSource {
       tableId: tableId,
       queries: queries,
     );
-    return result.rows.map(_fromRow).toList(growable: false);
+    return result.rows.map<Vehicle>(_fromRow).toList(growable: false);
   }
 
   @override
