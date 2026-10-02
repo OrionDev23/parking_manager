@@ -137,6 +137,7 @@ class _NotificationTileState extends State<NotificationTile> {
     storedData.add(widget.pNotification.id);
 
     await prefs.setStringList(recordName, storedData).then((value) {
+      if (!mounted) return;
       if (widget.pNotification.type == 0) {
         VehicleProvider.removedVehiDocs.add(widget.pNotification.id);
       } else if (widget.pNotification.type == 1) {
