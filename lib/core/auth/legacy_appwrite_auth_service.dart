@@ -6,8 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/client_database.dart';
 import '../licensing/edition.dart';
 import '../licensing/license.dart';
-import '../permissions/role.dart';
-import '../../domain/repositories/permission_repository.dart';
+import '../../domain/repositories/access_control_repository.dart';
 import '../tenancy/company_context.dart';
 import 'auth_service.dart';
 import 'auth_session.dart';
@@ -17,7 +16,7 @@ import 'auth_state.dart';
 class LegacyAppwriteAuthService implements AuthService {
   final SharedPreferences preferences;
   final ParcotoEdition edition;
-  final PermissionRepository permissionRepository;
+  final AccessControlRepository accessControlRepository;
 
   AuthState _state = AuthState.unknown;
   AuthSession? _session;
@@ -26,7 +25,7 @@ class LegacyAppwriteAuthService implements AuthService {
 
   LegacyAppwriteAuthService({
     required this.preferences,
-    required this.permissionRepository,
+    required this.accessControlRepository,
     this.edition = ParcotoEdition.online,
   });
 
@@ -69,8 +68,11 @@ class LegacyAppwriteAuthService implements AuthService {
         return null;
       }
 
-      _resolvedRole = await permissionRepository.getCurrentRole();
-      _session = _buildSessionWithRole(configuredProject, _resolvedRole);
+      final permissions = await accessControlRepository.getEffectivePermissions(
+        configuredProject,
+        DatabaseGetter.user!.$id,
+      );
+      _session = _buildSession(configuredProject, permissions);
       _setState(AuthState.signedIn);
       return _session;
     } catch (_) {
@@ -127,8 +129,11 @@ class LegacyAppwriteAuthService implements AuthService {
         );
       }
 
-      _resolvedRole = await permissionRepository.getCurrentRole();
-      _session = _buildSessionWithRole(resolvedProject, _resolvedRole);
+      final permissions = await accessControlRepository.getEffectivePermissions(
+        resolvedProject,
+        DatabaseGetter.user!.$id,
+      );
+      _session = _buildSession(resolvedProject, permissions);
       _setState(AuthState.signedIn);
       return _session!;
     } on AppwriteException {
@@ -142,9 +147,10 @@ class LegacyAppwriteAuthService implements AuthService {
     }
   }
 
-  Role _resolvedRole = Role.user;
-
-  AuthSession _buildSessionWithRole(String projectId, Role role) {
+  AuthSession _buildSession(
+    String projectId,
+    Set<String> permissions,
+  ) {
     final user = DatabaseGetter.user!;
     final profile = DatabaseGetter.me.value!;
 
@@ -164,7 +170,7 @@ class LegacyAppwriteAuthService implements AuthService {
       email: user.email,
       displayName: profile.name ?? user.name,
       company: CompanyContext(companyId: projectId),
-      role: role,
+      permissions: permissions,
       license: license,
     );
   }
