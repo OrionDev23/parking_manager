@@ -137,7 +137,6 @@ class Vehicle extends ParcOtoDefault {
     return res.trim();
   }
 
-  @override
   factory Vehicle.fromJson(Map<String, dynamic> json) =>
       _$VehicleFromJson(json);
 
