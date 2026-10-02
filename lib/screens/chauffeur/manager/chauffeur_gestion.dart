@@ -72,7 +72,7 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
 
 
   void importList() async {
-    FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
+    PlatformFile? pickedFile = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
       allowMultiple: false,
