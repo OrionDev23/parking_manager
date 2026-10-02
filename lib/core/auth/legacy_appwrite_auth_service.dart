@@ -7,6 +7,7 @@ import '../../providers/client_database.dart';
 import '../licensing/edition.dart';
 import '../licensing/license.dart';
 import '../permissions/role.dart';
+import '../../domain/repositories/permission_repository.dart';
 import '../tenancy/company_context.dart';
 import 'auth_service.dart';
 import 'auth_session.dart';
@@ -16,6 +17,7 @@ import 'auth_state.dart';
 class LegacyAppwriteAuthService implements AuthService {
   final SharedPreferences preferences;
   final ParcotoEdition edition;
+  final PermissionRepository permissionRepository;
 
   AuthState _state = AuthState.unknown;
   AuthSession? _session;
@@ -24,6 +26,7 @@ class LegacyAppwriteAuthService implements AuthService {
 
   LegacyAppwriteAuthService({
     required this.preferences,
+    required this.permissionRepository,
     this.edition = ParcotoEdition.online,
   });
 
@@ -66,7 +69,8 @@ class LegacyAppwriteAuthService implements AuthService {
         return null;
       }
 
-      _session = _buildSession(configuredProject);
+      _resolvedRole = await permissionRepository.getCurrentRole();
+      _session = _buildSessionWithRole(configuredProject, _resolvedRole);
       _setState(AuthState.signedIn);
       return _session;
     } catch (_) {
@@ -123,7 +127,8 @@ class LegacyAppwriteAuthService implements AuthService {
         );
       }
 
-      _session = _buildSession(resolvedProject);
+      _resolvedRole = await permissionRepository.getCurrentRole();
+      _session = _buildSessionWithRole(resolvedProject, _resolvedRole);
       _setState(AuthState.signedIn);
       return _session!;
     } on AppwriteException {
@@ -137,18 +142,16 @@ class LegacyAppwriteAuthService implements AuthService {
     }
   }
 
+  Role _resolvedRole = Role.user;
+
   AuthSession _buildSession(String projectId) {
+    return _buildSessionWithRole(projectId, _resolvedRole);
+  }
+
+  AuthSession _buildSessionWithRole(String projectId, Role role) {
     final user = DatabaseGetter.user!;
     final profile = DatabaseGetter.me.value!;
-    final teams = DatabaseGetter.myTeams;
-
-    final isAdmin =
-        teams.any((team) => team.name.toLowerCase() == 'admins');
-    final isManager =
-        teams.any((team) => team.name.toLowerCase() == 'managers');
-    final role = isAdmin
-        ? Role.admin
-        : (isManager ? Role.manager : Role.user);
+    final role = _resolvedRole;
 
     final trialDate = DatabaseGetter.trialDate;
     final limits = DatabaseGetter.limits;
