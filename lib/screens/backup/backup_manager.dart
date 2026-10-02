@@ -54,23 +54,20 @@ class _BackupManagerState extends State<BackupManager> {
       setState(() {
         pickingFile=true;
       });
-      await FilePicker.pickFile(
-          dialogTitle: 'importfile'.tr(),
-          type: FileType.custom,
-          allowedExtensions: ['gz']
-      )
-          .then((value) {
-        if(value!=null){
-          var bytes=await value.readAsBytes();
-
-          Future.delayed(const Duration(milliseconds: 30)).then((value) {
-            if(mounted){
-              showDialog(context: context, builder: (con){
-                return BackupRestore(backupFile: bytes);
-              });
-            }
-
-          });
+      final value = await FilePicker.pickFile(
+        dialogTitle: 'importfile'.tr(),
+        type: FileType.custom,
+        allowedExtensions: ['gz'],
+      );
+      if (value != null) {
+        final bytes = await value.readAsBytes();
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (con) => BackupRestore(backupFile: bytes),
+          );
+        }
+      }
         }
       });
       setState(() {
