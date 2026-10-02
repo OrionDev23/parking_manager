@@ -21,5 +21,5 @@ class AuthSession {
   });
 
   bool hasPermission(String permission) =>
-      permissions.contains(permission) || permissions.contains('*') || role.allows(permission) || role.permissions.contains('*');
+      permissions.contains(permission) || permissions.contains('*');
 }
