@@ -1233,7 +1233,7 @@ class ReparationPdf {
   }
 
 
-  Widget getFirstPageTasks(nbrPages,List<TaskGroup> tasksValues){
+  Widget getFirstPageTasks(int nbrPages, List<TaskGroup> tasksValues){
     int nbrLines = nbrPages == 1 ? nbrPageOne : nbrPageOne + pageAdition;
     double height = nbrLines * 0.5 + 0.75 + 0.5;
 
