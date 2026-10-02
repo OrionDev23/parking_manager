@@ -23,6 +23,7 @@ import 'providers/client_database.dart';
 import 'core/auth/auth_service.dart';
 import 'core/auth/legacy_appwrite_auth_service.dart';
 import 'core/services/company_service.dart';
+import 'data/remote/permissions/legacy_appwrite_permission_repository.dart';
 import 'core/services/user_profile_service.dart';
 import 'core/services/vehicle_services.dart';
 import 'data/remote/company/legacy_appwrite_company_repository.dart';
@@ -69,7 +70,10 @@ void displayMessage(BuildContext context,String msg,InfoBarSeverity severity){
 void launchApp() async {
   prefs = await SharedPreferences.getInstance();
   DatabaseGetter();
-  authService = LegacyAppwriteAuthService(preferences: prefs);
+  authService = LegacyAppwriteAuthService(
+    preferences: prefs,
+    permissionRepository: const LegacyAppwritePermissionRepository(),
+  );
   userProfileService = const UserProfileService(
     repository: LegacyAppwriteUserProfileRepository(),
   );
