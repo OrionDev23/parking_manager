@@ -1,5 +1,4 @@
 import '../licensing/license.dart';
-import '../permissions/role.dart';
 import '../tenancy/company_context.dart';
 
 class AuthSession {
@@ -7,7 +6,6 @@ class AuthSession {
   final String email;
   final String? displayName;
   final CompanyContext company;
-  final Role role;
   final Set<String> permissions;
   final License? license;
   final bool isOfflineSession;
@@ -16,7 +14,6 @@ class AuthSession {
     required this.userId,
     required this.email,
     required this.company,
-    required this.role,
     this.displayName,
     this.permissions = const {},
     this.license,
