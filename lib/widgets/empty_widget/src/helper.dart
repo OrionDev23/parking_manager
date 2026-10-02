@@ -19,13 +19,12 @@ class CustomText extends StatefulWidget {
   final TextAlign? textAlign;
 
   @override
-  _CustomTextState createState() => _CustomTextState();
+  State<CustomText> createState() => _CustomTextState();
 }
 
 class _CustomTextState extends State<CustomText> {
   TextStyle? style;
 
-  @override
   @override
   void initState() {
     style = widget.style;
