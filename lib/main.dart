@@ -85,9 +85,15 @@ void launchApp() async {
   );
   const AccessControlRepository accessRepository = AppwriteAccessControlRepository();
   accessControlService = AccessControlService(repository: accessRepository);
+
+  // Restore the existing Appwrite session before building the UI.
+  // This guarantees that PaneItemsAndFooters sees the effective permissions
+  // on the very first frame instead of showing a partially authorized menu.
+  await authService.restoreSession();
+
   vehicleServices = await VehicleServices.create(
     preferences: prefs,
-    companyId: project ?? 'local',
+    companyId: authService.session?.company.companyId ?? project ?? 'local',
   );
 
   VehiclesUtilities();
