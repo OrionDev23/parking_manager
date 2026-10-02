@@ -161,13 +161,12 @@ class MyEntrepriseState extends State<MyEntreprise> {
     setState(() {
       pickingFile = true;
     });
-    await FilePicker.platform
-        .pickFiles(
+    await FilePicker.pickFile(
       dialogTitle: 'picklogo'.tr(),
       type: FileType.image,
     )
         .then((value) {
-      imageFile = io.File(value!.files.first.path!);
+      if (value?.path != null) imageFile = io.File(value!.path!);
       setState(() {});
     }).onError((error, stackTrace) {});
     setState(() {
@@ -921,7 +920,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
   }
 
   void importDepartments() async{
-    FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
+    PlatformFile? pickedFile = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
       allowMultiple: false,
