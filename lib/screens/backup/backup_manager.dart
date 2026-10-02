@@ -61,7 +61,7 @@ class _BackupManagerState extends State<BackupManager> {
       )
           .then((value) {
         if(value!=null){
-          var bytes=value.bytes;
+          var bytes=await value.readAsBytes();
 
           Future.delayed(const Duration(milliseconds: 30)).then((value) {
             if(mounted){
