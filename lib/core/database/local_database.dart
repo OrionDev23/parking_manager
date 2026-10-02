@@ -11,9 +11,9 @@ class LocalDatabase {
     final directory = await getApplicationSupportDirectory();
     await Directory(directory.path).create(recursive: true);
     final file = File('${directory.path}${Platform.pathSeparator}parcoto.db');
-    final db = sqlite3.open(file.path);
-    _database = db;
-    _migrate(db);
+    final opened = sqlite3.open(file.path);
+    _database = opened;
+    _migrate(opened);
   }
 
   void _migrate(Database db) {
@@ -21,6 +21,7 @@ class LocalDatabase {
     db.execute('PRAGMA journal_mode = WAL');
     db.execute('CREATE TABLE IF NOT EXISTS schema_migrations (version INTEGER PRIMARY KEY, applied_at TEXT NOT NULL)');
     final version = db.select('SELECT COALESCE(MAX(version), 0) AS version FROM schema_migrations').first['version'] as int;
+
     if (version < 1) {
       db.execute('''CREATE TABLE vehicles (
         id TEXT PRIMARY KEY, company_id TEXT NOT NULL, site_id TEXT,
@@ -37,7 +38,15 @@ class LocalDatabase {
       db.execute('CREATE INDEX idx_sync_operations_status ON sync_operations(status, created_at)');
       db.execute("INSERT INTO schema_migrations(version, applied_at) VALUES (1, datetime('now'))");
     }
+    if (version < 2) {
+      db.execute('ALTER TABLE vehicles ADD COLUMN payload TEXT');
+      db.execute("UPDATE vehicles SET payload = '{}' WHERE payload IS NULL");
+      db.execute("INSERT INTO schema_migrations(version, applied_at) VALUES (2, datetime('now'))");
+    }
   }
 
-  Future<void> close() async { _database?.close(); _database = null; }
+  Future<void> close() async {
+    _database?.close();
+    _database = null;
+  }
 }
