@@ -53,6 +53,7 @@ class PaneItemsAndFooters {
   static late PaneItem dashboard;
   static late PaneItem usermanagement;
   static late PaneItem accessManagement;
+  static late PaneItemExpander userAccessManagement;
   static late PaneItemExpander vehicles;
   static late PaneItemExpander reparations;
   static late PaneItemExpander chauffeurs;
@@ -499,15 +500,32 @@ class PaneItemsAndFooters {
           style: paneTextStyle,
         ).tr(),
         body: const Tutorial());
-    final canManageUsers = authService.session?.hasPermission('users.manage') ?? false;
-    final canManageAccess = authService.session?.hasPermission('permissions.manage') ?? false;
+    final canManageUsers =
+        authService.session?.hasPermission('users.manage') ?? false;
+    final canManageAccess =
+        authService.session?.hasPermission('permissions.manage') ?? false;
+
+    userAccessManagement = PaneItemExpander(
+      key: const Key("user-access-management"),
+      icon: Icon(
+        FluentIcons.people,
+        color: appTheme.color.lightest,
+      ),
+      title: const Text('Utilisateurs & accès'),
+      body: canManageUsers
+          ? const UserManagement()
+          : const AccessManagement(),
+      items: [
+        if (canManageUsers) usermanagement,
+        if (canManageAccess) accessManagement,
+      ],
+    );
 
     if (PanesListState.signedIn.value) {
       originalItems = [
-        if (PanesListState.signedIn.value)dashboard,
-        if (canManageUsers) usermanagement,
-        if (canManageAccess) accessManagement,
-        if (PanesListState.signedIn.value)vehicles,
+        if (PanesListState.signedIn.value) dashboard,
+        if (canManageUsers || canManageAccess) userAccessManagement,
+        if (PanesListState.signedIn.value) vehicles,
         if (PanesListState.signedIn.value)reparations,
         if (showAtelier) atelier,
         if (PanesListState.signedIn.value)chauffeurs,
