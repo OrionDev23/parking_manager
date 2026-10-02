@@ -214,6 +214,11 @@ class _TeamEditorState extends State<_TeamEditor> {
     final isLocked = widget.team?.isSystem == true;
 
     return ContentDialog(
+      constraints: const BoxConstraints(
+        minWidth: 680,
+        maxWidth: 900,
+        maxHeight: 820,
+      ),
       title: Row(children: [
         Icon(FluentIcons.people, color: FluentTheme.of(context).accentColor),
         const SizedBox(width: 10),
@@ -249,8 +254,13 @@ class _TeamEditorState extends State<_TeamEditor> {
             Button(onPressed: isLocked ? null : () => _setAll(false), child: const Text('Tout retirer')),
           ]),
           const SizedBox(height: 10),
-          Text('\${_selected.length} / \${total} permissions sélectionnées',
-              style: FluentTheme.of(context).typography.caption),
+          Row(children: [
+            Icon(FluentIcons.permissions, size: 14,
+                color: FluentTheme.of(context).accentColor),
+            const SizedBox(width: 6),
+            Text('\${_selected.length} / \${total} permissions sélectionnées',
+                style: FluentTheme.of(context).typography.caption),
+          ]),
           const SizedBox(height: 8),
           Expanded(child: ListView.separated(
             itemCount: grouped.length,
@@ -266,26 +276,37 @@ class _TeamEditorState extends State<_TeamEditor> {
                   header: Row(children: [
                     Expanded(child: Text(_moduleLabel(entry.key),
                         style: FluentTheme.of(context).typography.subtitle)),
-                    Text('\${selectedCount}/\${permissions.length}'),
-                    const SizedBox(width: 10),
-                    Button(
-                      onPressed: isLocked ? null : () => _setCategory(permissions, !allSelected),
-                      child: Text(allSelected ? 'Tout retirer' : 'Tout sélectionner'),
-                    ),
+                    Text('\${selectedCount}/\${permissions.length}',
+                        style: FluentTheme.of(context).typography.caption),
                   ]),
                   content: Padding(
                     padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
-                    child: Column(children: [
-                      for (final permission in permissions)
-                        Checkbox(
-                          content: Text(permission.label),
-                          checked: _selected.contains(permission.id),
-                          onChanged: isLocked ? null : (value) => setState(() {
-                            if (value == true) { _selected.add(permission.id); }
-                            else { _selected.remove(permission.id); }
-                          }),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Button(
+                            onPressed: isLocked
+                                ? null
+                                : () => _setCategory(permissions, !allSelected),
+                            child: Text(allSelected
+                                ? 'Tout retirer de cette catégorie'
+                                : 'Tout sélectionner dans cette catégorie'),
+                          ),
                         ),
-                    ]),
+                        const SizedBox(height: 6),
+                        for (final permission in permissions)
+                          Checkbox(
+                            content: Text(permission.label),
+                            checked: _selected.contains(permission.id),
+                            onChanged: isLocked ? null : (value) => setState(() {
+                              if (value == true) { _selected.add(permission.id); }
+                              else { _selected.remove(permission.id); }
+                            }),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               );
