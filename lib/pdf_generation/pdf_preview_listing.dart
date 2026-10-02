@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:pdf/widgets.dart' show PageOrientation;
 import 'package:universal_html/html.dart' as html;
-import 'dart:io';
 import 'package:document_file_save_plus/document_file_save_plus.dart';
 
 import 'package:easy_localization/easy_localization.dart';
