@@ -112,7 +112,7 @@ class DatabaseGetter {
 
   static en.Encrypter? encrypter;
   static en.IV? iv;
-  void setSecretKey() async {
+  Future<void> setSecretKey() async {
     if (!settingSecretKey && !secretKeySet) {
       settingSecretKey = true;
       await database!
