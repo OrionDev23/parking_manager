@@ -2,7 +2,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/screens/sidemenu/profil_form.dart';
 import 'package:parc_oto/serializables/parc_user.dart';
 import 'package:parc_oto/theme.dart';
-import 'package:parc_oto/utilities/profil_beautifier.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
