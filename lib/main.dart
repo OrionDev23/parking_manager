@@ -28,6 +28,7 @@ import 'domain/repositories/access_control_repository.dart';
 import 'data/remote/access/appwrite_access_control_repository.dart';
 import 'core/services/user_profile_service.dart';
 import 'core/services/vehicle_services.dart';
+import 'core/services/driver_services.dart';
 import 'data/remote/company/legacy_appwrite_company_repository.dart';
 import 'data/remote/users/legacy_appwrite_user_profile_repository.dart';
 import 'theme.dart';
@@ -36,6 +37,7 @@ const appTitle = "ParcOto";
 late final PackageInfo packageInfo;
 late final SharedPreferences prefs;
 late final VehicleServices vehicleServices;
+late final DriverServices driverServices;
 late final AuthService authService;
 late final UserProfileService userProfileService;
 late final CompanyService companyService;
@@ -91,9 +93,15 @@ void launchApp() async {
   // on the very first frame instead of showing a partially authorized menu.
   await authService.restoreSession();
 
+  final activeCompanyId =
+      authService.session?.company.companyId ?? project ?? 'local';
   vehicleServices = await VehicleServices.create(
     preferences: prefs,
-    companyId: authService.session?.company.companyId ?? project ?? 'local',
+    companyId: activeCompanyId,
+  );
+  driverServices = await DriverServices.create(
+    preferences: prefs,
+    companyId: activeCompanyId,
   );
 
   VehiclesUtilities();
