@@ -179,11 +179,13 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
             'departments':MyEntrepriseState.p!.departments,
         })
         .then((value) {
+      if (!widget.state.mounted) return;
       displayMessage(widget.state.context,'done',InfoBarSeverity.success);
       widget.state.setState(() {
 
       });
     }).onError((AppwriteException error, stackTrace) {
+      if (!widget.state.mounted) return;
       displayMessage(widget.state.context,'error',InfoBarSeverity.error);
     });
 
