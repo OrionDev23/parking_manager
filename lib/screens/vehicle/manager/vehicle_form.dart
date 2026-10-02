@@ -1,4 +1,3 @@
-import 'package:appwrite/appwrite.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:dzair_data_usage/langs.dart';
