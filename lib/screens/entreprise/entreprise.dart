@@ -686,7 +686,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     height: tilesHeight,
                     child: ListTile(
                       tileColor:
-                      WidgetStateColor.resolveWith((states) => appTheme.fillColor),
+                      WidgetStatePropertyAll(appTheme.fillColor),
                       title: Text(
                         filliales[index],
                         softWrap: true,
@@ -713,7 +713,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
 
   Widget directionsWidget(AppTheme appTheme) {
     return SizedBox(
-      height: directions.isEmpty?100.px:directions.length * tilesHeight + 80.px,
+      height: departments.isEmpty?100.px:departments.length * tilesHeight + 80.px,
       child: ZoneBox(
         label: 'directions'.tr(),
         child: Padding(
@@ -790,7 +790,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     height: tilesHeight,
                     child: ListTile(
                       tileColor:
-                      WidgetStateColor.resolveWith((states) => appTheme.fillColor),
+                      WidgetStatePropertyAll(appTheme.fillColor),
                       title: Text(
                         directions[index],
                         softWrap: true,
@@ -876,7 +876,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
               ),
               smallSpace,
               ListView.builder(
-                itemCount: departments.isEmpty?1:directions.length,
+                itemCount: departments.isEmpty?1:departments.length,
                 shrinkWrap: true,
                 itemBuilder: (BuildContext context, int index) {
                   if(departments.isEmpty){
@@ -894,7 +894,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     height: tilesHeight,
                     child: ListTile(
                       tileColor:
-                      WidgetStateColor.resolveWith((states) => appTheme.fillColor),
+                      WidgetStatePropertyAll(appTheme.fillColor),
                       title: Text(
                         departments[index],
                         softWrap: true,
@@ -935,7 +935,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
   }
 
   void importDirections() async{
-    FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
+    PlatformFile? pickedFile = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
       allowMultiple: false,
@@ -943,14 +943,12 @@ class MyEntrepriseState extends State<MyEntreprise> {
     if (pickedFile != null) {
       directions.addAll(await ImportAppartenance(file: pickedFile,type:1)
           .loadFile());
-      setState(() {
-
-      });
+      setState(() {});
     }
   }
 
   void importFiliales() async{
-    FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
+    PlatformFile? pickedFile = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
       allowMultiple: false,
@@ -958,9 +956,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
     if (pickedFile != null) {
       filliales.addAll(await ImportAppartenance(file: pickedFile,type:0)
           .loadFile());
-      setState(() {
-
-      });
+      setState(() {});
     }
   }
   void upload() async {
