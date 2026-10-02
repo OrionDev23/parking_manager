@@ -92,7 +92,7 @@ class VehicleManagementState extends State<VehicleManagement>
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
     );
-    if (pickedFile != null) {
+    if (pickedFile != null && mounted) {
       Future.delayed(const Duration(milliseconds: 50))
           .then((value) => showDialog(
               context: context,
