@@ -10,6 +10,7 @@ import 'package:parc_oto/theme.dart';
 
 import '../../providers/client_database.dart';
 import '../../screens/user_management/user_creation.dart';
+import '../../screens/access/user_access_editor.dart';
 import '../../widgets/on_tap_scale.dart';
 import '../parcoto_datasource.dart';
 
@@ -99,55 +100,57 @@ class UsersManagementDatasource
           style: rowTextStyle)),
       DataCell(f.FlyoutTarget(
         controller: controllers[element.value.key.$id]!,
-        child: !isAdmin(element.value.value)?OnTapScaleAndFade(
-            onTap: () {
-              controllers[element.value.key.$id]!.showFlyout(
-                  builder: (context) {
+        child: OnTapScaleAndFade(
+          onTap: () {
+            controllers[element.value.key.$id]!.showFlyout(
+              builder: (context) {
                 return f.MenuFlyout(
                   items: [
-                    if (!isManager(element.value.value) &&
-                        !isInvitedButNotJoined(element.value.value))
-                      f.MenuFlyoutItem(
-                        text: const Text('invitmanager').tr(),
-                        onPressed: () {
-                          inviteToBecomeManager(
-                              element.value.key, element.value.value);
-                        },
-                      ),
-                    if (isInvitedButNotJoined(element.value.value))
-                      f.MenuFlyoutItem(
-                          text: Text(
-                            'alreadyinvited',
-                            style: TextStyle(color: placeStyle.color),
-                          ).tr(),
-                          onPressed: null),
                     f.MenuFlyoutItem(
-                        text: const Text('mod').tr(),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          Future.delayed(const Duration(milliseconds: 50))
-                              .then((value) => showUserForm(element.value.key));
-                        }),
+                      text: const Text('Gérer les accès'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Future.delayed(const Duration(milliseconds: 50)).then(
+                          (_) => f.showDialog(
+                            context: current,
+                            builder: (_) => UserAccessEditor(
+                              userId: element.value.key.$id,
+                              userName: element.value.key.name.isEmpty
+                                  ? element.value.key.email
+                                  : element.value.key.name,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                     f.MenuFlyoutItem(
-                        text: const Text('delete').tr(),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          showDeleteConfirmation(element.key, element.value);
-                        }),
+                      text: const Text('Modifier'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Future.delayed(const Duration(milliseconds: 50))
+                            .then((_) => showUserForm(element.value.key));
+                      },
+                    ),
+                    f.MenuFlyoutItem(
+                      text: const Text('Supprimer'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        showDeleteConfirmation(element.key, element.value);
+                      },
+                    ),
                   ],
                 );
-              });
-            },
-            child: f.Container(
-                decoration: BoxDecoration(
-                  color: appTheme?.color.lightest,
-                  boxShadow: kElevationToShadow[2],
-                ),
-                child: Icon(
-                  Icons.edit,
-                  color: appTheme!.color.darkest,
-                ))):
-        const Text(''),
+              },
+            );
+          },
+          child: f.Container(
+            decoration: BoxDecoration(
+              color: appTheme?.color.lightest,
+              boxShadow: kElevationToShadow[2],
+            ),
+            child: Icon(Icons.edit, color: appTheme!.color.darkest),
+          ),
+        ),
       )),
     ];
   }
