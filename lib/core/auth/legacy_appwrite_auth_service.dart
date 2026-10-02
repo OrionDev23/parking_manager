@@ -1,4 +1,6 @@
 import 'package:appwrite/appwrite.dart';
+import 'dart:async';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../providers/client_database.dart';
@@ -17,6 +19,8 @@ class LegacyAppwriteAuthService implements AuthService {
 
   AuthState _state = AuthState.unknown;
   AuthSession? _session;
+  final StreamController<AuthState> _stateController =
+      StreamController<AuthState>.broadcast();
 
   LegacyAppwriteAuthService({
     required this.preferences,
@@ -30,11 +34,14 @@ class LegacyAppwriteAuthService implements AuthService {
   AuthSession? get session => _session;
 
   @override
-  Stream<AuthState> get stateStream async* {
-    yield _state;
-  }
+  Stream<AuthState> get stateStream => _stateController.stream;
 
-  void _setState(AuthState value) => _state = value;
+  void _setState(AuthState value) {
+    _state = value;
+    if (!_stateController.isClosed) {
+      _stateController.add(value);
+    }
+  }
 
   @override
   Future<AuthSession?> restoreSession() async {
