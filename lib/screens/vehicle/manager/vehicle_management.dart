@@ -87,24 +87,26 @@ class VehicleManagementState extends State<VehicleManagement>
     return tab;
   }
 
-  void importList() async {
-    PlatformFile? pickedFile = await FilePicker.pickFile(
+  Future<void> importList() async {
+    final pickedFile = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
     );
-    if (pickedFile != null && mounted) {
-      Future.delayed(const Duration(milliseconds: 50))
-          .then((value) {
-            if (!mounted) return;
-            return showDialog(
-              context: context,
-              barrierDismissible: true,
-              builder: (c) {
-                return ImportVehicles(
-                  file: pickedFile,
-                );
-              }));
-    }
+
+    if (pickedFile == null || !mounted) return;
+
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    if (!mounted) return;
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (c) {
+        return ImportVehicles(
+          file: pickedFile,
+        );
+      },
+    );
   }
 
   @override
