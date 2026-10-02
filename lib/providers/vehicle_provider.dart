@@ -71,7 +71,7 @@ class VehicleProvider extends ChangeNotifier {
         legacy,
         companyId: companyId,
       );
-      await vehicleServices.repository.createVehicle(domainVehicle);
+      await vehicleServices.seedLocal(domainVehicle);
     }
   }
 
