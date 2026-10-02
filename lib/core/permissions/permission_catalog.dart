@@ -33,6 +33,67 @@ abstract final class PermissionCatalog {
     Permission(id: 'backup.manage', label: 'Gérer les sauvegardes', module: 'backup', action: 'manage'),
   ];
 
+  static const presets = <String, Set<String>>{
+    'Administrateur': {'*'},
+    'Gestionnaire': {
+      'dashboard.view',
+      'vehicles.view',
+      'vehicles.create',
+      'vehicles.update',
+      'drivers.view',
+      'drivers.create',
+      'drivers.update',
+      'stock.view',
+      'stock.manage',
+      'repairs.view',
+      'repairs.manage',
+      'planning.view',
+      'planning.manage',
+      'reception.view',
+      'reception.manage',
+      'clients.view',
+      'clients.manage',
+      'activity.view',
+    },
+    'Réception': {
+      'dashboard.view',
+      'vehicles.view',
+      'vehicles.create',
+      'vehicles.update',
+      'reception.view',
+      'reception.manage',
+      'clients.view',
+      'clients.manage',
+    },
+    'Atelier': {
+      'dashboard.view',
+      'vehicles.view',
+      'repairs.view',
+      'repairs.manage',
+      'stock.view',
+      'stock.manage',
+      'drivers.view',
+    },
+    'Lecture seule': {
+      'dashboard.view',
+      'vehicles.view',
+      'drivers.view',
+      'stock.view',
+      'repairs.view',
+      'planning.view',
+      'reception.view',
+      'clients.view',
+      'activity.view',
+    },
+  };
+
+  static Set<String> preset(String name) {
+    final permissions = presets[name];
+    if (permissions == null) return <String>{};
+    if (permissions.contains('*')) return all.map((permission) => permission.id).toSet();
+    return {...permissions};
+  }
+
   static Permission? find(String id) {
     for (final permission in all) {
       if (permission.id == id) return permission;
