@@ -87,7 +87,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
               rowId: "1")
           .then((value) {
         p = value
-            .convertTo((p0) => Entreprise.fromJson(p0 as Map<String, dynamic>));
+            .convertTo((p0) => Entreprise.fromJson(p0));
         downloadLogo();
         initValues();
       });
