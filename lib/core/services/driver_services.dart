@@ -29,7 +29,7 @@ class DriverServices {
 
     final deviceIdentity = SharedPreferencesDeviceIdentity(
       Future.value(preferences),
-      idFactory: () => 'desktop_' + DateTime.now().microsecondsSinceEpoch.toString(),
+      idFactory: () => 'desktop_${'${DateTime.now().microsecondsSinceEpoch}'}',
     );
     final syncQueue = SqliteSyncQueue(localDatabase);
     final localSource = SqliteDriverSource(
