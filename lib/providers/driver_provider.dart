@@ -171,7 +171,7 @@ class DriverProvider extends ChangeNotifier {
           ]).then((value) {
         for (int i = 0; i < value.rows.length; i++) {
           result.add(value.rows[i].convertTo(
-                  (p0) => DocumentChauffeur.fromJson(p0 as Map<String, dynamic>)));
+                  (p0) => DocumentChauffeur.fromJson(p0)));
         }
       }).onError((AppwriteException error, stackTrace) {
         if (kDebugMode) {
