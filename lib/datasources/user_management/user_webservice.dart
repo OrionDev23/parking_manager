@@ -88,7 +88,7 @@ class UsersWebservice
     final accessTeams = await database.listRows(
       databaseId: databaseId,
       tableId: 'access_teams',
-      queries: const [Query.limit(500)],
+      queries: [Query.limit(500)],
     );
     final accessUsers = await database.listRows(
       databaseId: databaseId,
