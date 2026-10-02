@@ -64,7 +64,7 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
       1,
     ).getComparisonFunction(sortColumn, sortAscending);
 
-    data.sort(comparator);
+    if (comparator != null) data.sort(comparator);
 
     final rows = data
         .skip(startIndex)
