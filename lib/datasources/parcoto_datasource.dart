@@ -2,7 +2,7 @@ import 'package:appwrite/models.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:parc_oto/datasources/parcoto_webservice.dart';
 import 'package:parc_oto/datasources/parcoto_webservice_response.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
