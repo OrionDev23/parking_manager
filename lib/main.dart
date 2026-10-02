@@ -23,6 +23,8 @@ import 'providers/client_database.dart';
 import 'core/auth/auth_service.dart';
 import 'core/auth/legacy_appwrite_auth_service.dart';
 import 'core/services/company_service.dart';
+import 'core/services/access_control_service.dart';
+import 'domain/repositories/access_control_repository.dart';
 import 'data/remote/access/appwrite_access_control_repository.dart';
 import 'core/services/user_profile_service.dart';
 import 'core/services/vehicle_services.dart';
@@ -37,6 +39,7 @@ late final VehicleServices vehicleServices;
 late final AuthService authService;
 late final UserProfileService userProfileService;
 late final CompanyService companyService;
+late final AccessControlService accessControlService;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -80,6 +83,8 @@ void launchApp() async {
   companyService = const CompanyService(
     repository: LegacyAppwriteCompanyRepository(),
   );
+  const AccessControlRepository accessRepository = AppwriteAccessControlRepository();
+  accessControlService = AccessControlService(repository: accessRepository);
   vehicleServices = await VehicleServices.create(
     preferences: prefs,
     companyId: project ?? 'local',
