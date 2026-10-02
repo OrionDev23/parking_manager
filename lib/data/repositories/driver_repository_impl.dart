@@ -31,12 +31,27 @@ class DriverRepositoryImpl implements DriverRepository {
     int? limit,
     int offset = 0,
     bool includeArchived = false,
-  }) => local.getDrivers(
-    search: search,
-    limit: limit,
-    offset: offset,
-    includeArchived: includeArchived,
-  );
+  }) async {
+    final localDrivers = await local.getDrivers(
+      search: search,
+      limit: limit,
+      offset: offset,
+      includeArchived: includeArchived,
+    );
+    if (localDrivers.isNotEmpty || remote == null) return localDrivers;
+
+    // First online read hydrates the local cache. Later reads are local-first.
+    final remoteDrivers = await remote!.getDrivers(
+      search: search,
+      limit: limit,
+      offset: offset,
+      includeArchived: includeArchived,
+    );
+    for (final driver in remoteDrivers) {
+      await local.upsertDriver(driver);
+    }
+    return remoteDrivers;
+  }
 
   @override
   Future<Driver?> getDriver(String id) => local.getDriver(id);
