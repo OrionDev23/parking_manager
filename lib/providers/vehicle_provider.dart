@@ -38,7 +38,7 @@ class VehicleProvider extends ChangeNotifier {
     ]).then((value) {
       for(int i=0;i<value.rows.length;i++){
         vehicles[value.rows[i].$id]=value.rows[i].convertTo(
-                (p0) => Vehicle.fromJson(p0 as Map<String,dynamic>));
+                (p0) => Vehicle.fromJson(p0));
       }
       downloadedVehicles=true;
 
@@ -61,7 +61,7 @@ class VehicleProvider extends ChangeNotifier {
         tableId: vehicDoc,queries: [Query.limit(5000)]).then((value) {
       for(int i=0;i<value.rows.length;i++){
         documentsVehicules[value.rows[i].$id]=value.rows[i].convertTo(
-                (p0) => DocumentVehicle.fromJson(p0 as Map<String,dynamic>));
+                (p0) => DocumentVehicle.fromJson(p0));
       }
       downloadedDocuments=true;
 
@@ -84,7 +84,7 @@ class VehicleProvider extends ChangeNotifier {
         tableId: etatId,queries: [Query.limit(5000)]).then((value) {
       for(int i=0;i<value.rows.length;i++){
         etats[value.rows[i].$id]=value.rows[i].convertTo(
-                (p0) => Etat.fromJson(p0 as Map<String,dynamic>));
+                (p0) => Etat.fromJson(p0));
       }
       downloadedStates=true;
 
@@ -178,7 +178,7 @@ class VehicleProvider extends ChangeNotifier {
         ]).then((value) {
       for (int i = 0; i < value.rows.length; i++) {
         result.add(value.rows[i].convertTo(
-                (p0) => DocumentVehicle.fromJson(p0 as Map<String, dynamic>)));
+                (p0) => DocumentVehicle.fromJson(p0)));
       }
     }).onError((error, stackTrace) {
       if (kDebugMode) {
@@ -199,7 +199,7 @@ class VehicleProvider extends ChangeNotifier {
           databaseId: databaseId, tableId: vehiculeid, rowId: docID)
           .then((value) {
         return value
-            .convertTo((p0) => Vehicle.fromJson(p0 as Map<String, dynamic>));
+            .convertTo((p0) => Vehicle.fromJson(p0));
       }).onError((error, stackTrace) {
         return Future.value(
             Vehicle(id: docID, matricule: '', matriculeEtrang: false));
