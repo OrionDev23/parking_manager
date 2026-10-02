@@ -158,11 +158,11 @@ class Settings extends ScrollablePage {
           appTheme.color = color;
         },
         style: ButtonStyle(
-          padding: ButtonState.all(EdgeInsets.zero),
-          backgroundColor: ButtonState.resolveWith((states) {
-            if (states.isPressing) {
+          padding: WidgetStatePropertyAll(EdgeInsets.zero),
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.pressed)) {
               return color.light;
-            } else if (states.isHovering) {
+            } else if (states.contains(WidgetState.hovered)) {
               return color.lighter;
             }
             return color;
