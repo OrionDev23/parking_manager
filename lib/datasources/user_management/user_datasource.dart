@@ -14,7 +14,7 @@ import '../../widgets/on_tap_scale.dart';
 import '../parcoto_datasource.dart';
 
 class UsersManagementDatasource
-    extends ParcOtoDatasourceUsers<String, MapEntry<User, List<Membership>?>> {
+    extends ParcOtoDatasourceUsers<String, MapEntry<User, List<String>?>> {
   final bool archive;
 
   UsersManagementDatasource(
@@ -27,13 +27,13 @@ class UsersManagementDatasource
   }
 
   @override
-  Future<void> addToActivity(MapEntry<User, List<Membership>?> c) async {
+  Future<void> addToActivity(MapEntry<User, List<String>?> c) async {
     await DatabaseGetter().ajoutActivity(34, c.key.$id,
         docName: c.key.name.isEmpty ? c.key.email : c.key.name);
   }
 
   @override
-  String deleteConfirmationMessage(MapEntry<User, List<Membership>?> c) {
+  String deleteConfirmationMessage(MapEntry<User, List<String>?> c) {
     return '${'supreuser'.tr()} ${c.key.name.isEmpty ? c.key.email : c.key.name}';
   }
 
@@ -74,20 +74,12 @@ class UsersManagementDatasource
 
   @override
   List<DataCell> getCellsToShow(
-      MapEntry<String, MapEntry<User, List<Membership>?>> element) {
+      MapEntry<String, MapEntry<User, List<String>?>> element) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
-    String roles = '';
-    if (isInvitedButNotJoined(element.value.value)) {
-      roles = "enattente".tr();
-    } else {
-      element.value.value?.forEach((element) {
-        if (roles.isNotEmpty) {
-          roles += ', ';
-        }
-        roles += element.teamName.tr();
-      });
-      roles = roles.toLowerCase().tr();
-    }
+    final teams = element.value.value ?? const <String>[];
+    final roles = teams.isEmpty
+        ? 'Aucune équipe'
+        : teams.map((team) => team.tr()).join(', ');
 
     return [
       DataCell(SelectableText(element.value.key.name, style: rowTextStyle)),
@@ -167,89 +159,5 @@ class UsersManagementDatasource
         });
   }
 
-  bool isManager(List<Membership>? e) {
-    if (e != null) {
-      for (var t in e) {
-        if (t.teamName.toLowerCase() == 'managers') {
-          return true;
-        }
-      }
-    }
 
-    return false;
-  }
-
-  bool isAdmin(List<Membership>? e) {
-    if (e != null) {
-      for (var t in e) {
-        if (t.teamName.toLowerCase() == 'admins') {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-  bool isInvitedButNotJoined(List<Membership>? e) {
-    if (e != null) {
-      for (var t in e) {
-        if (t.teamName.toLowerCase() == 'managers') {
-          if (t.joined.isEmpty) {
-            return true;
-          } else {
-            if (kDebugMode) {
-              print("joined :${t.joined}");
-            }
-            return false;
-          }
-        }
-      }
-    }
-
-    return false;
-  }
-
-  String getMembershipID(List<Membership>? t) {
-    if (t != null) {
-      for (var e in t) {
-        if (e.teamId == 'managers') {
-          return e.$id;
-        }
-      }
-    }
-
-    return '';
-  }
-
-  void inviteToBecomeManager(User user, List<Membership>? t) async {
-    await client_aw.Teams(DatabaseGetter.client!)
-        .createMembership(
-            teamId: 'managers',
-            roles: ['member'],
-            userId: user.$id,
-            email: user.email,
-            name: user.name,
-            url:
-                'https://app.parcoto.com/acceptinvitation?projectId=$project&endpoint=$endpoint')
-        .then((value) {
-      if (!current.mounted) return;
-      f.displayInfoBar(current, builder: (co, s) {
-        return f.InfoBar(
-          severity: f.InfoBarSeverity.success,
-          title: const Text('invitationsent').tr(),
-        );
-      });
-    }).onError((client_aw.AppwriteException error, stackTrace) {
-      if (kDebugMode) {
-        print('====================================================');
-        print('error sending invitation');
-        print('type: ${error.type}');
-        print('code: ${error.code}');
-        print('message: ${error.message}');
-        print('response: ${error.response}');
-        print('stacktrace: $stackTrace');
-        print('====================================================');
-      }
-    });
-  }
 }
