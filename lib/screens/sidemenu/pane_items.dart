@@ -71,7 +71,7 @@ class PaneItemsAndFooters {
     fontSize: 12.px,
   );
 
-  initPanes() {
+  void initPanes() {
     dashboard = PaneItem(
         key: Key("dashboard"),
         icon: Icon(
