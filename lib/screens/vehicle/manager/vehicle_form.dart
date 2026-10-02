@@ -18,6 +18,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../serializables/vehicle/vehicle.dart';
+import '../../../data/mappers/vehicle_mapper.dart';
 import '../../../theme.dart';
 import '../../../utilities/algeria_lists.dart';
 import '../../../widgets/select_dialog/select_dialog.dart';
@@ -2110,37 +2111,23 @@ class _VehicleFormState extends State<VehicleForm>
   }
 
   Future<void> updateVehicle(Vehicle vehicle) async {
-    await DatabaseGetter.database!
-        .updateRow(
-          databaseId: databaseId,
-          tableId: vehiculeid,
-          rowId: documentID!,
-          data: vehicle.toJson(),
-        )
-        .then((value) {})
-        .onError((AppwriteException error, stackTrace) {
-      setState(() {
-        uploading = false;
-        errorUploading = true;
-      });
-    });
+    vehicle.updatedAt = DateTime.now().toUtc();
+    final domainVehicle = VehicleMapper.toDomain(
+      vehicle,
+      companyId: project ?? 'local',
+    );
+    await vehicleServices.repository.updateVehicle(domainVehicle);
   }
 
   Future<void> createVehicle(Vehicle vehicle) async {
-    await DatabaseGetter.database!
-        .createRow(
-          databaseId: databaseId,
-          tableId: vehiculeid,
-          rowId: documentID!,
-          data: vehicle.toJson(),
-        )
-        .then((value) {})
-        .onError((AppwriteException error, stackTrace) {
-      setState(() {
-        uploading = false;
-        errorUploading = true;
-      });
-    });
+    final now = DateTime.now().toUtc();
+    vehicle.createdAt = now;
+    vehicle.updatedAt = now;
+    final domainVehicle = VehicleMapper.toDomain(
+      vehicle,
+      companyId: project ?? 'local',
+    );
+    await vehicleServices.repository.createVehicle(domainVehicle);
   }
 
   Future<void> uploadActivity(bool update, Vehicle vehicle) async {
