@@ -43,6 +43,7 @@ class UsersManagementDatasource
 
     await Future.wait([
       Users(client).delete(userId: t.key.$id).then((value) async {
+        if (!current.mounted) return;
         f.displayInfoBar(
           current,
           builder: (co, s) {
@@ -226,6 +227,7 @@ class UsersManagementDatasource
             url:
                 'https://app.parcoto.com/acceptinvitation?projectId=$project&endpoint=$endpoint')
         .then((value) {
+      if (!current.mounted) return;
       f.displayInfoBar(current, builder: (co, s) {
         return f.InfoBar(
           severity: f.InfoBarSeverity.success,
