@@ -2,7 +2,6 @@ import 'package:appwrite/appwrite.dart';
 import 'package:flutter/foundation.dart';
 
 import '../data/mappers/vehicle_mapper.dart';
-import '../domain/entities/vehicle.dart' as domain;
 import '../main.dart';
 import '../serializables/vehicle/document_vehicle.dart';
 import '../serializables/vehicle/state.dart';
