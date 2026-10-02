@@ -5,7 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 
 class ImportAppartenance {
-  final FilePickerResult file;
+  final PlatformFile file;
   final int type;
   ImportAppartenance({required this.file,required this.type});
   double progressLoadingFile = 0;
@@ -19,11 +19,9 @@ class ImportAppartenance {
 
   Future<List<String>> loadFile() async {
 
-    Uint8List? bytes = file.files.first.bytes;
-    if (kIsWeb) {
-      bytes = file.files.first.bytes;
-    } else {
-      bytes = await f.File(file.files.single.path!).readAsBytes();
+    Uint8List? bytes = file.bytes;
+    if (!kIsWeb && bytes == null && file.path != null) {
+      bytes = await f.File(file.path!).readAsBytes();
     }
     if (bytes != null) {
       var excel = Excel.decodeBytes(bytes);
