@@ -39,5 +39,5 @@ class LocalDatabase {
     }
   }
 
-  Future<void> close() async { _database?.dispose(); _database = null; }
+  Future<void> close() async { _database?.close(); _database = null; }
 }
