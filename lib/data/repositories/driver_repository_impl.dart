@@ -65,7 +65,7 @@ class DriverRepositoryImpl implements DriverRepository {
     await local.deleteDriver(id);
     final deviceId = await deviceIdentity.getDeviceId();
     await syncQueue.enqueue(SyncOperation(
-      id: '${'${deviceId}_${id}_${DateTime.now().microsecondsSinceEpoch}'}',
+      id: '${deviceId}_${id}_${DateTime.now().microsecondsSinceEpoch}',
       companyId: companyContext.companyId,
       deviceId: deviceId,
       entity: 'driver',
@@ -87,7 +87,7 @@ class DriverRepositoryImpl implements DriverRepository {
   Future<void> _enqueue(Driver driver, SyncOperationType type) async {
     final deviceId = await deviceIdentity.getDeviceId();
     await syncQueue.enqueue(SyncOperation(
-      id: '${'${deviceId}_${driver.id}_${DateTime.now().microsecondsSinceEpoch}'}',
+      id: '${deviceId}_${driver.id}_${DateTime.now().microsecondsSinceEpoch}',
       companyId: driver.companyId,
       deviceId: deviceId,
       entity: 'driver',
