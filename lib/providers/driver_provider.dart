@@ -36,7 +36,7 @@ class DriverProvider extends ChangeNotifier {
     ]).then((value) {
       for(int i=0;i<value.rows.length;i++){
         conducteurs[value.rows[i].$id]=value.rows[i].convertTo(
-                (p0) => Conducteur.fromJson(p0 as Map<String,dynamic>));
+                (p0) => Conducteur.fromJson(p0));
       }
       downloadedConducteurs=true;
 
@@ -59,7 +59,7 @@ class DriverProvider extends ChangeNotifier {
         tableId: chaufDoc,queries: [Query.limit(5000)]).then((value) {
       for(int i=0;i<value.rows.length;i++){
         documentConducteurs[value.rows[i].$id]=value.rows[i].convertTo(
-                (p0) => DocumentChauffeur.fromJson(p0 as Map<String,dynamic>));
+                (p0) => DocumentChauffeur.fromJson(p0));
       }
       downloadedDocuments=true;
 
@@ -82,7 +82,7 @@ class DriverProvider extends ChangeNotifier {
         tableId: chaufDispID,queries: [Query.limit(5000)]).then((value) {
       for(int i=0;i<value.rows.length;i++){
         disponibiliteConducteurs[value.rows[i].$id]=value.rows[i].convertTo(
-                (p0) => DisponibiliteChauffeur.fromJson(p0 as Map<String,dynamic>));
+                (p0) => DisponibiliteChauffeur.fromJson(p0));
       }
       downloadedDisp=true;
 
