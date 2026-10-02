@@ -51,46 +51,51 @@ class Settings extends ScrollablePage {
     return [
       Text('theme', style: FluentTheme.of(context).typography.subtitle).tr(),
       spacer,
-      ...List.generate(ThemeMode.values.length, (index) {
-        final mode = ThemeMode.values[index];
-        return Padding(
-          padding: const EdgeInsetsDirectional.only(bottom: 8.0),
-          child: RadioButton(
-            checked: appTheme.mode == mode,
-            onChanged: (value) {
-              if (value) {
-                appTheme.mode = mode;
-                prefs.setInt('themeMode', mode.index);
-              }
-            },
-            content: Text('$mode'.replaceAll('ThemeMode.', '')).tr(),
-          ),
-        );
-      }),
+      RadioGroup<ThemeMode>(
+        groupValue: appTheme.mode,
+        onChanged: (value) {
+          if (value != null) {
+            appTheme.mode = value;
+            prefs.setInt('themeMode', value.index);
+          }
+        },
+        child: Column(
+          children: List.generate(ThemeMode.values.length, (index) {
+            final mode = ThemeMode.values[index];
+            return Padding(
+              padding: const EdgeInsetsDirectional.only(bottom: 8.0),
+              child: RadioButton<ThemeMode>(
+                value: mode,
+                content: Text('$mode'.replaceAll('ThemeMode.', '')).tr(),
+              ),
+            );
+          }),
+        ),
+      ),
       biggerSpacer,
-      Text(
-        'dispositionpaneau',
-        style: FluentTheme.of(context).typography.subtitle,
-      ).tr(),
+      Text('dispositionpaneau', style: FluentTheme.of(context).typography.subtitle).tr(),
       spacer,
-      ...List.generate(PaneDisplayMode.values.length, (index) {
-        final mode = PaneDisplayMode.values[index];
-        return Padding(
-          padding: const EdgeInsetsDirectional.only(bottom: 8.0),
-          child: RadioButton(
-            checked: appTheme.displayMode == mode,
-            onChanged: (value) {
-              if (value) {
-                appTheme.displayMode = mode;
-                prefs.setInt('display', index);
-              }
-            },
-            content: Text(
-              mode.toString().replaceAll('PaneDisplayMode.', ''),
-            ).tr(),
-          ),
-        );
-      }),
+      RadioGroup<PaneDisplayMode>(
+        groupValue: appTheme.displayMode,
+        onChanged: (value) {
+          if (value != null) {
+            appTheme.displayMode = value;
+            prefs.setInt('display', PaneDisplayMode.values.indexOf(value));
+          }
+        },
+        child: Column(
+          children: List.generate(PaneDisplayMode.values.length, (index) {
+            final mode = PaneDisplayMode.values[index];
+            return Padding(
+              padding: const EdgeInsetsDirectional.only(bottom: 8.0),
+              child: RadioButton<PaneDisplayMode>(
+                value: mode,
+                content: Text(mode.toString().replaceAll('PaneDisplayMode.', '')).tr(),
+              ),
+            );
+          }),
+        ),
+      ),
       biggerSpacer,
       Text('couleurprincipale',
           style: FluentTheme.of(context).typography.subtitle).tr(),
@@ -107,43 +112,32 @@ class Settings extends ScrollablePage {
       biggerSpacer,
       biggerSpacer,
       Text('langue', style: FluentTheme.of(context).typography.subtitle).tr(),
-      Wrap(
-        spacing: 15.0,
-        runSpacing: 10.0,
-        children: List.generate(
-          supportedLocales.length,
-          (index) {
-            if (supportedLocales[index].languageCode.toUpperCase() == 'AR' ||
-                supportedLocales[index].languageCode.toUpperCase() == 'FR' ||
-                supportedLocales[index].languageCode.toUpperCase() == 'EN') {
-              final locale = supportedLocales[index];
-
-              return Padding(
-                padding: const EdgeInsetsDirectional.only(bottom: 8.0),
-                child: RadioButton(
-                  checked: currentLocale == locale,
-                  onChanged: (value) async {
-                    if (value) {
-                      await context.setLocale(locale).whenComplete(() {
-                        appTheme.locale = locale;
-                        prefs.setString('lang', locale.languageCode);
-                      });
-                    }
-                  },
-                  content: Text(
-                      supportedLocales[index].languageCode.toUpperCase() == 'FR'
-                          ? "Français"
-                          : supportedLocales[index]
-                                      .languageCode
-                                      .toUpperCase() ==
-                                  'AR'
-                              ? "عربية"
-                              : "English"),
-                ),
-              );
-            }
-            return const Padding(padding: EdgeInsets.all(0));
-          },
+      RadioGroup<Locale>(
+        groupValue: currentLocale,
+        onChanged: (value) async {
+          if (value != null) {
+            await context.setLocale(value);
+            appTheme.locale = value;
+            await prefs.setString('lang', value.languageCode);
+          }
+        },
+        child: Wrap(
+          spacing: 15.0,
+          runSpacing: 10.0,
+          children: supportedLocales.map((locale) {
+            final label = locale.languageCode.toUpperCase() == 'FR'
+                ? 'Français'
+                : locale.languageCode.toUpperCase() == 'AR'
+                    ? 'عربية'
+                    : 'English';
+            return Padding(
+              padding: const EdgeInsetsDirectional.only(bottom: 8.0),
+              child: RadioButton<Locale>(
+                value: locale,
+                content: Text(label),
+              ),
+            );
+          }).toList(),
         ),
       ),
     ];
