@@ -1,9 +1,7 @@
-import 'package:appwrite/appwrite.dart' as client_aw;
 import 'package:dart_appwrite/dart_appwrite.dart';
 import 'package:dart_appwrite/models.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
-import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:parc_oto/datasources/user_management/user_webservice.dart';
 
