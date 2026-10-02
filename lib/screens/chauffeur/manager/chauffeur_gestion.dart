@@ -75,7 +75,6 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
     PlatformFile? pickedFile = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
-      allowMultiple: false,
     );
     if (pickedFile != null) {
       Future.delayed(const Duration(milliseconds: 50))
