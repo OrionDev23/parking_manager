@@ -29,7 +29,7 @@ class PlanningProvider extends ChangeNotifier {
         tableId: planningID,queries: [Query.limit(5000)]).then((value) {
       for(int i=0;i<value.rows.length;i++){
         plannings[value.rows[i].$id]=value.rows[i].convertTo(
-                (p0) => Planning.fromJson(p0 as Map<String,dynamic>));
+                (p0) => Planning.fromJson(p0));
       }
       downloadedPlanning=true;
 
@@ -83,7 +83,7 @@ class PlanningProvider extends ChangeNotifier {
         ]).then((value) {
       for (int i = 0; i < value.rows.length; i++) {
         result.add(value.rows[i]
-            .convertTo((p0) => Planning.fromJson(p0 as Map<String, dynamic>)));
+            .convertTo((p0) => Planning.fromJson(p0)));
       }
     }).onError((error, stackTrace) {
       if (kDebugMode) {
