@@ -91,7 +91,6 @@ class VehicleManagementState extends State<VehicleManagement>
     PlatformFile? pickedFile = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
-      allowMultiple: false,
     );
     if (pickedFile != null) {
       Future.delayed(const Duration(milliseconds: 50))
