@@ -7,6 +7,8 @@ import 'package:parc_oto/theme.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/client_database.dart';
+import '../../data/mappers/vehicle_mapper.dart';
+import '../../main.dart';
 import '../../screens/vehicle/documents/document_form.dart';
 import '../../screens/vehicle/manager/vehicle_form.dart';
 import '../../screens/vehicle/manager/vehicle_tabs.dart';
@@ -486,38 +488,64 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
 
 
 
-  void changePerimeter(MapEntry<String,Vehicle> element,int
-  perimeter) async{
-      await DatabaseGetter.database?.updateRow(
-          databaseId: databaseId,
-          tableId: vehiculeid,
-          rowId: element.key,
-          data: {
-            'perimetre':perimeter
-          }
-      ).then((value) {
-        element.value.perimetre=perimeter;
-        if(current.mounted){
-        f.displayInfoBar(current,
-            builder: (BuildContext context, void Function() close) {
-              return f.InfoBar(
-                title: const Text('done').tr(),
-                severity: f.InfoBarSeverity.success,
-              );
-            }, duration: snackbarShortDuration);}
-        DatabaseGetter().ajoutActivity(35, element.key,docName:element.value
-            .matricule);
-        notifyListeners();
-      }).onError((error, stackTrace) {
-        if(current.mounted){
-        f.displayInfoBar(current,
-            builder: (BuildContext context, void Function() close) {
-              return f.InfoBar(
-                title: const Text('erreur').tr(),
-                severity: f.InfoBarSeverity.error,
-              );
-            }, duration: snackbarShortDuration);}
-      });
+  void changePerimeter(MapEntry<String,Vehicle> element, int perimeter) async {
+    try {
+      final domainVehicle = VehicleMapper.toDomain(
+        element.value,
+        companyId: project ?? 'local',
+      ).copyWith(perimeter: perimeter);
+      await vehicleServices.repository.updateVehicle(domainVehicle);
+      element.value.perimetre = perimeter;
+
+      if (current.mounted) {
+        f.displayInfoBar(
+          current,
+          builder: (context, close) => f.InfoBar(
+            title: const Text('done').tr(),
+            severity: f.InfoBarSeverity.success,
+          ),
+          duration: snackbarShortDuration,
+        );
+      }
+      await DatabaseGetter().ajoutActivity(
+        35,
+        element.key,
+        docName: element.value.matricule,
+      );
+      notifyListeners();
+    } catch (_) {
+      if (current.mounted) {
+        f.displayInfoBar(
+          current,
+          builder: (context, close) => f.InfoBar(
+            title: const Text('erreur').tr(),
+            severity: f.InfoBarSeverity.error,
+          ),
+          duration: snackbarShortDuration,
+        );
+      }
+    }
+  }
+
+  @override
+  void deleteRow(dynamic c) async {
+    try {
+      await vehicleServices.repository.deleteVehicle(c.id);
+      data.removeWhere((entry) => entry.key == c.id);
+      refreshDatasource();
+      await addToActivity(c);
+    } catch (_) {
+      if (current.mounted) {
+        f.displayInfoBar(
+          current,
+          builder: (context, close) => f.InfoBar(
+            title: const Text('erreur').tr(),
+            severity: f.InfoBarSeverity.error,
+          ),
+          duration: snackbarShortDuration,
+        );
+      }
+    }
   }
 
   void viewVehicule(MapEntry<String,Vehicle> element){
