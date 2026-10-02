@@ -112,8 +112,7 @@ class RepairProvider extends ChangeNotifier {
       tableId: fichesreceptionId,
     ).then((value) {
       for(var doc in value.rows){
-        FicheReception rep=doc.convertTo((p0) => FicheReception.fromJson(p0 as
-        Map<String,dynamic>));
+        FicheReception rep=doc.convertTo((p0) => FicheReception.fromJson(p0));
         if(!repPerVeh.containsKey(rep.vehicule)){
           repPerVeh[rep.vehiculemat??'nonind']=[rep];
         }
