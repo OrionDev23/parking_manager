@@ -54,10 +54,10 @@ class UsersManagementDatasource
           Alignment.lerp(Alignment.topCenter, Alignment.center, 0.6)!,
         );
           try{
-            await Databases(client).deleteDocument(
+            await DatabaseGetter.database!.deleteRow(
                 databaseId: databaseId,
-                collectionId: userid,
-                documentId: t.key.$id);
+                tableId: userid,
+                rowId: t.key.$id);
           }
           catch(e){
             //
