@@ -136,7 +136,7 @@ class MyApp extends StatelessWidget {
             tstyle=tstyle.copyWith(fontSize: 10.sp);
           }
           return Localizations(
-            locale: appTheme.locale,
+            locale: appTheme.locale ?? const Locale('fr'),
             delegates: const [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
