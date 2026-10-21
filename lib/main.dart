@@ -149,7 +149,7 @@ class MyApp extends StatelessWidget {
     results.addAll([
       // Avoid loading the package's missing i18n JSON assets at startup.
       // Country names in this picker remain English; app UI localization is unchanged.
-      CountryLocalizations.delegate(enableLocalization: false),
+      CountryLocalizations.delegate,
       FluentLocalizations.delegate,
       ...GlobalMaterialLocalizations.delegates,
       SfGlobalLocalizations.delegate
