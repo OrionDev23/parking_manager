@@ -30,16 +30,13 @@ class AppwriteDriverSource implements RemoteDriverSource {
         return Driver.fromMap(decoded);
       }
     }
-
     if (payload is Map) {
       return Driver.fromMap(Map<String, dynamic>.from(payload));
     }
 
-    final createdAt =
-        DateTime.tryParse(row.$createdAt.toString()) ?? DateTime.now().toUtc();
-    final updatedAt =
-        DateTime.tryParse(row.$updatedAt.toString()) ?? createdAt;
-
+    final createdAt = DateTime.tryParse(row.$createdAt.toString()) ??
+        DateTime.now().toUtc();
+    final updatedAt = DateTime.tryParse(row.$updatedAt.toString()) ?? createdAt;
     final rawBirthDate = data['dateNaissance'];
     final birthDate = rawBirthDate is num
         ? _legacyDate(rawBirthDate.toInt())
@@ -73,9 +70,8 @@ class AppwriteDriverSource implements RemoteDriverSource {
   }
 
   static DateTime? _legacyDate(int milliseconds) =>
-      DateTime(2023, 11, 1, 12, 13, 15).add(
-        Duration(milliseconds: milliseconds),
-      );
+      DateTime(2023, 11, 1, 12, 13, 15)
+          .add(Duration(milliseconds: milliseconds));
 
   Map<String, dynamic> _toRow(Driver driver) => {
         'companyId': driver.companyId,
@@ -110,54 +106,120 @@ class AppwriteDriverSource implements RemoteDriverSource {
       '${driver.profession ?? ''} ${driver.subsidiary ?? ''} '
       '${driver.direction ?? ''} ${driver.department ?? ''}';
 
-  void _checkCompany(Driver driver) {
-    if (driver.companyId != companyContext.companyId) {
-      throw StateError('Driver company does not match the active company.');
-    }
-  }
-}  Future<List<Driver>> getDrivers({
+  @override
+  Future<List<Driver>> getDrivers({
     String? search,
     int? limit,
     int offset = 0,
     bool includeArchived = false,
   }) async {
     final baseQueries = <String>[
-      if (!includeArchived) Query.notEqual('etat', 3),
-      if (includeArchived) Query.equal('etat', 3),
+      if (includeArchived)
+        Query.equal('etat', 3)
+      else
+        Query.notEqual('etat', 3),
       Query.orderDesc(r'$updatedAt'),
       if (search != null && search.trim().isNotEmpty)
         Query.search('search', search.trim()),
     ];
 
-    Future<List<dynamic>> listRows(List<String> extra) async {
+    Future<List<dynamic>> listRows(List<String> tenantQueries) async {
       final result = await backend.database.listRows(
         databaseId: databaseId,
         tableId: tableId,
-        queries: [...baseQueries, ...extra],
+        queries: [
+          ...baseQueries,
+          ...tenantQueries,
+          Query.limit(limit ?? 100),
+          Query.offset(offset),
+        ],
       );
       return result.rows;
     }
 
     final currentRows = await listRows([
       Query.equal('companyId', companyContext.companyId),
-      Query.limit(limit ?? 100),
-      Query.offset(offset),
     ]);
-    final legacyRows = await listRows([
-      Query.isNull('companyId'),
-      Query.limit(limit ?? 100),
-      Query.offset(offset),
-    ]);
-
+    // Compatibility for rows created before companyId was introduced.
+    final legacyRows = await listRows([Query.isNull('companyId')]);
     final rows = [...currentRows, ...legacyRows];
-    rows.sort(
-      (a, b) => DateTime.parse(b.$updatedAt)
-          .compareTo(DateTime.parse(a.$updatedAt)),
-    );
-
+    rows.sort((a, b) {
+      final aDate = DateTime.tryParse(a.$updatedAt.toString()) ?? DateTime(1970);
+      final bDate = DateTime.tryParse(b.$updatedAt.toString()) ?? DateTime(1970);
+      return bDate.compareTo(aDate);
+    });
     final start = offset.clamp(0, rows.length);
     final end = (start + (limit ?? 100)).clamp(start, rows.length);
-    return rows.sublist(start, end).map<Driver>(_fromRow).toList(growable: false);
+    return rows
+        .sublist(start, end)
+        .map<Driver>(_fromRow)
+        .toList(growable: false);
   }
 
+  @override
+  Future<Driver?> getDriver(String id) async {
+    try {
+      final row = await backend.database.getRow(
+        databaseId: databaseId,
+        tableId: tableId,
+        rowId: id,
+      );
+      final rawCompanyId = row.data['companyId']?.toString();
+      if (rawCompanyId != null &&
+          rawCompanyId.isNotEmpty &&
+          rawCompanyId != companyContext.companyId) {
+        return null;
+      }
+      return _fromRow(row);
+    } on AppwriteException catch (error) {
+      if (error.code == 404) return null;
+      rethrow;
+    }
+  }
 
+  @override
+  Future<Driver> createDriver(Driver driver) async {
+    _checkCompany(driver);
+    await backend.database.createRow(
+      databaseId: databaseId,
+      tableId: tableId,
+      rowId: driver.id,
+      data: _toRow(driver),
+    );
+    return driver;
+  }
+
+  @override
+  Future<Driver> updateDriver(Driver driver) async {
+    _checkCompany(driver);
+    final existing = await getDriver(driver.id);
+    if (existing == null) {
+      throw StateError('Driver not found in the active company.');
+    }
+    await backend.database.updateRow(
+      databaseId: databaseId,
+      tableId: tableId,
+      rowId: driver.id,
+      data: _toRow(driver),
+    );
+    return driver;
+  }
+
+  @override
+  Future<void> deleteDriver(String id) async {
+    final existing = await getDriver(id);
+    if (existing == null) return;
+    _checkCompany(existing);
+    await backend.database.deleteRow(
+      databaseId: databaseId,
+      tableId: tableId,
+      rowId: id,
+    );
+  }
+
+  void _checkCompany(Driver driver) {
+    if (driver.companyId != companyContext.companyId) {
+      throw StateError('Driver company does not match the active company.');
+    }
+  }
+}
