@@ -8,7 +8,9 @@ import 'local_vehicle_source.dart';
 
 class SqliteVehicleSource implements LocalVehicleSource {
   final LocalDatabase localDatabase;
-  SqliteVehicleSource(this.localDatabase);
+  final String companyId;
+
+  SqliteVehicleSource(this.localDatabase, {required this.companyId});
 
   Database get _db => localDatabase.database;
 
@@ -30,30 +32,53 @@ class SqliteVehicleSource implements LocalVehicleSource {
   }
 
   @override
-  Future<List<Vehicle>> getVehicles({String? search, int? limit, int offset = 0}) async {
-    final query = StringBuffer('SELECT * FROM vehicles');
-    final args = <Object?>[];
+  Future<List<Vehicle>> getVehicles({
+    String? search,
+    int? limit,
+    int offset = 0,
+  }) async {
+    final query = StringBuffer(
+      'SELECT * FROM vehicles WHERE company_id = ?',
+    );
+    final args = <Object?>[companyId];
+
     if (search != null && search.trim().isNotEmpty) {
-      query.write(' WHERE registration LIKE ? OR brand LIKE ? OR model LIKE ?');
+      query.write(
+        ' AND (registration LIKE ? OR brand LIKE ? OR model LIKE ? OR payload LIKE ?)',
+      );
       final value = '%${search.trim()}%';
-      args.addAll([value, value, value]);
+      args.addAll([value, value, value, value]);
     }
+
     query.write(' ORDER BY updated_at DESC');
     if (limit != null) {
       query.write(' LIMIT ? OFFSET ?');
       args.addAll([limit, offset]);
+    } else if (offset > 0) {
+      query.write(' LIMIT -1 OFFSET ?');
+      args.add(offset);
     }
-    return _db.select(query.toString(), args).map(_fromRow).toList(growable: false);
+
+    return _db
+        .select(query.toString(), args)
+        .map(_fromRow)
+        .toList(growable: false);
   }
 
   @override
   Future<Vehicle?> getVehicle(String id) async {
-    final rows = _db.select('SELECT * FROM vehicles WHERE id = ? LIMIT 1', [id]);
+    final rows = _db.select(
+      'SELECT * FROM vehicles WHERE id = ? AND company_id = ? LIMIT 1',
+      [id, companyId],
+    );
     return rows.isEmpty ? null : _fromRow(rows.first);
   }
 
   @override
   Future<void> upsertVehicle(Vehicle vehicle) async {
+    if (vehicle.companyId != companyId) {
+      throw StateError('Vehicle company does not match the local company.');
+    }
     final payload = jsonEncode(vehicle.toMap());
     _db.execute(
       '''INSERT INTO vehicles
@@ -70,15 +95,26 @@ class SqliteVehicleSource implements LocalVehicleSource {
         updated_at=excluded.updated_at,
         payload=excluded.payload''',
       [
-        vehicle.id, vehicle.companyId, vehicle.siteId, vehicle.registration,
-        vehicle.brand, vehicle.type, null, 'active',
-        vehicle.createdAt.toIso8601String(), vehicle.updatedAt.toIso8601String(), payload,
+        vehicle.id,
+        vehicle.companyId,
+        vehicle.siteId,
+        vehicle.registration,
+        vehicle.brand,
+        vehicle.type,
+        null,
+        'active',
+        vehicle.createdAt.toIso8601String(),
+        vehicle.updatedAt.toIso8601String(),
+        payload,
       ],
     );
   }
 
   @override
   Future<void> deleteVehicle(String id) async {
-    _db.execute('DELETE FROM vehicles WHERE id = ?', [id]);
+    _db.execute(
+      'DELETE FROM vehicles WHERE id = ? AND company_id = ?',
+      [id, companyId],
+    );
   }
 }
