@@ -112,8 +112,17 @@ class ConducteurWebService extends ParcOtoWebService<Conducteur> {
   }
 
   @override
-  String getAttributeForSearch(int att) {
-    return 'search';
+  String getAttributeForSearch(int att) => 'search';
+
+  int _compareNullable<T>(
+    T? a,
+    T? b,
+    int Function(T, T) compare,
+  ) {
+    if (a == null && b == null) return 0;
+    if (a == null) return 1;
+    if (b == null) return -1;
+    return compare(a, b);
   }
 
   @override
@@ -121,33 +130,30 @@ class ConducteurWebService extends ParcOtoWebService<Conducteur> {
           MapEntry<String, Conducteur> p1, MapEntry<String, Conducteur> p2)?
       getComparisonFunction(int column, bool ascending) {
     final coef = ascending ? 1 : -1;
-    int compareNullable<T extends Comparable<dynamic>>(T? a, T? b) {
-      if (a == null && b == null) return 0;
-      if (a == null) return 1;
-      if (b == null) return -1;
-      return a.compareTo(b);
-    }
 
     switch (column) {
       case 0:
         return (a, b) => coef * '${a.value.name} ${a.value.prenom}'
             .compareTo('${b.value.name} ${b.value.prenom}');
       case 1:
-        return (a, b) => coef * compareNullable(a.value.email, b.value.email);
+        return (a, b) => coef * _compareNullable<String>(
+              a.value.email, b.value.email, (x, y) => x.compareTo(y));
       case 2:
-        return (a, b) =>
-            coef * compareNullable(a.value.telephone, b.value.telephone);
+        return (a, b) => coef * _compareNullable<String>(
+              a.value.telephone, b.value.telephone, (x, y) => x.compareTo(y));
       case 3:
-        return (a, b) =>
-            coef * compareNullable(a.value.adresse, b.value.adresse);
+        return (a, b) => coef * _compareNullable<String>(
+              a.value.adresse, b.value.adresse, (x, y) => x.compareTo(y));
       case 4:
-        return (a, b) =>
-            coef * compareNullable(a.value.dateNaissance, b.value.dateNaissance);
+        return (a, b) => coef * _compareNullable<DateTime>(
+              a.value.dateNaissance, b.value.dateNaissance,
+              (x, y) => x.compareTo(y));
       case 5:
-        return (a, b) =>
-            coef * compareNullable(a.value.updatedAt, b.value.updatedAt);
+        return (a, b) => coef * _compareNullable<DateTime>(
+              a.value.updatedAt, b.value.updatedAt, (x, y) => x.compareTo(y));
       case 6:
-        return (a, b) => coef * compareNullable(a.value.etat, b.value.etat);
+        return (a, b) => coef * _compareNullable<int>(
+              a.value.etat, b.value.etat, (x, y) => x.compareTo(y));
     }
 
     return null;
