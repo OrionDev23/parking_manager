@@ -27,13 +27,14 @@ class DriverServices {
   static Future<DriverServices> create({
     required SharedPreferences preferences,
     required String companyId,
+    required String appwriteProjectId,
   }) async {
     final localDatabase = LocalDatabase();
     await localDatabase.open();
 
     final deviceIdentity = SharedPreferencesDeviceIdentity(
       Future.value(preferences),
-      idFactory: () => 'desktop_${'${DateTime.now().microsecondsSinceEpoch}'}',
+      idFactory: () => 'desktop_${DateTime.now().microsecondsSinceEpoch}',
     );
     final syncQueue = SqliteSyncQueue(localDatabase);
     final localSource = SqliteDriverSource(
@@ -43,8 +44,8 @@ class DriverServices {
     final backend = AppwriteBackend(
       BackendConfig(
         type: BackendType.appwrite,
-        endpoint: 'https://cloud.appwrite.io/v1',
-        projectId: companyId,
+        endpoint: 'https://fra.cloud.appwrite.io/v1',
+        projectId: appwriteProjectId,
       ),
     );
     await backend.initialize();
