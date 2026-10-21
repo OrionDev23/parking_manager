@@ -102,6 +102,7 @@ void launchApp() async {
   driverServices = await DriverServices.create(
     preferences: prefs,
     companyId: activeCompanyId,
+    appwriteProjectId: project ?? 'essais',
   );
 
   VehiclesUtilities();
@@ -154,7 +155,7 @@ class MyApp extends StatelessWidget {
     return results;
   }
 
-  // This widget is the root of your application.
+  // This is the root widget of the application.
   final GlobalKey<NavigatorState> navigatorKey;
 
   @override
@@ -187,8 +188,7 @@ class MyApp extends StatelessWidget {
                 }
               }
 
-              return supportedLocales
-                  .first; // because of this it will always return the first locale from the list
+              return supportedLocales.first;
             },
             darkTheme: FluentThemeData(
               brightness: Brightness.dark,
