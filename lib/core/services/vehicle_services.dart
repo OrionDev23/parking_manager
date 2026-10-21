@@ -49,7 +49,7 @@ class VehicleServices {
       BackendConfig(
         type: BackendType.appwrite,
         endpoint: endpoint,
-        projectId: preferences.getString('project'),
+        projectId: preferences.getString('project') ?? 'essais',
       ),
     );
     await backend.initialize();
