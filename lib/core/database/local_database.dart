@@ -9,7 +9,8 @@ class LocalDatabase {
   factory LocalDatabase() => instance;
 
   LocalDatabase._();
-  Database get database => _database ?? (throw StateError('LocalDatabase has not been initialized.'));
+  Database get database => _database ??
+      (throw StateError('LocalDatabase has not been initialized.'));
 
   Future<void> open() async {
     if (_database != null) return;
@@ -24,8 +25,13 @@ class LocalDatabase {
   void _migrate(Database db) {
     db.execute('PRAGMA foreign_keys = ON');
     db.execute('PRAGMA journal_mode = WAL');
-    db.execute('CREATE TABLE IF NOT EXISTS schema_migrations (version INTEGER PRIMARY KEY, applied_at TEXT NOT NULL)');
-    final version = db.select('SELECT COALESCE(MAX(version), 0) AS version FROM schema_migrations').first['version'] as int;
+    db.execute(
+      'CREATE TABLE IF NOT EXISTS schema_migrations '
+      '(version INTEGER PRIMARY KEY, applied_at TEXT NOT NULL)',
+    );
+    final version = db
+        .select('SELECT COALESCE(MAX(version), 0) AS version FROM schema_migrations')
+        .first['version'] as int;
 
     if (version < 1) {
       db.execute('''CREATE TABLE vehicles (
@@ -40,13 +46,43 @@ class LocalDatabase {
         entity TEXT NOT NULL, entity_id TEXT NOT NULL, operation TEXT NOT NULL,
         payload TEXT NOT NULL, created_at TEXT NOT NULL, status TEXT NOT NULL,
         attempts INTEGER NOT NULL DEFAULT 0)''');
-      db.execute('CREATE INDEX idx_sync_operations_status ON sync_operations(status, created_at)');
-      db.execute("INSERT INTO schema_migrations(version, applied_at) VALUES (1, datetime('now'))");
+      db.execute(
+        'CREATE INDEX idx_sync_operations_status ON sync_operations(status, created_at)',
+      );
+      db.execute(
+        "INSERT INTO schema_migrations(version, applied_at) VALUES (1, datetime('now'))",
+      );
     }
     if (version < 2) {
       db.execute('ALTER TABLE vehicles ADD COLUMN payload TEXT');
       db.execute("UPDATE vehicles SET payload = '{}' WHERE payload IS NULL");
-      db.execute("INSERT INTO schema_migrations(version, applied_at) VALUES (2, datetime('now'))");
+      db.execute(
+        "INSERT INTO schema_migrations(version, applied_at) VALUES (2, datetime('now'))",
+      );
+    }
+
+    // The driver repository uses this table for every local-first read.
+    // Keep this migration idempotent so existing installations are repaired.
+    if (version < 3) {
+      db.execute('''CREATE TABLE IF NOT EXISTS drivers (
+        id TEXT PRIMARY KEY,
+        company_id TEXT NOT NULL,
+        site_id TEXT,
+        first_name TEXT NOT NULL DEFAULT '',
+        last_name TEXT NOT NULL DEFAULT '',
+        registration TEXT NOT NULL DEFAULT '',
+        email TEXT,
+        phone TEXT,
+        state INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        payload TEXT NOT NULL DEFAULT '{}'
+      )''');
+      db.execute('CREATE INDEX IF NOT EXISTS idx_drivers_company ON drivers(company_id)');
+      db.execute('CREATE INDEX IF NOT EXISTS idx_drivers_registration ON drivers(registration)');
+      db.execute(
+        "INSERT INTO schema_migrations(version, applied_at) VALUES (3, datetime('now'))",
+      );
     }
   }
 
