@@ -79,10 +79,7 @@ class AppwriteDriverSource implements RemoteDriverSource {
         'name': driver.lastName,
         'prenom': driver.firstName,
         'matricule': driver.registration,
-        'dateNaissance': driver.birthDate == null
-            ? null
-            : driver.birthDate!
-                .difference(DateTime(2023, 11, 1, 12, 13, 15))
+        'dateNaissance': driver.birthDate?.difference(DateTime(2023, 11, 1, 12, 13, 15))
                 .inMilliseconds,
         'email': driver.email,
         'telephone': driver.phone,
