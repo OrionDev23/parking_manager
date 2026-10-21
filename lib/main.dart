@@ -147,7 +147,9 @@ class MyApp extends StatelessWidget {
     List<LocalizationsDelegate> results =
         List.from(context.localizationDelegates);
     results.addAll([
-      CountryLocalizations.delegate,
+      // Avoid loading the package's missing i18n JSON assets at startup.
+      // Country names in this picker remain English; app UI localization is unchanged.
+      CountryLocalizations.delegate(enableLocalization: false),
       FluentLocalizations.delegate,
       ...GlobalMaterialLocalizations.delegates,
       SfGlobalLocalizations.delegate
