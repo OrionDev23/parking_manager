@@ -30,22 +30,41 @@ class SqliteDriverSource implements LocalDriverSource {
 
   @override
   Future<List<Driver>> getDrivers({
-    String? search, int? limit, int offset = 0, bool includeArchived = false,
+    String? search,
+    int? limit,
+    int offset = 0,
+    bool includeArchived = false,
   }) async {
-    final query = StringBuffer('SELECT * FROM drivers WHERE company_id = ?');
+    final query = StringBuffer(
+      'SELECT * FROM drivers WHERE company_id = ?',
+    );
     final args = <Object?>[companyId];
-    if (!includeArchived) query.write(' AND state != 3');
+
+    // The archive screen must show archived drivers only, matching Appwrite.
+    if (includeArchived) {
+      query.write(' AND state = 3');
+    } else {
+      query.write(' AND state != 3');
+    }
+
     if (search != null && search.trim().isNotEmpty) {
-      query.write(' AND (first_name LIKE ? OR last_name LIKE ? OR registration LIKE ? OR email LIKE ? OR phone LIKE ?)');
+      query.write(
+        ' AND (first_name LIKE ? OR last_name LIKE ? OR registration LIKE ? OR email LIKE ? OR phone LIKE ?)',
+      );
       final value = '%${search.trim()}%';
       args.addAll([value, value, value, value, value]);
     }
+
     query.write(' ORDER BY updated_at DESC');
     if (limit != null) {
       query.write(' LIMIT ? OFFSET ?');
       args.addAll([limit, offset]);
     }
-    return _db.select(query.toString(), args).map(_fromRow).toList(growable: false);
+
+    return _db
+        .select(query.toString(), args)
+        .map(_fromRow)
+        .toList(growable: false);
   }
 
   @override
@@ -71,16 +90,27 @@ class SqliteDriverSource implements LocalDriverSource {
         phone=excluded.phone, state=excluded.state,
         updated_at=excluded.updated_at, payload=excluded.payload''',
       [
-        driver.id, driver.companyId, driver.siteId, driver.firstName, driver.lastName,
-        driver.registration, driver.email, driver.phone, driver.state,
-        driver.createdAt.toIso8601String(), driver.updatedAt.toIso8601String(), payload,
+        driver.id,
+        driver.companyId,
+        driver.siteId,
+        driver.firstName,
+        driver.lastName,
+        driver.registration,
+        driver.email,
+        driver.phone,
+        driver.state,
+        driver.createdAt.toIso8601String(),
+        driver.updatedAt.toIso8601String(),
+        payload,
       ],
     );
   }
 
   @override
   Future<void> deleteDriver(String id) async {
-    _db.execute('DELETE FROM drivers WHERE id = ? AND company_id = ?',
-        [id, companyId]);
+    _db.execute(
+      'DELETE FROM drivers WHERE id = ? AND company_id = ?',
+      [id, companyId],
+    );
   }
 }
