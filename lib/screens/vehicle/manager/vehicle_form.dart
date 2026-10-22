@@ -2039,75 +2039,53 @@ class _VehicleFormState extends State<VehicleForm>
         service: service,
         matriculeConducteur: matempl.text,
       );
-      if (widget.vehicle != null) {
-        await Future.wait([
-          updateVehicle(vehicle),
-          uploadActivity(true, vehicle),
-        ]).then((value) {
-          if(mounted){
-          displayInfoBar(context,
-              builder: (BuildContext context, void Function() close) {
-            return InfoBar(
+      final isUpdate = widget.vehicle != null;
+      try {
+        // The repository writes to SQLite and queues the remote mutation.
+        // A failure in the legacy remote-only activity log must not turn a
+        // successful local save into a visible upload failure.
+        if (isUpdate) {
+          await updateVehicle(vehicle);
+        } else {
+          await createVehicle(vehicle);
+        }
+
+        if (mounted) {
+          displayInfoBar(
+            context,
+            builder: (BuildContext context, void Function() close) => InfoBar(
               title: const Text('done').tr(),
               severity: InfoBarSeverity.success,
-            );
-          }, duration: snackbarShortDuration);
+            ),
+            duration: snackbarShortDuration,
+          );
           setState(() {
             uploading = false;
+            errorUploading = false;
           });
+        }
 
-          }
-        }).onError((error, stackTrace) {
-          if(mounted) {
-            displayInfoBar(context,
-                builder: (BuildContext context, void Function() close) {
-                  return InfoBar(
-                    title: const Text('echec').tr(),
-                    severity: InfoBarSeverity.success,
-                  );
-                }, duration: snackbarShortDuration);
-
-            setState(() {
-              uploading = false;
-              errorUploading=true;
-            });
-          }
-        });
-      } else {
-        await Future.wait([
-          createVehicle(vehicle),
-          uploadActivity(false, vehicle),
-        ]).then((value) {
-          if(mounted){
-          displayInfoBar(context,
-              builder: (BuildContext context, void Function() close) {
-            return InfoBar(
-              title: const Text('done').tr(),
-              severity: InfoBarSeverity.success,
-            );
-          }, duration: snackbarShortDuration);
-          setState(() {
-            uploading = false;
-          });
-          }
-        }).onError((error, stackTrace) {
-          if(mounted){
-          displayInfoBar(context,
-              builder: (BuildContext context, void Function() close) {
-            return InfoBar(
+        try {
+          await uploadActivity(isUpdate, vehicle);
+        } catch (_) {
+          // Activity logging remains best-effort while offline.
+        }
+      } catch (_) {
+        if (mounted) {
+          displayInfoBar(
+            context,
+            builder: (BuildContext context, void Function() close) => InfoBar(
               title: const Text('echec').tr(),
               severity: InfoBarSeverity.error,
-            );
-          }, duration: snackbarShortDuration);
+            ),
+            duration: snackbarShortDuration,
+          );
           setState(() {
-            errorUploading=true;
+            errorUploading = true;
             uploading = false;
           });
-          }
-
-        });
+        }
       }
-    }
   }
 
   Future<void> updateVehicle(Vehicle vehicle) async {
