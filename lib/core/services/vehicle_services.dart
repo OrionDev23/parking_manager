@@ -95,12 +95,15 @@ class VehicleServices {
         await remoteSource.createVehicle(
           domain.Vehicle.fromMap(operation.payload),
         );
+        return;
       case SyncOperationType.update:
         await remoteSource.updateVehicle(
           domain.Vehicle.fromMap(operation.payload),
         );
+        return;
       case SyncOperationType.delete:
         await remoteSource.deleteVehicle(operation.entityId);
+        return;
     }
   }
 
