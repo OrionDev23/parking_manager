@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:appwrite/appwrite.dart' hide Client;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
@@ -6,6 +8,7 @@ import 'package:parc_oto/serializables/client.dart';
 import 'package:parc_oto/serializables/reparation/reparation.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 
+import '../main.dart';
 import '../serializables/reparation/fiche_reception.dart';
 import '../serializables/vehicle/vehicle.dart';
 import '../utilities/profil_beautifier.dart';
@@ -31,51 +34,122 @@ class RepairProvider extends ChangeNotifier {
 
   static Map<String,List<FicheReception>> repPerVeh={};
 
-  Future<void> refreshReparations() async{
-    if(downloadingReparations){
-      return;
-    }
-    downloadingReparations=true;
-    reparations.clear();
-    await DatabaseGetter.database!.listRows(
-        databaseId: databaseId,
-        tableId: reparationId,queries: [Query.limit(5000)]).then((value) {
-      for(int i=0;i<value.rows.length;i++){
-        reparations[value.rows[i].$id]=value.rows[i].convertTo(
-                (p0) => Reparation.fromJson(p0));
-      }
-      downloadedReparations=true;
-
-    }).onError((error, stackTrace) {
-      downloadedReparations=false;
-
-    });
-    downloadingReparations=false;
-    notifyListeners();
-
+  List<Map<String, dynamic>> _readCached(String entity) {
+    return vehicleServices.localDatabase.readLegacyCache(
+      companyId: vehicleServices.companyId,
+      entity: entity,
+    );
   }
-  Future<void> refreshPrestataires() async{
-    if(downloadingPrestataires){
-      return;
-    }
-    downloadingPrestataires=true;
-    prestataires.clear();
-    await DatabaseGetter.database!.listRows(
-        databaseId: databaseId,
-        tableId: reparationId,queries: [Query.limit(5000)]).then((value) {
-      for(int i=0;i<value.rows.length;i++){
-        prestataires[value.rows[i].$id]=value.rows[i].convertTo(
-                (p0) => Client.fromJson(p0));
+
+  Map<String, dynamic> _rowPayload(dynamic row) => <String, dynamic>{
+    ...Map<String, dynamic>.from(row.data),
+    r'$id': row.$id,
+    r'$createdAt': row.$createdAt,
+    r'$updatedAt': row.$updatedAt,
+  };
+
+  Future<void> refreshReparations() async {
+    if (downloadingReparations) return;
+    downloadingReparations = true;
+    try {
+      final cached = _readCached('repair');
+      for (final payload in cached) {
+        try {
+          final item = Reparation.fromJson(payload);
+          reparations[item.id] = item;
+        } catch (error) {
+          debugPrint('[ParcOto Repairs] invalid cached repair ignored: $error');
+        }
       }
-      downloadedPrestataires=true;
+      if (reparations.isNotEmpty) {
+        downloadedReparations = true;
+        notifyListeners();
+      }
 
-    }).onError((error, stackTrace) {
-      downloadedPrestataires=false;
+      final database = DatabaseGetter.database;
+      if (database == null) throw StateError('Appwrite database unavailable');
+      final value = await database.listRows(
+        databaseId: databaseId,
+        tableId: reparationId,
+        queries: [Query.limit(5000)],
+      );
+      final refreshed = <String, Reparation>{};
+      for (final row in value.rows) {
+        final payload = _rowPayload(row);
+        try {
+          final item = Reparation.fromJson(payload);
+          refreshed[item.id] = item;
+          vehicleServices.localDatabase.cacheLegacyRow(
+            companyId: vehicleServices.companyId,
+            entity: 'repair',
+            entityId: row.$id,
+            payload: payload,
+          );
+        } catch (error) {
+          debugPrint('[ParcOto Repairs] remote row ignored: $error');
+        }
+      }
+      reparations = refreshed;
+      downloadedReparations = true;
+    } catch (error) {
+      downloadedReparations = reparations.isNotEmpty;
+      debugPrint('[ParcOto Repairs] refresh failed: $error');
+    } finally {
+      downloadingReparations = false;
+      notifyListeners();
+    }
+  }
 
-    });
-    downloadingPrestataires=false;
-    notifyListeners();
+  Future<void> refreshPrestataires() async {
+    if (downloadingPrestataires) return;
+    downloadingPrestataires = true;
+    try {
+      for (final payload in _readCached('provider')) {
+        try {
+          final item = Client.fromJson(payload);
+          prestataires[item.id] = item;
+        } catch (error) {
+          debugPrint('[ParcOto Providers] invalid cached provider ignored: $error');
+        }
+      }
+      if (prestataires.isNotEmpty) {
+        downloadedPrestataires = true;
+        notifyListeners();
+      }
 
+      final database = DatabaseGetter.database;
+      if (database == null) throw StateError('Appwrite database unavailable');
+      // Providers live in prestataire, not in the reparation table.
+      final value = await database.listRows(
+        databaseId: databaseId,
+        tableId: prestataireId,
+        queries: [Query.limit(5000)],
+      );
+      final refreshed = <String, Client>{};
+      for (final row in value.rows) {
+        final payload = _rowPayload(row);
+        try {
+          final item = Client.fromJson(payload);
+          refreshed[item.id] = item;
+          vehicleServices.localDatabase.cacheLegacyRow(
+            companyId: vehicleServices.companyId,
+            entity: 'provider',
+            entityId: row.$id,
+            payload: payload,
+          );
+        } catch (error) {
+          debugPrint('[ParcOto Providers] remote row ignored: $error');
+        }
+      }
+      prestataires = refreshed;
+      downloadedPrestataires = true;
+    } catch (error) {
+      downloadedPrestataires = prestataires.isNotEmpty;
+      debugPrint('[ParcOto Providers] refresh failed: $error');
+    } finally {
+      downloadingPrestataires = false;
+      notifyListeners();
+    }
   }
 
   Future<int> getRepairsCount() async{
@@ -104,30 +178,64 @@ class RepairProvider extends ChangeNotifier {
     return prestataires.length;
 
   }
-  static Future<Map<String,List<FicheReception>>> downloadFicheReparations()async {
+  static Future<Map<String, List<FicheReception>>> downloadFicheReparations() async {
+    repPerVeh = {};
+    final database = DatabaseGetter.database;
 
-
-    await DatabaseGetter.database!.listRows(
-      databaseId: databaseId,
-      tableId: fichesreceptionId,
-    ).then((value) {
-      for(var doc in value.rows){
-        FicheReception rep=doc.convertTo((p0) => FicheReception.fromJson(p0));
-        if(!repPerVeh.containsKey(rep.vehicule)){
-          repPerVeh[rep.vehiculemat??'nonind']=[rep];
-        }
-        else{
-          repPerVeh[rep.vehiculemat??'']!.add(rep);
+    // Local cache provides an offline fallback and is refreshed when online.
+    try {
+      final cached = vehicleServices.localDatabase.readLegacyCache(
+        companyId: vehicleServices.companyId,
+        entity: 'reception_sheet',
+      );
+      for (final payload in cached) {
+        try {
+          final fiche = FicheReception.fromJson(payload);
+          final key = fiche.vehiculemat ?? fiche.vehicule ?? 'nonind';
+          repPerVeh.putIfAbsent(key, () => <FicheReception>[]).add(fiche);
+        } catch (error) {
+          debugPrint('[ParcOto Reception] invalid cached sheet ignored: $error');
         }
       }
-      return repPerVeh;
-    });
+    } catch (error) {
+      debugPrint('[ParcOto Reception] local cache read failed: $error');
+    }
 
-    return {};
+    if (database == null) return repPerVeh;
+    try {
+      final value = await database.listRows(
+        databaseId: databaseId,
+        tableId: fichesreceptionId,
+        queries: [Query.limit(5000)],
+      );
+      final refreshed = <String, List<FicheReception>>{};
+      for (final row in value.rows) {
+        final payload = <String, dynamic>{
+          ...row.data,
+          r'$id': row.$id,
+          r'$createdAt': row.$createdAt,
+          r'$updatedAt': row.$updatedAt,
+        };
+        try {
+          final fiche = FicheReception.fromJson(payload);
+          final key = fiche.vehiculemat ?? fiche.vehicule ?? 'nonind';
+          refreshed.putIfAbsent(key, () => <FicheReception>[]).add(fiche);
+          vehicleServices.localDatabase.cacheLegacyRow(
+            companyId: vehicleServices.companyId,
+            entity: 'reception_sheet',
+            entityId: row.$id,
+            payload: payload,
+          );
+        } catch (error) {
+          debugPrint('[ParcOto Reception] remote row ignored: $error');
+        }
+      }
+      repPerVeh = refreshed;
+    } catch (error) {
+      debugPrint('[ParcOto Reception] remote refresh failed; using cache: $error');
+    }
+    return repPerVeh;
   }
-
-
-
 
   static List<Map<String,dynamic>> prepareVehicRepList(Map<String,
       List<FicheReception>> repPerVeh){
