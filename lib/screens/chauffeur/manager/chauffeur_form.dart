@@ -1,4 +1,3 @@
-import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
@@ -14,7 +13,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../serializables/vehicle/vehicle.dart';
 import '../../../domain/entities/driver.dart' as domain;
 import '../../../theme.dart';
-import '../../../main.dart' show driverServices, project;
+import '../../../main.dart' show driverServices;
 import '../../../utilities/form_validators.dart';
 import '../../entreprise/entreprise.dart';
 import '../../sidemenu/pane_items.dart';
