@@ -91,12 +91,15 @@ class DriverServices {
         await remoteSource.createDriver(
           domain.Driver.fromMap(operation.payload),
         );
+        return;
       case SyncOperationType.update:
         await remoteSource.updateDriver(
           domain.Driver.fromMap(operation.payload),
         );
+        return;
       case SyncOperationType.delete:
         await remoteSource.deleteDriver(operation.entityId);
+        return;
     }
   }
 
