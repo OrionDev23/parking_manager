@@ -51,9 +51,9 @@ class AppwriteSyncEngine implements SyncEngine {
       unawaited(syncNow());
     });
 
-    if (await _connection.hasInternetAccess) {
-      await syncNow();
-    }
+    // Never wait for network reachability or remote requests during app boot.
+    // The UI can start immediately and cached SQLite data remains available.
+    unawaited(syncNow());
   }
 
   @override
@@ -70,7 +70,13 @@ class AppwriteSyncEngine implements SyncEngine {
     if (!_running || _syncing) return;
     _syncing = true;
     try {
-      if (!await _connection.hasInternetAccess) return;
+      try {
+        if (!await _connection.hasInternetAccess) return;
+      } catch (_) {
+        // Connectivity checks must never prevent offline startup or crash
+        // the background worker.
+        return;
+      }
 
       // Take a snapshot so failed operations are not retried in a tight loop
       // during this same run. Failed rows are retried by the next timer/event.
