@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:appwrite/appwrite.dart' hide Client;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
