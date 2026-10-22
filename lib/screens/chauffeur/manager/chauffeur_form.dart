@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../serializables/vehicle/vehicle.dart';
+import '../../../domain/entities/driver.dart' as domain;
 import '../../../theme.dart';
 import '../../../utilities/form_validators.dart';
 import '../../entreprise/entreprise.dart';
@@ -672,48 +673,60 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   String? etatID;
 
   Future<void> uploadChauffeur() async {
-    Conducteur chauf = Conducteur(
+    final now = DateTime.now().toUtc();
+    final legacy = Conducteur(
       id: chaufID!,
       matricule: matricule.text,
       name: nom.value.text,
       prenom: prenom.value.text,
-      email: FormValidators.isEmail(email.value.text)?email.value.text:null,
+      email: FormValidators.isEmail(email.value.text) ? email.value.text : null,
       telephone: telephone.value.text,
       filliale: selectedAppartenance.text.replaceAll(' ', '').trim(),
       direction: selectedDirection.text.replaceAll(' ', '').trim(),
-      departement: selectedDepartment.text.replaceAll('', '').tr(),
+      departement: selectedDepartment.text.replaceAll(' ', '').trim(),
       profession: profession.text,
       service: service,
       adresse: adresse.value.text,
       dateNaissance: birthDay,
       etat: etat,
       etatactuel: etatID,
+      vehicules: vehicules,
+      createdBy: DatabaseGetter.me.value?.id,
+      createdAt: widget.chauf?.createdAt ?? now,
+      updatedAt: now,
     );
-    if (widget.chauf != null) {
-      await DatabaseGetter.database!
-          .updateRow(
-              databaseId: databaseId,
-              tableId: chauffeurid,
-              rowId: chaufID!,
-              data: chauf.toJson())
-          .then((value) {
-        DatabaseGetter().ajoutActivity(17, chaufID!,
-            docName: '${chauf.name} ${chauf.prenom}');
-      }).onError((AppwriteException error, stackTrace) {
-      });
-    } else {
-      await DatabaseGetter.database!
-          .createRow(
-              databaseId: databaseId,
-              tableId: chauffeurid,
-              rowId: chaufID!,
-              data: chauf.toJson())
-          .then((value) {
-        DatabaseGetter().ajoutActivity(16, chaufID!,
-            docName: '${chauf.name} ${chauf.prenom}');
+    final driver = domain.Driver(
+      id: legacy.id,
+      companyId: project ?? 'local',
+      firstName: legacy.prenom,
+      lastName: legacy.name,
+      registration: legacy.matricule,
+      email: legacy.email,
+      phone: legacy.telephone,
+      address: legacy.adresse,
+      profession: legacy.profession,
+      birthDate: legacy.dateNaissance,
+      createdBy: legacy.createdBy,
+      currentStateId: legacy.etatactuel,
+      state: legacy.etat ?? 0,
+      subsidiary: legacy.filliale,
+      direction: legacy.direction,
+      department: legacy.departement,
+      vehicleIds: legacy.vehicules ?? const [],
+      service: legacy.service,
+      createdAt: widget.chauf?.createdAt ?? now,
+      updatedAt: now,
+    );
 
-      }).onError((AppwriteException error, stackTrace) {
-      });
+    if (widget.chauf != null) {
+      await driverServices.repository.updateDriver(driver);
+    } else {
+      await driverServices.repository.createDriver(driver);
+    }
+    // Update the in-memory legacy list immediately; the UI should not wait
+    // for Appwrite to become reachable.
+    if (mounted) {
+      context.read<DriverProvider>().addConducteur(legacy);
     }
   }
 
