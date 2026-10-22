@@ -32,18 +32,101 @@ class AppwriteVehicleSource implements RemoteVehicleSource {
     if (payload is Map) {
       return Vehicle.fromMap(Map<String, dynamic>.from(payload));
     }
-    throw const FormatException('Vehicle remote payload is missing.');
+
+    // Legacy Appwrite rows store the vehicle attributes directly.
+    return Vehicle.fromMap({
+      'id': row.$id,
+      'companyId': data['companyId'] ?? companyContext.companyId,
+      'siteId': data['siteId'],
+      'registration': data['matricule'],
+      'foreignRegistration': data['martricule_etrang'] ?? false,
+      'wilaya': data['wilaya'],
+      'commune': data['commune'],
+      'daira': data['daira'],
+      'address': data['adresse'],
+      'registrationDate': data['date']?.toString(),
+      'receiptAmount': data['quittance'],
+      'receiptNumber': data['numero'],
+      'ownerLastName': data['nom'],
+      'ownerFirstName': data['prenom'],
+      'ownerProfession': data['profession'],
+      'serialNumber': data['numero_serie'],
+      'type': data['type'],
+      'brand': data['marque'],
+      'genre': data['genre'],
+      'usefulLoad': data['charge_utile'],
+      'totalWeight': data['poids_total'],
+      'seats': data['place_assises'],
+      'power': data['puissance'],
+      'energy': data['energie'],
+      'body': data['carrosserie'],
+      'usageYear': data['annee_util'],
+      'previousRegistrations': data['matricule_prec'] ?? const [],
+      'createdBy': data['user_creation'],
+      'country': data['pays'],
+      'state': data['etat'],
+      'currentState': data['etatactuel'],
+      'subsidiary': data['filliale'],
+      'department': data['departement'],
+      'direction': data['direction'],
+      'ownership': data['appartenance'],
+      'driverOwnership': data['appartenanceconducteur'],
+      'service': data['service'] ?? false,
+      'driverRegistration': data['matriculeConducteur'],
+      'heavy': data['lourd'] ?? false,
+      'decision': data['decision'] ?? false,
+      'location': data['emplacement'],
+      'perimeter': data['perimetre'] ?? 0,
+      'createdAt': row.$createdAt,
+      'updatedAt': row.$updatedAt,
+    });
   }
 
   Map<String, dynamic> _toRow(Vehicle vehicle) => {
         'companyId': vehicle.companyId,
         'siteId': vehicle.siteId,
-        // The Appwrite table schema requires `matricule`; keep it aligned
-        // with the domain model's registration value.
+        // Keep the exact legacy Appwrite attribute names defined in
+        // lib/serializables/vehicle/vehicle.dart.
         'matricule': vehicle.registration,
-        'registration': vehicle.registration,
-        'brand': vehicle.brand,
-        'model': vehicle.type,
+        'martricule_etrang': vehicle.foreignRegistration,
+        'wilaya': vehicle.wilaya,
+        'commune': vehicle.commune,
+        'daira': vehicle.daira,
+        'adresse': vehicle.address,
+        'date': vehicle.registrationDate?.millisecondsSinceEpoch,
+        'quittance': vehicle.receiptAmount,
+        'numero': vehicle.receiptNumber,
+        'nom': vehicle.ownerLastName,
+        'prenom': vehicle.ownerFirstName,
+        'profession': vehicle.ownerProfession,
+        'numero_serie': vehicle.serialNumber,
+        'type': vehicle.type,
+        'marque': vehicle.brand,
+        'genre': vehicle.genre,
+        'charge_utile': vehicle.usefulLoad,
+        'poids_total': vehicle.totalWeight,
+        'place_assises': vehicle.seats,
+        'puissance': vehicle.power,
+        'energie': vehicle.energy,
+        'carrosserie': vehicle.body,
+        'annee_util': vehicle.usageYear,
+        'matricule_prec': vehicle.previousRegistrations,
+        'user_creation': vehicle.createdBy,
+        'pays': vehicle.country,
+        'etat': vehicle.state,
+        'etatactuel': vehicle.currentState,
+        'filliale': vehicle.subsidiary,
+        'departement': vehicle.department,
+        'direction': vehicle.direction,
+        'appartenance': vehicle.ownership,
+        'appartenanceconducteur': vehicle.driverOwnership,
+        'service': vehicle.service,
+        'matriculeConducteur': vehicle.driverRegistration,
+        'lourd': vehicle.heavy,
+        'decision': vehicle.decision,
+        'emplacement': vehicle.location,
+        'perimetre': vehicle.perimeter,
+        // Preserve the full local-first model for round-tripping.
         'payload': jsonEncode(vehicle.toMap()),
       };
 
@@ -59,7 +142,7 @@ class AppwriteVehicleSource implements RemoteVehicleSource {
       Query.limit(limit ?? 100),
       Query.offset(offset),
       if (search != null && search.trim().isNotEmpty)
-        Query.search('registration', search.trim()),
+        Query.search('matricule', search.trim()),
     ];
 
     final result = await backend.database.listRows(
