@@ -44,9 +44,7 @@ class AppwriteDriverSource implements RemoteDriverSource {
 
     return Driver(
       id: row.$id.toString(),
-      companyId: (data['companyId']?.toString().isNotEmpty ?? false)
-          ? data['companyId'].toString()
-          : companyContext.companyId,
+      companyId: data['companyId']?.toString() ?? '',
       siteId: data['siteId']?.toString(),
       firstName: data['prenom']?.toString() ?? '',
       lastName: data['name']?.toString() ?? '',
@@ -134,12 +132,11 @@ class AppwriteDriverSource implements RemoteDriverSource {
       return result.rows;
     }
 
-    final currentRows = await listRows([
+    // Tenant isolation is strict: never expose rows without a matching
+    // companyId to the active company.
+    final rows = await listRows([
       Query.equal('companyId', companyContext.companyId),
     ]);
-    // Compatibility for rows created before companyId was introduced.
-    final legacyRows = await listRows([Query.isNull('companyId')]);
-    final rows = [...currentRows, ...legacyRows];
     rows.sort((a, b) {
       final aDate = DateTime.tryParse(a.$updatedAt.toString()) ?? DateTime(1970);
       final bDate = DateTime.tryParse(b.$updatedAt.toString()) ?? DateTime(1970);
@@ -162,8 +159,8 @@ class AppwriteDriverSource implements RemoteDriverSource {
         rowId: id,
       );
       final rawCompanyId = row.data['companyId']?.toString();
-      if (rawCompanyId != null &&
-          rawCompanyId.isNotEmpty &&
+      if (rawCompanyId == null ||
+          rawCompanyId.isEmpty ||
           rawCompanyId != companyContext.companyId) {
         return null;
       }
