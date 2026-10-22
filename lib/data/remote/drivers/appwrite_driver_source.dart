@@ -137,17 +137,9 @@ class AppwriteDriverSource implements RemoteDriverSource {
     final rows = await listRows([
       Query.equal('companyId', companyContext.companyId),
     ]);
-    rows.sort((a, b) {
-      final aDate = DateTime.tryParse(a.$updatedAt.toString()) ?? DateTime(1970);
-      final bDate = DateTime.tryParse(b.$updatedAt.toString()) ?? DateTime(1970);
-      return bDate.compareTo(aDate);
-    });
-    final start = offset.clamp(0, rows.length);
-    final end = (start + (limit ?? 100)).clamp(start, rows.length);
-    return rows
-        .sublist(start, end)
-        .map<Driver>(_fromRow)
-        .toList(growable: false);
+    // Appwrite already applies order, limit and offset. Do not apply offset
+    // a second time locally, or every page after the first will skip rows.
+    return rows.map<Driver>(_fromRow).toList(growable: false);
   }
 
   @override
