@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/local/vehicles/sqlite_vehicle_source.dart';
@@ -85,6 +86,27 @@ class VehicleServices {
 
   Future<void> seedLocal(domain.Vehicle vehicle) =>
       localSource.upsertVehicle(vehicle);
+
+  /// Backfills missing SQLite cache rows from the migrated Appwrite table.
+  /// Existing local rows are never overwritten, so pending offline edits survive.
+  Future<int> migrateRemoteCache() async {
+    var offset = 0;
+    var migrated = 0;
+    while (true) {
+      final page = await remoteSource.getVehicles(limit: 100, offset: offset);
+      if (page.isEmpty) break;
+      for (final vehicle in page) {
+        if (await localSource.getVehicle(vehicle.id) == null) {
+          await localSource.upsertVehicle(vehicle);
+          migrated++;
+        }
+      }
+      offset += page.length;
+      if (page.length < 100) break;
+    }
+    debugPrint('[ParcOto Migration] vehicles copied to SQLite: $migrated');
+    return migrated;
+  }
 
   Future<void> applySyncOperation(SyncOperation operation) async {
     if (operation.companyId != companyId) {
