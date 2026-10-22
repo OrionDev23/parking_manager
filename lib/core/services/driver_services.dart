@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/local/drivers/sqlite_driver_source.dart';
@@ -81,6 +82,33 @@ class DriverServices {
 
   Future<void> seedLocal(domain.Driver driver) =>
       localSource.upsertDriver(driver);
+
+  /// Backfills missing SQLite cache rows from Appwrite without overwriting
+  /// local records that may contain offline changes.
+  Future<int> migrateRemoteCache() async {
+    var migrated = 0;
+    for (final includeArchived in [false, true]) {
+      var offset = 0;
+      while (true) {
+        final page = await remoteSource.getDrivers(
+          limit: 100,
+          offset: offset,
+          includeArchived: includeArchived,
+        );
+        if (page.isEmpty) break;
+        for (final driver in page) {
+          if (await localSource.getDriver(driver.id) == null) {
+            await localSource.upsertDriver(driver);
+            migrated++;
+          }
+        }
+        offset += page.length;
+        if (page.length < 100) break;
+      }
+    }
+    debugPrint('[ParcOto Migration] drivers copied to SQLite: $migrated');
+    return migrated;
+  }
 
   Future<void> applySyncOperation(SyncOperation operation) async {
     if (operation.companyId != companyId) {
