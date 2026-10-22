@@ -30,9 +30,18 @@ class SqliteSyncQueue implements SyncQueue {
   }
 
   @override
-  Future<List<SyncOperation>> pending({int limit = 50}) async => _db
-      .select("SELECT * FROM sync_operations WHERE status IN ('pending','failed') ORDER BY created_at LIMIT ?", [limit])
-      .map(_fromRow).toList(growable: false);
+  Future<List<SyncOperation>> pending({int limit = 50, String? companyId}) async {
+    final rows = companyId == null
+        ? _db.select(
+            "SELECT * FROM sync_operations WHERE status IN ('pending','failed') ORDER BY created_at LIMIT ?",
+            [limit],
+          )
+        : _db.select(
+            "SELECT * FROM sync_operations WHERE status IN ('pending','failed') AND company_id = ? ORDER BY created_at LIMIT ?",
+            [companyId, limit],
+          );
+    return rows.map(_fromRow).toList(growable: false);
+  }
 
   @override
   Future<void> markCompleted(String operationId) async => _db.execute("UPDATE sync_operations SET status='completed' WHERE id=?", [operationId]);
