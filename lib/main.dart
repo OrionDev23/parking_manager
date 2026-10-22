@@ -108,6 +108,18 @@ void launchApp() async {
     appwriteProjectId: project ?? 'essais',
   );
 
+  // Migrate existing Appwrite records into the local SQLite cache before
+  // the first local-first screens read it. Existing local rows are preserved.
+  try {
+    await Future.wait([
+      vehicleServices.migrateRemoteCache(),
+      driverServices.migrateRemoteCache(),
+    ]);
+  } catch (error, stackTrace) {
+    debugPrint('[ParcOto Migration] remote cache migration failed: $error\\n$stackTrace');
+    // Keep startup available even when Appwrite is temporarily unreachable.
+  }
+
   syncEngine = AppwriteSyncEngine(
     queue: vehicleServices.syncQueue,
     companyId: activeCompanyId,
