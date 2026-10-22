@@ -28,6 +28,7 @@ import 'domain/repositories/access_control_repository.dart';
 import 'data/remote/access/appwrite_access_control_repository.dart';
 import 'core/services/user_profile_service.dart';
 import 'core/services/vehicle_services.dart';
+import 'core/database/legacy_module_cache_migration.dart';
 import 'core/services/driver_services.dart';
 import 'core/sync/appwrite_sync_engine.dart';
 import 'core/sync/sync_engine.dart';
@@ -118,6 +119,18 @@ void launchApp() async {
   } catch (error, stackTrace) {
     debugPrint('[ParcOto Migration] remote cache migration failed: $error\\n$stackTrace');
     // Keep startup available even when Appwrite is temporarily unreachable.
+  }
+
+  // Stage the remaining legacy modules in SQLite without overwriting any
+  // cached row. Their screens will be switched to repository-backed access in
+  // subsequent migration steps; this cache backfill itself is safe to repeat.
+  try {
+    await LegacyModuleCacheMigration(
+      localDatabase: vehicleServices.localDatabase,
+      companyId: activeCompanyId,
+    ).migrate();
+  } catch (error, stackTrace) {
+    debugPrint('[ParcOto Migration] legacy module cache failed: $error\\n$stackTrace');
   }
 
   syncEngine = AppwriteSyncEngine(
