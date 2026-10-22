@@ -29,6 +29,8 @@ import 'data/remote/access/appwrite_access_control_repository.dart';
 import 'core/services/user_profile_service.dart';
 import 'core/services/vehicle_services.dart';
 import 'core/services/driver_services.dart';
+import 'core/sync/appwrite_sync_engine.dart';
+import 'core/sync/sync_engine.dart';
 import 'data/remote/company/legacy_appwrite_company_repository.dart';
 import 'data/remote/users/legacy_appwrite_user_profile_repository.dart';
 import 'theme.dart';
@@ -38,6 +40,7 @@ late final PackageInfo packageInfo;
 late final SharedPreferences prefs;
 late final VehicleServices vehicleServices;
 late final DriverServices driverServices;
+late final SyncEngine syncEngine;
 late final AuthService authService;
 late final UserProfileService userProfileService;
 late final CompanyService companyService;
@@ -104,6 +107,16 @@ void launchApp() async {
     companyId: activeCompanyId,
     appwriteProjectId: project ?? 'essais',
   );
+
+  syncEngine = AppwriteSyncEngine(
+    queue: vehicleServices.syncQueue,
+    companyId: activeCompanyId,
+    handlers: {
+      'vehicle': vehicleServices.applySyncOperation,
+      'driver': driverServices.applySyncOperation,
+    },
+  );
+  await syncEngine.start();
 
   VehiclesUtilities();
   EasyLocalization.logger.enableBuildModes = [];
