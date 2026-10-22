@@ -2086,6 +2086,7 @@ class _VehicleFormState extends State<VehicleForm>
           });
         }
       }
+    }
   }
 
   Future<void> updateVehicle(Vehicle vehicle) async {
