@@ -161,6 +161,12 @@ class AppwriteVehicleSource implements RemoteVehicleSource {
         tableId: tableId,
         rowId: id,
       );
+      final rowCompanyId = row.data['companyId']?.toString();
+      if (rowCompanyId == null ||
+          rowCompanyId.isEmpty ||
+          rowCompanyId != companyContext.companyId) {
+        return null;
+      }
       final vehicle = _fromRow(row);
       if (vehicle.companyId != companyContext.companyId) return null;
       return vehicle;
