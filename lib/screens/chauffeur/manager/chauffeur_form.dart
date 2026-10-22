@@ -14,6 +14,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../serializables/vehicle/vehicle.dart';
 import '../../../domain/entities/driver.dart' as domain;
 import '../../../theme.dart';
+import '../../../main.dart' show driverServices, project;
 import '../../../utilities/form_validators.dart';
 import '../../entreprise/entreprise.dart';
 import '../../sidemenu/pane_items.dart';
