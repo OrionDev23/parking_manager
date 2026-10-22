@@ -2,7 +2,6 @@ import 'package:appwrite/appwrite.dart';
 import 'package:parc_oto/datasources/parcoto_webservice.dart';
 import 'package:parc_oto/datasources/parcoto_webservice_response.dart';
 import 'package:parc_oto/main.dart' show driverServices;
-import 'package:parc_oto/providers/client_database.dart';
 
 import '../../domain/entities/driver.dart';
 import '../../serializables/conducteur/conducteur.dart';
