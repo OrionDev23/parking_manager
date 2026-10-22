@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart';
@@ -101,6 +102,41 @@ class LocalDatabase {
         "INSERT INTO schema_migrations(version, applied_at) VALUES (4, datetime('now'))",
       );
     }
+  }
+
+  List<Map<String, dynamic>> readLegacyCache({
+    required String companyId,
+    required String entity,
+  }) {
+    final rows = database.select(
+      'SELECT payload FROM legacy_module_cache WHERE company_id = ? AND entity = ?',
+      [companyId, entity],
+    );
+    return rows
+        .map((row) => jsonDecode(row['payload'] as String) as Map<String, dynamic>)
+        .toList(growable: false);
+  }
+
+  void cacheLegacyRow({
+    required String companyId,
+    required String entity,
+    required String entityId,
+    required Map<String, dynamic> payload,
+    bool overwrite = true,
+  }) {
+    final conflictAction = overwrite ? 'REPLACE' : 'IGNORE';
+    database.execute(
+      '''INSERT OR $conflictAction INTO legacy_module_cache
+        (company_id, entity, entity_id, payload, cached_at)
+        VALUES (?, ?, ?, ?, ?)''',
+      [
+        companyId,
+        entity,
+        entityId,
+        jsonEncode(payload),
+        DateTime.now().toUtc().toIso8601String(),
+      ],
+    );
   }
 
   Future<void> close() async {
