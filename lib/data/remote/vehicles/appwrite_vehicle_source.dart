@@ -38,6 +38,9 @@ class AppwriteVehicleSource implements RemoteVehicleSource {
   Map<String, dynamic> _toRow(Vehicle vehicle) => {
         'companyId': vehicle.companyId,
         'siteId': vehicle.siteId,
+        // The Appwrite table schema requires `matricule`; keep it aligned
+        // with the domain model's registration value.
+        'matricule': vehicle.registration,
         'registration': vehicle.registration,
         'brand': vehicle.brand,
         'model': vehicle.type,
