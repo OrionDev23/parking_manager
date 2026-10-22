@@ -2,6 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/local/vehicles/sqlite_vehicle_source.dart';
 import '../../data/remote/vehicles/appwrite_vehicle_source.dart';
+import '../../core/sync/sync_operation.dart';
 import '../../data/repositories/vehicle_repository_impl.dart';
 import '../../domain/entities/vehicle.dart' as domain;
 import '../../domain/repositories/vehicle_repository.dart';
@@ -18,11 +19,17 @@ class VehicleServices {
   final LocalDatabase localDatabase;
   final VehicleRepository repository;
   final SqliteVehicleSource localSource;
+  final AppwriteVehicleSource remoteSource;
+  final SqliteSyncQueue syncQueue;
+  final String companyId;
 
   VehicleServices._({
     required this.localDatabase,
     required this.repository,
     required this.localSource,
+    required this.remoteSource,
+    required this.syncQueue,
+    required this.companyId,
   });
 
   static Future<VehicleServices> create({
@@ -63,6 +70,9 @@ class VehicleServices {
     return VehicleServices._(
       localDatabase: localDatabase,
       localSource: localSource,
+      remoteSource: remoteSource,
+      syncQueue: syncQueue,
+      companyId: companyId,
       repository: VehicleRepositoryImpl(
         local: localSource,
         syncQueue: syncQueue,
@@ -75,6 +85,24 @@ class VehicleServices {
 
   Future<void> seedLocal(domain.Vehicle vehicle) =>
       localSource.upsertVehicle(vehicle);
+
+  Future<void> applySyncOperation(SyncOperation operation) async {
+    if (operation.companyId != companyId) {
+      throw StateError('Vehicle sync operation belongs to another company.');
+    }
+    switch (operation.type) {
+      case SyncOperationType.create:
+        await remoteSource.createVehicle(
+          domain.Vehicle.fromMap(operation.payload),
+        );
+      case SyncOperationType.update:
+        await remoteSource.updateVehicle(
+          domain.Vehicle.fromMap(operation.payload),
+        );
+      case SyncOperationType.delete:
+        await remoteSource.deleteVehicle(operation.entityId);
+    }
+  }
 
   Future<void> dispose() => localDatabase.close();
 }
