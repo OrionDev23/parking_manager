@@ -20,6 +20,19 @@ class AppwriteVehicleSource implements RemoteVehicleSource {
     required this.tableId,
   });
 
+  static DateTime? _legacyDate(dynamic raw) {
+    if (raw == null) return null;
+    final value = int.tryParse(raw.toString());
+    if (value == null) return DateTime.tryParse(raw.toString());
+    // New rows use Unix epoch milliseconds. Legacy rows stored an offset from
+    // the application's historical reference date.
+    final date = value > 1000000000000
+        ? DateTime.fromMillisecondsSinceEpoch(value)
+        : DateTime(2023, 11, 1, 12, 13, 15)
+            .add(Duration(milliseconds: value));
+    return date;
+  }
+
   Vehicle _fromRow(dynamic row) {
     final data = Map<String, dynamic>.from(row.data);
     final payload = data['payload'];
@@ -44,7 +57,7 @@ class AppwriteVehicleSource implements RemoteVehicleSource {
       'commune': data['commune'],
       'daira': data['daira'],
       'address': data['adresse'],
-      'registrationDate': data['date']?.toString(),
+      'registrationDate': _legacyDate(data['date'])?.toIso8601String(),
       'receiptAmount': data['quittance'],
       'receiptNumber': data['numero'],
       'ownerLastName': data['nom'],
