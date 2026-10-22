@@ -84,6 +84,23 @@ class LocalDatabase {
         "INSERT INTO schema_migrations(version, applied_at) VALUES (3, datetime('now'))",
       );
     }
+
+    if (version < 4) {
+      db.execute('''CREATE TABLE IF NOT EXISTS legacy_module_cache (
+        company_id TEXT NOT NULL,
+        entity TEXT NOT NULL,
+        entity_id TEXT NOT NULL,
+        payload TEXT NOT NULL,
+        cached_at TEXT NOT NULL,
+        PRIMARY KEY (company_id, entity, entity_id)
+      )''');
+      db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_legacy_module_cache_entity ON legacy_module_cache(company_id, entity)',
+      );
+      db.execute(
+        "INSERT INTO schema_migrations(version, applied_at) VALUES (4, datetime('now'))",
+      );
+    }
   }
 
   Future<void> close() async {
