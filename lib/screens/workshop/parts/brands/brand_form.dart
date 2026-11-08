@@ -1,7 +1,6 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/foundation.dart';
 import 'package:parc_oto/providers/parts_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -254,10 +253,12 @@ class _BrandFormState extends State<BrandForm> with
       );
       PartsProvider.brands[brandKey] = brand;
       BrandDatasource.instance?.refreshDatasource();
-      if (mounted) showMessage(
-        widget.brand == null ? 'brandadd' : 'brandmod',
-        'fait',
-      );
+      if (mounted) {
+        showMessage(
+          widget.brand == null ? 'brandadd' : 'brandmod',
+          'fait',
+        );
+      }
     } catch (error) {
       debugPrint('[ParcOto Stock] brand save failed: $error');
       if (mounted) showMessage('errupld', 'erreur');
