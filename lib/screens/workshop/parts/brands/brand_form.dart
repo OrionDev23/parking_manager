@@ -1,12 +1,14 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:parc_oto/providers/parts_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../../datasources/workshop/brand/brand_datasrouce.dart';
 import '../../../../providers/client_database.dart';
+import '../../../../main.dart' show legacyStockSyncService;
 import '../../../../serializables/pieces/brand.dart';
 import '../../../../theme.dart';
 import '../../../../widgets/zone_box.dart';
@@ -238,37 +240,29 @@ class _BrandFormState extends State<BrandForm> with
             ? date
             : widget.brand!.createdAt);
 
-    if(widget.brand==null){
-      await DatabaseGetter().addDocument(
-          collectionId: brandsID,
-          documentId: brandKey,
-          data: brand.toJson()).then((s){
-        DatabaseGetter().ajoutActivity(57, brand.id, docName: brand.name);
-
-        showMessage('brandadd', 'fait');
-        PartsProvider.brands[brandKey] = brand;
-        if (BrandDatasource.instance != null ) {
-          BrandDatasource.instance!.refreshDatasource();}
-      }).catchError((e){
-        showMessage('errupld', 'erreur');
-      });
+    try {
+      await legacyStockSyncService.save(
+        entity: 'part_brand',
+        id: brandKey,
+        data: brand.toJson(),
+        isNew: widget.brand == null,
+      );
+      DatabaseGetter().ajoutActivity(
+        widget.brand == null ? 57 : 58,
+        brand.id,
+        docName: brand.name,
+      );
+      PartsProvider.brands[brandKey] = brand;
+      BrandDatasource.instance?.refreshDatasource();
+      if (mounted) showMessage(
+        widget.brand == null ? 'brandadd' : 'brandmod',
+        'fait',
+      );
+    } catch (error) {
+      debugPrint('[ParcOto Stock] brand save failed: $error');
+      if (mounted) showMessage('errupld', 'erreur');
     }
-    else{
-      await DatabaseGetter().updateDocument(
-          collectionId: brandsID,
-          documentId: brandKey,
-          data: brand.toJson()).then((s){
-        DatabaseGetter().ajoutActivity(58, brand.id, docName: brand.name);
 
-        showMessage('brandmod', 'fait');
-        PartsProvider.brands[brandKey] = brand;
-        if (BrandDatasource.instance != null ) {
-          BrandDatasource.instance!.refreshDatasource();
-        }
-      }).catchError((e){
-        showMessage('errupld', 'erreur');
-      });
-    }
     setState(() {
       loading = false;
     });
