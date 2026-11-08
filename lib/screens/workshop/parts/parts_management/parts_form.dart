@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 
 import 'package:appwrite/appwrite.dart' show AppwriteException;
 import 'package:barcode_widget/barcode_widget.dart';
@@ -1092,39 +1093,26 @@ class _PartsFormState extends State<PartsForm>
       fournisseurName: selectedFournisseur?.nom,
     );
 
-    if (newpart) {
-      await DatabaseGetter()
-          .addDocument(
-              collectionId: partsID,
-              documentId: partID!,
-              data: part.toJson())
-          .then((s) {
-        if (mounted) {
-          displayMessage(context, 'pieceadded', InfoBarSeverity.success);
-        }
-      }).onError((AppwriteException e,s) {
-        partID=null;
-
-        if (mounted) {
-          displayMessage(context, 'errupld', InfoBarSeverity.error);
-        }
-      });
-    } else {
-      await DatabaseGetter()
-          .updateDocument(
-              collectionId: partsID,
-              documentId: partID!,
-              data: part.toJson())
-          .then((s) {
-        if (mounted) {
-          displayMessage(context, 'piecemoded', InfoBarSeverity.success);
-        }
-      }).onError((AppwriteException e,s) {
-
-        if (mounted) {
-          displayMessage(context, 'errupld', InfoBarSeverity.error);
-        }
-      });
+    try {
+      await legacyStockSyncService.save(
+        entity: 'part',
+        id: part.id,
+        data: part.toJson(),
+        isNew: newpart,
+      );
+      if (mounted) {
+        displayMessage(
+          context,
+          newpart ? 'pieceadded' : 'piecemoded',
+          InfoBarSeverity.success,
+        );
+      }
+    } catch (error, stackTrace) {
+      debugPrint('[ParcOto Stock] part save failed: $error');
+      if (kDebugMode) debugPrintStack(stackTrace: stackTrace);
+      if (mounted) {
+        displayMessage(context, 'errupld', InfoBarSeverity.error);
+      }
     }
     setState(() {
       uploading = false;
