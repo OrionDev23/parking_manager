@@ -1,7 +1,6 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/foundation.dart';
 import 'package:parc_oto/datasources/workshop/category/category_datasource.dart';
 import 'package:parc_oto/screens/workshop/parts/categories/category_table.dart';
 import 'package:parc_oto/theme.dart';
@@ -305,10 +304,12 @@ class _CategoryFormState extends State<CategoryForm> with
       if (CategoryDatasource.instance != null) {
         CategoryDatasource.instance!.refreshDatasource();
       }
-      if (mounted) showMessage(
-        widget.category == null ? 'catadd' : 'catmod',
-        'fait',
-      );
+      if (mounted) {
+        showMessage(
+          widget.category == null ? 'catadd' : 'catmod',
+          'fait',
+        );
+      }
     } catch (error) {
       debugPrint('[ParcOto Stock] category save failed: $error');
       if (mounted) showMessage('errupld', 'erreur');
