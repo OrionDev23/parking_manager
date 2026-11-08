@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' as m;
 import 'package:flutter_chip_tags/flutter_chip_tags.dart';
 import 'package:parc_oto/datasources/workshop/option/option_datasource.dart';
@@ -261,10 +260,12 @@ class _OptionFormState extends State<OptionForm> with
         datasource.data.add(MapEntry(optionKey, option));
         datasource.refreshDatasource();
       }
-      if (mounted) showMessage(
-        widget.option == null ? 'optionadd' : 'optionmod',
-        'fait',
-      );
+      if (mounted) {
+        showMessage(
+          widget.option == null ? 'optionadd' : 'optionmod',
+          'fait',
+        );
+      }
     } catch (error) {
       debugPrint('[ParcOto Stock] option save failed: $error');
       if (mounted) showMessage('errupld', 'erreur');
