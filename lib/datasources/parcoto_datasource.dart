@@ -10,6 +10,7 @@ import 'package:parc_oto/datasources/parcoto_webservice_response.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../providers/client_database.dart';
+import '../main.dart';
 import '../serializables/parc_oto_serializable.dart';
 import '../theme.dart';
 TextStyle rowTextStyle=TextStyle(
@@ -32,6 +33,71 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
   List<MapEntry<String, T>> data = List.empty(growable: true);
 
   late final ParcOtoWebService repo;
+  bool _localCacheLoaded = false;
+
+  String? get _cacheEntity {
+    switch (collectionID) {
+      case clientsID:
+        return 'client';
+      case prestataireId:
+        return 'provider';
+      default:
+        return null;
+    }
+  }
+
+  void _loadLocalCache() {
+    if (_localCacheLoaded) return;
+    _localCacheLoaded = true;
+    final entity = _cacheEntity;
+    if (entity == null) return;
+    try {
+      final rows = vehicleServices.localDatabase.readLegacyCache(
+        companyId: vehicleServices.companyId,
+        entity: entity,
+      );
+      for (final payload in rows) {
+        final id = payload[r'$id']?.toString();
+        if (id == null || id.isEmpty) continue;
+        try {
+          if (!data.any((entry) => entry.key == id)) {
+            data.add(MapEntry(id, repo.fromJsonFunction(payload)));
+          }
+        } catch (error) {
+          f.debugPrint('[ParcOto] invalid $entity cache row ignored: $error');
+        }
+      }
+    } catch (error) {
+      f.debugPrint('[ParcOto] unable to read $entity cache: $error');
+    }
+  }
+
+  void _persistRows(List<MapEntry<String, dynamic>> rows) {
+    final entity = _cacheEntity;
+    if (entity == null) return;
+    for (final entry in rows) {
+      final value = entry.value;
+      if (value is! ParcOtoDefault) continue;
+      final payload = <String, dynamic>{
+        ...value.toJson(),
+        r'$id': entry.key,
+        if (value.createdAt != null)
+          r'$createdAt': value.createdAt!.toUtc().toIso8601String(),
+        if (value.updatedAt != null)
+          r'$updatedAt': value.updatedAt!.toUtc().toIso8601String(),
+      };
+      try {
+        vehicleServices.localDatabase.cacheLegacyRow(
+          companyId: vehicleServices.companyId,
+          entity: entity,
+          entityId: entry.key,
+          payload: payload,
+        );
+      } catch (error) {
+        f.debugPrint('[ParcOto] unable to cache $entity row: $error');
+      }
+    }
+  }
 
   ParcOtoDatasource(
       {required this.collectionID,
@@ -123,12 +189,16 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
 
     assert(startIndex >= 0);
 
+    // Populate from SQLite before attempting the remote page.
+    _loadLocalCache();
+
     // List returned will be empty is there're fewer items than startingAt
     var x = empty
         ? await Future.delayed(const Duration(milliseconds: 1000),
             () => ParcOtoWebServiceResponse<T>(0, []))
         : await repo.getData(startIndex, count, sortColumn, sortAscending,
             searchKey: searchKey, filters: filters);
+    _persistRows(x.data.cast<MapEntry<String, dynamic>>());
 
     var r = AsyncRowsResponse(
         x.totalRecords,
