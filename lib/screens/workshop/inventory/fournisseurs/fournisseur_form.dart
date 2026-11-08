@@ -11,7 +11,7 @@ class FournisseurForm extends ClientForm {
   const FournisseurForm({super.key, super.prest});
 
   @override
-  State<PrestataireForm> createState() => ClientFormState();
+  State<PrestataireForm> createState() => FournisseurFormState();
 }
 
 class FournisseurFormState extends ClientFormState {
