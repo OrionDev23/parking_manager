@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart' hide Category;
 
-import 'package:appwrite/appwrite.dart' show AppwriteException;
 import 'package:barcode_widget/barcode_widget.dart';
 import 'package:chip_list/chip_list.dart';
 import 'package:easy_localization/easy_localization.dart';
