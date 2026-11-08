@@ -1,6 +1,7 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:parc_oto/datasources/workshop/category/category_datasource.dart';
 import 'package:parc_oto/screens/workshop/parts/categories/category_table.dart';
 import 'package:parc_oto/theme.dart';
@@ -9,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../../providers/client_database.dart';
+import '../../../../main.dart' show legacyStockSyncService;
 import '../../../../providers/parts_provider.dart';
 import '../../../../serializables/pieces/category.dart';
 
@@ -287,34 +289,29 @@ class _CategoryFormState extends State<CategoryForm> with
             widget.category!.createdAt == null
             ? date
             : widget.category!.createdAt);
-    if(widget.category==null){
-      await DatabaseGetter().addDocument(collectionId: categoriesID,
-          documentId: categoryKey, data: cat.toJson()).then((s){
-        DatabaseGetter().ajoutActivity(54, cat.id, docName: cat.name);
-
-        showMessage('catadd', 'fait');
-        PartsProvider.categories[categoryKey] = cat;
-        if (CategoryDatasource.instance != null) {
-          CategoryDatasource.instance!.refreshDatasource();
-        }
-      }).catchError((s){
-        showMessage('errupld', 'erreur');
-      });
-    }
-    else{
-      await DatabaseGetter().updateDocument(collectionId: categoriesID,
-          documentId: categoryKey, data: cat.toJson()).then((s){
-        DatabaseGetter().ajoutActivity(55, cat.id, docName: cat.name);
-
-        showMessage('catmod', 'fait');
-        PartsProvider.categories[categoryKey] = cat;
-        if (CategoryDatasource.instance != null) {
-          CategoryDatasource.instance!.refreshDatasource();
-        }
-      }).catchError
-        ((s){
-        showMessage('errupld', 'erreur');
-      });
+    try {
+      await legacyStockSyncService.save(
+        entity: 'part_category',
+        id: categoryKey,
+        data: cat.toJson(),
+        isNew: widget.category == null,
+      );
+      DatabaseGetter().ajoutActivity(
+        widget.category == null ? 54 : 55,
+        cat.id,
+        docName: cat.name,
+      );
+      PartsProvider.categories[categoryKey] = cat;
+      if (CategoryDatasource.instance != null) {
+        CategoryDatasource.instance!.refreshDatasource();
+      }
+      if (mounted) showMessage(
+        widget.category == null ? 'catadd' : 'catmod',
+        'fait',
+      );
+    } catch (error) {
+      debugPrint('[ParcOto Stock] category save failed: $error');
+      if (mounted) showMessage('errupld', 'erreur');
     }
 
 
