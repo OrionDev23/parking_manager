@@ -20,13 +20,15 @@ abstract class ParcOtoWebService<T> {
   Future<ParcOtoWebServiceResponse<T>> getData(
       int startingAt, int count, int sortedBy, bool sortedAsc,
       {String? searchKey, Map<String, String>? filters}) async {
-    if (startingAt == 0) {
-      data.clear();
-    }
+    // Keep the SQLite-hydrated rows until the remote request succeeds.
+    // A failed request must not erase the local snapshot.
     //  final stopwatch = Stopwatch()..start();
     return getSearchResult(
             searchKey, filters ?? {}, count, startingAt, sortedBy, sortedAsc)
         .then((value) {
+      if (startingAt == 0) {
+        data.clear();
+      }
       for (var element in value.rows) {
         if (!testIfElementContained(element.$id)) {
           data.add(MapEntry(element.$id, element.convertTo<T>((p0) {
@@ -53,7 +55,7 @@ abstract class ParcOtoWebService<T> {
         print('stacktrace : $stackTrace');
       }
 
-      return Future.value(ParcOtoWebServiceResponse<T>(0, data));
+      return Future.value(ParcOtoWebServiceResponse<T>(data.length, data.skip(startingAt).take(count).toList()));
     });
   }
 
