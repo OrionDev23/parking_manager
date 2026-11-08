@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:parc_oto/serializables/planning.dart';
 
 import '../main.dart';
-import '../utilities/profil_beautifier.dart';
 import 'client_database.dart';
 
 class PlanningProvider extends ChangeNotifier {
