@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' as m;
 import 'package:flutter_chip_tags/flutter_chip_tags.dart';
 import 'package:parc_oto/datasources/workshop/option/option_datasource.dart';
@@ -8,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../../providers/client_database.dart';
+import '../../../../main.dart' show legacyStockSyncService;
 import '../../../../providers/parts_provider.dart';
 import '../../../../serializables/pieces/option.dart';
 import '../../../../theme.dart';
@@ -240,42 +242,32 @@ class _OptionFormState extends State<OptionForm> with
             widget.option!.createdAt == null
             ? date
             : widget.option!.createdAt);
-    if(widget.option!=null){
-      await DatabaseGetter().updateDocument(collectionId: optionsID,
-          documentId: optionKey, data: option.toJson()).then((s){
-        DatabaseGetter().ajoutActivity(52, option.id, docName: option.name);
-
-        showMessage('optionadd', 'fait');
-        PartsProvider.options[optionKey] = option;
-        if (OptionDatasource.instance != null) {
-          OptionDatasource.instance!.repo.data.add(MapEntry(optionKey,
-              option));
-          OptionDatasource.instance!.refreshDatasource();
-
-        }
-
-      }).catchError(
-              (s){
-
-            showMessage('errupld', 'erreur');});
-    }
-    else{
-      await DatabaseGetter().addDocument(collectionId: optionsID,
-          documentId: optionKey, data: option.toJson()).then((s){
-        DatabaseGetter().ajoutActivity(51, option.id, docName: option.name);
-
-        showMessage('optionmod', 'fait');
-        PartsProvider.options[optionKey] = option;
-        if (OptionDatasource.instance != null) {
-          OptionDatasource.instance!.repo.data.add(MapEntry(optionKey,
-              option));
-          OptionDatasource.instance!.refreshDatasource();
-
-        }
-      }).catchError(
-              (s){
-
-        showMessage('errupld', 'erreur');});
+    try {
+      await legacyStockSyncService.save(
+        entity: 'part_option',
+        id: optionKey,
+        data: option.toJson(),
+        isNew: widget.option == null,
+      );
+      DatabaseGetter().ajoutActivity(
+        widget.option == null ? 51 : 52,
+        option.id,
+        docName: option.name,
+      );
+      PartsProvider.options[optionKey] = option;
+      final datasource = OptionDatasource.instance;
+      if (datasource != null) {
+        datasource.data.removeWhere((entry) => entry.key == optionKey);
+        datasource.data.add(MapEntry(optionKey, option));
+        datasource.refreshDatasource();
+      }
+      if (mounted) showMessage(
+        widget.option == null ? 'optionmod' : 'optionadd',
+        'fait',
+      );
+    } catch (error) {
+      debugPrint('[ParcOto Stock] option save failed: $error');
+      if (mounted) showMessage('errupld', 'erreur');
     }
 
 
