@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:appwrite/models.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
@@ -64,7 +65,7 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
             data.add(MapEntry(id, repo.fromJsonFunction(payload)));
           }
         } catch (error) {
-          f.debugPrint('[ParcOto] invalid $entity cache row ignored: $error');
+          debugPrint('[ParcOto] invalid $entity cache row ignored: $error');
         }
       }
     } catch (error) {
