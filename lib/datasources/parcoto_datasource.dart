@@ -69,7 +69,7 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
         }
       }
     } catch (error) {
-      f.debugPrint('[ParcOto] unable to read $entity cache: $error');
+      debugPrint('[ParcOto] unable to read $entity cache: $error');
     }
   }
 
