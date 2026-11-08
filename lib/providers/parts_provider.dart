@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart' hide Category;
-import 'package:get/get.dart';
 
 import '../main.dart';
 import 'client_database.dart';
