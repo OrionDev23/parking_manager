@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:appwrite/models.dart';
-import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
@@ -11,7 +11,8 @@ import 'package:parc_oto/datasources/parcoto_webservice_response.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../providers/client_database.dart';
-import '../main.dart';
+import '../main.dart' show vehicleServices, legacyStockSyncService;
+import '../core/services/legacy_stock_sync_service.dart';
 import '../serializables/parc_oto_serializable.dart';
 import '../theme.dart';
 TextStyle rowTextStyle=TextStyle(
@@ -42,6 +43,16 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
         return 'client';
       case prestataireId:
         return 'provider';
+      case partsID:
+        return 'part';
+      case categoriesID:
+        return 'part_category';
+      case brandsID:
+        return 'part_brand';
+      case optionsID:
+        return 'part_option';
+      case fournsID:
+        return 'supplier';
       default:
         return null;
     }
@@ -270,15 +281,17 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
   String deleteConfirmationMessage(T c);
 
   void deleteRow(dynamic c) async {
-    await Future.wait([
-      DatabaseGetter.database!
-          .deleteRow(
-              databaseId: databaseId,
-              tableId: collectionID,
-              rowId: c.id)
-          .then((value) {
-        data.remove(MapEntry(c.id, c));
-        final entity = _cacheEntity;
+    try {
+      final entity = _cacheEntity;
+      if (entity != null &&
+          LegacyStockSyncService.tableByEntity.containsKey(entity)) {
+        await legacyStockSyncService.delete(entity: entity, id: c.id);
+      } else {
+        await DatabaseGetter.database!.deleteRow(
+          databaseId: databaseId,
+          tableId: collectionID,
+          rowId: c.id,
+        );
         if (entity != null) {
           vehicleServices.localDatabase.deleteLegacyRow(
             companyId: vehicleServices.companyId,
@@ -286,23 +299,23 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
             entityId: c.id,
           );
         }
-        refreshDatasource();
-      }),
-      addToActivity(c),
-    ]).onError((error, stackTrace) {
-      return [
-        f.displayInfoBar(
-          current,
-          builder: (c, s) {
-            return f.InfoBar(
-                title: const Text('erreur').tr(),
-                severity: f.InfoBarSeverity.error);
-          },
-          alignment:
-              Alignment.lerp(Alignment.topCenter, Alignment.center, 0.6)!,
-        )
-      ];
-    });
+      }
+      data.removeWhere((entry) => entry.key == c.id);
+      await addToActivity(c);
+      refreshDatasource();
+    } catch (error, stackTrace) {
+      debugPrint('[ParcOto] row deletion failed: $error');
+      if (kDebugMode) debugPrintStack(stackTrace: stackTrace);
+      f.displayInfoBar(
+        current,
+        builder: (context, state) => f.InfoBar(
+          title: const Text('erreur').tr(),
+          severity: f.InfoBarSeverity.error,
+        ),
+        alignment:
+            Alignment.lerp(Alignment.topCenter, Alignment.center, 0.6)!,
+      );
+    }
   }
 
   Future<void> addToActivity(T c);
