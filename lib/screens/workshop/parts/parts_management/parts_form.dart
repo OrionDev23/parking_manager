@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' hide Category;
 
 import 'package:appwrite/appwrite.dart' show AppwriteException;
 import 'package:barcode_widget/barcode_widget.dart';
