@@ -104,6 +104,36 @@ class PartsProvider extends ChangeNotifier {
           debugPrint('[ParcOto Stock] remote $entity row ignored: $error');
         }
       }
+      // A remote refresh must never overwrite local changes that have not
+      // reached Appwrite yet. Replay this company's pending/failed outbox
+      // operations over the freshly downloaded snapshot.
+      final pendingOperations = await vehicleServices.syncQueue.pending(
+        limit: 5000,
+        companyId: vehicleServices.companyId,
+      );
+      for (final operation in pendingOperations) {
+        if (operation.entity != entity) continue;
+        switch (operation.type.name) {
+          case 'create':
+          case 'update':
+            try {
+              final payload = <String, dynamic>{
+                ...operation.payload,
+                r'$id': operation.entityId,
+              };
+              refreshed[operation.entityId] = decode(payload);
+            } catch (error) {
+              debugPrint(
+                '[ParcOto Stock] pending $entity operation ignored: $error',
+              );
+            }
+            break;
+          case 'delete':
+            refreshed.remove(operation.entityId);
+            break;
+        }
+      }
+
       target
         ..clear()
         ..addAll(refreshed);
