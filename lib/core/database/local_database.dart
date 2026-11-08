@@ -139,6 +139,17 @@ class LocalDatabase {
     );
   }
 
+  void deleteLegacyRow({
+    required String companyId,
+    required String entity,
+    required String entityId,
+  }) {
+    database.execute(
+      'DELETE FROM legacy_module_cache WHERE company_id = ? AND entity = ? AND entity_id = ?',
+      [companyId, entity, entityId],
+    );
+  }
+
   Future<void> close() async {
     _database?.close();
     _database = null;
