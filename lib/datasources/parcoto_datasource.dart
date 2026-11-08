@@ -278,6 +278,14 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
               rowId: c.id)
           .then((value) {
         data.remove(MapEntry(c.id, c));
+        final entity = _cacheEntity;
+        if (entity != null) {
+          vehicleServices.localDatabase.deleteLegacyRow(
+            companyId: vehicleServices.companyId,
+            entity: entity,
+            entityId: c.id,
+          );
+        }
         refreshDatasource();
       }),
       addToActivity(c),
