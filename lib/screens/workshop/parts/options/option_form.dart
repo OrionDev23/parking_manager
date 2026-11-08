@@ -262,7 +262,7 @@ class _OptionFormState extends State<OptionForm> with
         datasource.refreshDatasource();
       }
       if (mounted) showMessage(
-        widget.option == null ? 'optionmod' : 'optionadd',
+        widget.option == null ? 'optionadd' : 'optionmod',
         'fait',
       );
     } catch (error) {
