@@ -55,7 +55,7 @@ abstract class ParcOtoWebService<T> {
         print('stacktrace : $stackTrace');
       }
 
-      return Future.value(ParcOtoWebServiceResponse<T>(0, data));
+      return Future.value(ParcOtoWebServiceResponse<T>(data.length, data.skip(startingAt).take(count).toList()));
     });
   }
 
