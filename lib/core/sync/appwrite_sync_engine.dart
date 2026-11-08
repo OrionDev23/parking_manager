@@ -47,15 +47,11 @@ class AppwriteSyncEngine implements SyncEngine {
       }
     });
 
-    // Also retry periodically: a server/API failure can occur while the
-    // device remains connected, so waiting only for connectivity changes
-    // would leave failed operations stuck indefinitely.
     _retryTimer = Timer.periodic(const Duration(minutes: 1), (_) {
       unawaited(syncNow());
     });
 
-    // Never wait for network reachability or remote requests during app boot.
-    // The UI can start immediately and cached SQLite data remains available.
+    // Never block startup on network reachability or remote requests.
     unawaited(syncNow());
   }
 
@@ -83,25 +79,21 @@ class AppwriteSyncEngine implements SyncEngine {
         if (!hasInternet) return;
       } catch (error, stackTrace) {
         debugPrint('[ParcOto Sync] connectivity check failed: $error\n$stackTrace');
-        // Connectivity checks must never prevent offline startup or crash
-        // the background worker.
         return;
       }
 
-      // Take a snapshot so failed operations are not retried in a tight loop
-      // during this same run. Failed rows are retried by the next timer/event.
-      final operations = await queue.pending(
-        limit: 5000,
-        companyId: companyId,
-      );
+      final operations = await queue.pending(limit: 5000, companyId: companyId);
       debugPrint('[ParcOto Sync] pending operations=${operations.length}');
 
       for (final operation in operations) {
-        debugPrint('[ParcOto Sync] processing ${operation.entity} ${operation.type.name} id=${operation.entityId} status=${operation.status} attempts=${operation.attempts}');
         if (!_running) break;
+        debugPrint('[ParcOto Sync] processing ${operation.entity} ${operation.type.name} id=${operation.entityId} status=${operation.status} attempts=${operation.attempts}');
         final handler = handlers[operation.entity];
         if (handler == null) {
-          await queue.markConflict(operation.id);
+          // Leave the row pending. A later app version may register its
+          // handler; marking it as a conflict would make that impossible
+          // without manual database repair.
+          debugPrint('[ParcOto Sync] no handler for entity=${operation.entity}; operation left pending');
           continue;
         }
 
@@ -112,7 +104,6 @@ class AppwriteSyncEngine implements SyncEngine {
         } on AppwriteException catch (error, stackTrace) {
           debugPrint('[ParcOto Sync] APPWRITE ERROR entity=${operation.entity} op=${operation.type.name} id=${operation.entityId} code=${error.code} type=${error.type} message=${error.message}\n$stackTrace');
           if (error.code == 409) {
-            // Do not silently overwrite a remote record on an ID conflict.
             await queue.markConflict(operation.id);
           } else {
             await queue.markFailed(operation.id);
