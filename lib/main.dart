@@ -30,6 +30,8 @@ import 'core/services/user_profile_service.dart';
 import 'core/services/vehicle_services.dart';
 import 'core/database/legacy_module_cache_migration.dart';
 import 'core/services/driver_services.dart';
+import 'core/services/legacy_stock_sync_service.dart';
+import 'core/device/shared_preferences_device_identity.dart';
 import 'core/sync/appwrite_sync_engine.dart';
 import 'core/sync/sync_engine.dart';
 import 'data/remote/company/legacy_appwrite_company_repository.dart';
@@ -41,6 +43,7 @@ late final PackageInfo packageInfo;
 late final SharedPreferences prefs;
 late final VehicleServices vehicleServices;
 late final DriverServices driverServices;
+late final LegacyStockSyncService legacyStockSyncService;
 late final SyncEngine syncEngine;
 late final AuthService authService;
 late final UserProfileService userProfileService;
@@ -133,12 +136,27 @@ void launchApp() async {
     debugPrint('[ParcOto Migration] legacy module cache failed: $error\\n$stackTrace');
   }
 
+  legacyStockSyncService = LegacyStockSyncService(
+    localDatabase: vehicleServices.localDatabase,
+    queue: vehicleServices.syncQueue,
+    deviceIdentity: SharedPreferencesDeviceIdentity(
+      Future.value(prefs),
+      idFactory: () => 'desktop_\u0024{DateTime.now().microsecondsSinceEpoch}',
+    ),
+    companyId: activeCompanyId,
+  );
+
   syncEngine = AppwriteSyncEngine(
     queue: vehicleServices.syncQueue,
     companyId: activeCompanyId,
     handlers: {
       'vehicle': vehicleServices.applySyncOperation,
       'driver': driverServices.applySyncOperation,
+      'part': legacyStockSyncService.applySyncOperation,
+      'part_category': legacyStockSyncService.applySyncOperation,
+      'part_brand': legacyStockSyncService.applySyncOperation,
+      'part_option': legacyStockSyncService.applySyncOperation,
+      'supplier': legacyStockSyncService.applySyncOperation,
     },
   );
   await syncEngine.start();
