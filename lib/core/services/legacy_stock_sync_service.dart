@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
-import '../../data/device/shared_preferences_device_identity.dart';
 import '../device/device_identity.dart';
 import '../sync/sync_operation.dart';
 import '../sync/sqlite_sync_queue.dart';
@@ -41,9 +40,6 @@ class LegacyStockSyncService {
     required Map<String, dynamic> data,
     required bool isNew,
   }) async {
-    final tableId = tableByEntity[entity];
-    if (tableId == null) throw ArgumentError.value(entity, 'entity');
-
     final payload = <String, dynamic>{
       ...data,
       r'$id': id,
@@ -74,9 +70,6 @@ class LegacyStockSyncService {
     required String entity,
     required String id,
   }) async {
-    final tableId = tableByEntity[entity];
-    if (tableId == null) throw ArgumentError.value(entity, 'entity');
-
     final deviceId = await deviceIdentity.getDeviceId();
     final now = DateTime.now().toUtc();
     // Queue first: never discard the only local copy of a pending deletion.
