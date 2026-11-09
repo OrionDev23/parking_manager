@@ -125,6 +125,19 @@ class SqliteSyncQueue implements SyncQueue {
   }
 
   @override
+  Future<void> markProcessing(String operationId) async =>
+      _db.execute("UPDATE sync_operations SET status='processing' WHERE id=? AND status IN ('pending','failed')", [operationId]);
+
+  @override
+  Future<void> recoverInterrupted({String? companyId}) async {
+    if (companyId == null) {
+      _db.execute("UPDATE sync_operations SET status='pending' WHERE status='processing'");
+    } else {
+      _db.execute("UPDATE sync_operations SET status='pending' WHERE status='processing' AND company_id=?", [companyId]);
+    }
+  }
+
+  @override
   Future<void> markCompleted(String operationId) async =>
       _db.execute("UPDATE sync_operations SET status='completed' WHERE id=?", [operationId]);
 
