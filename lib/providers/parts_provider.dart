@@ -1,3 +1,4 @@
+import '../core/sync/sync_operation.dart';
 import 'package:flutter/foundation.dart' hide Category;
 
 import '../main.dart';
@@ -76,6 +77,34 @@ class PartsProvider extends ChangeNotifier {
           debugPrint('[ParcOto Stock] invalid $entity cache row ignored: $error');
         }
       }
+      // Reapply unsynced mutations even when the app is offline. The
+      // cache may contain the last remote snapshot, while the outbox is the
+      // source of truth for newer local changes and deletion tombstones.
+      final cachedPendingOperations = await vehicleServices.syncQueue.pending(
+        limit: 5000,
+        companyId: vehicleServices.companyId,
+      );
+      for (final operation in cachedPendingOperations) {
+        if (operation.entity != entity) continue;
+        switch (operation.type) {
+          case SyncOperationType.create:
+          case SyncOperationType.update:
+            try {
+              final payload = <String, dynamic>{
+                ...operation.payload,
+                r'$id': operation.entityId,
+              };
+              target[operation.entityId] = decode(payload);
+            } catch (error) {
+              debugPrint('[ParcOto Stock] cached pending $entity row ignored: $error');
+            }
+            break;
+          case SyncOperationType.delete:
+            target.remove(operation.entityId);
+            break;
+        }
+      }
+
       if (target.isNotEmpty) {
         setError(false);
         notifyListeners();
@@ -232,6 +261,33 @@ class PartsProvider extends ChangeNotifier {
     required String id,
     required T Function(Map<String, dynamic>) decode,
   }) async {
+    // A queued deletion is a local tombstone: do not resurrect the remote
+    // record through a detail lookup before the delete reaches Appwrite.
+    final pendingOperations = await vehicleServices.syncQueue.pending(
+      limit: 5000,
+      companyId: vehicleServices.companyId,
+    );
+    SyncOperation? latestPending;
+    for (final operation in pendingOperations) {
+      if (operation.entity == entity && operation.entityId == id) {
+        if (latestPending == null ||
+            operation.createdAt.isAfter(latestPending.createdAt)) {
+          latestPending = operation;
+        }
+      }
+    }
+    if (latestPending?.type == SyncOperationType.delete) return null;
+    if (latestPending != null) {
+      try {
+        return decode(<String, dynamic>{
+          ...latestPending.payload,
+          r'$id': id,
+        });
+      } catch (error) {
+        debugPrint('[ParcOto Stock] pending $entity detail decode failed: $error');
+      }
+    }
+
     final cached = _cachedById(entity: entity, id: id, decode: decode);
     if (cached != null) return cached;
 
