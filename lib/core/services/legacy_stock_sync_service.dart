@@ -1,3 +1,5 @@
+import 'package:appwrite/appwrite.dart';
+
 import '../device/device_identity.dart';
 import '../sync/sync_operation.dart';
 import '../sync/sqlite_sync_queue.dart';
@@ -97,12 +99,36 @@ class LegacyStockSyncService {
 
     switch (operation.type) {
       case SyncOperationType.create:
-        await legacy.DatabaseGetter.database!.createRow(
-          databaseId: legacy.databaseId,
-          tableId: tableId,
-          rowId: operation.entityId,
-          data: operation.payload,
-        );
+        try {
+          await legacy.DatabaseGetter.database!.createRow(
+            databaseId: legacy.databaseId,
+            tableId: tableId,
+            rowId: operation.entityId,
+            data: operation.payload,
+          );
+        } on AppwriteException catch (error) {
+          // A timeout can happen after Appwrite committed the row. Retrying
+          // the create then returns 409 even though this exact row exists.
+          // Verify the row ID before treating the operation as an idempotent
+          // replay; never convert unrelated conflicts into updates.
+          if (error.code != 409) rethrow;
+          try {
+            await legacy.DatabaseGetter.database!.getRow(
+              databaseId: legacy.databaseId,
+              tableId: tableId,
+              rowId: operation.entityId,
+            );
+          } on AppwriteException catch (lookupError) {
+            if (lookupError.code == 404) rethrow error;
+            rethrow;
+          }
+          await legacy.DatabaseGetter.database!.updateRow(
+            databaseId: legacy.databaseId,
+            tableId: tableId,
+            rowId: operation.entityId,
+            data: operation.payload,
+          );
+        }
         break;
       case SyncOperationType.update:
         await legacy.DatabaseGetter.database!.updateRow(
