@@ -13,6 +13,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../providers/client_database.dart';
 import '../main.dart' show vehicleServices, legacyStockSyncService;
 import '../core/services/legacy_stock_sync_service.dart';
+import '../core/sync/sync_operation.dart';
 import '../serializables/parc_oto_serializable.dart';
 import '../theme.dart';
 TextStyle rowTextStyle=TextStyle(
@@ -210,13 +211,65 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
             () => ParcOtoWebServiceResponse<T>(0, []))
         : await repo.getData(startIndex, count, sortColumn, sortAscending,
             searchKey: searchKey, filters: filters);
-    _persistRows(x.data.cast<MapEntry<String, dynamic>>());
+    var visibleData = List<MapEntry<String, T>>.from(x.data);
+    var totalRecords = x.totalRecords;
 
-    var r = AsyncRowsResponse(
-        x.totalRecords,
-        x.data.map((element) {
-          return rowDisplay(startIndex, count, element);
-        }).toList());
+    final entity = _cacheEntity;
+    if (entity != null &&
+        LegacyStockSyncService.tableByEntity.containsKey(entity)) {
+      final pendingOperations = await vehicleServices.syncQueue.pending(
+        limit: 5000,
+        companyId: vehicleServices.companyId,
+      );
+      for (final operation in pendingOperations) {
+        if (operation.entity != entity) continue;
+        final existingIndex = visibleData.indexWhere(
+          (entry) => entry.key == operation.entityId,
+        );
+        switch (operation.type) {
+          case SyncOperationType.delete:
+            if (existingIndex >= 0) {
+              visibleData.removeAt(existingIndex);
+              totalRecords = totalRecords > 0 ? totalRecords - 1 : 0;
+            }
+            break;
+          case SyncOperationType.create:
+          case SyncOperationType.update:
+            try {
+              final payload = <String, dynamic>{
+                ...operation.payload,
+                r'$id': operation.entityId,
+              };
+              final localValue = repo.fromJsonFunction(payload);
+              if (existingIndex >= 0) {
+                visibleData[existingIndex] =
+                    MapEntry(operation.entityId, localValue);
+              } else if (operation.type == SyncOperationType.create &&
+                  startIndex == 0 &&
+                  (searchKey == null || searchKey!.isEmpty) &&
+                  (filters == null || filters!.isEmpty)) {
+                visibleData.add(MapEntry(operation.entityId, localValue));
+                totalRecords++;
+              }
+            } catch (error) {
+              debugPrint('[ParcOto] pending $entity row ignored: $error');
+            }
+            break;
+        }
+      }
+      if (visibleData.length > count) {
+        visibleData = visibleData.take(count).toList();
+      }
+    }
+
+    _persistRows(visibleData.cast<MapEntry<String, dynamic>>());
+
+    final r = AsyncRowsResponse(
+      totalRecords,
+      visibleData.map((element) {
+        return rowDisplay(startIndex, count, element);
+      }).toList(),
+    );
 
     return r;
   }
