@@ -73,6 +73,10 @@ class AppwriteSyncEngine implements SyncEngine {
     _syncing = true;
     debugPrint('[ParcOto Sync] syncNow started — companyId=$companyId');
     try {
+      // A process may have terminated after marking an operation as
+      // processing. Return those leases to pending before checking network.
+      await queue.recoverInterrupted(companyId: companyId);
+
       try {
         final hasInternet = await _connection.hasInternetAccess;
         debugPrint('[ParcOto Sync] hasInternetAccess=$hasInternet');
@@ -85,8 +89,11 @@ class AppwriteSyncEngine implements SyncEngine {
       final operations = await queue.pending(limit: 5000, companyId: companyId);
       debugPrint('[ParcOto Sync] pending operations=${operations.length}');
 
+      final blockedRecords = <String>{};
       for (final operation in operations) {
         if (!_running) break;
+        final recordKey = '${operation.companyId}:${operation.entity}:${operation.entityId}';
+        if (blockedRecords.contains(recordKey)) continue;
         debugPrint('[ParcOto Sync] processing ${operation.entity} ${operation.type.name} id=${operation.entityId} status=${operation.status} attempts=${operation.attempts}');
         final handler = handlers[operation.entity];
         if (handler == null) {
@@ -94,10 +101,12 @@ class AppwriteSyncEngine implements SyncEngine {
           // handler; marking it as a conflict would make that impossible
           // without manual database repair.
           debugPrint('[ParcOto Sync] no handler for entity=${operation.entity}; operation left pending');
+          blockedRecords.add(recordKey);
           continue;
         }
 
         try {
+          await queue.markProcessing(operation.id);
           await handler(operation);
           await queue.markCompleted(operation.id);
           debugPrint('[ParcOto Sync] SUCCESS ${operation.entity} ${operation.type.name} id=${operation.entityId}');
@@ -108,9 +117,11 @@ class AppwriteSyncEngine implements SyncEngine {
           } else {
             await queue.markFailed(operation.id);
           }
+          blockedRecords.add(recordKey);
         } catch (error, stackTrace) {
           debugPrint('[ParcOto Sync] ERROR entity=${operation.entity} op=${operation.type.name} id=${operation.entityId}: $error\n$stackTrace');
           await queue.markFailed(operation.id);
+          blockedRecords.add(recordKey);
         }
       }
     } catch (error, stackTrace) {
