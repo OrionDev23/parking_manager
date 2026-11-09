@@ -42,16 +42,10 @@ class LegacyStockSyncService {
       ...data,
       r'$id': id,
     };
-    // Persist the cache before queueing. If queue persistence fails, the
-    // caller receives the error and must not report a successful save.
-    localDatabase.cacheLegacyRow(
-      companyId: companyId,
-      entity: entity,
-      entityId: id,
-      payload: payload,
-    );
     final deviceId = await deviceIdentity.getDeviceId();
     final now = DateTime.now().toUtc();
+    // The outbox is the source of truth. Queue first so a cache write failure
+    // can never leave a visible local row with no operation to synchronize.
     await queue.enqueue(SyncOperation(
       id: '${deviceId}_${entity}_${id}_${now.microsecondsSinceEpoch}',
       companyId: companyId,
@@ -62,6 +56,12 @@ class LegacyStockSyncService {
       payload: data,
       createdAt: now,
     ));
+    localDatabase.cacheLegacyRow(
+      companyId: companyId,
+      entity: entity,
+      entityId: id,
+      payload: payload,
+    );
   }
 
   Future<void> delete({
