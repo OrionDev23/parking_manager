@@ -59,16 +59,16 @@ class DriverRepositoryImpl implements DriverRepository {
   @override
   Future<Driver> createDriver(Driver driver) async {
     _checkCompany(driver);
-    await local.upsertDriver(driver);
     await _enqueue(driver, SyncOperationType.create);
+    await local.upsertDriver(driver);
     return driver;
   }
 
   @override
   Future<Driver> updateDriver(Driver driver) async {
     _checkCompany(driver);
-    await local.upsertDriver(driver);
     await _enqueue(driver, SyncOperationType.update);
+    await local.upsertDriver(driver);
     return driver;
   }
 
@@ -77,7 +77,6 @@ class DriverRepositoryImpl implements DriverRepository {
     final existing = await local.getDriver(id);
     if (existing == null) return;
     _checkCompany(existing);
-    await local.deleteDriver(id);
     final deviceId = await deviceIdentity.getDeviceId();
     await syncQueue.enqueue(SyncOperation(
       id: '${deviceId}_${id}_${DateTime.now().microsecondsSinceEpoch}',
@@ -89,6 +88,7 @@ class DriverRepositoryImpl implements DriverRepository {
       payload: {'id': id, 'companyId': existing.companyId},
       createdAt: DateTime.now().toUtc(),
     ));
+    await local.deleteDriver(id);
   }
 
   void _checkCompany(Driver driver) {
