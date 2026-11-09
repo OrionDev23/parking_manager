@@ -1,3 +1,4 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -116,9 +117,17 @@ class DriverServices {
     }
     switch (operation.type) {
       case SyncOperationType.create:
-        await remoteSource.createDriver(
-          domain.Driver.fromMap(operation.payload),
-        );
+        final driver = domain.Driver.fromMap(operation.payload);
+        try {
+          await remoteSource.createDriver(driver);
+        } on AppwriteException catch (error) {
+          if (error.code != 409) rethrow;
+          // Recover a create whose remote commit succeeded but whose
+          // response was lost. Only update after verifying tenant ownership.
+          final existing = await remoteSource.getDriver(operation.entityId);
+          if (existing == null) rethrow;
+          await remoteSource.updateDriver(driver);
+        }
         return;
       case SyncOperationType.update:
         await remoteSource.updateDriver(
@@ -126,7 +135,12 @@ class DriverServices {
         );
         return;
       case SyncOperationType.delete:
-        await remoteSource.deleteDriver(operation.entityId);
+        try {
+          await remoteSource.deleteDriver(operation.entityId);
+        } on AppwriteException catch (error) {
+          // Missing rows already satisfy the desired delete state.
+          if (error.code != 404) rethrow;
+        }
         return;
     }
   }
