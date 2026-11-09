@@ -79,16 +79,16 @@ class VehicleRepositoryImpl implements VehicleRepository {
   @override
   Future<Vehicle> createVehicle(Vehicle vehicle) async {
     _checkCompany(vehicle);
-    await local.upsertVehicle(vehicle);
     await _enqueue(vehicle, SyncOperationType.create);
+    await local.upsertVehicle(vehicle);
     return vehicle;
   }
 
   @override
   Future<Vehicle> updateVehicle(Vehicle vehicle) async {
     _checkCompany(vehicle);
-    await local.upsertVehicle(vehicle);
     await _enqueue(vehicle, SyncOperationType.update);
+    await local.upsertVehicle(vehicle);
     return vehicle;
   }
 
