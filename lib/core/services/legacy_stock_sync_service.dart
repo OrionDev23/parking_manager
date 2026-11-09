@@ -139,11 +139,17 @@ class LegacyStockSyncService {
         );
         break;
       case SyncOperationType.delete:
-        await legacy.DatabaseGetter.database!.deleteRow(
-          databaseId: legacy.databaseId,
-          tableId: tableId,
-          rowId: operation.entityId,
-        );
+        try {
+          await legacy.DatabaseGetter.database!.deleteRow(
+            databaseId: legacy.databaseId,
+            tableId: tableId,
+            rowId: operation.entityId,
+          );
+        } on AppwriteException catch (error) {
+          // Deleting an already absent row is the desired final state. This
+          // makes retries safe if Appwrite deleted it but the response was lost.
+          if (error.code != 404) rethrow;
+        }
         break;
     }
   }
