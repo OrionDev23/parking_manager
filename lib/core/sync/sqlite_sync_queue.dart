@@ -114,11 +114,11 @@ class SqliteSyncQueue implements SyncQueue {
   Future<List<SyncOperation>> pending({int limit = 50, String? companyId}) async {
     final rows = companyId == null
         ? _db.select(
-            "SELECT * FROM sync_operations WHERE status IN ('pending','failed') ORDER BY created_at LIMIT ?",
+            "SELECT * FROM sync_operations WHERE status IN ('pending','failed','conflict') ORDER BY created_at, rowid LIMIT ?",
             [limit],
           )
         : _db.select(
-            "SELECT * FROM sync_operations WHERE status IN ('pending','failed') AND company_id = ? ORDER BY created_at LIMIT ?",
+            "SELECT * FROM sync_operations WHERE status IN ('pending','failed','conflict') AND company_id = ? ORDER BY created_at, rowid LIMIT ?",
             [companyId, limit],
           );
     return rows.map(_fromRow).toList(growable: false);
