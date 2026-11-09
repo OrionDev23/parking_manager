@@ -26,6 +26,8 @@ abstract class ParcOtoWebService<T> {
     return getSearchResult(
             searchKey, filters ?? {}, count, startingAt, sortedBy, sortedAsc)
         .then((value) {
+        // Clear only after the remote request has succeeded. If it fails,
+      // the SQLite-hydrated snapshot must remain available as the fallback.
       if (startingAt == 0) {
         data.clear();
       }
