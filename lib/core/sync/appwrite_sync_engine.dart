@@ -94,6 +94,13 @@ class AppwriteSyncEngine implements SyncEngine {
         if (!_running) break;
         final recordKey = '${operation.companyId}:${operation.entity}:${operation.entityId}';
         if (blockedRecords.contains(recordKey)) continue;
+        if (operation.status == SyncOperationStatus.conflict) {
+          // A conflict is not retried automatically, but later mutations for
+          // the same record must wait until the conflict is resolved.
+          blockedRecords.add(recordKey);
+          debugPrint('[ParcOto Sync] blocked by unresolved conflict: ${operation.entity} id=${operation.entityId}');
+          continue;
+        }
         debugPrint('[ParcOto Sync] processing ${operation.entity} ${operation.type.name} id=${operation.entityId} status=${operation.status} attempts=${operation.attempts}');
         final handler = handlers[operation.entity];
         if (handler == null) {
