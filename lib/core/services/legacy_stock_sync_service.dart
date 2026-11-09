@@ -119,7 +119,7 @@ class LegacyStockSyncService {
               rowId: operation.entityId,
             );
           } on AppwriteException catch (lookupError) {
-            if (lookupError.code == 404) rethrow error;
+            if (lookupError.code == 404) throw error;
             rethrow;
           }
           await legacy.DatabaseGetter.database!.updateRow(
