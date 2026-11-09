@@ -1,3 +1,4 @@
+import 'package:appwrite/appwrite.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -114,9 +115,18 @@ class VehicleServices {
     }
     switch (operation.type) {
       case SyncOperationType.create:
-        await remoteSource.createVehicle(
-          domain.Vehicle.fromMap(operation.payload),
-        );
+        final vehicle = domain.Vehicle.fromMap(operation.payload);
+        try {
+          await remoteSource.createVehicle(vehicle);
+        } on AppwriteException catch (error) {
+          if (error.code != 409) rethrow;
+          // A previous attempt may have committed remotely before its
+          // response was lost. Verify this exact tenant-owned row, then
+          // converge it to the latest queued payload.
+          final existing = await remoteSource.getVehicle(operation.entityId);
+          if (existing == null) rethrow;
+          await remoteSource.updateVehicle(vehicle);
+        }
         return;
       case SyncOperationType.update:
         await remoteSource.updateVehicle(
@@ -124,7 +134,12 @@ class VehicleServices {
         );
         return;
       case SyncOperationType.delete:
-        await remoteSource.deleteVehicle(operation.entityId);
+        try {
+          await remoteSource.deleteVehicle(operation.entityId);
+        } on AppwriteException catch (error) {
+          // Missing rows already satisfy the desired delete state.
+          if (error.code != 404) rethrow;
+        }
         return;
     }
   }
