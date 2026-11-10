@@ -51,6 +51,8 @@ class _PartsFormState extends State<PartsForm>
   Category? selectedCategory;
   Client? selectedFournisseur;
   Option? option1, option2, option3, option4;
+  final List<String> unresolvedOptionIds = [];
+  final List<String> unresolvedOptionNames = [];
   int selectedUnit = 0;
   Brand? selectedBrand;
   @override
@@ -74,21 +76,38 @@ class _PartsFormState extends State<PartsForm>
       selectedCategory =
           await PartsProvider().getCategory(widget.part?.categoryID);
       selectedBrand = await PartsProvider().getBrand(widget.part?.brandID);
-      List<Option>? options =
-          await PartsProvider().getOptionsList(widget.part?.selectedOptions);
+      final savedOptionIds = widget.part?.selectedOptions ?? const <String>[];
+      final savedOptionNames =
+          widget.part?.selectedOptionsNames ?? const <String>[];
+      final options =
+          await PartsProvider().getOptionsList(savedOptionIds);
+      final resolvedOptionIds = <String>{};
       if (options != null) {
-        for (int i = 0; i < options.length; i++) {
-          if (i == 0) {
-            option1 = options[i];
-          } else if (i == 1) {
-            option2 = options[i];
-          } else if (i == 2) {
-            option3 = options[i];
-          } else if (i == 3) {
-            option4 = options[i];
+        for (final option in options) {
+          resolvedOptionIds.add(option.id);
+          if (option1 == null) {
+            option1 = option;
+          } else if (option2 == null) {
+            option2 = option;
+          } else if (option3 == null) {
+            option3 = option;
+          } else if (option4 == null) {
+            option4 = option;
           }
         }
       }
+      // Keep references whose option record is temporarily unavailable.
+      // Otherwise merely editing a part would silently erase those IDs.
+      unresolvedOptionIds = [
+        for (final id in savedOptionIds)
+          if (!resolvedOptionIds.contains(id)) id,
+      ];
+      unresolvedOptionNames = [
+        for (var i = 0; i < savedOptionIds.length; i++)
+          if (!resolvedOptionIds.contains(savedOptionIds[i]) &&
+              i < savedOptionNames.length)
+            savedOptionNames[i],
+      ];
       variations = widget.part?.variations?? [];
     }
     loading = false;
@@ -1075,12 +1094,14 @@ class _PartsFormState extends State<PartsForm>
         if (option2 != null) option2!.id,
         if (option3 != null) option3!.id,
         if (option4 != null) option4!.id,
+        ...unresolvedOptionIds,
       ],
       selectedOptionsNames: [
         if (option1 != null) option1!.name,
         if (option2 != null) option2!.name,
         if (option3 != null) option3!.name,
         if (option4 != null) option4!.name,
+        ...unresolvedOptionNames,
       ],
       price: prix,
       unitType: selectedUnit,
