@@ -295,9 +295,7 @@ class MyApp extends StatelessWidget {
               builder: (context, child) {
                 return NavigationPaneTheme(
                   data: NavigationPaneThemeData(
-                    backgroundColor: appTheme.mode == ThemeMode.dark
-                        ? Colors.grey[220]
-                        : Colors.white,
+                    backgroundColor: appTheme.backGroundColor,
                   ),
                   child: child!,
                 );
