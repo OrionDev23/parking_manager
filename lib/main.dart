@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart'
     hide Colors, VisualDensity, ThemeMode;
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart' as m;
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:parc_oto/router.dart';
@@ -271,21 +272,8 @@ class MyApp extends StatelessWidget {
 
                 return supportedLocales.first;
               },
-              darkTheme: FluentThemeData(
-                brightness: Brightness.dark,
-                accentColor: appTheme.color,
-                visualDensity: VisualDensity.standard,
-                focusTheme: FocusThemeData(
-                  glowFactor: is10footScreen(context) ? 2.0 : 0.0,
-                ),
-              ),
-              theme: FluentThemeData(
-                accentColor: appTheme.color,
-                visualDensity: VisualDensity.standard,
-                focusTheme: FocusThemeData(
-                  glowFactor: is10footScreen(context) ? 2.0 : 0.0,
-                ),
-              ),
+              darkTheme: appTheme.fluentTheme(Brightness.dark),
+              theme: appTheme.fluentTheme(Brightness.light),
               supportedLocales: const [
                 Locale('fr'),
                 Locale('en'),
@@ -293,11 +281,14 @@ class MyApp extends StatelessWidget {
               ],
               locale: appTheme.locale,
               builder: (context, child) {
-                return NavigationPaneTheme(
-                  data: NavigationPaneThemeData(
-                    backgroundColor: appTheme.backGroundColor,
+                return m.Theme(
+                  data: appTheme.materialTheme,
+                  child: NavigationPaneTheme(
+                    data: NavigationPaneThemeData(
+                      backgroundColor: appTheme.backGroundColor,
+                    ),
+                    child: child!,
                   ),
-                  child: child!,
                 );
               },
               routerConfig: Routes(appTheme).router,
