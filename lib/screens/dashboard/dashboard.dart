@@ -466,7 +466,7 @@ class _DashboardState extends State<Dashboard>
               ),
             ),
             onTap: () {
-              PaneItemsAndFooters.selectPane('vehicle-manager');
+              PaneItemsAndFooters.selectPane('driver-manager');
             },
           ),
         ),
@@ -514,7 +514,7 @@ class _DashboardState extends State<Dashboard>
             numberOfRows: 5,
           ),
           onTap: () {
-            PaneItemsAndFooters.selectPane('vehicle-manager');
+            PaneItemsAndFooters.selectPane('repair-orders');
           },
         ),
       ),
@@ -532,7 +532,7 @@ class _DashboardState extends State<Dashboard>
             numberOfRows: 5,
           ),
           onTap: () {
-            PaneItemsAndFooters.selectPane('vehicle-manager');
+            PaneItemsAndFooters.selectPane('driver-manager');
           },
         ),
       ),
