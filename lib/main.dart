@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:country_code_picker/country_code_picker.dart';
@@ -53,7 +54,7 @@ late final UserProfileService userProfileService;
 late final CompanyService companyService;
 late final AccessControlService accessControlService;
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   packageInfo = await PackageInfo.fromPlatform();
   VideoPlayerMediaKit.ensureInitialized(
@@ -69,7 +70,7 @@ void main() async {
     await initWindow();
   }
 
-  launchApp();
+  await launchApp();
 }
 
 void displayMessage(
@@ -86,9 +87,96 @@ void displayMessage(
   );
 }
 
-void launchApp() async {
+Future<bool>? _initialSessionRestore;
+Future<void>? _backgroundInitialization;
+
+Future<bool> restoreInitialSession() {
+  return _initialSessionRestore ??= _restoreInitialSession();
+}
+
+Future<bool> _restoreInitialSession() async {
+  final session = await authService.restoreSession();
+  return session != null;
+}
+
+/// Starts remote backfills only after the first frame and after authentication.
+/// Completion markers live in SQLite, so a hot restart does not repeat full scans.
+void startBackgroundInitialization(String companyId) {
+  _backgroundInitialization ??= _initializeBackgroundData(companyId);
+}
+
+Future<void> _initializeBackgroundData(String companyId) async {
+  final localDatabase = vehicleServices.localDatabase;
+
+  Future<void> runMigration(
+    String key,
+    Future<void> Function() migration,
+  ) async {
+    if (localDatabase.isStartupMigrationComplete(
+      companyId: companyId,
+      migrationKey: key,
+    )) {
+      debugPrint('[ParcOto Startup] $key already completed; skipped');
+      return;
+    }
+
+    final stopwatch = Stopwatch()..start();
+    try {
+      await migration();
+      localDatabase.markStartupMigrationComplete(
+        companyId: companyId,
+        migrationKey: key,
+      );
+      debugPrint(
+        '[ParcOto Startup] $key completed in ${stopwatch.elapsedMilliseconds} ms',
+      );
+    } catch (error, stackTrace) {
+      debugPrint(
+        '[ParcOto Startup] $key failed after ${stopwatch.elapsedMilliseconds} ms: $error\\n$stackTrace',
+      );
+    }
+  }
+
+  await Future.wait([
+    runMigration('vehicles', () async {
+      await vehicleServices.migrateRemoteCache();
+    }),
+    runMigration('drivers', () async {
+      await driverServices.migrateRemoteCache();
+    }),
+    runMigration('legacy_modules', () async {
+      final counts = await LegacyModuleCacheMigration(
+        localDatabase: localDatabase,
+        companyId: companyId,
+      ).migrate();
+      if (counts.isEmpty || counts.values.any((count) => count < 0)) {
+        throw StateError('One or more legacy module cache tables failed.');
+      }
+    }),
+  ]);
+
+  await syncEngine.start();
+}
+
+void displayMessage(
+  BuildContext context,
+  String msg,
+  InfoBarSeverity severity,
+) {
+  displayInfoBar(
+    context,
+    builder: (BuildContext context, void Function() close) {
+      return InfoBar(title: Text(msg).tr(), severity: severity);
+    },
+    duration: snackbarShortDuration,
+  );
+}
+
+Future<void> launchApp() async {
+  final startupWatch = Stopwatch()..start();
   prefs = await SharedPreferences.getInstance();
   DatabaseGetter();
+
   authService = LegacyAppwriteAuthService(
     preferences: prefs,
     accessControlRepository: const AppwriteAccessControlRepository(),
@@ -103,13 +191,9 @@ void launchApp() async {
       AppwriteAccessControlRepository();
   accessControlService = AccessControlService(repository: accessRepository);
 
-  // Restore the existing Appwrite session before building the UI.
-  // This guarantees that PaneItemsAndFooters sees the effective permissions
-  // on the very first frame instead of showing a partially authorized menu.
-  await authService.restoreSession();
-
-  final activeCompanyId =
-      authService.session?.company.companyId ?? project ?? 'local';
+  // SQLite and service construction are local operations. Remote authentication,
+  // backfills and synchronization are deliberately deferred until after runApp.
+  final activeCompanyId = project ?? 'local';
   vehicleServices = await VehicleServices.create(
     preferences: prefs,
     companyId: activeCompanyId,
@@ -120,40 +204,12 @@ void launchApp() async {
     appwriteProjectId: project ?? 'essais',
   );
 
-  // Migrate existing Appwrite records into the local SQLite cache before
-  // the first local-first screens read it. Existing local rows are preserved.
-  try {
-    await Future.wait([
-      vehicleServices.migrateRemoteCache(),
-      driverServices.migrateRemoteCache(),
-    ]);
-  } catch (error, stackTrace) {
-    debugPrint(
-      '[ParcOto Migration] remote cache migration failed: $error\\n$stackTrace',
-    );
-    // Keep startup available even when Appwrite is temporarily unreachable.
-  }
-
-  // Stage the remaining legacy modules in SQLite without overwriting any
-  // cached row. Their screens will be switched to repository-backed access in
-  // subsequent migration steps; this cache backfill itself is safe to repeat.
-  try {
-    await LegacyModuleCacheMigration(
-      localDatabase: vehicleServices.localDatabase,
-      companyId: activeCompanyId,
-    ).migrate();
-  } catch (error, stackTrace) {
-    debugPrint(
-      '[ParcOto Migration] legacy module cache failed: $error\\n$stackTrace',
-    );
-  }
-
   legacyStockSyncService = LegacyStockSyncService(
     localDatabase: vehicleServices.localDatabase,
     queue: vehicleServices.syncQueue,
     deviceIdentity: SharedPreferencesDeviceIdentity(
       Future.value(prefs),
-      idFactory: () => 'desktop_\u0024{DateTime.now().microsecondsSinceEpoch}',
+      idFactory: () => 'desktop_${DateTime.now().microsecondsSinceEpoch}',
     ),
     companyId: activeCompanyId,
   );
@@ -182,11 +238,11 @@ void launchApp() async {
       },
     },
   );
-  await syncEngine.start();
 
   VehiclesUtilities();
   EasyLocalization.logger.enableBuildModes = [];
   await EasyLocalization.ensureInitialized();
+
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('fr'), Locale('ar'), Locale('en')],
@@ -196,16 +252,36 @@ void launchApp() async {
       child: MyApp(navigatorKey: GlobalKey<NavigatorState>()),
     ),
   );
+
+  debugPrint(
+    '[ParcOto Startup] first frame requested after ${startupWatch.elapsedMilliseconds} ms',
+  );
+  if (!kIsWeb &&
+      (Platform.isMacOS || Platform.isLinux || Platform.isWindows)) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_showMainWindow());
+    });
+  }
+}
+
+Future<void> _showMainWindow() async {
+  try {
+    await windowManager.show();
+    await windowManager.focus();
+    await windowManager.maximize();
+  } catch (error, stackTrace) {
+    debugPrint('[ParcOto Window] show failed: $error\\n$stackTrace');
+  }
 }
 
 Future<void> initWindow() async {
-  var pr = await screenRetriever.getPrimaryDisplay();
+  final display = await screenRetriever.getPrimaryDisplay();
   await windowManager.ensureInitialized();
 
-  WindowOptions windowOptions = WindowOptions(
-    title: "ParcOto",
-    minimumSize: Size(pr.size.width / 2, pr.size.height - 50),
-    size: Size(pr.size.width - 50, pr.size.height - 50),
+  final windowOptions = WindowOptions(
+    title: 'ParcOto',
+    minimumSize: Size(display.size.width / 2, display.size.height - 50),
+    size: Size(display.size.width - 50, display.size.height - 50),
     center: true,
     backgroundColor: Colors.grey,
     fullScreen: false,
@@ -213,11 +289,9 @@ Future<void> initWindow() async {
     titleBarStyle: TitleBarStyle.hidden,
   );
 
-  await windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.focus();
-  });
-  await windowManager.maximize();
+  // Configure the native window, but keep it hidden until Flutter has painted
+  // its first frame. This avoids showing a blank, draggable window at startup.
+  await windowManager.waitUntilReadyToShow(windowOptions, () async {});
 }
 
 class MyApp extends StatelessWidget {
