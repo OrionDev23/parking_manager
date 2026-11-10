@@ -1,14 +1,12 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:provider/provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/counters.dart';
-import '../../theme.dart';
 import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
 import '../../widgets/module_dashboard_panel.dart';
+import '../../widgets/module_dashboard_section_header.dart';
 import '../dashboard/charts/pie_chart.dart';
 import '../logs/logging/log_table.dart';
 import '../sidemenu/pane_items.dart';
@@ -22,189 +20,175 @@ class ConducteurDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var appTheme = context.watch<AppTheme>();
-    bool portrait = Device.orientation == Orientation.portrait;
-    double height = 380.px;
+    const panelHeight = 380.0;
+    final actions = <Widget>[
+      ModuleDashboardAction(
+        label: 'gchauffeurs'.tr(),
+        detail: 'Consulter les conducteurs',
+        icon: FluentIcons.people,
+        onPressed: () => PaneItemsAndFooters.selectPane('driver-manager'),
+      ),
+      ModuleDashboardAction(
+        label: 'nouvchauf'.tr(),
+        detail: 'Ajouter un conducteur',
+        icon: FluentIcons.add_friend,
+        onPressed: () {
+          if (!PaneItemsAndFooters.selectPane('driver-manager')) return;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            late Tab tab;
+            tab = Tab(
+              key: UniqueKey(),
+              text: Text('nouvchauf'.tr()),
+              semanticLabel: 'nouvchauf'.tr(),
+              icon: const Icon(FluentIcons.add_friend),
+              body: const ChauffeurForm(),
+              onClosed: () {
+                ChauffeurTabsState.tabs.remove(tab);
+                if (ChauffeurTabsState.currentIndex.value > 0) {
+                  ChauffeurTabsState.currentIndex.value--;
+                }
+              },
+            );
+            ChauffeurTabsState.tabs.add(tab);
+            ChauffeurTabsState.currentIndex.value =
+                ChauffeurTabsState.tabs.length - 1;
+          });
+        },
+      ),
+      ModuleDashboardAction(
+        label: 'disponibilite'.tr(),
+        detail: 'Voir les disponibilités',
+        icon: FluentIcons.health,
+        onPressed: () =>
+            PaneItemsAndFooters.selectPane('driver-availability'),
+      ),
+      ModuleDashboardAction(
+        label: 'documents'.tr(),
+        detail: 'Consulter les dossiers conducteurs',
+        icon: FluentIcons.document_set,
+        onPressed: () =>
+            PaneItemsAndFooters.selectPane('driver-documents'),
+      ),
+      ModuleDashboardAction(
+        label: 'nouvdocument'.tr(),
+        detail: 'Ajouter un document',
+        icon: FluentIcons.document,
+        onPressed: () {
+          if (!PaneItemsAndFooters.selectPane('driver-documents')) return;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            late Tab tab;
+            tab = Tab(
+              key: UniqueKey(),
+              text: Text('nouvdocument'.tr()),
+              semanticLabel: 'nouvdocument'.tr(),
+              icon: const Icon(FluentIcons.new_folder),
+              body: const ScaffoldPage(content: CDocumentForm()),
+              onClosed: () {
+                CDocumentTabsState.tabs.remove(tab);
+                if (CDocumentTabsState.currentIndex.value > 0) {
+                  CDocumentTabsState.currentIndex.value--;
+                }
+              },
+            );
+            CDocumentTabsState.tabs.add(tab);
+            CDocumentTabsState.currentIndex.value =
+                CDocumentTabsState.tabs.length - 1;
+          });
+        },
+      ),
+      ModuleDashboardAction(
+        label: 'archive'.tr(),
+        detail: 'Consulter les conducteurs archivés',
+        icon: FluentIcons.archive,
+        onPressed: () => PaneItemsAndFooters.selectPane('driver-archive'),
+      ),
+    ];
+
     return ScaffoldPage(
       padding: EdgeInsets.zero,
-      content: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 22),
-        children: [
-          ModuleDashboardHeader(
-            title: 'chauffeurs'.tr(),
-            subtitle:
-                'Gérez les conducteurs, leurs disponibilités et leurs documents.',
-            eyebrow: 'Fleet / People',
-            heroTitle: 'Centre de gestion des conducteurs',
-            heroDescription:
-                'Consultez les équipes, planifiez les disponibilités et gardez les dossiers conducteurs à jour.',
-            icon: FluentIcons.people,
-          ),
-          const SizedBox(height: 26),
-          Text(
-            'Suivi des conducteurs',
-            style: TextStyle(
-              color: appTheme.writingStyle.color,
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
+      content: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 760;
+          return ListView(
+            padding: EdgeInsets.symmetric(
+              horizontal: compact ? 14 : 28,
+              vertical: 22,
             ),
-          ),
-          const SizedBox(height: 12),
-          StaggeredGrid.count(
-            crossAxisCount: portrait ? 1 : 2,
-            mainAxisSpacing: 14,
-            crossAxisSpacing: 14,
             children: [
-              StaggeredGridTile.fit(
-                crossAxisCellCount: 1,
-                child: ModuleDashboardPanel(
-                  title: 'Activité récente',
-                  height: height,
-                  child: const LogTable(
-                    statTable: true,
-                    pages: false,
-                    numberOfRows: 3,
-                    filters: {'typemin': '16', 'typemax': '25'},
-                    fieldsToShow: ['act', 'date'],
-                  ),
-                ),
+              ModuleDashboardHeader(
+                title: 'chauffeurs'.tr(),
+                subtitle:
+                    'Gérez les conducteurs, leurs disponibilités et leurs documents.',
+                eyebrow: 'Fleet / People',
+                heroTitle: 'Centre de gestion des conducteurs',
+                heroDescription:
+                    'Consultez les équipes, planifiez les disponibilités et gardez les dossiers conducteurs à jour.',
+                icon: FluentIcons.people,
               ),
-              StaggeredGridTile.fit(
-                crossAxisCellCount: 1,
-                child: ModuleDashboardPanel(
-                  title: 'Disponibilité',
-                  height: height,
-                  child: ParcOtoPie(
-                    labels: [
-                      MapEntry(
-                        'disponible',
-                        DatabaseCounters().countChauffeur(etat: 0),
+              const SizedBox(height: 24),
+              ModuleDashboardSectionHeader(
+                title: 'Gestion de votre équipe',
+                subtitle:
+                    'Accédez aux conducteurs, aux disponibilités et aux dossiers administratifs.',
+              ),
+              Wrap(spacing: 12, runSpacing: 12, children: actions),
+              const SizedBox(height: 30),
+              ModuleDashboardSectionHeader(
+                title: 'Activité et disponibilité',
+                subtitle:
+                    'Suivez les derniers mouvements et la répartition des conducteurs.',
+              ),
+              StaggeredGrid.count(
+                crossAxisCount: compact ? 1 : 2,
+                mainAxisSpacing: 14,
+                crossAxisSpacing: 14,
+                children: [
+                  StaggeredGridTile.fit(
+                    crossAxisCellCount: 1,
+                    child: ModuleDashboardPanel(
+                      title: 'Derniers mouvements',
+                      height: panelHeight,
+                      child: const LogTable(
+                        statTable: true,
+                        pages: false,
+                        numberOfRows: 3,
+                        filters: {'typemin': '16', 'typemax': '25'},
+                        fieldsToShow: ['act', 'date'],
                       ),
-                      MapEntry(
-                        'absent',
-                        DatabaseCounters().countChauffeur(etat: 1),
-                      ),
-                      MapEntry(
-                        'mission',
-                        DatabaseCounters().countChauffeur(etat: 2),
-                      ),
-                      MapEntry(
-                        'quitteentre',
-                        DatabaseCounters().countChauffeur(etat: 3),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                  StaggeredGridTile.fit(
+                    crossAxisCellCount: 1,
+                    child: ModuleDashboardPanel(
+                      title: 'Répartition des disponibilités',
+                      height: panelHeight,
+                      child: ParcOtoPie(
+                        labels: [
+                          MapEntry(
+                            'disponible',
+                            DatabaseCounters().countChauffeur(etat: 0),
+                          ),
+                          MapEntry(
+                            'absent',
+                            DatabaseCounters().countChauffeur(etat: 1),
+                          ),
+                          MapEntry(
+                            'mission',
+                            DatabaseCounters().countChauffeur(etat: 2),
+                          ),
+                          MapEntry(
+                            'quitteentre',
+                            DatabaseCounters().countChauffeur(etat: 3),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
-          ),
-          const SizedBox(height: 28),
-          Text(
-            'Accès rapides',
-            style: TextStyle(
-              color: appTheme.writingStyle.color,
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              ModuleDashboardAction(
-            label: 'gchauffeurs'.tr(),
-            detail: 'Accès et gestion',
-            icon: FluentIcons.list,
-            onPressed: () {
-                  PaneItemsAndFooters.selectPane('driver-manager');
-                },
-          ),
-              ModuleDashboardAction(
-            label: 'nouvchauf'.tr(),
-            detail: 'Créer un nouvel élément',
-            icon: FluentIcons.car,
-            onPressed: () {
-                  PaneItemsAndFooters.selectPane('driver-manager');
-                  Future.delayed(const Duration(milliseconds: 300))
-                      .whenComplete(() {
-                        late Tab tab;
-                        tab = Tab(
-                          key: UniqueKey(),
-                          text: Text('nouvchauf'.tr()),
-                          semanticLabel: 'nouvchauf'.tr(),
-                          icon: const Icon(FluentIcons.add_friend),
-                          body: const ChauffeurForm(),
-                          onClosed: () {
-                            ChauffeurTabsState.tabs.remove(tab);
-
-                            if (ChauffeurTabsState.currentIndex.value > 0) {
-                              ChauffeurTabsState.currentIndex.value--;
-                            }
-                          },
-                        );
-                        final index = ChauffeurTabsState.tabs.length + 1;
-                        ChauffeurTabsState.tabs.add(tab);
-                        ChauffeurTabsState.currentIndex.value = index - 1;
-                      });
-                },
-          ),
-              ModuleDashboardAction(
-            label: 'disponibilite'.tr(),
-            detail: 'Disponibilités et planning',
-            icon: FluentIcons.health,
-            onPressed: () {
-                  PaneItemsAndFooters.selectPane('driver-availability');
-                },
-          ),
-              ModuleDashboardAction(
-            label: 'documents'.tr(),
-            detail: 'Documents et dossiers',
-            icon: FluentIcons.document_set,
-            onPressed: () {
-                  PaneItemsAndFooters.selectPane('driver-documents');
-                },
-          ),
-              ModuleDashboardAction(
-            label: 'nouvdocument'.tr(),
-            detail: 'Créer un nouvel élément',
-            icon: FluentIcons.document,
-            onPressed: () {
-                  PaneItemsAndFooters.selectPane('driver-documents');
-                  Future.delayed(const Duration(milliseconds: 400))
-                      .whenComplete(() {
-                        late Tab tab;
-                        tab = Tab(
-                          key: UniqueKey(),
-                          text: Text('nouvdocument'.tr()),
-                          semanticLabel: 'nouvdocument'.tr(),
-                          icon: const Icon(FluentIcons.new_folder),
-                          body: const ScaffoldPage(content: CDocumentForm()),
-                          onClosed: () {
-                            CDocumentTabsState.tabs.remove(tab);
-
-                            if (CDocumentTabsState.currentIndex.value > 0) {
-                              CDocumentTabsState.currentIndex.value--;
-                            }
-                          },
-                        );
-                        final index = CDocumentTabsState.tabs.length + 1;
-                        CDocumentTabsState.tabs.add(tab);
-                        CDocumentTabsState.currentIndex.value = index - 1;
-                      });
-                },
-          ),
-              ModuleDashboardAction(
-            label: 'archive'.tr(),
-            detail: 'Éléments archivés',
-            icon: FluentIcons.list,
-            onPressed: () {
-                  PaneItemsAndFooters.selectPane('driver-archive');
-                },
-          ),
-            ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }
