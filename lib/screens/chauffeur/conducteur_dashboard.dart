@@ -12,7 +12,6 @@ import '../../widgets/module_dashboard_header.dart';
 import '../dashboard/charts/pie_chart.dart';
 import '../logs/logging/log_table.dart';
 import '../sidemenu/pane_items.dart';
-import '../sidemenu/sidemenu.dart';
 import 'document/chauf_document_form.dart';
 import 'document/chauf_document_tabs.dart';
 import 'manager/chauffeur_form.dart';
@@ -62,16 +61,7 @@ class ConducteurDashboard extends StatelessWidget {
             detail: 'Accès et gestion',
             icon: FluentIcons.list,
             onPressed: () {
-                  PanesListState.index.value =
-                      PaneItemsAndFooters.originalItems.indexOf(
-                        PaneItemsAndFooters.chauffeurs,
-                      ) +
-                      PaneItemsAndFooters.vehicles.items.length +
-                      PaneItemsAndFooters.reparations.items.length +
-                      (showAtelier
-                          ? PaneItemsAndFooters.atelier.items.length
-                          : 0) -
-                      1;
+                  PaneItemsAndFooters.selectPane('driver-manager');
                 },
           ),
               ModuleDashboardAction(
@@ -79,16 +69,7 @@ class ConducteurDashboard extends StatelessWidget {
             detail: 'Créer un nouvel élément',
             icon: FluentIcons.car,
             onPressed: () {
-                  PanesListState.index.value =
-                      PaneItemsAndFooters.originalItems.indexOf(
-                        PaneItemsAndFooters.chauffeurs,
-                      ) +
-                      PaneItemsAndFooters.vehicles.items.length +
-                      PaneItemsAndFooters.reparations.items.length +
-                      (showAtelier
-                          ? PaneItemsAndFooters.atelier.items.length
-                          : 0) -
-                      1;
+                  PaneItemsAndFooters.selectPane('driver-manager');
                   Future.delayed(const Duration(milliseconds: 300))
                       .whenComplete(() {
                         late Tab tab;
@@ -117,15 +98,7 @@ class ConducteurDashboard extends StatelessWidget {
             detail: 'Disponibilités et planning',
             icon: FluentIcons.health,
             onPressed: () {
-                  PanesListState.index.value =
-                      PaneItemsAndFooters.originalItems.indexOf(
-                        PaneItemsAndFooters.chauffeurs,
-                      ) +
-                      PaneItemsAndFooters.vehicles.items.length +
-                      PaneItemsAndFooters.reparations.items.length +
-                      (showAtelier
-                          ? PaneItemsAndFooters.atelier.items.length
-                          : 0);
+                  PaneItemsAndFooters.selectPane('driver-availability');
                 },
           ),
               ModuleDashboardAction(
@@ -133,16 +106,7 @@ class ConducteurDashboard extends StatelessWidget {
             detail: 'Documents et dossiers',
             icon: FluentIcons.document_set,
             onPressed: () {
-                  PanesListState.index.value =
-                      PaneItemsAndFooters.originalItems.indexOf(
-                        PaneItemsAndFooters.chauffeurs,
-                      ) +
-                      PaneItemsAndFooters.vehicles.items.length +
-                      PaneItemsAndFooters.reparations.items.length +
-                      (showAtelier
-                          ? PaneItemsAndFooters.atelier.items.length
-                          : 0) +
-                      1;
+                  PaneItemsAndFooters.selectPane('driver-documents');
                 },
           ),
               ModuleDashboardAction(
@@ -150,16 +114,7 @@ class ConducteurDashboard extends StatelessWidget {
             detail: 'Créer un nouvel élément',
             icon: FluentIcons.document,
             onPressed: () {
-                  PanesListState.index.value =
-                      PaneItemsAndFooters.originalItems.indexOf(
-                        PaneItemsAndFooters.chauffeurs,
-                      ) +
-                      PaneItemsAndFooters.vehicles.items.length +
-                      PaneItemsAndFooters.reparations.items.length +
-                      (showAtelier
-                          ? PaneItemsAndFooters.atelier.items.length
-                          : 0) +
-                      1;
+                  PaneItemsAndFooters.selectPane('driver-documents');
                   Future.delayed(const Duration(milliseconds: 400))
                       .whenComplete(() {
                         late Tab tab;
@@ -188,16 +143,7 @@ class ConducteurDashboard extends StatelessWidget {
             detail: 'Éléments archivés',
             icon: FluentIcons.list,
             onPressed: () {
-                  PanesListState.index.value =
-                      PaneItemsAndFooters.originalItems.indexOf(
-                        PaneItemsAndFooters.chauffeurs,
-                      ) +
-                      PaneItemsAndFooters.vehicles.items.length +
-                      PaneItemsAndFooters.reparations.items.length +
-                      (showAtelier
-                          ? PaneItemsAndFooters.atelier.items.length
-                          : 0) +
-                      2;
+                  PaneItemsAndFooters.selectPane('driver-archive');
                 },
           ),
             ],
