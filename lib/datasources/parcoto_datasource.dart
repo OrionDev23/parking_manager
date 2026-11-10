@@ -354,7 +354,13 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
         }
       }
       data.removeWhere((entry) => entry.key == c.id);
-      await addToActivity(c);
+      // Activity logging is secondary to the deletion. If the device is
+      // offline, the local tombstone must remain a successful operation.
+      try {
+        await addToActivity(c);
+      } catch (activityError) {
+        debugPrint('[ParcOto] deletion activity could not be recorded: $activityError');
+      }
       refreshDatasource();
     } catch (error, stackTrace) {
       debugPrint('[ParcOto] row deletion failed: $error');
