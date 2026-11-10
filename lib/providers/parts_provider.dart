@@ -18,11 +18,11 @@ class PartsProvider extends ChangeNotifier {
   static Map<String, VehiclePart> parts = {};
   static Map<String, Client> fournisseurs = {};
 
-  static bool errorCategories = false;
-  static bool errorBrands = false;
-  static bool errorOptions = false;
-  static bool errorParts = false;
-  static bool errorFournisseurs = false;
+  static bool errorCategories = true;
+  static bool errorBrands = true;
+  static bool errorOptions = true;
+  static bool errorParts = true;
+  static bool errorFournisseurs = true;
 
   /// Last remote refresh failures, keyed by the legacy collection/entity.
   /// Cached rows remain usable; a failed remote refresh is still reported.
