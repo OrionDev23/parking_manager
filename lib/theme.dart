@@ -327,13 +327,13 @@ class AppTheme extends ChangeNotifier {
         hintStyle: TextStyle(color: mutedTextColor),
         filled: true,
         isDense: true,
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: borderColor),
-          borderRadius: BorderRadius.circular(8),
+        enabledBorder: m.OutlineInputBorder(
+          borderSide: m.BorderSide(color: borderColor),
+          borderRadius: m.BorderRadius.circular(8),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: p.accent, width: 1.5),
-          borderRadius: BorderRadius.circular(8),
+        focusedBorder: m.OutlineInputBorder(
+          borderSide: m.BorderSide(color: p.accent, width: 1.5),
+          borderRadius: m.BorderRadius.circular(8),
         ),
       );
       return;
