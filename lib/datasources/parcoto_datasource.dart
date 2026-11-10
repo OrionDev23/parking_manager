@@ -55,11 +55,13 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
 
     // A zero-duration future runs after pending microtasks, including the
     // table package's continuation that calls notifyListeners().
-    Future<void>.delayed(Duration.zero, () {
-      if (!_disposeRequested || _activeRowsRequests > 0 || _disposed) return;
-      _disposed = true;
-      super.dispose();
-    });
+    Future<void>.delayed(Duration.zero, _disposeNow);
+  }
+
+  void _disposeNow() {
+    if (!_disposeRequested || _activeRowsRequests > 0 || _disposed) return;
+    _disposed = true;
+    super.dispose();
   }
 
   String? get _cacheEntity {
