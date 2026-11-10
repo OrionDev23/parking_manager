@@ -4,6 +4,7 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:material_ui/material_ui.dart'
     hide Colors, VisualDensity, ThemeMode;
+import 'package:material_ui/material_ui.dart' as mui;
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' as m;
@@ -281,13 +282,16 @@ class MyApp extends StatelessWidget {
               ],
               locale: appTheme.locale,
               builder: (context, child) {
-                return m.Theme(
-                  data: appTheme.materialTheme,
-                  child: NavigationPaneTheme(
-                    data: NavigationPaneThemeData(
-                      backgroundColor: appTheme.backGroundColor,
+                return mui.Theme(
+                  data: appTheme.materialUiTheme,
+                  child: m.Theme(
+                    data: appTheme.materialTheme,
+                    child: NavigationPaneTheme(
+                      data: NavigationPaneThemeData(
+                        backgroundColor: appTheme.backGroundColor,
+                      ),
+                      child: child!,
                     ),
-                    child: child!,
                   ),
                 );
               },
