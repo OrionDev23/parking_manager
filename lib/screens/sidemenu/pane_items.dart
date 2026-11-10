@@ -177,8 +177,8 @@ class PaneItemsAndFooters {
         ).tr(),
         body: const ConducteurDashboard(),
         items: [
-key: const Key('driver-manager'),
-          PaneItem(
+PaneItem(
+            key: const Key('driver-manager'),
             icon: Icon(
               FluentIcons.list,
               color: appTheme.color.lightest,
@@ -189,8 +189,8 @@ key: const Key('driver-manager'),
               style: paneTextStyle,
             ).tr(),
           ),
-key: const Key('driver-availability'),
-          PaneItem(
+PaneItem(
+            key: const Key('driver-availability'),
             icon: Icon(
               FluentIcons.check_list_check,
               color: appTheme.color.lightest,
@@ -201,8 +201,8 @@ key: const Key('driver-availability'),
             ).tr(),
             body: const DisponbiliteTabs(),
           ),
-key: const Key('driver-documents'),
-          PaneItem(
+PaneItem(
+            key: const Key('driver-documents'),
             icon: Icon(
               FluentIcons.document_set,
               color: appTheme.color.lightest,
@@ -213,8 +213,8 @@ key: const Key('driver-documents'),
             ).tr(),
             body: const CDocumentTabs(),
           ),
-key: const Key('driver-archive'),
-          PaneItem(
+PaneItem(
+            key: const Key('driver-archive'),
             icon: Icon(
               FluentIcons.search_bookmark,
               color: appTheme.color.lightest,
@@ -436,8 +436,8 @@ key: const Key('driver-archive'),
           style: paneTextStyle,
         ).tr(),
         items: [
-key: const Key('repair-reception'),
-          PaneItem(
+PaneItem(
+            key: const Key('repair-reception'),
             icon: Icon(
               Icons.receipt_long_outlined,
               color: appTheme.color.lightest,
@@ -448,8 +448,8 @@ key: const Key('repair-reception'),
             ).tr(),
             body: const FicheReceptionTabs(),
           ),
-key: const Key('repair-orders'),
-          PaneItem(
+PaneItem(
+            key: const Key('repair-orders'),
             icon: Icon(
               Icons.car_repair_outlined,
               color: appTheme.color.lightest,
@@ -460,8 +460,8 @@ key: const Key('repair-orders'),
             ).tr(),
             body: const ReparationTabs(),
           ),
-key: const Key('repair-providers'),
-          PaneItem(
+PaneItem(
+            key: const Key('repair-providers'),
             icon: Icon(
               FluentIcons.service_activity,
               color: appTheme.color.lightest,
@@ -472,8 +472,8 @@ key: const Key('repair-providers'),
             ).tr(),
             body: const PrestataireTabs(),
           ),
-key: const Key('repair-clients'),
-          PaneItem(
+PaneItem(
+            key: const Key('repair-clients'),
             icon: Icon(
               Icons.people_alt_outlined,
               color: appTheme.color.lightest,
