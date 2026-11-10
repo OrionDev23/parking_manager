@@ -156,21 +156,6 @@ class VehicleDashboard extends StatelessWidget {
                     'Accédez aux véhicules, aux états et aux documents administratifs.',
                 icon: FluentIcons.car,
               ),
-              const SizedBox(height: 26),
-              Text(
-                'Accès rapides',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  color: appTheme.writingStyle.color,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: moduleActions,
-              ),
               const SizedBox(height: 28),
               Text(
                 'Suivi du parc',
@@ -224,6 +209,21 @@ class VehicleDashboard extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 26),
+              Text(
+                'Accès rapides',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: appTheme.writingStyle.color,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: moduleActions,
               ),
             ],
           );
