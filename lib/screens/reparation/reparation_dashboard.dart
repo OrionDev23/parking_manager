@@ -20,11 +20,10 @@ class ReparationDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
-    bool portrait = Device.orientation == Orientation.portrait;
     return ScaffoldPage(
       padding: EdgeInsets.zero,
       content: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 22),
         children: [
           ModuleDashboardHeader(
             title: 'reparations'.tr(),
@@ -37,6 +36,15 @@ class ReparationDashboard extends StatelessWidget {
             icon: FluentIcons.repair,
           ),
           const SizedBox(height: 26),
+          Text(
+            'Accès rapides',
+            style: TextStyle(
+              color: appTheme.writingStyle.color,
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 12),
           Wrap(
             spacing: 12,
             runSpacing: 12,
