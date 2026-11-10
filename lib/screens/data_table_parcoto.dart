@@ -1,5 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -49,98 +50,146 @@ class _DataTableParcState extends State<DataTableParc> {
   @override
   Widget build(BuildContext context) {
     final appTheme = context.watch<AppTheme>();
+    // ThemeMode.system must follow the brightness actually resolved by
+    // FluentApp, not be treated as dark by the legacy AppTheme helpers.
+    final isDark =
+        fluent.FluentTheme.of(context).brightness == Brightness.dark;
     final accent = appTheme.color;
-    final isDark = appTheme.mode == ThemeMode.dark;
-    final borderColor = appTheme.writingStyle.color!.withValues(alpha: .10);
+    final surfaceColor = isDark
+        ? const Color(0xFF202126)
+        : const Color(0xFFFFFFFF);
+    final rowHoverColor = accent.withValues(alpha: isDark ? .13 : .07);
+    final borderColor = isDark
+        ? const Color(0xFF383A42)
+        : const Color(0xFFE5E7EB);
+    final primaryText = isDark
+        ? const Color(0xFFE8EAF0)
+        : const Color(0xFF20232A);
+    final secondaryText = isDark
+        ? const Color(0xFFB5BAC5)
+        : const Color(0xFF555D6B);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: appTheme.backGroundColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? .12 : .035),
-            blurRadius: 18,
-            offset: const Offset(0, 5),
-          ),
-        ],
+    // data_table_2 is a Material widget inside a Fluent application. Without
+    // an explicit Material theme it falls back to Flutter's default light
+    // palette, which produces unreadable controls in dark/system themes.
+    final materialTheme = ThemeData(
+      useMaterial3: true,
+      brightness: isDark ? Brightness.dark : Brightness.light,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: accent,
+        brightness: isDark ? Brightness.dark : Brightness.light,
+        surface: surfaceColor,
+      ).copyWith(
+        onSurface: primaryText,
+        outline: borderColor,
+        outlineVariant: borderColor,
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(11),
-        child: AsyncPaginatedDataTable2(
-          header: widget.header,
-          sortAscending: widget.sortAscending,
-          headingRowHeight: 44,
-          minWidth: widget.horizontalScroll ? 2000.px : null,
-          isHorizontalScrollBarVisible: widget.horizontalScroll,
-          headingRowDecoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                accent.withValues(alpha: isDark ? .24 : .13),
-                accent.withValues(alpha: isDark ? .12 : .07),
-              ],
-              begin: AlignmentDirectional.centerStart,
-              end: AlignmentDirectional.centerEnd,
+      scaffoldBackgroundColor: surfaceColor,
+      canvasColor: surfaceColor,
+      dividerColor: borderColor,
+      iconTheme: IconThemeData(color: secondaryText),
+      textTheme: ThemeData(
+        brightness: isDark ? Brightness.dark : Brightness.light,
+      ).textTheme.apply(
+        bodyColor: primaryText,
+        displayColor: primaryText,
+      ),
+    );
+
+    return Theme(
+      data: materialTheme,
+      child: Container(
+        decoration: BoxDecoration(
+          color: surfaceColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? .22 : .045),
+              blurRadius: 18,
+              offset: const Offset(0, 5),
             ),
-            border: Border(
-              bottom: BorderSide(
-                color: accent.withValues(alpha: .24),
-                width: 1,
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(11),
+          child: AsyncPaginatedDataTable2(
+            header: widget.header,
+            sortAscending: widget.sortAscending,
+            headingRowHeight: 48,
+            minWidth: widget.horizontalScroll ? 2000.px : null,
+            isHorizontalScrollBarVisible: widget.horizontalScroll,
+            headingRowDecoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  accent.withValues(alpha: isDark ? .30 : .15),
+                  accent.withValues(alpha: isDark ? .16 : .07),
+                ],
+                begin: AlignmentDirectional.centerStart,
+                end: AlignmentDirectional.centerEnd,
+              ),
+              border: Border(
+                bottom: BorderSide(
+                  color: accent.withValues(alpha: isDark ? .42 : .30),
+                  width: 1,
+                ),
               ),
             ),
+            headingTextStyle: TextStyle(
+              color: primaryText,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              letterSpacing: .3,
+            ),
+            dataTextStyle: TextStyle(
+              color: primaryText,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+            border: TableBorder(
+              horizontalInside: BorderSide(
+                color: borderColor.withValues(alpha: isDark ? .85 : 1),
+                width: .7,
+              ),
+            ),
+            dividerThickness: .4,
+            autoRowsToHeight: widget.autoRowHeight,
+            empty: NoDataWidget(datasource: widget.source),
+            pageSyncApproach: PageSyncApproach.goToLast,
+            horizontalMargin: 18,
+            columnSpacing: 16,
+            dataRowHeight: widget.autoRowHeight
+                ? kMinInteractiveDimension
+                : widget.rowHeight ??
+                      (widget.numberOfRows == null ? rowHeight : rowHeight * 2),
+            onPageChanged: (_) {},
+            rowsPerPage: widget.numberOfRows ?? rowPerPage,
+            onRowsPerPageChanged: widget.pages
+                ? (count) {
+                    // data_table_2 may normalize rowsPerPage while building.
+                    // Defer our state update to avoid setState during build.
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (!mounted) return;
+                      final nextCount = count ?? 12;
+                      if (rowPerPage != nextCount) {
+                        setState(() => rowPerPage = nextCount);
+                      }
+                    });
+                  }
+                : null,
+            availableRowsPerPage: widget.numberOfRows == null
+                ? const [12, 24, 50, 100, 200]
+                : [widget.numberOfRows!],
+            showCheckboxColumn: false,
+            sortColumnIndex: widget.sortColumnIndex,
+            showFirstLastButtons: true,
+            renderEmptyRowsInTheEnd: false,
+            fit: FlexFit.loose,
+            columns: widget.columns,
+            source: widget.source,
+            sortArrowAlwaysVisible: true,
+            hidePaginator: widget.hidePaginator,
           ),
-          headingTextStyle: TextStyle(
-            color: appTheme.writingStyle.color,
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            letterSpacing: .25,
-          ),
-          dataTextStyle: TextStyle(
-            color: appTheme.writingStyle.color,
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-          border: TableBorder(
-            horizontalInside: BorderSide(color: borderColor, width: .6),
-          ),
-          dividerThickness: .4,
-          autoRowsToHeight: widget.autoRowHeight,
-          empty: NoDataWidget(datasource: widget.source),
-          pageSyncApproach: PageSyncApproach.goToLast,
-          horizontalMargin: 16,
-          columnSpacing: 14,
-          dataRowHeight: widget.autoRowHeight
-              ? kMinInteractiveDimension
-              : widget.rowHeight ??
-                    (widget.numberOfRows == null ? rowHeight : rowHeight * 2),
-          onPageChanged: (_) {},
-          rowsPerPage: widget.numberOfRows ?? rowPerPage,
-          onRowsPerPageChanged: widget.pages
-              ? (count) {
-                  // data_table_2 may normalize rowsPerPage while building.
-                  // Defer our state update to avoid setState during build.
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (!mounted) return;
-                    final nextCount = count ?? 12;
-                    if (rowPerPage != nextCount) {
-                      setState(() => rowPerPage = nextCount);
-                    }
-                  });
-                }
-              : null,
-          availableRowsPerPage: widget.numberOfRows == null
-              ? const [12, 24, 50, 100, 200]
-              : [widget.numberOfRows!],
-          showCheckboxColumn: false,
-          sortColumnIndex: widget.sortColumnIndex,
-          showFirstLastButtons: true,
-          renderEmptyRowsInTheEnd: false,
-          fit: FlexFit.loose,
-          columns: widget.columns,
-          source: widget.source,
-          sortArrowAlwaysVisible: true,
-          hidePaginator: widget.hidePaginator,
         ),
       ),
     );
