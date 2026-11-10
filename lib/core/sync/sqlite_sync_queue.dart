@@ -237,6 +237,44 @@ class SqliteSyncQueue implements SyncQueue {
   }
 
   @override
+  Future<void> retryConflict(String operationId) async {
+    _db.execute('BEGIN IMMEDIATE');
+    try {
+      final rows = _db.select(
+        """SELECT company_id, entity, entity_id FROM sync_operations
+           WHERE id = ? AND status = 'conflict'""",
+        [operationId],
+      );
+      if (rows.isEmpty) {
+        throw StateError('Conflict operation not found: $operationId');
+      }
+      final row = rows.first;
+      _db.execute(
+        """UPDATE sync_operations
+           SET status='pending', conflict_reason=NULL, conflicted_at=NULL
+           WHERE id=? AND status='conflict'""",
+        [operationId],
+      );
+      _db.execute(
+        """INSERT INTO sync_conflict_resolutions
+           (operation_id, company_id, entity, entity_id, resolution, resolved_at)
+           VALUES (?, ?, ?, ?, 'retry_local', ?)""",
+        [
+          operationId,
+          row['company_id'],
+          row['entity'],
+          row['entity_id'],
+          DateTime.now().toUtc().toIso8601String(),
+        ],
+      );
+      _db.execute('COMMIT');
+    } catch (_) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
+  }
+
+  @override
   Future<List<SyncOperation>> conflicts({
     String? companyId,
     int limit = 100,
