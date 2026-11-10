@@ -148,7 +148,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                               Text(
                                 'PARCOTO',
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(.78),
+                                  color: Colors.white.withValues(alpha: .78),
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: 1.8,
@@ -167,7 +167,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                               Text(
                                 'Retrouvez vos véhicules, interventions et équipes au même endroit.',
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(.86),
+                                  color: Colors.white.withValues(alpha: .86),
                                   fontSize: 12,
                                 ),
                               ),
@@ -179,7 +179,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                           Icon(
                             FluentIcons.car,
                             size: 58,
-                            color: Colors.white.withOpacity(.88),
+                            color: Colors.white.withValues(alpha: .88),
                           ),
                         ],
                       ],
