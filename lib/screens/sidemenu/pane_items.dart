@@ -177,6 +177,7 @@ class PaneItemsAndFooters {
         ).tr(),
         body: const ConducteurDashboard(),
         items: [
+key: const Key('driver-manager'),
           PaneItem(
             icon: Icon(
               FluentIcons.list,
@@ -188,6 +189,7 @@ class PaneItemsAndFooters {
               style: paneTextStyle,
             ).tr(),
           ),
+key: const Key('driver-availability'),
           PaneItem(
             icon: Icon(
               FluentIcons.check_list_check,
@@ -199,6 +201,7 @@ class PaneItemsAndFooters {
             ).tr(),
             body: const DisponbiliteTabs(),
           ),
+key: const Key('driver-documents'),
           PaneItem(
             icon: Icon(
               FluentIcons.document_set,
@@ -210,6 +213,7 @@ class PaneItemsAndFooters {
             ).tr(),
             body: const CDocumentTabs(),
           ),
+key: const Key('driver-archive'),
           PaneItem(
             icon: Icon(
               FluentIcons.search_bookmark,
@@ -432,6 +436,7 @@ class PaneItemsAndFooters {
           style: paneTextStyle,
         ).tr(),
         items: [
+key: const Key('repair-reception'),
           PaneItem(
             icon: Icon(
               Icons.receipt_long_outlined,
@@ -443,6 +448,7 @@ class PaneItemsAndFooters {
             ).tr(),
             body: const FicheReceptionTabs(),
           ),
+key: const Key('repair-orders'),
           PaneItem(
             icon: Icon(
               Icons.car_repair_outlined,
@@ -454,6 +460,7 @@ class PaneItemsAndFooters {
             ).tr(),
             body: const ReparationTabs(),
           ),
+key: const Key('repair-providers'),
           PaneItem(
             icon: Icon(
               FluentIcons.service_activity,
@@ -465,6 +472,7 @@ class PaneItemsAndFooters {
             ).tr(),
             body: const PrestataireTabs(),
           ),
+key: const Key('repair-clients'),
           PaneItem(
             icon: Icon(
               Icons.people_alt_outlined,
