@@ -60,61 +60,39 @@ class _DataTableParcState extends State<DataTableParc> {
     final secondaryText = appTheme.mutedTextColor;
     final borderColor = appTheme.borderColor;
 
-    // data_table_2 is a Material widget inside a Fluent application. Without
-    // an explicit Material theme it falls back to Flutter's default light
-    // palette, which produces unreadable controls in dark/system themes.
-    final materialTheme = ThemeData(
-      useMaterial3: true,
-      brightness: isDark ? Brightness.dark : Brightness.light,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: accent,
-        brightness: isDark ? Brightness.dark : Brightness.light,
-        surface: surfaceColor,
-      ).copyWith(
-        onSurface: primaryText,
-        outline: borderColor,
-        outlineVariant: borderColor,
-      ),
-      scaffoldBackgroundColor: surfaceColor,
-      canvasColor: surfaceColor,
-      dividerColor: borderColor,
-      iconTheme: IconThemeData(color: secondaryText),
-      textTheme: ThemeData(
-        brightness: isDark ? Brightness.dark : Brightness.light,
-      ).textTheme.apply(
-        bodyColor: primaryText,
-        displayColor: primaryText,
-      ),
-    );
+    // DataTable2 inherits the application-wide Material theme. Explicit row
+    // fills prevent the package's default light row from clashing with dark text.
+    final materialTheme = appTheme.materialTheme;
 
     return Theme(
       data: materialTheme,
       child: Container(
         decoration: BoxDecoration(
           color: surfaceColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(appTheme.tableRadius),
           border: Border.all(color: borderColor),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: isDark ? .22 : .045),
-              blurRadius: 18,
-              offset: const Offset(0, 5),
+              blurRadius: appTheme.palette.shadowBlur,
+              offset: Offset(0, appTheme.palette.shadowBlur / 3),
             ),
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(11),
+          borderRadius: BorderRadius.circular(appTheme.tableRadius),
           child: AsyncPaginatedDataTable2(
             header: widget.header,
             sortAscending: widget.sortAscending,
             headingRowHeight: 48,
             minWidth: widget.horizontalScroll ? 2000.px : null,
             isHorizontalScrollBarVisible: widget.horizontalScroll,
+            dataRowColor: WidgetStatePropertyAll(surfaceColor),
             headingRowDecoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  accent.withValues(alpha: isDark ? .30 : .15),
-                  accent.withValues(alpha: isDark ? .16 : .07),
+                  accent.withValues(alpha: appTheme.palette.headerAccentOpacity),
+                  accent.withValues(alpha: appTheme.palette.headerAccentOpacity * .45),
                 ],
                 begin: AlignmentDirectional.centerStart,
                 end: AlignmentDirectional.centerEnd,
