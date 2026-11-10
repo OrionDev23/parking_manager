@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' as m;
+import 'package:material_ui/material_ui.dart' as mui;
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -309,6 +310,58 @@ class AppTheme extends ChangeNotifier {
       typography: Typography.fromBrightness(
         brightness: brightness,
         color: foreground,
+      ),
+    );
+  }
+
+  mui.ThemeData get materialUiTheme {
+    final isDark = mode == ThemeMode.dark;
+    final brightness = isDark ? Brightness.dark : Brightness.light;
+    final scheme = mui.ColorScheme.fromSeed(
+      seedColor: color,
+      brightness: brightness,
+      surface: surfaceColor,
+    ).copyWith(
+      primary: color,
+      onPrimary: isDark ? Colors.black : Colors.white,
+      onSurface: textColor,
+      outline: borderColor,
+      outlineVariant: borderColor,
+      surfaceContainer: fillColor,
+      surfaceContainerHighest: fillColor,
+    );
+    final baseTextTheme = mui.ThemeData(
+      brightness: brightness,
+      useMaterial3: true,
+    ).textTheme.apply(bodyColor: textColor, displayColor: textColor);
+    return mui.ThemeData.from(
+      colorScheme: scheme,
+      textTheme: baseTextTheme,
+      useMaterial3: true,
+    ).copyWith(
+      scaffoldBackgroundColor: backGroundColor,
+      canvasColor: surfaceColor,
+      cardColor: surfaceColor,
+      dividerColor: borderColor,
+      iconTheme: mui.IconThemeData(color: mutedTextColor),
+      visualDensity: mui.VisualDensity.standard,
+      dataTableTheme: mui.DataTableThemeData(
+        dataRowColor: mui.WidgetStatePropertyAll(surfaceColor),
+        headingRowColor: mui.WidgetStatePropertyAll(fillColor),
+      ),
+      inputDecorationTheme: mui.InputDecorationTheme(
+        filled: true,
+        fillColor: fillColor,
+        hintStyle: TextStyle(color: mutedTextColor),
+        labelStyle: TextStyle(color: mutedTextColor),
+        enabledBorder: mui.OutlineInputBorder(
+          borderSide: mui.BorderSide(color: borderColor),
+          borderRadius: BorderRadius.circular(controlRadius),
+        ),
+        focusedBorder: mui.OutlineInputBorder(
+          borderSide: mui.BorderSide(color: color, width: 1.5),
+          borderRadius: BorderRadius.circular(controlRadius),
+        ),
       ),
     );
   }
