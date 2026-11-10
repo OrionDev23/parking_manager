@@ -1,15 +1,11 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
-class PartsManagement extends StatefulWidget {
+import 'parts_management/parts_manager.dart';
+
+/// Compatibility entry point for the workshop parts manager.
+class PartsManagement extends StatelessWidget {
   const PartsManagement({super.key});
 
   @override
-  State<PartsManagement> createState() => _PartsManagementState();
-}
-
-class _PartsManagementState extends State<PartsManagement> {
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
-  }
+  Widget build(BuildContext context) => const PartsManager();
 }
