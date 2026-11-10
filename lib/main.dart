@@ -250,6 +250,7 @@ Future<void> launchApp() async {
   final startupWatch = Stopwatch()..start();
   prefs = await SharedPreferences.getInstance();
   DatabaseGetter();
+  DatabaseGetter.onSessionExpired = stopSessionRuntime;
 
   authService = LegacyAppwriteAuthService(
     preferences: prefs,
