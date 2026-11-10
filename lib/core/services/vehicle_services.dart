@@ -186,20 +186,30 @@ class VehicleServices {
       return 0;
     }
 
-    final localVehicles = await localSource.getVehicles();
+    // Only IDs present in a previously completed remote snapshot are
+    // eligible for deletion. Local-only imports are never pruned.
+    final previousSnapshot = localDatabase.readRemoteSnapshotIds(
+      companyId: companyId,
+      entity: 'vehicle',
+    );
+    final remotelyDeleted = previousSnapshot.difference(secondScan);
     var deleted = 0;
-    for (final vehicle in localVehicles) {
-      if (secondScan.contains(vehicle.id)) continue;
+    for (final vehicleId in remotelyDeleted) {
       final hasLocalMutation = await syncQueue.hasUnresolvedMutation(
         companyId: companyId,
         entity: 'vehicle',
-        entityId: vehicle.id,
+        entityId: vehicleId,
       );
       if (hasLocalMutation) continue;
-      await localSource.deleteVehicle(vehicle.id);
+      await localSource.deleteVehicle(vehicleId);
       deleted++;
     }
 
+    localDatabase.replaceRemoteSnapshot(
+      companyId: companyId,
+      entity: 'vehicle',
+      entityIds: secondScan,
+    );
     localDatabase.saveReconciliationTime(
       companyId: companyId,
       entity: 'vehicle',
