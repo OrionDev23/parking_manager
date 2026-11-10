@@ -232,6 +232,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
       if (!kIsWeb) {
         await io.File(logoid).writeAsBytes(bytes);
         if (!DatabaseGetter.isCurrentTenant(projectId)) return;
+        await prefs.setString('company_logo_project', projectId);
       }
       logo = bytes;
       MyEntrepriseState.logo = bytes;
@@ -264,11 +265,11 @@ class MyEntrepriseState extends State<MyEntreprise> {
       if (mounted) {
         setState(() {});
       }
-      if (await io.File(logoid).exists()) {
-        logoExists = true;
-      } else {
-        logoExists = false;
-      }
+      final projectId = DatabaseGetter.activeProjectId;
+      final cachedProject = prefs.getString('company_logo_project');
+      logoExists = projectId != null &&
+          cachedProject == projectId &&
+          await io.File(logoid).exists();
     }
     checkingFile = false;
     if (mounted) {
