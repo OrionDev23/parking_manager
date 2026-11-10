@@ -100,7 +100,8 @@ class _ButtonContainerState extends State<ButtonContainer> {
               child: Icon(widget.icon, size: 22, color: accent),
             ),
             const SizedBox(width: 13),
-            Expanded(
+            Flexible(
+              fit: FlexFit.loose,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
