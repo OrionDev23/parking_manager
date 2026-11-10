@@ -7,6 +7,7 @@ import '../../providers/counters.dart';
 import '../../theme.dart';
 import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
+import '../../widgets/module_dashboard_panel.dart';
 import '../dashboard/charts/pie_chart.dart';
 import '../logs/logging/log_table.dart';
 import '../sidemenu/pane_items.dart';
@@ -171,7 +172,7 @@ class VehicleDashboard extends StatelessWidget {
                 mainAxisSpacing: 14,
                 crossAxisSpacing: 14,
                 children: [
-                  _VehicleDashboardPanel(
+                  ModuleDashboardPanel(
                     title: 'Activité récente',
                     child: const LogTable(
                       statTable: true,
@@ -181,7 +182,7 @@ class VehicleDashboard extends StatelessWidget {
                       fieldsToShow: ['act', 'id', 'date'],
                     ),
                   ),
-                  _VehicleDashboardPanel(
+                  ModuleDashboardPanel(
                     title: 'vstates'.tr(),
                     child: ParcOtoPie(
                       labels: [
@@ -233,45 +234,3 @@ class VehicleDashboard extends StatelessWidget {
   }
 }
 
-class _VehicleDashboardPanel extends StatelessWidget {
-  final String title;
-  final Widget child;
-
-  const _VehicleDashboardPanel({required this.title, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    final appTheme = context.watch<AppTheme>();
-    return Container(
-      height: 360,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: appTheme.backGroundColor,
-        borderRadius: BorderRadius.circular(13),
-        border: Border.all(color: Colors.grey[30]),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: .035),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: appTheme.writingStyle.color,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Expanded(child: child),
-        ],
-      ),
-    );
-  }
-}
