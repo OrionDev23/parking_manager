@@ -25,21 +25,157 @@ final boldStyle = TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold);
 final littleStyle = TextStyle(fontSize: 10.sp);
 const snackbarShortDuration = Duration(seconds: 2);
 
+enum AppThemePreset {
+  obsidian,
+  arctic,
+  emerald,
+  amethyst,
+  sunset,
+}
+
+class AppThemePalette {
+  final String name;
+  final String description;
+  final Color accent;
+  final Color darkBackground;
+  final Color darkSurface;
+  final Color darkText;
+  final Color darkMutedText;
+  final Color darkBorder;
+  final Color lightBackground;
+  final Color lightSurface;
+  final Color lightText;
+  final Color lightMutedText;
+  final Color lightBorder;
+
+  const AppThemePalette({
+    required this.name,
+    required this.description,
+    required this.accent,
+    required this.darkBackground,
+    required this.darkSurface,
+    required this.darkText,
+    required this.darkMutedText,
+    required this.darkBorder,
+    required this.lightBackground,
+    required this.lightSurface,
+    required this.lightText,
+    required this.lightMutedText,
+    required this.lightBorder,
+  });
+}
+
+const Map<AppThemePreset, AppThemePalette> appThemePalettes = {
+  AppThemePreset.obsidian: AppThemePalette(
+    name: 'Obsidian',
+    description: 'Noir profond · Cyan électrique',
+    accent: Color(0xFF16C7D9),
+    darkBackground: Color(0xFF101820),
+    darkSurface: Color(0xFF182630),
+    darkText: Color(0xFFEAF5F7),
+    darkMutedText: Color(0xFF9CB2BA),
+    darkBorder: Color(0xFF2B414B),
+    lightBackground: Color(0xFFF1F6F7),
+    lightSurface: Color(0xFFFFFFFF),
+    lightText: Color(0xFF17252B),
+    lightMutedText: Color(0xFF60747B),
+    lightBorder: Color(0xFFD8E3E6),
+  ),
+  AppThemePreset.arctic: AppThemePalette(
+    name: 'Arctic',
+    description: 'Clair net · Bleu glacier',
+    accent: Color(0xFF2878E5),
+    darkBackground: Color(0xFF111A2A),
+    darkSurface: Color(0xFF1A2940),
+    darkText: Color(0xFFEDF3FF),
+    darkMutedText: Color(0xFFA5B6D0),
+    darkBorder: Color(0xFF30435F),
+    lightBackground: Color(0xFFF0F5FC),
+    lightSurface: Color(0xFFFFFFFF),
+    lightText: Color(0xFF17263D),
+    lightMutedText: Color(0xFF62748E),
+    lightBorder: Color(0xFFD8E2F0),
+  ),
+  AppThemePreset.emerald: AppThemePalette(
+    name: 'Emerald',
+    description: 'Vert profond · Ambiance premium',
+    accent: Color(0xFF18A879),
+    darkBackground: Color(0xFF101D1A),
+    darkSurface: Color(0xFF192B25),
+    darkText: Color(0xFFE9F6EF),
+    darkMutedText: Color(0xFFA0BCAF),
+    darkBorder: Color(0xFF30483D),
+    lightBackground: Color(0xFFF0F7F3),
+    lightSurface: Color(0xFFFFFFFF),
+    lightText: Color(0xFF193329),
+    lightMutedText: Color(0xFF637C70),
+    lightBorder: Color(0xFFD8E7DE),
+  ),
+  AppThemePreset.amethyst: AppThemePalette(
+    name: 'Amethyst',
+    description: 'Violet moderne · Contraste marqué',
+    accent: Color(0xFF9B72F2),
+    darkBackground: Color(0xFF191426),
+    darkSurface: Color(0xFF251D36),
+    darkText: Color(0xFFF3EDFF),
+    darkMutedText: Color(0xFFB7A9D0),
+    darkBorder: Color(0xFF403454),
+    lightBackground: Color(0xFFF6F2FC),
+    lightSurface: Color(0xFFFFFFFF),
+    lightText: Color(0xFF2C2140),
+    lightMutedText: Color(0xFF77668F),
+    lightBorder: Color(0xFFE4DCEF),
+  ),
+  AppThemePreset.sunset: AppThemePalette(
+    name: 'Sunset',
+    description: 'Anthracite · Ambre énergique',
+    accent: Color(0xFFFFA33A),
+    darkBackground: Color(0xFF201A16),
+    darkSurface: Color(0xFF30251D),
+    darkText: Color(0xFFFFF3E6),
+    darkMutedText: Color(0xFFC8B29C),
+    darkBorder: Color(0xFF514031),
+    lightBackground: Color(0xFFFAF4ED),
+    lightSurface: Color(0xFFFFFFFF),
+    lightText: Color(0xFF33271D),
+    lightMutedText: Color(0xFF806D5A),
+    lightBorder: Color(0xFFEADFD1),
+  ),
+};
+
 class AppTheme extends ChangeNotifier {
   AccentColor _color = systemAccentColor;
-
   AccentColor get color => _color;
 
-  RadialGradient getRadiantStandard() {
+  AppThemePreset _preset = AppThemePreset.obsidian;
+  AppThemePreset get preset => _preset;
+  AppThemePalette get palette => appThemePalettes[_preset]!;
+
+  set preset(AppThemePreset value) {
+    if (_preset == value) return;
+    _preset = value;
+    changeDecorations();
+    notifyListeners();
+  }
+
+  RadialGradient getRadiantStandard() => _radiant(color);
+  RadialGradient getRadiantLight() => _radiant(color.light);
+  RadialGradient getRadiantLighter() => _radiant(color.lighter);
+  RadialGradient getRadiantLightest() => _radiant(color.lightest);
+  RadialGradient getRadiantDarkest() => _radiant(color.darkest);
+  RadialGradient getRadiantDarker() => _radiant(color.darker);
+  RadialGradient getRadiantDark() => _radiant(color.dark);
+
+  RadialGradient _radiant(Color tone) {
     return RadialGradient(
       radius: 0.6,
       colors: [
-        color,
-        color.withAlpha(200),
-        color.withAlpha(150),
-        color.withAlpha(100),
-        color.withAlpha(50),
-        color.withAlpha(20),
+        tone,
+        tone.withAlpha(200),
+        tone.withAlpha(150),
+        tone.withAlpha(100),
+        tone.withAlpha(50),
+        tone.withAlpha(20),
         backGroundColor.withAlpha(10),
         backGroundColor.withAlpha(0),
       ],
@@ -55,181 +191,85 @@ class AppTheme extends ChangeNotifier {
     Colors.teal,
     Colors.yellow,
     Colors.orange.darker,
-
     Colors.blue.darker,
     Colors.orange.lightest,
   ];
 
   List<Color> getRandomColors(int nbr) {
-    if (nbr <= colors.length) {
-      return colors;
-    } else {
-      return [
-        ...colors,
-        ...List.generate(
-          nbr - colors.length,
-          (index) => colors[colors.length - 1],
-        ),
-      ];
-    }
+    if (nbr <= colors.length) return colors;
+    return [
+      ...colors,
+      ...List.generate(nbr - colors.length, (_) => colors.last),
+    ];
   }
 
-  RadialGradient getRadiantLight() {
-    return RadialGradient(
-      radius: 0.6,
-      colors: [
-        color.light,
-        color.light.withAlpha(200),
-        color.light.withAlpha(150),
-        color.light.withAlpha(100),
-        color.light.withAlpha(50),
-        color.light.withAlpha(20),
-        backGroundColor.withAlpha(10),
-        backGroundColor.withAlpha(0),
-      ],
-    );
-  }
-
-  RadialGradient getRadiantLighter() {
-    return RadialGradient(
-      radius: 0.6,
-      colors: [
-        color.lighter,
-        color.lighter.withAlpha(200),
-        color.lighter.withAlpha(150),
-        color.lighter.withAlpha(100),
-        color.lighter.withAlpha(50),
-        color.lighter.withAlpha(20),
-        backGroundColor.withAlpha(10),
-        backGroundColor.withAlpha(0),
-      ],
-    );
-  }
-
-  RadialGradient getRadiantLightest() {
-    return RadialGradient(
-      radius: 0.6,
-      colors: [
-        color.lightest,
-        color.lightest.withAlpha(200),
-        color.lightest.withAlpha(150),
-        color.lightest.withAlpha(100),
-        color.lightest.withAlpha(50),
-        color.lightest.withAlpha(20),
-        backGroundColor.withAlpha(10),
-        backGroundColor.withAlpha(0),
-      ],
-    );
-  }
-
-  RadialGradient getRadiantDarkest() {
-    return RadialGradient(
-      radius: 0.6,
-      colors: [
-        color.darkest,
-        color.darkest.withAlpha(200),
-        color.darkest.withAlpha(150),
-        color.darkest.withAlpha(100),
-        color.darkest.withAlpha(50),
-        color.darkest.withAlpha(20),
-        backGroundColor.withAlpha(10),
-        backGroundColor.withAlpha(0),
-      ],
-    );
-  }
-
-  RadialGradient getRadiantDarker() {
-    return RadialGradient(
-      radius: 0.6,
-      colors: [
-        color.darker,
-        color.darker.withAlpha(200),
-        color.darker.withAlpha(150),
-        color.darker.withAlpha(100),
-        color.darker.withAlpha(50),
-        color.darker.withAlpha(20),
-        backGroundColor.withAlpha(10),
-        backGroundColor.withAlpha(0),
-      ],
-    );
-  }
-
-  RadialGradient getRadiantDark() {
-    return RadialGradient(
-      radius: 0.6,
-      colors: [
-        color.dark,
-        color.dark.withAlpha(200),
-        color.dark.withAlpha(150),
-        color.dark.withAlpha(100),
-        color.dark.withAlpha(50),
-        color.dark.withAlpha(20),
-        backGroundColor.withAlpha(10),
-        backGroundColor.withAlpha(0),
-      ],
-    );
-  }
-
-  set color(AccentColor color) {
-    _color = color;
+  set color(AccentColor value) {
+    _color = value;
     notifyListeners();
   }
 
   ThemeMode _mode = ThemeMode.system;
-
   ThemeMode get mode => _mode;
 
   late TextStyle writingStyle;
   late TextStyle titleStyle;
   late Color fillColor;
   late Color backGroundColor;
+  late Color surfaceColor;
+  late Color mutedTextColor;
+  late Color borderColor;
   late m.InputDecoration inputDecoration;
 
-  set mode(ThemeMode mode) {
-    _mode = mode;
+  set mode(ThemeMode value) {
+    if (_mode == value) return;
+    _mode = value;
     changeDecorations();
     notifyListeners();
   }
 
   PaneDisplayMode _displayMode = PaneDisplayMode.auto;
-
   PaneDisplayMode get displayMode => _displayMode;
 
-  set displayMode(PaneDisplayMode displayMode) {
-    _displayMode = displayMode;
+  set displayMode(PaneDisplayMode value) {
+    _displayMode = value;
     notifyListeners();
   }
 
   NavigationIndicators _indicator = NavigationIndicators.sticky;
-
   NavigationIndicators get indicator => _indicator;
 
-  set indicator(NavigationIndicators indicator) {
-    _indicator = indicator;
+  set indicator(NavigationIndicators value) {
+    _indicator = value;
     notifyListeners();
   }
 
   TextDirection _textDirection = TextDirection.ltr;
-
   TextDirection get textDirection => _textDirection;
 
-  set textDirection(TextDirection direction) {
-    _textDirection = direction;
+  set textDirection(TextDirection value) {
+    _textDirection = value;
     notifyListeners();
   }
 
   Locale? _locale;
-
   Locale? get locale => _locale;
 
-  set locale(Locale? locale) {
-    DatabaseGetter.client?.setLocale(locale!.languageCode);
-    _locale = locale;
+  set locale(Locale? value) {
+    if (value == null) return;
+    DatabaseGetter.client?.setLocale(value.languageCode);
+    _locale = value;
     notifyListeners();
   }
 
   AppTheme() {
     final savedSettings = prefs;
+    final savedPreset = savedSettings.getInt('appThemePreset');
+    if (savedPreset != null &&
+        savedPreset >= 0 &&
+        savedPreset < AppThemePreset.values.length) {
+      _preset = AppThemePreset.values[savedPreset];
+    }
+
     mode = gts
         ? savedSettings.getInt('themeMode') == 0
               ? ThemeMode.dark
@@ -239,71 +279,90 @@ class AppTheme extends ChangeNotifier {
         : savedSettings.getInt('themeMode') == 1
         ? ThemeMode.light
         : ThemeMode.dark;
-    color = gts
-        ? Colors.red
-        : savedSettings.get('color') == null
-        ? systemAccentColor
-        : getColor(savedSettings.get('color')!);
+
+    if (!gts) {
+      color = savedSettings.get('color') == null
+          ? systemAccentColor
+          : getColor(savedSettings.get('color')!);
+    }
+
     displayMode = savedSettings.getInt('display') == null
         ? PaneDisplayMode.auto
         : getDisplayMode(savedSettings.getInt('display')!);
     locale = Locale(savedSettings.getString('lang') ?? 'fr');
     rowHeight = 24.px;
-
     changeDecorations();
   }
 
-  void changeDecorations() {
-    fillColor = mode == ThemeMode.dark
-        ? Colors.grey[150]
-        : mode == ThemeMode.light
-        ? Colors.grey[20]
-        : ThemeMode.system == ThemeMode.light
-        ? Colors.grey[20]
-        : Colors.grey[150];
+  AccentColor _accentFromColor(Color value) {
+    return AccentColor.swatch({
+      'darkest': Color.lerp(value, Colors.black, .42)!,
+      'darker': Color.lerp(value, Colors.black, .30)!,
+      'dark': Color.lerp(value, Colors.black, .16)!,
+      'normal': value,
+      'light': Color.lerp(value, Colors.white, .18)!,
+      'lighter': Color.lerp(value, Colors.white, .32)!,
+      'lightest': Color.lerp(value, Colors.white, .46)!,
+    });
+  }
 
-    writingStyle = TextStyle(
-      color: mode == ThemeMode.dark
-          ? Colors.white
-          : mode == ThemeMode.light
-          ? Colors.black
-          : ThemeMode.system == ThemeMode.light
-          ? Colors.black
-          : Colors.white,
-    );
+  void changeDecorations() {
+    if (gts) {
+      final p = palette;
+      final isDark = mode == ThemeMode.dark;
+      _color = _accentFromColor(p.accent);
+      backGroundColor = isDark ? p.darkBackground : p.lightBackground;
+      surfaceColor = isDark ? p.darkSurface : p.lightSurface;
+      fillColor = isDark
+          ? Color.lerp(p.darkSurface, Colors.white, .055)!
+          : Color.lerp(p.lightSurface, p.lightBackground, .55)!;
+      mutedTextColor = isDark ? p.darkMutedText : p.lightMutedText;
+      borderColor = isDark ? p.darkBorder : p.lightBorder;
+      final textColor = isDark ? p.darkText : p.lightText;
+      writingStyle = TextStyle(color: textColor);
+      titleStyle = TextStyle(color: textColor, fontSize: 16.sp);
+      inputDecoration = m.InputDecoration(
+        fillColor: fillColor,
+        labelStyle: TextStyle(color: mutedTextColor),
+        hintStyle: TextStyle(color: mutedTextColor),
+        filled: true,
+        isDense: true,
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: borderColor),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: p.accent, width: 1.5),
+          borderRadius: BorderRadius.circular(8),
+        ),
+      );
+      return;
+    }
+
+    final isDark = mode == ThemeMode.dark;
+    fillColor = isDark ? Colors.grey[150] : Colors.grey[20];
+    writingStyle = TextStyle(color: isDark ? Colors.white : Colors.black);
     titleStyle = TextStyle(
-      color: mode == ThemeMode.dark
-          ? Colors.white
-          : mode == ThemeMode.light
-          ? Colors.black
-          : ThemeMode.system == ThemeMode.light
-          ? Colors.black
-          : Colors.white,
+      color: isDark ? Colors.white : Colors.black,
       fontSize: 16.sp,
     );
-
-    backGroundColor = mode == ThemeMode.dark
-        ? gts
-              ? Colors.grey[180]
-              : Colors.grey
-        : mode == ThemeMode.light
-        ? Colors.white
-        : ThemeMode.system == ThemeMode.light
-        ? Colors.white
-        : Colors.grey;
-
+    backGroundColor = isDark ? Colors.grey : Colors.white;
+    surfaceColor = backGroundColor;
+    mutedTextColor = isDark ? Colors.grey[80] : Colors.grey[120];
+    borderColor = isDark ? Colors.grey[120] : Colors.grey[30];
     inputDecoration = m.InputDecoration(
       fillColor: fillColor,
-      labelStyle: TextStyle(color: Colors.grey[100]),
+      labelStyle: TextStyle(color: mutedTextColor),
+      hintStyle: TextStyle(color: mutedTextColor),
       filled: true,
       isDense: true,
     );
   }
 
-  AccentColor getColor(dynamic color) {
+  AccentColor getColor(dynamic value) {
     try {
-      return ThemeColors.accentColors[color];
-    } catch (e) {
+      return ThemeColors.accentColors[value];
+    } catch (_) {
       return systemAccentColor;
     }
   }
