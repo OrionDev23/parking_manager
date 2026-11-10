@@ -138,6 +138,80 @@ class SqliteSyncQueue implements SyncQueue {
   }
 
   @override
+  Future<bool> acquireEngineLease({
+    required String companyId,
+    required String ownerId,
+    required DateTime now,
+    required Duration leaseDuration,
+  }) async {
+    final nowUtc = now.toUtc();
+    final nowText = nowUtc.toIso8601String();
+    final expiresText = nowUtc.add(leaseDuration).toIso8601String();
+
+    _db.execute('BEGIN IMMEDIATE');
+    try {
+      _db.execute(
+        '''INSERT INTO sync_engine_leases (company_id, owner_id, lease_until)
+           VALUES (?, ?, ?)
+           ON CONFLICT(company_id) DO UPDATE SET
+             owner_id = excluded.owner_id,
+             lease_until = excluded.lease_until
+           WHERE sync_engine_leases.lease_until <= ?
+              OR sync_engine_leases.owner_id = ?''',
+        [companyId, ownerId, expiresText, nowText, ownerId],
+      );
+      final rows = _db.select(
+        'SELECT owner_id FROM sync_engine_leases WHERE company_id = ?',
+        [companyId],
+      );
+      final acquired = rows.isNotEmpty && rows.first['owner_id'] == ownerId;
+      _db.execute('COMMIT');
+      return acquired;
+    } catch (_) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<bool> renewEngineLease({
+    required String companyId,
+    required String ownerId,
+    required DateTime now,
+    required Duration leaseDuration,
+  }) async {
+    final nowUtc = now.toUtc();
+    _db.execute(
+      '''UPDATE sync_engine_leases SET lease_until = ?
+         WHERE company_id = ? AND owner_id = ? AND lease_until > ?''',
+      [
+        nowUtc.add(leaseDuration).toIso8601String(),
+        companyId,
+        ownerId,
+        nowUtc.toIso8601String(),
+      ],
+    );
+    final rows = _db.select(
+      'SELECT owner_id, lease_until FROM sync_engine_leases WHERE company_id = ?',
+      [companyId],
+    );
+    return rows.isNotEmpty &&
+        rows.first['owner_id'] == ownerId &&
+        DateTime.parse(rows.first['lease_until'] as String).isAfter(nowUtc);
+  }
+
+  @override
+  Future<void> releaseEngineLease({
+    required String companyId,
+    required String ownerId,
+  }) async {
+    _db.execute(
+      'DELETE FROM sync_engine_leases WHERE company_id = ? AND owner_id = ?',
+      [companyId, ownerId],
+    );
+  }
+
+  @override
   Future<void> markCompleted(String operationId) async =>
       _db.execute("UPDATE sync_operations SET status='completed' WHERE id=?", [operationId]);
 
