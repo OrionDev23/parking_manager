@@ -30,13 +30,17 @@ class _TileContainerState extends State<TileContainer> {
       onTap: () {
         PanesListState.index.value = widget.index;
       },
-      child: Card(
-        backgroundColor: appTheme.surfaceColor,
-        shape: RoundedRectangleBorder(
+      child: Container(
+        decoration: BoxDecoration(
+          color: appTheme.surfaceColor,
           borderRadius: BorderRadius.circular(appTheme.cardRadius),
-          side: BorderSide(color: appTheme.borderColor),
+          border: Border.all(color: appTheme.borderColor),
+          boxShadow: [appTheme.surfaceShadow],
         ),
-        child: Column(
+        clipBehavior: Clip.antiAlias,
+        child: Card(
+          backgroundColor: appTheme.surfaceColor,
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Flexible(
@@ -67,6 +71,7 @@ class _TileContainerState extends State<TileContainer> {
               ),
             ),
           ],
+          ),
         ),
       ),
     );
