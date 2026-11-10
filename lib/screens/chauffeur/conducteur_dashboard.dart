@@ -8,7 +8,7 @@ import '../../admin_parameters.dart';
 import '../../providers/counters.dart';
 import '../../theme.dart';
 import '../../widgets/button_container.dart';
-import '../../widgets/page_header.dart';
+import '../../widgets/module_dashboard_header.dart';
 import '../dashboard/charts/pie_chart.dart';
 import '../logs/logging/log_table.dart';
 import '../sidemenu/pane_items.dart';
@@ -29,11 +29,21 @@ class ConducteurDashboard extends StatelessWidget {
     bool portrait = Device.orientation == Orientation.portrait;
     double height = 380.px;
     return ScaffoldPage(
-      padding: const EdgeInsets.all(10),
-      header: PageTitle(text: 'chauffeurs'.tr()),
+      padding: EdgeInsets.zero,
       content: ListView(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
         children: [
+          ModuleDashboardHeader(
+            title: 'chauffeurs'.tr(),
+            subtitle:
+                'Gérez les conducteurs, leurs disponibilités et leurs documents.',
+            eyebrow: 'Fleet / People',
+            heroTitle: 'Centre de gestion des conducteurs',
+            heroDescription:
+                'Consultez les équipes, planifiez les disponibilités et gardez les dossiers conducteurs à jour.',
+            icon: FluentIcons.people,
+          ),
+          const SizedBox(height: 26),
           StaggeredGrid.count(
             crossAxisCount: portrait ? 2 : 4,
             mainAxisSpacing: 5,
