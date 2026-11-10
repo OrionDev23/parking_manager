@@ -43,6 +43,71 @@ class ConducteurDashboard extends StatelessWidget {
             icon: FluentIcons.people,
           ),
           const SizedBox(height: 26),
+          bigSpace,
+          StaggeredGrid.count(
+            crossAxisCount: portrait ? 1 : 2,
+            mainAxisSpacing: 5,
+            crossAxisSpacing: 5,
+            children: [
+              StaggeredGridTile.fit(
+                crossAxisCellCount: 1,
+                child: SizedBox(
+                  height: height,
+                  child: Column(
+                    children: [
+                      Text(
+                        'lactivities',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: appTheme.writingStyle.color,
+                        ),
+                      ).tr(),
+                      smallSpace,
+                      const Flexible(
+                        child: LogTable(
+                          statTable: true,
+                          pages: false,
+                          numberOfRows: 3,
+                          filters: {'typemin': '16', 'typemax': '25'},
+                          fieldsToShow: ['act', 'date'],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              smallSpace,
+              StaggeredGridTile.fit(
+                crossAxisCellCount: 1,
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  height: height,
+                  child: ParcOtoPie(
+                    title: 'disponibilite'.tr(),
+                    labels: [
+                      MapEntry(
+                        'disponible',
+                        DatabaseCounters().countChauffeur(etat: 0),
+                      ),
+                      MapEntry(
+                        'absent',
+                        DatabaseCounters().countChauffeur(etat: 1),
+                      ),
+                      MapEntry(
+                        'mission',
+                        DatabaseCounters().countChauffeur(etat: 2),
+                      ),
+                      MapEntry(
+                        'quitteentre',
+                        DatabaseCounters().countChauffeur(etat: 3),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
           Text(
             'Accès rapides',
             style: TextStyle(
@@ -146,71 +211,6 @@ class ConducteurDashboard extends StatelessWidget {
                   PaneItemsAndFooters.selectPane('driver-archive');
                 },
           ),
-            ],
-          ),
-          bigSpace,
-          StaggeredGrid.count(
-            crossAxisCount: portrait ? 1 : 2,
-            mainAxisSpacing: 5,
-            crossAxisSpacing: 5,
-            children: [
-              StaggeredGridTile.fit(
-                crossAxisCellCount: 1,
-                child: SizedBox(
-                  height: height,
-                  child: Column(
-                    children: [
-                      Text(
-                        'lactivities',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: appTheme.writingStyle.color,
-                        ),
-                      ).tr(),
-                      smallSpace,
-                      const Flexible(
-                        child: LogTable(
-                          statTable: true,
-                          pages: false,
-                          numberOfRows: 3,
-                          filters: {'typemin': '16', 'typemax': '25'},
-                          fieldsToShow: ['act', 'date'],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              smallSpace,
-              StaggeredGridTile.fit(
-                crossAxisCellCount: 1,
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  height: height,
-                  child: ParcOtoPie(
-                    title: 'disponibilite'.tr(),
-                    labels: [
-                      MapEntry(
-                        'disponible',
-                        DatabaseCounters().countChauffeur(etat: 0),
-                      ),
-                      MapEntry(
-                        'absent',
-                        DatabaseCounters().countChauffeur(etat: 1),
-                      ),
-                      MapEntry(
-                        'mission',
-                        DatabaseCounters().countChauffeur(etat: 2),
-                      ),
-                      MapEntry(
-                        'quitteentre',
-                        DatabaseCounters().countChauffeur(etat: 3),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ],
           ),
         ],
