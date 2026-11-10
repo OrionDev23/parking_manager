@@ -193,26 +193,30 @@ class DriverServices {
       return 0;
     }
 
-    final localDrivers = [
-      ...await localSource.getDrivers(),
-      ...await localSource.getDrivers(includeArchived: true),
-    ];
-    final checkedIds = <String>{};
+    // Compare only against a previous complete snapshot: this protects
+    // local-only imports that have never existed remotely.
+    final previousSnapshot = localDatabase.readRemoteSnapshotIds(
+      companyId: companyId,
+      entity: 'driver',
+    );
+    final remotelyDeleted = previousSnapshot.difference(secondScan);
     var deleted = 0;
-    for (final driver in localDrivers) {
-      if (!checkedIds.add(driver.id) || secondScan.contains(driver.id)) {
-        continue;
-      }
+    for (final driverId in remotelyDeleted) {
       final hasLocalMutation = await syncQueue.hasUnresolvedMutation(
         companyId: companyId,
         entity: 'driver',
-        entityId: driver.id,
+        entityId: driverId,
       );
       if (hasLocalMutation) continue;
-      await localSource.deleteDriver(driver.id);
+      await localSource.deleteDriver(driverId);
       deleted++;
     }
 
+    localDatabase.replaceRemoteSnapshot(
+      companyId: companyId,
+      entity: 'driver',
+      entityIds: secondScan,
+    );
     localDatabase.saveReconciliationTime(
       companyId: companyId,
       entity: 'driver',
