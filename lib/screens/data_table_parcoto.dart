@@ -70,8 +70,8 @@ class _DataTableParcState extends State<DataTableParc> {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: isDark ? .22 : .045),
-              blurRadius: appTheme.palette.shadowBlur,
-              offset: Offset(0, appTheme.palette.shadowBlur / 3),
+              blurRadius: appTheme.definition.shadowBlur,
+              offset: Offset(0, appTheme.definition.shadowBlur / 3),
             ),
           ],
         ),
@@ -86,8 +86,8 @@ class _DataTableParcState extends State<DataTableParc> {
             headingRowDecoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  accent.withValues(alpha: appTheme.palette.headerAccentOpacity),
-                  accent.withValues(alpha: appTheme.palette.headerAccentOpacity * .45),
+                  accent.withValues(alpha: appTheme.definition.headerAccentOpacity),
+                  accent.withValues(alpha: appTheme.definition.headerAccentOpacity * .45),
                 ],
                 begin: AlignmentDirectional.centerStart,
                 end: AlignmentDirectional.centerEnd,
