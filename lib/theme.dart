@@ -290,7 +290,7 @@ class AppTheme extends ChangeNotifier {
     return FluentThemeData(
       brightness: brightness,
       accentColor: color,
-      activeColor: foreground,
+      activeColor: color,
       inactiveColor: muted,
       inactiveBackgroundColor: fill,
       scaffoldBackgroundColor: background,
