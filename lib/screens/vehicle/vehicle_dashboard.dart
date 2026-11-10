@@ -21,12 +21,9 @@ class VehicleDashboard extends StatelessWidget {
   const VehicleDashboard({super.key});
 
   void _openNewVehicle() {
-    final vehicleIndex = PaneItemsAndFooters.originalItems
-        .indexOf(PaneItemsAndFooters.vehicles);
-    if (vehicleIndex < 0) return;
+    if (!PaneItemsAndFooters.selectPane('vehicle-manager')) return;
 
-    PanesListState.index.value = vehicleIndex + 1;
-    Future.delayed(const Duration(milliseconds: 300), () {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       late Tab tab;
       tab = Tab(
         key: UniqueKey(),
@@ -48,12 +45,9 @@ class VehicleDashboard extends StatelessWidget {
   }
 
   void _openNewDocument() {
-    final vehicleIndex = PaneItemsAndFooters.originalItems
-        .indexOf(PaneItemsAndFooters.vehicles);
-    if (vehicleIndex < 0) return;
+    if (!PaneItemsAndFooters.selectPane('vehicle-documents')) return;
 
-    PanesListState.index.value = vehicleIndex + 4;
-    Future.delayed(const Duration(milliseconds: 300), () {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       late Tab tab;
       tab = Tab(
         key: UniqueKey(),
@@ -75,12 +69,9 @@ class VehicleDashboard extends StatelessWidget {
   }
 
   void _openStateDialog(BuildContext context) {
-    final vehicleIndex = PaneItemsAndFooters.originalItems
-        .indexOf(PaneItemsAndFooters.vehicles);
-    if (vehicleIndex < 0) return;
+    if (!PaneItemsAndFooters.selectPane('vehicle-states')) return;
 
-    PanesListState.index.value = vehicleIndex + 3;
-    Future.delayed(const Duration(milliseconds: 300), () {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       final dialogContext = EtatManagerState.current;
       if (dialogContext == null || !dialogContext.mounted) return;
       showDialog(
@@ -112,8 +103,6 @@ class VehicleDashboard extends StatelessWidget {
                       ? 2
                       : 1;
 
-          final vehicleIndex = PaneItemsAndFooters.originalItems
-              .indexOf(PaneItemsAndFooters.vehicles);
           final moduleActions = <ButtonContainer>[
             ButtonContainer(
               icon: FluentIcons.task_manager,
@@ -122,11 +111,7 @@ class VehicleDashboard extends StatelessWidget {
               showBothLN: false,
               showBottom: false,
               showCounter: false,
-              action: () {
-                if (vehicleIndex >= 0) {
-                  PanesListState.index.value = vehicleIndex + 1;
-                }
-              },
+              action: () => PaneItemsAndFooters.selectPane('vehicle-manager'),
             ),
             ButtonContainer(
               icon: FluentIcons.car,
@@ -144,11 +129,7 @@ class VehicleDashboard extends StatelessWidget {
               showBothLN: false,
               showBottom: false,
               showCounter: false,
-              action: () {
-                if (vehicleIndex >= 0) {
-                  PanesListState.index.value = vehicleIndex + 2;
-                }
-              },
+              action: () => PaneItemsAndFooters.selectPane('vehicle-brands'),
             ),
             ButtonContainer(
               icon: FluentIcons.health,
@@ -157,11 +138,7 @@ class VehicleDashboard extends StatelessWidget {
               showBothLN: false,
               showBottom: false,
               showCounter: false,
-              action: () {
-                if (vehicleIndex >= 0) {
-                  PanesListState.index.value = vehicleIndex + 3;
-                }
-              },
+              action: () => PaneItemsAndFooters.selectPane('vehicle-states'),
             ),
             ButtonContainer(
               icon: FluentIcons.health_refresh,
@@ -179,11 +156,7 @@ class VehicleDashboard extends StatelessWidget {
               showBothLN: false,
               showBottom: false,
               showCounter: false,
-              action: () {
-                if (vehicleIndex >= 0) {
-                  PanesListState.index.value = vehicleIndex + 4;
-                }
-              },
+              action: () => PaneItemsAndFooters.selectPane('vehicle-documents'),
             ),
             ButtonContainer(
               icon: FluentIcons.document,
