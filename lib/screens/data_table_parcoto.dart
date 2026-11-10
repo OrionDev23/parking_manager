@@ -101,12 +101,6 @@ class _DataTableParcState extends State<DataTableParc> {
             fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
-          dataRowColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.hovered)) {
-              return accent.withValues(alpha: .07);
-            }
-            return null;
-          }),
           border: TableBorder(
             horizontalInside: BorderSide(
               color: borderColor,
