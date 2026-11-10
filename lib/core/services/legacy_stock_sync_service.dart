@@ -88,6 +88,156 @@ class LegacyStockSyncService {
     );
   }
 
+  /// Pulls the legacy stock catalogue into the company-scoped SQLite
+  /// cache. These Appwrite tables are installation-scoped and do not expose
+  /// companyId, so tenant isolation is applied by the local cache and outbox.
+  Future<int> pullRemoteChanges() async {
+    final database = legacy.DatabaseGetter.database;
+    if (database == null) {
+      throw StateError('Appwrite database unavailable for stock pull.');
+    }
+
+    final startedAt = DateTime.now().toUtc();
+    var imported = 0;
+    for (final entry in tableByEntity.entries) {
+      final entity = entry.key;
+      final tableId = entry.value;
+      final cursor = localDatabase.readSyncCursor(
+            companyId: companyId,
+            entity: entity,
+          ) ??
+          DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
+      final since = cursor.subtract(const Duration(seconds: 5));
+      var offset = 0;
+      while (true) {
+        final page = await database.listRows(
+          databaseId: legacy.databaseId,
+          tableId: tableId,
+          queries: [
+            Query.greaterThan(r'$updatedAt', since.toIso8601String()),
+            Query.orderAsc(r'$updatedAt'),
+            Query.limit(100),
+            Query.offset(offset),
+          ],
+        );
+        if (page.rows.isEmpty) break;
+        for (final row in page.rows) {
+          final hasLocalMutation = await queue.hasUnresolvedMutation(
+            companyId: companyId,
+            entity: entity,
+            entityId: row.$id,
+          );
+          if (hasLocalMutation) continue;
+          localDatabase.cacheLegacyRow(
+            companyId: companyId,
+            entity: entity,
+            entityId: row.$id,
+            payload: <String, dynamic>{
+              ...Map<String, dynamic>.from(row.data),
+              r'$id': row.$id,
+              r'$createdAt': row.$createdAt,
+              r'$updatedAt': row.$updatedAt,
+            },
+          );
+          imported++;
+        }
+        offset += page.rows.length;
+        if (page.rows.length < 100) break;
+      }
+      localDatabase.saveSyncCursor(
+        companyId: companyId,
+        entity: entity,
+        cursor: startedAt.subtract(const Duration(seconds: 5)),
+      );
+    }
+
+    final reconciled = await _reconcileRemoteSnapshots(startedAt);
+    debugPrint(
+      '[ParcOto Stock Sync] rows pulled=$imported, remote deletions=$reconciled',
+    );
+    return imported;
+  }
+
+  /// Detects hard deletes once per day. Two full scans must agree, and only
+  /// IDs in a previous complete snapshot are eligible for cache removal.
+  Future<int> _reconcileRemoteSnapshots(DateTime now) async {
+    final lastRun = localDatabase.readReconciliationTime(
+      companyId: companyId,
+      entity: 'legacy_stock',
+    );
+    if (lastRun != null &&
+        now.difference(lastRun) < const Duration(hours: 24)) {
+      return 0;
+    }
+
+    final database = legacy.DatabaseGetter.database;
+    if (database == null) {
+      throw StateError('Appwrite database unavailable for stock reconciliation.');
+    }
+
+    Future<Map<String, Set<String>>> scan() async {
+      final result = <String, Set<String>>{};
+      for (final entry in tableByEntity.entries) {
+        final rows = await legacy.DatabaseGetter().listDocuments(entry.value);
+        result[entry.key] = rows.map((row) => row.$id).toSet();
+      }
+      return result;
+    }
+
+    final first = await scan();
+    final second = await scan();
+    for (final entity in tableByEntity.keys) {
+      final firstIds = first[entity]!;
+      final secondIds = second[entity]!;
+      if (firstIds.length != secondIds.length ||
+          !firstIds.containsAll(secondIds)) {
+        debugPrint(
+          '[ParcOto Stock Sync] $entity reconciliation deferred: unstable snapshot',
+        );
+        return 0;
+      }
+    }
+
+    var deleted = 0;
+    for (final entity in tableByEntity.keys) {
+      final currentIds = second[entity]!;
+      final previousIds = localDatabase.readRemoteSnapshotIds(
+        companyId: companyId,
+        entity: entity,
+      );
+      for (final missingId in previousIds.difference(currentIds)) {
+        final hasLocalMutation = await queue.hasUnresolvedMutation(
+          companyId: companyId,
+          entity: entity,
+          entityId: missingId,
+        );
+        if (hasLocalMutation) {
+          // Keep it in the baseline so a later reconciliation retries.
+          currentIds.add(missingId);
+          continue;
+        }
+        localDatabase.deleteLegacyRow(
+          companyId: companyId,
+          entity: entity,
+          entityId: missingId,
+        );
+        deleted++;
+      }
+      localDatabase.replaceRemoteSnapshot(
+        companyId: companyId,
+        entity: entity,
+        entityIds: currentIds,
+      );
+    }
+
+    localDatabase.saveReconciliationTime(
+      companyId: companyId,
+      entity: 'legacy_stock',
+      reconciledAt: now,
+    );
+    return deleted;
+  }
+
   Future<void> applySyncOperation(SyncOperation operation) async {
     if (operation.companyId != companyId) {
       throw StateError('Stock sync operation belongs to another company.');
