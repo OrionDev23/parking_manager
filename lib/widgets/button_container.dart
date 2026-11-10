@@ -77,16 +77,10 @@ class _ButtonContainerState extends State<ButtonContainer> {
         height: 112,
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: appTheme.backGroundColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey[30]),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: .035),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          color: appTheme.surfaceColor,
+          borderRadius: BorderRadius.circular(appTheme.cardRadius),
+          border: Border.all(color: appTheme.borderColor),
+          boxShadow: [appTheme.surfaceShadow],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -160,7 +154,7 @@ class _ButtonContainerState extends State<ButtonContainer> {
               Icon(
                 FluentIcons.chevron_right,
                 size: 13,
-                color: Colors.grey[100],
+                color: appTheme.mutedTextColor,
               ),
           ],
         ),
