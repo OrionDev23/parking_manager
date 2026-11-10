@@ -193,6 +193,46 @@ class LocalDatabase {
         "INSERT INTO schema_migrations(version, applied_at) VALUES (10, datetime('now'))",
       );
     }
+
+    if (version < 11) {
+      db.execute('''CREATE TABLE IF NOT EXISTS startup_migrations (
+        company_id TEXT NOT NULL,
+        migration_key TEXT NOT NULL,
+        completed_at TEXT NOT NULL,
+        PRIMARY KEY (company_id, migration_key)
+      )''');
+      db.execute(
+        "INSERT INTO schema_migrations(version, applied_at) VALUES (11, datetime('now'))",
+      );
+    }
+  }
+
+  bool isStartupMigrationComplete({
+    required String companyId,
+    required String migrationKey,
+  }) {
+    final rows = database.select(
+      'SELECT 1 FROM startup_migrations WHERE company_id = ? AND migration_key = ? LIMIT 1',
+      [companyId, migrationKey],
+    );
+    return rows.isNotEmpty;
+  }
+
+  void markStartupMigrationComplete({
+    required String companyId,
+    required String migrationKey,
+  }) {
+    database.execute(
+      '''INSERT INTO startup_migrations(company_id, migration_key, completed_at)
+         VALUES (?, ?, ?)
+         ON CONFLICT(company_id, migration_key) DO UPDATE SET
+           completed_at=excluded.completed_at''',
+      [
+        companyId,
+        migrationKey,
+        DateTime.now().toUtc().toIso8601String(),
+      ],
+    );
   }
 
   Set<String> readRemoteSnapshotIds({
