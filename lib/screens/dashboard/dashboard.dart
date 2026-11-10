@@ -93,7 +93,7 @@ class _DashboardState extends State<Dashboard>
                     ),
                   ),
                   ModuleDashboardSectionHeader(
-                    title: 'Actions courantes',
+                    title: 'Accès directs aux modules',
                     subtitle:
                         'Accédez directement aux fonctions les plus utilisées.',
                   ),
