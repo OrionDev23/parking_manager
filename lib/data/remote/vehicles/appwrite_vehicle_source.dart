@@ -167,6 +167,26 @@ class AppwriteVehicleSource implements RemoteVehicleSource {
   }
 
   @override
+  Future<List<Vehicle>> getVehiclesUpdatedSince(
+    DateTime since, {
+    int limit = 100,
+    int offset = 0,
+  }) async {
+    final result = await backend.database.listRows(
+      databaseId: databaseId,
+      tableId: tableId,
+      queries: [
+        Query.equal('companyId', companyContext.companyId),
+        Query.greaterThan(r'$updatedAt', since.toUtc().toIso8601String()),
+        Query.orderAsc(r'$updatedAt'),
+        Query.limit(limit),
+        Query.offset(offset),
+      ],
+    );
+    return result.rows.map<Vehicle>(_fromRow).toList(growable: false);
+  }
+
+  @override
   Future<Vehicle?> getVehicle(String id) async {
     try {
       final row = await backend.database.getRow(
