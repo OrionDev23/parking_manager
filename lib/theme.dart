@@ -34,7 +34,7 @@ enum AppThemePreset {
   sunset,
 }
 
-class AppThemePalette {
+class AppThemeDefinition {
   final String name;
   final String description;
   final Color accent;
@@ -55,7 +55,7 @@ class AppThemePalette {
   final double shadowOpacity;
   final double headerAccentOpacity;
 
-  const AppThemePalette({
+  const AppThemeDefinition({
     required this.name,
     required this.description,
     required this.accent,
@@ -78,8 +78,8 @@ class AppThemePalette {
   });
 }
 
-const Map<AppThemePreset, AppThemePalette> appThemePalettes = {
-  AppThemePreset.obsidian: AppThemePalette(
+const Map<AppThemePreset, AppThemeDefinition> appThemes = {
+  AppThemePreset.obsidian: AppThemeDefinition(
     name: 'Obsidian',
     description: 'Noir profond · Cyan électrique',
     accent: Color(0xFF16C7D9),
@@ -100,7 +100,7 @@ const Map<AppThemePreset, AppThemePalette> appThemePalettes = {
     shadowOpacity: .20,
     headerAccentOpacity: .30,
   ),
-  AppThemePreset.arctic: AppThemePalette(
+  AppThemePreset.arctic: AppThemeDefinition(
     name: 'Arctic',
     description: 'Clair net · Bleu glacier',
     accent: Color(0xFF2878E5),
@@ -121,7 +121,7 @@ const Map<AppThemePreset, AppThemePalette> appThemePalettes = {
     shadowOpacity: .06,
     headerAccentOpacity: .16,
   ),
-  AppThemePreset.emerald: AppThemePalette(
+  AppThemePreset.emerald: AppThemeDefinition(
     name: 'Emerald',
     description: 'Vert profond · Ambiance premium',
     accent: Color(0xFF18A879),
@@ -142,7 +142,7 @@ const Map<AppThemePreset, AppThemePalette> appThemePalettes = {
     shadowOpacity: .12,
     headerAccentOpacity: .22,
   ),
-  AppThemePreset.amethyst: AppThemePalette(
+  AppThemePreset.amethyst: AppThemeDefinition(
     name: 'Amethyst',
     description: 'Violet moderne · Contraste marqué',
     accent: Color(0xFF9B72F2),
@@ -163,7 +163,7 @@ const Map<AppThemePreset, AppThemePalette> appThemePalettes = {
     shadowOpacity: .17,
     headerAccentOpacity: .25,
   ),
-  AppThemePreset.sunset: AppThemePalette(
+  AppThemePreset.sunset: AppThemeDefinition(
     name: 'Sunset',
     description: 'Anthracite · Ambre énergique',
     accent: Color(0xFFFFA33A),
@@ -192,7 +192,7 @@ class AppTheme extends ChangeNotifier {
 
   AppThemePreset _preset = AppThemePreset.obsidian;
   AppThemePreset get preset => _preset;
-  AppThemePalette get palette => appThemePalettes[_preset]!;
+  AppThemeDefinition get definition => appThemes[_preset]!;
 
   set preset(AppThemePreset value) {
     if (_preset == value) return;
@@ -264,25 +264,25 @@ class AppTheme extends ChangeNotifier {
   late m.InputDecoration inputDecoration;
 
   Color get textColor => writingStyle.color ?? Colors.black;
-  double get cardRadius => palette.cardRadius;
-  double get controlRadius => palette.controlRadius;
-  double get tableRadius => palette.tableRadius;
+  double get cardRadius => definition.cardRadius;
+  double get controlRadius => definition.controlRadius;
+  double get tableRadius => definition.tableRadius;
 
   BoxShadow get surfaceShadow => BoxShadow(
     color: Colors.black.withValues(
-      alpha: palette.shadowOpacity * (mode == ThemeMode.dark ? 1.25 : 1),
+      alpha: definition.shadowOpacity * (mode == ThemeMode.dark ? 1.25 : 1),
     ),
-    blurRadius: palette.shadowBlur,
-    offset: Offset(0, palette.shadowBlur / 3),
+    blurRadius: definition.shadowBlur,
+    offset: Offset(0, definition.shadowBlur / 3),
   );
 
   FluentThemeData fluentTheme(Brightness brightness) {
     final foreground = brightness == Brightness.dark
-        ? palette.darkText
-        : palette.lightText;
-    final background = isDark ? palette.darkBackground : palette.lightBackground;
-    final surface = isDark ? palette.darkSurface : palette.lightSurface;
-    final muted = isDark ? palette.darkMutedText : palette.lightMutedText;
+        ? definition.darkText
+        : definition.lightText;
+    final background = isDark ? definition.darkBackground : definition.lightBackground;
+    final surface = isDark ? definition.darkSurface : definition.lightSurface;
+    final muted = isDark ? definition.darkMutedText : definition.lightMutedText;
     final fill = isDark
         ? Color.lerp(surface, Colors.white, .055)!
         : Color.lerp(surface, background, .55)!;
@@ -296,7 +296,7 @@ class AppTheme extends ChangeNotifier {
       acrylicBackgroundColor: surface,
       micaBackgroundColor: background,
       shadowColor: Colors.black.withValues(
-        alpha: palette.shadowOpacity * (isDark ? 1.25 : 1),
+        alpha: definition.shadowOpacity * (isDark ? 1.25 : 1),
       ),
       menuColor: surface,
       cardColor: surface,
