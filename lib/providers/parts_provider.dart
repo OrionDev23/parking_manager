@@ -311,28 +311,28 @@ class PartsProvider extends ChangeNotifier {
 
   Future<Client?> getFournisseur(String? id) async {
     if (id == null || id.isEmpty) return null;
-    return fournisseurs[id] ?? await _getById<Client>(
+    return _getById<Client>(
       entity: 'supplier', tableId: fournsID, id: id, decode: Client.fromJson,
     );
   }
 
   Future<Brand?> getBrand(String? id) async {
     if (id == null || id.isEmpty) return null;
-    return brands[id] ?? await _getById<Brand>(
+    return _getById<Brand>(
       entity: 'part_brand', tableId: brandsID, id: id, decode: Brand.fromJson,
     );
   }
 
   Future<Category?> getCategory(String? id) async {
     if (id == null || id.isEmpty) return null;
-    return categories[id] ?? await _getById<Category>(
+    return _getById<Category>(
       entity: 'part_category', tableId: categoriesID, id: id, decode: Category.fromJson,
     );
   }
 
   Future<Option?> getOption(String? id) async {
     if (id == null || id.isEmpty) return null;
-    return options[id] ?? await _getById<Option>(
+    return _getById<Option>(
       entity: 'part_option', tableId: optionsID, id: id, decode: Option.fromJson,
     );
   }
@@ -349,7 +349,7 @@ class PartsProvider extends ChangeNotifier {
 
   Future<VehiclePart?> getPart(String? id) async {
     if (id == null || id.isEmpty) return null;
-    return parts[id] ?? await _getById<VehiclePart>(
+    return _getById<VehiclePart>(
       entity: 'part', tableId: partsID, id: id, decode: VehiclePart.fromJson,
     );
   }
