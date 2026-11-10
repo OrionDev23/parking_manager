@@ -9,7 +9,6 @@ import '../../widgets/button_container.dart';
 import '../dashboard/charts/pie_chart.dart';
 import '../logs/logging/log_table.dart';
 import '../sidemenu/pane_items.dart';
-import '../sidemenu/sidemenu.dart';
 import 'documents/document_form.dart';
 import 'documents/document_tabs.dart';
 import 'manager/vehicle_form.dart';
