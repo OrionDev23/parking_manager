@@ -67,6 +67,11 @@ class DatabaseGetter {
   static bool _isCurrentProject(int generation, String projectId) =>
       generation == _projectGeneration && _configuredProjectId == projectId;
 
+  static String? get activeProjectId => _configuredProjectId;
+
+  static bool isCurrentTenant(String projectId) =>
+      _isCurrentProject(_projectGeneration, projectId);
+
   DatabaseGetter() {
     final requestedProject = project ?? prefs.getString('project');
     if (requestedProject == null || requestedProject.isEmpty) return;
