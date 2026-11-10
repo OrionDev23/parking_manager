@@ -17,7 +17,6 @@ import 'package:parc_oto/screens/entreprise/entreprise.dart';
 import 'package:parc_oto/screens/logs/logging/log_table.dart';
 import 'package:parc_oto/screens/reparation/fiche_reception/form/fiche_reception_form.dart';
 import 'package:parc_oto/screens/reparation/fiche_reception/manager/fiche_reception_tabs.dart';
-import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
