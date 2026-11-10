@@ -7,6 +7,7 @@ import '../../providers/counters.dart';
 import '../../theme.dart';
 import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
+import '../../widgets/module_dashboard_section_header.dart';
 import '../../widgets/module_dashboard_panel.dart';
 import '../dashboard/charts/pie_chart.dart';
 import '../logs/logging/log_table.dart';
@@ -158,8 +159,13 @@ class VehicleDashboard extends StatelessWidget {
                 icon: FluentIcons.car,
               ),
               const SizedBox(height: 28),
+          ModuleDashboardSectionHeader(
+            title: 'Actions courantes',
+            subtitle: 'Ouvrez directement la gestion des véhicules, documents et référentiels.',
+          ),
+              const SizedBox(height: 26),
               Text(
-                'Suivi du parc',
+                'Accès rapides',
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
@@ -167,6 +173,17 @@ class VehicleDashboard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: moduleActions,
+
+          const SizedBox(height: 28),
+          ModuleDashboardSectionHeader(
+            title: 'État et activité du parc',
+            subtitle: 'Suivez la répartition des véhicules et les dernières opérations enregistrées.',
+          ),
+
               StaggeredGrid.count(
                 crossAxisCount: compact ? 1 : 2,
                 mainAxisSpacing: 14,
@@ -211,20 +228,6 @@ class VehicleDashboard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 26),
-              Text(
-                'Accès rapides',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  color: appTheme.writingStyle.color,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: moduleActions,
               ),
             ],
           );
