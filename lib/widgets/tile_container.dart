@@ -31,7 +31,11 @@ class _TileContainerState extends State<TileContainer> {
         PanesListState.index.value = widget.index;
       },
       child: Card(
-        backgroundColor: appTheme.color.withValues(alpha: 0.1),
+        backgroundColor: appTheme.surfaceColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(appTheme.cardRadius),
+          side: BorderSide(color: appTheme.borderColor),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -44,17 +48,7 @@ class _TileContainerState extends State<TileContainer> {
                     image: AssetImage(widget.image),
                     fit: BoxFit.fitHeight,
                   ),
-                  borderRadius: widget.corner == 0
-                      ? BorderRadius.zero
-                      : widget.corner == 1
-                      ? const BorderRadius.only(topLeft: Radius.circular(10))
-                      : widget.corner == 2
-                      ? const BorderRadius.only(topRight: Radius.circular(10))
-                      : widget.corner == 3
-                      ? const BorderRadius.only(bottomLeft: Radius.circular(10))
-                      : const BorderRadius.only(
-                          bottomRight: Radius.circular(10),
-                        ),
+                  borderRadius: BorderRadius.circular(appTheme.cardRadius),
                 ),
               ),
             ),
@@ -65,8 +59,8 @@ class _TileContainerState extends State<TileContainer> {
               child: Text(
                 widget.title.toUpperCase(),
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 8,
+                style: appTheme.writingStyle.copyWith(
+                  fontSize: 10,
                   letterSpacing: -0.12,
                   fontWeight: FontWeight.bold,
                 ),
