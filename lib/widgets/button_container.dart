@@ -89,6 +89,7 @@ class _ButtonContainerState extends State<ButtonContainer> {
           ],
         ),
         child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               width: 46,
