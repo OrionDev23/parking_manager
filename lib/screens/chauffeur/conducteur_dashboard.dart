@@ -9,6 +9,7 @@ import '../../providers/counters.dart';
 import '../../theme.dart';
 import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
+import '../../widgets/module_dashboard_section_header.dart';
 import '../../widgets/module_dashboard_panel.dart';
 import '../dashboard/charts/pie_chart.dart';
 import '../logs/logging/log_table.dart';
@@ -42,64 +43,10 @@ class ConducteurDashboard extends StatelessWidget {
             icon: FluentIcons.people,
           ),
           const SizedBox(height: 26),
-          Text(
-            'Suivi des conducteurs',
-            style: TextStyle(
-              color: appTheme.writingStyle.color,
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
-            ),
+          ModuleDashboardSectionHeader(
+            title: 'Actions courantes',
+            subtitle: 'Gérez les conducteurs, leurs dossiers et les actions administratives courantes.',
           ),
-          const SizedBox(height: 12),
-          StaggeredGrid.count(
-            crossAxisCount: portrait ? 1 : 2,
-            mainAxisSpacing: 14,
-            crossAxisSpacing: 14,
-            children: [
-              StaggeredGridTile.fit(
-                crossAxisCellCount: 1,
-                child: ModuleDashboardPanel(
-                  title: 'Activité récente',
-                  height: height,
-                  child: const LogTable(
-                    statTable: true,
-                    pages: false,
-                    numberOfRows: 3,
-                    filters: {'typemin': '16', 'typemax': '25'},
-                    fieldsToShow: ['act', 'date'],
-                  ),
-                ),
-              ),
-              StaggeredGridTile.fit(
-                crossAxisCellCount: 1,
-                child: ModuleDashboardPanel(
-                  title: 'Disponibilité',
-                  height: height,
-                  child: ParcOtoPie(
-                    labels: [
-                      MapEntry(
-                        'disponible',
-                        DatabaseCounters().countChauffeur(etat: 0),
-                      ),
-                      MapEntry(
-                        'absent',
-                        DatabaseCounters().countChauffeur(etat: 1),
-                      ),
-                      MapEntry(
-                        'mission',
-                        DatabaseCounters().countChauffeur(etat: 2),
-                      ),
-                      MapEntry(
-                        'quitteentre',
-                        DatabaseCounters().countChauffeur(etat: 3),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 28),
           Text(
             'Accès rapides',
             style: TextStyle(
@@ -203,7 +150,63 @@ class ConducteurDashboard extends StatelessWidget {
                   PaneItemsAndFooters.selectPane('driver-archive');
                 },
           ),
+            ]
+          const SizedBox(height: 28),
+          ModuleDashboardSectionHeader(
+            title: 'Équipe et disponibilité',
+            subtitle: 'Consultez les mouvements récents et la répartition des disponibilités.',
+          ),
+
+          StaggeredGrid.count(
+            crossAxisCount: portrait ? 1 : 2,
+            mainAxisSpacing: 14,
+            crossAxisSpacing: 14,
+            children: [
+              StaggeredGridTile.fit(
+                crossAxisCellCount: 1,
+                child: ModuleDashboardPanel(
+                  title: 'Activité récente',
+                  height: height,
+                  child: const LogTable(
+                    statTable: true,
+                    pages: false,
+                    numberOfRows: 3,
+                    filters: {'typemin': '16', 'typemax': '25'},
+                    fieldsToShow: ['act', 'date'],
+                  ),
+                ),
+              ),
+              StaggeredGridTile.fit(
+                crossAxisCellCount: 1,
+                child: ModuleDashboardPanel(
+                  title: 'Disponibilité',
+                  height: height,
+                  child: ParcOtoPie(
+                    labels: [
+                      MapEntry(
+                        'disponible',
+                        DatabaseCounters().countChauffeur(etat: 0),
+                      ),
+                      MapEntry(
+                        'absent',
+                        DatabaseCounters().countChauffeur(etat: 1),
+                      ),
+                      MapEntry(
+                        'mission',
+                        DatabaseCounters().countChauffeur(etat: 2),
+                      ),
+                      MapEntry(
+                        'quitteentre',
+                        DatabaseCounters().countChauffeur(etat: 3),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
+          ),
+          const SizedBox(height: 28),
+,
           ),
         ],
       ),
