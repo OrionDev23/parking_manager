@@ -62,6 +62,7 @@ class _LoginScreenState extends State<LoginScreen>
       if (session != null) {
         PanesListState.signedIn.value = true;
         signedIn = true;
+        startBackgroundInitialization(session.company.companyId);
       }
     } catch (_) {
       PanesListState.signedIn.value = false;
