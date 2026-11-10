@@ -207,7 +207,12 @@ class DriverServices {
         entity: 'driver',
         entityId: driverId,
       );
-      if (hasLocalMutation) continue;
+      if (hasLocalMutation) {
+        // Keep the missing ID in the baseline so deletion is retried after
+        // the local outbox mutation is resolved.
+        secondScan.add(driverId);
+        continue;
+      }
       await localSource.deleteDriver(driverId);
       deleted++;
     }
