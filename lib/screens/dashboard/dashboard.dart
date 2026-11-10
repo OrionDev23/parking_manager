@@ -68,35 +68,176 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         var plannings=Provider.of<PlanningProvider>(con);
         var repairs=Provider.of<RepairProvider>(con);
         return ScaffoldPage(
-            header:  PageTitle(text: 'home',trailing: Button(
-              onPressed: ()=>onRefresh(vehicles,drivers,logs,
-                  plannings,repairs),
-              child: const Text('refresh').tr(),),),
-            content: ListView(
-              padding: const EdgeInsets.all(10),
-              children: [
-                StaggeredGrid.count(
-                  crossAxisCount:
-                  portrait
-                      ? 2
-                      : 4,
-                  mainAxisSpacing: 5,
-                  crossAxisSpacing: 5,
-                  children: buttonList(appTheme,vehicles,drivers,logs,
-                    plannings,repairs),
+          padding: EdgeInsets.zero,
+          content: LayoutBuilder(
+            builder: (context, constraints) {
+              final compact = constraints.maxWidth < 760;
+              final columns = constraints.maxWidth >= 1450
+                  ? 4
+                  : constraints.maxWidth >= 1050
+                      ? 3
+                      : constraints.maxWidth >= 620
+                          ? 2
+                          : 1;
+              return ListView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: compact ? 14 : 28,
+                  vertical: 22,
                 ),
-                smallSpace,
-                StaggeredGrid.count(
-                  crossAxisCount:
-                  portrait
-                      ? 1
-                      : 2,
-                  mainAxisSpacing: 5,
-                  crossAxisSpacing: 5,
-                  children: widgetList(appTheme),
-                ),
-              ],
-            ));
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'home'.tr(),
+                              style: TextStyle(
+                                fontSize: compact ? 25 : 30,
+                                fontWeight: FontWeight.w700,
+                                color: appTheme.writingStyle.color,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              'Vue d’ensemble de votre activité',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[100],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Button(
+                        onPressed: () => onRefresh(
+                          vehicles, drivers, logs, plannings, repairs,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(FluentIcons.refresh, size: 14),
+                            const SizedBox(width: 8),
+                            const Text('refresh').tr(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 22),
+                  Container(
+                    padding: EdgeInsets.all(compact ? 16 : 22),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          appTheme.color.dark,
+                          appTheme.color,
+                          appTheme.color.light,
+                        ],
+                        begin: AlignmentDirectional.centerStart,
+                        end: AlignmentDirectional.centerEnd,
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'PARCOTO',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(.78),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1.8,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Pilotage de votre parc automobile',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: compact ? 17 : 21,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                'Retrouvez vos véhicules, interventions et équipes au même endroit.',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(.86),
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (!compact) ...[
+                          const SizedBox(width: 20),
+                          Icon(
+                            FluentIcons.car,
+                            size: 58,
+                            color: Colors.white.withOpacity(.88),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 26),
+                  Row(
+                    children: [
+                      Text(
+                        'Accès rapides',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                          color: appTheme.writingStyle.color,
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        '${buttonList(appTheme,vehicles,drivers,logs,plannings,repairs).length} modules',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey[100],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  StaggeredGrid.count(
+                    crossAxisCount: columns,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    children: buttonList(
+                      appTheme, vehicles, drivers, logs, plannings, repairs,
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  Text(
+                    'Statistiques et activité',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: appTheme.writingStyle.color,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  StaggeredGrid.count(
+                    crossAxisCount: compact ? 1 : 2,
+                    mainAxisSpacing: 14,
+                    crossAxisSpacing: 14,
+                    children: widgetList(appTheme),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
       },
     );
   }
