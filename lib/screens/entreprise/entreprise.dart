@@ -1060,44 +1060,46 @@ class MyEntrepriseState extends State<MyEntreprise> {
       showMessage('nomadresreq', 'erreur');
       return;
     }
-    if (!uploading) {
-      setState(() {
-        uploading = true;
-        progress = 0;
-      });
-      try {
-        setState(() {
-          progress = 10;
-        });
-        await uploadLogo();
-        setState(() {
-          progress = 50;
-        });
-        await uploadEntreprise();
+    if (uploading) return;
 
-        setState(() {
-          progress = 90;
-        });
-        await Future.delayed(const Duration(milliseconds: 300));
-        setState(() {
-          progress = 100;
-          changes = false;
-        });
-        if (p == null) {
-          showMessage('entrepsuccess', "ok");
-        } else {
-          showMessage('entrepupdate', "ok");
-        }
-      } catch (e) {
+    final projectId = DatabaseGetter.activeProjectId;
+    if (projectId == null) {
+      showMessage('errupld', 'erreur');
+      return;
+    }
+
+    setState(() {
+      uploading = true;
+      progress = 0;
+    });
+
+    try {
+      setState(() => progress = 10);
+      await uploadLogo();
+      if (!mounted || !DatabaseGetter.isCurrentTenant(projectId)) return;
+
+      setState(() => progress = 50);
+      await uploadEntreprise();
+      if (!mounted || !DatabaseGetter.isCurrentTenant(projectId)) return;
+
+      setState(() => progress = 90);
+      await Future.delayed(const Duration(milliseconds: 300));
+      if (!mounted || !DatabaseGetter.isCurrentTenant(projectId)) return;
+
+      setState(() {
+        progress = 100;
+        changes = false;
+        uploading = false;
+      });
+      showMessage(p == null ? 'entrepsuccess' : 'entrepupdate', 'ok');
+    } catch (error) {
+      debugPrint('[ParcOto Company] save failed: $error');
+      if (mounted) {
         setState(() {
           uploading = false;
-          showMessage('errupld', 'erreur');
         });
+        showMessage('errupld', 'erreur');
       }
-      setState(() {
-        uploading = false;
-        progress = 100;
-      });
     }
   }
 
