@@ -25,7 +25,8 @@ import 'charts/pie_chart.dart';
 
 import '../../providers/counters.dart';
 import '../../theme.dart';
-import '../../widgets/button_container.dart';
+import '../../widgets/module_dashboard_action.dart';
+import '../../widgets/module_dashboard_header.dart';
 import '../chauffeur/document/chauf_document_form.dart';
 import '../chauffeur/document/chauf_document_tabs.dart';
 import '../prestataire/prestataire_form.dart';
@@ -75,46 +76,24 @@ class _DashboardState extends State<Dashboard>
           content: LayoutBuilder(
             builder: (context, constraints) {
               final compact = constraints.maxWidth < 760;
-              final columns = constraints.maxWidth >= 1450
-                  ? 4
-                  : constraints.maxWidth >= 1050
-                  ? 3
-                  : constraints.maxWidth >= 620
-                  ? 2
-                  : 1;
               return ListView(
                 padding: EdgeInsets.symmetric(
                   horizontal: compact ? 14 : 28,
                   vertical: 22,
                 ),
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'home'.tr(),
-                              style: TextStyle(
-                                fontSize: compact ? 25 : 30,
-                                fontWeight: FontWeight.w700,
-                                color: appTheme.writingStyle.color,
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              'Vue d’ensemble de votre activité',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey[100],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Button(
+                  ModuleDashboardHeader(
+                    title: 'home'.tr(),
+                    subtitle: 'Vue d’ensemble de votre activité',
+                    eyebrow: 'ParcOto / Overview',
+                    heroTitle: 'Pilotage de votre parc automobile',
+                    heroDescription:
+                        'Retrouvez vos véhicules, interventions et équipes au même endroit.',
+                    icon: FluentIcons.car,
+                    trailing: Tooltip(
+                      message: 'Actualiser les données',
+                      child: IconButton(
+                        icon: const Icon(FluentIcons.refresh),
                         onPressed: () => onRefresh(
                           vehicles,
                           drivers,
@@ -122,101 +101,22 @@ class _DashboardState extends State<Dashboard>
                           plannings,
                           repairs,
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(FluentIcons.refresh, size: 14),
-                            const SizedBox(width: 8),
-                            const Text('refresh').tr(),
-                          ],
-                        ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 22),
-                  Container(
-                    padding: EdgeInsets.all(compact ? 16 : 22),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          appTheme.color.dark,
-                          appTheme.color,
-                          appTheme.color.light,
-                        ],
-                        begin: AlignmentDirectional.centerStart,
-                        end: AlignmentDirectional.centerEnd,
-                      ),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'PARCOTO',
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: .78),
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 1.8,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Pilotage de votre parc automobile',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: compact ? 17 : 21,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                'Retrouvez vos véhicules, interventions et équipes au même endroit.',
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: .86),
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (!compact) ...[
-                          const SizedBox(width: 20),
-                          Icon(
-                            FluentIcons.car,
-                            size: 58,
-                            color: Colors.white.withValues(alpha: .88),
-                          ),
-                        ],
-                      ],
                     ),
                   ),
                   const SizedBox(height: 26),
-                  Row(
-                    children: [
-                      Text(
-                        'Accès rapides',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w700,
-                          color: appTheme.writingStyle.color,
-                        ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        '${buttonList(appTheme, vehicles, drivers, logs, plannings, repairs).length} modules',
-                        style: TextStyle(fontSize: 11, color: Colors.grey[100]),
-                      ),
-                    ],
+                  Text(
+                    'Accès rapides',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                      color: appTheme.writingStyle.color,
+                    ),
                   ),
                   const SizedBox(height: 12),
-                  StaggeredGrid.count(
-                    crossAxisCount: columns,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
                     children: buttonList(
                       appTheme,
                       vehicles,
@@ -270,7 +170,7 @@ class _DashboardState extends State<Dashboard>
     setState(() {});
   }
 
-  List<ButtonContainer> buttonList(
+  List<Widget> buttonList(
     AppTheme appTheme,
     VehicleProvider vehicles,
     DriverProvider drivers,
@@ -278,277 +178,82 @@ class _DashboardState extends State<Dashboard>
     PlanningProvider plannings,
     RepairProvider repairs,
   ) {
+    final vehicleCount = VehicleProvider.downloadedVehicles
+        ? VehicleProvider.vehicles.length
+        : null;
+    final vehicleDocumentCount = VehicleProvider.downloadedDocuments
+        ? VehicleProvider.documentsVehicules.length
+        : null;
+    final repairCount = RepairProvider.downloadedReparations
+        ? RepairProvider.reparations.length
+        : null;
+    final providerCount = RepairProvider.downloadedPrestataires
+        ? RepairProvider.prestataires.length
+        : null;
+    final driverCount = DriverProvider.downloadedConducteurs
+        ? DriverProvider.conducteurs.length
+        : null;
+    final driverDocumentCount = DriverProvider.downloadedDocuments
+        ? DriverProvider.documentConducteurs.length
+        : null;
+    final planningCount = PlanningProvider.downloadedPlanning
+        ? PlanningProvider.plannings.length
+        : null;
+    final activityCount = LogProvider.downloadedActivities
+        ? LogProvider.activities.length
+        : null;
+
+    String countDetail(int? count, String singular, String plural) =>
+        count == null ? 'Synchronisation des données' : '$count ${count == 1 ? singular : plural}';
+
     return [
-      ButtonContainer(
+      ModuleDashboardAction(
+        label: 'vehicules'.tr(),
+        detail: countDetail(vehicleCount, 'véhicule', 'véhicules'),
         icon: FluentIcons.car,
-        text: 'vehicules'.tr(),
-        getCount: !VehicleProvider.downloadedVehicles
-            ? vehicles.getVehicleCount
-            : null,
-        counter: VehicleProvider.downloadedVehicles
-            ? VehicleProvider.vehicles.length
-            : null,
-        maxCounter:
-            DatabaseGetter.gotLimit &&
-                DatabaseGetter.limits.containsKey('vehicles')
-            ? DatabaseGetter.limits['vehicles']
-            : null,
-        action: () {
-          PaneItemsAndFooters.selectPane('vehicles');
-        },
-        actionList: () {
-          PaneItemsAndFooters.selectPane('vehicle-manager');
-        },
-        actionNouveau: () {
-          PaneItemsAndFooters.selectPane('vehicle-manager');
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            late Tab tab;
-            tab = Tab(
-              key: UniqueKey(),
-              text: Text('nouvvehicule'.tr()),
-              semanticLabel: 'nouvvehicule'.tr(),
-              icon: const Icon(FluentIcons.new_folder),
-              body: const VehicleForm(),
-              onClosed: () {
-                VehicleTabsState.tabs.remove(tab);
-
-                if (VehicleTabsState.currentIndex.value > 0) {
-                  VehicleTabsState.currentIndex.value--;
-                }
-              },
-            );
-            final index = VehicleTabsState.tabs.length + 1;
-            VehicleTabsState.tabs.add(tab);
-            VehicleTabsState.currentIndex.value = index - 1;
-          });
-        },
+        onPressed: () => PaneItemsAndFooters.selectPane('vehicles'),
       ),
-      ButtonContainer(
+      ModuleDashboardAction(
+        label: 'vehicledocuments'.tr(),
+        detail: countDetail(vehicleDocumentCount, 'document', 'documents'),
         icon: FluentIcons.document_set,
-        text: 'vehicledocuments'.tr(),
-        getCount: !VehicleProvider.downloadedDocuments
-            ? vehicles.getVehicleDocsCount
-            : null,
-        counter: VehicleProvider.downloadedDocuments
-            ? VehicleProvider.documentsVehicules.length
-            : null,
-        action: () {
-          PaneItemsAndFooters.selectPane('vehicle-documents');
-        },
-        actionList: () {
-          PaneItemsAndFooters.selectPane('vehicle-documents');
-        },
-        actionNouveau: () {
-          PaneItemsAndFooters.selectPane('vehicle-documents');
-          Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
-            late Tab tab;
-            tab = Tab(
-              key: UniqueKey(),
-              text: Text('nouvdocument'.tr()),
-              semanticLabel: 'nouvdocument'.tr(),
-              icon: const Icon(FluentIcons.new_folder),
-              body: const ScaffoldPage(content: DocumentForm()),
-              onClosed: () {
-                DocumentTabsState.tabs.remove(tab);
-
-                if (DocumentTabsState.currentIndex.value > 0) {
-                  DocumentTabsState.currentIndex.value--;
-                }
-              },
-            );
-            final index = DocumentTabsState.tabs.length + 1;
-            DocumentTabsState.tabs.add(tab);
-            DocumentTabsState.currentIndex.value = index - 1;
-          });
-        },
+        onPressed: () => PaneItemsAndFooters.selectPane('vehicle-documents'),
       ),
-      ButtonContainer(
+      ModuleDashboardAction(
+        label: 'reparations'.tr(),
+        detail: countDetail(repairCount, 'intervention', 'interventions'),
         icon: FluentIcons.repair,
-        text: 'reparations'.tr(),
-        getCount: !RepairProvider.downloadedReparations
-            ? repairs.getRepairsCount
-            : null,
-        counter: RepairProvider.downloadedReparations
-            ? RepairProvider.reparations.length
-            : null,
-        action: () {
-          PaneItemsAndFooters.selectPane('vehicle-manager');
-        },
-        actionList: () {
-          PaneItemsAndFooters.selectPane('vehicle-manager');
-        },
-        actionNouveau: () {
-          PaneItemsAndFooters.selectPane('vehicle-manager');
-          Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
-            late Tab tab;
-            tab = Tab(
-              key: UniqueKey(),
-              text: Text('nouvfiche'.tr()),
-              semanticLabel: 'nouvfiche'.tr(),
-              icon: const Icon(FluentIcons.document),
-              body: FicheReceptionForm(key: UniqueKey()),
-              onClosed: () {
-                FicheReceptionTabsState.tabs.remove(tab);
-
-                if (FicheReceptionTabsState.currentIndex.value > 0) {
-                  FicheReceptionTabsState.currentIndex.value--;
-                }
-              },
-            );
-            final index = FicheReceptionTabsState.tabs.length + 1;
-            FicheReceptionTabsState.tabs.add(tab);
-            FicheReceptionTabsState.currentIndex.value = index - 1;
-          });
-        },
+        onPressed: () => PaneItemsAndFooters.selectPane('reparations'),
       ),
-      ButtonContainer(
+      ModuleDashboardAction(
+        label: 'prestataires'.tr(),
+        detail: countDetail(providerCount, 'prestataire', 'prestataires'),
         icon: FluentIcons.service_activity,
-        text: 'prestataires'.tr(),
-        getCount: !RepairProvider.downloadedPrestataires
-            ? repairs.getProvidersCount
-            : null,
-        counter: RepairProvider.downloadedPrestataires
-            ? RepairProvider.prestataires.length
-            : null,
-        action: () {
-          PaneItemsAndFooters.selectPane('vehicle-manager');
-        },
-        actionList: () {
-          PaneItemsAndFooters.selectPane('vehicle-manager');
-        },
-        actionNouveau: () {
-          PaneItemsAndFooters.selectPane('vehicle-manager');
-          Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
-            late Tab tab;
-            tab = Tab(
-              key: UniqueKey(),
-              text: Text('nouvprest'.tr()),
-              semanticLabel: 'nouvprest'.tr(),
-              icon: const Icon(FluentIcons.document),
-              body: const PrestataireForm(),
-              onClosed: () {
-                PrestataireTabsState.tabs.remove(tab);
-
-                if (PrestataireTabsState.currentIndex.value > 0) {
-                  PrestataireTabsState.currentIndex.value--;
-                }
-              },
-            );
-            final index = PrestataireTabsState.tabs.length + 1;
-            PrestataireTabsState.tabs.add(tab);
-            PrestataireTabsState.currentIndex.value = index - 1;
-          });
-        },
+        onPressed: () => PaneItemsAndFooters.selectPane('prestataires'),
       ),
-      ButtonContainer(
+      ModuleDashboardAction(
+        label: 'chauffeurs'.tr(),
+        detail: countDetail(driverCount, 'conducteur', 'conducteurs'),
         icon: FluentIcons.people,
-        text: 'chauffeurs'.tr(),
-        getCount: !DriverProvider.downloadedConducteurs
-            ? drivers.getDriversCount
-            : null,
-        counter: DriverProvider.downloadedConducteurs
-            ? DriverProvider.conducteurs.length
-            : null,
-        action: () {
-          PaneItemsAndFooters.selectPane('vehicle-manager');
-        },
-        actionList: () {
-          PaneItemsAndFooters.selectPane('vehicle-manager');
-        },
-        actionNouveau: () {
-          PaneItemsAndFooters.selectPane('vehicle-manager');
-          Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
-            late Tab tab;
-            tab = Tab(
-              key: UniqueKey(),
-              text: Text('nouvchauf'.tr()),
-              semanticLabel: 'nouvchauf'.tr(),
-              icon: const Icon(FluentIcons.people_add),
-              body: const ChauffeurForm(),
-              onClosed: () {
-                ChauffeurTabsState.tabs.remove(tab);
-
-                if (ChauffeurTabsState.currentIndex.value > 0) {
-                  ChauffeurTabsState.currentIndex.value--;
-                }
-              },
-            );
-            final index = ChauffeurTabsState.tabs.length + 1;
-            ChauffeurTabsState.tabs.add(tab);
-            ChauffeurTabsState.currentIndex.value = index - 1;
-          });
-        },
+        onPressed: () => PaneItemsAndFooters.selectPane('chauffeurs'),
       ),
-      ButtonContainer(
+      ModuleDashboardAction(
+        label: 'chaufdocuments'.tr(),
+        detail: countDetail(driverDocumentCount, 'document', 'documents'),
         icon: FluentIcons.document_set,
-        text: 'chaufdocuments'.tr(),
-        getCount: !DriverProvider.downloadedDocuments
-            ? drivers.getDriversDocsCount
-            : null,
-        counter: DriverProvider.downloadedDocuments
-            ? DriverProvider.documentConducteurs.length
-            : null,
-        action: () {
-          PaneItemsAndFooters.selectPane('vehicle-manager');
-        },
-        actionList: () {
-          PaneItemsAndFooters.selectPane('vehicle-manager');
-        },
-        actionNouveau: () {
-          PaneItemsAndFooters.selectPane('vehicle-manager');
-          Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
-            late Tab tab;
-            tab = Tab(
-              key: UniqueKey(),
-              text: Text('nouvdocument'.tr()),
-              semanticLabel: 'nouvdocument'.tr(),
-              icon: const Icon(FluentIcons.new_folder),
-              body: const ScaffoldPage(content: CDocumentForm()),
-              onClosed: () {
-                CDocumentTabsState.tabs.remove(tab);
-
-                if (CDocumentTabsState.currentIndex.value > 0) {
-                  CDocumentTabsState.currentIndex.value--;
-                }
-              },
-            );
-            final index = CDocumentTabsState.tabs.length + 1;
-            CDocumentTabsState.tabs.add(tab);
-            CDocumentTabsState.currentIndex.value = index - 1;
-          });
-        },
+        onPressed: () => PaneItemsAndFooters.selectPane('driver-documents'),
       ),
-      ButtonContainer(
+      ModuleDashboardAction(
+        label: 'reservation'.tr(),
+        detail: countDetail(planningCount, 'réservation', 'réservations'),
         icon: FluentIcons.edit_event,
-        text: 'reservation'.tr(),
-        getCount: !PlanningProvider.downloadedPlanning
-            ? plannings.getPlanningCount
-            : null,
-        counter: PlanningProvider.downloadedPlanning
-            ? PlanningProvider.plannings.length
-            : null,
-        action: () {
-          PaneItemsAndFooters.selectPane('vehicle-manager');
-        },
-        showBothLN: false,
-        actionList: () {
-          PaneItemsAndFooters.selectPane('vehicle-manager');
-        },
+        onPressed: () => PaneItemsAndFooters.selectPane('planner'),
       ),
-      ButtonContainer(
+      ModuleDashboardAction(
+        label: 'activities'.tr(),
+        detail: countDetail(activityCount, 'activité', 'activités'),
         icon: FluentIcons.database_activity,
-        text: 'activities'.tr(),
-        getCount: !LogProvider.downloadedActivities ? logs.getLogCount : null,
-        counter: LogProvider.downloadedActivities
-            ? LogProvider.activities.length
-            : null,
-        action: () {
-          PaneItemsAndFooters.selectPane('vehicle-manager');
-        },
-        showBothLN: false,
-        actionList: () {
-          PaneItemsAndFooters.selectPane('events');
-        },
+        onPressed: () => PaneItemsAndFooters.selectPane('events'),
       ),
     ];
   }
