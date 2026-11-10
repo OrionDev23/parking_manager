@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/counters.dart';
 import '../../theme.dart';
-import '../../widgets/button_container.dart';
+import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
 import '../dashboard/charts/pie_chart.dart';
 import '../logs/logging/log_table.dart';
@@ -95,79 +95,50 @@ class VehicleDashboard extends StatelessWidget {
       content: LayoutBuilder(
         builder: (context, constraints) {
           final compact = constraints.maxWidth < 760;
-          final moduleColumns = constraints.maxWidth >= 1400
-              ? 4
-              : constraints.maxWidth >= 1000
-              ? 3
-              : constraints.maxWidth >= 620
-              ? 2
-              : 1;
-
-          final moduleActions = <ButtonContainer>[
-            ButtonContainer(
+          final moduleActions = <Widget>[
+            ModuleDashboardAction(
+              label: 'gestionvehicles'.tr(),
+              detail: 'Parc et fiches véhicules',
               icon: FluentIcons.task_manager,
-              text: 'gestionvehicles'.tr(),
-              color: appTheme.color,
-              showBothLN: false,
-              showBottom: false,
-              showCounter: false,
-              action: () => PaneItemsAndFooters.selectPane('vehicle-manager'),
+              onPressed: () => PaneItemsAndFooters.selectPane('vehicle-manager'),
             ),
-            ButtonContainer(
+            ModuleDashboardAction(
+              label: 'nouvvehicule'.tr(),
+              detail: 'Ajouter un véhicule',
               icon: FluentIcons.car,
-              text: 'nouvvehicule'.tr(),
-              color: appTheme.color,
-              showBothLN: false,
-              showBottom: false,
-              showCounter: false,
-              action: _openNewVehicle,
+              onPressed: _openNewVehicle,
             ),
-            ButtonContainer(
+            ModuleDashboardAction(
+              label: 'brands'.tr(),
+              detail: 'Référentiels fabricants',
               icon: FluentIcons.verified_brand,
-              text: 'brands'.tr(),
-              color: appTheme.color,
-              showBothLN: false,
-              showBottom: false,
-              showCounter: false,
-              action: () => PaneItemsAndFooters.selectPane('vehicle-brands'),
+              onPressed: () => PaneItemsAndFooters.selectPane('vehicle-brands'),
             ),
-            ButtonContainer(
+            ModuleDashboardAction(
+              label: 'vstates'.tr(),
+              detail: 'États et statuts du parc',
               icon: FluentIcons.health,
-              text: 'vstates'.tr(),
-              color: appTheme.color,
-              showBothLN: false,
-              showBottom: false,
-              showCounter: false,
-              action: () => PaneItemsAndFooters.selectPane('vehicle-states'),
+              onPressed: () => PaneItemsAndFooters.selectPane('vehicle-states'),
             ),
-            ButtonContainer(
+            ModuleDashboardAction(
+              label: 'nouvetat'.tr(),
+              detail: 'Créer un état',
               icon: FluentIcons.health_refresh,
-              text: 'nouvetat'.tr(),
-              color: appTheme.color,
-              showBothLN: false,
-              showBottom: false,
-              showCounter: false,
-              action: () => _openStateDialog(context),
+              onPressed: () => _openStateDialog(context),
             ),
-            ButtonContainer(
+            ModuleDashboardAction(
+              label: 'documents'.tr(),
+              detail: 'Documents administratifs',
               icon: FluentIcons.document_set,
-              text: 'documents'.tr(),
-              color: appTheme.color,
-              showBothLN: false,
-              showBottom: false,
-              showCounter: false,
-              action: () => PaneItemsAndFooters.selectPane('vehicle-documents'),
+              onPressed: () => PaneItemsAndFooters.selectPane('vehicle-documents'),
             ),
-            ButtonContainer(
+            ModuleDashboardAction(
+              label: 'nouvdocument'.tr(),
+              detail: 'Ajouter un document',
               icon: FluentIcons.document,
-              text: 'nouvdocument'.tr(),
-              color: appTheme.color,
-              showBothLN: false,
-              showBottom: false,
-              showCounter: false,
-              action: _openNewDocument,
+              onPressed: _openNewDocument,
             ),
-          ];
+          ];;
 
           return ListView(
             padding: EdgeInsets.symmetric(
@@ -195,10 +166,9 @@ class VehicleDashboard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              StaggeredGrid.count(
-                crossAxisCount: moduleColumns,
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
                 children: moduleActions,
               ),
               const SizedBox(height: 28),
