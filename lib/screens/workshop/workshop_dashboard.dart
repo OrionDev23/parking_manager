@@ -159,7 +159,7 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                         if (!compact) ...[
                           const SizedBox(width: 20),
                           Icon(
-                            FluentIcons.toolbox,
+                            FluentIcons.repair,
                             size: 54,
                             color: Colors.white.withValues(alpha: .9),
                           ),
@@ -188,7 +188,7 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                       _WorkshopMetric(
                         label: 'Pièces référencées',
                         value: PartsProvider.parts.length,
-                        icon: FluentIcons.product,
+                        icon: FluentIcons.list,
                         accent: theme.color,
                       ),
                       _WorkshopMetric(
@@ -206,7 +206,7 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                       _WorkshopMetric(
                         label: 'Fournisseurs',
                         value: PartsProvider.fournisseurs.length,
-                        icon: FluentIcons.contact,
+                        icon: FluentIcons.people,
                         accent: theme.color,
                       ),
                     ],
@@ -246,7 +246,7 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                       _WorkshopAction(
                         label: 'Gestion des pièces',
                         detail: 'Catalogue et références',
-                        icon: FluentIcons.product,
+                        icon: FluentIcons.list,
                         onPressed: () => PaneItemsAndFooters.selectPane('workshop-parts'),
                       ),
                       _WorkshopAction(
@@ -258,7 +258,7 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                       _WorkshopAction(
                         label: 'Fournisseurs',
                         detail: 'Partenaires et approvisionnement',
-                        icon: FluentIcons.contact,
+                        icon: FluentIcons.people,
                         onPressed: () => PaneItemsAndFooters.selectPane('workshop-suppliers'),
                       ),
                       _WorkshopAction(
