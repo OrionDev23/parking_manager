@@ -102,6 +102,17 @@ class LocalDatabase {
         "INSERT INTO schema_migrations(version, applied_at) VALUES (4, datetime('now'))",
       );
     }
+
+    if (version < 5) {
+      db.execute('''CREATE TABLE IF NOT EXISTS sync_engine_leases (
+        company_id TEXT PRIMARY KEY,
+        owner_id TEXT NOT NULL,
+        lease_until TEXT NOT NULL
+      )''');
+      db.execute(
+        "INSERT INTO schema_migrations(version, applied_at) VALUES (5, datetime('now'))",
+      );
+    }
   }
 
   List<Map<String, dynamic>> readLegacyCache({
