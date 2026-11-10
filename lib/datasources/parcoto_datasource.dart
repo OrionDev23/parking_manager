@@ -47,6 +47,15 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
   void dispose() {
     if (_disposeRequested || _disposed) return;
     _disposeRequested = true;
+
+    if (_activeRowsRequests == 0) {
+      _disposed = true;
+      super.dispose();
+      return;
+    }
+
+    // The table package still has a continuation to run after getRows.
+    // Defer disposal only while a request is active.
     _disposeWhenIdle();
   }
 
