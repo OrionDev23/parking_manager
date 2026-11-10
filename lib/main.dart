@@ -45,10 +45,10 @@ import 'theme.dart';
 const appTitle = "ParcOto";
 late final PackageInfo packageInfo;
 late final SharedPreferences prefs;
-late final VehicleServices vehicleServices;
-late final DriverServices driverServices;
-late final LegacyStockSyncService legacyStockSyncService;
-late final SyncEngine syncEngine;
+late VehicleServices vehicleServices;
+late DriverServices driverServices;
+late LegacyStockSyncService legacyStockSyncService;
+late SyncEngine syncEngine;
 late final AuthService authService;
 late final UserProfileService userProfileService;
 late final CompanyService companyService;
@@ -89,6 +89,85 @@ void displayMessage(
 
 Future<bool>? _initialSessionRestore;
 Future<void>? _backgroundInitialization;
+String? _runtimeCompanyId;
+bool _runtimeReady = false;
+Future<void>? _runtimeConfiguration;
+
+Future<void> stopSessionRuntime() async {
+  if (!_runtimeReady) return;
+  await syncEngine.stop();
+  // A later login, including one in the same project, must start the engine
+  // again. Migration markers make the backfill idempotent.
+  _backgroundInitialization = null;
+}
+
+Future<void> _configureSessionRuntime(String companyId) async {
+  if (_runtimeReady && _runtimeCompanyId == companyId) return;
+
+  // Serialize runtime swaps. A project switch must never leave two engines
+  // using the shared SQLite outbox or the global legacy Appwrite client.
+  if (_runtimeConfiguration != null) {
+    await _runtimeConfiguration;
+    if (_runtimeReady && _runtimeCompanyId == companyId) return;
+  }
+
+  final configuration = () async {
+    if (_runtimeReady) await syncEngine.stop();
+
+    final nextVehicles = await VehicleServices.create(
+      preferences: prefs,
+      companyId: companyId,
+    );
+    final nextDrivers = await DriverServices.create(
+      preferences: prefs,
+      companyId: companyId,
+      appwriteProjectId: companyId,
+    );
+    final nextStock = LegacyStockSyncService(
+      localDatabase: nextVehicles.localDatabase,
+      queue: nextVehicles.syncQueue,
+      deviceIdentity: SharedPreferencesDeviceIdentity(
+        Future.value(prefs),
+        idFactory: () => 'desktop_${DateTime.now().microsecondsSinceEpoch}',
+      ),
+      companyId: companyId,
+    );
+    final nextEngine = AppwriteSyncEngine(
+      queue: nextVehicles.syncQueue,
+      companyId: companyId,
+      handlers: {
+        'vehicle': nextVehicles.applySyncOperation,
+        'driver': nextDrivers.applySyncOperation,
+        'part': nextStock.applySyncOperation,
+        'part_category': nextStock.applySyncOperation,
+        'part_brand': nextStock.applySyncOperation,
+        'part_option': nextStock.applySyncOperation,
+        'supplier': nextStock.applySyncOperation,
+      },
+      pullHandlers: {
+        'vehicle': nextVehicles.pullRemoteChanges,
+        'driver': nextDrivers.pullRemoteChanges,
+        'stock': nextStock.pullRemoteChanges,
+      },
+    );
+
+    vehicleServices = nextVehicles;
+    driverServices = nextDrivers;
+    legacyStockSyncService = nextStock;
+    syncEngine = nextEngine;
+    _runtimeCompanyId = companyId;
+    _runtimeReady = true;
+    _backgroundInitialization = null;
+    debugPrint('[ParcOto Runtime] configured for companyId=$companyId');
+  }();
+
+  _runtimeConfiguration = configuration;
+  try {
+    await configuration;
+  } finally {
+    _runtimeConfiguration = null;
+  }
+}
 
 Future<bool> restoreInitialSession() {
   return _initialSessionRestore ??= _restoreInitialSession();
@@ -99,10 +178,12 @@ Future<bool> _restoreInitialSession() async {
   return session != null;
 }
 
-/// Starts remote backfills only after the first frame and after authentication.
-/// Completion markers live in SQLite, so a hot restart does not repeat full scans.
-void startBackgroundInitialization(String companyId) {
+/// Configures services for the authenticated tenant, then starts remote
+/// backfills after the first frame. The Future is scoped to the active company.
+Future<void> startBackgroundInitialization(String companyId) async {
+  await _configureSessionRuntime(companyId);
   _backgroundInitialization ??= _initializeBackgroundData(companyId);
+  await _backgroundInitialization;
 }
 
 Future<void> _initializeBackgroundData(String companyId) async {
@@ -166,6 +247,7 @@ Future<void> launchApp() async {
   authService = LegacyAppwriteAuthService(
     preferences: prefs,
     accessControlRepository: const AppwriteAccessControlRepository(),
+    onSessionEnding: stopSessionRuntime,
   );
   userProfileService = const UserProfileService(
     repository: LegacyAppwriteUserProfileRepository(),
@@ -177,53 +259,11 @@ Future<void> launchApp() async {
       AppwriteAccessControlRepository();
   accessControlService = AccessControlService(repository: accessRepository);
 
-  // SQLite and service construction are local operations. Remote authentication,
-  // backfills and synchronization are deliberately deferred until after runApp.
+  // Keep a local runtime available to widgets before authentication. Once
+  // a session is restored or created, it is replaced with the authenticated
+  // company's runtime before any backfill or sync is started.
   final activeCompanyId = project ?? 'local';
-  vehicleServices = await VehicleServices.create(
-    preferences: prefs,
-    companyId: activeCompanyId,
-  );
-  driverServices = await DriverServices.create(
-    preferences: prefs,
-    companyId: activeCompanyId,
-    appwriteProjectId: project ?? 'essais',
-  );
-
-  legacyStockSyncService = LegacyStockSyncService(
-    localDatabase: vehicleServices.localDatabase,
-    queue: vehicleServices.syncQueue,
-    deviceIdentity: SharedPreferencesDeviceIdentity(
-      Future.value(prefs),
-      idFactory: () => 'desktop_${DateTime.now().microsecondsSinceEpoch}',
-    ),
-    companyId: activeCompanyId,
-  );
-
-  syncEngine = AppwriteSyncEngine(
-    queue: vehicleServices.syncQueue,
-    companyId: activeCompanyId,
-    handlers: {
-      'vehicle': vehicleServices.applySyncOperation,
-      'driver': driverServices.applySyncOperation,
-      'part': legacyStockSyncService.applySyncOperation,
-      'part_category': legacyStockSyncService.applySyncOperation,
-      'part_brand': legacyStockSyncService.applySyncOperation,
-      'part_option': legacyStockSyncService.applySyncOperation,
-      'supplier': legacyStockSyncService.applySyncOperation,
-    },
-    pullHandlers: {
-      'vehicle': () async {
-        await vehicleServices.pullRemoteChanges();
-      },
-      'driver': () async {
-        await driverServices.pullRemoteChanges();
-      },
-      'stock': () async {
-        await legacyStockSyncService.pullRemoteChanges();
-      },
-    },
-  );
+  await _configureSessionRuntime(activeCompanyId);
 
   VehiclesUtilities();
   EasyLocalization.logger.enableBuildModes = [];
