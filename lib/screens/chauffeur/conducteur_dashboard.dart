@@ -7,7 +7,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../admin_parameters.dart';
 import '../../providers/counters.dart';
 import '../../theme.dart';
-import '../../widgets/button_container.dart';
+import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
 import '../dashboard/charts/pie_chart.dart';
 import '../logs/logging/log_table.dart';
@@ -44,14 +44,15 @@ class ConducteurDashboard extends StatelessWidget {
             icon: FluentIcons.people,
           ),
           const SizedBox(height: 26),
-          StaggeredGrid.count(
-            crossAxisCount: portrait ? 2 : 4,
-            mainAxisSpacing: 5,
-            crossAxisSpacing: 5,
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
             children: [
-              ButtonContainer(
-                color: appTheme.color,
-                action: () {
+              ModuleDashboardAction(
+            label: 'gchauffeurs'.tr(),
+            detail: 'Accès et gestion',
+            icon: FluentIcons.list,
+            onPressed: () {
                   PanesListState.index.value =
                       PaneItemsAndFooters.originalItems.indexOf(
                         PaneItemsAndFooters.chauffeurs,
@@ -63,14 +64,12 @@ class ConducteurDashboard extends StatelessWidget {
                           : 0) -
                       1;
                 },
-                icon: FluentIcons.list,
-                text: 'gchauffeurs'.tr(),
-                showBothLN: false,
-                showBottom: false,
-                showCounter: false,
-              ),
-              ButtonContainer(
-                action: () {
+          ),
+              ModuleDashboardAction(
+            label: 'nouvchauf'.tr(),
+            detail: 'Créer un nouvel élément',
+            icon: FluentIcons.car,
+            onPressed: () {
                   PanesListState.index.value =
                       PaneItemsAndFooters.originalItems.indexOf(
                         PaneItemsAndFooters.chauffeurs,
@@ -103,15 +102,12 @@ class ConducteurDashboard extends StatelessWidget {
                         ChauffeurTabsState.currentIndex.value = index - 1;
                       });
                 },
-                color: appTheme.color,
-                icon: FluentIcons.car,
-                text: 'nouvchauf'.tr(),
-                showBothLN: false,
-                showBottom: false,
-                showCounter: false,
-              ),
-              ButtonContainer(
-                action: () {
+          ),
+              ModuleDashboardAction(
+            label: 'disponibilite'.tr(),
+            detail: 'Disponibilités et planning',
+            icon: FluentIcons.health,
+            onPressed: () {
                   PanesListState.index.value =
                       PaneItemsAndFooters.originalItems.indexOf(
                         PaneItemsAndFooters.chauffeurs,
@@ -122,15 +118,12 @@ class ConducteurDashboard extends StatelessWidget {
                           ? PaneItemsAndFooters.atelier.items.length
                           : 0);
                 },
-                color: appTheme.color,
-                icon: FluentIcons.health,
-                text: 'disponibilite'.tr(),
-                showBothLN: false,
-                showBottom: false,
-                showCounter: false,
-              ),
-              ButtonContainer(
-                action: () {
+          ),
+              ModuleDashboardAction(
+            label: 'documents'.tr(),
+            detail: 'Documents et dossiers',
+            icon: FluentIcons.document_set,
+            onPressed: () {
                   PanesListState.index.value =
                       PaneItemsAndFooters.originalItems.indexOf(
                         PaneItemsAndFooters.chauffeurs,
@@ -142,15 +135,12 @@ class ConducteurDashboard extends StatelessWidget {
                           : 0) +
                       1;
                 },
-                color: appTheme.color,
-                icon: FluentIcons.document_set,
-                text: 'documents'.tr(),
-                showBothLN: false,
-                showBottom: false,
-                showCounter: false,
-              ),
-              ButtonContainer(
-                action: () {
+          ),
+              ModuleDashboardAction(
+            label: 'nouvdocument'.tr(),
+            detail: 'Créer un nouvel élément',
+            icon: FluentIcons.document,
+            onPressed: () {
                   PanesListState.index.value =
                       PaneItemsAndFooters.originalItems.indexOf(
                         PaneItemsAndFooters.chauffeurs,
@@ -183,16 +173,12 @@ class ConducteurDashboard extends StatelessWidget {
                         CDocumentTabsState.currentIndex.value = index - 1;
                       });
                 },
-                color: appTheme.color,
-                icon: FluentIcons.document,
-                text: 'nouvdocument'.tr(),
-                showBothLN: false,
-                showBottom: false,
-                showCounter: false,
-              ),
-              ButtonContainer(
-                color: appTheme.color,
-                action: () {
+          ),
+              ModuleDashboardAction(
+            label: 'archive'.tr(),
+            detail: 'Éléments archivés',
+            icon: FluentIcons.list,
+            onPressed: () {
                   PanesListState.index.value =
                       PaneItemsAndFooters.originalItems.indexOf(
                         PaneItemsAndFooters.chauffeurs,
@@ -204,12 +190,7 @@ class ConducteurDashboard extends StatelessWidget {
                           : 0) +
                       2;
                 },
-                icon: FluentIcons.list,
-                text: 'archive'.tr(),
-                showBothLN: false,
-                showBottom: false,
-                showCounter: false,
-              ),
+          ),
             ],
           ),
           bigSpace,
