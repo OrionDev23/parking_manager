@@ -161,6 +161,7 @@ void launchApp() async {
     pullHandlers: {
       'vehicle': () async { await vehicleServices.pullRemoteChanges(); },
       'driver': () async { await driverServices.pullRemoteChanges(); },
+      'stock': () async { await legacyStockSyncService.pullRemoteChanges(); },
     },
   );
   await syncEngine.start();
