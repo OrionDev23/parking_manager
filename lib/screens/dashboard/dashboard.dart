@@ -114,6 +114,13 @@ class _DashboardState extends State<Dashboard>
                     ),
                   ),
                   const SizedBox(height: 12),
+                  StaggeredGrid.count(
+                    crossAxisCount: compact ? 1 : 2,
+                    mainAxisSpacing: 14,
+                    crossAxisSpacing: 14,
+                    children: widgetList(appTheme),
+                  ),
+                  const SizedBox(height: 28),
                   Text(
                     'Accès rapides',
                     style: TextStyle(
@@ -134,13 +141,6 @@ class _DashboardState extends State<Dashboard>
                       plannings,
                       repairs,
                     ),
-                  ),
-                  const SizedBox(height: 28),
-                  StaggeredGrid.count(
-                    crossAxisCount: compact ? 1 : 2,
-                    mainAxisSpacing: 14,
-                    crossAxisSpacing: 14,
-                    children: widgetList(appTheme),
                   ),
                 ],
               );
