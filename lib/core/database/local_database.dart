@@ -113,6 +113,17 @@ class LocalDatabase {
         "INSERT INTO schema_migrations(version, applied_at) VALUES (5, datetime('now'))",
       );
     }
+
+    if (version < 6) {
+      db.execute('ALTER TABLE sync_operations ADD COLUMN conflict_reason TEXT');
+      db.execute('ALTER TABLE sync_operations ADD COLUMN conflicted_at TEXT');
+      db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_sync_operations_conflicts ON sync_operations(company_id, status, conflicted_at)',
+      );
+      db.execute(
+        "INSERT INTO schema_migrations(version, applied_at) VALUES (6, datetime('now'))",
+      );
+    }
   }
 
   List<Map<String, dynamic>> readLegacyCache({
