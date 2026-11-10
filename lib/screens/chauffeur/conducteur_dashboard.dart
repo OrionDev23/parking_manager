@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
-import '../../admin_parameters.dart';
 import '../../providers/counters.dart';
 import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
@@ -52,7 +51,7 @@ class ConducteurDashboard extends StatelessWidget {
             );
             ChauffeurTabsState.tabs.add(tab);
             ChauffeurTabsState.currentIndex.value =
-                ChauffeurTabsState.tabs.length;
+                ChauffeurTabsState.tabs.length - 1;
           });
         },
       ),
@@ -93,7 +92,7 @@ class ConducteurDashboard extends StatelessWidget {
             );
             CDocumentTabsState.tabs.add(tab);
             CDocumentTabsState.currentIndex.value =
-                CDocumentTabsState.tabs.length;
+                CDocumentTabsState.tabs.length - 1;
           });
         },
       ),
