@@ -29,6 +29,10 @@ class SqliteSyncQueue implements SyncQueue {
     createdAt: DateTime.parse(row['created_at'] as String),
     status: _status(row['status'] as String),
     attempts: row['attempts'] as int,
+    conflictReason: row['conflict_reason'] as String?,
+    conflictedAt: row['conflicted_at'] == null
+        ? null
+        : DateTime.tryParse(row['conflicted_at'] as String),
   );
 
   @override
@@ -220,6 +224,35 @@ class SqliteSyncQueue implements SyncQueue {
       _db.execute("UPDATE sync_operations SET status='failed', attempts=attempts+1 WHERE id=?", [operationId]);
 
   @override
-  Future<void> markConflict(String operationId) async =>
-      _db.execute("UPDATE sync_operations SET status='conflict' WHERE id=?", [operationId]);
+  Future<void> markConflict(
+    String operationId, {
+    required String reason,
+  }) async {
+    _db.execute(
+      """UPDATE sync_operations
+         SET status='conflict', conflict_reason=?, conflicted_at=?
+         WHERE id=?""",
+      [reason, DateTime.now().toUtc().toIso8601String(), operationId],
+    );
+  }
+
+  @override
+  Future<List<SyncOperation>> conflicts({
+    String? companyId,
+    int limit = 100,
+  }) async {
+    final rows = companyId == null
+        ? _db.select(
+            """SELECT * FROM sync_operations WHERE status='conflict'
+               ORDER BY conflicted_at, created_at LIMIT ?""",
+            [limit],
+          )
+        : _db.select(
+            """SELECT * FROM sync_operations
+               WHERE status='conflict' AND company_id=?
+               ORDER BY conflicted_at, created_at LIMIT ?""",
+            [companyId, limit],
+          );
+    return rows.map(_fromRow).toList(growable: false);
+  }
 }
