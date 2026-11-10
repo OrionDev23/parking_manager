@@ -26,26 +26,21 @@ class ReparationPdf {
   PdfUtilities pdfUtilities = PdfUtilities();
 
   Future<Uint8List> getDocument() async {
-
     await Future.wait([
       pdfUtilities.initPrestataire(reparation),
       pdfUtilities.initFiche(reparation),
-      PDFTheming().initFontsAndLogos()
+      PDFTheming().initFontsAndLogos(),
     ]);
     if (entretienEmpty()) {
       nbrPageOne += 9;
     }
-    if(gts){
-      nbrPageOne+=4;
+    if (gts) {
+      nbrPageOne += 4;
     }
     p = pdfUtilities.p;
-    fiche=pdfUtilities.fiche;
+    fiche = pdfUtilities.fiche;
     var doc = Document(
-      theme: ThemeData.withFont(
-        base: baseFont,
-        bold: boldFont,
-        icons: icons!,
-      ),
+      theme: ThemeData.withFont(base: baseFont, bold: boldFont, icons: icons!),
       title: 'ordre ${reparation.numero}',
       author:
           DatabaseGetter.me.value?.name ?? DatabaseGetter.me.value?.email ?? '',
@@ -55,13 +50,12 @@ class ReparationPdf {
     int nbrPages = getNumberOfPages();
 
     int lastIndex = 0;
-    int nbrTotal=0;
-    if(reparation.designations!=null){
-      nbrTotal=reparation.designations!.length;
-    }
-    else if(reparation.tasks!=null){
-      for(int pm=0;pm<reparation.tasks!.length;pm++){
-        nbrTotal+=reparation.tasks![pm].tasks.length;
+    int nbrTotal = 0;
+    if (reparation.designations != null) {
+      nbrTotal = reparation.designations!.length;
+    } else if (reparation.tasks != null) {
+      for (int pm = 0; pm < reparation.tasks!.length; pm++) {
+        nbrTotal += reparation.tasks![pm].tasks.length;
       }
     }
     List<Widget> pages = List.empty(growable: true);
@@ -82,13 +76,14 @@ class ReparationPdf {
 
     for (int j = 0; j < pages.length; j++) {
       doc.addPage(
-          Page(
-            margin: const EdgeInsets.all(PdfPageFormat.cm),
-            build: (context) {
-              return pages[j];
-            },
-          ),
-          index: j);
+        Page(
+          margin: const EdgeInsets.all(PdfPageFormat.cm),
+          build: (context) {
+            return pages[j];
+          },
+        ),
+        index: j,
+      );
     }
 
     return doc.save();
@@ -96,28 +91,30 @@ class ReparationPdf {
 
   Widget getPageContent(int page, int nbrPages, int lastIndex) {
     return Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          getHeader(),
-          bigSpace,
-          if (page == 0) getPrestataire() ?? SizedBox(),
-          if (page == 0) bigSpace,
-          if (page == 0) getVehicleInfo(),
-          if (page == 0) bigSpace,
-          if (!entretienEmpty())
-            VehicleEntretienPDF(reparation:reparation).vehicleEntretien(),
-          if (!entretienEmpty()) bigSpace,
-          if(reparation.tasks==null && reparation.designations!=null)
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        getHeader(),
+        bigSpace,
+        if (page == 0) getPrestataire() ?? SizedBox(),
+        if (page == 0) bigSpace,
+        if (page == 0) getVehicleInfo(),
+        if (page == 0) bigSpace,
+        if (!entretienEmpty())
+          VehicleEntretienPDF(reparation: reparation).vehicleEntretien(),
+        if (!entretienEmpty()) bigSpace,
+        if (reparation.tasks == null && reparation.designations != null)
           getDesignations(page, nbrPages, lastIndex),
-          if(reparation.designations==null && reparation.tasks!=null)
-            getTasks(page, nbrPages, lastIndex),
-          if (page == nbrPages - 1 && reparation.designations!=null) getPrixInLetter(),
-          smallSpace,
-          if (page == nbrPages - 1) getRemarqueAndSignature(),
-          Spacer(),
-          brandingAndPaging(page, nbrPages),
-        ]);
+        if (reparation.designations == null && reparation.tasks != null)
+          getTasks(page, nbrPages, lastIndex),
+        if (page == nbrPages - 1 && reparation.designations != null)
+          getPrixInLetter(),
+        smallSpace,
+        if (page == nbrPages - 1) getRemarqueAndSignature(),
+        Spacer(),
+        brandingAndPaging(page, nbrPages),
+      ],
+    );
   }
 
   Widget? getPrestataire() {
@@ -131,21 +128,31 @@ class ReparationPdf {
           border: Border.all(),
         ),
         child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Text('Prestataire',
-                    style: smallTextBold.copyWith(color: orangeDeep)),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  'Prestataire',
+                  style: smallTextBold.copyWith(color: orangeDeep),
+                ),
                 smallSpace,
                 Text(p?.nom ?? '', style: smallText),
-              ]),
-              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              ],
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Text('Adresse', style: smallTextBold),
                 smallSpace,
                 Text(p?.adresse ?? '', style: smallText),
-              ]),
-              Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              ],
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
                 Text('Email', style: smallTextBold),
                 dotsSpacer(),
                 Text(p?.email ?? '', style: smallText),
@@ -153,8 +160,11 @@ class ReparationPdf {
                 Text('Tél', style: smallTextBold),
                 dotsSpacer(),
                 Text(p?.telephone ?? '', style: smallText),
-              ]),
-              Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              ],
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
                 Text('NIF', style: smallTextBold),
                 dotsSpacer(),
                 Text(p?.nif ?? '', style: smallText),
@@ -162,8 +172,11 @@ class ReparationPdf {
                 Text('NIS', style: smallTextBold),
                 dotsSpacer(),
                 Text(p?.nis ?? '', style: smallText),
-              ]),
-              Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              ],
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
                 Text('ART', style: smallTextBold),
                 dotsSpacer(),
                 Text(p?.art ?? '', style: smallText),
@@ -171,8 +184,10 @@ class ReparationPdf {
                 Text('RC', style: smallTextBold),
                 dotsSpacer(),
                 Text(p?.rc ?? '', style: smallText),
-              ]),
-            ]),
+              ],
+            ),
+          ],
+        ),
       );
     }
     return null;
@@ -185,13 +200,12 @@ class ReparationPdf {
   int nbrLastPage = 35;
 
   int getNumberOfPages() {
-    int nbr=0;
+    int nbr = 0;
     if (reparation.designations != null) {
       nbr = reparation.designations?.length ?? 0;
-    }
-    else if(reparation.tasks!=null){
-      for(int pm=0;pm<reparation.tasks!.length;pm++){
-        nbr+=reparation.tasks![pm].tasks.length;
+    } else if (reparation.tasks != null) {
+      for (int pm = 0; pm < reparation.tasks!.length; pm++) {
+        nbr += reparation.tasks![pm].tasks.length;
       }
     }
     if (nbr <= (nbrPageOne + nbrLastPage + pageAdition)) {
@@ -209,7 +223,7 @@ class ReparationPdf {
   }
 
   bool entretienEmpty() {
-    if(reparation.showEntretien){
+    if (reparation.showEntretien) {
       return false;
     }
     if (reparation.entretien == null) {
@@ -224,9 +238,6 @@ class ReparationPdf {
       return true;
     }
   }
-
-
-
 
   Widget getDesignations(int page, int nbrPages, int lastIndex) {
     if (page == 0) {
@@ -246,36 +257,38 @@ class ReparationPdf {
         color: orange,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(5)),
       ),
-      child: Row(children: [
-        SizedBox(
-          width: PdfPageFormat.cm * 1,
-          child: Text(
-            '  N°',
-            style: smallTextBold,
+      child: Row(
+        children: [
+          SizedBox(
+            width: PdfPageFormat.cm * 1,
+            child: Text('  N°', style: smallTextBold),
           ),
-        ),
-        SizedBox(
-          width: PdfPageFormat.cm * 10.22,
-          child: Text('    Observations', style: smallTextBold),
-        ),
-        SizedBox(
-          width: PdfPageFormat.cm * 1,
-          child: Text('QTE', style: smallTextBold, textAlign: TextAlign.end),
-        ),
-        SizedBox(
-          width: PdfPageFormat.cm * 2.5,
-          child:
-              Text('MONTANT', style: smallTextBold, textAlign: TextAlign.end),
-        ),
-        SizedBox(
-          width: PdfPageFormat.cm * 1.5,
-          child: Text('TVA', style: smallTextBold, textAlign: TextAlign.end),
-        ),
-        SizedBox(
-          width: PdfPageFormat.cm * 2.5,
-          child: Text('TTC', style: smallTextBold, textAlign: TextAlign.end),
-        ),
-      ]),
+          SizedBox(
+            width: PdfPageFormat.cm * 10.22,
+            child: Text('    Observations', style: smallTextBold),
+          ),
+          SizedBox(
+            width: PdfPageFormat.cm * 1,
+            child: Text('QTE', style: smallTextBold, textAlign: TextAlign.end),
+          ),
+          SizedBox(
+            width: PdfPageFormat.cm * 2.5,
+            child: Text(
+              'MONTANT',
+              style: smallTextBold,
+              textAlign: TextAlign.end,
+            ),
+          ),
+          SizedBox(
+            width: PdfPageFormat.cm * 1.5,
+            child: Text('TVA', style: smallTextBold, textAlign: TextAlign.end),
+          ),
+          SizedBox(
+            width: PdfPageFormat.cm * 2.5,
+            child: Text('TTC', style: smallTextBold, textAlign: TextAlign.end),
+          ),
+        ],
+      ),
     );
   }
 
@@ -286,15 +299,22 @@ class ReparationPdf {
       height: PdfPageFormat.cm * height,
       width: PdfPageFormat.cm * 21 - smallSpace.width!.toDouble(),
       child: SizedBox(
-          height: PdfPageFormat.cm * 10,
-          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        height: PdfPageFormat.cm * 10,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
             designationHeader(),
             ...List.generate(nbrLastPage, (index) {
               return getOneDesignationLine(
-                  index + lastIndex, nbrPages - 1, nbrPages);
+                index + lastIndex,
+                nbrPages - 1,
+                nbrPages,
+              );
             }),
             getTotal(),
-          ])),
+          ],
+        ),
+      ),
     );
   }
 
@@ -305,13 +325,17 @@ class ReparationPdf {
       height: PdfPageFormat.cm * height,
       width: PdfPageFormat.cm * 21 - smallSpace.width!.toDouble(),
       child: SizedBox(
-          height: PdfPageFormat.cm * 10,
-          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        height: PdfPageFormat.cm * 10,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
             designationHeader(),
             ...List.generate(nbrMaxMiddlePages, (index) {
               return getOneDesignationLine(lastIndex + index, page, nbrPages);
             }),
-          ])),
+          ],
+        ),
+      ),
     );
   }
 
@@ -323,14 +347,18 @@ class ReparationPdf {
       height: PdfPageFormat.cm * height,
       width: PdfPageFormat.cm * 21 - smallSpace.width!.toDouble(),
       child: SizedBox(
-          height: PdfPageFormat.cm * 10,
-          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        height: PdfPageFormat.cm * 10,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
             designationHeader(),
             ...List.generate(nbrLines, (index) {
               return getOneDesignationLine(index, 0, nbrPages);
             }),
             if (nbrPages == 1) getTotal(),
-          ])),
+          ],
+        ),
+      ),
     );
   }
 
@@ -341,12 +369,12 @@ class ReparationPdf {
         height: PdfPageFormat.cm * 0.5,
         padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4.5),
         decoration: const BoxDecoration(
-            border: Border(
-          bottom: BorderSide(style: BorderStyle.dotted),
-        )),
+          border: Border(bottom: BorderSide(style: BorderStyle.dotted)),
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
-          children: (reparation.designations == null) ||
+          children:
+              (reparation.designations == null) ||
                   (reparation.designations!.length) <= index ||
                   (page == nbrPages - 2 &&
                       index == reparation.designations!.length - 1)
@@ -354,44 +382,52 @@ class ReparationPdf {
               : [
                   SizedBox(
                     width: PdfPageFormat.cm * 1,
-                    child: Text(numberFormat2.format(index + 1),
-                        style: smallText, textAlign: TextAlign.start),
+                    child: Text(
+                      numberFormat2.format(index + 1),
+                      style: smallText,
+                      textAlign: TextAlign.start,
+                    ),
                   ),
                   SizedBox(
                     width: PdfPageFormat.cm * 10,
-                    child: Text(reparation.designations![index].designation,
-                        style: smallText),
+                    child: Text(
+                      reparation.designations![index].designation,
+                      style: smallText,
+                    ),
                   ),
                   SizedBox(
                     width: PdfPageFormat.cm * 1,
                     child: Text(
-                        numberFormat2
-                            .format(reparation.designations![index].qte),
-                        style: smallText,
-                        textAlign: TextAlign.end),
+                      numberFormat2.format(reparation.designations![index].qte),
+                      style: smallText,
+                      textAlign: TextAlign.end,
+                    ),
                   ),
                   SizedBox(
                     width: PdfPageFormat.cm * 2.5,
                     child: Text(
-                        prixFormat.format(reparation.designations![index].prix),
-                        style: smallText,
-                        textAlign: TextAlign.end),
+                      prixFormat.format(reparation.designations![index].prix),
+                      style: smallText,
+                      textAlign: TextAlign.end,
+                    ),
                   ),
                   SizedBox(
                     width: PdfPageFormat.cm * 1.5,
                     child: Text(
-                        numberFormat3
-                            .format(reparation.designations![index].tva),
-                        style: smallText,
-                        textAlign: TextAlign.end),
+                      numberFormat3.format(reparation.designations![index].tva),
+                      style: smallText,
+                      textAlign: TextAlign.end,
+                    ),
                   ),
                   SizedBox(
                     width: PdfPageFormat.cm * 2.5,
                     child: Text(
-                        prixFormat
-                            .format(reparation.designations![index].getTTC()),
-                        style: smallTextBold,
-                        textAlign: TextAlign.end),
+                      prixFormat.format(
+                        reparation.designations![index].getTTC(),
+                      ),
+                      style: smallTextBold,
+                      textAlign: TextAlign.end,
+                    ),
                   ),
                 ],
         ),
@@ -403,127 +439,158 @@ class ReparationPdf {
     double width = 3;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-        Container(
-          height: PdfPageFormat.cm * 0.5,
-          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4.5),
-          decoration: const BoxDecoration(
-              border: Border(
-            bottom: BorderSide(style: BorderStyle.dotted),
-          )),
-          child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-            SizedBox(
-              width: PdfPageFormat.cm * width,
-              child: Text('Montant total', style: smallTextBold),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Container(
+            height: PdfPageFormat.cm * 0.5,
+            padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4.5),
+            decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(style: BorderStyle.dotted)),
             ),
-            SizedBox(
-              width: PdfPageFormat.cm * width,
-              child: Text(prixFormat.format(reparation.getPrixTotal()),
-                  style: smallText, textAlign: TextAlign.end),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: PdfPageFormat.cm * width,
+                  child: Text('Montant total', style: smallTextBold),
+                ),
+                SizedBox(
+                  width: PdfPageFormat.cm * width,
+                  child: Text(
+                    prixFormat.format(reparation.getPrixTotal()),
+                    style: smallText,
+                    textAlign: TextAlign.end,
+                  ),
+                ),
+              ],
             ),
-          ]),
-        ),
-        Container(
-          height: PdfPageFormat.cm * 0.5,
-          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4.5),
-          decoration: const BoxDecoration(
-              border: Border(
-            bottom: BorderSide(style: BorderStyle.dotted),
-          )),
-          child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-            SizedBox(
-              width: PdfPageFormat.cm * width,
-              child: Text('TVA', style: smallTextBold),
+          ),
+          Container(
+            height: PdfPageFormat.cm * 0.5,
+            padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4.5),
+            decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(style: BorderStyle.dotted)),
             ),
-            SizedBox(
-              width: PdfPageFormat.cm * width,
-              child: Text(prixFormat.format(reparation.getPrixTva()),
-                  style: smallText, textAlign: TextAlign.end),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: PdfPageFormat.cm * width,
+                  child: Text('TVA', style: smallTextBold),
+                ),
+                SizedBox(
+                  width: PdfPageFormat.cm * width,
+                  child: Text(
+                    prixFormat.format(reparation.getPrixTva()),
+                    style: smallText,
+                    textAlign: TextAlign.end,
+                  ),
+                ),
+              ],
             ),
-          ]),
-        ),
-        Container(
-          height: PdfPageFormat.cm * 0.5,
-          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4.5),
-          decoration: const BoxDecoration(
-              border: Border(
-            bottom: BorderSide(style: BorderStyle.dotted),
-          )),
-          child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-            SizedBox(
-              width: PdfPageFormat.cm * width,
-              child: Text('Montant TTC', style: smallTextBold),
+          ),
+          Container(
+            height: PdfPageFormat.cm * 0.5,
+            padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4.5),
+            decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(style: BorderStyle.dotted)),
             ),
-            SizedBox(
-              width: PdfPageFormat.cm * width,
-              child: Text(prixFormat.format(reparation.getPrixTTC()),
-                  style: smallTextBold, textAlign: TextAlign.end),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: PdfPageFormat.cm * width,
+                  child: Text('Montant TTC', style: smallTextBold),
+                ),
+                SizedBox(
+                  width: PdfPageFormat.cm * width,
+                  child: Text(
+                    prixFormat.format(reparation.getPrixTTC()),
+                    style: smallTextBold,
+                    textAlign: TextAlign.end,
+                  ),
+                ),
+              ],
             ),
-          ]),
-        ),
-      ]),
+          ),
+        ],
+      ),
     );
   }
 
   Widget getPrixInLetter() {
-    int getCentimes = (double.parse(prixFormat
-                .format(
-                    reparation.getPrixTTC() - reparation.getPrixTTC().toInt())
-                .replaceAll('DA', '')
-                .replaceAll(',', '.')) *
-            100)
-        .toInt();
+    int getCentimes =
+        (double.parse(
+                  prixFormat
+                      .format(
+                        reparation.getPrixTTC() -
+                            reparation.getPrixTTC().toInt(),
+                      )
+                      .replaceAll('DA', '')
+                      .replaceAll(',', '.'),
+                ) *
+                100)
+            .toInt();
     return Container(
       height: 0.5 * PdfPageFormat.cm,
       width: 20 * PdfPageFormat.cm,
       padding: const EdgeInsets.fromLTRB(2, -7, 2, 2),
       child: Text(
-          'Le montant total de cet ordre est arreté à ${numToLetters(reparation.getPrixTTC().floor())} dinar${reparation.getPrixTTC().floor() > 1 ? 's' : ''}  ${getCentimes != 0 ? 'et ${numToLetters(getCentimes)} centime${getCentimes > 1 ? 's' : ''}' : ''}'
-              .toUpperCase(),
-          style: smallTextBold),
+        'Le montant total de cet ordre est arreté à ${numToLetters(reparation.getPrixTTC().floor())} dinar${reparation.getPrixTTC().floor() > 1 ? 's' : ''}  ${getCentimes != 0 ? 'et ${numToLetters(getCentimes)} centime${getCentimes > 1 ? 's' : ''}' : ''}'
+            .toUpperCase(),
+        style: smallTextBold,
+      ),
     );
   }
 
   Widget getRemarqueAndSignature() {
-    if(gts){
+    if (gts) {
       return Container(
         width: 20 * PdfPageFormat.cm,
         height: 2 * PdfPageFormat.cm,
         child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                  width: 9 * PdfPageFormat.cm,
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                    Text('SIGNATURE RÉCEPTIONNAIRE', style: smallTextBold),
-                    Text(
-                        (DatabaseGetter.me.value?.name ?? '').toUpperCase(),
-                        style: smallText),
-                  ])),
-              Spacer(),
-              SizedBox(
-                width: 9 * PdfPageFormat.cm,
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text('SIGNATURE CLIENT', style: smallTextBold),
-                      Text(
-                          '${fiche?.nomConducteur ?? ""} ${fiche?.prenomConducteur ?? ""}'
-                              .toUpperCase(),
-                          style: smallText),
-                    ]),
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 9 * PdfPageFormat.cm,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('SIGNATURE RÉCEPTIONNAIRE', style: smallTextBold),
+                  Text(
+                    (DatabaseGetter.me.value?.name ?? '').toUpperCase(),
+                    style: smallText,
+                  ),
+                ],
               ),
-            ])
+            ),
+            Spacer(),
+            SizedBox(
+              width: 9 * PdfPageFormat.cm,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text('SIGNATURE CLIENT', style: smallTextBold),
+                  Text(
+                    '${fiche?.nomConducteur ?? ""} ${fiche?.prenomConducteur ?? ""}'
+                        .toUpperCase(),
+                    style: smallText,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       );
     }
     return Container(
       width: 20 * PdfPageFormat.cm,
       height: 2 * PdfPageFormat.cm,
-      child: Row(children: [
-        Container(
+      child: Row(
+        children: [
+          Container(
             padding: const EdgeInsets.symmetric(horizontal: 3),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5),
@@ -531,44 +598,54 @@ class ReparationPdf {
             ),
             width: 9 * PdfPageFormat.cm,
             child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Remarques', style: smallTextBold),
-                  smallSpace,
-                  SizedBox(
-                    height: PdfPageFormat.cm * 1.5,
-                    child: Stack(children: [
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Remarques', style: smallTextBold),
+                smallSpace,
+                SizedBox(
+                  height: PdfPageFormat.cm * 1.5,
+                  child: Stack(
+                    children: [
                       Positioned.fill(
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
                             dotsSpacer(),
                             dotsSpacer(),
                             dotsSpacer(),
                             dotsSpacer(),
-                          ])),
+                          ],
+                        ),
+                      ),
                       Positioned.fill(
-                          top: -1.5,
-                          left: 2,
-                          right: 2,
-                          child:
-                              Text(reparation.remarque ?? '', style: smallText))
-                    ]),
+                        top: -1.5,
+                        left: 2,
+                        right: 2,
+                        child: Text(
+                          reparation.remarque ?? '',
+                          style: smallText,
+                        ),
+                      ),
+                    ],
                   ),
-                ])),
-        Spacer(),
-        Container(
+                ),
+              ],
+            ),
+          ),
+          Spacer(),
+          Container(
             padding: const EdgeInsets.symmetric(horizontal: 3),
             width: 9 * PdfPageFormat.cm,
             child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Cachet et signature', style: smallTextBold),
-                ])),
-      ]),
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [Text('Cachet et signature', style: smallTextBold)],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -576,123 +653,143 @@ class ReparationPdf {
     return SizedBox(
       height: PdfPageFormat.cm * 2.7,
       child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image(entrepriseLogo!,
-                width: PdfPageFormat.cm * 2.8,
-                height: PdfPageFormat.cm * 2.8,
-                fit: BoxFit.contain,
-                alignment: Alignment.topCenter),
-            Container(
-              padding: const EdgeInsets.all(5),
-              width: 9 * PdfPageFormat.cm,
-              height: PdfPageFormat.cm * 2.7,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(),
-              ),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text(MyEntrepriseState.p?.nom ?? '',
-                        style: smallTextBold.copyWith(color: orangeDeep)),
-                    Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Adresse', style: smallTextBold),
-                          smallSpace,
-                          Text(MyEntrepriseState.p?.adresse ?? '',
-                              style: smallText),
-                        ]),
-                    Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Text('Email', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.email ?? '', style: smallText),
-                      smallSpace,
-                      Text('Tél', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.telephone ?? '',
-                          style: smallText),
-                    ]),
-                    Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Text('NIF', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.nif ?? '', style: smallText),
-                      smallSpace,
-                      Text('NIS', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.nis ?? '', style: smallText),
-                    ]),
-                    Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Text('ART', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.art ?? '', style: smallText),
-                      smallSpace,
-                      Text('RC', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.rc ?? '', style: smallText),
-                    ]),
-                  ]),
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Image(
+            entrepriseLogo!,
+            width: PdfPageFormat.cm * 2.8,
+            height: PdfPageFormat.cm * 2.8,
+            fit: BoxFit.contain,
+            alignment: Alignment.topCenter,
+          ),
+          Container(
+            padding: const EdgeInsets.all(5),
+            width: 9 * PdfPageFormat.cm,
+            height: PdfPageFormat.cm * 2.7,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(),
             ),
-            SizedBox(
-              height: PdfPageFormat.cm * 2.7,
-              child:
-                  Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Text('ORDRE DE RÉPARATION', style: bigTitle),
-                SizedBox(
-                  height: PdfPageFormat.cm * 0.3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  MyEntrepriseState.p?.nom ?? '',
+                  style: smallTextBold.copyWith(color: orangeDeep),
                 ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Adresse', style: smallTextBold),
+                    smallSpace,
+                    Text(MyEntrepriseState.p?.adresse ?? '', style: smallText),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('Email', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(MyEntrepriseState.p?.email ?? '', style: smallText),
+                    smallSpace,
+                    Text('Tél', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(
+                      MyEntrepriseState.p?.telephone ?? '',
+                      style: smallText,
+                    ),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('NIF', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(MyEntrepriseState.p?.nif ?? '', style: smallText),
+                    smallSpace,
+                    Text('NIS', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(MyEntrepriseState.p?.nis ?? '', style: smallText),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('ART', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(MyEntrepriseState.p?.art ?? '', style: smallText),
+                    smallSpace,
+                    Text('RC', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(MyEntrepriseState.p?.rc ?? '', style: smallText),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: PdfPageFormat.cm * 2.7,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text('ORDRE DE RÉPARATION', style: bigTitle),
+                SizedBox(height: PdfPageFormat.cm * 0.3),
                 Expanded(
                   child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(5),
-                          width: PdfPageFormat.cm * 6.3,
-                          decoration: BoxDecoration(
-                            color: orangeDeep,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Flexible(
-                                  child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Text('Ordre #',
-                                            style: kindaBigTextBold),
-                                        dotsSpacer(),
-                                        Text(
-                                            numberFormat
-                                                .format(reparation.numero),
-                                            style: kindaBigText),
-                                      ]),
-                                ),
-                                SizedBox(height: PdfPageFormat.cm * 0.5),
-                                Flexible(
-                                  child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Text('Date', style: kindaBigTextBold),
-                                        dotsSpacer(),
-                                        Text(dateFormat.format(reparation.date),
-                                            style: kindaBigText),
-                                      ]),
-                                )
-                              ]),
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(5),
+                        width: PdfPageFormat.cm * 6.3,
+                        decoration: BoxDecoration(
+                          color: orangeDeep,
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                      ]),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text('Ordre #', style: kindaBigTextBold),
+                                  dotsSpacer(),
+                                  Text(
+                                    numberFormat.format(reparation.numero),
+                                    style: kindaBigText,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: PdfPageFormat.cm * 0.5),
+                            Flexible(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text('Date', style: kindaBigTextBold),
+                                  dotsSpacer(),
+                                  Text(
+                                    dateFormat.format(reparation.date),
+                                    style: kindaBigText,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ]),
+              ],
             ),
-          ]),
+          ),
+        ],
+      ),
     );
   }
 
@@ -701,384 +798,478 @@ class ReparationPdf {
     double height = PdfPageFormat.cm * 0.6;
     double bottom = 4;
     double bottomFill = 3;
-    return
-      Column(
-        children: [
-          Table(
-              columnWidths: {
-                0: const FlexColumnWidth(3),
-                1: const FlexColumnWidth(3),
-                2: const FlexColumnWidth(5),
-                3: const FlexColumnWidth(5),
-              },
-              border: const TableBorder(
-                verticalInside: BorderSide(),
+    return Column(
+      children: [
+        Table(
+          columnWidths: {
+            0: const FlexColumnWidth(3),
+            1: const FlexColumnWidth(3),
+            2: const FlexColumnWidth(5),
+            3: const FlexColumnWidth(5),
+          },
+          border: const TableBorder(verticalInside: BorderSide()),
+          children: [
+            TableRow(
+              decoration: BoxDecoration(
+                border: Border.all(),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(5),
+                ),
               ),
               children: [
-                TableRow(
-                    decoration: BoxDecoration(
-                      border: Border.all(),
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(5)),
-                    ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
                     children: [
-                      Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(children: [
-                            Text('Marque', style: smallTextBold),
-                            SizedBox(
-                              width: width,
-                              height: height,
-                              child: Stack(children: [
-                                Positioned.fill(
-                                    bottom: bottomFill,
-                                    left: 0,
-                                    right: 5,
-                                    child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          dotsSpacer(),
-                                        ])),
-                                Positioned(
-                                  bottom: 5,
-                                  left: 5,
-                                  right: 5,
-                                  child: Text(fiche?.marque ?? '', style: smallText),
-                                ),
-                              ]),
-                            ),
-                          ])),
-                      Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(children: [
-                            Text('Modele', style: smallTextBold),
-                            SizedBox(
-                              width: width,
-                              height: height,
-                              child: Stack(children: [
-                                Positioned.fill(
-                                    bottom: bottomFill,
-                                    left: 0,
-                                    right: 5,
-                                    child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          dotsSpacer(),
-                                        ])),
-                                Positioned(
-                                  bottom: bottom,
-                                  left: 5,
-                                  right: 5,
-                                  child: Text(fiche?.modele ?? '', style: smallText),
-                                ),
-                              ]),
-                            ),
-                          ])),
-                      Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(children: [
-                            Text('Immatriculation', style: smallTextBold),
-                            SizedBox(
-                              width: width,
-                              height: height,
-                              child: Stack(children: [
-                                Positioned.fill(
-                                    bottom: bottomFill,
-                                    left: 0,
-                                    right: 5,
-                                    child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          dotsSpacer(),
-                                        ])),
-                                Positioned(
-                                  bottom: bottom,
-                                  left: 5,
-                                  right: 5,
-                                  child: Text(reparation.vehiculemat ?? '',
-                                      style: smallText),
-                                ),
-                              ]),
-                            ),
-                          ])),
-                      Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(children: [
-                            Text('N° Chassis', style: smallTextBold),
-                            SizedBox(
-                              width: width,
-                              height: height,
-                              child: Stack(children: [
-                                Positioned.fill(
-                                    bottom: bottomFill,
-                                    left: 0,
-                                    right: 5,
-                                    child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          dotsSpacer(),
-                                        ])),
-                                Positioned(
-                                  bottom: bottom,
-                                  left: 5,
-                                  right: 5,
-                                  child: Text(reparation.nchassi ?? '', style: smallText),
-                                ),
-                              ]),
-                            ),
-                          ])),
-                    ]),
-                TableRow(
-                    decoration: BoxDecoration(
-                      border: Border.all(),
-                    ),
-                    children: [
-                      Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(children: [
-                            Text('Couleur', style: smallTextBold),
-                            SizedBox(
-                              width: width,
-                              height: height,
-                              child: Stack(children: [
-                                Positioned.fill(
-                                    bottom: bottomFill,
-                                    left: 0,
-                                    right: 5,
-                                    child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          dotsSpacer(),
-                                        ])),
-                                Positioned(
-                                  bottom: bottom,
-                                  left: 5,
-                                  right: 5,
-                                  child: Text(fiche?.couleur ?? '', style: smallText),
-                                ),
-                              ]),
-                            ),
-                          ])),
-                      Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(children: [
-                            Text('Killometrage', style: smallTextBold),
-                            SizedBox(
-                              width: width,
-                              height: height,
-                              child: Stack(children: [
-                                Positioned.fill(
-                                    bottom: bottomFill,
-                                    left: 0,
-                                    right: 5,
-                                    child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          dotsSpacer(),
-                                        ])),
-                                Positioned(
-                                  bottom: bottom,
-                                  left: 5,
-                                  right: 5,
-                                  child: Text(fiche?.kilometrage?.toString() ?? '',
-                                      style: smallText),
-                                ),
-                              ]),
-                            ),
-                          ])),
-                      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        Padding(
-                            padding: const EdgeInsets.fromLTRB(5, 5, 2.5, 5),
-                            child: Row(children: [
-                              Text('Année', style: smallTextBold),
-                              SizedBox(
-                                width: width / 3,
-                                height: height,
-                                child: Stack(children: [
-                                  Positioned.fill(
-                                      bottom: bottomFill,
-                                      left: 0,
-                                      right: 2.5,
-                                      child: Row(
-                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                          children: [
-                                            dotsSpacer(),
-                                          ])),
-                                  Positioned(
-                                    bottom: bottom,
-                                    left: 5,
-                                    right: 5,
-                                    child: Text(fiche?.anneeUtil?.toString() ?? '',
-                                        style: smallText),
-                                  ),
-                                ]),
+                      Text('Marque', style: smallTextBold),
+                      SizedBox(
+                        width: width,
+                        height: height,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
                               ),
-                            ])),
-                        SizedBox(
-                          height: height + 10,
-                          child: VerticalDivider(
-                              width: 1,
-                              indent: 0,
-                              endIndent: 0,
-                              borderStyle: BorderStyle.solid),
+                            ),
+                            Positioned(
+                              bottom: 5,
+                              left: 5,
+                              right: 5,
+                              child: Text(
+                                fiche?.marque ?? '',
+                                style: smallText,
+                              ),
+                            ),
+                          ],
                         ),
-                        Padding(
-                            padding: const EdgeInsets.fromLTRB(5, 5, 2.5, 5),
-                            child: Row(children: [
-                              Text('Carburant', style: smallTextBold),
-                              SizedBox(
-                                width: width,
-                                height: height,
-                                child: Stack(children: [
-                                  Positioned.fill(
-                                      bottom: bottomFill,
-                                      left: 0,
-                                      right: 2.5,
-                                      child: Row(
-                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                          children: [
-                                            dotsSpacer(),
-                                          ])),
-                                  Positioned(
-                                    bottom: bottom,
-                                    left: 5,
-                                    right: 5,
-                                    child: Text('${fiche?.gaz?.toString() ?? '4'}/8',
-                                        style: smallText),
-                                  ),
-                                ]),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('Modele', style: smallTextBold),
+                      SizedBox(
+                        width: width,
+                        height: height,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
                               ),
-                            ])),
-                      ]),
-                      Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(children: [
-                            Text('N° Moteur', style: smallTextBold),
-                            SizedBox(
-                              width: width,
-                              height: height,
-                              child: Stack(children: [
+                            ),
+                            Positioned(
+                              bottom: bottom,
+                              left: 5,
+                              right: 5,
+                              child: Text(
+                                fiche?.modele ?? '',
+                                style: smallText,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('Immatriculation', style: smallTextBold),
+                      SizedBox(
+                        width: width,
+                        height: height,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
+                            ),
+                            Positioned(
+                              bottom: bottom,
+                              left: 5,
+                              right: 5,
+                              child: Text(
+                                reparation.vehiculemat ?? '',
+                                style: smallText,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('N° Chassis', style: smallTextBold),
+                      SizedBox(
+                        width: width,
+                        height: height,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
+                            ),
+                            Positioned(
+                              bottom: bottom,
+                              left: 5,
+                              right: 5,
+                              child: Text(
+                                reparation.nchassi ?? '',
+                                style: smallText,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            TableRow(
+              decoration: BoxDecoration(border: Border.all()),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('Couleur', style: smallTextBold),
+                      SizedBox(
+                        width: width,
+                        height: height,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
+                            ),
+                            Positioned(
+                              bottom: bottom,
+                              left: 5,
+                              right: 5,
+                              child: Text(
+                                fiche?.couleur ?? '',
+                                style: smallText,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('Killometrage', style: smallTextBold),
+                      SizedBox(
+                        width: width,
+                        height: height,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
+                            ),
+                            Positioned(
+                              bottom: bottom,
+                              left: 5,
+                              right: 5,
+                              child: Text(
+                                fiche?.kilometrage?.toString() ?? '',
+                                style: smallText,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(5, 5, 2.5, 5),
+                      child: Row(
+                        children: [
+                          Text('Année', style: smallTextBold),
+                          SizedBox(
+                            width: width / 3,
+                            height: height,
+                            child: Stack(
+                              children: [
                                 Positioned.fill(
-                                    bottom: bottomFill,
-                                    left: 0,
-                                    right: 5,
-                                    child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          dotsSpacer(),
-                                        ])),
+                                  bottom: bottomFill,
+                                  left: 0,
+                                  right: 2.5,
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [dotsSpacer()],
+                                  ),
+                                ),
                                 Positioned(
-                                  bottom: 5,
+                                  bottom: bottom,
                                   left: 5,
                                   right: 5,
-                                  child: Text(fiche?.nmoteur ?? '', style: smallText),
+                                  child: Text(
+                                    fiche?.anneeUtil?.toString() ?? '',
+                                    style: smallText,
+                                  ),
                                 ),
-                              ]),
+                              ],
                             ),
-                          ])),
-                    ]),
-              ]),
-          Table(
-              columnWidths: {
-                0: const FlexColumnWidth(6),
-                1: const FlexColumnWidth(5),
-                2: const FlexColumnWidth(5),
-              },
-              border: const TableBorder(
-                verticalInside: BorderSide(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: height + 10,
+                      child: VerticalDivider(
+                        width: 1,
+                        indent: 0,
+                        endIndent: 0,
+                        borderStyle: BorderStyle.solid,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(5, 5, 2.5, 5),
+                      child: Row(
+                        children: [
+                          Text('Carburant', style: smallTextBold),
+                          SizedBox(
+                            width: width,
+                            height: height,
+                            child: Stack(
+                              children: [
+                                Positioned.fill(
+                                  bottom: bottomFill,
+                                  left: 0,
+                                  right: 2.5,
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [dotsSpacer()],
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: bottom,
+                                  left: 5,
+                                  right: 5,
+                                  child: Text(
+                                    '${fiche?.gaz?.toString() ?? '4'}/8',
+                                    style: smallText,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('N° Moteur', style: smallTextBold),
+                      SizedBox(
+                        width: width,
+                        height: height,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 5,
+                              left: 5,
+                              right: 5,
+                              child: Text(
+                                fiche?.nmoteur ?? '',
+                                style: smallText,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        Table(
+          columnWidths: {
+            0: const FlexColumnWidth(6),
+            1: const FlexColumnWidth(5),
+            2: const FlexColumnWidth(5),
+          },
+          border: const TableBorder(verticalInside: BorderSide()),
+          children: [
+            TableRow(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(5),
+                ),
+                border: Border.all(),
               ),
               children: [
-                TableRow(
-                    decoration: BoxDecoration(
-                      borderRadius:
-                      const BorderRadius.vertical(bottom: Radius.circular(5)),
-                      border: Border.all(),
-                    ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
                     children: [
-                      Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(children: [
-                            Text('Mat. conducteur', style: smallTextBold),
-                            SizedBox(
-                              width: width*1.5,
-                              height: height,
-                              child: Stack(children: [
-                                Positioned.fill(
-                                    bottom: bottomFill,
-                                    left: 0,
-                                    right: 5,
-                                    child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          dotsSpacer(),
-                                        ])),
-                                Positioned(
-                                  bottom: bottom,
-                                  left: 5,
-                                  right: 5,
-                                  child: Text(fiche?.matriculeConducteur ?? '',
-                                      style: smallText),
-                                ),
-                              ]),
+                      Text('Mat. conducteur', style: smallTextBold),
+                      SizedBox(
+                        width: width * 1.5,
+                        height: height,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
                             ),
-                          ])),
-                      Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(children: [
-                            Text('Nom', style: smallTextBold),
-                            SizedBox(
-                              width: width*1.5,
-                              height: height,
-                              child: Stack(children: [
-                                Positioned.fill(
-                                    bottom: bottomFill,
-                                    left: 0,
-                                    right: 5,
-                                    child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          dotsSpacer(),
-                                        ])),
-                                Positioned(
-                                  bottom: bottom,
-                                  left: 5,
-                                  right: 5,
-                                  child: Text(fiche?.nomConducteur ?? '',
-                                      style: smallText),
-                                ),
-                              ]),
+                            Positioned(
+                              bottom: bottom,
+                              left: 5,
+                              right: 5,
+                              child: Text(
+                                fiche?.matriculeConducteur ?? '',
+                                style: smallText,
+                              ),
                             ),
-                          ])),
-                      Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Row(children: [
-                            Text('Prénom', style: smallTextBold),
-                            SizedBox(
-                              width: width*1.5,
-                              height: height,
-                              child: Stack(children: [
-                                Positioned.fill(
-                                    bottom: bottomFill,
-                                    left: 0,
-                                    right: 5,
-                                    child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          dotsSpacer(),
-                                        ])),
-                                Positioned(
-                                  bottom: bottom,
-                                  left: 5,
-                                  right: 5,
-                                  child: Text(fiche?.prenomConducteur ?? '',
-                                      style: smallText),
-                                ),
-                              ]),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('Nom', style: smallTextBold),
+                      SizedBox(
+                        width: width * 1.5,
+                        height: height,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
                             ),
-                          ])),
-                    ]),
-              ]),
-        ]
-      );
+                            Positioned(
+                              bottom: bottom,
+                              left: 5,
+                              right: 5,
+                              child: Text(
+                                fiche?.nomConducteur ?? '',
+                                style: smallText,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('Prénom', style: smallTextBold),
+                      SizedBox(
+                        width: width * 1.5,
+                        height: height,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
+                            ),
+                            Positioned(
+                              bottom: bottom,
+                              left: 5,
+                              right: 5,
+                              child: Text(
+                                fiche?.prenomConducteur ?? '',
+                                style: smallText,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   Widget brandingAndPaging(int page, int nbrPages) {
@@ -1086,80 +1277,91 @@ class ReparationPdf {
       height: PdfPageFormat.cm * 1.25,
       width: PdfPageFormat.cm * 21,
       child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            if (nbrPages != 1)
-              Container(
-                width: PdfPageFormat.cm * 2,
-                height: PdfPageFormat.cm * 0.75,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: orangeDeep,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Text('Page ${page + 1}/$nbrPages', style: smallTextBold),
-              ),
-            if (nbrPages != 1) Spacer(),
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (nbrPages != 1)
             Container(
-              width: PdfPageFormat.cm * 4.5,
-              height: PdfPageFormat.cm * 1.25,
+              width: PdfPageFormat.cm * 2,
+              height: PdfPageFormat.cm * 0.75,
+              alignment: Alignment.center,
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
-                border: Border.all(),
+                color: orangeDeep,
                 borderRadius: BorderRadius.circular(5),
               ),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: PdfPageFormat.cm * 4.5,
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text('Via ', style: TextStyle(color: orange)),
-                            Spacer(),
-                            Image(poLogo!,
-                                width: PdfPageFormat.cm * 2,
-                                height: PdfPageFormat.cm * 2,
-                                fit: BoxFit.contain,
-                                alignment: Alignment.topCenter),
-                          ]),
-                    ),
-                    Text('https://www.parcoto.com',
-                        style: const TextStyle(
-                            color: PdfColors.blue, fontSize: 10)),
-                  ]),
+              child: Text('Page ${page + 1}/$nbrPages', style: smallTextBold),
             ),
-          ]),
+          if (nbrPages != 1) Spacer(),
+          Container(
+            width: PdfPageFormat.cm * 4.5,
+            height: PdfPageFormat.cm * 1.25,
+            padding: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              border: Border.all(),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: PdfPageFormat.cm * 4.5,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text('Via ', style: TextStyle(color: orange)),
+                      Spacer(),
+                      Image(
+                        poLogo!,
+                        width: PdfPageFormat.cm * 2,
+                        height: PdfPageFormat.cm * 2,
+                        fit: BoxFit.contain,
+                        alignment: Alignment.topCenter,
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  'https://www.parcoto.com',
+                  style: const TextStyle(color: PdfColors.blue, fontSize: 10),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget getTasks(int page,int nbrPages,int lastIndex){
-
-    List<TaskGroup> tasksValues=separateGroup();
+  Widget getTasks(int page, int nbrPages, int lastIndex) {
+    List<TaskGroup> tasksValues = separateGroup();
 
     if (page == 0) {
-      return getFirstPageTasks(nbrPages,tasksValues);
+      return getFirstPageTasks(nbrPages, tasksValues);
     } else if (page == nbrPages - 1) {
-      return getLastPageTasks(nbrPages, lastIndex,tasksValues);
+      return getLastPageTasks(nbrPages, lastIndex, tasksValues);
     } else {
-      return getMiddlePageTasks(nbrPages, page, lastIndex,tasksValues);
+      return getMiddlePageTasks(nbrPages, page, lastIndex, tasksValues);
     }
   }
 
-
-  List<TaskGroup> separateGroup(){
-    List<TaskGroup> separatedList=[];
-    for(int i=0;i<reparation.tasks!.length;i++){
-      for(int j=0;j<reparation.tasks![i].tasks.length;j++){
-        separatedList.add(TaskGroup(numero: reparation.tasks![i].numero,time: reparation.tasks![i].time,tasks: [reparation.tasks![i].tasks[j]]),);
+  List<TaskGroup> separateGroup() {
+    List<TaskGroup> separatedList = [];
+    for (int i = 0; i < reparation.tasks!.length; i++) {
+      for (int j = 0; j < reparation.tasks![i].tasks.length; j++) {
+        separatedList.add(
+          TaskGroup(
+            numero: reparation.tasks![i].numero,
+            time: reparation.tasks![i].time,
+            tasks: [reparation.tasks![i].tasks[j]],
+          ),
+        );
       }
     }
     return separatedList;
   }
+
   Widget tasksHeader() {
     return Container(
       height: PdfPageFormat.cm * 0.75,
@@ -1168,72 +1370,82 @@ class ReparationPdf {
         color: orange,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(5)),
       ),
-      child: Row(children: [
-        SizedBox(
-          width: PdfPageFormat.cm * 3.5,
-          child: Text(
-            'Numéro',
-            style: smallTextBold,
+      child: Row(
+        children: [
+          SizedBox(
+            width: PdfPageFormat.cm * 3.5,
+            child: Text('Numéro', style: smallTextBold),
           ),
-        ),
-        SizedBox(
-          width: PdfPageFormat.cm * 8,
-          child: Text('Descriptif', style: smallTextBold),
-        ),
-        SizedBox(
-          width: PdfPageFormat.cm * 4,
-          child:
-          Text('', style: smallTextBold, textAlign: TextAlign.end),
-        ),
-      ]),
+          SizedBox(
+            width: PdfPageFormat.cm * 8,
+            child: Text('Descriptif', style: smallTextBold),
+          ),
+          SizedBox(
+            width: PdfPageFormat.cm * 4,
+            child: Text('', style: smallTextBold, textAlign: TextAlign.end),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget getOneTaskLine(int taskGroupIndex, int page, int nbrPages,List<TaskGroup> separatedTasks) {
-    bool sameAsLast=taskGroupIndex>0 && taskGroupIndex<separatedTasks.length?separatedTasks[taskGroupIndex-1].numero==separatedTasks[taskGroupIndex].numero:false;
+  Widget getOneTaskLine(
+    int taskGroupIndex,
+    int page,
+    int nbrPages,
+    List<TaskGroup> separatedTasks,
+  ) {
+    bool sameAsLast =
+        taskGroupIndex > 0 && taskGroupIndex < separatedTasks.length
+        ? separatedTasks[taskGroupIndex - 1].numero ==
+              separatedTasks[taskGroupIndex].numero
+        : false;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2),
       child: Container(
         height: PdfPageFormat.cm * 0.5,
         padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4.5),
         decoration: const BoxDecoration(
-            border: Border(
-              bottom: BorderSide(style: BorderStyle.dotted),
-            )),
+          border: Border(bottom: BorderSide(style: BorderStyle.dotted)),
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children:
               (separatedTasks.length) <= taskGroupIndex ||
-              (page == nbrPages - 2 &&
-                  taskGroupIndex == separatedTasks.length - 1)
+                  (page == nbrPages - 2 &&
+                      taskGroupIndex == separatedTasks.length - 1)
               ? []
               : [
-            SizedBox(
-              width: PdfPageFormat.cm * 3.5,
-              child: Text(sameAsLast?'':separatedTasks[taskGroupIndex].numero,
-                  style: smallText, textAlign: TextAlign.start),
-            ),
-            SizedBox(
-              width: PdfPageFormat.cm * 8,
-              child: Text(separatedTasks[taskGroupIndex].tasks.first,
-                  style: smallText),
-            ),
-            SizedBox(
-              width: PdfPageFormat.cm * 4,
-              child: Text(
-                  numberFormat2
-                      .format(separatedTasks[taskGroupIndex].time),
-                  style: smallText,
-                  textAlign: TextAlign.start),
-            ),
-          ],
+                  SizedBox(
+                    width: PdfPageFormat.cm * 3.5,
+                    child: Text(
+                      sameAsLast ? '' : separatedTasks[taskGroupIndex].numero,
+                      style: smallText,
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
+                  SizedBox(
+                    width: PdfPageFormat.cm * 8,
+                    child: Text(
+                      separatedTasks[taskGroupIndex].tasks.first,
+                      style: smallText,
+                    ),
+                  ),
+                  SizedBox(
+                    width: PdfPageFormat.cm * 4,
+                    child: Text(
+                      numberFormat2.format(separatedTasks[taskGroupIndex].time),
+                      style: smallText,
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
+                ],
         ),
       ),
     );
   }
 
-
-  Widget getFirstPageTasks(int nbrPages, List<TaskGroup> tasksValues){
+  Widget getFirstPageTasks(int nbrPages, List<TaskGroup> tasksValues) {
     int nbrLines = nbrPages == 1 ? nbrPageOne : nbrPageOne + pageAdition;
     double height = nbrLines * 0.5 + 0.75 + 0.5;
 
@@ -1241,50 +1453,79 @@ class ReparationPdf {
       height: PdfPageFormat.cm * height,
       width: PdfPageFormat.cm * 21 - smallSpace.width!.toDouble(),
       child: SizedBox(
-          height: PdfPageFormat.cm * 10,
-          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        height: PdfPageFormat.cm * 10,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
             tasksHeader(),
             ...List.generate(nbrLines, (index) {
-              return getOneTaskLine(index, 0, nbrPages,tasksValues);
+              return getOneTaskLine(index, 0, nbrPages, tasksValues);
             }),
-          ])),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget getLastPageTasks(int nbrPages, int lastIndex,List<TaskGroup> tasksValues) {
+  Widget getLastPageTasks(
+    int nbrPages,
+    int lastIndex,
+    List<TaskGroup> tasksValues,
+  ) {
     double height = (nbrLastPage + 3) * 0.5 + 0.75 + 0.5;
 
     return SizedBox(
       height: PdfPageFormat.cm * height,
       width: PdfPageFormat.cm * 21 - smallSpace.width!.toDouble(),
       child: SizedBox(
-          height: PdfPageFormat.cm * 10,
-          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        height: PdfPageFormat.cm * 10,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
             designationHeader(),
             ...List.generate(nbrLastPage, (index) {
               return getOneTaskLine(
-                  index + lastIndex, nbrPages - 1, nbrPages,tasksValues);
+                index + lastIndex,
+                nbrPages - 1,
+                nbrPages,
+                tasksValues,
+              );
             }),
             getTotal(),
-          ])),
+          ],
+        ),
+      ),
     );
   }
-  Widget getMiddlePageTasks(int nbrPages, int page, int lastIndex,List<TaskGroup> tasksValues) {
+
+  Widget getMiddlePageTasks(
+    int nbrPages,
+    int page,
+    int lastIndex,
+    List<TaskGroup> tasksValues,
+  ) {
     double height = (nbrMaxMiddlePages) * 0.5 + 0.75 + 0.5;
 
     return SizedBox(
       height: PdfPageFormat.cm * height,
       width: PdfPageFormat.cm * 21 - smallSpace.width!.toDouble(),
       child: SizedBox(
-          height: PdfPageFormat.cm * 10,
-          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        height: PdfPageFormat.cm * 10,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
             designationHeader(),
             ...List.generate(nbrMaxMiddlePages, (index) {
-              return getOneTaskLine(lastIndex + index, page, nbrPages,tasksValues);
+              return getOneTaskLine(
+                lastIndex + index,
+                page,
+                nbrPages,
+                tasksValues,
+              );
             }),
-          ])),
+          ],
+        ),
+      ),
     );
   }
-
-
 }

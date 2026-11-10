@@ -24,22 +24,23 @@ class ButtonContainer extends StatefulWidget {
   final Function()? actionList;
   final Function()? actionNouveau;
 
-  const ButtonContainer(
-      {super.key,
-      required this.icon,
-      this.action,
-      this.actionList,
-      this.actionNouveau,
-      this.counter,
-        this.maxCounter,
-      required this.text,
-      this.color,
-      this.textList = "Liste",
-      this.textNouveau = "Nouveau",
-      this.showBothLN = true,
-      this.showBottom = true,
-      this.showCounter = true,
-      this.getCount});
+  const ButtonContainer({
+    super.key,
+    required this.icon,
+    this.action,
+    this.actionList,
+    this.actionNouveau,
+    this.counter,
+    this.maxCounter,
+    required this.text,
+    this.color,
+    this.textList = "Liste",
+    this.textNouveau = "Nouveau",
+    this.showBothLN = true,
+    this.showBottom = true,
+    this.showCounter = true,
+    this.getCount,
+  });
 
   @override
   State<ButtonContainer> createState() => _ButtonContainerState();
@@ -56,7 +57,6 @@ class _ButtonContainerState extends State<ButtonContainer> {
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     final appTheme = context.watch<AppTheme>();
@@ -66,10 +66,10 @@ class _ButtonContainerState extends State<ButtonContainer> {
     final countLabel = loadingCount
         ? '-${widget.maxCounter != null ? ' / ${widget.maxCounter}' : ''}'
         : widget.counter != null
-            ? '${widget.counter}${widget.maxCounter != null ? ' / ${widget.maxCounter}' : ''}'
-            : widget.getCount != null
-                ? '$count${widget.maxCounter != null ? ' / ${widget.maxCounter}' : ''}'
-                : null;
+        ? '${widget.counter}${widget.maxCounter != null ? ' / ${widget.maxCounter}' : ''}'
+        : widget.getCount != null
+        ? '$count${widget.maxCounter != null ? ' / ${widget.maxCounter}' : ''}'
+        : null;
 
     return OnTapScaleAndFade(
       onTap: widget.action,

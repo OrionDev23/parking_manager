@@ -11,27 +11,17 @@ import 'utilities/theme_colors.dart';
 enum NavigationIndicators { sticky, end }
 
 late final double rowHeight;
-TextStyle tstyle = const TextStyle(fontSize:9, fontWeight:
-FontWeight.bold);
-TextStyle formHintStyle = TextStyle(fontSize:10, fontWeight:
-FontWeight.bold,color: placeStyle.color);
+TextStyle tstyle = const TextStyle(fontSize: 9, fontWeight: FontWeight.bold);
+TextStyle formHintStyle = TextStyle(
+  fontSize: 10,
+  fontWeight: FontWeight.bold,
+  color: placeStyle.color,
+);
 final placeStyle = TextStyle(color: Colors.grey[100]);
-const smallSpace = SizedBox(
-  width: 5,
-  height: 5,
-);
-const bigSpace = SizedBox(
-  width: 10,
-  height: 10,
-);
-final headerStyle = TextStyle(
-  fontSize: 14.sp,
-  fontWeight: FontWeight.bold,
-);
-final boldStyle = TextStyle(
-  fontSize: 12.sp,
-  fontWeight: FontWeight.bold,
-);
+const smallSpace = SizedBox(width: 5, height: 5);
+const bigSpace = SizedBox(width: 10, height: 10);
+final headerStyle = TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold);
+final boldStyle = TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold);
 final littleStyle = TextStyle(fontSize: 10.sp);
 const snackbarShortDuration = Duration(seconds: 2);
 
@@ -41,19 +31,22 @@ class AppTheme extends ChangeNotifier {
   AccentColor get color => _color;
 
   RadialGradient getRadiantStandard() {
-    return RadialGradient(radius: 0.6, colors: [
-      color,
-      color.withAlpha(200),
-      color.withAlpha(150),
-      color.withAlpha(100),
-      color.withAlpha(50),
-      color.withAlpha(20),
-      backGroundColor.withAlpha(10),
-      backGroundColor.withAlpha(0),
-    ]);
+    return RadialGradient(
+      radius: 0.6,
+      colors: [
+        color,
+        color.withAlpha(200),
+        color.withAlpha(150),
+        color.withAlpha(100),
+        color.withAlpha(50),
+        color.withAlpha(20),
+        backGroundColor.withAlpha(10),
+        backGroundColor.withAlpha(0),
+      ],
+    );
   }
 
-  List<Color> colors=[
+  List<Color> colors = [
     Colors.blue,
     Colors.orange,
     Colors.green,
@@ -64,108 +57,117 @@ class AppTheme extends ChangeNotifier {
     Colors.orange.darker,
 
     Colors.blue.darker,
-    Colors.orange.lightest
+    Colors.orange.lightest,
   ];
 
-  List<Color> getRandomColors(int nbr){
-
-
-
-    if(nbr<=colors.length){
+  List<Color> getRandomColors(int nbr) {
+    if (nbr <= colors.length) {
       return colors;
-    }
-    else{
+    } else {
       return [
         ...colors,
-        ...List.generate(nbr-colors.length, (index) =>colors[colors.length-1],
-        )
+        ...List.generate(
+          nbr - colors.length,
+          (index) => colors[colors.length - 1],
+        ),
       ];
     }
-
   }
 
-
-
-
-
-
-
   RadialGradient getRadiantLight() {
-    return RadialGradient(radius: 0.6, colors: [
-      color.light,
-      color.light.withAlpha(200),
-      color.light.withAlpha(150),
-      color.light.withAlpha(100),
-      color.light.withAlpha(50),
-      color.light.withAlpha(20),
-      backGroundColor.withAlpha(10),
-      backGroundColor.withAlpha(0),
-    ]);
+    return RadialGradient(
+      radius: 0.6,
+      colors: [
+        color.light,
+        color.light.withAlpha(200),
+        color.light.withAlpha(150),
+        color.light.withAlpha(100),
+        color.light.withAlpha(50),
+        color.light.withAlpha(20),
+        backGroundColor.withAlpha(10),
+        backGroundColor.withAlpha(0),
+      ],
+    );
   }
 
   RadialGradient getRadiantLighter() {
-    return RadialGradient(radius: 0.6, colors: [
-      color.lighter,
-      color.lighter.withAlpha(200),
-      color.lighter.withAlpha(150),
-      color.lighter.withAlpha(100),
-      color.lighter.withAlpha(50),
-      color.lighter.withAlpha(20),
-      backGroundColor.withAlpha(10),
-      backGroundColor.withAlpha(0),
-    ]);
+    return RadialGradient(
+      radius: 0.6,
+      colors: [
+        color.lighter,
+        color.lighter.withAlpha(200),
+        color.lighter.withAlpha(150),
+        color.lighter.withAlpha(100),
+        color.lighter.withAlpha(50),
+        color.lighter.withAlpha(20),
+        backGroundColor.withAlpha(10),
+        backGroundColor.withAlpha(0),
+      ],
+    );
   }
 
   RadialGradient getRadiantLightest() {
-    return RadialGradient(radius: 0.6, colors: [
-      color.lightest,
-      color.lightest.withAlpha(200),
-      color.lightest.withAlpha(150),
-      color.lightest.withAlpha(100),
-      color.lightest.withAlpha(50),
-      color.lightest.withAlpha(20),
-      backGroundColor.withAlpha(10),
-      backGroundColor.withAlpha(0),
-    ]);
+    return RadialGradient(
+      radius: 0.6,
+      colors: [
+        color.lightest,
+        color.lightest.withAlpha(200),
+        color.lightest.withAlpha(150),
+        color.lightest.withAlpha(100),
+        color.lightest.withAlpha(50),
+        color.lightest.withAlpha(20),
+        backGroundColor.withAlpha(10),
+        backGroundColor.withAlpha(0),
+      ],
+    );
   }
 
   RadialGradient getRadiantDarkest() {
-    return RadialGradient(radius: 0.6, colors: [
-      color.darkest,
-      color.darkest.withAlpha(200),
-      color.darkest.withAlpha(150),
-      color.darkest.withAlpha(100),
-      color.darkest.withAlpha(50),
-      color.darkest.withAlpha(20),
-      backGroundColor.withAlpha(10),
-      backGroundColor.withAlpha(0),
-    ]);
+    return RadialGradient(
+      radius: 0.6,
+      colors: [
+        color.darkest,
+        color.darkest.withAlpha(200),
+        color.darkest.withAlpha(150),
+        color.darkest.withAlpha(100),
+        color.darkest.withAlpha(50),
+        color.darkest.withAlpha(20),
+        backGroundColor.withAlpha(10),
+        backGroundColor.withAlpha(0),
+      ],
+    );
   }
 
   RadialGradient getRadiantDarker() {
-    return RadialGradient(radius: 0.6, colors: [
-      color.darker,
-      color.darker.withAlpha(200),
-      color.darker.withAlpha(150),
-      color.darker.withAlpha(100),
-      color.darker.withAlpha(50),
-      color.darker.withAlpha(20),
-      backGroundColor.withAlpha(10),
-      backGroundColor.withAlpha(0),
-    ]);
+    return RadialGradient(
+      radius: 0.6,
+      colors: [
+        color.darker,
+        color.darker.withAlpha(200),
+        color.darker.withAlpha(150),
+        color.darker.withAlpha(100),
+        color.darker.withAlpha(50),
+        color.darker.withAlpha(20),
+        backGroundColor.withAlpha(10),
+        backGroundColor.withAlpha(0),
+      ],
+    );
   }
 
   RadialGradient getRadiantDark() {
-    return RadialGradient(radius: 0.6, colors: [
-      color.dark,
-      color.dark.withAlpha(200),
-      color.dark.withAlpha(150),
-      color.dark.withAlpha(100),
-      color.dark.withAlpha(50),
-      color.dark.withAlpha(20),
-      backGroundColor.withAlpha(10),
-      backGroundColor.withAlpha(0),
-    ]);
+    return RadialGradient(
+      radius: 0.6,
+      colors: [
+        color.dark,
+        color.dark.withAlpha(200),
+        color.dark.withAlpha(150),
+        color.dark.withAlpha(100),
+        color.dark.withAlpha(50),
+        color.dark.withAlpha(20),
+        backGroundColor.withAlpha(10),
+        backGroundColor.withAlpha(0),
+      ],
+    );
   }
 
   set color(AccentColor color) {
@@ -228,13 +230,18 @@ class AppTheme extends ChangeNotifier {
 
   AppTheme() {
     final savedSettings = prefs;
-    mode = gts?savedSettings.getInt('themeMode') == 0?ThemeMode.dark:ThemeMode.light
-    :savedSettings.getInt('themeMode') == 0
+    mode = gts
+        ? savedSettings.getInt('themeMode') == 0
+              ? ThemeMode.dark
+              : ThemeMode.light
+        : savedSettings.getInt('themeMode') == 0
         ? ThemeMode.system
         : savedSettings.getInt('themeMode') == 1
-            ? ThemeMode.light
-            : ThemeMode.dark;
-    color = gts?Colors.red:savedSettings.get('color') == null
+        ? ThemeMode.light
+        : ThemeMode.dark;
+    color = gts
+        ? Colors.red
+        : savedSettings.get('color') == null
         ? systemAccentColor
         : getColor(savedSettings.get('color')!);
     displayMode = savedSettings.getInt('display') == null
@@ -250,43 +257,47 @@ class AppTheme extends ChangeNotifier {
     fillColor = mode == ThemeMode.dark
         ? Colors.grey[150]
         : mode == ThemeMode.light
-            ? Colors.grey[20]
-            : ThemeMode.system == ThemeMode.light
-                ? Colors.grey[20]
-                : Colors.grey[150];
+        ? Colors.grey[20]
+        : ThemeMode.system == ThemeMode.light
+        ? Colors.grey[20]
+        : Colors.grey[150];
 
     writingStyle = TextStyle(
-        color: mode == ThemeMode.dark
-            ? Colors.white
-            : mode == ThemeMode.light
-                ? Colors.black
-                : ThemeMode.system == ThemeMode.light
-                    ? Colors.black
-                    : Colors.white);
-    titleStyle= TextStyle(
-        color: mode == ThemeMode.dark
-            ? Colors.white
-            : mode == ThemeMode.light
-            ? Colors.black
-            : ThemeMode.system == ThemeMode.light
-            ? Colors.black
-            : Colors.white,
+      color: mode == ThemeMode.dark
+          ? Colors.white
+          : mode == ThemeMode.light
+          ? Colors.black
+          : ThemeMode.system == ThemeMode.light
+          ? Colors.black
+          : Colors.white,
+    );
+    titleStyle = TextStyle(
+      color: mode == ThemeMode.dark
+          ? Colors.white
+          : mode == ThemeMode.light
+          ? Colors.black
+          : ThemeMode.system == ThemeMode.light
+          ? Colors.black
+          : Colors.white,
       fontSize: 16.sp,
     );
 
     backGroundColor = mode == ThemeMode.dark
-        ? gts?Colors.grey[180]:Colors.grey
+        ? gts
+              ? Colors.grey[180]
+              : Colors.grey
         : mode == ThemeMode.light
-            ? Colors.white
-            : ThemeMode.system == ThemeMode.light
-                ? Colors.white
-                : Colors.grey;
+        ? Colors.white
+        : ThemeMode.system == ThemeMode.light
+        ? Colors.white
+        : Colors.grey;
 
     inputDecoration = m.InputDecoration(
-        fillColor: fillColor,
-        labelStyle: TextStyle(color: Colors.grey[100]),
-        filled: true,
-        isDense: true);
+      fillColor: fillColor,
+      labelStyle: TextStyle(color: Colors.grey[100]),
+      filled: true,
+      isDense: true,
+    );
   }
 
   AccentColor getColor(dynamic color) {
@@ -314,7 +325,6 @@ class AppTheme extends ChangeNotifier {
     }
   }
 }
-
 
 AccentColor get systemAccentColor {
   if ((defaultTargetPlatform == TargetPlatform.windows ||

@@ -8,40 +8,41 @@ part of 'fiche_reception.dart';
 
 FicheReception _$FicheReceptionFromJson(Map<String, dynamic> json) =>
     FicheReception(
-      id: json[r'$id'] as String,
-      createdAt: createdAtJson(json[r'$createdAt'] as String),
-      updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
-      mobile: json['mobile'] as bool? ?? false,
-      numero: (json['numero'] as num).toInt(),
-      anneeUtil: (json['anneeUtil'] as num?)?.toInt(),
-      couleur: json['couleur'] as String?,
-      dateEntre: dateFromIntJsonNonNull((json['dateEntre'] as num).toInt()),
-      dateSortie: dateFromIntJson((json['dateSortie'] as num?)?.toInt()),
-      etatActuel: etatFromJson(json['etatActuel'] as String?),
-      gaz: (json['gaz'] as num?)?.toInt(),
-      images: (json['images'] as List<dynamic>?)
-              ?.map((e) => (e as num?)?.toInt())
-              .toList() ??
-          const [null, null, null, null],
-      kilometrage: (json['kilometrage'] as num?)?.toInt(),
-      modele: json['modele'] as String?,
-      nchassi: json['nchassi'] as String?,
-      nmoteur: json['nmoteur'] as String?,
-      remarque: json['remarque'] as String?,
-      type: (json['type'] as num?)?.toInt(),
-      vehicule: json['vehicule'] as String?,
-      entretien: entretienFromJson(json['entretien'] as String?),
-      vehiculemat: json['vehiculemat'] as String?,
-      marque: json['marque'] as String?,
-      matriculeConducteur: json['matriculeConducteur'] as String?,
-      prenomConducteur: json['prenomConducteur'] as String?,
-      nomConducteur: json['nomConducteur'] as String?,
-      showImages: json['showImages'] as bool? ?? true,
-      showEntretien: json['showEntretien'] as bool? ?? true,
-      showEtat: json['showEtat'] as bool? ?? true,
-      reparation: json['reparation'] as String?,
-      reparationCost: (json['reparationCost'] as num?)?.toDouble(),
-    )
+        id: json[r'$id'] as String,
+        createdAt: createdAtJson(json[r'$createdAt'] as String),
+        updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
+        mobile: json['mobile'] as bool? ?? false,
+        numero: (json['numero'] as num).toInt(),
+        anneeUtil: (json['anneeUtil'] as num?)?.toInt(),
+        couleur: json['couleur'] as String?,
+        dateEntre: dateFromIntJsonNonNull((json['dateEntre'] as num).toInt()),
+        dateSortie: dateFromIntJson((json['dateSortie'] as num?)?.toInt()),
+        etatActuel: etatFromJson(json['etatActuel'] as String?),
+        gaz: (json['gaz'] as num?)?.toInt(),
+        images:
+            (json['images'] as List<dynamic>?)
+                ?.map((e) => (e as num?)?.toInt())
+                .toList() ??
+            const [null, null, null, null],
+        kilometrage: (json['kilometrage'] as num?)?.toInt(),
+        modele: json['modele'] as String?,
+        nchassi: json['nchassi'] as String?,
+        nmoteur: json['nmoteur'] as String?,
+        remarque: json['remarque'] as String?,
+        type: (json['type'] as num?)?.toInt(),
+        vehicule: json['vehicule'] as String?,
+        entretien: entretienFromJson(json['entretien'] as String?),
+        vehiculemat: json['vehiculemat'] as String?,
+        marque: json['marque'] as String?,
+        matriculeConducteur: json['matriculeConducteur'] as String?,
+        prenomConducteur: json['prenomConducteur'] as String?,
+        nomConducteur: json['nomConducteur'] as String?,
+        showImages: json['showImages'] as bool? ?? true,
+        showEntretien: json['showEntretien'] as bool? ?? true,
+        showEtat: json['showEtat'] as bool? ?? true,
+        reparation: json['reparation'] as String?,
+        reparationCost: (json['reparationCost'] as num?)?.toDouble(),
+      )
       ..search = json['search'] as String?
       ..reparationNumero = (json['reparationNumero'] as num?)?.toInt();
 

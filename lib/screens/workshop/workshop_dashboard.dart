@@ -45,12 +45,14 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
     return AnimatedBuilder(
       animation: _partsProvider,
       builder: (context, _) {
-        final isLoading = PartsProvider.downloadingParts ||
+        final isLoading =
+            PartsProvider.downloadingParts ||
             PartsProvider.downloadingCategories ||
             PartsProvider.downloadingBrands ||
             PartsProvider.downloadingOptions ||
             PartsProvider.downloadingFournisseurs;
-        final hasError = PartsProvider.errorParts ||
+        final hasError =
+            PartsProvider.errorParts ||
             PartsProvider.errorCategories ||
             PartsProvider.errorBrands ||
             PartsProvider.errorOptions ||
@@ -64,10 +66,10 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
               final columns = constraints.maxWidth >= 1250
                   ? 4
                   : constraints.maxWidth >= 850
-                      ? 3
-                      : constraints.maxWidth >= 540
-                          ? 2
-                          : 1;
+                  ? 3
+                  : constraints.maxWidth >= 540
+                  ? 2
+                  : 1;
               return ListView(
                 padding: EdgeInsets.symmetric(
                   horizontal: compact ? 16 : 28,
@@ -247,37 +249,45 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                         label: 'Gestion des pièces',
                         detail: 'Catalogue et références',
                         icon: FluentIcons.list,
-                        onPressed: () => PaneItemsAndFooters.selectPane('workshop-parts'),
+                        onPressed: () =>
+                            PaneItemsAndFooters.selectPane('workshop-parts'),
                       ),
                       _WorkshopAction(
                         label: 'Stock',
                         detail: 'Quantités et emplacements',
                         icon: FluentIcons.database,
-                        onPressed: () => PaneItemsAndFooters.selectPane('workshop-stock'),
+                        onPressed: () =>
+                            PaneItemsAndFooters.selectPane('workshop-stock'),
                       ),
                       _WorkshopAction(
                         label: 'Fournisseurs',
                         detail: 'Partenaires et approvisionnement',
                         icon: FluentIcons.people,
-                        onPressed: () => PaneItemsAndFooters.selectPane('workshop-suppliers'),
+                        onPressed: () => PaneItemsAndFooters.selectPane(
+                          'workshop-suppliers',
+                        ),
                       ),
                       _WorkshopAction(
                         label: 'Marques',
                         detail: 'Référentiels fabricants',
                         icon: FluentIcons.verified_brand,
-                        onPressed: () => PaneItemsAndFooters.selectPane('workshop-brands'),
+                        onPressed: () =>
+                            PaneItemsAndFooters.selectPane('workshop-brands'),
                       ),
                       _WorkshopAction(
                         label: 'Catégories',
                         detail: 'Organisation du catalogue',
                         icon: FluentIcons.category_classification,
-                        onPressed: () => PaneItemsAndFooters.selectPane('workshop-categories'),
+                        onPressed: () => PaneItemsAndFooters.selectPane(
+                          'workshop-categories',
+                        ),
                       ),
                       _WorkshopAction(
                         label: 'Options',
                         detail: 'Variantes et caractéristiques',
                         icon: FluentIcons.settings,
-                        onPressed: () => PaneItemsAndFooters.selectPane('workshop-options'),
+                        onPressed: () =>
+                            PaneItemsAndFooters.selectPane('workshop-options'),
                       ),
                     ],
                   ),
@@ -390,7 +400,10 @@ class _WorkshopAction extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+                  Text(
+                    label,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
                   const SizedBox(height: 3),
                   Text(
                     detail,

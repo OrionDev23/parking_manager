@@ -25,12 +25,13 @@ class AppartenanceContainer extends StatefulWidget {
 
   final MesFillialesState state;
 
-  const AppartenanceContainer(
-      {super.key,
-        required this.state,
-      this.type = 0,
-      required this.fieldToSearch,
-      required this.name});
+  const AppartenanceContainer({
+    super.key,
+    required this.state,
+    this.type = 0,
+    required this.fieldToSearch,
+    required this.name,
+  });
 
   @override
   State<AppartenanceContainer> createState() => _AppartenanceContainerState();
@@ -47,15 +48,21 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
   }
 
   void getCount() async {
-    await DatabaseGetter.database!.listRows(
-        databaseId: databaseId,
-        tableId: vehiculeid,
-        queries: [
-          Query.equal(widget.fieldToSearch, widget.name.replaceAll(' ', '').toUpperCase()),
-          Query.limit(1),
-        ]).then((value) {
-      vCount = value.total;
-    });
+    await DatabaseGetter.database!
+        .listRows(
+          databaseId: databaseId,
+          tableId: vehiculeid,
+          queries: [
+            Query.equal(
+              widget.fieldToSearch,
+              widget.name.replaceAll(' ', '').toUpperCase(),
+            ),
+            Query.limit(1),
+          ],
+        )
+        .then((value) {
+          vCount = value.total;
+        });
     if (mounted) {
       setState(() {
         loading = false;
@@ -71,33 +78,31 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
         width: 200.px,
         height: 70.px,
         decoration: BoxDecoration(
-            borderRadius:BorderRadius.circular(5),
-            color: appTheme.backGroundColor,
-            boxShadow: kElevationToShadow[2]),
+          borderRadius: BorderRadius.circular(5),
+          color: appTheme.backGroundColor,
+          boxShadow: kElevationToShadow[2],
+        ),
         child: Column(
           children: [
-            if (widget.type==0)
+            if (widget.type == 0)
               AutoSizeText(
                 VehiclesUtilities.getAppartenance(widget.name),
-                style:
-                    TextStyle(color: appTheme.color.lightest),
+                style: TextStyle(color: appTheme.color.lightest),
               ),
-            if (widget.type==1)
+            if (widget.type == 1)
               AutoSizeText(
                 VehiclesUtilities.getDirection(widget.name),
-                style:
-                    TextStyle(color: appTheme.color.lightest),
+                style: TextStyle(color: appTheme.color.lightest),
               ),
-            if (widget.type==2)
+            if (widget.type == 2)
               AutoSizeText(
                 VehiclesUtilities.getDepartment(widget.name),
-                style:
-                TextStyle(color: appTheme.color.lightest),
+                style: TextStyle(color: appTheme.color.lightest),
               ),
-              const Spacer(),
+            const Spacer(),
             Container(
               padding: const EdgeInsets.all(5),
-                  child:  Row(
+              child: Row(
                 children: [
                   loading
                       ? const Text('')
@@ -106,7 +111,10 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
                           style: appTheme.writingStyle,
                         ),
                   const Spacer(),
-                  Button(onPressed: confirmDelete,child: const Icon(FluentIcons.delete,),),
+                  Button(
+                    onPressed: confirmDelete,
+                    child: const Icon(FluentIcons.delete),
+                  ),
                 ],
               ),
             ),
@@ -114,8 +122,10 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
         ),
       ),
       onTap: () {
-        PanesListState.index.value = PaneItemsAndFooters.originalItems
-                .indexOf(PaneItemsAndFooters.vehicles) +
+        PanesListState.index.value =
+            PaneItemsAndFooters.originalItems.indexOf(
+              PaneItemsAndFooters.vehicles,
+            ) +
             1;
         VehicleTabsState.currentIndex.value = 0;
         VehicleTableState.filterNow = true;
@@ -125,70 +135,69 @@ class _AppartenanceContainerState extends State<AppartenanceContainer> {
     );
   }
 
-
-
-  void confirmDelete(){
+  void confirmDelete() {
     showDialog(
-        context: widget.state.context,
-        barrierDismissible: true,
-        builder: (c) {
-          return ContentDialog(
-            constraints: BoxConstraints.loose(Size(300.px, 150.px)),
-            content: Text('confirmsuppr',style:TextStyle(fontSize: 16.px)).tr(),
-            actions: [
-              Button(child:const Text('fermer').tr(),onPressed:(){
+      context: widget.state.context,
+      barrierDismissible: true,
+      builder: (c) {
+        return ContentDialog(
+          constraints: BoxConstraints.loose(Size(300.px, 150.px)),
+          content: Text('confirmsuppr', style: TextStyle(fontSize: 16.px)).tr(),
+          actions: [
+            Button(
+              child: const Text('fermer').tr(),
+              onPressed: () {
                 Navigator.of(context).pop();
-              }),
-              FilledButton(onPressed: delete, child: const Text('confirmer').tr())
-            ],
-          );
-        });
+              },
+            ),
+            FilledButton(
+              onPressed: delete,
+              child: const Text('confirmer').tr(),
+            ),
+          ],
+        );
+      },
+    );
   }
 
-  void delete() async{
-
+  void delete() async {
     Navigator.of(widget.state.context).pop();
-    if(widget.type==1){
-      if(MyEntrepriseState.p!.directions==null){
-        MyEntrepriseState.p!.directions=[];
+    if (widget.type == 1) {
+      if (MyEntrepriseState.p!.directions == null) {
+        MyEntrepriseState.p!.directions = [];
       }
       MyEntrepriseState.p!.directions!.remove(widget.name);
-    }
-    else if(widget.type==0){
-      if(MyEntrepriseState.p!.filiales==null){
-        MyEntrepriseState.p!.filiales=[];
+    } else if (widget.type == 0) {
+      if (MyEntrepriseState.p!.filiales == null) {
+        MyEntrepriseState.p!.filiales = [];
       }
       MyEntrepriseState.p!.filiales!.remove(widget.name);
-    }
-    else if(widget.type==2){
-      if(MyEntrepriseState.p!.departments==null){
-        MyEntrepriseState.p!.departments=[];
+    } else if (widget.type == 2) {
+      if (MyEntrepriseState.p!.departments == null) {
+        MyEntrepriseState.p!.departments = [];
       }
       MyEntrepriseState.p!.departments!.remove(widget.name);
     }
     await DatabaseGetter.database!
         .updateRow(
-        databaseId: databaseId,
-        tableId: entrepriseid,
-        rowId: MyEntrepriseState.p!.id,
-        data: {
-          if(widget.type==1)
-            'directions':MyEntrepriseState.p!.directions,
-          if(widget.type==0)
-            'filiales':MyEntrepriseState.p!.filiales,
-          if(widget.type==2)
-            'departments':MyEntrepriseState.p!.departments,
-        })
+          databaseId: databaseId,
+          tableId: entrepriseid,
+          rowId: MyEntrepriseState.p!.id,
+          data: {
+            if (widget.type == 1) 'directions': MyEntrepriseState.p!.directions,
+            if (widget.type == 0) 'filiales': MyEntrepriseState.p!.filiales,
+            if (widget.type == 2)
+              'departments': MyEntrepriseState.p!.departments,
+          },
+        )
         .then((value) {
-      if (!widget.state.mounted) return;
-      displayMessage(widget.state.context,'done',InfoBarSeverity.success);
-      widget.state.setState(() {
-
-      });
-    }).onError((AppwriteException error, stackTrace) {
-      if (!widget.state.mounted) return;
-      displayMessage(widget.state.context,'error',InfoBarSeverity.error);
-    });
-
+          if (!widget.state.mounted) return;
+          displayMessage(widget.state.context, 'done', InfoBarSeverity.success);
+          widget.state.setState(() {});
+        })
+        .onError((AppwriteException error, stackTrace) {
+          if (!widget.state.mounted) return;
+          displayMessage(widget.state.context, 'error', InfoBarSeverity.error);
+        });
   }
 }

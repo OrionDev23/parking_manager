@@ -23,66 +23,70 @@ class _BrandListState extends State<BrandList> {
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
     return ScaffoldPage(
-        header: PageTitle(text: 'brandlist'.tr()),
-        content: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    width: 350.px,
-                    height: 45.px,
-                    child: TextBox(
-                      controller: searchController,
-                      placeholder: 'search'.tr(),
-                      style: appTheme.writingStyle,
-                      cursorColor: appTheme.color.darker,
-                      placeholderStyle: placeStyle,
-                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-                      onChanged: (s) {
-                        if (s.isNotEmpty) {
-                          notEmpty = true;
-                        } else {
-                          if (notEmpty) {
-                            notEmpty = false;
-                          }
-                        }
-                        setState(() {});
-                      },
-                      suffix: notEmpty
-                          ? IconButton(
-                              icon: const Icon(FluentIcons.cancel),
-                              onPressed: () {
-                                searchController.text = "";
-                                notEmpty = false;
-                                setState(() {});
-                              })
-                          : null,
+      header: PageTitle(text: 'brandlist'.tr()),
+      content: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 350.px,
+                  height: 45.px,
+                  child: TextBox(
+                    controller: searchController,
+                    placeholder: 'search'.tr(),
+                    style: appTheme.writingStyle,
+                    cursorColor: appTheme.color.darker,
+                    placeholderStyle: placeStyle,
+                    decoration: WidgetStatePropertyAll(
+                      BoxDecoration(color: appTheme.fillColor),
                     ),
+                    onChanged: (s) {
+                      if (s.isNotEmpty) {
+                        notEmpty = true;
+                      } else {
+                        if (notEmpty) {
+                          notEmpty = false;
+                        }
+                      }
+                      setState(() {});
+                    },
+                    suffix: notEmpty
+                        ? IconButton(
+                            icon: const Icon(FluentIcons.cancel),
+                            onPressed: () {
+                              searchController.text = "";
+                              notEmpty = false;
+                              setState(() {});
+                            },
+                          )
+                        : null,
                   ),
-                ],
-              ),
-            ),
-            Flexible(
-              child: GridView(
-                padding: const EdgeInsets.all(10),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount:
-                      MediaQuery.of(context).orientation == Orientation.portrait
-                          ? 2
-                          : 4,
-                  crossAxisSpacing: 5,
-                  mainAxisSpacing: 5,
                 ),
-                children: marquesSearched()
-                    .map((e) => BrandContainer(key: ValueKey(e), id: e))
-                    .toList(),
-              ),
+              ],
             ),
-          ],
-        ));
+          ),
+          Flexible(
+            child: GridView(
+              padding: const EdgeInsets.all(10),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount:
+                    MediaQuery.of(context).orientation == Orientation.portrait
+                    ? 2
+                    : 4,
+                crossAxisSpacing: 5,
+                mainAxisSpacing: 5,
+              ),
+              children: marquesSearched()
+                  .map((e) => BrandContainer(key: ValueKey(e), id: e))
+                  .toList(),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   List<int> marquesSearched() {

@@ -19,12 +19,13 @@ class AdaptiveTextContainer extends StatelessWidget {
       children: [
         Flexible(
           child: Container(
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                color: appTheme.color,
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Text(text,style: rowTextStyle,)),
+            padding: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              color: appTheme.color,
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Text(text, style: rowTextStyle),
+          ),
         ),
       ],
     );

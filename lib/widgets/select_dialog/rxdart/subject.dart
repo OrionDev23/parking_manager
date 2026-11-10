@@ -18,7 +18,7 @@ abstract class Subject<T> extends StreamView<T> implements StreamController<T> {
   /// Constructs a [Subject] which wraps the provided [controller].
   /// This constructor is applicable only for classes that extend [Subject].
   Subject(StreamController<T> controller, super.stream)
-      : _controller = controller;
+    : _controller = controller;
 
   @override
   StreamSink<T> get sink => _StreamSinkWrapper<T>(this);
@@ -74,7 +74,8 @@ abstract class Subject<T> extends StreamView<T> implements StreamController<T> {
   void addError(Object error, [StackTrace? stackTrace]) {
     if (_isAddingStreamItems) {
       throw StateError(
-          'You cannot add an error while items are being added from addStream');
+        'You cannot add an error while items are being added from addStream',
+      );
     }
 
     _addError(error, stackTrace);
@@ -95,7 +96,8 @@ abstract class Subject<T> extends StreamView<T> implements StreamController<T> {
   Future<void> addStream(Stream<T> source, {bool? cancelOnError}) {
     if (_isAddingStreamItems) {
       throw StateError(
-          'You cannot add items while items are being added from addStream');
+        'You cannot add items while items are being added from addStream',
+      );
     }
 
     final completer = Completer<void>();
@@ -110,17 +112,22 @@ abstract class Subject<T> extends StreamView<T> implements StreamController<T> {
 
     _isAddingStreamItems = true;
 
-    source.listen((T event) {
-      _add(event);
-    }, onError: (Object e, StackTrace? s) {
-      _addError(e, s);
+    source.listen(
+      (T event) {
+        _add(event);
+      },
+      onError: (Object e, StackTrace? s) {
+        _addError(e, s);
 
-      if (identical(cancelOnError, true)) {
+        if (identical(cancelOnError, true)) {
+          complete();
+        }
+      },
+      onDone: () {
         complete();
-      }
-    }, onDone: () {
-      complete();
-    }, cancelOnError: cancelOnError);
+      },
+      cancelOnError: cancelOnError,
+    );
 
     return completer.future;
   }
@@ -129,7 +136,8 @@ abstract class Subject<T> extends StreamView<T> implements StreamController<T> {
   void add(T event) {
     if (_isAddingStreamItems) {
       throw StateError(
-          'You cannot add items while items are being added from addStream');
+        'You cannot add items while items are being added from addStream',
+      );
     }
 
     _add(event);
@@ -150,7 +158,8 @@ abstract class Subject<T> extends StreamView<T> implements StreamController<T> {
   Future<dynamic> close() {
     if (_isAddingStreamItems) {
       throw StateError(
-          'You cannot close the subject while items are being added from addStream');
+        'You cannot close the subject while items are being added from addStream',
+      );
     }
 
     return _controller.close();

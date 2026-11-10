@@ -10,12 +10,13 @@ class GenreVehicle extends ParcOtoDefault {
 
   String? createdBy;
 
-  GenreVehicle(
-      {required super.id,
-      this.name,
-      this.createdBy,
-      super.createdAt,
-      super.updatedAt});
+  GenreVehicle({
+    required super.id,
+    this.name,
+    this.createdBy,
+    super.createdAt,
+    super.updatedAt,
+  });
 
   factory GenreVehicle.fromJson(Map<String, dynamic> json) =>
       _$GenreVehicleFromJson(json);

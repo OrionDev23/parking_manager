@@ -147,10 +147,7 @@ class LegacyAppwriteAuthService implements AuthService {
     }
   }
 
-  AuthSession _buildSession(
-    String projectId,
-    Set<String> permissions,
-  ) {
+  AuthSession _buildSession(String projectId, Set<String> permissions) {
     final user = DatabaseGetter.user!;
     final profile = DatabaseGetter.me.value!;
 

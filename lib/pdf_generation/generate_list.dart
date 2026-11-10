@@ -20,13 +20,14 @@ class List2PDF {
   final int firstPageLimit;
   final int midPagesLimit;
   String title;
-  List2PDF(
-      {required this.keysToInclude,
-        required this.firstPageLimit,
-        required this.midPagesLimit,
-      this.orientation = PageOrientation.portrait,
-      required this.list,
-      required this.title});
+  List2PDF({
+    required this.keysToInclude,
+    required this.firstPageLimit,
+    required this.midPagesLimit,
+    this.orientation = PageOrientation.portrait,
+    required this.list,
+    required this.title,
+  });
 
   Future<Uint8List> generatePDF() async {
     await PDFTheming().initFontsAndLogos();
@@ -39,55 +40,47 @@ class List2PDF {
     int pageLeft = 1 + limit.ceil();
     if (nbrLines <= firstPageLimit) {
       var fpage = getFirstPage(0);
-      doc.addPage(Page(
+      doc.addPage(
+        Page(
           orientation: orientation,
-          theme: ThemeData(
-            defaultTextStyle: const TextStyle(
-              fontSize: 12,
-            ),
-          ),
+          theme: ThemeData(defaultTextStyle: const TextStyle(fontSize: 12)),
           pageFormat: PdfPageFormat.a4.landscape,
           margin: const EdgeInsets.all(20),
           build: (context) {
             return fpage;
-          }));
+          },
+        ),
+      );
     } else {
       List<Widget> pages = List.empty(growable: true);
-      pages.add(getFirstPage(
-        pageLeft,
-      ));
+      pages.add(getFirstPage(pageLeft));
       int i = 1;
       for (i = 1; i < pageLeft; i++) {
         pages.add(getOtherPage(pageLeft, i));
       }
       for (int j = 0; j < pages.length; j++) {
-        doc.addPage(Page(
+        doc.addPage(
+          Page(
             orientation: orientation,
-            theme: ThemeData(
-              defaultTextStyle: const TextStyle(
-                fontSize: 12,
-              ),
-            ),
+            theme: ThemeData(defaultTextStyle: const TextStyle(fontSize: 12)),
             pageFormat: PdfPageFormat.a4.landscape,
             margin: const EdgeInsets.all(20),
             build: (context) {
               return pages[j];
-            }));
+            },
+          ),
+        );
       }
     }
     return doc.save();
   }
 
-  Table getDesiList(
-    int page,
-    int lastPage,
-  ) {
+  Table getDesiList(int page, int lastPage) {
     List<TableRow> l = [
       TableRow(
-          decoration: const BoxDecoration(
-            color: PdfColors.orange,
-          ),
-          children: getHeaders()),
+        decoration: const BoxDecoration(color: PdfColors.orange),
+        children: getHeaders(),
+      ),
     ];
 
     int nbrLines = list.length;
@@ -98,10 +91,7 @@ class List2PDF {
     for (int i = lastElement; i < max; i++) {
       l.add(getRow(i, nbrLines));
     }
-    return Table(
-      children: l,
-      border: TableBorder.all(),
-    );
+    return Table(children: l, border: TableBorder.all());
   }
 
   List<int> getMax(int nbrLines, int page, int lastPage) {
@@ -121,15 +111,11 @@ class List2PDF {
         }
       }
       result[1] = 0;
-    }
-    else if (page < lastPage-1) {
-
-      if(page==1){
+    } else if (page < lastPage - 1) {
+      if (page == 1) {
         result[1] = firstPageLimit;
-
-      }
-      else{
-        result[1] = firstPageLimit + (midPagesLimit+1) * (page-1);
+      } else {
+        result[1] = firstPageLimit + (midPagesLimit + 1) * (page - 1);
       }
       // middle pages
 
@@ -141,7 +127,7 @@ class List2PDF {
     } else {
       // last page
 
-        result[1] = firstPageLimit + (midPagesLimit+1) * (page - 1);
+      result[1] = firstPageLimit + (midPagesLimit + 1) * (page - 1);
       result[0] = list.length;
     }
 
@@ -149,21 +135,25 @@ class List2PDF {
   }
 
   List<Widget> getHeaders() {
-    TextStyle th = TextStyle(
-      fontSize: 11,
-      fontWeight: FontWeight.bold,
-    );
+    TextStyle th = TextStyle(fontSize: 11, fontWeight: FontWeight.bold);
     List<Widget> result = List.empty(growable: true);
 
-    result.add(Padding(
-        padding: const EdgeInsets.all(2), child: Text('N°', style: th)));
+    result.add(
+      Padding(
+        padding: const EdgeInsets.all(2),
+        child: Text('N°', style: th),
+      ),
+    );
 
     for (int i = 0; i < keysToInclude.length; i++) {
       result.add(
         Padding(
           padding: const EdgeInsets.all(2),
-          child: Text(keysToInclude[i].tr(),
-              style: th, textAlign: TextAlign.center),
+          child: Text(
+            keysToInclude[i].tr(),
+            style: th,
+            textAlign: TextAlign.center,
+          ),
         ),
       );
     }
@@ -172,9 +162,7 @@ class List2PDF {
   }
 
   TableRow getRow(int index, int nbrLines) {
-    const ts = TextStyle(
-      fontSize: 10,
-    );
+    const ts = TextStyle(fontSize: 10);
     TableRow tr;
 
     List<Widget> wids = List.empty(growable: true);
@@ -199,16 +187,16 @@ class List2PDF {
                 : const EdgeInsets.fromLTRB(2, 1, 2, 1),
             child: Text(
               DateConverter.formatDate(
-                      list[index][keysToInclude[i]] ?? '2024'.toString(), 1) ??
+                    list[index][keysToInclude[i]] ?? '2024'.toString(),
+                    1,
+                  ) ??
                   '2024',
               textDirection: TextDirection.rtl,
               style: ts,
             ),
           ),
         );
-      }
-      else if (keysToInclude[i].toUpperCase().contains('DIRECTION'))
-      {
+      } else if (keysToInclude[i].toUpperCase().contains('DIRECTION')) {
         wids.add(
           Padding(
             padding: index == list.length - 1 && nbrLines <= 4
@@ -222,8 +210,7 @@ class List2PDF {
             ),
           ),
         );
-      }
-      else if (keysToInclude[i].toUpperCase().contains('APPARTENANCE')) {
+      } else if (keysToInclude[i].toUpperCase().contains('APPARTENANCE')) {
         wids.add(
           Padding(
             padding: index == list.length - 1 && nbrLines <= 4
@@ -237,8 +224,7 @@ class List2PDF {
             ),
           ),
         );
-      }
-      else if (keysToInclude[i].toUpperCase().contains('FILLIALE')) {
+      } else if (keysToInclude[i].toUpperCase().contains('FILLIALE')) {
         wids.add(
           Padding(
             padding: index == list.length - 1 && nbrLines <= 4
@@ -252,23 +238,23 @@ class List2PDF {
             ),
           ),
         );
-      }
-      else if (keysToInclude[i].toUpperCase().contains('VEHICULES')) {
-
-
-        String vehicles='';
-        if(list[index][keysToInclude[i]]!=null &&
-            list[index][keysToInclude[i]].isNotEmpty){
-          for(int v=0;v<list[index][keysToInclude[i]].length && v<3;v++){
-            if(v==0){
-              vehicles=list[index][keysToInclude[i]][v];
-            }
-            else{
-              vehicles='$vehicles, ${list[index][keysToInclude[i]][v]}';
+      } else if (keysToInclude[i].toUpperCase().contains('VEHICULES')) {
+        String vehicles = '';
+        if (list[index][keysToInclude[i]] != null &&
+            list[index][keysToInclude[i]].isNotEmpty) {
+          for (
+            int v = 0;
+            v < list[index][keysToInclude[i]].length && v < 3;
+            v++
+          ) {
+            if (v == 0) {
+              vehicles = list[index][keysToInclude[i]][v];
+            } else {
+              vehicles = '$vehicles, ${list[index][keysToInclude[i]][v]}';
             }
           }
-          if(list[index][keysToInclude[i]].length>3){
-            vehicles='$vehicles, ...';
+          if (list[index][keysToInclude[i]].length > 3) {
+            vehicles = '$vehicles, ...';
           }
         }
 
@@ -285,20 +271,18 @@ class List2PDF {
             ),
           ),
         );
-      }
-
-
-      else {
+      } else {
         wids.add(
           Padding(
             padding: index == list.length - 1 && nbrLines <= 4
                 ? const EdgeInsets.fromLTRB(2, 1, 2, 60)
                 : const EdgeInsets.fromLTRB(2, 1, 2, 1),
             child: Text(
-              list[index
-                ][keysToInclude[i]]!=null?list[index
-              ][keysToInclude[i]].toString()=='null'?'':list[index
-              ][keysToInclude[i]].toString(): '',
+              list[index][keysToInclude[i]] != null
+                  ? list[index][keysToInclude[i]].toString() == 'null'
+                        ? ''
+                        : list[index][keysToInclude[i]].toString()
+                  : '',
               textDirection: TextDirection.rtl,
               style: ts,
             ),
@@ -312,109 +296,121 @@ class List2PDF {
 
   Widget getFirstPage(int lastPage) {
     return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          getHeader(),
-          bigSpace,
-          bigSpace,
-          getDesiList(
-            0,
-            lastPage,
-          ),
-          Spacer(),
-          brandingAndPaging(0, lastPage)
-        ]); // Center
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        getHeader(),
+        bigSpace,
+        bigSpace,
+        getDesiList(0, lastPage),
+        Spacer(),
+        brandingAndPaging(0, lastPage),
+      ],
+    ); // Center
   }
 
   Widget getOtherPage(int lastPage, int page) {
     return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          getDesiList(
-            page,
-            lastPage,
-          ),
-          Spacer(),
-          brandingAndPaging(page, lastPage)
-        ]);
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        getDesiList(page, lastPage),
+        Spacer(),
+        brandingAndPaging(page, lastPage),
+      ],
+    );
   }
 
   Widget getHeader() {
     return SizedBox(
       height: PdfPageFormat.cm * 2.7,
       child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image(entrepriseLogo!,
-                width: PdfPageFormat.cm * 3,
-                height: PdfPageFormat.cm * 3,
-                fit: BoxFit.contain,
-                alignment: Alignment.topCenter),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 0, 20),
-              child: Text(title,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  )),
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Image(
+            entrepriseLogo!,
+            width: PdfPageFormat.cm * 3,
+            height: PdfPageFormat.cm * 3,
+            fit: BoxFit.contain,
+            alignment: Alignment.topCenter,
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 0, 20),
+            child: Text(
+              title,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
-            Container(
-              padding: const EdgeInsets.all(5),
-              width: 9 * PdfPageFormat.cm,
-              height: PdfPageFormat.cm * 2.7,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(),
-              ),
-              child: Column(
+          ),
+          Container(
+            padding: const EdgeInsets.all(5),
+            width: 9 * PdfPageFormat.cm,
+            height: PdfPageFormat.cm * 2.7,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  MyEntrepriseState.p?.nom ?? '',
+                  style: smallTextBold.copyWith(color: orangeDeep),
+                ),
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Text(MyEntrepriseState.p?.nom ?? '',
-                        style: smallTextBold.copyWith(color: orangeDeep)),
-                    Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Adresse', style: smallTextBold),
-                          smallSpace,
-                          Text(MyEntrepriseState.p?.adresse ?? '',
-                              style: smallText),
-                        ]),
-                    Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Text('Email', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.email ?? '', style: smallText),
-                      smallSpace,
-                      Text('Tél', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.telephone ?? '',
-                          style: smallText),
-                    ]),
-                    Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Text('NIF', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.nif ?? '', style: smallText),
-                      smallSpace,
-                      Text('NIS', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.nis ?? '', style: smallText),
-                    ]),
-                    Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Text('ART', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.art ?? '', style: smallText),
-                      smallSpace,
-                      Text('RC', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.rc ?? '', style: smallText),
-                    ]),
-                  ]),
+                    Text('Adresse', style: smallTextBold),
+                    smallSpace,
+                    Text(MyEntrepriseState.p?.adresse ?? '', style: smallText),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('Email', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(MyEntrepriseState.p?.email ?? '', style: smallText),
+                    smallSpace,
+                    Text('Tél', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(
+                      MyEntrepriseState.p?.telephone ?? '',
+                      style: smallText,
+                    ),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('NIF', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(MyEntrepriseState.p?.nif ?? '', style: smallText),
+                    smallSpace,
+                    Text('NIS', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(MyEntrepriseState.p?.nis ?? '', style: smallText),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('ART', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(MyEntrepriseState.p?.art ?? '', style: smallText),
+                    smallSpace,
+                    Text('RC', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(MyEntrepriseState.p?.rc ?? '', style: smallText),
+                  ],
+                ),
+              ],
             ),
-          ]),
+          ),
+        ],
+      ),
     );
   }
 
@@ -423,54 +419,60 @@ class List2PDF {
       height: PdfPageFormat.cm * 1.25,
       width: PdfPageFormat.cm * 29,
       child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            if (nbrPages > 1)
-              Container(
-                width: PdfPageFormat.cm * 2,
-                height: PdfPageFormat.cm * 0.75,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: orangeDeep,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Text('Page ${page + 1}/$nbrPages', style: smallTextBold),
-              ),
-            if (nbrPages > 1) Spacer(),
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (nbrPages > 1)
             Container(
-              width: PdfPageFormat.cm * 4.5,
-              height: PdfPageFormat.cm * 1.25,
+              width: PdfPageFormat.cm * 2,
+              height: PdfPageFormat.cm * 0.75,
+              alignment: Alignment.center,
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
-                border: Border.all(),
+                color: orangeDeep,
                 borderRadius: BorderRadius.circular(5),
               ),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: PdfPageFormat.cm * 4.5,
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text('Via ', style: TextStyle(color: orange)),
-                            Spacer(),
-                            Image(poLogo!,
-                                width: PdfPageFormat.cm * 2,
-                                height: PdfPageFormat.cm * 2,
-                                fit: BoxFit.contain,
-                                alignment: Alignment.topCenter),
-                          ]),
-                    ),
-                    Text('https://www.parcoto.com',
-                        style: const TextStyle(
-                            color: PdfColors.blue, fontSize: 10)),
-                  ]),
+              child: Text('Page ${page + 1}/$nbrPages', style: smallTextBold),
             ),
-          ]),
+          if (nbrPages > 1) Spacer(),
+          Container(
+            width: PdfPageFormat.cm * 4.5,
+            height: PdfPageFormat.cm * 1.25,
+            padding: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              border: Border.all(),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: PdfPageFormat.cm * 4.5,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text('Via ', style: TextStyle(color: orange)),
+                      Spacer(),
+                      Image(
+                        poLogo!,
+                        width: PdfPageFormat.cm * 2,
+                        height: PdfPageFormat.cm * 2,
+                        fit: BoxFit.contain,
+                        alignment: Alignment.topCenter,
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  'https://www.parcoto.com',
+                  style: const TextStyle(color: PdfColors.blue, fontSize: 10),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

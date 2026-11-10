@@ -24,9 +24,7 @@ class ClientGestion extends PrestataireGestion {
 
   @override
   Widget getTable() {
-    return ClientTable(
-      archive: archive,
-    );
+    return ClientTable(archive: archive);
   }
 
   @override

@@ -1,4 +1,5 @@
 import '../core/sync/sync_operation.dart';
+
 import 'package:flutter/foundation.dart' hide Category;
 
 import '../main.dart';
@@ -30,27 +31,31 @@ class PartsProvider extends ChangeNotifier {
 
   static String getUniqueCodeCategory() {
     var i = 0;
-    while (categories.containsKey('cat$i')) { i++; }
+    while (categories.containsKey('cat$i')) {
+      i++;
+    }
     return 'cat$i';
   }
 
   static String getUniqueCodeBrand() {
     var i = 0;
-    while (brands.containsKey('bran$i')) { i++; }
+    while (brands.containsKey('bran$i')) {
+      i++;
+    }
     return 'bran$i';
   }
 
   static String getUniqueCodeOption() {
     var i = 0;
-    while (options.containsKey('opt$i')) { i++; }
+    while (options.containsKey('opt$i')) {
+      i++;
+    }
     return 'opt$i';
   }
 
-  List<Map<String, dynamic>> _readCache(String entity) =>
-      vehicleServices.localDatabase.readLegacyCache(
-        companyId: vehicleServices.companyId,
-        entity: entity,
-      );
+  List<Map<String, dynamic>> _readCache(String entity) => vehicleServices
+      .localDatabase
+      .readLegacyCache(companyId: vehicleServices.companyId, entity: entity);
 
   Map<String, dynamic> _payload(dynamic row) => <String, dynamic>{
     ...Map<String, dynamic>.from(row.data),
@@ -74,7 +79,9 @@ class PartsProvider extends ChangeNotifier {
           final id = payload[r'$id']?.toString();
           if (id != null && id.isNotEmpty) target[id] = item;
         } catch (error) {
-          debugPrint('[ParcOto Stock] invalid $entity cache row ignored: $error');
+          debugPrint(
+            '[ParcOto Stock] invalid $entity cache row ignored: $error',
+          );
         }
       }
       // Reapply unsynced mutations even when the app is offline. The
@@ -96,7 +103,9 @@ class PartsProvider extends ChangeNotifier {
               };
               target[operation.entityId] = decode(payload);
             } catch (error) {
-              debugPrint('[ParcOto Stock] cached pending $entity row ignored: $error');
+              debugPrint(
+                '[ParcOto Stock] cached pending $entity row ignored: $error',
+              );
             }
             break;
           case SyncOperationType.delete:
@@ -249,7 +258,11 @@ class PartsProvider extends ChangeNotifier {
   }) {
     for (final payload in _readCache(entity)) {
       if (payload[r'$id']?.toString() == id) {
-        try { return decode(payload); } catch (_) { return null; }
+        try {
+          return decode(payload);
+        } catch (_) {
+          return null;
+        }
       }
     }
     return null;
@@ -279,12 +292,11 @@ class PartsProvider extends ChangeNotifier {
     if (latestPending?.type == SyncOperationType.delete) return null;
     if (latestPending != null) {
       try {
-        return decode(<String, dynamic>{
-          ...latestPending.payload,
-          r'$id': id,
-        });
+        return decode(<String, dynamic>{...latestPending.payload, r'$id': id});
       } catch (error) {
-        debugPrint('[ParcOto Stock] pending $entity detail decode failed: $error');
+        debugPrint(
+          '[ParcOto Stock] pending $entity detail decode failed: $error',
+        );
       }
     }
 
@@ -312,28 +324,40 @@ class PartsProvider extends ChangeNotifier {
   Future<Client?> getFournisseur(String? id) async {
     if (id == null || id.isEmpty) return null;
     return _getById<Client>(
-      entity: 'supplier', tableId: fournsID, id: id, decode: Client.fromJson,
+      entity: 'supplier',
+      tableId: fournsID,
+      id: id,
+      decode: Client.fromJson,
     );
   }
 
   Future<Brand?> getBrand(String? id) async {
     if (id == null || id.isEmpty) return null;
     return _getById<Brand>(
-      entity: 'part_brand', tableId: brandsID, id: id, decode: Brand.fromJson,
+      entity: 'part_brand',
+      tableId: brandsID,
+      id: id,
+      decode: Brand.fromJson,
     );
   }
 
   Future<Category?> getCategory(String? id) async {
     if (id == null || id.isEmpty) return null;
     return _getById<Category>(
-      entity: 'part_category', tableId: categoriesID, id: id, decode: Category.fromJson,
+      entity: 'part_category',
+      tableId: categoriesID,
+      id: id,
+      decode: Category.fromJson,
     );
   }
 
   Future<Option?> getOption(String? id) async {
     if (id == null || id.isEmpty) return null;
     return _getById<Option>(
-      entity: 'part_option', tableId: optionsID, id: id, decode: Option.fromJson,
+      entity: 'part_option',
+      tableId: optionsID,
+      id: id,
+      decode: Option.fromJson,
     );
   }
 
@@ -350,7 +374,10 @@ class PartsProvider extends ChangeNotifier {
   Future<VehiclePart?> getPart(String? id) async {
     if (id == null || id.isEmpty) return null;
     return _getById<VehiclePart>(
-      entity: 'part', tableId: partsID, id: id, decode: VehiclePart.fromJson,
+      entity: 'part',
+      tableId: partsID,
+      id: id,
+      decode: VehiclePart.fromJson,
     );
   }
 }

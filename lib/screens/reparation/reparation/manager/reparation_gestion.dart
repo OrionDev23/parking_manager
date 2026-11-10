@@ -20,18 +20,16 @@ class ReparationGestion extends StatefulWidget {
 }
 
 class ReparationGestionState extends State<ReparationGestion> {
-  final tstyle = TextStyle(
-    fontSize: 10.sp,
-  );
+  final tstyle = TextStyle(fontSize: 10.sp);
 
   @override
   Widget build(BuildContext context) {
     return ScaffoldPage(
-        header: PageTitle(
-          text: 'reparations'.tr(),
-          trailing: widget.archive
-              ? null
-              : ButtonContainer(
+      header: PageTitle(
+        text: 'reparations'.tr(),
+        trailing: widget.archive
+            ? null
+            : ButtonContainer(
                 icon: FluentIcons.add,
                 text: 'add'.tr(),
                 showBottom: false,
@@ -43,13 +41,12 @@ class ReparationGestionState extends State<ReparationGestion> {
                   ReparationTabsState.currentIndex.value = index - 1;
                 },
               ),
-        ),
-        content: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: ReparationTable(
-            archive: widget.archive,
-          ),
-        ));
+      ),
+      content: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        child: ReparationTable(archive: widget.archive),
+      ),
+    );
   }
 
   Tab generateTab(int index) {
@@ -59,9 +56,9 @@ class ReparationGestionState extends State<ReparationGestion> {
       text: Text('nouvrepar'.tr()),
       semanticLabel: 'nouvrepar'.tr(),
       icon: const Icon(FluentIcons.document),
-      body: gts?ReparationFormGts(key:UniqueKey()):ReparationForm(
-        key: UniqueKey(),
-      ),
+      body: gts
+          ? ReparationFormGts(key: UniqueKey())
+          : ReparationForm(key: UniqueKey()),
       onClosed: () {
         ReparationTabsState.tabs.remove(tab);
 

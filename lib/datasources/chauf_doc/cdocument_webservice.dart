@@ -5,12 +5,17 @@ import '../../serializables/conducteur/document_chauffeur.dart';
 
 class ChaufDocumentWebService extends ParcOtoWebService<DocumentChauffeur> {
   ChaufDocumentWebService(
-      super.data, super.collectionID, super.columnForSearch);
+    super.data,
+    super.collectionID,
+    super.columnForSearch,
+  );
 
   @override
-  int Function(MapEntry<String, DocumentChauffeur>,
-          MapEntry<String, DocumentChauffeur>)?
-      getComparisonFunction(int column, bool ascending) {
+  int Function(
+    MapEntry<String, DocumentChauffeur>,
+    MapEntry<String, DocumentChauffeur>,
+  )?
+  getComparisonFunction(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
       //id
@@ -93,16 +98,25 @@ class ChaufDocumentWebService extends ParcOtoWebService<DocumentChauffeur> {
   }
 
   @override
-  List<String> getFilterQueries(Map<String, String> filters, int count,
-      int startingAt, int sortedBy, bool sortedAsc,
-      {int? index}) {
+  List<String> getFilterQueries(
+    Map<String, String> filters,
+    int count,
+    int startingAt,
+    int sortedBy,
+    bool sortedAsc, {
+    int? index,
+  }) {
     return [
       if (filters.containsKey('datemin'))
         Query.greaterThanEqual(
-            'date_expiration', int.tryParse(filters['datemin']!)),
+          'date_expiration',
+          int.tryParse(filters['datemin']!),
+        ),
       if (filters.containsKey('datemax'))
         Query.lessThanEqual(
-            'date_expiration', int.tryParse(filters['datemax']!)),
+          'date_expiration',
+          int.tryParse(filters['datemax']!),
+        ),
       if (filters.containsKey('createdBy'))
         Query.equal('createdBy', filters['createdBy']),
       if (filters.containsKey('chauffeur'))

@@ -21,6 +21,7 @@ import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+
 import 'charts/pie_chart.dart';
 
 import '../../providers/counters.dart';
@@ -46,25 +47,30 @@ class Dashboard extends StatefulWidget {
   State<Dashboard> createState() => _DashboardState();
 }
 
-class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixin {
+class _DashboardState extends State<Dashboard>
+    with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     super.build(context);
     var appTheme = context.watch<AppTheme>();
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<VehicleProvider>(create:(c)=> VehicleProvider()),
-        ChangeNotifierProvider<DriverProvider>(create:(c)=> DriverProvider()),
-        ChangeNotifierProvider<LogProvider>(create:(c)=> LogProvider()),
-        ChangeNotifierProvider<PlanningProvider>(create:(c)=> PlanningProvider()),
-        ChangeNotifierProvider<RepairProvider>(create:(c)=> RepairProvider()),
+        ChangeNotifierProvider<VehicleProvider>(
+          create: (c) => VehicleProvider(),
+        ),
+        ChangeNotifierProvider<DriverProvider>(create: (c) => DriverProvider()),
+        ChangeNotifierProvider<LogProvider>(create: (c) => LogProvider()),
+        ChangeNotifierProvider<PlanningProvider>(
+          create: (c) => PlanningProvider(),
+        ),
+        ChangeNotifierProvider<RepairProvider>(create: (c) => RepairProvider()),
       ],
-      builder: (con,w){
-        var vehicles=Provider.of<VehicleProvider>(con);
-        var drivers=Provider.of<DriverProvider>(con);
-        var logs=Provider.of<LogProvider>(con);
-        var plannings=Provider.of<PlanningProvider>(con);
-        var repairs=Provider.of<RepairProvider>(con);
+      builder: (con, w) {
+        var vehicles = Provider.of<VehicleProvider>(con);
+        var drivers = Provider.of<DriverProvider>(con);
+        var logs = Provider.of<LogProvider>(con);
+        var plannings = Provider.of<PlanningProvider>(con);
+        var repairs = Provider.of<RepairProvider>(con);
         return ScaffoldPage(
           padding: EdgeInsets.zero,
           content: LayoutBuilder(
@@ -73,10 +79,10 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
               final columns = constraints.maxWidth >= 1450
                   ? 4
                   : constraints.maxWidth >= 1050
-                      ? 3
-                      : constraints.maxWidth >= 620
-                          ? 2
-                          : 1;
+                  ? 3
+                  : constraints.maxWidth >= 620
+                  ? 2
+                  : 1;
               return ListView(
                 padding: EdgeInsets.symmetric(
                   horizontal: compact ? 14 : 28,
@@ -111,7 +117,11 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                       ),
                       Button(
                         onPressed: () => onRefresh(
-                          vehicles, drivers, logs, plannings, repairs,
+                          vehicles,
+                          drivers,
+                          logs,
+                          plannings,
+                          repairs,
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -198,11 +208,8 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                       ),
                       const Spacer(),
                       Text(
-                        '${buttonList(appTheme,vehicles,drivers,logs,plannings,repairs).length} modules',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey[100],
-                        ),
+                        '${buttonList(appTheme, vehicles, drivers, logs, plannings, repairs).length} modules',
+                        style: TextStyle(fontSize: 11, color: Colors.grey[100]),
                       ),
                     ],
                   ),
@@ -212,7 +219,12 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                     mainAxisSpacing: 12,
                     crossAxisSpacing: 12,
                     children: buttonList(
-                      appTheme, vehicles, drivers, logs, plannings, repairs,
+                      appTheme,
+                      vehicles,
+                      drivers,
+                      logs,
+                      plannings,
+                      repairs,
                     ),
                   ),
                   const SizedBox(height: 28),
@@ -240,10 +252,13 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
     );
   }
 
-
-  void onRefresh(VehicleProvider vehicles,
-      DriverProvider drivers,LogProvider logs,PlanningProvider plannings,
-      RepairProvider repairs)async{
+  void onRefresh(
+    VehicleProvider vehicles,
+    DriverProvider drivers,
+    LogProvider logs,
+    PlanningProvider plannings,
+    RepairProvider repairs,
+  ) async {
     await Future.wait([
       vehicles.refreshVehicles(),
       vehicles.refreshDocuments(),
@@ -251,26 +266,34 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
       drivers.refreshDocuments(),
       logs.refreshLogs(),
       plannings.refreshPlannings(),
-      repairs.refreshReparations()
+      repairs.refreshReparations(),
     ]);
-    setState(() {
-
-    });
+    setState(() {});
   }
 
-  List<ButtonContainer> buttonList(AppTheme appTheme,VehicleProvider vehicles,
-      DriverProvider drivers,LogProvider logs,PlanningProvider plannings,
-      RepairProvider repairs) {
+  List<ButtonContainer> buttonList(
+    AppTheme appTheme,
+    VehicleProvider vehicles,
+    DriverProvider drivers,
+    LogProvider logs,
+    PlanningProvider plannings,
+    RepairProvider repairs,
+  ) {
     return [
       ButtonContainer(
         icon: FluentIcons.car,
         text: 'vehicules'.tr(),
-        getCount:!VehicleProvider.downloadedVehicles?vehicles
-            .getVehicleCount:null,
-        counter: VehicleProvider.downloadedVehicles?VehicleProvider
-            .vehicles.length:null,
-        maxCounter: DatabaseGetter.gotLimit && DatabaseGetter.limits
-            .containsKey('vehicles')?DatabaseGetter.limits['vehicles']:null,
+        getCount: !VehicleProvider.downloadedVehicles
+            ? vehicles.getVehicleCount
+            : null,
+        counter: VehicleProvider.downloadedVehicles
+            ? VehicleProvider.vehicles.length
+            : null,
+        maxCounter:
+            DatabaseGetter.gotLimit &&
+                DatabaseGetter.limits.containsKey('vehicles')
+            ? DatabaseGetter.limits['vehicles']
+            : null,
         action: () {
           PaneItemsAndFooters.selectPane('vehicles');
         },
@@ -304,10 +327,12 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
       ButtonContainer(
         icon: FluentIcons.document_set,
         text: 'vehicledocuments'.tr(),
-        getCount:!VehicleProvider.downloadedDocuments?vehicles
-            .getVehicleDocsCount:null,
-        counter: VehicleProvider.downloadedDocuments?VehicleProvider
-        .documentsVehicules.length:null,
+        getCount: !VehicleProvider.downloadedDocuments
+            ? vehicles.getVehicleDocsCount
+            : null,
+        counter: VehicleProvider.downloadedDocuments
+            ? VehicleProvider.documentsVehicules.length
+            : null,
         action: () {
           PaneItemsAndFooters.selectPane('vehicle-documents');
         },
@@ -323,9 +348,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
               text: Text('nouvdocument'.tr()),
               semanticLabel: 'nouvdocument'.tr(),
               icon: const Icon(FluentIcons.new_folder),
-              body: const ScaffoldPage(
-                content: DocumentForm(),
-              ),
+              body: const ScaffoldPage(content: DocumentForm()),
               onClosed: () {
                 DocumentTabsState.tabs.remove(tab);
 
@@ -343,10 +366,12 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
       ButtonContainer(
         icon: FluentIcons.repair,
         text: 'reparations'.tr(),
-        getCount:!RepairProvider.downloadedReparations?repairs
-            .getRepairsCount:null,
-        counter: RepairProvider.downloadedReparations?RepairProvider
-            .reparations.length:null,
+        getCount: !RepairProvider.downloadedReparations
+            ? repairs.getRepairsCount
+            : null,
+        counter: RepairProvider.downloadedReparations
+            ? RepairProvider.reparations.length
+            : null,
         action: () {
           PaneItemsAndFooters.selectPane('vehicle-manager');
         },
@@ -362,9 +387,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
               text: Text('nouvfiche'.tr()),
               semanticLabel: 'nouvfiche'.tr(),
               icon: const Icon(FluentIcons.document),
-              body: FicheReceptionForm(
-                key: UniqueKey(),
-              ),
+              body: FicheReceptionForm(key: UniqueKey()),
               onClosed: () {
                 FicheReceptionTabsState.tabs.remove(tab);
 
@@ -382,10 +405,12 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
       ButtonContainer(
         icon: FluentIcons.service_activity,
         text: 'prestataires'.tr(),
-        getCount:!RepairProvider.downloadedPrestataires?repairs
-            .getProvidersCount:null,
-        counter: RepairProvider.downloadedPrestataires?RepairProvider
-            .prestataires.length:null,
+        getCount: !RepairProvider.downloadedPrestataires
+            ? repairs.getProvidersCount
+            : null,
+        counter: RepairProvider.downloadedPrestataires
+            ? RepairProvider.prestataires.length
+            : null,
         action: () {
           PaneItemsAndFooters.selectPane('vehicle-manager');
         },
@@ -419,10 +444,12 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
       ButtonContainer(
         icon: FluentIcons.people,
         text: 'chauffeurs'.tr(),
-        getCount:!DriverProvider.downloadedConducteurs?drivers
-        .getDriversCount:null,
-        counter:DriverProvider.downloadedConducteurs?DriverProvider
-        .conducteurs.length:null,
+        getCount: !DriverProvider.downloadedConducteurs
+            ? drivers.getDriversCount
+            : null,
+        counter: DriverProvider.downloadedConducteurs
+            ? DriverProvider.conducteurs.length
+            : null,
         action: () {
           PaneItemsAndFooters.selectPane('vehicle-manager');
         },
@@ -456,10 +483,12 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
       ButtonContainer(
         icon: FluentIcons.document_set,
         text: 'chaufdocuments'.tr(),
-        getCount:!DriverProvider.downloadedDocuments?drivers
-            .getDriversDocsCount:null,
-        counter:DriverProvider.downloadedDocuments?DriverProvider
-            .documentConducteurs.length:null,
+        getCount: !DriverProvider.downloadedDocuments
+            ? drivers.getDriversDocsCount
+            : null,
+        counter: DriverProvider.downloadedDocuments
+            ? DriverProvider.documentConducteurs.length
+            : null,
         action: () {
           PaneItemsAndFooters.selectPane('vehicle-manager');
         },
@@ -475,9 +504,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
               text: Text('nouvdocument'.tr()),
               semanticLabel: 'nouvdocument'.tr(),
               icon: const Icon(FluentIcons.new_folder),
-              body: const ScaffoldPage(
-                content: CDocumentForm(),
-              ),
+              body: const ScaffoldPage(content: CDocumentForm()),
               onClosed: () {
                 CDocumentTabsState.tabs.remove(tab);
 
@@ -495,10 +522,12 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
       ButtonContainer(
         icon: FluentIcons.edit_event,
         text: 'reservation'.tr(),
-        getCount:!PlanningProvider.downloadedPlanning?plannings
-            .getPlanningCount:null,
-        counter:PlanningProvider.downloadedPlanning?PlanningProvider
-            .plannings.length:null,
+        getCount: !PlanningProvider.downloadedPlanning
+            ? plannings.getPlanningCount
+            : null,
+        counter: PlanningProvider.downloadedPlanning
+            ? PlanningProvider.plannings.length
+            : null,
         action: () {
           PaneItemsAndFooters.selectPane('vehicle-manager');
         },
@@ -510,10 +539,10 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
       ButtonContainer(
         icon: FluentIcons.database_activity,
         text: 'activities'.tr(),
-        getCount:!LogProvider.downloadedActivities?logs
-            .getLogCount:null,
-        counter:LogProvider.downloadedActivities?LogProvider
-            .activities.length:null,
+        getCount: !LogProvider.downloadedActivities ? logs.getLogCount : null,
+        counter: LogProvider.downloadedActivities
+            ? LogProvider.activities.length
+            : null,
         action: () {
           PaneItemsAndFooters.selectPane('vehicle-manager');
         },
@@ -537,201 +566,250 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         child: TableStats(
           height: height,
           title: 'vstates'.tr(),
-          icon: Icon(
-            FluentIcons.health,
-            color: appTheme.color.darker,
-          ),
+          icon: Icon(FluentIcons.health, color: appTheme.color.darker),
           content: StateBars(
-            labels: conducteurEmploye?[
-              MapEntry('gstate', DatabaseCounters().countVehicles(etat: 0)),
-              MapEntry('bstate', DatabaseCounters().countVehicles(etat: 1)),
-              MapEntry('rstate', DatabaseCounters().countVehicles(etat: 2)),
-              MapEntry('ostate', DatabaseCounters().countVehicles(etat: 3)),
-              MapEntry('restate', DatabaseCounters().countVehicles(etat: 4)),
-            ]:[
-              MapEntry('dispo', DatabaseCounters().countVehicles(etat: 5)),
-              MapEntry('panne', DatabaseCounters().countVehicles(etat: 6)),
-              MapEntry('enreparation', DatabaseCounters().countVehicles(etat: 7)),
-              MapEntry('enmission', DatabaseCounters().countVehicles(etat: 8)),
-            ],
+            labels: conducteurEmploye
+                ? [
+                    MapEntry(
+                      'gstate',
+                      DatabaseCounters().countVehicles(etat: 0),
+                    ),
+                    MapEntry(
+                      'bstate',
+                      DatabaseCounters().countVehicles(etat: 1),
+                    ),
+                    MapEntry(
+                      'rstate',
+                      DatabaseCounters().countVehicles(etat: 2),
+                    ),
+                    MapEntry(
+                      'ostate',
+                      DatabaseCounters().countVehicles(etat: 3),
+                    ),
+                    MapEntry(
+                      'restate',
+                      DatabaseCounters().countVehicles(etat: 4),
+                    ),
+                  ]
+                : [
+                    MapEntry(
+                      'dispo',
+                      DatabaseCounters().countVehicles(etat: 5),
+                    ),
+                    MapEntry(
+                      'panne',
+                      DatabaseCounters().countVehicles(etat: 6),
+                    ),
+                    MapEntry(
+                      'enreparation',
+                      DatabaseCounters().countVehicles(etat: 7),
+                    ),
+                    MapEntry(
+                      'enmission',
+                      DatabaseCounters().countVehicles(etat: 8),
+                    ),
+                  ],
           ),
           onTap: () {
             PaneItemsAndFooters.selectPane('vehicle-manager');
           },
         ),
       ),
-      if(MyEntrepriseState.p!=null)
-      StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
-        child: TableStats(
-          height: height,
-          title: 'appartenancevehicule'.tr(),
-          icon: Icon(
-            Icons.emoji_transportation,
-            color: appTheme.color.darker,
+      if (MyEntrepriseState.p != null)
+        StaggeredGridTile.fit(
+          crossAxisCellCount: 1,
+          child: TableStats(
+            height: height,
+            title: 'appartenancevehicule'.tr(),
+            icon: Icon(
+              Icons.emoji_transportation,
+              color: appTheme.color.darker,
+            ),
+            content: ParcOtoPie(
+              labels: List.generate(
+                MyEntrepriseState.p?.filiales?.length ?? 0,
+                (index) => MapEntry(
+                  MyEntrepriseState.p!.filiales![index],
+                  DatabaseCounters().countVehiclesWithCondition([
+                    Query.equal(
+                      'appartenance',
+                      MyEntrepriseState.p!.filiales![index]
+                          .replaceAll(' ', '')
+                          .trim()
+                          .toUpperCase(),
+                    ),
+                  ]),
+                ),
+              ),
+            ),
+            onTap: () {
+              PaneItemsAndFooters.selectPane('vehicle-manager');
+            },
           ),
-          content: ParcOtoPie(
-            labels: List.generate(MyEntrepriseState.p?.filiales?.length??0,
-                    (index) => MapEntry(MyEntrepriseState.p!
-                    .filiales![index], DatabaseCounters().countVehiclesWithCondition([
-                  Query.equal('appartenance', MyEntrepriseState.p!
-                      .filiales![index]
-                      .replaceAll(' ', '').trim().toUpperCase())
-                ]))),
-          ),
-          onTap: () {
-            PaneItemsAndFooters.selectPane('vehicle-manager');
-          },
         ),
-      ),
       StaggeredGridTile.fit(
         crossAxisCellCount: 2,
         child: TableStats(
           height: height,
           title: 'perimetre'.tr(),
-          icon: Icon(
-            FluentIcons.map_directions,
-            color: appTheme.color.darker,
-          ),
+          icon: Icon(FluentIcons.map_directions, color: appTheme.color.darker),
           content: StateCategoryBars(
-            labels: List.generate(conducteurEmploye?5:4, (index) => MapEntry(VehiclesUtilities
-                .getEtatName(conducteurEmploye?index:index+5),[
-                  if(conducteurEmploye)
-              MapEntry(VehiclesUtilities
-                  .getPerimetre(0), DatabaseCounters()
-                  .countVehiclesWithCondition([
-                Query.equal('etatactuel', index),
-                Query.equal('perimetre', 0)
-              ])),
-              if(conducteurEmploye)
-
-                MapEntry(VehiclesUtilities
-                  .getPerimetre(1), DatabaseCounters()
-                  .countVehiclesWithCondition([
-                Query.equal('etatactuel', index),
-                Query.equal('perimetre', 1)
-              ])),
-              if(conducteurEmploye)
-
-                MapEntry(VehiclesUtilities
-                  .getPerimetre(2), DatabaseCounters()
-                  .countVehiclesWithCondition([
-                Query.equal('etatactuel', index),
-                Query.equal('perimetre', 2)
-              ])),
-              if(!conducteurEmploye)
-                MapEntry(VehiclesUtilities
-                    .getPerimetre(3), DatabaseCounters()
-                    .countVehiclesWithCondition([
-                  Query.equal('etatactuel', index),
-                  Query.equal('perimetre', 3)
-                ])),
-              if(!conducteurEmploye)
-                MapEntry(VehiclesUtilities
-                    .getPerimetre(4), DatabaseCounters()
-                    .countVehiclesWithCondition([
-                  Query.equal('etatactuel', index),
-                  Query.equal('perimetre', 4)
-                ])),
-            ],)),
+            labels: List.generate(
+              conducteurEmploye ? 5 : 4,
+              (index) => MapEntry(
+                VehiclesUtilities.getEtatName(
+                  conducteurEmploye ? index : index + 5,
+                ),
+                [
+                  if (conducteurEmploye)
+                    MapEntry(
+                      VehiclesUtilities.getPerimetre(0),
+                      DatabaseCounters().countVehiclesWithCondition([
+                        Query.equal('etatactuel', index),
+                        Query.equal('perimetre', 0),
+                      ]),
+                    ),
+                  if (conducteurEmploye)
+                    MapEntry(
+                      VehiclesUtilities.getPerimetre(1),
+                      DatabaseCounters().countVehiclesWithCondition([
+                        Query.equal('etatactuel', index),
+                        Query.equal('perimetre', 1),
+                      ]),
+                    ),
+                  if (conducteurEmploye)
+                    MapEntry(
+                      VehiclesUtilities.getPerimetre(2),
+                      DatabaseCounters().countVehiclesWithCondition([
+                        Query.equal('etatactuel', index),
+                        Query.equal('perimetre', 2),
+                      ]),
+                    ),
+                  if (!conducteurEmploye)
+                    MapEntry(
+                      VehiclesUtilities.getPerimetre(3),
+                      DatabaseCounters().countVehiclesWithCondition([
+                        Query.equal('etatactuel', index),
+                        Query.equal('perimetre', 3),
+                      ]),
+                    ),
+                  if (!conducteurEmploye)
+                    MapEntry(
+                      VehiclesUtilities.getPerimetre(4),
+                      DatabaseCounters().countVehiclesWithCondition([
+                        Query.equal('etatactuel', index),
+                        Query.equal('perimetre', 4),
+                      ]),
+                    ),
+                ],
+              ),
+            ),
           ),
           onTap: () {
             PaneItemsAndFooters.selectPane('vehicle-manager');
           },
         ),
       ),
-      if(MyEntrepriseState.p!=null)
+      if (MyEntrepriseState.p != null)
         StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
-        child: TableStats(
-          height: height*2,
-          title: 'exploitationvehicule'.tr(),
-          icon: Icon(
-            Icons.hub,
-            color: appTheme.color.darker,
+          crossAxisCellCount: 1,
+          child: TableStats(
+            height: height * 2,
+            title: 'exploitationvehicule'.tr(),
+            icon: Icon(Icons.hub, color: appTheme.color.darker),
+            content: StateBars(
+              hideEmpty: true,
+              vertical: true,
+              labels: List.generate(
+                MyEntrepriseState.p!.filiales?.length ?? 0,
+                (index) => MapEntry(
+                  MyEntrepriseState.p!.filiales![index],
+                  DatabaseCounters().countVehiclesWithCondition([
+                    Query.equal(
+                      'filliale',
+                      MyEntrepriseState.p!.filiales![index]
+                          .replaceAll(' ', '')
+                          .trim()
+                          .toUpperCase(),
+                    ),
+                  ]),
+                ),
+              ),
+            ),
+            onTap: () {
+              PaneItemsAndFooters.selectPane('vehicle-manager');
+            },
           ),
-          content: StateBars(
-            hideEmpty: true,
-            vertical: true,
-            labels: List.generate(MyEntrepriseState.p!.filiales?.length??0,
-                    (index) => MapEntry(MyEntrepriseState.p!
-                    .filiales![index], DatabaseCounters().countVehiclesWithCondition([
-                  Query.equal('filliale', MyEntrepriseState.p!
-                      .filiales![index]
-                      .replaceAll(' ', '').trim().toUpperCase())
-                ]))),
-          ),
-          onTap: () {
-            PaneItemsAndFooters.selectPane('vehicle-manager');
-          },
         ),
-      ),
-      if(MyEntrepriseState.p!=null)
+      if (MyEntrepriseState.p != null)
         StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
-        child: TableStats(
-          height: height*2,
-          title: 'directions'.tr(),
-          icon: Icon(
-            Icons.apartment,
-            color: appTheme.color.darker,
+          crossAxisCellCount: 1,
+          child: TableStats(
+            height: height * 2,
+            title: 'directions'.tr(),
+            icon: Icon(Icons.apartment, color: appTheme.color.darker),
+            content: StateBars(
+              hideEmpty: true,
+              vertical: true,
+              labels: List.generate(
+                MyEntrepriseState.p!.directions?.length ?? 0,
+                (index) => MapEntry(
+                  MyEntrepriseState.p!.directions![index],
+                  DatabaseCounters().countVehiclesWithCondition([
+                    Query.equal(
+                      'direction',
+                      MyEntrepriseState.p!.directions![index]
+                          .replaceAll(' ', '')
+                          .trim()
+                          .toUpperCase(),
+                    ),
+                  ]),
+                ),
+              ),
+            ),
+            onTap: () {
+              PaneItemsAndFooters.selectPane('vehicle-manager');
+            },
           ),
-          content: StateBars(
-            hideEmpty: true,
-            vertical: true,
-            labels: List.generate(MyEntrepriseState.p!.directions?.length??0,
-                    (index) => MapEntry(MyEntrepriseState.p!
-                    .directions![index], DatabaseCounters().countVehiclesWithCondition([
-                  Query.equal('direction', MyEntrepriseState.p!
-                      .directions![index]
-                      .replaceAll(' ', '').trim().toUpperCase())
-                ]))),
-          ),
-          onTap: () {
-            PaneItemsAndFooters.selectPane('vehicle-manager');
-          },
         ),
-      ),
-      if(MyEntrepriseState.p!=null)
+      if (MyEntrepriseState.p != null)
         StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
-        child: TableStats(
-          height: height,
-          title: 'appartenanceconducteur'.tr(),
-          icon: Icon(
-            Icons.home_work_outlined,
-            color: appTheme.color.darker,
+          crossAxisCellCount: 1,
+          child: TableStats(
+            height: height,
+            title: 'appartenanceconducteur'.tr(),
+            icon: Icon(Icons.home_work_outlined, color: appTheme.color.darker),
+            content: ParcOtoPie(
+              labels: List.generate(
+                MyEntrepriseState.p!.filiales?.length ?? 0,
+                (index) => MapEntry(
+                  MyEntrepriseState.p!.filiales![index],
+                  DatabaseCounters().countChauffeurWithCondition([
+                    Query.equal(
+                      'filliale',
+                      MyEntrepriseState.p!.filiales![index]
+                          .replaceAll(' ', '')
+                          .trim()
+                          .toUpperCase(),
+                    ),
+                  ]),
+                ),
+              ),
+            ),
+            onTap: () {
+              PaneItemsAndFooters.selectPane('vehicle-manager');
+            },
           ),
-          content: ParcOtoPie(
-            labels: List.generate(MyEntrepriseState.p!.filiales?.length??0,
-                    (index) => MapEntry(MyEntrepriseState.p!
-                    .filiales![index], DatabaseCounters().countChauffeurWithCondition([
-                  Query.equal('filliale', MyEntrepriseState.p!
-                      .filiales![index]
-                      .replaceAll(' ', '').trim().toUpperCase())
-                ]))),
-          ),
-          onTap: () {
-            PaneItemsAndFooters.selectPane('vehicle-manager');
-          },
         ),
-      ),
       StaggeredGridTile.fit(
         crossAxisCellCount: 1,
         child: TableStats(
           height: height,
           title: 'majvehicules'.tr(),
-          icon: Icon(
-            FluentIcons.car,
-            color: appTheme.color.darker,
-          ),
+          icon: Icon(FluentIcons.car, color: appTheme.color.darker),
           content: const LogTable(
             pages: false,
-            fieldsToShow: [
-              'act',
-              'id',
-              'date',
-            ],
+            fieldsToShow: ['act', 'id', 'date'],
             filters: {'typemin': '0', 'typemax': '9'},
             statTable: true,
             numberOfRows: 5,
@@ -746,15 +824,8 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         child: TableStats(
           height: height,
           title: 'depenses'.tr(),
-          icon: Icon(
-            FluentIcons.cost_control,
-            color: appTheme.color.darker,
-          ),
-          content: CostGraph(
-            start: start,
-            end: end,
-            appTheme: appTheme,
-          ),
+          icon: Icon(FluentIcons.cost_control, color: appTheme.color.darker),
+          content: CostGraph(start: start, end: end, appTheme: appTheme),
           onTap: () {
             PaneItemsAndFooters.selectPane('vehicle-manager');
           },
@@ -765,17 +836,10 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         child: TableStats(
           height: height,
           title: 'majreparation'.tr(),
-          icon: Icon(
-            FluentIcons.repair,
-            color: appTheme.color.darker,
-          ),
+          icon: Icon(FluentIcons.repair, color: appTheme.color.darker),
           content: const LogTable(
             pages: false,
-            fieldsToShow: [
-              'act',
-              'id',
-              'date',
-            ],
+            fieldsToShow: ['act', 'id', 'date'],
             filters: {'typemin': '10', 'typemax': '15'},
             statTable: true,
             numberOfRows: 5,
@@ -790,17 +854,10 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         child: TableStats(
           height: height,
           title: 'majconducteurs'.tr(),
-          icon: Icon(
-            FluentIcons.people,
-            color: appTheme.color.darker,
-          ),
+          icon: Icon(FluentIcons.people, color: appTheme.color.darker),
           content: const LogTable(
             pages: false,
-            fieldsToShow: [
-              'act',
-              'id',
-              'date',
-            ],
+            fieldsToShow: ['act', 'id', 'date'],
             filters: {'typemin': '16', 'typemax': '25'},
             statTable: true,
             numberOfRows: 5,

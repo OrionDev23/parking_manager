@@ -35,7 +35,9 @@ class LegacyModuleCacheMigration {
   Future<Map<String, int>> migrate() async {
     final database = DatabaseGetter.database;
     if (database == null) {
-      debugPrint('[ParcOto Migration] legacy cache skipped: Appwrite database unavailable');
+      debugPrint(
+        '[ParcOto Migration] legacy cache skipped: Appwrite database unavailable',
+      );
       return const {};
     }
 
@@ -81,7 +83,13 @@ class LegacyModuleCacheMigration {
               '''INSERT OR IGNORE INTO legacy_module_cache
                 (company_id, entity, entity_id, payload, cached_at)
                 VALUES (?, ?, ?, ?, ?)''',
-              [companyId, entry.key, row.$id, payload, DateTime.now().toUtc().toIso8601String()],
+              [
+                companyId,
+                entry.key,
+                row.$id,
+                payload,
+                DateTime.now().toUtc().toIso8601String(),
+              ],
             );
             inserted++;
           }
@@ -89,9 +97,13 @@ class LegacyModuleCacheMigration {
           if (rows.length < 100) break;
         }
         counts[entry.key] = inserted;
-        debugPrint('[ParcOto Migration] ${entry.key} cached rows inserted: $inserted');
+        debugPrint(
+          '[ParcOto Migration] ${entry.key} cached rows inserted: $inserted',
+        );
       } catch (error, stackTrace) {
-        debugPrint('[ParcOto Migration] ${entry.key} cache failed: $error\n$stackTrace');
+        debugPrint(
+          '[ParcOto Migration] ${entry.key} cache failed: $error\n$stackTrace',
+        );
         counts[entry.key] = -1;
       }
     }

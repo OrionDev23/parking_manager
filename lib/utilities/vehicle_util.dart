@@ -1,5 +1,3 @@
-
-
 import '../admin_parameters.dart';
 import '../screens/entreprise/entreprise.dart';
 import 'vehicle_brands.dart';
@@ -74,14 +72,14 @@ class VehiclesUtilities {
   static String getMarqueName(String? marque) {
     int m = marque == null ? 0 : int.tryParse(marque) ?? 0;
 
-    if(vehiculeBrands.length>m){
+    if (vehiculeBrands.length > m) {
       return vehiculeBrands[m];
     }
     return "";
   }
 
-  static int getGenreNumber(String? matricule){
-    if(matricule!=null){
+  static int getGenreNumber(String? matricule) {
+    if (matricule != null) {
       if (matricule.contains('-')) {
         var s = matricule.split('-');
         if (s.length == 3) {
@@ -164,62 +162,69 @@ class VehiclesUtilities {
       case 8:
         return "enmission";
 
-
       default:
-        return conducteurEmploye?'gstate':'dispo';
+        return conducteurEmploye ? 'gstate' : 'dispo';
     }
   }
 
-  static String getPerimetre (int perimetre){
-    switch(perimetre){
-      case 0:return 'buisiness';
-      case 1:return 'hors perimetre';
-      case 2:return 'industrie';
-      case 3:return 'auparking';
-      case 4: return 'horsparking';
-      default:return conducteurEmploye?'buisiness':'auparking';
-
-
+  static String getPerimetre(int perimetre) {
+    switch (perimetre) {
+      case 0:
+        return 'buisiness';
+      case 1:
+        return 'hors perimetre';
+      case 2:
+        return 'industrie';
+      case 3:
+        return 'auparking';
+      case 4:
+        return 'horsparking';
+      default:
+        return conducteurEmploye ? 'buisiness' : 'auparking';
     }
   }
 
-  static String getAppartenance(String? appartenance){
-    if(MyEntrepriseState.p!=null && appartenance!=null){
-      for(int i=0;i<MyEntrepriseState.p!.filiales!.length;i++){
-        if(MyEntrepriseState.p!.filiales![i].replaceAll(' ', '').toUpperCase
-          ().contains(appartenance.replaceAll(' ', '').toUpperCase())){
+  static String getAppartenance(String? appartenance) {
+    if (MyEntrepriseState.p != null && appartenance != null) {
+      for (int i = 0; i < MyEntrepriseState.p!.filiales!.length; i++) {
+        if (MyEntrepriseState.p!.filiales![i]
+            .replaceAll(' ', '')
+            .toUpperCase()
+            .contains(appartenance.replaceAll(' ', '').toUpperCase())) {
           return MyEntrepriseState.p!.filiales![i];
         }
       }
     }
 
-
     return '';
   }
-  static String getDirection(String? direction){
-    if(MyEntrepriseState.p!=null && direction!=null){
-      for(int i=0;i<MyEntrepriseState.p!.directions!.length;i++){
-        if(MyEntrepriseState.p!.directions![i].replaceAll(' ', '').toUpperCase
-          ().contains(direction.replaceAll(' ', '').toUpperCase())){
+
+  static String getDirection(String? direction) {
+    if (MyEntrepriseState.p != null && direction != null) {
+      for (int i = 0; i < MyEntrepriseState.p!.directions!.length; i++) {
+        if (MyEntrepriseState.p!.directions![i]
+            .replaceAll(' ', '')
+            .toUpperCase()
+            .contains(direction.replaceAll(' ', '').toUpperCase())) {
           return MyEntrepriseState.p!.directions![i];
         }
       }
     }
 
-
     return '';
   }
 
-  static String getDepartment(String? department){
-    if(MyEntrepriseState.p!=null && department!=null){
-      for(int i=0;i<MyEntrepriseState.p!.departments!.length;i++){
-        if(MyEntrepriseState.p!.departments![i].replaceAll(' ', '').toUpperCase
-          ().contains(department.replaceAll(' ', '').toUpperCase())){
+  static String getDepartment(String? department) {
+    if (MyEntrepriseState.p != null && department != null) {
+      for (int i = 0; i < MyEntrepriseState.p!.departments!.length; i++) {
+        if (MyEntrepriseState.p!.departments![i]
+            .replaceAll(' ', '')
+            .toUpperCase()
+            .contains(department.replaceAll(' ', '').toUpperCase())) {
           return MyEntrepriseState.p!.departments![i];
         }
       }
     }
-
 
     return '';
   }

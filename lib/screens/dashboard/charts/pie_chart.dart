@@ -12,11 +12,7 @@ class ParcOtoPie extends StatefulWidget {
 
   final List<MapEntry<String, Future<int>>> labels;
 
-  const ParcOtoPie({
-    super.key,
-    required this.labels,
-    this.title,
-  });
+  const ParcOtoPie({super.key, required this.labels, this.title});
 
   @override
   State<ParcOtoPie> createState() => _ParcOtoPieState();
@@ -59,7 +55,8 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
 
   Future<void> getValue(int index) async {
     values.add(
-        MapEntry(widget.labels[index].key, await widget.labels[index].value));
+      MapEntry(widget.labels[index].key, await widget.labels[index].value),
+    );
   }
 
   bool notOnlyOne = false;
@@ -120,9 +117,10 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
             Text(
               widget.title!,
               style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: appTheme.writingStyle.color),
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: appTheme.writingStyle.color,
+              ),
             ),
           smallSpace,
           valueOfBiggest == 0
@@ -141,13 +139,12 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                 )
               : Expanded(
                   child: SfCircularChart(
-                    legend: const Legend(
-                      isVisible: true,
-                    ),
+                    legend: const Legend(isVisible: true),
                     tooltipBehavior: TooltipBehavior(
-                        enable: true, format: 'point.x : point.y',
-                        color: appTheme.backGroundColor,
-                        textStyle: appTheme.writingStyle
+                      enable: true,
+                      format: 'point.x : point.y',
+                      color: appTheme.backGroundColor,
+                      textStyle: appTheme.writingStyle,
                     ),
                     series: [
                       PieSeries<MapEntry<String, int>, String>(
@@ -173,13 +170,17 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                           return colors[i];
                         },
                         dataLabelSettings: DataLabelSettings(
-                            isVisible: true,
-                            textStyle: TextStyle(fontSize: 10,color: appTheme
-                                .writingStyle.color),
-                            showZeroValue: false,
-                            connectorLineSettings: const ConnectorLineSettings(
-                                type: ConnectorType.line)),
-                      )
+                          isVisible: true,
+                          textStyle: TextStyle(
+                            fontSize: 10,
+                            color: appTheme.writingStyle.color,
+                          ),
+                          showZeroValue: false,
+                          connectorLineSettings: const ConnectorLineSettings(
+                            type: ConnectorType.line,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -194,21 +195,23 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                   SizedBox(
                     width: 70.px,
                     child: NumberBox(
-                        clearButton: false,
-                        mode: SpinButtonPlacementMode.none,
-                        value: minValue,
-                        onChanged: (s) {
-                          setState(() {
-                            minValue = s ?? 0;
-                          });
-                        }),
+                      clearButton: false,
+                      mode: SpinButtonPlacementMode.none,
+                      value: minValue,
+                      onChanged: (s) {
+                        setState(() {
+                          minValue = s ?? 0;
+                        });
+                      },
+                    ),
                   ),
                   smallSpace,
                   Checkbox(
-                      checked: group,
-                      onChanged: (s) => setState(() {
-                            group = s ?? false;
-                          })),
+                    checked: group,
+                    onChanged: (s) => setState(() {
+                      group = s ?? false;
+                    }),
+                  ),
                 ],
               ),
             ),

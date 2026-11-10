@@ -1,8 +1,14 @@
 import 'package:appwrite/appwrite.dart';
+
 import '../parcoto_webservice.dart';
 import '../../serializables/reparation/fiche_reception.dart';
+
 class FicheReceptionWebService extends ParcOtoWebService<FicheReception> {
-  FicheReceptionWebService(super.data, super.collectionID, super.columnForSearch);
+  FicheReceptionWebService(
+    super.data,
+    super.collectionID,
+    super.columnForSearch,
+  );
 
   @override
   fromJsonFunction(Map<String, dynamic> json) {
@@ -16,13 +22,18 @@ class FicheReceptionWebService extends ParcOtoWebService<FicheReception> {
 
   @override
   String getSearchQueryPerIndex(int index, String searchKey) {
-        return Query.search(getAttributeForSearch(index), searchKey);
+    return Query.search(getAttributeForSearch(index), searchKey);
   }
 
   @override
-  List<String> getFilterQueries(Map<String, String> filters, int count,
-      int startingAt, int sortedBy, bool sortedAsc,
-      {int? index}) {
+  List<String> getFilterQueries(
+    Map<String, String> filters,
+    int count,
+    int startingAt,
+    int sortedBy,
+    bool sortedAsc, {
+    int? index,
+  }) {
     return [
       if (filters.containsKey('datemin'))
         Query.greaterThanEqual('dateEntre', int.tryParse(filters['datemin']!)),
@@ -82,22 +93,23 @@ class FicheReceptionWebService extends ParcOtoWebService<FicheReception> {
 
   @override
   int Function(
-      MapEntry<String, FicheReception> p1, MapEntry<String, FicheReception> p2)?
+    MapEntry<String, FicheReception> p1,
+    MapEntry<String, FicheReception> p2,
+  )?
   getComparisonFunction(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
-    //numero
+      //numero
       case 0:
         return (d1, d2) => coef * d1.value.numero.compareTo(d2.value.numero);
-    //nchassi
+      //nchassi
       case 1:
         return (d1, d2) {
           if (d1.value.nchassi == null && d2.value.nchassi == null) {
             return 0;
           }
           return coef *
-              (d1.value.nchassi ?? '')
-                  .compareTo((d2.value.nchassi ?? ''));
+              (d1.value.nchassi ?? '').compareTo((d2.value.nchassi ?? ''));
         };
       case 2:
         return (d1, d2) {
@@ -105,8 +117,9 @@ class FicheReceptionWebService extends ParcOtoWebService<FicheReception> {
             return 0;
           }
           return coef *
-              (d1.value.vehiculemat ?? '')
-                  .compareTo((d2.value.vehiculemat ?? ''));
+              (d1.value.vehiculemat ?? '').compareTo(
+                (d2.value.vehiculemat ?? ''),
+              );
         };
       case 3:
         return (d1, d2) {
@@ -115,8 +128,9 @@ class FicheReceptionWebService extends ParcOtoWebService<FicheReception> {
             return 0;
           }
           return coef *
-              (d1.value.reparationNumero ?? 0)
-                  .compareTo((d2.value.reparationNumero ?? 0));
+              (d1.value.reparationNumero ?? 0).compareTo(
+                (d2.value.reparationNumero ?? 0),
+              );
         };
       case 4:
         return (d1, d2) {
@@ -124,12 +138,15 @@ class FicheReceptionWebService extends ParcOtoWebService<FicheReception> {
         };
       case 5:
         return (d1, d2) {
-          return coef * (d1.value.dateSortie??DateTime.now()).compareTo(d2.value.dateSortie??DateTime.now());
+          return coef *
+              (d1.value.dateSortie ?? DateTime.now()).compareTo(
+                d2.value.dateSortie ?? DateTime.now(),
+              );
         };
-    //date modif
+      //date modif
       case 6:
         return (d1, d2) =>
-        coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
+            coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
       default:
         return (d1, d2) => coef * d1.value.numero.compareTo(d2.value.numero);
     }

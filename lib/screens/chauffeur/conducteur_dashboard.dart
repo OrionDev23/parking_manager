@@ -30,9 +30,7 @@ class ConducteurDashboard extends StatelessWidget {
     double height = 380.px;
     return ScaffoldPage(
       padding: const EdgeInsets.all(10),
-      header: PageTitle(
-        text: 'chauffeurs'.tr(),
-      ),
+      header: PageTitle(text: 'chauffeurs'.tr()),
       content: ListView(
         padding: const EdgeInsets.all(10),
         children: [
@@ -44,12 +42,16 @@ class ConducteurDashboard extends StatelessWidget {
               ButtonContainer(
                 color: appTheme.color,
                 action: () {
-                  PanesListState.index.value = PaneItemsAndFooters.originalItems
-                          .indexOf(PaneItemsAndFooters.chauffeurs) +
-
-                      PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-                      .reparations.items.length+(showAtelier?PaneItemsAndFooters
-                      .atelier.items.length:0)-1;
+                  PanesListState.index.value =
+                      PaneItemsAndFooters.originalItems.indexOf(
+                        PaneItemsAndFooters.chauffeurs,
+                      ) +
+                      PaneItemsAndFooters.vehicles.items.length +
+                      PaneItemsAndFooters.reparations.items.length +
+                      (showAtelier
+                          ? PaneItemsAndFooters.atelier.items.length
+                          : 0) -
+                      1;
                 },
                 icon: FluentIcons.list,
                 text: 'gchauffeurs'.tr(),
@@ -59,32 +61,37 @@ class ConducteurDashboard extends StatelessWidget {
               ),
               ButtonContainer(
                 action: () {
-                  PanesListState.index.value = PaneItemsAndFooters.originalItems
-                          .indexOf(PaneItemsAndFooters.chauffeurs) +
-                      PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-                      .reparations.items.length+(showAtelier?PaneItemsAndFooters
-                      .atelier.items.length:0)-1;
+                  PanesListState.index.value =
+                      PaneItemsAndFooters.originalItems.indexOf(
+                        PaneItemsAndFooters.chauffeurs,
+                      ) +
+                      PaneItemsAndFooters.vehicles.items.length +
+                      PaneItemsAndFooters.reparations.items.length +
+                      (showAtelier
+                          ? PaneItemsAndFooters.atelier.items.length
+                          : 0) -
+                      1;
                   Future.delayed(const Duration(milliseconds: 300))
                       .whenComplete(() {
-                    late Tab tab;
-                    tab = Tab(
-                      key: UniqueKey(),
-                      text: Text('nouvchauf'.tr()),
-                      semanticLabel: 'nouvchauf'.tr(),
-                      icon: const Icon(FluentIcons.add_friend),
-                      body: const ChauffeurForm(),
-                      onClosed: () {
-                        ChauffeurTabsState.tabs.remove(tab);
+                        late Tab tab;
+                        tab = Tab(
+                          key: UniqueKey(),
+                          text: Text('nouvchauf'.tr()),
+                          semanticLabel: 'nouvchauf'.tr(),
+                          icon: const Icon(FluentIcons.add_friend),
+                          body: const ChauffeurForm(),
+                          onClosed: () {
+                            ChauffeurTabsState.tabs.remove(tab);
 
-                        if (ChauffeurTabsState.currentIndex.value > 0) {
-                          ChauffeurTabsState.currentIndex.value--;
-                        }
-                      },
-                    );
-                    final index = ChauffeurTabsState.tabs.length + 1;
-                    ChauffeurTabsState.tabs.add(tab);
-                    ChauffeurTabsState.currentIndex.value = index - 1;
-                  });
+                            if (ChauffeurTabsState.currentIndex.value > 0) {
+                              ChauffeurTabsState.currentIndex.value--;
+                            }
+                          },
+                        );
+                        final index = ChauffeurTabsState.tabs.length + 1;
+                        ChauffeurTabsState.tabs.add(tab);
+                        ChauffeurTabsState.currentIndex.value = index - 1;
+                      });
                 },
                 color: appTheme.color,
                 icon: FluentIcons.car,
@@ -95,11 +102,15 @@ class ConducteurDashboard extends StatelessWidget {
               ),
               ButtonContainer(
                 action: () {
-                  PanesListState.index.value = PaneItemsAndFooters.originalItems
-                          .indexOf(PaneItemsAndFooters.chauffeurs) +
-                      PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-                      .reparations.items.length+(showAtelier?PaneItemsAndFooters
-                      .atelier.items.length:0);
+                  PanesListState.index.value =
+                      PaneItemsAndFooters.originalItems.indexOf(
+                        PaneItemsAndFooters.chauffeurs,
+                      ) +
+                      PaneItemsAndFooters.vehicles.items.length +
+                      PaneItemsAndFooters.reparations.items.length +
+                      (showAtelier
+                          ? PaneItemsAndFooters.atelier.items.length
+                          : 0);
                 },
                 color: appTheme.color,
                 icon: FluentIcons.health,
@@ -110,11 +121,16 @@ class ConducteurDashboard extends StatelessWidget {
               ),
               ButtonContainer(
                 action: () {
-                  PanesListState.index.value = PaneItemsAndFooters.originalItems
-                          .indexOf(PaneItemsAndFooters.chauffeurs) +
-                      PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-                      .reparations.items.length+(showAtelier?PaneItemsAndFooters
-                      .atelier.items.length:0)+1;
+                  PanesListState.index.value =
+                      PaneItemsAndFooters.originalItems.indexOf(
+                        PaneItemsAndFooters.chauffeurs,
+                      ) +
+                      PaneItemsAndFooters.vehicles.items.length +
+                      PaneItemsAndFooters.reparations.items.length +
+                      (showAtelier
+                          ? PaneItemsAndFooters.atelier.items.length
+                          : 0) +
+                      1;
                 },
                 color: appTheme.color,
                 icon: FluentIcons.document_set,
@@ -125,34 +141,37 @@ class ConducteurDashboard extends StatelessWidget {
               ),
               ButtonContainer(
                 action: () {
-                  PanesListState.index.value = PaneItemsAndFooters.originalItems
-                          .indexOf(PaneItemsAndFooters.chauffeurs) +
-                      PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-                      .reparations.items.length+(showAtelier?PaneItemsAndFooters
-                      .atelier.items.length:0)+1;
+                  PanesListState.index.value =
+                      PaneItemsAndFooters.originalItems.indexOf(
+                        PaneItemsAndFooters.chauffeurs,
+                      ) +
+                      PaneItemsAndFooters.vehicles.items.length +
+                      PaneItemsAndFooters.reparations.items.length +
+                      (showAtelier
+                          ? PaneItemsAndFooters.atelier.items.length
+                          : 0) +
+                      1;
                   Future.delayed(const Duration(milliseconds: 400))
                       .whenComplete(() {
-                    late Tab tab;
-                    tab = Tab(
-                      key: UniqueKey(),
-                      text: Text('nouvdocument'.tr()),
-                      semanticLabel: 'nouvdocument'.tr(),
-                      icon: const Icon(FluentIcons.new_folder),
-                      body: const ScaffoldPage(
-                        content: CDocumentForm(),
-                      ),
-                      onClosed: () {
-                        CDocumentTabsState.tabs.remove(tab);
+                        late Tab tab;
+                        tab = Tab(
+                          key: UniqueKey(),
+                          text: Text('nouvdocument'.tr()),
+                          semanticLabel: 'nouvdocument'.tr(),
+                          icon: const Icon(FluentIcons.new_folder),
+                          body: const ScaffoldPage(content: CDocumentForm()),
+                          onClosed: () {
+                            CDocumentTabsState.tabs.remove(tab);
 
-                        if (CDocumentTabsState.currentIndex.value > 0) {
-                          CDocumentTabsState.currentIndex.value--;
-                        }
-                      },
-                    );
-                    final index = CDocumentTabsState.tabs.length + 1;
-                    CDocumentTabsState.tabs.add(tab);
-                    CDocumentTabsState.currentIndex.value = index - 1;
-                  });
+                            if (CDocumentTabsState.currentIndex.value > 0) {
+                              CDocumentTabsState.currentIndex.value--;
+                            }
+                          },
+                        );
+                        final index = CDocumentTabsState.tabs.length + 1;
+                        CDocumentTabsState.tabs.add(tab);
+                        CDocumentTabsState.currentIndex.value = index - 1;
+                      });
                 },
                 color: appTheme.color,
                 icon: FluentIcons.document,
@@ -164,11 +183,16 @@ class ConducteurDashboard extends StatelessWidget {
               ButtonContainer(
                 color: appTheme.color,
                 action: () {
-                  PanesListState.index.value = PaneItemsAndFooters.originalItems
-                          .indexOf(PaneItemsAndFooters.chauffeurs) +
-                      PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-                      .reparations.items.length+(showAtelier?PaneItemsAndFooters
-                      .atelier.items.length:0)+2;
+                  PanesListState.index.value =
+                      PaneItemsAndFooters.originalItems.indexOf(
+                        PaneItemsAndFooters.chauffeurs,
+                      ) +
+                      PaneItemsAndFooters.vehicles.items.length +
+                      PaneItemsAndFooters.reparations.items.length +
+                      (showAtelier
+                          ? PaneItemsAndFooters.atelier.items.length
+                          : 0) +
+                      2;
                 },
                 icon: FluentIcons.list,
                 text: 'archive'.tr(),
@@ -193,9 +217,10 @@ class ConducteurDashboard extends StatelessWidget {
                       Text(
                         'lactivities',
                         style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: appTheme.writingStyle.color),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: appTheme.writingStyle.color,
+                        ),
                       ).tr(),
                       smallSpace,
                       const Flexible(
@@ -220,14 +245,22 @@ class ConducteurDashboard extends StatelessWidget {
                   child: ParcOtoPie(
                     title: 'disponibilite'.tr(),
                     labels: [
-                      MapEntry('disponible',
-                          DatabaseCounters().countChauffeur(etat: 0)),
                       MapEntry(
-                          'absent', DatabaseCounters().countChauffeur(etat: 1)),
-                      MapEntry('mission',
-                          DatabaseCounters().countChauffeur(etat: 2)),
-                      MapEntry('quitteentre',
-                          DatabaseCounters().countChauffeur(etat: 3))
+                        'disponible',
+                        DatabaseCounters().countChauffeur(etat: 0),
+                      ),
+                      MapEntry(
+                        'absent',
+                        DatabaseCounters().countChauffeur(etat: 1),
+                      ),
+                      MapEntry(
+                        'mission',
+                        DatabaseCounters().countChauffeur(etat: 2),
+                      ),
+                      MapEntry(
+                        'quitteentre',
+                        DatabaseCounters().countChauffeur(etat: 3),
+                      ),
                     ],
                   ),
                 ),

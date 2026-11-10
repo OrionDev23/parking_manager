@@ -18,9 +18,7 @@ import '../serializables/vehicle/state.dart';
 import '../serializables/vehicle/vehicle.dart';
 
 class ParcOtoUtilities {
-  static String getFirstLetters(
-    ParcUser? user,
-  ) {
+  static String getFirstLetters(ParcUser? user) {
     String result = "";
     if (user != null) {
       if (user.name != null && user.name!.isNotEmpty) {
@@ -85,6 +83,7 @@ DateTime? updatedAtJson(String json) {
 List<String>? designationsToJson(List<Designation>? list) {
   return list?.map((e) => jsonEncode(e.toJson())).toList();
 }
+
 List<String>? tasksToJson(List<TaskGroup>? list) {
   return list?.map((e) => jsonEncode(e.toJson())).toList();
 }
@@ -98,22 +97,22 @@ String? entretienToJson(EntretienVehicle? entretienVehicle) {
 }
 
 EtatVehicleInterface? etatFromJson(String? json) {
-  if(json==null || json=='null'){
+  if (json == null || json == 'null') {
     return null;
-  }
-  else{
-    Map<String,dynamic> data=jsonDecode(json);
-    if(data.containsKey('intCab')){
+  } else {
+    Map<String, dynamic> data = jsonDecode(json);
+    if (data.containsKey('intCab')) {
       return EtatVehicleGTS.fromJson(data);
-    }
-    else{
+    } else {
       return EtatVehicle.fromJson(data);
     }
   }
 }
 
 EntretienVehicle? entretienFromJson(String? json) {
-  return json == null || json=='null'? null : EntretienVehicle.fromJson(jsonDecode(json));
+  return json == null || json == 'null'
+      ? null
+      : EntretienVehicle.fromJson(jsonDecode(json));
 }
 
 List<Designation>? designationsFromJson(List<dynamic> json) {
@@ -121,11 +120,13 @@ List<Designation>? designationsFromJson(List<dynamic> json) {
       .map((e) => Designation.fromJson(jsonDecode(e) as Map<String, dynamic>))
       .toList();
 }
+
 List<TaskGroup>? tasksFromJson(List<dynamic> json) {
   return json
       .map((e) => TaskGroup.fromJson(jsonDecode(e) as Map<String, dynamic>))
       .toList();
 }
+
 Appointment appointmentFromJson(String json) {
   Map<String, dynamic> map = jsonDecode(json);
   return Appointment(
@@ -168,19 +169,19 @@ Color colorFromInt(int? color) {
     return Color(color);
   }
 }
-String listToString(List<String>? words){
-  String result="";
-  if(words!=null){
-    for(int i=0;i<words.length;i++){
-      result+=words[i];
-      result+=" ";
+
+String listToString(List<String>? words) {
+  String result = "";
+  if (words != null) {
+    for (int i = 0; i < words.length; i++) {
+      result += words[i];
+      result += " ";
     }
   }
 
   result.trim();
   return result;
 }
-
 
 int colorToInt(Color? color) {
   return color?.toARGB32() ?? 0x00000000;
@@ -193,35 +194,37 @@ DateTime? stringtoTime(String? json) {
 DateTime stringToTimeNN(String? json) {
   return DateTime.tryParse(json ?? '') ?? DateTime.now();
 }
+
 String timeToJson(DateTime? date) {
   return date?.toIso8601String() ?? DateTime.now().toIso8601String();
 }
+
 String? timeToJsonN(DateTime? date) {
   return date?.toIso8601String();
 }
 
-
 List<dynamic>? listToJson(List<dynamic>? objects) {
   return objects?.map((s) => s.toJson()).toList();
 }
-List<String>? listToJsonString(List<dynamic>?objects){
-  return objects?.map((s)=>jsonEncode(s.toJson())).toList();
+
+List<String>? listToJsonString(List<dynamic>? objects) {
+  return objects?.map((s) => jsonEncode(s.toJson())).toList();
 }
 
-String dlistToString(List<dynamic>?objects){
-  List<String>? temp=listToJsonString(objects);
-  String result="";
-  if(temp!=null){
-    for(int i=0;i<temp.length;i++){
-      result+=temp[i];
-      result+=" ";
+String dlistToString(List<dynamic>? objects) {
+  List<String>? temp = listToJsonString(objects);
+  String result = "";
+  if (temp != null) {
+    for (int i = 0; i < temp.length; i++) {
+      result += temp[i];
+      result += " ";
     }
   }
 
   return result;
 }
 
-List<Variation>? variationsFromList(List<dynamic>? json){
+List<Variation>? variationsFromList(List<dynamic>? json) {
   return json
       ?.map((e) => Variation.fromJson(jsonDecode(e) as Map<String, dynamic>))
       .toList();

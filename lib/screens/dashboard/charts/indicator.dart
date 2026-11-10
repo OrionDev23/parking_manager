@@ -8,12 +8,13 @@ class Indicator extends StatelessWidget {
   final bool isSquare;
   final double size;
 
-  const Indicator(
-      {super.key,
-      required this.color,
-      required this.text,
-      required this.isSquare,
-      this.size = 16});
+  const Indicator({
+    super.key,
+    required this.color,
+    required this.text,
+    required this.isSquare,
+    this.size = 16,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +32,7 @@ class Indicator extends StatelessWidget {
         smallSpace,
         Text(
           text,
-          style: TextStyle(
-            fontSize: 12,
-            color: appTheme.writingStyle.color,
-          ),
+          style: TextStyle(fontSize: 12, color: appTheme.writingStyle.color),
         ),
       ],
     );

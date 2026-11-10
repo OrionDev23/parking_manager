@@ -108,10 +108,7 @@ class _DataTableParcState extends State<DataTableParc> {
             return null;
           }),
           border: TableBorder(
-            horizontalInside: BorderSide(
-              color: borderColor,
-              width: .6,
-            ),
+            horizontalInside: BorderSide(color: borderColor, width: .6),
           ),
           dividerThickness: .4,
           autoRowsToHeight: widget.autoRowHeight,
@@ -122,7 +119,7 @@ class _DataTableParcState extends State<DataTableParc> {
           dataRowHeight: widget.autoRowHeight
               ? kMinInteractiveDimension
               : widget.rowHeight ??
-                  (widget.numberOfRows == null ? rowHeight : rowHeight * 2),
+                    (widget.numberOfRows == null ? rowHeight : rowHeight * 2),
           onPageChanged: (_) {},
           rowsPerPage: widget.numberOfRows ?? rowPerPage,
           onRowsPerPageChanged: widget.pages

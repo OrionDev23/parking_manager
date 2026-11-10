@@ -6,28 +6,30 @@ import '../../../../widgets/button_container.dart';
 import '../../../../widgets/page_header.dart';
 import 'option_table.dart';
 import 'option_tabs.dart';
+
 class OptionManager extends StatelessWidget {
-  const OptionManager({super.key,});
+  const OptionManager({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ScaffoldPage(
-        header: PageTitle(
-          text: getTitle().tr(),
-          trailing: ButtonContainer(
-            icon: FluentIcons.add,
-            text: 'add'.tr(),
-            showBottom: false,
-            showCounter: false,
-            action: () {
-              addOption();
-            },
-          ),
+      header: PageTitle(
+        text: getTitle().tr(),
+        trailing: ButtonContainer(
+          icon: FluentIcons.add,
+          text: 'add'.tr(),
+          showBottom: false,
+          showCounter: false,
+          action: () {
+            addOption();
+          },
         ),
-        content: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: getTable(),
-        ));
+      ),
+      content: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        child: getTable(),
+      ),
+    );
   }
 
   String getTitle() {

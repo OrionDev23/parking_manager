@@ -51,21 +51,23 @@ class CDocumentFormState extends State<CDocumentForm>
     } else if (widget.cid != null) {
       downloadChauffeur(widget.cid!);
     }
-    documentID ??=
-        DateTime.now().difference(DatabaseGetter.ref).inMilliseconds.toString();
+    documentID ??= DateTime.now()
+        .difference(DatabaseGetter.ref)
+        .inMilliseconds
+        .toString();
   }
 
   void downloadChauffeur(String id) async {
     loadingConducteur = true;
     await DatabaseGetter.database!
-        .getRow(
-            databaseId: databaseId, tableId: chauffeurid, rowId: id)
+        .getRow(databaseId: databaseId, tableId: chauffeurid, rowId: id)
         .then((value) {
-      if (value.data.isNotEmpty) {
-        selectedConducteur = value
-            .convertTo((p0) => Conducteur.fromJson(p0));
-      }
-    });
+          if (value.data.isNotEmpty) {
+            selectedConducteur = value.convertTo(
+              (p0) => Conducteur.fromJson(p0),
+            );
+          }
+        });
     if (mounted) {
       setState(() {
         loadingConducteur = false;
@@ -86,117 +88,133 @@ class CDocumentFormState extends State<CDocumentForm>
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-              decoration: BoxDecoration(
-                  color: appTheme.backGroundColor,
-                  boxShadow: kElevationToShadow[2],
-                  borderRadius: BorderRadius.circular(10)),
-              padding: const EdgeInsets.all(10),
-              width: 420.px,
-              height: 300.px,
-              child: Column(
-                children: [
-                  Flexible(
-                    child: ZoneBox(
-                      label: 'chauffeur'.tr(),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: ListTile(
-                          title: Text(
-                              '${selectedConducteur?.name??'/'} '
-                                  '${selectedConducteur?.prenom??''}'),
-                          onPressed: widget.c != null ||
-                                  loadingConducteur ||
-                                  widget.dc?.chauffeur != null ||
-                                  widget.cid != null
-                              ? null
-                              : () async {
-                                  selectedConducteur = await showDialog<Conducteur>(
+            decoration: BoxDecoration(
+              color: appTheme.backGroundColor,
+              boxShadow: kElevationToShadow[2],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            padding: const EdgeInsets.all(10),
+            width: 420.px,
+            height: 300.px,
+            child: Column(
+              children: [
+                Flexible(
+                  child: ZoneBox(
+                    label: 'chauffeur'.tr(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: ListTile(
+                        title: Text(
+                          '${selectedConducteur?.name ?? '/'} '
+                          '${selectedConducteur?.prenom ?? ''}',
+                        ),
+                        onPressed:
+                            widget.c != null ||
+                                loadingConducteur ||
+                                widget.dc?.chauffeur != null ||
+                                widget.cid != null
+                            ? null
+                            : () async {
+                                selectedConducteur =
+                                    await showDialog<Conducteur>(
                                       context: context,
                                       barrierDismissible: true,
                                       builder: (context) {
                                         return ContentDialog(
                                           constraints: BoxConstraints.tight(
-                                              Size(700.px, 550.px)),
-                                          title: const Text('selectchauffeur').tr(),
+                                            Size(700.px, 550.px),
+                                          ),
+                                          title: const Text('selectchauffeur')
+                                              .tr(),
                                           style: ContentDialogThemeData(
-                                              titleStyle: appTheme.writingStyle
-                                                  .copyWith(
-                                                  fontWeight:
-                                                  FontWeight.bold)),
+                                            titleStyle: appTheme.writingStyle
+                                                .copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                          ),
                                           content: const ChauffeurTable(
                                             selectD: true,
                                           ),
-                                          actions: [Button(child: const Text('fermer').tr(),
-                                              onPressed: (){
+                                          actions: [
+                                            Button(
+                                              child: const Text('fermer').tr(),
+                                              onPressed: () {
                                                 Navigator.of(context).pop();
-                                              })],
+                                              },
+                                            ),
+                                          ],
                                         );
-                                      });
+                                      },
+                                    );
 
-                                  setState(() {});
-                                  checkForChanges();
-                                },
-                        ),
+                                setState(() {});
+                                checkForChanges();
+                              },
                       ),
                     ),
                   ),
-                  smallSpace,
-                  smallSpace,
-                  Flexible(
-                    child: ZoneBox(
-                      label: 'nom'.tr(),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: TextBox(
-                          controller: nom,
-                          style: appTheme.writingStyle,
-                          decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-                          cursorColor: appTheme.color.darker,
-                          placeholderStyle: placeStyle,
-                          placeholder: 'nom'.tr(),
-                          onChanged: (s) {
-                            checkForChanges();
-                          },
+                ),
+                smallSpace,
+                smallSpace,
+                Flexible(
+                  child: ZoneBox(
+                    label: 'nom'.tr(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: TextBox(
+                        controller: nom,
+                        style: appTheme.writingStyle,
+                        decoration: WidgetStatePropertyAll(
+                          BoxDecoration(color: appTheme.fillColor),
                         ),
+                        cursorColor: appTheme.color.darker,
+                        placeholderStyle: placeStyle,
+                        placeholder: 'nom'.tr(),
+                        onChanged: (s) {
+                          checkForChanges();
+                        },
                       ),
                     ),
                   ),
-                  smallSpace,
-                  smallSpace,
-                  Flexible(
-                    child: ZoneBox(
-                      label: 'dateexp'.tr(),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: DatePicker(
-                          selected: selectedDate,
-                          onChanged: (d) {
-                            setState(() {
-                              selectedDate = d;
-                            });
-                            checkForChanges();
-                          },
-                        ),
+                ),
+                smallSpace,
+                smallSpace,
+                Flexible(
+                  child: ZoneBox(
+                    label: 'dateexp'.tr(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: DatePicker(
+                        selected: selectedDate,
+                        onChanged: (d) {
+                          setState(() {
+                            selectedDate = d;
+                          });
+                          checkForChanges();
+                        },
                       ),
                     ),
-                  )
-                ],
-              )),
+                  ),
+                ),
+              ],
+            ),
+          ),
           bigSpace,
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               FilledButton(
-                  onPressed: changes ? () => confirm(appTheme) : null,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20.0, vertical: 5),
-                    child: uploading
-                        ? const ProgressRing()
-                        : const Text(
-                            'confirmer',
-                          ).tr(),
-                  )),
+                onPressed: changes ? () => confirm(appTheme) : null,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                    vertical: 5,
+                  ),
+                  child: uploading
+                      ? const ProgressRing()
+                      : const Text('confirmer').tr(),
+                ),
+              ),
             ],
           ),
         ],
@@ -261,29 +279,38 @@ class CDocumentFormState extends State<CDocumentForm>
       });
 
       DocumentChauffeur dv = DocumentChauffeur(
-          id: documentID!,
-          nom: nom.text,
-          chauffeur: selectedConducteur?.id,
-          chauffeurNom:
-              '${selectedConducteur?.name} ${selectedConducteur?.prenom}',
-          dateExpiration: selectedDate,
-          createdBy: DatabaseGetter.me.value?.id);
+        id: documentID!,
+        nom: nom.text,
+        chauffeur: selectedConducteur?.id,
+        chauffeurNom:
+            '${selectedConducteur?.name} ${selectedConducteur?.prenom}',
+        dateExpiration: selectedDate,
+        createdBy: DatabaseGetter.me.value?.id,
+      );
       if (widget.dc != null) {
         await DatabaseGetter.database!.updateRow(
-            databaseId: databaseId,
-            tableId: chaufDoc,
-            rowId: documentID!,
-            data: dv.toJson());
-        DatabaseGetter()
-            .ajoutActivity(24, documentID!, docName: dv.chauffeurNom);
+          databaseId: databaseId,
+          tableId: chaufDoc,
+          rowId: documentID!,
+          data: dv.toJson(),
+        );
+        DatabaseGetter().ajoutActivity(
+          24,
+          documentID!,
+          docName: dv.chauffeurNom,
+        );
       } else {
         await DatabaseGetter.database!.createRow(
-            databaseId: databaseId,
-            tableId: chaufDoc,
-            rowId: documentID!,
-            data: dv.toJson());
-        DatabaseGetter()
-            .ajoutActivity(23, documentID!, docName: dv.chauffeurNom);
+          databaseId: databaseId,
+          tableId: chaufDoc,
+          rowId: documentID!,
+          data: dv.toJson(),
+        );
+        DatabaseGetter().ajoutActivity(
+          23,
+          documentID!,
+          docName: dv.chauffeurNom,
+        );
       }
 
       setState(() {
@@ -292,25 +319,31 @@ class CDocumentFormState extends State<CDocumentForm>
       });
 
       Future.delayed(Duration.zero).whenComplete(() {
-        if(mounted) {
-          displayInfoBar(context,
-              builder: (BuildContext context, void Function() close) {
-                return InfoBar(
-                    title: const Text('done').tr(),
-                    severity: InfoBarSeverity.success,
-                    style: InfoBarThemeData(iconColor: (c) {
-                      switch (c) {
-                        case InfoBarSeverity.success:
-                          return appTheme.color.lightest;
-                        case InfoBarSeverity.error:
-                          return appTheme.color.darkest;
-                        case InfoBarSeverity.info:
-                          return appTheme.color;
-                        default:
-                          return appTheme.color;
-                      }
-                    }));
-              }, duration: snackbarShortDuration);
+        if (mounted) {
+          displayInfoBar(
+            context,
+            builder: (BuildContext context, void Function() close) {
+              return InfoBar(
+                title: const Text('done').tr(),
+                severity: InfoBarSeverity.success,
+                style: InfoBarThemeData(
+                  iconColor: (c) {
+                    switch (c) {
+                      case InfoBarSeverity.success:
+                        return appTheme.color.lightest;
+                      case InfoBarSeverity.error:
+                        return appTheme.color.darkest;
+                      case InfoBarSeverity.info:
+                        return appTheme.color;
+                      default:
+                        return appTheme.color;
+                    }
+                  },
+                ),
+              );
+            },
+            duration: snackbarShortDuration,
+          );
         }
         Future.delayed(snackbarShortDuration).whenComplete(() {
           if (widget.cid != null && mounted) {

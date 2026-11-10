@@ -10,12 +10,19 @@ import 'multiple_items_bloc.dart';
 import 'select_bloc.dart';
 
 typedef SelectOneItemBuilderType<T> = Widget Function(
-    BuildContext context, T item, bool isSelected);
+  BuildContext context,
+  T item,
+  bool isSelected,
+);
 
 typedef ErrorBuilderType<T> = Widget Function(
-    BuildContext context, dynamic exception);
+  BuildContext context,
+  dynamic exception,
+);
 typedef ButtonBuilderType = Widget Function(
-    BuildContext context, VoidCallback onPressed);
+  BuildContext context,
+  VoidCallback onPressed,
+);
 
 class SelectDialog<T> extends StatefulWidget {
   final T? selectedValue;
@@ -153,9 +160,12 @@ class SelectDialog<T> extends StatefulWidget {
             findController: findController,
           ),
           actions: [
-            Button(child: const Text('fermer').tr(),onPressed: (){
-              Navigator.of(context).pop();
-            },),
+            Button(
+              child: const Text('fermer').tr(),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
           ],
         );
       },
@@ -164,13 +174,13 @@ class SelectDialog<T> extends StatefulWidget {
 
   @override
   SelectDialogState<T> createState() => SelectDialogState<T>(
-        itemsList,
-        onChange,
-        onMultipleItemsChange,
-        multipleSelectedValues?.toList(),
-        onFind,
-        findController,
-      );
+    itemsList,
+    onChange,
+    onMultipleItemsChange,
+    multipleSelectedValues?.toList(),
+    onFind,
+    findController,
+  );
 }
 
 class SelectDialogState<T> extends State<SelectDialog<T>> {
@@ -179,15 +189,18 @@ class SelectDialogState<T> extends State<SelectDialog<T>> {
   void Function(T)? onChange;
 
   SelectDialogState(
-      List<T>? itemsList,
-      this.onChange,
-      void Function(List<T>)? onMultipleItemsChange,
-      List<T>? multipleSelectedValues,
-      Future<List<T>> Function(String text)? onFind,
-      TextEditingController? findController) {
+    List<T>? itemsList,
+    this.onChange,
+    void Function(List<T>)? onMultipleItemsChange,
+    List<T>? multipleSelectedValues,
+    Future<List<T>> Function(String text)? onFind,
+    TextEditingController? findController,
+  ) {
     bloc = SelectOneBloc(itemsList, onFind, findController);
-    multipleItemsBloc =
-        MultipleItemsBloc(multipleSelectedValues, onMultipleItemsChange);
+    multipleItemsBloc = MultipleItemsBloc(
+      multipleSelectedValues,
+      onMultipleItemsChange,
+    );
   }
 
   @override
@@ -213,9 +226,9 @@ class SelectDialogState<T> extends State<SelectDialog<T>> {
       const BoxConstraints(maxWidth: 250, maxHeight: 500);
 
   BoxConstraints get mobileDefaultConstraints => BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.9,
-        maxHeight: MediaQuery.of(context).size.height * 0.7,
-      );
+    maxWidth: MediaQuery.of(context).size.width * 0.9,
+    maxHeight: MediaQuery.of(context).size.height * 0.7,
+  );
 
   SelectOneItemBuilderType<T> get itemBuilder {
     return widget.itemBuilder ??
@@ -234,7 +247,8 @@ class SelectDialogState<T> extends State<SelectDialog<T>> {
     return Container(
       width: MediaQuery.of(context).size.width * 0.9,
       height: MediaQuery.of(context).size.height * 0.7,
-      constraints: widget.constraints ??
+      constraints:
+          widget.constraints ??
           (isWeb ? webDefaultConstraints : mobileDefaultConstraints),
       child: Column(
         children: <Widget>[
@@ -248,13 +262,16 @@ class SelectDialogState<T> extends State<SelectDialog<T>> {
                 cursorColor: widget.searchCursorColor,
                 maxLines: widget.searchBoxMaxLines,
                 minLines: widget.searchBoxMinLines,
-                decoration: widget.searchBoxDecoration?.copyWith(
-                        hintText: widget.searchBoxDecoration?.hintText ??
-                            widget.searchBoxDecoration!.hintText) ?? //
+                decoration:
+                    widget.searchBoxDecoration?.copyWith(
+                      hintText:
+                          widget.searchBoxDecoration?.hintText ??
+                          widget.searchBoxDecoration!.hintText,
+                    ) ?? //
                     InputDecoration(
-                        hintText:
-                            widget.searchBoxDecoration?.hintText ?? "Find",
-                        contentPadding: const EdgeInsets.all(2.0)),
+                      hintText: widget.searchBoxDecoration?.hintText ?? "Find",
+                      contentPadding: const EdgeInsets.all(2.0),
+                    ),
               ),
             ),
           Expanded(
@@ -278,25 +295,27 @@ class SelectDialogState<T> extends State<SelectDialog<T>> {
                       ? GridView.builder(
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: widget.numberOfGridCross ?? 2,
-                            crossAxisSpacing: 5,
-                            mainAxisSpacing: 5,
-                          ),
+                                crossAxisCount: widget.numberOfGridCross ?? 2,
+                                crossAxisSpacing: 5,
+                                mainAxisSpacing: 5,
+                              ),
                           controller: bloc.scrollController,
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
                             var item = snapshot.data![index];
-                            bool isSelected =
-                                multipleItemsBloc.selectedItems.contains(item);
+                            bool isSelected = multipleItemsBloc.selectedItems
+                                .contains(item);
                             isSelected =
                                 isSelected || item == widget.selectedValue;
                             return InkWell(
                               child: itemBuilder(context, item, isSelected),
                               onTap: () {
                                 if (isMultipleItems) {
-                                  setState(() => (isSelected)
-                                      ? multipleItemsBloc.unselectItem(item)
-                                      : multipleItemsBloc.selectItem(item));
+                                  setState(
+                                    () => (isSelected)
+                                        ? multipleItemsBloc.unselectItem(item)
+                                        : multipleItemsBloc.selectItem(item),
+                                  );
                                 } else {
                                   onChange?.call(item);
                                   Navigator.pop(context);
@@ -310,17 +329,19 @@ class SelectDialogState<T> extends State<SelectDialog<T>> {
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
                             var item = snapshot.data![index];
-                            bool isSelected =
-                                multipleItemsBloc.selectedItems.contains(item);
+                            bool isSelected = multipleItemsBloc.selectedItems
+                                .contains(item);
                             isSelected =
                                 isSelected || item == widget.selectedValue;
                             return InkWell(
                               child: itemBuilder(context, item, isSelected),
                               onTap: () {
                                 if (isMultipleItems) {
-                                  setState(() => (isSelected)
-                                      ? multipleItemsBloc.unselectItem(item)
-                                      : multipleItemsBloc.selectItem(item));
+                                  setState(
+                                    () => (isSelected)
+                                        ? multipleItemsBloc.unselectItem(item)
+                                        : multipleItemsBloc.selectItem(item),
+                                  );
                                 } else {
                                   onChange?.call(item);
                                   Navigator.pop(context);

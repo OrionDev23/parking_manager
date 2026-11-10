@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:universal_html/html.dart' as html;
 import 'package:document_file_save_plus/document_file_save_plus.dart';
 
@@ -21,7 +22,7 @@ class PdfPreviewPO extends StatelessWidget {
   final Reparation? reparation;
   final FicheReception? fiche;
   final List<Uint8List?>? images;
-  const PdfPreviewPO({super.key, this.reparation,this.fiche,this.images});
+  const PdfPreviewPO({super.key, this.reparation, this.fiche, this.images});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +30,9 @@ class PdfPreviewPO extends StatelessWidget {
       content: PdfPreview(
         maxPageWidth: 550.px,
         shouldRepaint: true,
-        pdfFileName: reparation!=null?'ordre${numberFormat.format(reparation!.numero)}':'fiche${numberFormat.format(fiche!.numero)}',
+        pdfFileName: reparation != null
+            ? 'ordre${numberFormat.format(reparation!.numero)}'
+            : 'fiche${numberFormat.format(fiche!.numero)}',
         initialPageFormat: PdfPageFormat.a4,
         canDebug: false,
         canChangeOrientation: false,
@@ -38,40 +41,38 @@ class PdfPreviewPO extends StatelessWidget {
         allowSharing: false,
         dpi: 400,
         dynamicLayout: true,
-        loadingWidget: const ProgressBar(
-          strokeWidth: 8,
-        ),
+        loadingWidget: const ProgressBar(strokeWidth: 8),
         build: (PdfPageFormat format) {
-          if(reparation!=null){
+          if (reparation != null) {
             return ReparationPdf(reparation: reparation!).getDocument();
-
-          }
-          else{
-            return FicheReceptionPdf(fiche: fiche!,images: images).getDocument();
+          } else {
+            return FicheReceptionPdf(
+              fiche: fiche!,
+              images: images,
+            ).getDocument();
           }
         },
         actions: [
           const PdfPrintAction(
-            icon: Icon(
-              FluentIcons.print,
-              color: Colors.white,
-            ),
+            icon: Icon(FluentIcons.print, color: Colors.white),
           ),
           PdfPreviewAction(
-            icon: const Icon(
-              FluentIcons.save,
-              color: Colors.white,
-            ),
+            icon: const Icon(FluentIcons.save, color: Colors.white),
             onPressed: saveThisFile,
           ),
           PdfPreviewAction(
-              icon: const Icon(
-                FluentIcons.share,
-                color: Colors.white,
-              ),
-              onPressed: (context, futureFile, pageFormat) async {
-                SharePlus.instance.share(ShareParams(files: [XFile.fromData(await futureFile(pageFormat))], subject: reparation!=null?'ordre${numberFormat.format(reparation!.numero)}':'fiche${numberFormat.format(fiche!.numero)}'));
-              }),
+            icon: const Icon(FluentIcons.share, color: Colors.white),
+            onPressed: (context, futureFile, pageFormat) async {
+              SharePlus.instance.share(
+                ShareParams(
+                  files: [XFile.fromData(await futureFile(pageFormat))],
+                  subject: reparation != null
+                      ? 'ordre${numberFormat.format(reparation!.numero)}'
+                      : 'fiche${numberFormat.format(fiche!.numero)}',
+                ),
+              );
+            },
+          ),
           PdfPreviewAction(
             icon: const Text(
               'fermer',
@@ -88,23 +89,32 @@ class PdfPreviewPO extends StatelessWidget {
   }
 
   void saveThisFile(
-      BuildContext s,
-      FutureOr<Uint8List> Function(PdfPageFormat) futureFile,
-      PdfPageFormat pageFormat) async {
+    BuildContext s,
+    FutureOr<Uint8List> Function(PdfPageFormat) futureFile,
+    PdfPageFormat pageFormat,
+  ) async {
     if (DeviceType.android == Device.deviceType ||
         Device.deviceType == DeviceType.ios) {
       DocumentFileSavePlus().saveFile(
-          await futureFile(pageFormat),
-          reparation!=null?'ordre${numberFormat.format(reparation!.numero)}.pdf':'fiche${numberFormat.format(fiche!.numero)}}.pdf',
-          "appliation/pdf");
+        await futureFile(pageFormat),
+        reparation != null
+            ? 'ordre${numberFormat.format(reparation!.numero)}.pdf'
+            : 'fiche${numberFormat.format(fiche!.numero)}}.pdf',
+        "appliation/pdf",
+      );
     } else if (kIsWeb) {
       saveFileWeb(
-          await futureFile(pageFormat),
-          reparation!=null?'ordre${numberFormat.format(reparation!.numero)}.pdf':'fiche${numberFormat.format(fiche!.numero)}}.pdf',);
+        await futureFile(pageFormat),
+        reparation != null
+            ? 'ordre${numberFormat.format(reparation!.numero)}.pdf'
+            : 'fiche${numberFormat.format(fiche!.numero)}}.pdf',
+      );
     } else {
       await FilePicker.saveFile(
         dialogTitle: "save".tr(),
-        fileName: reparation!=null?'ordre${numberFormat.format(reparation!.numero)}.pdf':'fiche${numberFormat.format(fiche!.numero)}}.pdf',
+        fileName: reparation != null
+            ? 'ordre${numberFormat.format(reparation!.numero)}.pdf'
+            : 'fiche${numberFormat.format(fiche!.numero)}}.pdf',
         bytes: await futureFile(pageFormat),
         type: FileType.custom,
         allowedExtensions: ['pdf'],
@@ -121,10 +131,10 @@ class PdfPreviewPO extends StatelessWidget {
       ..download = name;
     html.document.body?.children.add(anchor);
 
-// download
+    // download
     anchor.click();
 
-// cleanup
+    // cleanup
     html.document.body?.children.remove(anchor);
     html.Url.revokeObjectUrl(url);
   }

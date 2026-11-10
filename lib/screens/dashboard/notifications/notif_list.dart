@@ -86,25 +86,34 @@ class NotifListState extends State<NotifList>
   void createNotifListFromLists() {
     int i;
     for (i = 0; i < docVehic.length; i++) {
-      tiles.add(PNotification(
+      tiles.add(
+        PNotification(
           id: docVehic[i].id,
           title: docVehic[i].nom,
           type: 0,
-          date: docVehic[i].dateExpiration!));
+          date: docVehic[i].dateExpiration!,
+        ),
+      );
     }
     for (i = 0; i < docChauf.length; i++) {
-      tiles.add(PNotification(
+      tiles.add(
+        PNotification(
           id: docChauf[i].id,
           title: docChauf[i].nom,
           type: 1,
-          date: docChauf[i].dateExpiration!));
+          date: docChauf[i].dateExpiration!,
+        ),
+      );
     }
     for (i = 0; i < plannings.length; i++) {
-      tiles.add(PNotification(
+      tiles.add(
+        PNotification(
           id: plannings[i].id,
           title: plannings[i].subject,
           type: 2,
-          date: plannings[i].startTime));
+          date: plannings[i].startTime,
+        ),
+      );
     }
 
     tiles.sort((a, b) => a.date.compareTo(b.date));
@@ -118,48 +127,56 @@ class NotifListState extends State<NotifList>
     var appTheme = context.watch<AppTheme>();
     if (loading) {
       return const Center(
-          child: SizedBox(
-              width: 64, height: 16, child: LinearProgressIndicator()));
+        child: SizedBox(
+          width: 64,
+          height: 16,
+          child: LinearProgressIndicator(),
+        ),
+      );
     }
     return ValueListenableBuilder(
-        valueListenable: changes,
-        builder: (context, c, w) {
-          return FlyoutTarget(
-            controller: flyoutController,
-            child: OnTapScaleAndFade(
-                onTap: loading
-                    ? null
-                    : () {
-                        showNotifications();
-                      },
-                child: Badge(
-                  backgroundColor: appTheme.color.lightest,
-                  alignment: Alignment.bottomRight,
-                  offset: const Offset(5, 5),
-                  label: Text(tiles.length.toString()),
-                  isLabelVisible: tiles.isNotEmpty,
-                  child: tiles.isNotEmpty
-                      ? Icon(
-                          FluentIcons.ringer_solid,
-                          size: 24,
-                          color: appTheme.color.darkest,
-                        )
-                      : Icon(
-                          FluentIcons.ringer,
-                          size: 24,
-                          color: appTheme.color.darkest,
-                        ),
-                )),
-          );
-        });
+      valueListenable: changes,
+      builder: (context, c, w) {
+        return FlyoutTarget(
+          controller: flyoutController,
+          child: OnTapScaleAndFade(
+            onTap: loading
+                ? null
+                : () {
+                    showNotifications();
+                  },
+            child: Badge(
+              backgroundColor: appTheme.color.lightest,
+              alignment: Alignment.bottomRight,
+              offset: const Offset(5, 5),
+              label: Text(tiles.length.toString()),
+              isLabelVisible: tiles.isNotEmpty,
+              child: tiles.isNotEmpty
+                  ? Icon(
+                      FluentIcons.ringer_solid,
+                      size: 24,
+                      color: appTheme.color.darkest,
+                    )
+                  : Icon(
+                      FluentIcons.ringer,
+                      size: 24,
+                      color: appTheme.color.darkest,
+                    ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void showNotifications() {
     flyoutController.showFlyout(
-        autoModeConfiguration: FlyoutAutoConfiguration(
-            preferredMode: FlyoutPlacementMode.bottomLeft),
-        builder: (context) {
-          return StatefulBuilder(builder: (context, setS) {
+      autoModeConfiguration: FlyoutAutoConfiguration(
+        preferredMode: FlyoutPlacementMode.bottomLeft,
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setS) {
             return FlyoutContent(
               child: SizedBox(
                 height: 270.px,
@@ -178,29 +195,31 @@ class NotifListState extends State<NotifList>
                                 Text(
                                   'notifications'.tr().toUpperCase(),
                                   style: TextStyle(
-                                      color: Colors.grey[100],
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),
+                                    color: Colors.grey[100],
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 smallSpace,
                                 IconButton(
-                                    icon: const Icon(FluentIcons.refresh),
-                                    onPressed: () {
-                                      loaded = false;
-                                      getNotifs().then((value) {
-                                        setS(() {});
-                                      });
+                                  icon: const Icon(FluentIcons.refresh),
+                                  onPressed: () {
+                                    loaded = false;
+                                    getNotifs().then((value) {
                                       setS(() {});
-                                    })
+                                    });
+                                    setS(() {});
+                                  },
+                                ),
                               ],
                             ),
                           ),
                           Flexible(
                             child: ListView(
                               children: tiles
-                                  .map((e) => NotificationTile(
-                                        pNotification: e,
-                                      ))
+                                  .map(
+                                    (e) => NotificationTile(pNotification: e),
+                                  )
                                   .toList(),
                             ),
                           ),
@@ -208,8 +227,10 @@ class NotifListState extends State<NotifList>
                       ),
               ),
             );
-          });
-        });
+          },
+        );
+      },
+    );
   }
 
   @override

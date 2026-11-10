@@ -90,21 +90,24 @@ class PanesListState extends State<PanesList>
   StreamSubscription<InternetStatus>? internetListener;
 
   void listenToInternet() async {
-
-    internetListener =
-        InternetConnection().onStatusChange.listen((InternetStatus status) {
+    internetListener = InternetConnection().onStatusChange.listen((
+      InternetStatus status,
+    ) {
       switch (status) {
         case InternetStatus.connected:
           if (noConnection) {
             Future.delayed(const Duration(milliseconds: 10)).whenComplete(() {
               if (!mounted) return;
-              displayInfoBar(context,
-                  builder: (BuildContext context, void Function() close) {
-                return InfoBar(
-                  title: const Text('connectionback').tr(),
-                  severity: InfoBarSeverity.success,
-                );
-              }, duration: snackbarShortDuration);
+              displayInfoBar(
+                context,
+                builder: (BuildContext context, void Function() close) {
+                  return InfoBar(
+                    title: const Text('connectionback').tr(),
+                    severity: InfoBarSeverity.success,
+                  );
+                },
+                duration: snackbarShortDuration,
+              );
             });
             setState(() {
               noConnection = false;
@@ -115,13 +118,16 @@ class PanesListState extends State<PanesList>
           if (!noConnection) {
             Future.delayed(const Duration(milliseconds: 10)).whenComplete(() {
               if (!mounted) return;
-              displayInfoBar(context,
-                  builder: (BuildContext context, void Function() close) {
-                return InfoBar(
-                  title: const Text('noconnection').tr(),
-                  severity: InfoBarSeverity.warning,
-                );
-              }, duration: snackbarShortDuration * 3);
+              displayInfoBar(
+                context,
+                builder: (BuildContext context, void Function() close) {
+                  return InfoBar(
+                    title: const Text('noconnection').tr(),
+                    severity: InfoBarSeverity.warning,
+                  );
+                },
+                duration: snackbarShortDuration * 3,
+              );
             });
             setState(() {
               noConnection = true;
@@ -144,116 +150,113 @@ class PanesListState extends State<PanesList>
     }
     bool portrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return ValueListenableBuilder(
-        valueListenable: signedIn,
-        builder: (BuildContext context, bool value, Widget? child) {
-          widget.paneList.initPanes();
-          return ValueListenableBuilder(
-              valueListenable: index,
-              builder: (BuildContext context, int value, Widget? child) {
-                return NavigationView(
-                  transitionBuilder: (w, d) => DrillInPageTransition(
-                    animation: d,
-                    child: w,
-                  ),
-                  titleBar: Container(
-                    height: 65.px,
-                    color: widget.appTheme.mode == ThemeMode.dark
-                        ? Colors.grey[220]
-                        : Colors.white,
-                    child: DragToMoveArea(
-                      child: Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: Row(
-                          children: [
-                            Image.asset(
-                              'assets/images/logo.webp',
-                              width: 80.px,
-                              height: 80.px,
-                            ),
-                            smallSpace,
-                            Text('v${packageInfo.version}'),
-                            if (DatabaseGetter.trialDate != null &&
-                                DatabaseGetter.me.value != null)
-                              bigSpace,
-                            if (DatabaseGetter.trialDate != null)
-                              const Text('daysremain').tr(namedArgs: {
-                                'days': DatabaseGetter.trialDate!
-                                    .difference(DateTime.now())
-                                    .inDays
-                                    .toString()
-                              }),
-                            if (demo && !portrait) bigSpace,
-                            if (demo && !portrait)
-                              Text(
-                                'demofor'.tr().toUpperCase(),
-                                style: TextStyle(
-                                  fontStyle: FontStyle.italic,
-                                  color: Colors.red,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            if (brandt && !portrait) smallSpace,
-                            if (brandt && !portrait)
-                              Image.asset(
-                                'assets/images/brandt.png',
-                                width: 60.px,
-                                height: 60.px,
-                              ),
-                            const Spacer(),
-                            if (!loading &&
-                                signedIn.value &&
-                                DatabaseGetter.trialDate != null)
-                              const NotifList(),
-                            if (!loading &&
-                                signedIn.value &&
-                                DatabaseGetter.trialDate != null)
-                              const SizedBox(width: 10),
-                            if (!loading &&
-                                signedIn.value &&
-                                DatabaseGetter.trialDate != null)
-                              const ProfilNameTopBar(),
-                            smallSpace,
-                            if (!kIsWeb)
-                              if (Platform.isMacOS ||
-                                  Platform.isLinux ||
-                                  Platform.isWindows)
-                                const WindowButtons(),
-                          ],
+      valueListenable: signedIn,
+      builder: (BuildContext context, bool value, Widget? child) {
+        widget.paneList.initPanes();
+        return ValueListenableBuilder(
+          valueListenable: index,
+          builder: (BuildContext context, int value, Widget? child) {
+            return NavigationView(
+              transitionBuilder: (w, d) =>
+                  DrillInPageTransition(animation: d, child: w),
+              titleBar: Container(
+                height: 65.px,
+                color: widget.appTheme.mode == ThemeMode.dark
+                    ? Colors.grey[220]
+                    : Colors.white,
+                child: DragToMoveArea(
+                  child: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          'assets/images/logo.webp',
+                          width: 80.px,
+                          height: 80.px,
                         ),
-                      ),
+                        smallSpace,
+                        Text('v${packageInfo.version}'),
+                        if (DatabaseGetter.trialDate != null &&
+                            DatabaseGetter.me.value != null)
+                          bigSpace,
+                        if (DatabaseGetter.trialDate != null)
+                          const Text('daysremain').tr(
+                            namedArgs: {
+                              'days': DatabaseGetter.trialDate!
+                                  .difference(DateTime.now())
+                                  .inDays
+                                  .toString(),
+                            },
+                          ),
+                        if (demo && !portrait) bigSpace,
+                        if (demo && !portrait)
+                          Text(
+                            'demofor'.tr().toUpperCase(),
+                            style: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              color: Colors.red,
+                              fontSize: 14,
+                            ),
+                          ),
+                        if (brandt && !portrait) smallSpace,
+                        if (brandt && !portrait)
+                          Image.asset(
+                            'assets/images/brandt.png',
+                            width: 60.px,
+                            height: 60.px,
+                          ),
+                        const Spacer(),
+                        if (!loading &&
+                            signedIn.value &&
+                            DatabaseGetter.trialDate != null)
+                          const NotifList(),
+                        if (!loading &&
+                            signedIn.value &&
+                            DatabaseGetter.trialDate != null)
+                          const SizedBox(width: 10),
+                        if (!loading &&
+                            signedIn.value &&
+                            DatabaseGetter.trialDate != null)
+                          const ProfilNameTopBar(),
+                        smallSpace,
+                        if (!kIsWeb)
+                          if (Platform.isMacOS ||
+                              Platform.isLinux ||
+                              Platform.isWindows)
+                            const WindowButtons(),
+                      ],
                     ),
                   ),
-                  pane: NavigationPane(
-                    selected: value,
-                    onChanged: (i) {
-                      previousValue = index.value;
-                      index.value = i;
-                    },
-                    size: NavigationPaneSize(
-                      openMaxWidth: pwidth,
-                    ),
-                    displayMode: widget.appTheme.displayMode,
-                    items: PaneItemsAndFooters.originalItems,
-                    footerItems: PaneItemsAndFooters.footerItems,
-                  ),
-
-                );
-              });
-        });
+                ),
+              ),
+              pane: NavigationPane(
+                selected: value,
+                onChanged: (i) {
+                  previousValue = index.value;
+                  index.value = i;
+                },
+                size: NavigationPaneSize(openMaxWidth: pwidth),
+                displayMode: widget.appTheme.displayMode,
+                items: PaneItemsAndFooters.originalItems,
+                footerItems: PaneItemsAndFooters.footerItems,
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
   void onWindowClose() {
     windowManager.isPreventClose().then((value) {
       if (value) {
-        if(mounted){
+        if (mounted) {
           showDialog<String>(
             context: context,
             builder: (context) => ContentDialog(
               title: const Text('sur').tr(),
-              content: const Text(
-                'sauv',
-              ).tr(),
+              content: const Text('sauv').tr(),
               actions: [
                 Button(
                   child: const Text('oui').tr(),
@@ -272,7 +275,6 @@ class PanesListState extends State<PanesList>
             ),
           );
         }
-
       }
     });
   }
@@ -297,7 +299,8 @@ class WindowButtons extends StatelessWidget {
     return SizedBox(
       width: 138,
       height: 50,
-      child: (!kIsWeb &&
+      child:
+          (!kIsWeb &&
               (Platform.isMacOS || Platform.isLinux || Platform.isWindows))
           ? WindowCaption(
               brightness: theme.brightness,

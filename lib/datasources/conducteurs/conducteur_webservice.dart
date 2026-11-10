@@ -9,8 +9,12 @@ import '../../serializables/conducteur/conducteur.dart';
 class ConducteurWebService extends ParcOtoWebService<Conducteur> {
   final bool archive;
 
-  ConducteurWebService(super.data, super.collectionID, super.columnForSearch,
-      {this.archive = false});
+  ConducteurWebService(
+    super.data,
+    super.collectionID,
+    super.columnForSearch, {
+    this.archive = false,
+  });
 
   @override
   Conducteur fromJsonFunction(Map<String, dynamic> json) {
@@ -73,19 +77,22 @@ class ConducteurWebService extends ParcOtoWebService<Conducteur> {
 
     if (minAge != null || maxAge != null) {
       final now = DateTime.now();
-      conducteurs = conducteurs.where((conducteur) {
-        final birthDate = conducteur.dateNaissance;
-        if (birthDate == null) return false;
+      conducteurs = conducteurs
+          .where((conducteur) {
+            final birthDate = conducteur.dateNaissance;
+            if (birthDate == null) return false;
 
-        var age = now.year - birthDate.year;
-        final hadBirthday = now.month > birthDate.month ||
-            (now.month == birthDate.month && now.day >= birthDate.day);
-        if (!hadBirthday) age--;
+            var age = now.year - birthDate.year;
+            final hadBirthday =
+                now.month > birthDate.month ||
+                (now.month == birthDate.month && now.day >= birthDate.day);
+            if (!hadBirthday) age--;
 
-        if (minAge != null && age < minAge) return false;
-        if (maxAge != null && age > maxAge) return false;
-        return true;
-      }).toList(growable: true);
+            if (minAge != null && age < minAge) return false;
+            if (maxAge != null && age > maxAge) return false;
+            return true;
+          })
+          .toList(growable: true);
     }
 
     final allEntries = conducteurs
@@ -113,11 +120,7 @@ class ConducteurWebService extends ParcOtoWebService<Conducteur> {
   @override
   String getAttributeForSearch(int att) => 'search';
 
-  int _compareNullable<T>(
-    T? a,
-    T? b,
-    int Function(T, T) compare,
-  ) {
+  int _compareNullable<T>(T? a, T? b, int Function(T, T) compare) {
     if (a == null && b == null) return 0;
     if (a == null) return 1;
     if (b == null) return -1;
@@ -126,42 +129,81 @@ class ConducteurWebService extends ParcOtoWebService<Conducteur> {
 
   @override
   int Function(
-          MapEntry<String, Conducteur> p1, MapEntry<String, Conducteur> p2)?
-      getComparisonFunction(int column, bool ascending) {
+    MapEntry<String, Conducteur> p1,
+    MapEntry<String, Conducteur> p2,
+  )?
+  getComparisonFunction(int column, bool ascending) {
     final coef = ascending ? 1 : -1;
 
     switch (column) {
       case 0:
-        return (a, b) => coef * '${a.value.name} ${a.value.prenom}'
-            .compareTo('${b.value.name} ${b.value.prenom}');
+        return (a, b) =>
+            coef *
+            '${a.value.name} ${a.value.prenom}'.compareTo(
+              '${b.value.name} ${b.value.prenom}',
+            );
       case 1:
-        return (a, b) => coef * _compareNullable<String>(
-              a.value.email, b.value.email, (x, y) => x.compareTo(y));
+        return (a, b) =>
+            coef *
+            _compareNullable<String>(
+              a.value.email,
+              b.value.email,
+              (x, y) => x.compareTo(y),
+            );
       case 2:
-        return (a, b) => coef * _compareNullable<String>(
-              a.value.telephone, b.value.telephone, (x, y) => x.compareTo(y));
+        return (a, b) =>
+            coef *
+            _compareNullable<String>(
+              a.value.telephone,
+              b.value.telephone,
+              (x, y) => x.compareTo(y),
+            );
       case 3:
-        return (a, b) => coef * _compareNullable<String>(
-              a.value.adresse, b.value.adresse, (x, y) => x.compareTo(y));
+        return (a, b) =>
+            coef *
+            _compareNullable<String>(
+              a.value.adresse,
+              b.value.adresse,
+              (x, y) => x.compareTo(y),
+            );
       case 4:
-        return (a, b) => coef * _compareNullable<DateTime>(
-              a.value.dateNaissance, b.value.dateNaissance,
-              (x, y) => x.compareTo(y));
+        return (a, b) =>
+            coef *
+            _compareNullable<DateTime>(
+              a.value.dateNaissance,
+              b.value.dateNaissance,
+              (x, y) => x.compareTo(y),
+            );
       case 5:
-        return (a, b) => coef * _compareNullable<DateTime>(
-              a.value.updatedAt, b.value.updatedAt, (x, y) => x.compareTo(y));
+        return (a, b) =>
+            coef *
+            _compareNullable<DateTime>(
+              a.value.updatedAt,
+              b.value.updatedAt,
+              (x, y) => x.compareTo(y),
+            );
       case 6:
-        return (a, b) => coef * _compareNullable<int>(
-              a.value.etat, b.value.etat, (x, y) => x.compareTo(y));
+        return (a, b) =>
+            coef *
+            _compareNullable<int>(
+              a.value.etat,
+              b.value.etat,
+              (x, y) => x.compareTo(y),
+            );
     }
 
     return null;
   }
 
   @override
-  List<String> getFilterQueries(Map<String, String> filters, int count,
-      int startingAt, int sortedBy, bool sortedAsc,
-      {int? index}) {
+  List<String> getFilterQueries(
+    Map<String, String> filters,
+    int count,
+    int startingAt,
+    int sortedBy,
+    bool sortedAsc, {
+    int? index,
+  }) {
     // Filtering is performed by getData after repository retrieval.
     return [
       if (archive) Query.equal('etat', 3),

@@ -14,70 +14,70 @@ import 'package:parc_oto/screens/vehicle/states/state_tabs.dart';
 import 'package:parc_oto/screens/vehicle/vehicle_dashboard.dart';
 import 'package:parc_oto/theme.dart';
 
+GlobalKey sideKey = GlobalKey();
 
-GlobalKey sideKey=GlobalKey();
 class Routes {
   Routes(AppTheme appTheme) {
     router = GoRouter(
-
       initialLocation: '/',
       routes: [
         ShellRoute(
-            builder: (context, state,s ) =>
-                PanesList(key: sideKey,
-                  paneList: PaneItemsAndFooters(appTheme), appTheme:
-            appTheme,
-                ),
-            routes: [
-              GoRoute(
-                name: 'login',
-                path: '/login',
-                builder: (context, state) => const LoginScreen(),
-              ),
-              GoRoute(
-                name: 'dashboard',
-                path: '/',
-                builder: (context, state) => const Dashboard(),
-              ),
+          builder: (context, state, s) => PanesList(
+            key: sideKey,
+            paneList: PaneItemsAndFooters(appTheme),
+            appTheme: appTheme,
+          ),
+          routes: [
+            GoRoute(
+              name: 'login',
+              path: '/login',
+              builder: (context, state) => const LoginScreen(),
+            ),
+            GoRoute(
+              name: 'dashboard',
+              path: '/',
+              builder: (context, state) => const Dashboard(),
+            ),
 
-              GoRoute(
-                  path: '/vehicles',
-                  builder: (context, state) => const VehicleDashboard(),
-                  routes: [
-                    GoRoute(
-                        path: 'manager',
-                        builder: (context, state) => const VehicleTabs()),
-                    GoRoute(
-                        path: 'brands',
-                        builder: (context, state) => const BrandList()),
-                    GoRoute(
-                        path: 'states',
-                        builder: (context, state) => const StateTabs()),
-                    GoRoute(
-                        path: 'documents',
-                        builder: (context, state) => const DocumentTabs()),
-                  ]),
-            ]),
+            GoRoute(
+              path: '/vehicles',
+              builder: (context, state) => const VehicleDashboard(),
+              routes: [
+                GoRoute(
+                  path: 'manager',
+                  builder: (context, state) => const VehicleTabs(),
+                ),
+                GoRoute(
+                  path: 'brands',
+                  builder: (context, state) => const BrandList(),
+                ),
+                GoRoute(
+                  path: 'states',
+                  builder: (context, state) => const StateTabs(),
+                ),
+                GoRoute(
+                  path: 'documents',
+                  builder: (context, state) => const DocumentTabs(),
+                ),
+              ],
+            ),
+          ],
+        ),
         GoRoute(
-            name: 'recoverpassword',
-            path: '/recoverpassword',
-            builder: (context, state) => const ResetScreen()),
+          name: 'recoverpassword',
+          path: '/recoverpassword',
+          builder: (context, state) => const ResetScreen(),
+        ),
         GoRoute(
-            name: 'acceptinvitation',
-            path: '/acceptinvitation',
-            builder: (context, state) => const AcceptInvitation()),
+          name: 'acceptinvitation',
+          path: '/acceptinvitation',
+          builder: (context, state) => const AcceptInvitation(),
+        ),
       ],
     );
   }
 
   late final GoRouter router;
 
-
-
-static final List<GetPage> pages=[
-
-];
-
+  static final List<GetPage> pages = [];
 }
-
-

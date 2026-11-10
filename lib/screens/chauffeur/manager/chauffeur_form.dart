@@ -20,14 +20,10 @@ import '../../sidemenu/pane_items.dart';
 import '../../sidemenu/sidemenu.dart';
 import '../../vehicle/manager/vehicle_tabs.dart';
 
-
 class ChauffeurForm extends StatefulWidget {
   final Conducteur? chauf;
 
-  const ChauffeurForm({
-    super.key,
-    this.chauf,
-  });
+  const ChauffeurForm({super.key, this.chauf});
 
   @override
   State<ChauffeurForm> createState() => ChauffeurFormState();
@@ -52,7 +48,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   TextEditingController selectedDepartment = TextEditingController();
   TextEditingController profession = TextEditingController();
   DateTime? birthDay;
-  bool service=false;
+  bool service = false;
   @override
   void initState() {
     initValues();
@@ -74,13 +70,17 @@ class ChauffeurFormState extends State<ChauffeurForm> {
       adresse.text = widget.chauf!.adresse ?? '';
       birthDay = widget.chauf!.dateNaissance;
       vehicules.addAll(widget.chauf!.vehicules ?? []);
-      selectedDirection.text =
-          VehiclesUtilities.getDirection(widget.chauf!.direction);
-      selectedAppartenance.text =
-          VehiclesUtilities.getAppartenance(widget.chauf!.filliale);
-      selectedDepartment.text=VehiclesUtilities.getDepartment(widget.chauf!.departement);
-      profession.text=widget.chauf!.profession??'';
-      service=widget.chauf!.service;
+      selectedDirection.text = VehiclesUtilities.getDirection(
+        widget.chauf!.direction,
+      );
+      selectedAppartenance.text = VehiclesUtilities.getAppartenance(
+        widget.chauf!.filliale,
+      );
+      selectedDepartment.text = VehiclesUtilities.getDepartment(
+        widget.chauf!.departement,
+      );
+      profession.text = widget.chauf!.profession ?? '';
+      service = widget.chauf!.service;
     }
   }
 
@@ -97,9 +97,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
           children: [
             const Text('Sauvegarde en cours ...'),
             smallSpace,
-            ProgressBar(
-              value: progress,
-            ),
+            ProgressBar(value: progress),
           ],
         ),
       );
@@ -114,8 +112,9 @@ class ChauffeurFormState extends State<ChauffeurForm> {
             child: Container(
               color: appTheme.backGroundColor,
               child: ListView(
-                padding:
-                    portrait ? null : EdgeInsets.symmetric(horizontal: 200.px),
+                padding: portrait
+                    ? null
+                    : EdgeInsets.symmetric(horizontal: 200.px),
                 shrinkWrap: true,
                 children: [
                   SizedBox(
@@ -135,7 +134,9 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                 style: appTheme.writingStyle,
                                 placeholderStyle: placeStyle,
                                 cursorColor: appTheme.color.darker,
-                                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                decoration: WidgetStatePropertyAll(
+                                  BoxDecoration(color: appTheme.fillColor),
+                                ),
 
                                 onChanged: (s) {
                                   checkChanges();
@@ -154,32 +155,42 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                               child: Row(
                                 children: [
                                   Flexible(
-                                      child: TextBox(
-                                    controller: nom,
-                                    placeholder: 'Nom',
-                                    style: appTheme.writingStyle,
-                                    placeholderStyle: placeStyle,
-                                    cursorColor: appTheme.color.darker,
-                                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                    child: TextBox(
+                                      controller: nom,
+                                      placeholder: 'Nom',
+                                      style: appTheme.writingStyle,
+                                      placeholderStyle: placeStyle,
+                                      cursorColor: appTheme.color.darker,
+                                      decoration: WidgetStatePropertyAll(
+                                        BoxDecoration(
+                                          color: appTheme.fillColor,
+                                        ),
+                                      ),
 
-                                        onChanged: (s) {
-                                      checkChanges();
-                                    },
-                                  )),
+                                      onChanged: (s) {
+                                        checkChanges();
+                                      },
+                                    ),
+                                  ),
                                   smallSpace,
                                   Flexible(
-                                      child: TextBox(
-                                    controller: prenom,
-                                    placeholder: 'Prénom',
-                                    style: appTheme.writingStyle,
-                                    placeholderStyle: placeStyle,
-                                    cursorColor: appTheme.color.darker,
-                                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                    child: TextBox(
+                                      controller: prenom,
+                                      placeholder: 'Prénom',
+                                      style: appTheme.writingStyle,
+                                      placeholderStyle: placeStyle,
+                                      cursorColor: appTheme.color.darker,
+                                      decoration: WidgetStatePropertyAll(
+                                        BoxDecoration(
+                                          color: appTheme.fillColor,
+                                        ),
+                                      ),
 
-                                        onChanged: (s) {
-                                      checkChanges();
-                                    },
-                                  )),
+                                      onChanged: (s) {
+                                        checkChanges();
+                                      },
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -195,34 +206,42 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                               child: Row(
                                 children: [
                                   Flexible(
-                                      child: TextBox(
-                                        controller: profession,
-                                        placeholder: 'poste'.tr(),
-                                        style: appTheme.writingStyle,
-                                        placeholderStyle: placeStyle,
-                                        cursorColor: appTheme.color.darker,
-                                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                    child: TextBox(
+                                      controller: profession,
+                                      placeholder: 'poste'.tr(),
+                                      style: appTheme.writingStyle,
+                                      placeholderStyle: placeStyle,
+                                      cursorColor: appTheme.color.darker,
+                                      decoration: WidgetStatePropertyAll(
+                                        BoxDecoration(
+                                          color: appTheme.fillColor,
+                                        ),
+                                      ),
 
-                                        onChanged: (s) {
-                                          checkChanges();
-                                        },
-                                      )),
+                                      onChanged: (s) {
+                                        checkChanges();
+                                      },
+                                    ),
+                                  ),
                                   smallSpace,
                                   Flexible(
-                                      child: Row(
-                                        children: [
-                                          const Text('fonction').tr(),
-                                          smallSpace,
-                                          ToggleSwitch(checked: service,
-                                              onChanged: (s){
+                                    child: Row(
+                                      children: [
+                                        const Text('fonction').tr(),
+                                        smallSpace,
+                                        ToggleSwitch(
+                                          checked: service,
+                                          onChanged: (s) {
                                             setState(() {
-                                              service=s;
+                                              service = s;
                                             });
-                                              }),
-                                          smallSpace,
-                                          const Text('service').tr(),
-                                        ],
-                                      )),
+                                          },
+                                        ),
+                                        smallSpace,
+                                        const Text('service').tr(),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -232,20 +251,21 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                         Flexible(
                           flex: 2,
                           child: ZoneBox(
-                              label: 'birthday'.tr(),
-                              child: Container(
-                                height: 5.h,
-                                padding: const EdgeInsets.all(10),
-                                child: DatePicker(
-                                  selected: birthDay,
-                                  onChanged: (d) {
-                                    setState(() {
-                                      birthDay = d;
-                                    });
-                                    checkChanges();
-                                  },
-                                ),
-                              )),
+                            label: 'birthday'.tr(),
+                            child: Container(
+                              height: 5.h,
+                              padding: const EdgeInsets.all(10),
+                              child: DatePicker(
+                                selected: birthDay,
+                                onChanged: (d) {
+                                  setState(() {
+                                    birthDay = d;
+                                  });
+                                  checkChanges();
+                                },
+                              ),
+                            ),
+                          ),
                         ),
                         smallSpace,
                         Flexible(
@@ -266,7 +286,11 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                           style: appTheme.writingStyle,
                                           placeholderStyle: placeStyle,
                                           cursorColor: appTheme.color.darker,
-                                          decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                          decoration: WidgetStatePropertyAll(
+                                            BoxDecoration(
+                                              color: appTheme.fillColor,
+                                            ),
+                                          ),
 
                                           onChanged: (s) {
                                             checkChanges();
@@ -275,36 +299,46 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                       ),
                                       smallSpace,
                                       SizedBox(
-                                          width: 187,
-                                          child: TextBox(
-                                            controller: telephone,
-                                            placeholder: 'telephone'.tr(),
-                                            style: appTheme.writingStyle,
-                                            placeholderStyle: placeStyle,
-                                            cursorColor: appTheme.color.darker,
-                                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                        width: 187,
+                                        child: TextBox(
+                                          controller: telephone,
+                                          placeholder: 'telephone'.tr(),
+                                          style: appTheme.writingStyle,
+                                          placeholderStyle: placeStyle,
+                                          cursorColor: appTheme.color.darker,
+                                          decoration: WidgetStatePropertyAll(
+                                            BoxDecoration(
+                                              color: appTheme.fillColor,
+                                            ),
+                                          ),
 
-                                            onChanged: (s) {
-                                              checkChanges();
-                                            },
-                                          )),
+                                          onChanged: (s) {
+                                            checkChanges();
+                                          },
+                                        ),
+                                      ),
                                     ],
                                   ),
                                   smallSpace,
                                   Flexible(
-                                      child: TextBox(
-                                    controller: adresse,
-                                    placeholder: 'adresse'.tr(),
-                                    maxLines: 3,
-                                    style: appTheme.writingStyle,
-                                    placeholderStyle: placeStyle,
-                                    cursorColor: appTheme.color.darker,
-                                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                    child: TextBox(
+                                      controller: adresse,
+                                      placeholder: 'adresse'.tr(),
+                                      maxLines: 3,
+                                      style: appTheme.writingStyle,
+                                      placeholderStyle: placeStyle,
+                                      cursorColor: appTheme.color.darker,
+                                      decoration: WidgetStatePropertyAll(
+                                        BoxDecoration(
+                                          color: appTheme.fillColor,
+                                        ),
+                                      ),
 
-                                        onChanged: (s) {
-                                      checkChanges();
-                                    },
-                                  )),
+                                      onChanged: (s) {
+                                        checkChanges();
+                                      },
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -325,13 +359,17 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                       placeholderStyle: placeStyle,
                                       controller: selectedAppartenance,
                                       items: List.generate(
-                                          MyEntrepriseState.p!.filiales!.length,
-                                          (index) => AutoSuggestBoxItem(
-                                              value: MyEntrepriseState
-                                                  .p!.filiales![index],
-                                              label: MyEntrepriseState
-                                                  .p!.filiales![index]
-                                                  .toUpperCase())),
+                                        MyEntrepriseState.p!.filiales!.length,
+                                        (index) => AutoSuggestBoxItem(
+                                          value: MyEntrepriseState
+                                              .p!
+                                              .filiales![index],
+                                          label: MyEntrepriseState
+                                              .p!
+                                              .filiales![index]
+                                              .toUpperCase(),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   smallSpace,
@@ -341,14 +379,17 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                       placeholderStyle: placeStyle,
                                       controller: selectedDirection,
                                       items: List.generate(
-                                          MyEntrepriseState
-                                              .p!.directions!.length,
-                                          (index) => AutoSuggestBoxItem(
-                                              value: MyEntrepriseState
-                                                  .p!.directions![index],
-                                              label: MyEntrepriseState
-                                                  .p!.directions![index]
-                                                  .toUpperCase())),
+                                        MyEntrepriseState.p!.directions!.length,
+                                        (index) => AutoSuggestBoxItem(
+                                          value: MyEntrepriseState
+                                              .p!
+                                              .directions![index],
+                                          label: MyEntrepriseState
+                                              .p!
+                                              .directions![index]
+                                              .toUpperCase(),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   smallSpace,
@@ -358,13 +399,20 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                       placeholderStyle: placeStyle,
                                       controller: selectedDepartment,
                                       items: List.generate(
-                                          MyEntrepriseState.p!.departments!.length,
-                                              (index) => AutoSuggestBoxItem(
-                                              value: MyEntrepriseState
-                                                  .p!.departments![index],
-                                              label: MyEntrepriseState
-                                                  .p!.departments![index]
-                                                  .toUpperCase())),
+                                        MyEntrepriseState
+                                            .p!
+                                            .departments!
+                                            .length,
+                                        (index) => AutoSuggestBoxItem(
+                                          value: MyEntrepriseState
+                                              .p!
+                                              .departments![index],
+                                          label: MyEntrepriseState
+                                              .p!
+                                              .departments![index]
+                                              .toUpperCase(),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -454,8 +502,9 @@ class ChauffeurFormState extends State<ChauffeurForm> {
   double tilesHeight = 50.px;
   Widget vehiclesWidget(AppTheme appTheme) {
     return SizedBox(
-      height:
-          vehicules.isEmpty ? 100.px : vehicules.length * tilesHeight + 80.px,
+      height: vehicules.isEmpty
+          ? 100.px
+          : vehicules.length * tilesHeight + 80.px,
       child: ZoneBox(
         label: 'vehicules'.tr(),
         child: Padding(
@@ -469,36 +518,41 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     FilledButton(
-                        onPressed: () async {
-                          Vehicle? vehicle = await showDialog<Vehicle>(
-                              context: context,
-                              barrierDismissible: true,
-                              builder: (context) {
-                                return ContentDialog(
-                                  constraints: BoxConstraints.tight(
-                                      Size(700.px, 550.px)),
-                                  title: const Text('selectvehicle').tr(),
-                                  style: ContentDialogThemeData(
-                                      titleStyle: appTheme.writingStyle
-                                          .copyWith(
-                                          fontWeight:
-                                          FontWeight.bold)),
-                                  content: const VehicleTable(
-                                    selectV: true,
-                                  ),
-                                  actions: [Button(child: const Text('fermer').tr(),
-                                      onPressed: (){
+                      onPressed: () async {
+                        Vehicle? vehicle = await showDialog<Vehicle>(
+                          context: context,
+                          barrierDismissible: true,
+                          builder: (context) {
+                            return ContentDialog(
+                              constraints: BoxConstraints.tight(
+                                Size(700.px, 550.px),
+                              ),
+                              title: const Text('selectvehicle').tr(),
+                              style: ContentDialogThemeData(
+                                titleStyle: appTheme.writingStyle.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              content: const VehicleTable(selectV: true),
+                              actions: [
+                                Button(
+                                  child: const Text('fermer').tr(),
+                                  onPressed: () {
                                     Navigator.of(context).pop();
-                                      })],
-                                );
-                              });
-                          if (vehicle != null &&
-                              !vehicules.contains(vehicle.matricule)) {
-                            vehicules.add(vehicle.matricule);
-                            setState(() {});
-                          }
-                        },
-                        child: const Text('add').tr())
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                        if (vehicle != null &&
+                            !vehicules.contains(vehicle.matricule)) {
+                          vehicules.add(vehicle.matricule);
+                          setState(() {});
+                        }
+                      },
+                      child: const Text('add').tr(),
+                    ),
                   ],
                 ),
               ),
@@ -509,19 +563,24 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                 itemBuilder: (BuildContext context, int index) {
                   if (vehicules.isEmpty) {
                     return Center(
-                        child: SizedBox(
-                      height: 20.px,
-                      child: Text('vehiculesempty',
-                              style: TextStyle(
-                                  color: Colors.grey[100],
-                                  fontStyle: FontStyle.italic))
-                          .tr(),
-                    ));
+                      child: SizedBox(
+                        height: 20.px,
+                        child: Text(
+                          'vehiculesempty',
+                          style: TextStyle(
+                            color: Colors.grey[100],
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ).tr(),
+                      ),
+                    );
                   }
                   return SizedBox(
                     height: tilesHeight,
                     child: ListTile(
-                      tileColor: WidgetStateColor.resolveWith((states) => appTheme.fillColor),
+                      tileColor: WidgetStateColor.resolveWith(
+                        (states) => appTheme.fillColor,
+                      ),
                       title: Text(
                         vehicules[index],
                         softWrap: true,
@@ -532,16 +591,13 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                           Button(
                             child: const Text('voir').tr(),
                             onPressed: () {
-                              String v=vehicules[index];
+                              String v = vehicules[index];
                               showMyVehicule(v);
                             },
                           ),
                           smallSpace,
                           IconButton(
-                            icon: const Icon(
-                              FluentIcons.cancel,
-                              size: 15,
-                            ),
+                            icon: const Icon(FluentIcons.cancel, size: 15),
                             onPressed: () {
                               setState(() {
                                 vehicules.removeAt(index);
@@ -553,7 +609,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                     ),
                   );
                 },
-              )
+              ),
             ],
           ),
         ),
@@ -563,15 +619,15 @@ class ChauffeurFormState extends State<ChauffeurForm> {
 
   void showMyVehicule(String? matricule) {
     if (matricule != null) {
-
-      PanesListState.index.value = PaneItemsAndFooters.originalItems
-              .indexOf(PaneItemsAndFooters.vehicles) +
+      PanesListState.index.value =
+          PaneItemsAndFooters.originalItems.indexOf(
+            PaneItemsAndFooters.vehicles,
+          ) +
           1;
       VehicleTabsState.currentIndex.value = 0;
       VehicleTableState.filterVehicule.value = '"$matricule"';
 
       VehicleTableState.filterNow = true;
-
     }
   }
 
@@ -586,14 +642,15 @@ class ChauffeurFormState extends State<ChauffeurForm> {
           ((disp == null && etat == widget.chauf!.etat) ||
               (disp != null && disp!.type == etat)) &&
           adresse.text == widget.chauf!.adresse &&
-          telephone.text == widget.chauf!.telephone && profession
-          .text==widget.chauf!.profession && service==widget.chauf!.service &&
-          selectedDepartment.text==VehiclesUtilities.getDepartment(widget
-              .chauf!.departement) &&
-          selectedAppartenance.text==VehiclesUtilities.getAppartenance(widget
-              .chauf!.filliale) &&
-          selectedDirection.text==VehiclesUtilities.getDirection(widget
-              .chauf!.direction) &&
+          telephone.text == widget.chauf!.telephone &&
+          profession.text == widget.chauf!.profession &&
+          service == widget.chauf!.service &&
+          selectedDepartment.text ==
+              VehiclesUtilities.getDepartment(widget.chauf!.departement) &&
+          selectedAppartenance.text ==
+              VehiclesUtilities.getAppartenance(widget.chauf!.filliale) &&
+          selectedDirection.text ==
+              VehiclesUtilities.getDirection(widget.chauf!.direction) &&
           email.text == widget.chauf!.email) {
         if (changes) {
           setState(() {
@@ -742,22 +799,27 @@ class ChauffeurFormState extends State<ChauffeurForm> {
             .toString();
       }
       disp = DisponibiliteChauffeur(
-          id: etatID!,
-          type: etat ?? 0,
-          createdBy: DatabaseGetter.me.value?.id,
-          chauffeur: chaufID!,
-          chauffeurNom: '${nom.text} ${prenom.text}');
+        id: etatID!,
+        type: etat ?? 0,
+        createdBy: DatabaseGetter.me.value?.id,
+        chauffeur: chaufID!,
+        chauffeurNom: '${nom.text} ${prenom.text}',
+      );
       return await DatabaseGetter.database!
           .createRow(
-              databaseId: databaseId,
-              tableId: chaufDispID,
-              rowId: etatID!,
-              data: disp!.toJson())
+            databaseId: databaseId,
+            tableId: chaufDispID,
+            rowId: etatID!,
+            data: disp!.toJson(),
+          )
           .then((value) {
-        DatabaseGetter()
-            .ajoutActivity(20, etatID!, docName: disp?.chauffeurNom);
-        return value as Row;
-      });
+            DatabaseGetter().ajoutActivity(
+              20,
+              etatID!,
+              docName: disp?.chauffeurNom,
+            );
+            return value as Row;
+          });
     } else {
       return null;
     }
@@ -768,9 +830,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
       context: context,
       builder: (context) => ContentDialog(
         title: Text(title).tr(),
-        content: Text(
-          message,
-        ).tr(),
+        content: Text(message).tr(),
         actions: [
           Button(
             child: const Text('OK').tr(),

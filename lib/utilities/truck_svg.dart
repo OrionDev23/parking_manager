@@ -337,4 +337,4 @@ String trucksvg = '''<?xml version="1.0" encoding="UTF-8"?>
 <path d="" fill="#FFFFFF" transform="translate(0,0)"/>
 </g>
 </svg>
-''' ;
+''';

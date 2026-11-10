@@ -15,50 +15,73 @@ abstract class ParcOtoWebService<T> {
   ParcOtoWebService(this.data, this.collectionID, this.columnForSearch);
 
   int Function(MapEntry<String, T>, MapEntry<String, T>)? getComparisonFunction(
-      int column, bool ascending);
+    int column,
+    bool ascending,
+  );
 
   Future<ParcOtoWebServiceResponse<T>> getData(
-      int startingAt, int count, int sortedBy, bool sortedAsc,
-      {String? searchKey, Map<String, String>? filters}) async {
+    int startingAt,
+    int count,
+    int sortedBy,
+    bool sortedAsc, {
+    String? searchKey,
+    Map<String, String>? filters,
+  }) async {
     // Keep the SQLite-hydrated rows until the remote request succeeds.
     // A failed request must not erase the local snapshot.
     //  final stopwatch = Stopwatch()..start();
     return getSearchResult(
-            searchKey, filters ?? {}, count, startingAt, sortedBy, sortedAsc)
+          searchKey,
+          filters ?? {},
+          count,
+          startingAt,
+          sortedBy,
+          sortedAsc,
+        )
         .then((value) {
-        // Clear only after the remote request has succeeded. If it fails,
-      // the SQLite-hydrated snapshot must remain available as the fallback.
-      if (startingAt == 0) {
-        data.clear();
-      }
-      for (var element in value.rows) {
-        if (!testIfElementContained(element.$id)) {
-          data.add(MapEntry(element.$id, element.convertTo<T>((p0) {
-            return fromJsonFunction(p0);
-          })));
-        }
-        else{
-        }
-      }
-      var result = data;
+          // Clear only after the remote request has succeeded. If it fails,
+          // the SQLite-hydrated snapshot must remain available as the fallback.
+          if (startingAt == 0) {
+            data.clear();
+          }
+          for (var element in value.rows) {
+            if (!testIfElementContained(element.$id)) {
+              data.add(
+                MapEntry(
+                  element.$id,
+                  element.convertTo<T>((p0) {
+                    return fromJsonFunction(p0);
+                  }),
+                ),
+              );
+            } else {}
+          }
+          var result = data;
 
-      result.sort(getComparisonFunction(sortedBy, sortedAsc));
+          result.sort(getComparisonFunction(sortedBy, sortedAsc));
 
-      return ParcOtoWebServiceResponse<T>(
-          value.total, result.skip(startingAt).take(value.rows.length)
-          .toList());
-    }).onError((error, stackTrace) {
-      if (kDebugMode) {
-        if (error is AppwriteException) {
-          print('error.message : ${error.message}');
-          print('error.response : ${error.response}');
-        }
+          return ParcOtoWebServiceResponse<T>(
+            value.total,
+            result.skip(startingAt).take(value.rows.length).toList(),
+          );
+        })
+        .onError((error, stackTrace) {
+          if (kDebugMode) {
+            if (error is AppwriteException) {
+              print('error.message : ${error.message}');
+              print('error.response : ${error.response}');
+            }
 
-        print('stacktrace : $stackTrace');
-      }
+            print('stacktrace : $stackTrace');
+          }
 
-      return Future.value(ParcOtoWebServiceResponse<T>(data.length, data.skip(startingAt).take(count).toList()));
-    });
+          return Future.value(
+            ParcOtoWebServiceResponse<T>(
+              data.length,
+              data.skip(startingAt).take(count).toList(),
+            ),
+          );
+        });
   }
 
   T fromJsonFunction(Map<String, dynamic> json);
@@ -75,10 +98,18 @@ abstract class ParcOtoWebService<T> {
       late RowList d;
       for (int i = 0; i < columnForSearch; i++) {
         d = await DatabaseGetter.database!.listRows(
-            databaseId: databaseId,
-            tableId: collectionID,
-            queries: getQueriesForSearch(
-                searchKey, filters, count, startingAt, sortedBy, sortedAsc, i));
+          databaseId: databaseId,
+          tableId: collectionID,
+          queries: getQueriesForSearch(
+            searchKey,
+            filters,
+            count,
+            startingAt,
+            sortedBy,
+            sortedAsc,
+            i,
+          ),
+        );
         if (d.rows.isNotEmpty) {
           break;
         }
@@ -86,9 +117,10 @@ abstract class ParcOtoWebService<T> {
       return d;
     } else {
       return await DatabaseGetter.database!.listRows(
-          databaseId: databaseId,
-          tableId: collectionID,
-          queries: getQueries(filters, count, startingAt, sortedBy, sortedAsc));
+        databaseId: databaseId,
+        tableId: collectionID,
+        queries: getQueries(filters, count, startingAt, sortedBy, sortedAsc),
+      );
     }
   }
 
@@ -107,18 +139,24 @@ abstract class ParcOtoWebService<T> {
     ];
   }
 
-  List<String> getFilterQueries(Map<String, String> filters, int count,
-      int startingAt, int sortedBy, bool sortedAsc,
-      {int? index});
+  List<String> getFilterQueries(
+    Map<String, String> filters,
+    int count,
+    int startingAt,
+    int sortedBy,
+    bool sortedAsc, {
+    int? index,
+  });
 
   List<String> getQueriesForSearch(
-      String searchKey,
-      Map<String, String> filters,
-      int count,
-      int startingAt,
-      int sortedBy,
-      bool sortedAsc,
-      int index) {
+    String searchKey,
+    Map<String, String> filters,
+    int count,
+    int startingAt,
+    int sortedBy,
+    bool sortedAsc,
+    int index,
+  ) {
     return [
       getSearchQueryPerIndex(index, searchKey),
       ...getFilterQueries(filters, count, startingAt, sortedBy, sortedAsc),
@@ -126,7 +164,7 @@ abstract class ParcOtoWebService<T> {
   }
 
   String getSearchQueryPerIndex(int index, String searchKey) {
-    String test=Query.search(getAttributeForSearch(index), searchKey);
+    String test = Query.search(getAttributeForSearch(index), searchKey);
     return test;
   }
 
@@ -147,40 +185,47 @@ abstract class ParcOtoWebService<T> {
 abstract class ParcOtoWebServiceUsers<S, T> {
   List<MapEntry<S, T>> data;
 
-  ParcOtoWebServiceUsers(
-    this.data,
-  );
+  ParcOtoWebServiceUsers(this.data);
 
   int Function(MapEntry<S, T>, MapEntry<S, T>)? getComparisonFunction(
-      int column, bool ascending);
+    int column,
+    bool ascending,
+  );
 
   Future<UsersWebServiceResponse<S, T>> getData(
-      int startingAt, int count, int sortedBy, bool sortedAsc,
-      {String? searchKey, Map<String, String>? filters}) async {
+    int startingAt,
+    int count,
+    int sortedBy,
+    bool sortedAsc, {
+    String? searchKey,
+    Map<String, String>? filters,
+  }) async {
     if (startingAt == 0) {
       data.clear();
     }
     //  final stopwatch = Stopwatch()..start();
-    return getSearchResult(
-      searchKey,
-    ).then((value) {
-      //stopwatch.stop();
-      // print("finished in ${stopwatch.elapsed.inMilliseconds} s");
+    return getSearchResult(searchKey)
+        .then((value) {
+          //stopwatch.stop();
+          // print("finished in ${stopwatch.elapsed.inMilliseconds} s");
 
-      for (var element in value.entries) {
-        if (!testIfContained(data, element)) {
-          data.add(element);
-        }
-      }
-      var result = data;
+          for (var element in value.entries) {
+            if (!testIfContained(data, element)) {
+              data.add(element);
+            }
+          }
+          var result = data;
 
-      result.sort(getComparisonFunction(sortedBy, sortedAsc));
+          result.sort(getComparisonFunction(sortedBy, sortedAsc));
 
-      return UsersWebServiceResponse<S, T>(
-          value.length, result.skip(startingAt).take(count).toList());
-    }).onError((error, stackTrace) {
-      return Future.value(UsersWebServiceResponse<S, T>(0, data));
-    });
+          return UsersWebServiceResponse<S, T>(
+            value.length,
+            result.skip(startingAt).take(count).toList(),
+          );
+        })
+        .onError((error, stackTrace) {
+          return Future.value(UsersWebServiceResponse<S, T>(0, data));
+        });
   }
 
   bool testIfContained(List<MapEntry<dynamic, dynamic>> list, dynamic s) {

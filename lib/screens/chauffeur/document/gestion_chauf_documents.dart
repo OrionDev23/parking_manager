@@ -16,9 +16,7 @@ class ChauffeurDocuments extends StatefulWidget {
 }
 
 class ChauffeurDocumentsState extends State<ChauffeurDocuments> {
-  final tstyle = TextStyle(
-    fontSize: 10.sp,
-  );
+  final tstyle = TextStyle(fontSize: 10.sp);
 
   @override
   Widget build(BuildContext context) {

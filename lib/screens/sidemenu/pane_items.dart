@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
+
 import '../clients/client_tabs.dart';
 import '../reparation/fiche_reception/manager/fiche_reception_tabs.dart';
 import '../reparation/reparation/manager/reparation_tabs.dart';
@@ -10,6 +11,7 @@ import '../workshop/parts/parts_management/parts_tabs.dart';
 import '../../admin_parameters.dart';
 import '../../main.dart';
 import 'sidemenu.dart';
+
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../theme.dart';
@@ -69,189 +71,123 @@ class PaneItemsAndFooters {
 
   static late PaneItem tutorial;
 
-  final TextStyle paneTextStyle = TextStyle(
-    fontSize: 12.px,
-  );
+  final TextStyle paneTextStyle = TextStyle(fontSize: 12.px);
 
   void initPanes() {
     dashboard = PaneItem(
-        key: Key("dashboard"),
-        icon: Icon(
-          FluentIcons.home,
-          color: appTheme.color.lightest,
-        ),
-        body: const Dashboard(),
-        title: Text(
-          'home',
-          style: paneTextStyle,
-        ).tr());
+      key: Key("dashboard"),
+      icon: Icon(FluentIcons.home, color: appTheme.color.lightest),
+      body: const Dashboard(),
+      title: Text('home', style: paneTextStyle).tr(),
+    );
     accessManagement = PaneItem(
-        key: const Key("access"),
-        title: const Text('Équipes et accès'),
-        icon: Icon(
-          FluentIcons.security_group,
-          color: appTheme.color.lightest,
-        ),
-        body: const AccessManagement());
+      key: const Key("access"),
+      title: const Text('Équipes et accès'),
+      icon: Icon(FluentIcons.security_group, color: appTheme.color.lightest),
+      body: const AccessManagement(),
+    );
     usermanagement = PaneItem(
-        key: Key("usermngmt"),
-        title: Text(
-          'usermanagement',
-          style: paneTextStyle,
-        ).tr(),
-        icon: Icon(
-          FluentIcons.account_management,
-          color: appTheme.color.lightest,
-        ),
-        body: const UserManagement());
+      key: Key("usermngmt"),
+      title: Text('usermanagement', style: paneTextStyle).tr(),
+      icon: Icon(
+        FluentIcons.account_management,
+        color: appTheme.color.lightest,
+      ),
+      body: const UserManagement(),
+    );
     vehicles = PaneItemExpander(
-        key: Key("vehicles"),
-        icon: Icon(
-          gts?Icons.local_shipping_outlined:Icons.directions_car,
-          color: appTheme.color.lightest,
+      key: Key("vehicles"),
+      icon: Icon(
+        gts ? Icons.local_shipping_outlined : Icons.directions_car,
+        color: appTheme.color.lightest,
+      ),
+      title: Text('thevehicles', style: paneTextStyle).tr(),
+      items: [
+        PaneItem(
+          key: const Key('vehicle-manager'),
+          icon: Icon(FluentIcons.list, color: appTheme.color.lightest),
+          title: Text('gestionvehicles', style: paneTextStyle).tr(),
+          body: const VehicleTabs(),
         ),
-        title: Text(
-          'thevehicles',
-          style: paneTextStyle,
-        ).tr(),
-        items: [
-          PaneItem(
-              key: const Key('vehicle-manager'),
-              icon: Icon(
-                FluentIcons.list,
-                color: appTheme.color.lightest,
-              ),
-              title: Text(
-                'gestionvehicles',
-                style: paneTextStyle,
-              ).tr(),
-              body: const VehicleTabs()),
-          PaneItem(
-            key: const Key('vehicle-brands'),
-            icon: Icon(
-              FluentIcons.verified_brand,
-              color: appTheme.color.lightest,
-            ),
-            title: Text(
-              'brands',
-              style: paneTextStyle,
-            ).tr(),
-            body: const BrandList(),
+        PaneItem(
+          key: const Key('vehicle-brands'),
+          icon: Icon(
+            FluentIcons.verified_brand,
+            color: appTheme.color.lightest,
           ),
-          PaneItem(
-            key: const Key('vehicle-states'),
-            icon: Icon(
-              FluentIcons.health,
-              color: appTheme.color.lightest,
-            ),
-            title: Text(
-              'vstates',
-              style: paneTextStyle,
-            ).tr(),
-            body: const StateTabs(),
-          ),
-          PaneItem(
-            key: const Key('vehicle-documents'),
-            icon: Icon(
-              FluentIcons.document_set,
-              color: appTheme.color.lightest,
-            ),
-            title: Text(
-              'documents',
-              style: paneTextStyle,
-            ).tr(),
-            body: const DocumentTabs(),
-          ),
-        ],
-        body: const VehicleDashboard());
+          title: Text('brands', style: paneTextStyle).tr(),
+          body: const BrandList(),
+        ),
+        PaneItem(
+          key: const Key('vehicle-states'),
+          icon: Icon(FluentIcons.health, color: appTheme.color.lightest),
+          title: Text('vstates', style: paneTextStyle).tr(),
+          body: const StateTabs(),
+        ),
+        PaneItem(
+          key: const Key('vehicle-documents'),
+          icon: Icon(FluentIcons.document_set, color: appTheme.color.lightest),
+          title: Text('documents', style: paneTextStyle).tr(),
+          body: const DocumentTabs(),
+        ),
+      ],
+      body: const VehicleDashboard(),
+    );
     chauffeurs = PaneItemExpander(
-        key: Key("chauffeurs"),
+      key: Key("chauffeurs"),
 
-        icon: Icon(
-          FluentIcons.people,
-          color: appTheme.color.lightest,
+      icon: Icon(FluentIcons.people, color: appTheme.color.lightest),
+      title: Text("thechauffeurs", style: paneTextStyle).tr(),
+      body: const ConducteurDashboard(),
+      items: [
+        PaneItem(
+          key: const Key('driver-manager'),
+          icon: Icon(FluentIcons.list, color: appTheme.color.lightest),
+          body: const ChauffeurTabs(),
+          title: Text('gchauffeurs', style: paneTextStyle).tr(),
         ),
-        title: Text(
-          "thechauffeurs",
-          style: paneTextStyle,
-        ).tr(),
-        body: const ConducteurDashboard(),
-        items: [
-PaneItem(
-            key: const Key('driver-manager'),
-            icon: Icon(
-              FluentIcons.list,
-              color: appTheme.color.lightest,
-            ),
-            body: const ChauffeurTabs(),
-            title: Text(
-              'gchauffeurs',
-              style: paneTextStyle,
-            ).tr(),
+        PaneItem(
+          key: const Key('driver-availability'),
+          icon: Icon(
+            FluentIcons.check_list_check,
+            color: appTheme.color.lightest,
           ),
-PaneItem(
-            key: const Key('driver-availability'),
-            icon: Icon(
-              FluentIcons.check_list_check,
-              color: appTheme.color.lightest,
-            ),
-            title: Text(
-              'disponibilite',
-              style: paneTextStyle,
-            ).tr(),
-            body: const DisponbiliteTabs(),
+          title: Text('disponibilite', style: paneTextStyle).tr(),
+          body: const DisponbiliteTabs(),
+        ),
+        PaneItem(
+          key: const Key('driver-documents'),
+          icon: Icon(FluentIcons.document_set, color: appTheme.color.lightest),
+          title: Text('documents', style: paneTextStyle).tr(),
+          body: const CDocumentTabs(),
+        ),
+        PaneItem(
+          key: const Key('driver-archive'),
+          icon: Icon(
+            FluentIcons.search_bookmark,
+            color: appTheme.color.lightest,
           ),
-PaneItem(
-            key: const Key('driver-documents'),
-            icon: Icon(
-              FluentIcons.document_set,
-              color: appTheme.color.lightest,
-            ),
-            title: Text(
-              'documents',
-              style: paneTextStyle,
-            ).tr(),
-            body: const CDocumentTabs(),
-          ),
-PaneItem(
-            key: const Key('driver-archive'),
-            icon: Icon(
-              FluentIcons.search_bookmark,
-              color: appTheme.color.lightest,
-            ),
-            title: Text(
-              'archive',
-              style: paneTextStyle,
-            ).tr(),
-            body: const ChauffeurTabs(
-              archive: true,
-            ),
-          ),
-        ]);
+          title: Text('archive', style: paneTextStyle).tr(),
+          body: const ChauffeurTabs(archive: true),
+        ),
+      ],
+    );
     atelier = PaneItemExpander(
       icon: Icon(
         Icons.home_repair_service_outlined,
         color: appTheme.color.lightest,
       ),
       body: const WorkshopDashboard(),
-      title: Text(
-        "workshop",
-        style: paneTextStyle,
-      ).tr(),
+      title: Text("workshop", style: paneTextStyle).tr(),
       items: [
-        PaneItemHeader(
-            header: Text('inventaire',style: paneTextStyle,).tr()
-        ),
+        PaneItemHeader(header: Text('inventaire', style: paneTextStyle).tr()),
         PaneItem(
           key: const ValueKey('workshop-stock'),
           icon: Icon(
             Icons.inventory_2_outlined,
             color: appTheme.color.lightest,
           ),
-          title: Text(
-            'stock',
-            style: paneTextStyle,
-          ).tr(),
+          title: Text('stock', style: paneTextStyle).tr(),
           body: const StorageTabs(),
         ),
         PaneItem(
@@ -260,26 +196,15 @@ PaneItem(
             FluentIcons.service_activity,
             color: appTheme.color.lightest,
           ),
-          title: Text(
-            'fournisseurs',
-            style: paneTextStyle,
-          ).tr(),
+          title: Text('fournisseurs', style: paneTextStyle).tr(),
           body: const FournisseurTabs(),
         ),
-        PaneItemHeader(
-            header: Text('pieces',style: paneTextStyle,).tr()
-        ),
+        PaneItemHeader(header: Text('pieces', style: paneTextStyle).tr()),
         PaneItem(
           key: const ValueKey('workshop-parts'),
-          icon: Icon(
-            Icons.plumbing,
-            color: appTheme.color.lightest,
-          ),
+          icon: Icon(Icons.plumbing, color: appTheme.color.lightest),
           body: const PartsTabs(),
-          title: Text(
-            "gpieces",
-            style: paneTextStyle,
-          ).tr(),
+          title: Text("gpieces", style: paneTextStyle).tr(),
         ),
         PaneItem(
           key: const ValueKey('workshop-brands'),
@@ -288,10 +213,7 @@ PaneItem(
             color: appTheme.color.lightest,
           ),
           body: const BrandTabs(),
-          title: Text(
-            "brands",
-            style: paneTextStyle,
-          ).tr(),
+          title: Text("brands", style: paneTextStyle).tr(),
         ),
         PaneItem(
           key: const ValueKey('workshop-categories'),
@@ -300,10 +222,7 @@ PaneItem(
             color: appTheme.color.lightest,
           ),
           body: const CategoryTabs(),
-          title: Text(
-            "categories",
-            style: paneTextStyle,
-          ).tr(),
+          title: Text("categories", style: paneTextStyle).tr(),
         ),
         PaneItem(
           key: const ValueKey('workshop-options'),
@@ -312,211 +231,127 @@ PaneItem(
             color: appTheme.color.lightest,
           ),
           body: const OptionTabs(),
-          title: Text(
-            "options",
-            style: paneTextStyle,
-          ).tr(),
+          title: Text("options", style: paneTextStyle).tr(),
         ),
       ],
     );
     evenements = PaneItem(
-        key: Key("events"),
+      key: Key("events"),
 
-        icon: Icon(
-          FluentIcons.database_activity,
-          color: appTheme.color.lightest,
-        ),
-        title: Text(
-          'journal',
-          style: paneTextStyle,
-        ).tr(),
-        body: const LogActivityManagement());
+      icon: Icon(FluentIcons.database_activity, color: appTheme.color.lightest),
+      title: Text('journal', style: paneTextStyle).tr(),
+      body: const LogActivityManagement(),
+    );
     planner = PaneItem(
-        key: Key("planner"),
+      key: Key("planner"),
 
-        icon: Icon(
-          FluentIcons.event,
-          color: appTheme.color.lightest,
-        ),
-        title: Text(
-          'planifier',
-          style: paneTextStyle,
-        ).tr(),
-        body: const PlanningManager());
+      icon: Icon(FluentIcons.event, color: appTheme.color.lightest),
+      title: Text('planifier', style: paneTextStyle).tr(),
+      body: const PlanningManager(),
+    );
     login = PaneItem(
-        key: Key("login"),
+      key: Key("login"),
 
-        icon: Icon(
-          FluentIcons.signin,
-          color: appTheme.color.lightest,
-        ),
-        title: Text(
-          'seconnecter',
-          style: paneTextStyle,
-        ).tr(),
-        body: const LoginScreen());
+      icon: Icon(FluentIcons.signin, color: appTheme.color.lightest),
+      title: Text('seconnecter', style: paneTextStyle).tr(),
+      body: const LoginScreen(),
+    );
     logout = PaneItem(
-        key: Key("logout"),
-        icon: Icon(
-          FluentIcons.sign_out,
-          color: appTheme.color.lightest,
-        ),
-        title: Text(
-          'decon',
-          style: paneTextStyle,
-        ).tr(),
-        body: const LogoutScreen());
+      key: Key("logout"),
+      icon: Icon(FluentIcons.sign_out, color: appTheme.color.lightest),
+      title: Text('decon', style: paneTextStyle).tr(),
+      body: const LogoutScreen(),
+    );
     parametres = PaneItem(
       key: Key("settings"),
 
-      icon: Icon(
-        FluentIcons.settings,
-        color: appTheme.color.lightest,
-      ),
-      title: Text(
-        'parametres',
-        style: paneTextStyle,
-      ).tr(),
-      body: gts?SettingsGTS(prefs):Settings(prefs),
+      icon: Icon(FluentIcons.settings, color: appTheme.color.lightest),
+      title: Text('parametres', style: paneTextStyle).tr(),
+      body: gts ? SettingsGTS(prefs) : Settings(prefs),
     );
     entreprise = PaneItemExpander(
-        key: Key("company"),
+      key: Key("company"),
 
-        icon: Icon(
-          FluentIcons.build_definition,
-          color: appTheme.color.lightest,
+      icon: Icon(FluentIcons.build_definition, color: appTheme.color.lightest),
+      title: Text('monentreprise', style: paneTextStyle).tr(),
+      body: const MyEntreprise(),
+      items: [
+        PaneItem(
+          icon: Icon(FluentIcons.sections, color: appTheme.color.lightest),
+          title: Text('filiales', style: paneTextStyle).tr(),
+          body: const MesFilliales(),
         ),
-        title: Text(
-          'monentreprise',
-          style: paneTextStyle,
-        ).tr(),
-        body: const MyEntreprise(),
-        items: [
-          PaneItem(
-            icon: Icon(
-              FluentIcons.sections,
-              color: appTheme.color.lightest,
-            ),
-            title: Text(
-              'filiales',
-              style: paneTextStyle,
-            ).tr(),
-            body: const MesFilliales(),
+        PaneItem(
+          icon: Icon(
+            FluentIcons.company_directory,
+            color: appTheme.color.lightest,
           ),
-          PaneItem(
-            icon: Icon(
-              FluentIcons.company_directory,
-              color: appTheme.color.lightest,
-            ),
-            title: Text(
-              'directions',
-              style: paneTextStyle,
-            ).tr(),
-            body: const MesFilliales(
-              type: 1,
-            ),
+          title: Text('directions', style: paneTextStyle).tr(),
+          body: const MesFilliales(type: 1),
+        ),
+        PaneItem(
+          icon: Icon(
+            FluentIcons.company_directory_mirrored,
+            color: appTheme.color.lightest,
           ),
-          PaneItem(
-            icon: Icon(
-              FluentIcons.company_directory_mirrored,
-              color: appTheme.color.lightest,
-            ),
-            title: Text(
-              'departements',
-              style: paneTextStyle,
-            ).tr(),
-            body: const MesFilliales(
-              type: 2,
-            ),
-          ),
-        ]);
+          title: Text('departements', style: paneTextStyle).tr(),
+          body: const MesFilliales(type: 2),
+        ),
+      ],
+    );
     reparations = PaneItemExpander(
-        key: Key("repairs"),
+      key: Key("repairs"),
 
-        icon: Icon(
-          FluentIcons.repair,
-          color: appTheme.color.lightest,
+      icon: Icon(FluentIcons.repair, color: appTheme.color.lightest),
+      title: Text('thereparations', style: paneTextStyle).tr(),
+      items: [
+        PaneItem(
+          key: const Key('repair-reception'),
+          icon: Icon(
+            Icons.receipt_long_outlined,
+            color: appTheme.color.lightest,
+          ),
+          title: Text('fichesreception', style: paneTextStyle).tr(),
+          body: const FicheReceptionTabs(),
         ),
-        title: Text(
-          'thereparations',
-          style: paneTextStyle,
-        ).tr(),
-        items: [
-PaneItem(
-            key: const Key('repair-reception'),
-            icon: Icon(
-              Icons.receipt_long_outlined,
-              color: appTheme.color.lightest,
-            ),
-            title: Text(
-              'fichesreception',
-              style: paneTextStyle,
-            ).tr(),
-            body: const FicheReceptionTabs(),
+        PaneItem(
+          key: const Key('repair-orders'),
+          icon: Icon(Icons.car_repair_outlined, color: appTheme.color.lightest),
+          title: Text('orderreparations', style: paneTextStyle).tr(),
+          body: const ReparationTabs(),
+        ),
+        PaneItem(
+          key: const Key('repair-providers'),
+          icon: Icon(
+            FluentIcons.service_activity,
+            color: appTheme.color.lightest,
           ),
-PaneItem(
-            key: const Key('repair-orders'),
-            icon: Icon(
-              Icons.car_repair_outlined,
-              color: appTheme.color.lightest,
-            ),
-            title: Text(
-              'orderreparations',
-              style: paneTextStyle,
-            ).tr(),
-            body: const ReparationTabs(),
-          ),
-PaneItem(
-            key: const Key('repair-providers'),
-            icon: Icon(
-              FluentIcons.service_activity,
-              color: appTheme.color.lightest,
-            ),
-            title: Text(
-              'prestataires',
-              style: paneTextStyle,
-            ).tr(),
-            body: const PrestataireTabs(),
-          ),
-PaneItem(
-            key: const Key('repair-clients'),
-            icon: Icon(
-              Icons.people_alt_outlined,
-              color: appTheme.color.lightest,
-            ),
-            title: Text(
-              'clients',
-              style: paneTextStyle,
-            ).tr(),
-            body: const ClientTabs(),
-          ),
-        ],
-        body: const ReparationDashboard());
+          title: Text('prestataires', style: paneTextStyle).tr(),
+          body: const PrestataireTabs(),
+        ),
+        PaneItem(
+          key: const Key('repair-clients'),
+          icon: Icon(Icons.people_alt_outlined, color: appTheme.color.lightest),
+          title: Text('clients', style: paneTextStyle).tr(),
+          body: const ClientTabs(),
+        ),
+      ],
+      body: const ReparationDashboard(),
+    );
     backup = PaneItem(
       key: Key("backup"),
 
-      icon: Icon(
-        FluentIcons.save,
-        color: appTheme.color.lightest,
-      ),
-      title: Text(
-        'backup',
-        style: paneTextStyle,
-      ).tr(),
+      icon: Icon(FluentIcons.save, color: appTheme.color.lightest),
+      title: Text('backup', style: paneTextStyle).tr(),
       body: const BackupManager(),
     );
     tutorial = PaneItem(
-        key: Key("tutorials"),
+      key: Key("tutorials"),
 
-        icon: Icon(
-          FluentIcons.guid,
-          color: appTheme.color.lightest,
-        ),
-        title: Text(
-          'tutorial',
-          style: paneTextStyle,
-        ).tr(),
-        body: const Tutorial());
+      icon: Icon(FluentIcons.guid, color: appTheme.color.lightest),
+      title: Text('tutorial', style: paneTextStyle).tr(),
+      body: const Tutorial(),
+    );
     final canManageUsers =
         authService.session?.hasPermission('users.manage') ?? false;
     final canManageAccess =
@@ -524,14 +359,9 @@ PaneItem(
 
     userAccessManagement = PaneItemExpander(
       key: const Key("user-access-management"),
-      icon: Icon(
-        FluentIcons.people,
-        color: appTheme.color.lightest,
-      ),
+      icon: Icon(FluentIcons.people, color: appTheme.color.lightest),
       title: const Text('Utilisateurs & accès'),
-      body: canManageUsers
-          ? const UserManagement()
-          : const AccessManagement(),
+      body: canManageUsers ? const UserManagement() : const AccessManagement(),
       items: [
         if (canManageUsers) usermanagement,
         if (canManageAccess) accessManagement,
@@ -543,28 +373,30 @@ PaneItem(
         if (PanesListState.signedIn.value) dashboard,
         if (canManageUsers || canManageAccess) userAccessManagement,
         if (PanesListState.signedIn.value) vehicles,
-        if (PanesListState.signedIn.value)reparations,
+        if (PanesListState.signedIn.value) reparations,
         if (showAtelier) atelier,
-        if (PanesListState.signedIn.value)chauffeurs,
-        if (authService.session?.hasPermission('planning.manage') == true) planner,
-        if (authService.session?.hasPermission('activity.view') == true) evenements,
+        if (PanesListState.signedIn.value) chauffeurs,
+        if (authService.session?.hasPermission('planning.manage') == true)
+          planner,
+        if (authService.session?.hasPermission('activity.view') == true)
+          evenements,
       ];
     } else {
-      originalItems = [
-        login,
-      ];
+      originalItems = [login];
     }
     footerItems = [
       PaneItemSeparator(),
-      if (authService.session?.hasPermission('company.manage') == true && PanesListState.signedIn.value) entreprise,
-      if (authService.session?.hasPermission('backup.manage') == true && PanesListState.signedIn.value) backup,
+      if (authService.session?.hasPermission('company.manage') == true &&
+          PanesListState.signedIn.value)
+        entreprise,
+      if (authService.session?.hasPermission('backup.manage') == true &&
+          PanesListState.signedIn.value)
+        backup,
       if (PanesListState.signedIn.value) logout,
       parametres,
       if (PanesListState.signedIn.value) tutorial,
     ];
   }
-
-
 
   /// Resolves a destination from the current, permission-filtered navigation
   /// tree. The flattened index is derived from the actual menu structure.
@@ -577,8 +409,7 @@ PaneItem(
       flatIndex++;
       if (item is PaneItemExpander) {
         for (final child in item.items) {
-          if (child.key is ValueKey &&
-              (child.key as ValueKey).value == value) {
+          if (child.key is ValueKey && (child.key as ValueKey).value == value) {
             return flatIndex;
           }
           flatIndex++;

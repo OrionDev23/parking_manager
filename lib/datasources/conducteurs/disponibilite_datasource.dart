@@ -11,13 +11,14 @@ import 'disponibilite_webservice.dart';
 
 class DisponibiliteDataSource
     extends ParcOtoDatasource<DisponibiliteChauffeur> {
-  DisponibiliteDataSource(
-      {required super.collectionID,
-      required super.current,
-      super.appTheme,
-      super.filters,
-      super.searchKey,
-      super.selectC}) {
+  DisponibiliteDataSource({
+    required super.collectionID,
+    required super.current,
+    super.appTheme,
+    super.filters,
+    super.searchKey,
+    super.selectC,
+  }) {
     repo = DisponibiliteWebService(data, collectionID, 1);
   }
 
@@ -28,51 +29,61 @@ class DisponibiliteDataSource
 
   @override
   List<DataCell> getCellsToShow(
-      MapEntry<String, DisponibiliteChauffeur> element) {
+    MapEntry<String, DisponibiliteChauffeur> element,
+  ) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
     return [
-      DataCell(SelectableText(
-        element.value.chauffeurNom,
-        style: rowTextStyle,
-        onTap: () {
-          goToChauffeur(element.value.chauffeurNom);
-        },
-      )),
-      DataCell(SelectableText(
-        DriverProvider.getEtat(element.value.type).tr(),
-        style: rowTextStyle,
-      )),
-      DataCell(SelectableText(
-        dateFormat.format(element.value.createdAt!),
-        style: rowTextStyle,
-      )),
+      DataCell(
+        SelectableText(
+          element.value.chauffeurNom,
+          style: rowTextStyle,
+          onTap: () {
+            goToChauffeur(element.value.chauffeurNom);
+          },
+        ),
+      ),
+      DataCell(
+        SelectableText(
+          DriverProvider.getEtat(element.value.type).tr(),
+          style: rowTextStyle,
+        ),
+      ),
+      DataCell(
+        SelectableText(
+          dateFormat.format(element.value.createdAt!),
+          style: rowTextStyle,
+        ),
+      ),
       DataCell(
         DatabaseGetter().isAdmin()
             ? f.FlyoutTarget(
                 controller: element.value.controller,
                 child: OnTapScaleAndFade(
-                    onTap: () {
-                      element.value.controller.showFlyout(builder: (context) {
+                  onTap: () {
+                    element.value.controller.showFlyout(
+                      builder: (context) {
                         return f.MenuFlyout(
                           items: [
                             f.MenuFlyoutItem(
-                                text: const Text('delete').tr(),
-                                onPressed: () {
-                                  showDeleteConfirmation(element.value);
-                                }),
+                              text: const Text('delete').tr(),
+                              onPressed: () {
+                                showDeleteConfirmation(element.value);
+                              },
+                            ),
                           ],
                         );
-                      });
-                    },
-                    child: f.Container(
-                        decoration: BoxDecoration(
-                          color: appTheme?.color.lightest,
-                          boxShadow: kElevationToShadow[2],
-                        ),
-                        child: Icon(Icons.edit,color: appTheme!
-                            .color.darkest,))
-                )
-        )
+                      },
+                    );
+                  },
+                  child: f.Container(
+                    decoration: BoxDecoration(
+                      color: appTheme?.color.lightest,
+                      boxShadow: kElevationToShadow[2],
+                    ),
+                    child: Icon(Icons.edit, color: appTheme!.color.darkest),
+                  ),
+                ),
+              )
             : const Text(''),
       ),
     ];

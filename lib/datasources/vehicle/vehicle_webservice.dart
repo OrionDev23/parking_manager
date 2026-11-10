@@ -18,9 +18,14 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
   }
 
   @override
-  List<String> getFilterQueries(Map<String, String> filters, int count,
-      int startingAt, int sortedBy, bool sortedAsc,
-      {int? index}) {
+  List<String> getFilterQueries(
+    Map<String, String> filters,
+    int count,
+    int startingAt,
+    int sortedBy,
+    bool sortedAsc, {
+    int? index,
+  }) {
     return [
       if (filters.containsKey('yearmin'))
         Query.greaterThanEqual('annee_util', int.tryParse(filters['yearmin']!)),
@@ -34,18 +39,14 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
 
   @override
   String getSortingQuery(int sortedBy, bool sortedAsc) {
-
-    if(conducteurEmploye){
-      return getSortingQueryEmploye(sortedBy,sortedAsc);
-    }
-    else{
-      return getSortingQueryNonEmploye(sortedBy,sortedAsc);
-
+    if (conducteurEmploye) {
+      return getSortingQueryEmploye(sortedBy, sortedAsc);
+    } else {
+      return getSortingQueryNonEmploye(sortedBy, sortedAsc);
     }
   }
 
-
-  String getSortingQueryEmploye(int sortedBy, bool sortedAsc){
+  String getSortingQueryEmploye(int sortedBy, bool sortedAsc) {
     switch (sortedBy) {
       case 0:
         if (sortedAsc) {
@@ -76,7 +77,8 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
         if (sortedAsc) {
           return Query.orderAsc('perimetre');
         } else {
-          return Query.orderDesc('perimetre');}
+          return Query.orderDesc('perimetre');
+        }
 
       case 5:
         if (sortedAsc) {
@@ -121,15 +123,15 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
           return Query.orderDesc('\$updatedAt');
         }
       default:
-        if(sortedAsc){
+        if (sortedAsc) {
           return Query.orderAsc('\$id');
-        }
-        else{
+        } else {
           return Query.orderDesc('\$id');
         }
     }
   }
-  String getSortingQueryNonEmploye(int sortedBy, bool sortedAsc){
+
+  String getSortingQueryNonEmploye(int sortedBy, bool sortedAsc) {
     switch (sortedBy) {
       case 0:
         if (sortedAsc) {
@@ -165,7 +167,8 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
         if (sortedAsc) {
           return Query.orderAsc('perimetre');
         } else {
-          return Query.orderDesc('perimetre');}
+          return Query.orderDesc('perimetre');
+        }
 
       case 6:
         if (sortedAsc) {
@@ -174,10 +177,9 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
           return Query.orderDesc('\$updatedAt');
         }
       default:
-        if(sortedAsc){
+        if (sortedAsc) {
           return Query.orderAsc('\$id');
-        }
-        else{
+        } else {
           return Query.orderDesc('\$id');
         }
     }
@@ -185,113 +187,120 @@ class VehiculesWebService extends ParcOtoWebService<Vehicle> {
 
   @override
   int Function(MapEntry<String, Vehicle> p1, MapEntry<String, Vehicle> p2)?
-      getComparisonFunction(int column, bool ascending) {
-    if(conducteurEmploye){
+  getComparisonFunction(int column, bool ascending) {
+    if (conducteurEmploye) {
       return getComparisionFunctionEmploye(column, ascending);
-    }
-    else{
-      return getComparisionFunctionNonEmploye(column,ascending);
+    } else {
+      return getComparisionFunctionNonEmploye(column, ascending);
     }
   }
 
-
-  int Function(MapEntry<String,Vehicle> p1,MapEntry<String,Vehicle> p2) getComparisionFunctionEmploye(int column,bool ascending){
+  int Function(MapEntry<String, Vehicle> p1, MapEntry<String, Vehicle> p2)
+  getComparisionFunctionEmploye(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
-    //id
+      //id
       case 0:
-        return (d1, d2) =>
-        coef * d1.value.id.compareTo(d2.value.id);
-    //matricule
+        return (d1, d2) => coef * d1.value.id.compareTo(d2.value.id);
+      //matricule
 
       case 1:
         return (d1, d2) =>
-        coef * d1.value.matricule.compareTo(d2.value.matricule);
-    //marque
+            coef * d1.value.matricule.compareTo(d2.value.matricule);
+      //marque
       case 2:
         return (d1, d2) {
           return coef * (d1.value.type ?? '').compareTo((d2.value.type ?? ''));
         };
-    //etat
+      //etat
       case 3:
         return (d1, d2) {
-
-          return coef * (d1.value.etatactuel ?? 0).compareTo((d2.value.etatactuel ?? 0));
+          return coef *
+              (d1.value.etatactuel ?? 0).compareTo((d2.value.etatactuel ?? 0));
         };
       case 4:
         return (d1, d2) =>
-        coef *
-            d1.value.perimetre .compareTo(d2.value.perimetre );
+            coef * d1.value.perimetre.compareTo(d2.value.perimetre);
       case 5:
         return (d1, d2) {
-          return coef * (d1.value.appartenance ?? '').compareTo((d2.value.appartenance ?? ''));
+          return coef *
+              (d1.value.appartenance ?? '').compareTo(
+                (d2.value.appartenance ?? ''),
+              );
         };
 
-      case 6:return (d1, d2) {
-        return coef * (d1.value.direction??'').compareTo((d2.value
-            .direction??''));
-      };
-      case 7:return (d1, d2) {
-        return coef * (d1.value.matriculeConducteur??'').compareTo((d2.value
-            .matriculeConducteur??''));
-      };
-      case 8:return (d1, d2) {
-        return coef * (d1.value.nom??'').compareTo((d2.value
-            .nom??''));
-      };
-      case 9:return (d1, d2) {
-        return coef * (d1.value.prenom??'').compareTo((d2.value
-            .prenom??''));
-      };
-      case 10:return (d1, d2) {
-        return coef * (d1.value.profession??'').compareTo((d2.value
-            .profession??''));
-      };
-    //date modif
+      case 6:
+        return (d1, d2) {
+          return coef *
+              (d1.value.direction ?? '').compareTo((d2.value.direction ?? ''));
+        };
+      case 7:
+        return (d1, d2) {
+          return coef *
+              (d1.value.matriculeConducteur ?? '').compareTo(
+                (d2.value.matriculeConducteur ?? ''),
+              );
+        };
+      case 8:
+        return (d1, d2) {
+          return coef * (d1.value.nom ?? '').compareTo((d2.value.nom ?? ''));
+        };
+      case 9:
+        return (d1, d2) {
+          return coef *
+              (d1.value.prenom ?? '').compareTo((d2.value.prenom ?? ''));
+        };
+      case 10:
+        return (d1, d2) {
+          return coef *
+              (d1.value.profession ?? '').compareTo(
+                (d2.value.profession ?? ''),
+              );
+        };
+      //date modif
       case 11:
         return (d1, d2) =>
-        coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
+            coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
       default:
         return (d1, d2) => coef * d1.key.compareTo(d2.key);
     }
   }
 
-
-  int Function(MapEntry<String,Vehicle> p1,MapEntry<String,Vehicle> p2) getComparisionFunctionNonEmploye(int column,bool ascending){
+  int Function(MapEntry<String, Vehicle> p1, MapEntry<String, Vehicle> p2)
+  getComparisionFunctionNonEmploye(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
-    //id
+      //id
       case 0:
-        return (d1, d2) =>
-        coef * d1.value.id.compareTo(d2.value.id);
-    //matricule
+        return (d1, d2) => coef * d1.value.id.compareTo(d2.value.id);
+      //matricule
 
       case 1:
         return (d1, d2) =>
-        coef * (d1.value.numeroSerie??'').compareTo(d2.value.numeroSerie??'');
+            coef *
+            (d1.value.numeroSerie ?? '').compareTo(d2.value.numeroSerie ?? '');
       case 2:
         return (d1, d2) =>
-        coef * d1.value.matricule.compareTo(d2.value.matricule);
-    //marque
+            coef * d1.value.matricule.compareTo(d2.value.matricule);
+      //marque
       case 3:
         return (d1, d2) {
           return coef * (d1.value.type ?? '').compareTo((d2.value.type ?? ''));
         };
-    //etat
+      //etat
       case 4:
         return (d1, d2) {
-
-          return coef * (d1.value.etatactuel ?? 0).compareTo((d2.value.etatactuel ?? 0));
+          return coef *
+              (d1.value.etatactuel ?? 0).compareTo((d2.value.etatactuel ?? 0));
         };
       case 5:
         return (d1, d2) =>
-        coef *
-            d1.value.perimetre .compareTo(d2.value.perimetre );
+            coef * d1.value.perimetre.compareTo(d2.value.perimetre);
 
-    //date modif
+      //date modif
       case 6:
         return (d1, d2) =>
-        coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
+            coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
       default:
         return (d1, d2) => coef * d1.key.compareTo(d2.key);
     }

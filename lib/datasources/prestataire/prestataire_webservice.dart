@@ -17,9 +17,8 @@ class PrestataireWebservice extends ParcOtoWebService<Client> {
   }
 
   @override
-  int Function(
-          MapEntry<String, Client> p1, MapEntry<String, Client> p2)?
-      getComparisonFunction(int column, bool ascending) {
+  int Function(MapEntry<String, Client> p1, MapEntry<String, Client> p2)?
+  getComparisonFunction(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
       case 0:
@@ -73,9 +72,14 @@ class PrestataireWebservice extends ParcOtoWebService<Client> {
   }
 
   @override
-  List<String> getFilterQueries(Map<String, String> filters, int count,
-      int startingAt, int sortedBy, bool sortedAsc,
-      {int? index}) {
+  List<String> getFilterQueries(
+    Map<String, String> filters,
+    int count,
+    int startingAt,
+    int sortedBy,
+    bool sortedAsc, {
+    int? index,
+  }) {
     return [];
   }
 

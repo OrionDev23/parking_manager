@@ -49,7 +49,9 @@ class AppwriteSyncEngine implements SyncEngine {
   Future<void> start() async {
     if (_running) return;
     _running = true;
-    debugPrint('[ParcOto Sync] start() — companyId=$companyId, handlers=${handlers.keys.toList()}');
+    debugPrint(
+      '[ParcOto Sync] start() — companyId=$companyId, handlers=${handlers.keys.toList()}',
+    );
 
     _subscription = _connection.onStatusChange.listen((status) {
       debugPrint('[ParcOto Sync] connectivity status=$status');
@@ -96,7 +98,9 @@ class AppwriteSyncEngine implements SyncEngine {
           }
         } catch (error, stackTrace) {
           _leaseLost = true;
-          debugPrint('[ParcOto Sync] lease renewal failed: $error\n$stackTrace');
+          debugPrint(
+            '[ParcOto Sync] lease renewal failed: $error\n$stackTrace',
+          );
         } finally {
           _leaseRenewing = false;
         }
@@ -107,7 +111,9 @@ class AppwriteSyncEngine implements SyncEngine {
   @override
   Future<void> syncNow() async {
     if (!_running || _syncing) {
-      debugPrint('[ParcOto Sync] syncNow skipped: running=$_running syncing=$_syncing');
+      debugPrint(
+        '[ParcOto Sync] syncNow skipped: running=$_running syncing=$_syncing',
+      );
       return;
     }
     _syncing = true;
@@ -119,7 +125,9 @@ class AppwriteSyncEngine implements SyncEngine {
         debugPrint('[ParcOto Sync] hasInternetAccess=$hasInternet');
         if (!hasInternet || !_running) return;
       } catch (error, stackTrace) {
-        debugPrint('[ParcOto Sync] connectivity check failed: $error\n$stackTrace');
+        debugPrint(
+          '[ParcOto Sync] connectivity check failed: $error\n$stackTrace',
+        );
         return;
       }
 
@@ -130,7 +138,9 @@ class AppwriteSyncEngine implements SyncEngine {
         leaseDuration: _leaseDuration,
       );
       if (!leaseAcquired) {
-        debugPrint('[ParcOto Sync] another engine owns the company lease; skipping');
+        debugPrint(
+          '[ParcOto Sync] another engine owns the company lease; skipping',
+        );
         return;
       }
       _startLeaseRenewal();
@@ -144,16 +154,21 @@ class AppwriteSyncEngine implements SyncEngine {
       final blockedRecords = <String>{};
       for (final operation in operations) {
         if (!_running || _leaseLost) break;
-        final recordKey = '${operation.companyId}:${operation.entity}:${operation.entityId}';
+        final recordKey =
+            '${operation.companyId}:${operation.entity}:${operation.entityId}';
         if (blockedRecords.contains(recordKey)) continue;
         if (operation.status == SyncOperationStatus.conflict) {
           blockedRecords.add(recordKey);
-          debugPrint('[ParcOto Sync] blocked by unresolved conflict: ${operation.entity} id=${operation.entityId}');
+          debugPrint(
+            '[ParcOto Sync] blocked by unresolved conflict: ${operation.entity} id=${operation.entityId}',
+          );
           continue;
         }
         final handler = handlers[operation.entity];
         if (handler == null) {
-          debugPrint('[ParcOto Sync] no handler for entity=${operation.entity}; operation left pending');
+          debugPrint(
+            '[ParcOto Sync] no handler for entity=${operation.entity}; operation left pending',
+          );
           blockedRecords.add(recordKey);
           continue;
         }
@@ -165,24 +180,33 @@ class AppwriteSyncEngine implements SyncEngine {
           // not acknowledge the operation. The next lease owner will recover
           // and retry it; handlers are designed to be idempotent.
           if (_leaseLost) {
-            debugPrint('[ParcOto Sync] lease lost during remote write; leaving operation for recovery');
+            debugPrint(
+              '[ParcOto Sync] lease lost during remote write; leaving operation for recovery',
+            );
             break;
           }
           await queue.markCompleted(operation.id);
-          debugPrint('[ParcOto Sync] SUCCESS ${operation.entity} ${operation.type.name} id=${operation.entityId}');
+          debugPrint(
+            '[ParcOto Sync] SUCCESS ${operation.entity} ${operation.type.name} id=${operation.entityId}',
+          );
         } on AppwriteException catch (error, stackTrace) {
-          debugPrint('[ParcOto Sync] APPWRITE ERROR entity=${operation.entity} op=${operation.type.name} id=${operation.entityId} code=${error.code} type=${error.type} message=${error.message}\n$stackTrace');
+          debugPrint(
+            '[ParcOto Sync] APPWRITE ERROR entity=${operation.entity} op=${operation.type.name} id=${operation.entityId} code=${error.code} type=${error.type} message=${error.message}\n$stackTrace',
+          );
           if (error.code == 409) {
             await queue.markConflict(
               operation.id,
-              reason: 'Appwrite ${error.code} (${error.type ?? 'unknown'}): ${error.message ?? 'Conflit distant'}',
+              reason:
+                  'Appwrite ${error.code} (${error.type ?? 'unknown'}): ${error.message ?? 'Conflit distant'}',
             );
           } else {
             await queue.markFailed(operation.id);
           }
           blockedRecords.add(recordKey);
         } catch (error, stackTrace) {
-          debugPrint('[ParcOto Sync] ERROR entity=${operation.entity} op=${operation.type.name} id=${operation.entityId}: $error\n$stackTrace');
+          debugPrint(
+            '[ParcOto Sync] ERROR entity=${operation.entity} op=${operation.type.name} id=${operation.entityId}: $error\n$stackTrace',
+          );
           await queue.markFailed(operation.id);
           blockedRecords.add(recordKey);
         }
@@ -196,7 +220,9 @@ class AppwriteSyncEngine implements SyncEngine {
           try {
             await entry.value();
           } catch (error, stackTrace) {
-            debugPrint('[ParcOto Sync] pull failed for ${entry.key}: $error\n$stackTrace');
+            debugPrint(
+              '[ParcOto Sync] pull failed for ${entry.key}: $error\n$stackTrace',
+            );
           }
         }
       }
@@ -207,9 +233,14 @@ class AppwriteSyncEngine implements SyncEngine {
       _leaseTimer = null;
       if (leaseAcquired) {
         try {
-          await queue.releaseEngineLease(companyId: companyId, ownerId: _ownerId);
+          await queue.releaseEngineLease(
+            companyId: companyId,
+            ownerId: _ownerId,
+          );
         } catch (error, stackTrace) {
-          debugPrint('[ParcOto Sync] lease release failed: $error\n$stackTrace');
+          debugPrint(
+            '[ParcOto Sync] lease release failed: $error\n$stackTrace',
+          );
         }
       }
       _syncing = false;

@@ -30,12 +30,12 @@ class ParcOtoDefault {
 
   Map<String, dynamic> toJson() => _$ParcOtoDefaultToJson(this);
 
-  Map<String,dynamic> toJsonWithId(){
+  Map<String, dynamic> toJsonWithId() {
     return {
       ...toJson(),
-      r'$id':id,
-      r'$updatedAt':updatedAt?.toIso8601String(),
-      r'$createdAt':createdAt?.toIso8601String(),
+      r'$id': id,
+      r'$updatedAt': updatedAt?.toIso8601String(),
+      r'$createdAt': createdAt?.toIso8601String(),
     };
   }
 }

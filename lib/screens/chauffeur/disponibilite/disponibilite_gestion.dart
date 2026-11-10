@@ -6,25 +6,19 @@ import '../../../../widgets/page_header.dart';
 import 'disponibilite_table.dart';
 
 class DisponibiliteGestion extends StatefulWidget {
-  const DisponibiliteGestion({
-    super.key,
-  });
+  const DisponibiliteGestion({super.key});
 
   @override
   DisponibiliteGestionState createState() => DisponibiliteGestionState();
 }
 
 class DisponibiliteGestionState extends State<DisponibiliteGestion> {
-  final tstyle = TextStyle(
-    fontSize: 10.sp,
-  );
+  final tstyle = TextStyle(fontSize: 10.sp);
 
   @override
   Widget build(BuildContext context) {
     return ScaffoldPage(
-      header: PageTitle(
-        text: 'disponibilite'.tr(),
-      ),
+      header: PageTitle(text: 'disponibilite'.tr()),
       content: const DisponibliteTable(),
     );
   }

@@ -17,11 +17,7 @@ class UserProfile {
     this.updatedAt,
   });
 
-  UserProfile copyWith({
-    String? name,
-    String? phone,
-    String? avatar,
-  }) {
+  UserProfile copyWith({String? name, String? phone, String? avatar}) {
     return UserProfile(
       id: id,
       email: email,

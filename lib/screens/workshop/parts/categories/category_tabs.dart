@@ -1,19 +1,19 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+
 import 'category_manager.dart';
 
 import 'category_form.dart';
 
 class CategoryTabs extends StatefulWidget {
-
-  const CategoryTabs({super.key, });
+  const CategoryTabs({super.key});
 
   @override
   CategoryTabsState createState() => CategoryTabsState();
 }
 
-class CategoryTabsState extends State<CategoryTabs> with
-    AutomaticKeepAliveClientMixin<CategoryTabs>{
+class CategoryTabsState extends State<CategoryTabs>
+    with AutomaticKeepAliveClientMixin<CategoryTabs> {
   static ValueNotifier<int> currentIndex = ValueNotifier(0);
   static List<Tab> tabs = [];
   Tab generateTab(int index) {
@@ -43,21 +43,21 @@ class CategoryTabsState extends State<CategoryTabs> with
   }
 
   Widget getGestionnaire() {
-    return const CategoryManager(
-    );
+    return const CategoryManager();
   }
-
 
   void addTab1() {
     currentIndex.value = 0;
     if (tabs.isEmpty) {
-      tabs.add(Tab(
-        text: Text(getTitle().tr()),
-        closeIcon: null,
-        icon: const Icon(FluentIcons.settings),
-        body: getGestionnaire(),
-        onClosed: null,
-      ));
+      tabs.add(
+        Tab(
+          text: Text(getTitle().tr()),
+          closeIcon: null,
+          icon: const Icon(FluentIcons.settings),
+          body: getGestionnaire(),
+          onClosed: null,
+        ),
+      );
     }
   }
 
@@ -72,41 +72,41 @@ class CategoryTabsState extends State<CategoryTabs> with
       initValues();
     }
     return ValueListenableBuilder(
-        valueListenable:  currentIndex,
-        builder: (context, value, _) {
-          return TabView(
-            tabs:tabs,
-            currentIndex: value,
-            onChanged: (index) =>currentIndex.value = index,
-            tabWidthBehavior: TabWidthBehavior.equal,
-            closeButtonVisibility: CloseButtonVisibilityMode.always,
-            showScrollButtons: true,
-            onNewPressed: () {
-              setState(() {
-                final index = tabs.length + 1;
-                final tab = generateTab(index);
-                tabs.add(tab);
-                currentIndex.value = index - 1;
-              });
-            },
-            onReorder: (oldIndex, newIndex) {
-              setState(() {
-                if (oldIndex < newIndex) {
-                  newIndex -= 1;
-                }
-                final item = tabs.removeAt(oldIndex);
-                tabs.insert(newIndex, item);
+      valueListenable: currentIndex,
+      builder: (context, value, _) {
+        return TabView(
+          tabs: tabs,
+          currentIndex: value,
+          onChanged: (index) => currentIndex.value = index,
+          tabWidthBehavior: TabWidthBehavior.equal,
+          closeButtonVisibility: CloseButtonVisibilityMode.always,
+          showScrollButtons: true,
+          onNewPressed: () {
+            setState(() {
+              final index = tabs.length + 1;
+              final tab = generateTab(index);
+              tabs.add(tab);
+              currentIndex.value = index - 1;
+            });
+          },
+          onReorder: (oldIndex, newIndex) {
+            setState(() {
+              if (oldIndex < newIndex) {
+                newIndex -= 1;
+              }
+              final item = tabs.removeAt(oldIndex);
+              tabs.insert(newIndex, item);
 
-                if (currentIndex.value == newIndex) {
-                  currentIndex.value = oldIndex;
-                } else if (currentIndex.value == oldIndex) {
-                  currentIndex.value = newIndex;
-                }
-
-              });
-            },
-          );
-        });
+              if (currentIndex.value == newIndex) {
+                currentIndex.value = oldIndex;
+              } else if (currentIndex.value == oldIndex) {
+                currentIndex.value = newIndex;
+              }
+            });
+          },
+        );
+      },
+    );
   }
 
   @override

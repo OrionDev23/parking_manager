@@ -20,16 +20,25 @@ class Backup extends ParcOtoDefault {
 
   final String? createdBy;
 
-  Backup({this.vehicles=0, this.vehicledocs=0, this
-      .vehiclesstates=0,
-  this.drivers=0, this.driversdocs=0, this.driversstates=0, this.repairs=0, this
-      .providers=0, this.plannings=0, this.logs=0, this.createdBy, required
-    super.id,super.createdAt,super.updatedAt});
+  Backup({
+    this.vehicles = 0,
+    this.vehicledocs = 0,
+    this.vehiclesstates = 0,
+    this.drivers = 0,
+    this.driversdocs = 0,
+    this.driversstates = 0,
+    this.repairs = 0,
+    this.providers = 0,
+    this.plannings = 0,
+    this.logs = 0,
+    this.createdBy,
+    required super.id,
+    super.createdAt,
+    super.updatedAt,
+  });
 
-  factory Backup.fromJson(Map<String, dynamic> json) =>
-      _$BackupFromJson(json);
+  factory Backup.fromJson(Map<String, dynamic> json) => _$BackupFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$BackupToJson(this);
-
 }

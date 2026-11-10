@@ -19,7 +19,7 @@ class PageTitle extends StatefulWidget {
 class _PageTitleState extends State<PageTitle> {
   @override
   Widget build(BuildContext context) {
-    var appTheme=context.watch<AppTheme>();
+    var appTheme = context.watch<AppTheme>();
     return Column(
       children: [
         Row(
@@ -27,21 +27,18 @@ class _PageTitleState extends State<PageTitle> {
             bigSpace,
             Text(
               widget.text,
-              style: TextStyle(color: appTheme.color,fontStyle:FontStyle.italic,
-                  fontSize: 16
-                  .sp),
+              style: TextStyle(
+                color: appTheme.color,
+                fontStyle: FontStyle.italic,
+                fontSize: 16.sp,
+              ),
             ).tr(),
             if (widget.trailing != null) const Spacer(),
             if (widget.trailing != null) widget.trailing!,
-            if (widget.trailing != null)
-              SizedBox(
-                width: 2.w,
-              ),
+            if (widget.trailing != null) SizedBox(width: 2.w),
           ],
         ),
-        SizedBox(
-          height: 2.h,
-        ),
+        SizedBox(height: 2.h),
         const Divider(),
       ],
     );

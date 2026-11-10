@@ -67,15 +67,13 @@ class Vehicle extends ParcOtoDefault {
 
   int perimetre;
 
-
   Vehicle({
-
     required super.id,
     super.createdAt,
     super.updatedAt,
     this.appartenance,
-    this.perimetre=0,
-    this.lourd=false,
+    this.perimetre = 0,
+    this.lourd = false,
     this.direction,
     this.filliale,
     required this.matricule,
@@ -106,33 +104,28 @@ class Vehicle extends ParcOtoDefault {
     this.puissance,
     this.createdBy,
     this.etat,
-    this.service=false,
+    this.service = false,
     this.appartenanceconducteur,
-    this.decision=false,
+    this.decision = false,
     this.emplacement,
     this.etatactuel = 0,
-    this.matriculeConducteur
+    this.matriculeConducteur,
   }) {
-    search = '$matricule $wilaya $commune $anneeUtil '
+    search =
+        '$matricule $wilaya $commune $anneeUtil '
         '$adresse $numero $nom $prenom $profession '
         '$numeroSerie $type $carrosserie $daira $energie'
         ' ${VehiclesUtilities.getMarqueName(marque)} ${VehiclesUtilities.getAnneeFromMatricule(matricule)}'
-        '$pays $getMatPrecString() ${VehiclesUtilities.getEtatName(etatactuel ??
-        0)} ${VehiclesUtilities.getPerimetre(perimetre)} ${VehiclesUtilities
-        .getAppartenance(appartenance)} '
-        '${VehiclesUtilities
-        .getAppartenance(filliale)} ${VehiclesUtilities
-        .getDirection(direction)} ${VehiclesUtilities
-        .getDepartment(departement)} ${VehiclesUtilities
-        .getAppartenance(appartenanceconducteur)} $matriculeConducteur '
-        '${service?'service':'fonction'} $emplacement';
+        '$pays $getMatPrecString() ${VehiclesUtilities.getEtatName(etatactuel ?? 0)} ${VehiclesUtilities.getPerimetre(perimetre)} ${VehiclesUtilities.getAppartenance(appartenance)} '
+        '${VehiclesUtilities.getAppartenance(filliale)} ${VehiclesUtilities.getDirection(direction)} ${VehiclesUtilities.getDepartment(departement)} ${VehiclesUtilities.getAppartenance(appartenanceconducteur)} $matriculeConducteur '
+        '${service ? 'service' : 'fonction'} $emplacement';
   }
 
-  String getMatPrecString(){
-    String res="";
+  String getMatPrecString() {
+    String res = "";
 
-    matriculePrec?.forEach((e){
-      res+="$e ";
+    matriculePrec?.forEach((e) {
+      res += "$e ";
     });
     return res.trim();
   }
@@ -143,8 +136,6 @@ class Vehicle extends ParcOtoDefault {
   /// Connect the generated [_$PersonToJson] function to the `toJson` method.
   @override
   Map<String, dynamic> toJson() => _$VehicleToJson(this);
-
-
 
   int compareTo(Vehicle vehicle) {
     return id.compareTo(vehicle.id);

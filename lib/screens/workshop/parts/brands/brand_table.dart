@@ -1,7 +1,9 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+
 import '../../../../datasources/workshop/brand/brand_datasrouce.dart';
+
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -9,12 +11,10 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../../theme.dart';
 import '../../../data_table_parcoto.dart';
 
-
 class BrandTable extends StatefulWidget {
   final bool selectD;
 
-  const BrandTable(
-      {super.key, this.selectD = false,});
+  const BrandTable({super.key, this.selectD = false});
 
   @override
   State<BrandTable> createState() => BrandTableState();
@@ -55,10 +55,11 @@ class BrandTableState extends State<BrandTable> {
         startedWithFiltersOn = true;
         searchController.text = filterDocument.value!;
         brandDataSource = BrandDatasource(
-            current: context,
-            selectC: widget.selectD,
-            collectionID: getCollectionID(),
-            searchKey: filterDocument.value);
+          current: context,
+          selectC: widget.selectD,
+          collectionID: getCollectionID(),
+          searchKey: filterDocument.value,
+        );
         filterDocument.value = null;
       } else {
         startedWithFiltersOn = false;
@@ -66,7 +67,8 @@ class BrandTableState extends State<BrandTable> {
         brandDataSource = BrandDatasource(
           current: context,
           collectionID: getCollectionID(),
-          selectC: widget.selectD,);
+          selectC: widget.selectD,
+        );
       }
       initColumns();
     }
@@ -79,10 +81,7 @@ class BrandTableState extends State<BrandTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'code',
-            style: tstyle,
-          ).tr(),
+          child: Text('code', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -96,10 +95,7 @@ class BrandTableState extends State<BrandTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'name',
-            style: tstyle,
-          ).tr(),
+          child: Text('name', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -113,10 +109,7 @@ class BrandTableState extends State<BrandTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'dateModif',
-            style: tstyle,
-          ).tr(),
+          child: Text('dateModif', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -135,7 +128,6 @@ class BrandTableState extends State<BrandTable> {
     ];
   }
 
-
   TextEditingController searchController = TextEditingController();
 
   bool notEmpty = false;
@@ -145,78 +137,81 @@ class BrandTableState extends State<BrandTable> {
     var appTheme = context.watch<AppTheme>();
     brandDataSource.appTheme = appTheme;
     return ValueListenableBuilder(
-        valueListenable: filterDocument,
-        builder: (context, v, _) {
-          if (!startedWithFiltersOn && v != null && filterNow) {
-            searchController.text = v;
-            brandDataSource.search(v);
-            notEmpty = true;
-            filtered = true;
-            filterNow = false;
-          }
-          return DataTableParc(
-            header: Padding(
-              padding:
-              const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    width: 350.px,
-                    height: 45.px,
-                    child: TextBox(
-                      onChanged: (s) {
-                        if (s.isEmpty) {
-                          notEmpty = false;
-                          brandDataSource.search('');
-                        } else {
-                          notEmpty = true;
-                        }
-                        setState(() {});
-                      },
-                      controller: searchController,
-                      placeholder: 'search'.tr(),
-                      style: appTheme.writingStyle,
-                      cursorColor: appTheme.color.darker,
-                      placeholderStyle: placeStyle,
-                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-                      onSubmitted: (s) {
-                        if (s.isNotEmpty) {
-                          brandDataSource.search(s);
-                          if (!notEmpty) {
-                            setState(() {
-                              notEmpty = true;
-                            });
-                          }
-                        } else {
-                          if (notEmpty) {
-                            setState(() {
-                              notEmpty = false;
-                            });
-                          }
-                        }
-                      },
-                      suffix: notEmpty
-                          ? IconButton(
-                          icon: const Icon(FluentIcons.cancel),
-                          onPressed: () {
-                            searchController.text = "";
-                            notEmpty = false;
-                            setState(() {});
-                            brandDataSource.search('');
-                          })
-                          : null,
+      valueListenable: filterDocument,
+      builder: (context, v, _) {
+        if (!startedWithFiltersOn && v != null && filterNow) {
+          searchController.text = v;
+          brandDataSource.search(v);
+          notEmpty = true;
+          filtered = true;
+          filterNow = false;
+        }
+        return DataTableParc(
+          header: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 350.px,
+                  height: 45.px,
+                  child: TextBox(
+                    onChanged: (s) {
+                      if (s.isEmpty) {
+                        notEmpty = false;
+                        brandDataSource.search('');
+                      } else {
+                        notEmpty = true;
+                      }
+                      setState(() {});
+                    },
+                    controller: searchController,
+                    placeholder: 'search'.tr(),
+                    style: appTheme.writingStyle,
+                    cursorColor: appTheme.color.darker,
+                    placeholderStyle: placeStyle,
+                    decoration: WidgetStatePropertyAll(
+                      BoxDecoration(color: appTheme.fillColor),
                     ),
+                    onSubmitted: (s) {
+                      if (s.isNotEmpty) {
+                        brandDataSource.search(s);
+                        if (!notEmpty) {
+                          setState(() {
+                            notEmpty = true;
+                          });
+                        }
+                      } else {
+                        if (notEmpty) {
+                          setState(() {
+                            notEmpty = false;
+                          });
+                        }
+                      }
+                    },
+                    suffix: notEmpty
+                        ? IconButton(
+                            icon: const Icon(FluentIcons.cancel),
+                            onPressed: () {
+                              searchController.text = "";
+                              notEmpty = false;
+                              setState(() {});
+                              brandDataSource.search('');
+                            },
+                          )
+                        : null,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            sortAscending: assending,
-            sortColumnIndex: sortColumn,
-            columns: columns,
-            source: brandDataSource,
-          );
-        });
+          ),
+          sortAscending: assending,
+          sortColumnIndex: sortColumn,
+          columns: columns,
+          source: brandDataSource,
+        );
+      },
+    );
   }
 
   @override

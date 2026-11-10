@@ -9,7 +9,7 @@ import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 class PaOVideoPlayer extends StatefulWidget {
   final String link;
   final String ytLink;
-  const PaOVideoPlayer({super.key, required this.link,required this.ytLink});
+  const PaOVideoPlayer({super.key, required this.link, required this.ytLink});
 
   @override
   State<PaOVideoPlayer> createState() => _PaOVideoPlayerState();
@@ -22,7 +22,8 @@ class _PaOVideoPlayerState extends State<PaOVideoPlayer> {
   @override
   void initState() {
     super.initState();
-    if (!kIsWeb && (Platform.isLinux || Platform.isWindows|| Platform.isMacOS)) {
+    if (!kIsWeb &&
+        (Platform.isLinux || Platform.isWindows || Platform.isMacOS)) {
       _controller = VideoPlayerController.networkUrl(Uri.parse(widget.link));
       _initializeVideoPlayerFuture = _controller.initialize();
     } else {
@@ -33,7 +34,7 @@ class _PaOVideoPlayerState extends State<PaOVideoPlayer> {
           mute: false,
           showControls: true,
           showFullscreenButton: false,
-          strictRelatedVideos: true
+          strictRelatedVideos: true,
         ),
       );
     }
@@ -43,7 +44,8 @@ class _PaOVideoPlayerState extends State<PaOVideoPlayer> {
   bool currentlyWaiting = false;
   @override
   Widget build(BuildContext context) {
-    if (!kIsWeb && (Platform.isLinux || Platform.isWindows || Platform.isMacOS)) {
+    if (!kIsWeb &&
+        (Platform.isLinux || Platform.isWindows || Platform.isMacOS)) {
       return Stack(
         children: [
           Positioned.fill(
@@ -72,21 +74,23 @@ class _PaOVideoPlayerState extends State<PaOVideoPlayer> {
                           Positioned.fill(child: VideoPlayer(_controller)),
                           if (!_controller.value.isPlaying)
                             Positioned(
-                                child: FilledButton(
-                              child: const Icon(FluentIcons.play),
-                              onPressed: () {
-                                _controller.play();
-                                setCurretlyWaiting();
-                              },
-                            )),
+                              child: FilledButton(
+                                child: const Icon(FluentIcons.play),
+                                onPressed: () {
+                                  _controller.play();
+                                  setCurretlyWaiting();
+                                },
+                              ),
+                            ),
                           if (_controller.value.isPlaying && currentlyWaiting)
                             Positioned(
-                                child: Button(
-                              child: const Icon(FluentIcons.pause),
-                              onPressed: () {
-                                _controller.pause();
-                              },
-                            )),
+                              child: Button(
+                                child: const Icon(FluentIcons.pause),
+                                onPressed: () {
+                                  _controller.pause();
+                                },
+                              ),
+                            ),
                         ],
                       ),
                     ),
@@ -94,9 +98,7 @@ class _PaOVideoPlayerState extends State<PaOVideoPlayer> {
                 } else {
                   // If the VideoPlayerController is still initializing, show a
                   // loading spinner.
-                  return const Center(
-                    child: ProgressRing(),
-                  );
+                  return const Center(child: ProgressRing());
                 }
               },
             ),
@@ -110,39 +112,39 @@ class _PaOVideoPlayerState extends State<PaOVideoPlayer> {
               children: [
                 if (!_controller.value.isPlaying)
                   FilledButton(
-                      onPressed: () {
-                        _controller.play();
-                        setState(() {});
-                      },
-                      child: const Icon(FluentIcons.play)),
+                    onPressed: () {
+                      _controller.play();
+                      setState(() {});
+                    },
+                    child: const Icon(FluentIcons.play),
+                  ),
                 if (_controller.value.isPlaying)
                   Button(
-                      onPressed: () {
-                        _controller.pause();
-                        setState(() {});
-                      },
-                      child: const Icon(FluentIcons.pause)),
+                    onPressed: () {
+                      _controller.pause();
+                      setState(() {});
+                    },
+                    child: const Icon(FluentIcons.pause),
+                  ),
                 smallSpace,
                 Flexible(
                   child: VideoProgressIndicator(
                     _controller,
                     allowScrubbing: true,
                     colors: VideoProgressColors(
-                        backgroundColor: Colors.red,
-                        bufferedColor: Colors.black,
-                        playedColor: Colors.blue),
+                      backgroundColor: Colors.red,
+                      bufferedColor: Colors.black,
+                      playedColor: Colors.blue,
+                    ),
                   ),
                 ),
               ],
             ),
-          )
+          ),
         ],
       );
-    }
-    else {
-      return YoutubePlayer(
-        controller: _yTcontroller,
-      );
+    } else {
+      return YoutubePlayer(controller: _yTcontroller);
     }
   }
 
@@ -150,11 +152,13 @@ class _PaOVideoPlayerState extends State<PaOVideoPlayer> {
     setState(() {
       currentlyWaiting = true;
     });
-    Future.delayed(const Duration(seconds: 3)).then((value) => {
-          setState(() {
-            currentlyWaiting = false;
-          })
-        });
+    Future.delayed(const Duration(seconds: 3)).then(
+      (value) => {
+        setState(() {
+          currentlyWaiting = false;
+        }),
+      },
+    );
   }
 
   @override

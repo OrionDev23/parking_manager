@@ -63,13 +63,8 @@ class CombineLatestStream<T, R> extends StreamView<R> {
 
   /// Constructs a [CombineLatestStream] using a default combiner, which simply
   /// yields a [List] of all latest events emitted by the provided [Iterable] of [Stream].
-  static CombineLatestStream<T, List<T>> list<T>(
-    Iterable<Stream<T>> streams,
-  ) =>
-      CombineLatestStream<T, List<T>>(
-        streams,
-        (List<T> values) => values,
-      );
+  static CombineLatestStream<T, List<T>> list<T>(Iterable<Stream<T>> streams) =>
+      CombineLatestStream<T, List<T>>(streams, (List<T> values) => values);
 
   /// Constructs a [CombineLatestStream] from a pair of [Stream]s
   /// where [combiner] is used to create a new event of type [R], based on the
@@ -78,11 +73,10 @@ class CombineLatestStream<T, R> extends StreamView<R> {
     Stream<A> streamOne,
     Stream<B> streamTwo,
     R Function(A a, B b) combiner,
-  ) =>
-      CombineLatestStream<dynamic, R>(
-        [streamOne, streamTwo],
-        (List<dynamic> values) => combiner(values[0] as A, values[1] as B),
-      );
+  ) => CombineLatestStream<dynamic, R>([
+    streamOne,
+    streamTwo,
+  ], (List<dynamic> values) => combiner(values[0] as A, values[1] as B));
 
   /// Constructs a [CombineLatestStream] from 3 [Stream]s
   /// where [combiner] is used to create a new event of type [R], based on the
@@ -92,17 +86,11 @@ class CombineLatestStream<T, R> extends StreamView<R> {
     Stream<B> streamB,
     Stream<C> streamC,
     R Function(A a, B b, C c) combiner,
-  ) =>
-      CombineLatestStream<dynamic, R>(
-        [streamA, streamB, streamC],
-        (List<dynamic> values) {
-          return combiner(
-            values[0] as A,
-            values[1] as B,
-            values[2] as C,
-          );
-        },
-      );
+  ) => CombineLatestStream<dynamic, R>([streamA, streamB, streamC], (
+    List<dynamic> values,
+  ) {
+    return combiner(values[0] as A, values[1] as B, values[2] as C);
+  });
 
   /// Constructs a [CombineLatestStream] from 4 [Stream]s
   /// where [combiner] is used to create a new event of type [R], based on the
@@ -113,18 +101,16 @@ class CombineLatestStream<T, R> extends StreamView<R> {
     Stream<C> streamC,
     Stream<D> streamD,
     R Function(A a, B b, C c, D d) combiner,
-  ) =>
-      CombineLatestStream<dynamic, R>(
-        [streamA, streamB, streamC, streamD],
-        (List<dynamic> values) {
-          return combiner(
-            values[0] as A,
-            values[1] as B,
-            values[2] as C,
-            values[3] as D,
-          );
-        },
-      );
+  ) => CombineLatestStream<dynamic, R>([streamA, streamB, streamC, streamD], (
+    List<dynamic> values,
+  ) {
+    return combiner(
+      values[0] as A,
+      values[1] as B,
+      values[2] as C,
+      values[3] as D,
+    );
+  });
 
   /// Constructs a [CombineLatestStream] from 5 [Stream]s
   /// where [combiner] is used to create a new event of type [R], based on the
@@ -136,19 +122,18 @@ class CombineLatestStream<T, R> extends StreamView<R> {
     Stream<D> streamD,
     Stream<E> streamE,
     R Function(A a, B b, C c, D d, E e) combiner,
-  ) =>
-      CombineLatestStream<dynamic, R>(
-        [streamA, streamB, streamC, streamD, streamE],
-        (List<dynamic> values) {
-          return combiner(
-            values[0] as A,
-            values[1] as B,
-            values[2] as C,
-            values[3] as D,
-            values[4] as E,
-          );
-        },
+  ) => CombineLatestStream<dynamic, R>(
+    [streamA, streamB, streamC, streamD, streamE],
+    (List<dynamic> values) {
+      return combiner(
+        values[0] as A,
+        values[1] as B,
+        values[2] as C,
+        values[3] as D,
+        values[4] as E,
       );
+    },
+  );
 
   /// Constructs a [CombineLatestStream] from 6 [Stream]s
   /// where [combiner] is used to create a new event of type [R], based on the
@@ -161,20 +146,19 @@ class CombineLatestStream<T, R> extends StreamView<R> {
     Stream<E> streamE,
     Stream<F> streamF,
     R Function(A a, B b, C c, D d, E e, F f) combiner,
-  ) =>
-      CombineLatestStream<dynamic, R>(
-        [streamA, streamB, streamC, streamD, streamE, streamF],
-        (List<dynamic> values) {
-          return combiner(
-            values[0] as A,
-            values[1] as B,
-            values[2] as C,
-            values[3] as D,
-            values[4] as E,
-            values[5] as F,
-          );
-        },
+  ) => CombineLatestStream<dynamic, R>(
+    [streamA, streamB, streamC, streamD, streamE, streamF],
+    (List<dynamic> values) {
+      return combiner(
+        values[0] as A,
+        values[1] as B,
+        values[2] as C,
+        values[3] as D,
+        values[4] as E,
+        values[5] as F,
       );
+    },
+  );
 
   /// Constructs a [CombineLatestStream] from 7 [Stream]s
   /// where [combiner] is used to create a new event of type [R], based on the
@@ -188,21 +172,20 @@ class CombineLatestStream<T, R> extends StreamView<R> {
     Stream<F> streamF,
     Stream<G> streamG,
     R Function(A a, B b, C c, D d, E e, F f, G g) combiner,
-  ) =>
-      CombineLatestStream<dynamic, R>(
-        [streamA, streamB, streamC, streamD, streamE, streamF, streamG],
-        (List<dynamic> values) {
-          return combiner(
-            values[0] as A,
-            values[1] as B,
-            values[2] as C,
-            values[3] as D,
-            values[4] as E,
-            values[5] as F,
-            values[6] as G,
-          );
-        },
+  ) => CombineLatestStream<dynamic, R>(
+    [streamA, streamB, streamC, streamD, streamE, streamF, streamG],
+    (List<dynamic> values) {
+      return combiner(
+        values[0] as A,
+        values[1] as B,
+        values[2] as C,
+        values[3] as D,
+        values[4] as E,
+        values[5] as F,
+        values[6] as G,
       );
+    },
+  );
 
   /// Constructs a [CombineLatestStream] from 8 [Stream]s
   /// where [combiner] is used to create a new event of type [R], based on the
@@ -217,31 +200,21 @@ class CombineLatestStream<T, R> extends StreamView<R> {
     Stream<G> streamG,
     Stream<H> streamH,
     R Function(A a, B b, C c, D d, E e, F f, G g, H h) combiner,
-  ) =>
-      CombineLatestStream<dynamic, R>(
-        [
-          streamA,
-          streamB,
-          streamC,
-          streamD,
-          streamE,
-          streamF,
-          streamG,
-          streamH
-        ],
-        (List<dynamic> values) {
-          return combiner(
-            values[0] as A,
-            values[1] as B,
-            values[2] as C,
-            values[3] as D,
-            values[4] as E,
-            values[5] as F,
-            values[6] as G,
-            values[7] as H,
-          );
-        },
+  ) => CombineLatestStream<dynamic, R>(
+    [streamA, streamB, streamC, streamD, streamE, streamF, streamG, streamH],
+    (List<dynamic> values) {
+      return combiner(
+        values[0] as A,
+        values[1] as B,
+        values[2] as C,
+        values[3] as D,
+        values[4] as E,
+        values[5] as F,
+        values[6] as G,
+        values[7] as H,
       );
+    },
+  );
 
   /// Constructs a [CombineLatestStream] from 9 [Stream]s
   /// where [combiner] is used to create a new event of type [R], based on the
@@ -257,33 +230,32 @@ class CombineLatestStream<T, R> extends StreamView<R> {
     Stream<H> streamH,
     Stream<I> streamI,
     R Function(A a, B b, C c, D d, E e, F f, G g, H h, I i) combiner,
-  ) =>
-      CombineLatestStream<dynamic, R>(
-        [
-          streamA,
-          streamB,
-          streamC,
-          streamD,
-          streamE,
-          streamF,
-          streamG,
-          streamH,
-          streamI
-        ],
-        (List<dynamic> values) {
-          return combiner(
-            values[0] as A,
-            values[1] as B,
-            values[2] as C,
-            values[3] as D,
-            values[4] as E,
-            values[5] as F,
-            values[6] as G,
-            values[7] as H,
-            values[8] as I,
-          );
-        },
+  ) => CombineLatestStream<dynamic, R>(
+    [
+      streamA,
+      streamB,
+      streamC,
+      streamD,
+      streamE,
+      streamF,
+      streamG,
+      streamH,
+      streamI,
+    ],
+    (List<dynamic> values) {
+      return combiner(
+        values[0] as A,
+        values[1] as B,
+        values[2] as C,
+        values[3] as D,
+        values[4] as E,
+        values[5] as F,
+        values[6] as G,
+        values[7] as H,
+        values[8] as I,
       );
+    },
+  );
 
   static StreamController<R> _buildController<T, R>(
     Iterable<Stream<T>> streams,
@@ -309,40 +281,44 @@ class CombineLatestStream<T, R> extends StreamView<R> {
           if (++completed == len) controller.close();
         }
 
-        onUpdate(int index) => (T value) => values[index] = value;
+        onUpdate(int index) =>
+            (T value) => values[index] = value;
 
-        subscriptions = streams.map((stream) {
-          final onUpdateForStream = onUpdate(index++);
-          var hasFirstEvent = false;
+        subscriptions = streams
+            .map((stream) {
+              final onUpdateForStream = onUpdate(index++);
+              var hasFirstEvent = false;
 
-          return stream.listen(
-            (T value) {
-              onUpdateForStream(value);
+              return stream.listen(
+                (T value) {
+                  onUpdateForStream(value);
 
-              if (!hasFirstEvent) {
-                hasFirstEvent = true;
-                triggered++;
-              }
+                  if (!hasFirstEvent) {
+                    hasFirstEvent = true;
+                    triggered++;
+                  }
 
-              if (allHaveEvent()) {
-                try {
-                  controller.add(combiner(List<T>.unmodifiable(values)));
-                } catch (e, s) {
-                  controller.addError(e, s);
-                }
-              }
-            },
-            onError: controller.addError,
-            onDone: onDone,
-          );
-        }).toList(growable: false);
+                  if (allHaveEvent()) {
+                    try {
+                      controller.add(combiner(List<T>.unmodifiable(values)));
+                    } catch (e, s) {
+                      controller.addError(e, s);
+                    }
+                  }
+                },
+                onError: controller.addError,
+                onDone: onDone,
+              );
+            })
+            .toList(growable: false);
       },
       onPause: () =>
           subscriptions.forEach((subscription) => subscription.pause()),
       onResume: () =>
           subscriptions.forEach((subscription) => subscription.resume()),
       onCancel: () => Future.wait<dynamic>(
-          subscriptions.map((subscription) => subscription.cancel())),
+        subscriptions.map((subscription) => subscription.cancel()),
+      ),
     );
 
     return controller;

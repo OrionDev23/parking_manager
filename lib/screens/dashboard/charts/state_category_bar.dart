@@ -70,8 +70,13 @@ class _StateBarsState extends State<StateCategoryBars> {
   Future<void> getValue(int index) async {
     List<ChartData> s = [];
     for (int j = 0; j < widget.labels[index].value.length; j++) {
-      s.add(ChartData(j, await widget.labels[index].value[j].value,
-          widget.labels[index].value[j].key));
+      s.add(
+        ChartData(
+          j,
+          await widget.labels[index].value[j].value,
+          widget.labels[index].value[j].key,
+        ),
+      );
     }
     values.add(ChartDataCategory(widget.labels[index].key, s));
   }
@@ -91,35 +96,39 @@ class _StateBarsState extends State<StateCategoryBars> {
           Text(
             widget.title!,
             style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: appTheme.writingStyle.color),
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: appTheme.writingStyle.color,
+            ),
           ),
         smallSpace,
         Expanded(
           child: SfCartesianChart(
             plotAreaBorderWidth: 0,
-            legend: const Legend(
-              isVisible: true,
-            ),
+            legend: const Legend(isVisible: true),
             margin: const EdgeInsets.all(5),
             tooltipBehavior: TooltipBehavior(
-                enable: true,
-                color: appTheme.backGroundColor,
-                textStyle: appTheme.writingStyle),
+              enable: true,
+              color: appTheme.backGroundColor,
+              textStyle: appTheme.writingStyle,
+            ),
             primaryYAxis: const NumericAxis(
-                interval: 10,
-                axisLine: AxisLine(width: 0),
-                majorTickLines: MajorTickLines(size: 0)),
+              interval: 10,
+              axisLine: AxisLine(width: 0),
+              majorTickLines: MajorTickLines(size: 0),
+            ),
             primaryXAxis: const CategoryAxis(
-                labelIntersectAction: AxisLabelIntersectAction.multipleRows,
-                majorGridLines: MajorGridLines(width: 0)),
+              labelIntersectAction: AxisLabelIntersectAction.multipleRows,
+              majorGridLines: MajorGridLines(width: 0),
+            ),
             series: List<ColumnSeries<ChartData, String>>.generate(
-                values.length, (index) {
-              return ColumnSeries(
+              values.length,
+              (index) {
+                return ColumnSeries(
                   name: values[index].category.tr(),
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(5)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(5),
+                  ),
                   color: colors[index],
                   dataSource: values[index].values,
                   width: 1,
@@ -132,8 +141,10 @@ class _StateBarsState extends State<StateCategoryBars> {
                   },
                   yValueMapper: (s, r) {
                     return s.y;
-                  });
-            }),
+                  },
+                );
+              },
+            ),
           ),
         ),
       ],

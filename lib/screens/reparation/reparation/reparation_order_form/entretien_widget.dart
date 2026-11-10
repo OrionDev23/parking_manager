@@ -31,15 +31,13 @@ class EntretienWidgetState extends State<EntretienWidget> {
     );
   }
 
-  Widget firstColumn(){
+  Widget firstColumn() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ToggleSwitch(
-          content: Text(
-            'vidangeMoteur',
-            style:littleStyle,).tr(),
+          content: Text('vidangeMoteur', style: littleStyle).tr(),
           checked: widget.entretienVehicle.vidangeMoteur,
           onChanged: (s) {
             setState(() {
@@ -49,9 +47,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'vidangeBoite',
-            style:littleStyle,).tr(),
+          content: Text('vidangeBoite', style: littleStyle).tr(),
           checked: widget.entretienVehicle.vidangeBoite,
           onChanged: (s) {
             setState(() {
@@ -61,9 +57,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'vidangePont',
-            style:littleStyle,).tr(),
+          content: Text('vidangePont', style: littleStyle).tr(),
           checked: widget.entretienVehicle.vidangePont,
           onChanged: (s) {
             setState(() {
@@ -73,9 +67,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'filtreAir',
-            style:littleStyle,).tr(),
+          content: Text('filtreAir', style: littleStyle).tr(),
           checked: widget.entretienVehicle.filtreAir,
           onChanged: (s) {
             setState(() {
@@ -85,9 +77,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'filtreHuile',
-            style:littleStyle,).tr(),
+          content: Text('filtreHuile', style: littleStyle).tr(),
           checked: widget.entretienVehicle.filtreHuile,
           onChanged: (s) {
             setState(() {
@@ -97,9 +87,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'filtreCarburant',
-            style:littleStyle,).tr(),
+          content: Text('filtreCarburant', style: littleStyle).tr(),
           checked: widget.entretienVehicle.filtreCarburant,
           onChanged: (s) {
             setState(() {
@@ -109,9 +97,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            "filtreHabitacle",
-            style:littleStyle,).tr(),
+          content: Text("filtreHabitacle", style: littleStyle).tr(),
           checked: widget.entretienVehicle.filtreHabitacle,
           onChanged: (s) {
             setState(() {
@@ -121,9 +107,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'liquideFrein',
-            style:littleStyle,).tr(),
+          content: Text('liquideFrein', style: littleStyle).tr(),
           checked: widget.entretienVehicle.liquideFrein,
           onChanged: (s) {
             setState(() {
@@ -133,9 +117,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'liquideRefroidissement',
-            style:littleStyle,).tr(),
+          content: Text('liquideRefroidissement', style: littleStyle).tr(),
           checked: widget.entretienVehicle.liquideRefroidissement,
           onChanged: (s) {
             setState(() {
@@ -145,9 +127,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'liquideTransmission',
-            style:littleStyle,).tr(),
+          content: Text('liquideTransmission', style: littleStyle).tr(),
           checked: widget.entretienVehicle.liquideTransmission,
           onChanged: (s) {
             setState(() {
@@ -158,15 +138,14 @@ class EntretienWidgetState extends State<EntretienWidget> {
       ],
     );
   }
-  Widget secondColumn(){
+
+  Widget secondColumn() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ToggleSwitch(
-          content: Text(
-            'systemSuspension',
-            style:littleStyle,).tr(),
+          content: Text('systemSuspension', style: littleStyle).tr(),
           checked: widget.entretienVehicle.systemSuspension,
           onChanged: (s) {
             setState(() {
@@ -176,9 +155,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'systemFreinage',
-            style:littleStyle,).tr(),
+          content: Text('systemFreinage', style: littleStyle).tr(),
           checked: widget.entretienVehicle.systemFreinage,
           onChanged: (s) {
             setState(() {
@@ -188,9 +165,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'inspectionAmortisseurs',
-            style:littleStyle,).tr(),
+          content: Text('inspectionAmortisseurs', style: littleStyle).tr(),
           checked: widget.entretienVehicle.inspectionAmortisseurs,
           onChanged: (s) {
             setState(() {
@@ -200,9 +175,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'bougies',
-            style:littleStyle,).tr(),
+          content: Text('bougies', style: littleStyle).tr(),
           checked: widget.entretienVehicle.bougies,
           onChanged: (s) {
             setState(() {
@@ -212,9 +185,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'equilibrageRoues',
-            style:littleStyle,).tr(),
+          content: Text('equilibrageRoues', style: littleStyle).tr(),
           checked: widget.entretienVehicle.equilibrageRoues,
           onChanged: (s) {
             setState(() {
@@ -224,9 +195,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'controleNiveaux',
-            style:littleStyle,).tr(),
+          content: Text('controleNiveaux', style: littleStyle).tr(),
           checked: widget.entretienVehicle.controleNiveaux,
           onChanged: (s) {
             setState(() {
@@ -236,9 +205,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'changerPneux',
-            style:littleStyle,).tr(),
+          content: Text('changerPneux', style: littleStyle).tr(),
           checked: widget.entretienVehicle.changerPneux,
           onChanged: (s) {
             setState(() {
@@ -248,9 +215,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'differentielAvAr',
-            style:littleStyle,).tr(),
+          content: Text('differentielAvAr', style: littleStyle).tr(),
           checked: widget.entretienVehicle.differentielAvAr,
           onChanged: (s) {
             setState(() {
@@ -260,9 +225,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'tuyaux',
-            style:littleStyle,).tr(),
+          content: Text('tuyaux', style: littleStyle).tr(),
           checked: widget.entretienVehicle.tuyaux,
           onChanged: (s) {
             setState(() {
@@ -272,9 +235,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'echappement',
-            style:littleStyle,).tr(),
+          content: Text('echappement', style: littleStyle).tr(),
           checked: widget.entretienVehicle.echappement,
           onChanged: (s) {
             setState(() {
@@ -286,15 +247,13 @@ class EntretienWidgetState extends State<EntretienWidget> {
     );
   }
 
-  Widget thirdColumn(){
+  Widget thirdColumn() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ToggleSwitch(
-          content: Text(
-            'batterie',
-            style:littleStyle,).tr(),
+          content: Text('batterie', style: littleStyle).tr(),
           checked: widget.entretienVehicle.batterie,
           onChanged: (s) {
             setState(() {
@@ -304,9 +263,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'courroies',
-            style:littleStyle,).tr(),
+          content: Text('courroies', style: littleStyle).tr(),
           checked: widget.entretienVehicle.courroies,
           onChanged: (s) {
             setState(() {
@@ -316,9 +273,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'eclairage',
-            style:littleStyle,).tr(),
+          content: Text('eclairage', style: littleStyle).tr(),
           checked: widget.entretienVehicle.eclairage,
           onChanged: (s) {
             setState(() {
@@ -328,9 +283,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'cire',
-            style:littleStyle,).tr(),
+          content: Text('cire', style: littleStyle).tr(),
           checked: widget.entretienVehicle.cire,
           onChanged: (s) {
             setState(() {
@@ -340,9 +293,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'entretienClimatiseur',
-            style:littleStyle,).tr(),
+          content: Text('entretienClimatiseur', style: littleStyle).tr(),
           checked: widget.entretienVehicle.entretienClimatiseur,
           onChanged: (s) {
             setState(() {
@@ -352,9 +303,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'balaisEssuieGlace',
-            style:littleStyle,).tr(),
+          content: Text('balaisEssuieGlace', style: littleStyle).tr(),
           checked: widget.entretienVehicle.balaisEssuieGlace,
           onChanged: (s) {
             setState(() {
@@ -364,9 +313,7 @@ class EntretienWidgetState extends State<EntretienWidget> {
         ),
         smallSpace,
         ToggleSwitch(
-          content: Text(
-            'obd',
-            style:littleStyle,).tr(),
+          content: Text('obd', style: littleStyle).tr(),
           checked: widget.entretienVehicle.obd,
           onChanged: (s) {
             setState(() {
@@ -379,12 +326,14 @@ class EntretienWidgetState extends State<EntretienWidget> {
         Row(
           children: [
             Button(
-                onPressed: () => selectAllEntretien(false),
-                child: const Text('clear').tr()),
+              onPressed: () => selectAllEntretien(false),
+              child: const Text('clear').tr(),
+            ),
             smallSpace,
             FilledButton(
-                onPressed: () => selectAllEntretien(true),
-                child: const Text('selectall').tr()),
+              onPressed: () => selectAllEntretien(true),
+              child: const Text('selectall').tr(),
+            ),
           ],
         ),
       ],
@@ -408,20 +357,17 @@ class EntretienWidgetState extends State<EntretienWidget> {
     widget.entretienVehicle.eclairage = value;
     widget.entretienVehicle.obd = value;
     widget.entretienVehicle.bougies = value;
-    widget.entretienVehicle.systemSuspension=value;
-    widget.entretienVehicle.systemFreinage=value;
-    widget.entretienVehicle.tuyaux=value;
-    widget.entretienVehicle.batterie=value;
-    widget.entretienVehicle.changerPneux=value;
-    widget.entretienVehicle.cire=value;
-    widget.entretienVehicle.courroies=value;
-    widget.entretienVehicle.differentielAvAr=value;
-    widget.entretienVehicle.echappement=value;
-    widget.entretienVehicle.inspectionAmortisseurs=value;
-    widget.entretienVehicle.liquideTransmission=value;
+    widget.entretienVehicle.systemSuspension = value;
+    widget.entretienVehicle.systemFreinage = value;
+    widget.entretienVehicle.tuyaux = value;
+    widget.entretienVehicle.batterie = value;
+    widget.entretienVehicle.changerPneux = value;
+    widget.entretienVehicle.cire = value;
+    widget.entretienVehicle.courroies = value;
+    widget.entretienVehicle.differentielAvAr = value;
+    widget.entretienVehicle.echappement = value;
+    widget.entretienVehicle.inspectionAmortisseurs = value;
+    widget.entretienVehicle.liquideTransmission = value;
     setState(() {});
   }
-
-
-
 }

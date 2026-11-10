@@ -6,8 +6,6 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../theme.dart';
 
 class BigTitleForm extends StatelessWidget {
-
-
   const BigTitleForm({
     super.key,
     required this.bigTitle,
@@ -33,15 +31,10 @@ class BigTitleForm extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(
-            bigTitle,
-            textAlign: TextAlign.start,
-            style: headerStyle,
-          ).tr(),
+          Text(bigTitle, textAlign: TextAlign.start, style: headerStyle).tr(),
           smallSpace,
           Text(littleTitle!).tr(),
-          if(trailing!=null)
-            const   Spacer(),
+          if (trailing != null) const Spacer(),
           ?trailing,
         ],
       ),

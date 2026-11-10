@@ -34,8 +34,8 @@ class AppwriteDriverSource implements RemoteDriverSource {
       return Driver.fromMap(Map<String, dynamic>.from(payload));
     }
 
-    final createdAt = DateTime.tryParse(row.$createdAt.toString()) ??
-        DateTime.now().toUtc();
+    final createdAt =
+        DateTime.tryParse(row.$createdAt.toString()) ?? DateTime.now().toUtc();
     final updatedAt = DateTime.tryParse(row.$updatedAt.toString()) ?? createdAt;
     final rawBirthDate = data['dateNaissance'];
     final birthDate = rawBirthDate is num
@@ -67,33 +67,39 @@ class AppwriteDriverSource implements RemoteDriverSource {
     );
   }
 
-  static DateTime? _legacyDate(int milliseconds) =>
-      DateTime(2023, 11, 1, 12, 13, 15)
-          .add(Duration(milliseconds: milliseconds));
+  static DateTime? _legacyDate(int milliseconds) => DateTime(
+    2023,
+    11,
+    1,
+    12,
+    13,
+    15,
+  ).add(Duration(milliseconds: milliseconds));
 
   Map<String, dynamic> _toRow(Driver driver) => {
-        'companyId': driver.companyId,
-        'siteId': driver.siteId,
-        'name': driver.lastName,
-        'prenom': driver.firstName,
-        'matricule': driver.registration,
-        'dateNaissance': driver.birthDate?.difference(DateTime(2023, 11, 1, 12, 13, 15))
-                .inMilliseconds,
-        'email': driver.email,
-        'telephone': driver.phone,
-        'adresse': driver.address,
-        'createdBy': driver.createdBy,
-        'etatactuel': driver.currentStateId,
-        'etat': driver.state,
-        'filliale': driver.subsidiary,
-        'direction': driver.direction,
-        'departement': driver.department,
-        'profession': driver.profession,
-        'vehicules': driver.vehicleIds,
-        'service': driver.service,
-        'search': _searchText(driver),
-        'payload': jsonEncode(driver.toMap()),
-      };
+    'companyId': driver.companyId,
+    'siteId': driver.siteId,
+    'name': driver.lastName,
+    'prenom': driver.firstName,
+    'matricule': driver.registration,
+    'dateNaissance': driver.birthDate
+        ?.difference(DateTime(2023, 11, 1, 12, 13, 15))
+        .inMilliseconds,
+    'email': driver.email,
+    'telephone': driver.phone,
+    'adresse': driver.address,
+    'createdBy': driver.createdBy,
+    'etatactuel': driver.currentStateId,
+    'etat': driver.state,
+    'filliale': driver.subsidiary,
+    'direction': driver.direction,
+    'departement': driver.department,
+    'profession': driver.profession,
+    'vehicules': driver.vehicleIds,
+    'service': driver.service,
+    'search': _searchText(driver),
+    'payload': jsonEncode(driver.toMap()),
+  };
 
   String _searchText(Driver driver) =>
       '${driver.lastName} ${driver.firstName} ${driver.registration} '

@@ -11,18 +11,27 @@ import 'package:printing/printing.dart';
 
 final numberFormat = NumberFormat('00000000', 'fr');
 final numberFormat2 = NumberFormat('00', 'fr');
-final numberFormat3 =
-    NumberFormat.currency(locale: 'fr', symbol: '%', decimalDigits: 2);
-final numberFormat4 =
-    NumberFormat.currency(locale: 'fr', decimalDigits: 2);
-final prixFormat =
-    NumberFormat.currency(locale: 'fr', symbol: 'DA', decimalDigits: 2);
+final numberFormat3 = NumberFormat.currency(
+  locale: 'fr',
+  symbol: '%',
+  decimalDigits: 2,
+);
+final numberFormat4 = NumberFormat.currency(locale: 'fr', decimalDigits: 2);
+final prixFormat = NumberFormat.currency(
+  locale: 'fr',
+  symbol: 'DA',
+  decimalDigits: 2,
+);
 final dateFormat = DateFormat('dd MMMM yyyy', 'fr');
 final dateFormatHH = DateFormat('dd MMMM yyyy à HH:mm', 'fr');
-final smallSpace =
-    SizedBox(width: PdfPageFormat.cm * 0.1, height: PdfPageFormat.cm * 0.1);
-final bigSpace =
-    SizedBox(width: PdfPageFormat.cm * 0.2, height: PdfPageFormat.cm * 0.2);
+final smallSpace = SizedBox(
+  width: PdfPageFormat.cm * 0.1,
+  height: PdfPageFormat.cm * 0.1,
+);
+final bigSpace = SizedBox(
+  width: PdfPageFormat.cm * 0.2,
+  height: PdfPageFormat.cm * 0.2,
+);
 
 late TextStyle bigTitle;
 late TextStyle kindaBigText;
@@ -55,19 +64,13 @@ class PDFTheming {
       fontSize: 15,
       letterSpacing: -0.15,
     );
-    kindaBigText = const TextStyle(
-      fontSize: 12,
-      letterSpacing: -0.12,
-    );
+    kindaBigText = const TextStyle(fontSize: 12, letterSpacing: -0.12);
     kindaBigTextBold = TextStyle(
       fontWeight: FontWeight.bold,
       fontSize: 12,
       letterSpacing: -0.12,
     );
-    smallText = const TextStyle(
-      fontSize: 9,
-      letterSpacing: -0.12,
-    );
+    smallText = const TextStyle(fontSize: 9, letterSpacing: -0.12);
     smallTextBold = TextStyle(
       fontSize: 9,
       fontWeight: FontWeight.bold,
@@ -76,7 +79,7 @@ class PDFTheming {
   }
 
   Future<void> getEntrepriseLogo() async {
-    if (kIsWeb || Platform.isAndroid || Platform.isIOS ) {
+    if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
       if (MyEntrepriseState.logo == null) {
         await DatabaseGetter.downloadLogo();
       }
@@ -84,16 +87,14 @@ class PDFTheming {
         entrepriseLogo ??= MemoryImage(MyEntrepriseState.logo!);
       }
     } else {
-      entrepriseLogo ??= MemoryImage(
-        await File('mylogo.png').readAsBytes(),
-      );
+      entrepriseLogo ??= MemoryImage(await File('mylogo.png').readAsBytes());
     }
   }
 
   Future<void> getPoLogo() async {
-    poLogo ??= MemoryImage((await rootBundle.load('assets/images/logo.webp'))
-        .buffer
-        .asUint8List());
+    poLogo ??= MemoryImage(
+      (await rootBundle.load('assets/images/logo.webp')).buffer.asUint8List(),
+    );
   }
 
   Future<void> getBaseFont() async {
@@ -118,11 +119,7 @@ class PDFTheming {
     ]);
   }
 
-
-  Future<void> initLogosOnly() async{
-    await Future.wait([
-      getPoLogo(),
-      getEntrepriseLogo(),
-    ]);
+  Future<void> initLogosOnly() async {
+    await Future.wait([getPoLogo(), getEntrepriseLogo()]);
   }
 }

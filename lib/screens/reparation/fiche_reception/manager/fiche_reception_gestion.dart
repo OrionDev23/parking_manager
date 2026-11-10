@@ -18,36 +18,33 @@ class FicheReceptionGestion extends StatefulWidget {
 }
 
 class FicheReceptionGestionState extends State<FicheReceptionGestion> {
-  final tstyle = TextStyle(
-    fontSize: 10.sp,
-  );
+  final tstyle = TextStyle(fontSize: 10.sp);
 
   @override
   Widget build(BuildContext context) {
     return ScaffoldPage(
-        header: PageTitle(
-          text: 'fichesreception'.tr(),
-          trailing: widget.archive
-              ? null
-              : ButtonContainer(
-            icon: FluentIcons.add,
-            text: 'add'.tr(),
-            showBottom: false,
-            showCounter: false,
-            action: () {
-              final index = FicheReceptionTabsState.tabs.length + 1;
-              final tab = generateTab(index);
-              FicheReceptionTabsState.tabs.add(tab);
-              FicheReceptionTabsState.currentIndex.value = index - 1;
-            },
-          ),
-        ),
-        content: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: FicheReceptionTable(
-            archive: widget.archive,
-          ),
-        ));
+      header: PageTitle(
+        text: 'fichesreception'.tr(),
+        trailing: widget.archive
+            ? null
+            : ButtonContainer(
+                icon: FluentIcons.add,
+                text: 'add'.tr(),
+                showBottom: false,
+                showCounter: false,
+                action: () {
+                  final index = FicheReceptionTabsState.tabs.length + 1;
+                  final tab = generateTab(index);
+                  FicheReceptionTabsState.tabs.add(tab);
+                  FicheReceptionTabsState.currentIndex.value = index - 1;
+                },
+              ),
+      ),
+      content: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        child: FicheReceptionTable(archive: widget.archive),
+      ),
+    );
   }
 
   Tab generateTab(int index) {
@@ -57,9 +54,7 @@ class FicheReceptionGestionState extends State<FicheReceptionGestion> {
       text: Text('nouvfiche'.tr()),
       semanticLabel: 'nouvfiche'.tr(),
       icon: const Icon(FluentIcons.document),
-      body: FicheReceptionForm(
-        key: UniqueKey(),
-      ),
+      body: FicheReceptionForm(key: UniqueKey()),
       onClosed: () {
         FicheReceptionTabsState.tabs.remove(tab);
 

@@ -15,24 +15,32 @@ class SelectOneBloc<T> {
 
   String get filterValue => _filter$.value ?? "";
 
-  SelectOneBloc(List<T>? items, Future<List<T>?> Function(String text)? onFind,
-      TextEditingController? findController) {
+  SelectOneBloc(
+    List<T>? items,
+    Future<List<T>?> Function(String text)? onFind,
+    TextEditingController? findController,
+  ) {
     this.findController = findController ?? TextEditingController();
     _list$ = BehaviorSubject.seeded(items);
 
-    _filteredListOfflineOut =
-        CombineLatestStream.combine2(_list$, _filter$, filter);
+    _filteredListOfflineOut = CombineLatestStream.combine2(
+      _list$,
+      _filter$,
+      filter,
+    );
     _filteredListOnlineOut = _filter$
         .where((_) => onFind != null)
         .distinct()
         .debounceTime(const Duration(milliseconds: 500))
         .switchMap((val) => Stream.fromFuture(onFind!(val)).startWith(null));
-    filteredListOut =
-        MergeStream([_filteredListOfflineOut, _filteredListOnlineOut]);
+    filteredListOut = MergeStream([
+      _filteredListOfflineOut,
+      _filteredListOnlineOut,
+    ]);
 
-    this
-        .findController
-        .addListener(() => onTextChanged(this.findController.text));
+    this.findController.addListener(
+      () => onTextChanged(this.findController.text),
+    );
     onTextChanged(this.findController.text);
   }
 
@@ -42,10 +50,12 @@ class SelectOneBloc<T> {
 
   List<T>? filter(List<T>? list, String filter) {
     return list
-        ?.where((item) =>
-            _filter$.value == null ||
-            item.toString().toLowerCase().contains(filterValue) ||
-            filterValue.isEmpty)
+        ?.where(
+          (item) =>
+              _filter$.value == null ||
+              item.toString().toLowerCase().contains(filterValue) ||
+              filterValue.isEmpty,
+        )
         .toList();
   }
 

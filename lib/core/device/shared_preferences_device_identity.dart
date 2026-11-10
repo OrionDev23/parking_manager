@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'device_identity.dart';
 
 class SharedPreferencesDeviceIdentity implements DeviceIdentity {

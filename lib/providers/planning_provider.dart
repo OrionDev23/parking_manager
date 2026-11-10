@@ -116,9 +116,11 @@ class PlanningProvider extends ChangeNotifier {
       await refreshPlannings();
     }
     return plannings.values
-        .where((element) =>
-            element.startTime.isBefore(expiration) &&
-            !removedPlanDocs.contains(element.id))
+        .where(
+          (element) =>
+              element.startTime.isBefore(expiration) &&
+              !removedPlanDocs.contains(element.id),
+        )
         .toList(growable: false);
   }
 }

@@ -32,15 +32,18 @@ class _BrandContainerState extends State<BrandContainer> {
   }
 
   void getCount() async {
-    await DatabaseGetter.database!.listRows(
-        databaseId: databaseId,
-        tableId: vehiculeid,
-        queries: [
-          Query.equal('marque', widget.id.toString()),
-          Query.limit(1),
-        ]).then((value) {
-      vCount = value.total;
-    });
+    await DatabaseGetter.database!
+        .listRows(
+          databaseId: databaseId,
+          tableId: vehiculeid,
+          queries: [
+            Query.equal('marque', widget.id.toString()),
+            Query.limit(1),
+          ],
+        )
+        .then((value) {
+          vCount = value.total;
+        });
     if (mounted) {
       setState(() {
         loading = false;
@@ -56,32 +59,38 @@ class _BrandContainerState extends State<BrandContainer> {
         width: 10.w,
         height: 10.h,
         decoration: BoxDecoration(
-            color: appTheme.backGroundColor, boxShadow: kElevationToShadow[2]),
+          color: appTheme.backGroundColor,
+          boxShadow: kElevationToShadow[2],
+        ),
         child: Stack(
           children: [
             Positioned.fill(
-                child: Image.asset(
-              'assets/images/marques/${widget.id ?? 'default'}.webp',
-              fit: BoxFit.scaleDown,
-            )),
+              child: Image.asset(
+                'assets/images/marques/${widget.id ?? 'default'}.webp',
+                fit: BoxFit.scaleDown,
+              ),
+            ),
             Positioned(
-                bottom: 1.h,
-                right: 1.w,
-                child: Container(
-                  padding: const EdgeInsets.all(5),
-                  child: loading
-                      ? const Text('')
-                      : Text(
-                          '$vCount ${'vehicules'.tr()}',
-                          style: appTheme.writingStyle,
-                        ),
-                )),
+              bottom: 1.h,
+              right: 1.w,
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                child: loading
+                    ? const Text('')
+                    : Text(
+                        '$vCount ${'vehicules'.tr()}',
+                        style: appTheme.writingStyle,
+                      ),
+              ),
+            ),
           ],
         ),
       ),
       onTap: () {
-        PanesListState.index.value = PaneItemsAndFooters.originalItems
-                .indexOf(PaneItemsAndFooters.vehicles) +
+        PanesListState.index.value =
+            PaneItemsAndFooters.originalItems.indexOf(
+              PaneItemsAndFooters.vehicles,
+            ) +
             1;
         VehicleTabsState.currentIndex.value = 0;
 

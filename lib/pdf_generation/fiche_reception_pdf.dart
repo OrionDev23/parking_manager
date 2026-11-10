@@ -30,11 +30,7 @@ class FicheReceptionPdf {
       await pdfUtilities.initImages(fiche);
     }
     var doc = Document(
-      theme: ThemeData.withFont(
-        base: baseFont,
-        bold: boldFont,
-        icons: icons!,
-      ),
+      theme: ThemeData.withFont(base: baseFont, bold: boldFont, icons: icons!),
       title: 'Fiche ${fiche.numero}',
       author:
           DatabaseGetter.me.value?.name ?? DatabaseGetter.me.value?.email ?? '',
@@ -112,28 +108,28 @@ class FicheReceptionPdf {
 
   Widget getPageContent() {
     return Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          getHeader(),
-          bigSpace,
-          getVehicleInfo(),
-          bigSpace,
-          if (!etatEmpty())
-            gts
-                ? VehicleDamageGtsPdf(fiche).vehicleDamage()
-                : VehicleDamagePDF(fiche).vehicleDamage(),
-          if (!etatEmpty()) bigSpace,
-          if (!entretienEmpty())
-            VehicleEntretienPDF(fiche: fiche).vehicleEntretien(),
-          if (!entretienEmpty()) bigSpace,
-          if (!imagesEmpty()) imageContainer(),
-          smallSpace,
-          getRemarqueAndSignature(),
-          Spacer(),
-          if(!gts)
-          brandingAndPaging(),
-        ]);
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        getHeader(),
+        bigSpace,
+        getVehicleInfo(),
+        bigSpace,
+        if (!etatEmpty())
+          gts
+              ? VehicleDamageGtsPdf(fiche).vehicleDamage()
+              : VehicleDamagePDF(fiche).vehicleDamage(),
+        if (!etatEmpty()) bigSpace,
+        if (!entretienEmpty())
+          VehicleEntretienPDF(fiche: fiche).vehicleEntretien(),
+        if (!entretienEmpty()) bigSpace,
+        if (!imagesEmpty()) imageContainer(),
+        smallSpace,
+        getRemarqueAndSignature(),
+        Spacer(),
+        if (!gts) brandingAndPaging(),
+      ],
+    );
   }
 
   Widget imageContainer() {
@@ -148,70 +144,77 @@ class FicheReceptionPdf {
       return SizedBox();
     }
     return Container(
-        padding: EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          border: Border.all(),
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: Table(
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-            columnWidths: {
-              0: const FlexColumnWidth(5),
-              1: const FlexColumnWidth(5),
-              2: const FlexColumnWidth(5),
-            },
+      padding: EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        border: Border.all(),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Table(
+        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+        columnWidths: {
+          0: const FlexColumnWidth(5),
+          1: const FlexColumnWidth(5),
+          2: const FlexColumnWidth(5),
+        },
+        children: [
+          TableRow(
+            children: [Text('Photos des dégats', style: kindaBigTextBold)],
+          ),
+          TableRow(
             children: [
-              TableRow(
-                children: [
-                  Text('Photos des dégats', style: kindaBigTextBold),
-                ],
+              SizedBox(
+                height: imageHeight,
+                child: Center(
+                  child:
+                      pdfUtilities.images!.isNotEmpty &&
+                          pdfUtilities.images![0] != null &&
+                          pdfUtilities.images![0]!.isNotEmpty
+                      ? Image(MemoryImage(pdfUtilities.images![0]!))
+                      : Text('1'),
+                ),
               ),
-              TableRow(children: [
-                SizedBox(
-                  height: imageHeight,
-                  child: Center(
-                      child: pdfUtilities.images!.isNotEmpty &&
-                              pdfUtilities.images![0] != null &&
-                              pdfUtilities.images![0]!.isNotEmpty
-                          ? Image(
-                              MemoryImage(pdfUtilities.images![0]!),
-                            )
-                          : Text('1')),
+              SizedBox(
+                height: imageHeight,
+                child: Center(
+                  child:
+                      pdfUtilities.images!.isNotEmpty &&
+                          pdfUtilities.images![1] != null &&
+                          pdfUtilities.images![1]!.isNotEmpty
+                      ? Image(MemoryImage(pdfUtilities.images![1]!))
+                      : Text('2'),
                 ),
-                SizedBox(
-                    height: imageHeight,
-                    child: Center(
-                      child: pdfUtilities.images!.isNotEmpty &&
-                              pdfUtilities.images![1] != null &&
-                              pdfUtilities.images![1]!.isNotEmpty
-                          ? Image(MemoryImage(pdfUtilities.images![1]!))
-                          : Text('2'),
-                    ))
-              ]),
-              TableRow(children: [
-                SizedBox(
-                  height: imageHeight,
-                  child: Center(
-                    child: pdfUtilities.images!.isNotEmpty &&
-                            pdfUtilities.images![2] != null &&
-                            pdfUtilities.images![2]!.isNotEmpty
-                        ? Image(
-                            MemoryImage(pdfUtilities.images![2]!),
-                          )
-                        : Text('3'),
-                  ),
+              ),
+            ],
+          ),
+          TableRow(
+            children: [
+              SizedBox(
+                height: imageHeight,
+                child: Center(
+                  child:
+                      pdfUtilities.images!.isNotEmpty &&
+                          pdfUtilities.images![2] != null &&
+                          pdfUtilities.images![2]!.isNotEmpty
+                      ? Image(MemoryImage(pdfUtilities.images![2]!))
+                      : Text('3'),
                 ),
-                SizedBox(
-                    height: imageHeight,
-                    child: Center(
-                      child: pdfUtilities.images!.isNotEmpty &&
-                              pdfUtilities.images![3] != null &&
-                              pdfUtilities.images![3]!.isNotEmpty
-                          ? Image(MemoryImage(pdfUtilities.images![3]!))
-                          : Text('4'),
-                    ))
-              ]),
-            ]));
+              ),
+              SizedBox(
+                height: imageHeight,
+                child: Center(
+                  child:
+                      pdfUtilities.images!.isNotEmpty &&
+                          pdfUtilities.images![3] != null &&
+                          pdfUtilities.images![3]!.isNotEmpty
+                      ? Image(MemoryImage(pdfUtilities.images![3]!))
+                      : Text('4'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   bool entretienEmpty() {
@@ -236,8 +239,9 @@ class FicheReceptionPdf {
     return Container(
       width: 20 * PdfPageFormat.cm,
       height: 2.8 * PdfPageFormat.cm,
-      child: Column(children: [
-        Container(
+      child: Column(
+        children: [
+          Container(
             padding: const EdgeInsets.symmetric(horizontal: 3),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5),
@@ -245,64 +249,78 @@ class FicheReceptionPdf {
             ),
             width: 20 * PdfPageFormat.cm,
             child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Remarques', style: smallTextBold),
-                  smallSpace,
-                  SizedBox(
-                    height: PdfPageFormat.cm * 0.75,
-                    child: Stack(children: [
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Remarques', style: smallTextBold),
+                smallSpace,
+                SizedBox(
+                  height: PdfPageFormat.cm * 0.75,
+                  child: Stack(
+                    children: [
                       Positioned.fill(
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                            dotsSpacer(),
-                            dotsSpacer(),
-                          ])),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [dotsSpacer(), dotsSpacer()],
+                        ),
+                      ),
                       Positioned.fill(
-                          top: -1.5,
-                          left: 2,
-                          right: 2,
-                          child: Text(fiche.remarque ?? '', style: smallText))
-                    ]),
+                        top: -1.5,
+                        left: 2,
+                        right: 2,
+                        child: Text(fiche.remarque ?? '', style: smallText),
+                      ),
+                    ],
                   ),
-                ])),
-        smallSpace,
-        Container(
+                ),
+              ],
+            ),
+          ),
+          smallSpace,
+          Container(
             padding: const EdgeInsets.symmetric(horizontal: 3),
             width: 20 * PdfPageFormat.cm,
             child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                      width: 5 * PdfPageFormat.cm,
-                      child: Column(children: [
-                        Text('SIGNATURE RÉCEPTIONNAIRE', style: smallTextBold),
-                        Text(
-                            (DatabaseGetter.me.value?.name ?? '').toUpperCase(),
-                            style: smallText),
-                      ])),
-                  Spacer(),
-                  SizedBox(
-                    width: 9 * PdfPageFormat.cm,
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('SIGNATURE CONDUCTEUR', style: smallTextBold),
-                          Text(
-                              '${fiche.nomConducteur ?? ""} ${fiche.prenomConducteur ?? ""}'
-                                  .toUpperCase(),
-                              style: smallText),
-                          Text(
-                              "Le conducteur a signé la fiche de réception et accepté les termes et conditions applicables dans cette concession",
-                              style: smallText.copyWith(fontSize: 7.5))
-                        ]),
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 5 * PdfPageFormat.cm,
+                  child: Column(
+                    children: [
+                      Text('SIGNATURE RÉCEPTIONNAIRE', style: smallTextBold),
+                      Text(
+                        (DatabaseGetter.me.value?.name ?? '').toUpperCase(),
+                        style: smallText,
+                      ),
+                    ],
                   ),
-                ])),
-      ]),
+                ),
+                Spacer(),
+                SizedBox(
+                  width: 9 * PdfPageFormat.cm,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('SIGNATURE CONDUCTEUR', style: smallTextBold),
+                      Text(
+                        '${fiche.nomConducteur ?? ""} ${fiche.prenomConducteur ?? ""}'
+                            .toUpperCase(),
+                        style: smallText,
+                      ),
+                      Text(
+                        "Le conducteur a signé la fiche de réception et accepté les termes et conditions applicables dans cette concession",
+                        style: smallText.copyWith(fontSize: 7.5),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -310,121 +328,143 @@ class FicheReceptionPdf {
     return SizedBox(
       height: PdfPageFormat.cm * 2.7,
       child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image(entrepriseLogo!,
-                width: PdfPageFormat.cm * 2.8,
-                height: PdfPageFormat.cm * 2.8,
-                fit: BoxFit.contain,
-                alignment: Alignment.topCenter),
-            Container(
-              padding: const EdgeInsets.all(5),
-              width: 9 * PdfPageFormat.cm,
-              height: PdfPageFormat.cm * 2.7,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(),
-              ),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text(MyEntrepriseState.p?.nom ?? '',
-                        style: smallTextBold.copyWith(color: orangeDeep)),
-                    Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Adresse', style: smallTextBold),
-                          smallSpace,
-                          Text(MyEntrepriseState.p?.adresse ?? '',
-                              style: smallText),
-                        ]),
-                    Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Text('Email', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.email ?? '', style: smallText),
-                      smallSpace,
-                      Text('Tél', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.telephone ?? '',
-                          style: smallText),
-                    ]),
-                    Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Text('NIF', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.nif ?? '', style: smallText),
-                      smallSpace,
-                      Text('NIS', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.nis ?? '', style: smallText),
-                    ]),
-                    Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Text('ART', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.art ?? '', style: smallText),
-                      smallSpace,
-                      Text('RC', style: smallTextBold),
-                      dotsSpacer(),
-                      Text(MyEntrepriseState.p?.rc ?? '', style: smallText),
-                    ]),
-                  ]),
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Image(
+            entrepriseLogo!,
+            width: PdfPageFormat.cm * 2.8,
+            height: PdfPageFormat.cm * 2.8,
+            fit: BoxFit.contain,
+            alignment: Alignment.topCenter,
+          ),
+          Container(
+            padding: const EdgeInsets.all(5),
+            width: 9 * PdfPageFormat.cm,
+            height: PdfPageFormat.cm * 2.7,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(),
             ),
-            SizedBox(
-              height: PdfPageFormat.cm * 2.7,
-              child:
-                  Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Text('FICHE DE RECEPTION', style: bigTitle),
-                SizedBox(
-                  height: PdfPageFormat.cm * 0.3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  MyEntrepriseState.p?.nom ?? '',
+                  style: smallTextBold.copyWith(color: orangeDeep),
                 ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Adresse', style: smallTextBold),
+                    smallSpace,
+                    Text(MyEntrepriseState.p?.adresse ?? '', style: smallText),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('Email', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(MyEntrepriseState.p?.email ?? '', style: smallText),
+                    smallSpace,
+                    Text('Tél', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(
+                      MyEntrepriseState.p?.telephone ?? '',
+                      style: smallText,
+                    ),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('NIF', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(MyEntrepriseState.p?.nif ?? '', style: smallText),
+                    smallSpace,
+                    Text('NIS', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(MyEntrepriseState.p?.nis ?? '', style: smallText),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text('ART', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(MyEntrepriseState.p?.art ?? '', style: smallText),
+                    smallSpace,
+                    Text('RC', style: smallTextBold),
+                    dotsSpacer(),
+                    Text(MyEntrepriseState.p?.rc ?? '', style: smallText),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: PdfPageFormat.cm * 2.7,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text('FICHE DE RECEPTION', style: bigTitle),
+                SizedBox(height: PdfPageFormat.cm * 0.3),
                 Expanded(
                   child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(5),
-                          width: PdfPageFormat.cm * 6.3,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(color: orangeDeep)
-                          ),
-                          child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Flexible(
-                                  child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Text('Fiche #',
-                                            style: kindaBigTextBold),
-                                        dotsSpacer(),
-                                        Text(numberFormat.format(fiche.numero),
-                                            style: kindaBigText),
-                                      ]),
-                                ),
-                                SizedBox(height: PdfPageFormat.cm * 0.5),
-                                Flexible(
-                                  child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Text('Date', style: kindaBigTextBold),
-                                        dotsSpacer(),
-                                        Text(dateFormatHH.format(fiche.dateEntre),
-                                            style: kindaBigText),
-                                      ]),
-                                )
-                              ]),
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(5),
+                        width: PdfPageFormat.cm * 6.3,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(color: orangeDeep),
                         ),
-                      ]),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text('Fiche #', style: kindaBigTextBold),
+                                  dotsSpacer(),
+                                  Text(
+                                    numberFormat.format(fiche.numero),
+                                    style: kindaBigText,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: PdfPageFormat.cm * 0.5),
+                            Flexible(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text('Date', style: kindaBigTextBold),
+                                  dotsSpacer(),
+                                  Text(
+                                    dateFormatHH.format(fiche.dateEntre),
+                                    style: kindaBigText,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ]),
+              ],
             ),
-          ]),
+          ),
+        ],
+      ),
     );
   }
 
@@ -433,387 +473,472 @@ class FicheReceptionPdf {
     double height = PdfPageFormat.cm * 0.6;
     double bottom = 4;
     double bottomFill = 3;
-    return Column(children: [
-      Table(
+    return Column(
+      children: [
+        Table(
           columnWidths: {
             0: const FlexColumnWidth(3),
             1: const FlexColumnWidth(3),
             2: const FlexColumnWidth(5),
             3: const FlexColumnWidth(5),
           },
-          border: const TableBorder(
-            verticalInside: BorderSide(),
-          ),
+          border: const TableBorder(verticalInside: BorderSide()),
           children: [
             TableRow(
-                decoration: BoxDecoration(
-                  border: Border.all(),
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(5)),
+              decoration: BoxDecoration(
+                border: Border.all(),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(5),
                 ),
-                children: [
-                  Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: Row(children: [
-                        Text('Marque', style: smallTextBold),
-                        SizedBox(
-                          width: width,
-                          height: height,
-                          child: Stack(children: [
+              ),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('Marque', style: smallTextBold),
+                      SizedBox(
+                        width: width,
+                        height: height,
+                        child: Stack(
+                          children: [
                             Positioned.fill(
-                                bottom: bottomFill,
-                                left: 0,
-                                right: 5,
-                                child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      dotsSpacer(),
-                                    ])),
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
+                            ),
                             Positioned(
                               bottom: 5,
                               left: 5,
                               right: 5,
                               child: Text(fiche.marque ?? '', style: smallText),
                             ),
-                          ]),
+                          ],
                         ),
-                      ])),
-                  Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: Row(children: [
-                        Text('Modele', style: smallTextBold),
-                        SizedBox(
-                          width: width,
-                          height: height,
-                          child: Stack(children: [
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('Modele', style: smallTextBold),
+                      SizedBox(
+                        width: width,
+                        height: height,
+                        child: Stack(
+                          children: [
                             Positioned.fill(
-                                bottom: bottomFill,
-                                left: 0,
-                                right: 5,
-                                child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      dotsSpacer(),
-                                    ])),
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
+                            ),
                             Positioned(
                               bottom: bottom,
                               left: 5,
                               right: 5,
                               child: Text(fiche.modele ?? '', style: smallText),
                             ),
-                          ]),
+                          ],
                         ),
-                      ])),
-                  Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: Row(children: [
-                        Text('Immatriculation', style: smallTextBold),
-                        SizedBox(
-                          width: width,
-                          height: height,
-                          child: Stack(children: [
-                            Positioned.fill(
-                                bottom: bottomFill,
-                                left: 0,
-                                right: 5,
-                                child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      dotsSpacer(),
-                                    ])),
-                            Positioned(
-                              bottom: bottom,
-                              left: 5,
-                              right: 5,
-                              child: Text(fiche.vehiculemat ?? '',
-                                  style: smallText),
-                            ),
-                          ]),
-                        ),
-                      ])),
-                  Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: Row(children: [
-                        Text('N° Chassis', style: smallTextBold),
-                        SizedBox(
-                          width: width,
-                          height: height,
-                          child: Stack(children: [
-                            Positioned.fill(
-                                bottom: bottomFill,
-                                left: 0,
-                                right: 5,
-                                child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      dotsSpacer(),
-                                    ])),
-                            Positioned(
-                              bottom: bottom,
-                              left: 5,
-                              right: 5,
-                              child:
-                                  Text(fiche.nchassi ?? '', style: smallText),
-                            ),
-                          ]),
-                        ),
-                      ])),
-                ]),
-            TableRow(
-                decoration: BoxDecoration(
-                  border: Border.all(),
+                      ),
+                    ],
+                  ),
                 ),
-                children: [
-                  Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: Row(children: [
-                        Text('Couleur', style: smallTextBold),
-                        SizedBox(
-                          width: width,
-                          height: height,
-                          child: Stack(children: [
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('Immatriculation', style: smallTextBold),
+                      SizedBox(
+                        width: width,
+                        height: height,
+                        child: Stack(
+                          children: [
                             Positioned.fill(
-                                bottom: bottomFill,
-                                left: 0,
-                                right: 5,
-                                child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      dotsSpacer(),
-                                    ])),
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
+                            ),
                             Positioned(
                               bottom: bottom,
                               left: 5,
                               right: 5,
-                              child:
-                                  Text(fiche.couleur ?? '', style: smallText),
+                              child: Text(
+                                fiche.vehiculemat ?? '',
+                                style: smallText,
+                              ),
                             ),
-                          ]),
+                          ],
                         ),
-                      ])),
-                  Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: Row(children: [
-                        Text('Killometrage', style: smallTextBold),
-                        SizedBox(
-                          width: width,
-                          height: height,
-                          child: Stack(children: [
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('N° Chassis', style: smallTextBold),
+                      SizedBox(
+                        width: width,
+                        height: height,
+                        child: Stack(
+                          children: [
                             Positioned.fill(
-                                bottom: bottomFill,
-                                left: 0,
-                                right: 5,
-                                child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      dotsSpacer(),
-                                    ])),
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
+                            ),
                             Positioned(
                               bottom: bottom,
                               left: 5,
                               right: 5,
-                              child: Text(fiche.kilometrage?.toString() ?? '',
-                                  style: smallText),
+                              child: Text(
+                                fiche.nchassi ?? '',
+                                style: smallText,
+                              ),
                             ),
-                          ]),
+                          ],
                         ),
-                      ])),
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            TableRow(
+              decoration: BoxDecoration(border: Border.all()),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('Couleur', style: smallTextBold),
+                      SizedBox(
+                        width: width,
+                        height: height,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
+                            ),
+                            Positioned(
+                              bottom: bottom,
+                              left: 5,
+                              right: 5,
+                              child: Text(
+                                fiche.couleur ?? '',
+                                style: smallText,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('Killometrage', style: smallTextBold),
+                      SizedBox(
+                        width: width,
+                        height: height,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
+                            ),
+                            Positioned(
+                              bottom: bottom,
+                              left: 5,
+                              right: 5,
+                              child: Text(
+                                fiche.kilometrage?.toString() ?? '',
+                                style: smallText,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
                     Padding(
-                        padding: const EdgeInsets.fromLTRB(5, 5, 2.5, 5),
-                        child: Row(children: [
+                      padding: const EdgeInsets.fromLTRB(5, 5, 2.5, 5),
+                      child: Row(
+                        children: [
                           Text('Année', style: smallTextBold),
                           SizedBox(
                             width: width / 3,
                             height: height,
-                            child: Stack(children: [
-                              Positioned.fill(
+                            child: Stack(
+                              children: [
+                                Positioned.fill(
                                   bottom: bottomFill,
                                   left: 0,
                                   right: 2.5,
                                   child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        dotsSpacer(),
-                                      ])),
-                              Positioned(
-                                bottom: bottom,
-                                left: 5,
-                                right: 5,
-                                child: Text(fiche.anneeUtil?.toString() ?? '',
-                                    style: smallText),
-                              ),
-                            ]),
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [dotsSpacer()],
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: bottom,
+                                  left: 5,
+                                  right: 5,
+                                  child: Text(
+                                    fiche.anneeUtil?.toString() ?? '',
+                                    style: smallText,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ])),
+                        ],
+                      ),
+                    ),
                     SizedBox(
                       height: height + 10,
                       child: VerticalDivider(
-                          width: 1,
-                          indent: 0,
-                          endIndent: 0,
-                          borderStyle: BorderStyle.solid),
+                        width: 1,
+                        indent: 0,
+                        endIndent: 0,
+                        borderStyle: BorderStyle.solid,
+                      ),
                     ),
                     Padding(
-                        padding: const EdgeInsets.fromLTRB(5, 5, 2.5, 5),
-                        child: Row(children: [
+                      padding: const EdgeInsets.fromLTRB(5, 5, 2.5, 5),
+                      child: Row(
+                        children: [
                           Text('Carburant', style: smallTextBold),
                           SizedBox(
                             width: width,
                             height: height,
-                            child: Stack(children: [
-                              Positioned.fill(
+                            child: Stack(
+                              children: [
+                                Positioned.fill(
                                   bottom: bottomFill,
                                   left: 0,
                                   right: 2.5,
                                   child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        dotsSpacer(),
-                                      ])),
-                              Positioned(
-                                bottom: bottom,
-                                left: 5,
-                                right: 5,
-                                child: Text('${fiche.gaz?.toString() ?? '4'}/8',
-                                    style: smallText),
-                              ),
-                            ]),
-                          ),
-                        ])),
-                  ]),
-                  Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: Row(children: [
-                        Text('N° Moteur', style: smallTextBold),
-                        SizedBox(
-                          width: width,
-                          height: height,
-                          child: Stack(children: [
-                            Positioned.fill(
-                                bottom: bottomFill,
-                                left: 0,
-                                right: 5,
-                                child: Row(
                                     crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      dotsSpacer(),
-                                    ])),
+                                    children: [dotsSpacer()],
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: bottom,
+                                  left: 5,
+                                  right: 5,
+                                  child: Text(
+                                    '${fiche.gaz?.toString() ?? '4'}/8',
+                                    style: smallText,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('N° Moteur', style: smallTextBold),
+                      SizedBox(
+                        width: width,
+                        height: height,
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
+                            ),
                             Positioned(
                               bottom: 5,
                               left: 5,
                               right: 5,
-                              child:
-                                  Text(fiche.nmoteur ?? '', style: smallText),
+                              child: Text(
+                                fiche.nmoteur ?? '',
+                                style: smallText,
+                              ),
                             ),
-                          ]),
+                          ],
                         ),
-                      ])),
-                ]),
-          ]),
-      Table(
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        Table(
           columnWidths: {
             0: const FlexColumnWidth(6),
             1: const FlexColumnWidth(5),
             2: const FlexColumnWidth(5),
           },
-          border: const TableBorder(
-            verticalInside: BorderSide(),
-          ),
+          border: const TableBorder(verticalInside: BorderSide()),
           children: [
             TableRow(
-                decoration: BoxDecoration(
-                  borderRadius:
-                      const BorderRadius.vertical(bottom: Radius.circular(5)),
-                  border: Border.all(),
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(5),
                 ),
-                children: [
-                  Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: Row(children: [
-                        Text('Mat. conducteur', style: smallTextBold),
-                        SizedBox(
-                          width: width * 1.5,
-                          height: height,
-                          child: Stack(children: [
+                border: Border.all(),
+              ),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('Mat. conducteur', style: smallTextBold),
+                      SizedBox(
+                        width: width * 1.5,
+                        height: height,
+                        child: Stack(
+                          children: [
                             Positioned.fill(
-                                bottom: bottomFill,
-                                left: 0,
-                                right: 5,
-                                child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      dotsSpacer(),
-                                    ])),
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
+                            ),
                             Positioned(
                               bottom: bottom,
                               left: 5,
                               right: 5,
-                              child: Text(fiche.matriculeConducteur ?? '',
-                                  style: smallText),
+                              child: Text(
+                                fiche.matriculeConducteur ?? '',
+                                style: smallText,
+                              ),
                             ),
-                          ]),
+                          ],
                         ),
-                      ])),
-                  Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: Row(children: [
-                        Text('Nom', style: smallTextBold),
-                        SizedBox(
-                          width: width * 1.5,
-                          height: height,
-                          child: Stack(children: [
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('Nom', style: smallTextBold),
+                      SizedBox(
+                        width: width * 1.5,
+                        height: height,
+                        child: Stack(
+                          children: [
                             Positioned.fill(
-                                bottom: bottomFill,
-                                left: 0,
-                                right: 5,
-                                child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      dotsSpacer(),
-                                    ])),
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
+                            ),
                             Positioned(
                               bottom: bottom,
                               left: 5,
                               right: 5,
-                              child: Text(fiche.nomConducteur ?? '',
-                                  style: smallText),
+                              child: Text(
+                                fiche.nomConducteur ?? '',
+                                style: smallText,
+                              ),
                             ),
-                          ]),
+                          ],
                         ),
-                      ])),
-                  Padding(
-                      padding: const EdgeInsets.all(5),
-                      child: Row(children: [
-                        Text('Prénom', style: smallTextBold),
-                        SizedBox(
-                          width: width * 1.5,
-                          height: height,
-                          child: Stack(children: [
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Row(
+                    children: [
+                      Text('Prénom', style: smallTextBold),
+                      SizedBox(
+                        width: width * 1.5,
+                        height: height,
+                        child: Stack(
+                          children: [
                             Positioned.fill(
-                                bottom: bottomFill,
-                                left: 0,
-                                right: 5,
-                                child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      dotsSpacer(),
-                                    ])),
+                              bottom: bottomFill,
+                              left: 0,
+                              right: 5,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [dotsSpacer()],
+                              ),
+                            ),
                             Positioned(
                               bottom: bottom,
                               left: 5,
                               right: 5,
-                              child: Text(fiche.prenomConducteur ?? '',
-                                  style: smallText),
+                              child: Text(
+                                fiche.prenomConducteur ?? '',
+                                style: smallText,
+                              ),
                             ),
-                          ]),
+                          ],
                         ),
-                      ])),
-                ]),
-          ]),
-    ]);
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
   }
 
   Widget brandingAndPaging() {
@@ -821,41 +946,47 @@ class FicheReceptionPdf {
       height: PdfPageFormat.cm * 1.25,
       width: PdfPageFormat.cm * 21,
       child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Container(
-              width: PdfPageFormat.cm * 4.5,
-              height: PdfPageFormat.cm * 1.25,
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                border: Border.all(),
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: PdfPageFormat.cm * 4.5,
-                      child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text('Via ', style: TextStyle(color: orange)),
-                            Spacer(),
-                            Image(poLogo!,
-                                width: PdfPageFormat.cm * 2,
-                                height: PdfPageFormat.cm * 2,
-                                fit: BoxFit.contain,
-                                alignment: Alignment.topCenter),
-                          ]),
-                    ),
-                    Text('https://www.parcoto.com',
-                        style: const TextStyle(
-                            color: PdfColors.blue, fontSize: 10)),
-                  ]),
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Container(
+            width: PdfPageFormat.cm * 4.5,
+            height: PdfPageFormat.cm * 1.25,
+            padding: const EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              border: Border.all(),
+              borderRadius: BorderRadius.circular(5),
             ),
-          ]),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: PdfPageFormat.cm * 4.5,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text('Via ', style: TextStyle(color: orange)),
+                      Spacer(),
+                      Image(
+                        poLogo!,
+                        width: PdfPageFormat.cm * 2,
+                        height: PdfPageFormat.cm * 2,
+                        fit: BoxFit.contain,
+                        alignment: Alignment.topCenter,
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  'https://www.parcoto.com',
+                  style: const TextStyle(color: PdfColors.blue, fontSize: 10),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

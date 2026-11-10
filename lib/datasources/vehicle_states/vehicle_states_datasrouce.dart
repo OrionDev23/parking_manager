@@ -18,13 +18,14 @@ import '../../utilities/vehicle_util.dart';
 import '../../widgets/on_tap_scale.dart';
 
 class VStatesDatasource extends ParcOtoDatasource<Etat> {
-  VStatesDatasource(
-      {required super.collectionID,
-      required super.current,
-      super.appTheme,
-      super.filters,
-      super.searchKey,
-      super.selectC}) {
+  VStatesDatasource({
+    required super.collectionID,
+    required super.current,
+    super.appTheme,
+    super.filters,
+    super.searchKey,
+    super.selectC,
+  }) {
     repo = VehicleStateWebservice(data, collectionID, 4);
   }
 
@@ -43,94 +44,118 @@ class VStatesDatasource extends ParcOtoDatasource<Etat> {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
 
     return [
-      DataCell(Text(element.value.vehicleMat, style: rowTextStyle), onTap: () {
-        showMyVehicule(element.value.vehicleMat);
-      }),
-      DataCell(SelectableText(
-        VehiclesUtilities.getEtatName(element.value.type).tr(),
-        style: rowTextStyle,
-      )),
-      DataCell(SelectableText(
+      DataCell(
+        Text(element.value.vehicleMat, style: rowTextStyle),
+        onTap: () {
+          showMyVehicule(element.value.vehicleMat);
+        },
+      ),
+      DataCell(
+        SelectableText(
+          VehiclesUtilities.getEtatName(element.value.type).tr(),
+          style: rowTextStyle,
+        ),
+      ),
+      DataCell(
+        SelectableText(
           element.value.date != null
               ? dateFormat.format(element.value.date!)
               : '',
-          style: rowTextStyle)),
-      DataCell(SelectableText(element.value.remarque ?? '', style: rowTextStyle)),
-      DataCell(SelectableText(
+          style: rowTextStyle,
+        ),
+      ),
+      DataCell(
+        SelectableText(element.value.remarque ?? '', style: rowTextStyle),
+      ),
+      DataCell(
+        SelectableText(
           element.value.ordreNum != null
-              ? NumberFormat('000000000', 'fr_FR')
-                  .format(element.value.ordreNum)
+              ? NumberFormat(
+                  '000000000',
+                  'fr_FR',
+                ).format(element.value.ordreNum)
               : '',
-          style: rowTextStyle)),
-      DataCell(SelectableText(
+          style: rowTextStyle,
+        ),
+      ),
+      DataCell(
+        SelectableText(
           element.value.updatedAt != null
               ? dateFormat.format(element.value.updatedAt!)
               : '',
-          style: rowTextStyle)),
-      DataCell(DatabaseGetter().isAdmin() || DatabaseGetter().isManager()
-          ? f.FlyoutTarget(
-              controller: element.value.controller,
-              child: OnTapScaleAndFade(
+          style: rowTextStyle,
+        ),
+      ),
+      DataCell(
+        DatabaseGetter().isAdmin() || DatabaseGetter().isManager()
+            ? f.FlyoutTarget(
+                controller: element.value.controller,
+                child: OnTapScaleAndFade(
                   onTap: () {
-                    element.value.controller.showFlyout(builder: (context) {
-                      return f.MenuFlyout(
-                        items: [
-                          f.MenuFlyoutItem(
+                    element.value.controller.showFlyout(
+                      builder: (context) {
+                        return f.MenuFlyout(
+                          items: [
+                            f.MenuFlyoutItem(
                               text: const Text('mod').tr(),
                               onPressed: () {
                                 Navigator.of(current).pop();
                                 showStateForm(element.value);
-                              }),
-                          if (DatabaseGetter().isAdmin())
-                            f.MenuFlyoutItem(
+                              },
+                            ),
+                            if (DatabaseGetter().isAdmin())
+                              f.MenuFlyoutItem(
                                 text: const Text('delete').tr(),
                                 onPressed: () {
                                   showDeleteConfirmation(element.value);
-                                }),
-                        ],
-                      );
-                    });
+                                },
+                              ),
+                          ],
+                        );
+                      },
+                    );
                   },
                   child: f.Container(
-                      decoration: BoxDecoration(
-                        color: appTheme?.color.lightest,
-                        boxShadow: kElevationToShadow[2],
-                      ),
-                      child: Icon(Icons.edit,color: appTheme!
-                          .color.darkest,)))
-            )
-          : const Text('')),
+                    decoration: BoxDecoration(
+                      color: appTheme?.color.lightest,
+                      boxShadow: kElevationToShadow[2],
+                    ),
+                    child: Icon(Icons.edit, color: appTheme!.color.darkest),
+                  ),
+                ),
+              )
+            : const Text(''),
+      ),
     ];
   }
 
   void showMyVehicule(String? matricule) {
     if (matricule != null) {
-
-      PanesListState.index.value = PaneItemsAndFooters.originalItems
-              .indexOf(PaneItemsAndFooters.vehicles) +
+      PanesListState.index.value =
+          PaneItemsAndFooters.originalItems.indexOf(
+            PaneItemsAndFooters.vehicles,
+          ) +
           1;
       VehicleTabsState.currentIndex.value = 0;
       VehicleTableState.filterVehicule.value = '"$matricule"';
 
       VehicleTableState.filterNow = true;
-
     }
   }
 
   void showStateForm(Etat e) {
-    Future.delayed(const Duration(milliseconds: 50))
-        .then((value) => f.showDialog(
-            context: current,
-            barrierDismissible: true,
-            builder: (c) {
-              return f.ContentDialog(
-                title: const Text("nouvetat").tr(),
-                constraints: BoxConstraints.loose(f.Size(800.px, 500.px)),
-                content: StateForm(
-                  etat: e,
-                  datasource: this,
-                ),
-              );
-            }));
+    Future.delayed(const Duration(milliseconds: 50)).then(
+      (value) => f.showDialog(
+        context: current,
+        barrierDismissible: true,
+        builder: (c) {
+          return f.ContentDialog(
+            title: const Text("nouvetat").tr(),
+            constraints: BoxConstraints.loose(f.Size(800.px, 500.px)),
+            content: StateForm(etat: e, datasource: this),
+          );
+        },
+      ),
+    );
   }
 }

@@ -11,16 +11,17 @@ import '../../widgets/on_tap_scale.dart';
 class LogDatasource extends ParcOtoDatasource<Activity> {
   final List<String> fieldsToShow;
 
-  LogDatasource(
-      {required super.collectionID,
-      required super.current,
-      super.appTheme,
-      super.sortAscending,
-      super.sortColumn,
-      super.filters,
-      super.searchKey,
-      this.fieldsToShow = const ['act', 'id', 'date', 'user', 'plus'],
-      super.selectC}) {
+  LogDatasource({
+    required super.collectionID,
+    required super.current,
+    super.appTheme,
+    super.sortAscending,
+    super.sortColumn,
+    super.filters,
+    super.searchKey,
+    this.fieldsToShow = const ['act', 'id', 'date', 'user', 'plus'],
+    super.selectC,
+  }) {
     repo = LogWebService(data, collectionID, 1);
   }
 
@@ -29,8 +30,7 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
 
   @override
   String deleteConfirmationMessage(Activity c) {
-    return '${'delete'.tr()} "${DatabaseGetter().getActivityType(c.type).tr()
-    } ${c.docName}"';
+    return '${'delete'.tr()} "${DatabaseGetter().getActivityType(c.type).tr()} ${c.docName}"';
   }
 
   @override
@@ -39,59 +39,67 @@ class LogDatasource extends ParcOtoDatasource<Activity> {
 
     return [
       if (fieldsToShow.contains('act'))
-        DataCell(SelectableText(
-          DatabaseGetter().getActivityType(element.value.type).tr(),
-          style: rowTextStyle,
-        )),
+        DataCell(
+          SelectableText(
+            DatabaseGetter().getActivityType(element.value.type).tr(),
+            style: rowTextStyle,
+          ),
+        ),
       if (fieldsToShow.contains('id'))
-        DataCell(SelectableText(element.value.docName ?? '', style: rowTextStyle),
-            onTap: () {
-          showMyDoc(element.value.type, element.value.docID);
-        }),
+        DataCell(
+          SelectableText(element.value.docName ?? '', style: rowTextStyle),
+          onTap: () {
+            showMyDoc(element.value.type, element.value.docID);
+          },
+        ),
       if (fieldsToShow.contains('date'))
-        DataCell(SelectableText(
+        DataCell(
+          SelectableText(
             element.value.updatedAt != null
                 ? dateFormat.format(element.value.updatedAt!)
                 : '',
-            style: rowTextStyle)),
+            style: rowTextStyle,
+          ),
+        ),
       if (fieldsToShow.contains('user') && DatabaseGetter().isAdmin())
-        DataCell(SelectableText(
-          element.value.personName ?? '',
-          style: rowTextStyle,
-        )),
+        DataCell(
+          SelectableText(element.value.personName ?? '', style: rowTextStyle),
+        ),
       if (fieldsToShow.contains('plus'))
         DataCell(
           DatabaseGetter().isAdmin()
               ? f.FlyoutTarget(
                   controller: element.value.controller,
                   child: OnTapScaleAndFade(
-                      onTap: () {
-                        element.value.controller.showFlyout(builder: (context) {
+                    onTap: () {
+                      element.value.controller.showFlyout(
+                        builder: (context) {
                           return f.MenuFlyout(
                             items: [
                               f.MenuFlyoutItem(
-                                  text: const Text('delete').tr(),
-                                  onPressed: () {
-                                    showDeleteConfirmation(element.value);
-                                  }),
+                                text: const Text('delete').tr(),
+                                onPressed: () {
+                                  showDeleteConfirmation(element.value);
+                                },
+                              ),
                             ],
                           );
-                        });
-                      },
-                      child: f.Container(
-                          decoration: BoxDecoration(
-                            color: appTheme?.color.lightest,
-                            boxShadow: kElevationToShadow[2],
-                          ),
-                          child: Icon(Icons.edit,color: appTheme!
-                              .color.darkest,))
-                  )
-          )
+                        },
+                      );
+                    },
+                    child: f.Container(
+                      decoration: BoxDecoration(
+                        color: appTheme?.color.lightest,
+                        boxShadow: kElevationToShadow[2],
+                      ),
+                      child: Icon(Icons.edit, color: appTheme!.color.darkest),
+                    ),
+                  ),
+                )
               : const Text(''),
-        )
+        ),
     ];
   }
 
   void showMyDoc(int type, String docID) {}
-
 }

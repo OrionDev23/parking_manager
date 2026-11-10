@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+
 import 'option_manager.dart';
 
 import 'option_form.dart';
@@ -25,8 +26,8 @@ class OptionTabsState extends State<OptionTabs> {
       icon: const Icon(FluentIcons.shop),
       body: const OptionForm(),
       onClosed: () {
-          tabs.remove(tab);
-          if (currentIndex.value > 0) currentIndex.value--;
+        tabs.remove(tab);
+        if (currentIndex.value > 0) currentIndex.value--;
       },
     );
     return tab;
@@ -43,26 +44,26 @@ class OptionTabsState extends State<OptionTabs> {
   }
 
   Widget getGestionnaire() {
-    return const OptionManager(
-    );
+    return const OptionManager();
   }
-
 
   void addTab1() {
     currentIndex.value = 0;
     if (tabs.isEmpty) {
-      tabs.add(Tab(
-        text: Text(getTitle().tr()),
-        closeIcon: null,
-        icon: const Icon(FluentIcons.settings),
-        body: getGestionnaire(),
-        onClosed: null,
-      ));
+      tabs.add(
+        Tab(
+          text: Text(getTitle().tr()),
+          closeIcon: null,
+          icon: const Icon(FluentIcons.settings),
+          body: getGestionnaire(),
+          onClosed: null,
+        ),
+      );
     }
   }
 
   void initValues() {
-      addTab1();
+    addTab1();
   }
 
   @override
@@ -71,42 +72,42 @@ class OptionTabsState extends State<OptionTabs> {
       initValues();
     }
     return ValueListenableBuilder(
-        valueListenable:  currentIndex,
-        builder: (context, value, _) {
-          return TabView(
-            tabs:tabs,
-            currentIndex: value,
-            onChanged: (index) =>currentIndex.value = index,
-            tabWidthBehavior: TabWidthBehavior.equal,
-            closeButtonVisibility: CloseButtonVisibilityMode.always,
-            showScrollButtons: true,
-            onNewPressed: widget.archive
-                ? null
-                : () {
-              setState(() {
-                final index = tabs.length + 1;
-                final tab = generateTab(index);
-                tabs.add(tab);
-                currentIndex.value = index - 1;
-              });
-            },
-            onReorder: (oldIndex, newIndex) {
-              setState(() {
-                if (oldIndex < newIndex) {
-                  newIndex -= 1;
-                }
-                  final item = tabs.removeAt(oldIndex);
-                  tabs.insert(newIndex, item);
+      valueListenable: currentIndex,
+      builder: (context, value, _) {
+        return TabView(
+          tabs: tabs,
+          currentIndex: value,
+          onChanged: (index) => currentIndex.value = index,
+          tabWidthBehavior: TabWidthBehavior.equal,
+          closeButtonVisibility: CloseButtonVisibilityMode.always,
+          showScrollButtons: true,
+          onNewPressed: widget.archive
+              ? null
+              : () {
+                  setState(() {
+                    final index = tabs.length + 1;
+                    final tab = generateTab(index);
+                    tabs.add(tab);
+                    currentIndex.value = index - 1;
+                  });
+                },
+          onReorder: (oldIndex, newIndex) {
+            setState(() {
+              if (oldIndex < newIndex) {
+                newIndex -= 1;
+              }
+              final item = tabs.removeAt(oldIndex);
+              tabs.insert(newIndex, item);
 
-                  if (currentIndex.value == newIndex) {
-                    currentIndex.value = oldIndex;
-                  } else if (currentIndex.value == oldIndex) {
-                    currentIndex.value = newIndex;
-                  }
-
-              });
-            },
-          );
-        });
+              if (currentIndex.value == newIndex) {
+                currentIndex.value = oldIndex;
+              } else if (currentIndex.value == oldIndex) {
+                currentIndex.value = newIndex;
+              }
+            });
+          },
+        );
+      },
+    );
   }
 }

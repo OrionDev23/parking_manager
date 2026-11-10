@@ -7,21 +7,19 @@ import 'package:flutter/foundation.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:universal_html/html.dart' as html;
 
-class FileManipulation{
+class FileManipulation {}
 
-}
-
-void saveThisFile(Uint8List file,String title,String extension,String mime)
-async {
+void saveThisFile(
+  Uint8List file,
+  String title,
+  String extension,
+  String mime,
+) async {
   if (DeviceType.android == Device.deviceType ||
       Device.deviceType == DeviceType.ios) {
-    DocumentFileSavePlus().saveFile(file,
-        '$title.$extension',
-        mime);
+    DocumentFileSavePlus().saveFile(file, '$title.$extension', mime);
   } else if (kIsWeb) {
-    saveFileWeb(
-        file,
-        '$title.$extension');
+    saveFileWeb(file, '$title.$extension');
   } else {
     await FilePicker.saveFile(
       dialogTitle: "save".tr(),
@@ -42,60 +40,52 @@ void saveFileWeb(Uint8List bytes, String name) {
     ..download = name;
   html.document.body?.children.add(anchor);
 
-// download
+  // download
   anchor.click();
 
-// cleanup
+  // cleanup
   html.document.body?.children.remove(anchor);
   html.Url.revokeObjectUrl(url);
 }
 
-String jsonify(Map<String,dynamic> map){
+String jsonify(Map<String, dynamic> map) {
+  String result = "";
 
-  String result="";
-
-  result="{";
-  bool first=true;
+  result = "{";
+  bool first = true;
   map.forEach((key, value) {
-    if(!first){
-      result='$result,';
+    if (!first) {
+      result = '$result,';
     }
-    if(value==null){
-      result='$result "$key" : null';
-
-    }
-
-    else if(value is String){
-        result='$result "$key":${jsonEncode(value.trim().replaceAll('\n', '\\n')
-            .replaceAll('\t', '\\t'))}';
-    }
-    else if(value is List<String> ){
-      String temp="[";
-      bool f=true;
-      for(int i=0;i<value.length;i++){
-        if(!f){
-          temp='$temp,';
+    if (value == null) {
+      result = '$result "$key" : null';
+    } else if (value is String) {
+      result =
+          '$result "$key":${jsonEncode(value.trim().replaceAll('\n', '\\n').replaceAll('\t', '\\t'))}';
+    } else if (value is List<String>) {
+      String temp = "[";
+      bool f = true;
+      for (int i = 0; i < value.length; i++) {
+        if (!f) {
+          temp = '$temp,';
         }
-        temp='$temp ${jsonEncode(value[i].trim())}';
-        if(f){
-          f=false;
+        temp = '$temp ${jsonEncode(value[i].trim())}';
+        if (f) {
+          f = false;
         }
       }
 
-      temp="$temp ]";
+      temp = "$temp ]";
 
-      result='$result "$key":$temp';
-    }
-    else{
-        result='$result "$key":$value';
-    }
-
-    if(first){
-      first=false;
+      result = '$result "$key":$temp';
+    } else {
+      result = '$result "$key":$value';
     }
 
-
+    if (first) {
+      first = false;
+    }
   });
-  result="$result }";
+  result = "$result }";
   return result;
 }

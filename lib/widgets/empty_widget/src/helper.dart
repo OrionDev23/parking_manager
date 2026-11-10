@@ -1,15 +1,17 @@
 import 'utility.dart';
+
 import 'package:flutter/material.dart';
 
 class CustomText extends StatefulWidget {
-  const CustomText(
-      {super.key,
-      this.msg,
-      this.style,
-      this.textAlign,
-      this.overflow,
-      this.context,
-      this.softwrap});
+  const CustomText({
+    super.key,
+    this.msg,
+    this.style,
+    this.textAlign,
+    this.overflow,
+    this.context,
+    this.softwrap,
+  });
 
   final BuildContext? context;
   final String? msg;
@@ -40,8 +42,8 @@ class _CustomTextState extends State<CustomText> {
           ? Theme.of(context).textTheme.bodyLarge!.fontSize!
           : widget.style!.fontSize!;
       style = widget.style!.copyWith(
-          fontSize:
-              font - (EmptyWidgetUtility.fullWidth(context) <= 375 ? 2 : 0));
+        fontSize: font - (EmptyWidgetUtility.fullWidth(context) <= 375 ? 2 : 0),
+      );
     }
     return Text(
       widget.msg!,

@@ -20,21 +20,18 @@ class Tutorial extends StatelessWidget {
     bool portrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return Column(
       children: [
-        const PageTitle(text: 'tutorial',),
-        SizedBox(height: 100.px,),
+        const PageTitle(text: 'tutorial'),
+        SizedBox(height: 100.px),
         Center(
           child: ListView(
             shrinkWrap: true,
             padding: const EdgeInsets.all(10),
             children: [
               StaggeredGrid.count(
-                crossAxisCount:
-                portrait
-                    ? 2
-                    : 3,
+                crossAxisCount: portrait ? 2 : 3,
                 mainAxisSpacing: 5,
                 crossAxisSpacing: 5,
-                children: buttonList(appTheme,context),
+                children: buttonList(appTheme, context),
               ),
             ],
           ),
@@ -43,13 +40,17 @@ class Tutorial extends StatelessWidget {
     );
   }
 
-  List<Widget> buttonList(AppTheme appTheme,BuildContext context) {
+  List<Widget> buttonList(AppTheme appTheme, BuildContext context) {
     return [
       ButtonContainer(
         icon: FluentIcons.car,
         text: 'vehicules'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/voitures.mp4','JWXY28n2vTQ',context);
+          viewVideo(
+            'http://www.parcoto.com/tutorials/voitures.mp4',
+            'JWXY28n2vTQ',
+            context,
+          );
         },
         showCounter: false,
         showBothLN: false,
@@ -59,8 +60,12 @@ class Tutorial extends StatelessWidget {
         icon: FluentIcons.people_external_share,
         text: 'chauffeurs'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/conducteurs.mp4','RXwB6'
-              'u4ni0M',context);
+          viewVideo(
+            'http://www.parcoto.com/tutorials/conducteurs.mp4',
+            'RXwB6'
+                'u4ni0M',
+            context,
+          );
         },
         showCounter: false,
         showBothLN: false,
@@ -70,8 +75,12 @@ class Tutorial extends StatelessWidget {
         icon: FluentIcons.repair,
         text: 'reparations'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/reparations.mp4','_7XCO'
-              '8QHGtw',context);
+          viewVideo(
+            'http://www.parcoto.com/tutorials/reparations.mp4',
+            '_7XCO'
+                '8QHGtw',
+            context,
+          );
         },
         showCounter: false,
         showBothLN: false,
@@ -81,8 +90,11 @@ class Tutorial extends StatelessWidget {
         icon: FluentIcons.user_optional,
         text: 'users'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/utilisateurs.mp4','7Dw5rl77xTY',
-              context);
+          viewVideo(
+            'http://www.parcoto.com/tutorials/utilisateurs.mp4',
+            '7Dw5rl77xTY',
+            context,
+          );
         },
         showCounter: false,
         showBothLN: false,
@@ -92,8 +104,12 @@ class Tutorial extends StatelessWidget {
         icon: FluentIcons.external_build,
         text: 'monentreprise'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/entreprise.mp4','Jb9vVX'
-              'tJPmo',context);
+          viewVideo(
+            'http://www.parcoto.com/tutorials/entreprise.mp4',
+            'Jb9vVX'
+                'tJPmo',
+            context,
+          );
         },
         showCounter: false,
         showBothLN: false,
@@ -103,8 +119,11 @@ class Tutorial extends StatelessWidget {
         icon: FluentIcons.database_activity,
         text: 'journal'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/log.mp4','oYx_GWlgRew',
-              context);
+          viewVideo(
+            'http://www.parcoto.com/tutorials/log.mp4',
+            'oYx_GWlgRew',
+            context,
+          );
         },
         showCounter: false,
         showBothLN: false,
@@ -114,8 +133,12 @@ class Tutorial extends StatelessWidget {
         icon: FluentIcons.settings,
         text: 'parametres'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/parametres.mp4','GL7tXP'
-              'itaH4',context);
+          viewVideo(
+            'http://www.parcoto.com/tutorials/parametres.mp4',
+            'GL7tXP'
+                'itaH4',
+            context,
+          );
         },
         showCounter: false,
         showBothLN: false,
@@ -125,8 +148,12 @@ class Tutorial extends StatelessWidget {
         icon: FluentIcons.plan_view,
         text: 'planifier'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/planning.mp4','J69pgMwc'
-              'BqM',context);
+          viewVideo(
+            'http://www.parcoto.com/tutorials/planning.mp4',
+            'J69pgMwc'
+                'BqM',
+            context,
+          );
         },
         showCounter: false,
         showBothLN: false,
@@ -136,8 +163,12 @@ class Tutorial extends StatelessWidget {
         icon: FluentIcons.view_dashboard,
         text: 'home'.tr(),
         action: () {
-          viewVideo('http://www.parcoto.com/tutorials/tableaudebord.mp4','MbV'
-              'YdcSZcYg',context);
+          viewVideo(
+            'http://www.parcoto.com/tutorials/tableaudebord.mp4',
+            'MbV'
+                'YdcSZcYg',
+            context,
+          );
         },
         showCounter: false,
         showBothLN: false,
@@ -146,21 +177,26 @@ class Tutorial extends StatelessWidget {
     ];
   }
 
-  void viewVideo(String link,String ytLink,BuildContext context){
-    Future.delayed(const Duration(milliseconds: 50))
-        .then((value) => showDialog(
+  void viewVideo(String link, String ytLink, BuildContext context) {
+    Future.delayed(const Duration(milliseconds: 50)).then(
+      (value) => showDialog(
         context: context,
         barrierDismissible: true,
         builder: (c) {
           return ContentDialog(
             constraints: BoxConstraints.loose(Size(900.px, 800.px)),
-            content: PaOVideoPlayer(link: link,ytLink: ytLink,),
+            content: PaOVideoPlayer(link: link, ytLink: ytLink),
             actions: [
-              Button(child:const Text('fermer').tr(),onPressed:(){
-                Navigator.of(context).pop();
-              })
+              Button(
+                child: const Text('fermer').tr(),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
             ],
           );
-        }));
+        },
+      ),
+    );
   }
 }

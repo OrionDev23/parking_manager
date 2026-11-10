@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart' hide Row;
 
@@ -28,20 +29,21 @@ class BackupUploader extends StatefulWidget {
   final int planCount;
   final int logCount;
   final DateTime date;
-  const BackupUploader(
-      {super.key,
-      required this.data,
-      required this.date,
-      required this.vehicCount,
-      required this.vehicDocCount,
-      required this.vehicStatesCount,
-      required this.condCount,
-      required this.condDocCount,
-      required this.condStateCount,
-      required this.repairCount,
-      required this.prestCount,
-      required this.planCount,
-      required this.logCount});
+  const BackupUploader({
+    super.key,
+    required this.data,
+    required this.date,
+    required this.vehicCount,
+    required this.vehicDocCount,
+    required this.vehicStatesCount,
+    required this.condCount,
+    required this.condDocCount,
+    required this.condStateCount,
+    required this.repairCount,
+    required this.prestCount,
+    required this.planCount,
+    required this.logCount,
+  });
 
   @override
   BackupUploaderState createState() => BackupUploaderState();
@@ -62,17 +64,12 @@ class BackupUploaderState extends State<BackupUploader> {
   @override
   Widget build(BuildContext context) {
     return ContentDialog(
-      constraints: BoxConstraints(
-        minWidth: 300.px,
-        maxWidth: 500.px
-      ),
+      constraints: BoxConstraints(minWidth: 300.px, maxWidth: 500.px),
       title: const Text('backupnow').tr(),
       content: ListView(
         shrinkWrap: true,
         children: [
-          ProgressBar(
-            value: progress,
-          ),
+          ProgressBar(value: progress),
           bigSpace,
           if (progress >= 35 && progress < 100) const Text('uploading').tr(),
           if (progress < 10) const Text('crypting').tr(),
@@ -82,31 +79,34 @@ class BackupUploaderState extends State<BackupUploader> {
       ),
       actions: [
         Button(
-            onPressed: progress == 100 ? () => context.pop() : null,
-            child: const Text('fermer').tr()),
+          onPressed: progress == 100 ? () => context.pop() : null,
+          child: const Text('fermer').tr(),
+        ),
         FilledButton(
-            onPressed: progress == 100 ? saveCopy : null,
-            child:  Row(
-                    children: [
-                      const Icon(FluentIcons.save),
-                      smallSpace,
-                      const Text('regcopie').tr(),
-                    ],
-                  ))
+          onPressed: progress == 100 ? saveCopy : null,
+          child: Row(
+            children: [
+              const Icon(FluentIcons.save),
+              smallSpace,
+              const Text('regcopie').tr(),
+            ],
+          ),
+        ),
       ],
     );
   }
 
   void cryptString() {
-    if(DatabaseGetter.encrypter!=null){
-      cryptedString = DatabaseGetter.encrypter!.encrypt(widget.data, iv: DatabaseGetter.iv).base64;
+    if (DatabaseGetter.encrypter != null) {
+      cryptedString = DatabaseGetter.encrypter!
+          .encrypt(widget.data, iv: DatabaseGetter.iv)
+          .base64;
       setState(() {
         progress = 10;
       });
       compressFile();
     }
   }
-
 
   void compressFile() async {
     if (cryptedString != null) {
@@ -124,48 +124,58 @@ class BackupUploaderState extends State<BackupUploader> {
   String? id;
   void uploadFile() async {
     if (file != null) {
-      id ??=
-          widget.date.difference(DatabaseGetter.ref).inMilliseconds.toString();
+      id ??= widget.date
+          .difference(DatabaseGetter.ref)
+          .inMilliseconds
+          .toString();
       await DatabaseGetter.storage!
           .createFile(
-              bucketId: backupId,
-              fileId: id!,
-              file: InputFile.fromBytes(
-                bytes: file!,
-                filename: 'BACKUP '
-                    '${widget.date.day}-${widget.date.month}-${widget.date.year}-${widget.date.hour}-${widget.date.minute}-${widget.date.second}.gz',
-              ),
-              onProgress: (p) {
-                setState(() {
-                  progress += 0.45 * p.progress + 35;
-                });
-              })
+            bucketId: backupId,
+            fileId: id!,
+            file: InputFile.fromBytes(
+              bytes: file!,
+              filename:
+                  'BACKUP '
+                  '${widget.date.day}-${widget.date.month}-${widget.date.year}-${widget.date.hour}-${widget.date.minute}-${widget.date.second}.gz',
+            ),
+            onProgress: (p) {
+              setState(() {
+                progress += 0.45 * p.progress + 35;
+              });
+            },
+          )
           .onError((AppwriteException error, stackTrace) {
-        if (kDebugMode) {
-          print(error.message);
-          print(error.response);
-        }
-        return Future.value(File(
-            $id: '',
-            bucketId: '',
-            $createdAt: '',
-            $updatedAt: '',
-            $permissions: [],
-            name: '',
-            signature: '',
-            mimeType: '',
-            sizeOriginal: 10,
-            sizeActual: 10,
-            folder: '',
-            key: '',
-            chunksTotal: 10,
-            chunksUploaded: 10, encryption: false, compression: 'none'));
-      }).then((value) {
-        setState(() {
-          progress = 80;
-        });
-        updateDb();
-      });
+            if (kDebugMode) {
+              print(error.message);
+              print(error.response);
+            }
+            return Future.value(
+              File(
+                $id: '',
+                bucketId: '',
+                $createdAt: '',
+                $updatedAt: '',
+                $permissions: [],
+                name: '',
+                signature: '',
+                mimeType: '',
+                sizeOriginal: 10,
+                sizeActual: 10,
+                folder: '',
+                key: '',
+                chunksTotal: 10,
+                chunksUploaded: 10,
+                encryption: false,
+                compression: 'none',
+              ),
+            );
+          })
+          .then((value) {
+            setState(() {
+              progress = 80;
+            });
+            updateDb();
+          });
     } else {
       if (kDebugMode) {
         print('erreur fichier');
@@ -175,23 +185,24 @@ class BackupUploaderState extends State<BackupUploader> {
 
   void updateDb() async {
     await DatabaseGetter.database!.createRow(
-        databaseId: databaseId,
-        tableId: backupId,
-        rowId: id!,
-        data: Backup(
-          id: id!,
-          vehicles: widget.vehicCount,
-          vehicledocs: widget.vehicDocCount,
-          vehiclesstates: widget.vehicStatesCount,
-          drivers: widget.condCount,
-          driversdocs: widget.condDocCount,
-          driversstates: widget.condStateCount,
-          repairs: widget.repairCount,
-          providers: widget.prestCount,
-          plannings: widget.planCount,
-          logs: widget.logCount,
-          createdBy: DatabaseGetter.me.value?.id,
-        ).toJson());
+      databaseId: databaseId,
+      tableId: backupId,
+      rowId: id!,
+      data: Backup(
+        id: id!,
+        vehicles: widget.vehicCount,
+        vehicledocs: widget.vehicDocCount,
+        vehiclesstates: widget.vehicStatesCount,
+        drivers: widget.condCount,
+        driversdocs: widget.condDocCount,
+        driversstates: widget.condStateCount,
+        repairs: widget.repairCount,
+        providers: widget.prestCount,
+        plannings: widget.planCount,
+        logs: widget.logCount,
+        createdBy: DatabaseGetter.me.value?.id,
+      ).toJson(),
+    );
     setState(() {
       progress = 100;
     });
@@ -200,10 +211,11 @@ class BackupUploaderState extends State<BackupUploader> {
   void saveCopy() {
     if (file != null) {
       saveThisFile(
-          file!,
-          "BACKUP ${widget.date.day}-${widget.date.month}-${widget.date.year}-${widget.date.hour}-${widget.date.minute}-${widget.date.second}",
-          'gz',
-          "application/gzip");
+        file!,
+        "BACKUP ${widget.date.day}-${widget.date.month}-${widget.date.year}-${widget.date.hour}-${widget.date.minute}-${widget.date.second}",
+        'gz',
+        "application/gzip",
+      );
     }
   }
 }

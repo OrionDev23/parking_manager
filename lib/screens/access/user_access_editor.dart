@@ -161,8 +161,9 @@ class _UserAccessEditorState extends State<UserAccessEditor> {
                               final denied = _denied.contains(permission.id);
 
                               return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 5),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 5,
+                                ),
                                 child: Row(
                                   children: [
                                     Expanded(
@@ -188,7 +189,9 @@ class _UserAccessEditorState extends State<UserAccessEditor> {
                                                 if (value) {
                                                   _granted.add(permission.id);
                                                 } else {
-                                                  _granted.remove(permission.id);
+                                                  _granted.remove(
+                                                    permission.id,
+                                                  );
                                                 }
                                               });
                                             },
@@ -226,10 +229,7 @@ class _UserAccessEditorState extends State<UserAccessEditor> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Annuler'),
         ),
-        FilledButton(
-          onPressed: _save,
-          child: const Text('Enregistrer'),
-        ),
+        FilledButton(onPressed: _save, child: const Text('Enregistrer')),
       ],
     );
   }

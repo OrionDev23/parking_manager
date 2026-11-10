@@ -1,15 +1,17 @@
 import 'package:json_annotation/json_annotation.dart';
+
 import 'variation.dart';
 
 import '../../utilities/profil_beautifier.dart';
 
 part 'storage_variations.g.dart';
+
 @JsonSerializable()
-class StorageVariation extends Variation{
+class StorageVariation extends Variation {
   double qte;
-  @JsonKey(toJson:timeToJsonN,fromJson: createdAtJson)
+  @JsonKey(toJson: timeToJsonN, fromJson: createdAtJson)
   DateTime? expirationDate;
-  StorageVariation(  {
+  StorageVariation({
     required super.id,
     required super.name,
     required super.sku,
@@ -17,7 +19,6 @@ class StorageVariation extends Variation{
     this.expirationDate,
     required this.qte,
   });
-
 
   factory StorageVariation.fromJson(Map<String, dynamic> json) =>
       _$StorageVariationFromJson(json);

@@ -12,7 +12,6 @@ import 'vehicle_form.dart';
 import 'vehicle_tabs.dart';
 import 'vehicles_table.dart';
 
-
 class VehicleManagement extends StatefulWidget {
   const VehicleManagement({super.key});
 
@@ -117,9 +116,7 @@ class VehicleManagementState extends State<VehicleManagement>
       context: context,
       barrierDismissible: true,
       builder: (c) {
-        return ImportVehicles(
-          file: pickedFile,
-        );
+        return ImportVehicles(file: pickedFile);
       },
     );
   }

@@ -8,12 +8,7 @@ import '../theme.dart';
 import '../widgets/page.dart';
 import '../widgets/page_header.dart';
 
-
-
-enum GtsTheme{
-  gtsDark,
-  gtsLight,
-}
+enum GtsTheme { gtsDark, gtsLight }
 
 bool get kIsWindowEffectsSupported {
   return !kIsWeb &&
@@ -49,25 +44,36 @@ class SettingsGTS extends ScrollablePage {
       Text('theme', style: FluentTheme.of(context).typography.subtitle).tr(),
       spacer,
       RadioGroup<GtsTheme>(
-        groupValue: appTheme.mode == ThemeMode.dark ? GtsTheme.gtsDark : GtsTheme.gtsLight,
+        groupValue: appTheme.mode == ThemeMode.dark
+            ? GtsTheme.gtsDark
+            : GtsTheme.gtsLight,
         onChanged: (value) {
           if (value != null) {
-            appTheme.mode = value == GtsTheme.gtsDark ? ThemeMode.dark : ThemeMode.light;
+            appTheme.mode = value == GtsTheme.gtsDark
+                ? ThemeMode.dark
+                : ThemeMode.light;
             prefs.setInt('themeMode', value.index);
           }
         },
         child: Column(
-          children: GtsTheme.values.map((mode) => Padding(
-            padding: const EdgeInsetsDirectional.only(bottom: 8.0),
-            child: RadioButton<GtsTheme>(
-              value: mode,
-              content: Text('$mode'.replaceAll('GtsTheme.', '')).tr(),
-            ),
-          )).toList(),
+          children: GtsTheme.values
+              .map(
+                (mode) => Padding(
+                  padding: const EdgeInsetsDirectional.only(bottom: 8.0),
+                  child: RadioButton<GtsTheme>(
+                    value: mode,
+                    content: Text('$mode'.replaceAll('GtsTheme.', '')).tr(),
+                  ),
+                ),
+              )
+              .toList(),
         ),
       ),
       biggerSpacer,
-      Text('dispositionpaneau', style: FluentTheme.of(context).typography.subtitle).tr(),
+      Text(
+        'dispositionpaneau',
+        style: FluentTheme.of(context).typography.subtitle,
+      ).tr(),
       spacer,
       RadioGroup<PaneDisplayMode>(
         groupValue: appTheme.displayMode,
@@ -78,13 +84,19 @@ class SettingsGTS extends ScrollablePage {
           }
         },
         child: Column(
-          children: PaneDisplayMode.values.map((mode) => Padding(
-            padding: const EdgeInsetsDirectional.only(bottom: 8.0),
-            child: RadioButton<PaneDisplayMode>(
-              value: mode,
-              content: Text(mode.toString().replaceAll('PaneDisplayMode.', '')).tr(),
-            ),
-          )).toList(),
+          children: PaneDisplayMode.values
+              .map(
+                (mode) => Padding(
+                  padding: const EdgeInsetsDirectional.only(bottom: 8.0),
+                  child: RadioButton<PaneDisplayMode>(
+                    value: mode,
+                    content: Text(
+                      mode.toString().replaceAll('PaneDisplayMode.', ''),
+                    ).tr(),
+                  ),
+                ),
+              )
+              .toList(),
         ),
       ),
       biggerSpacer,
@@ -106,8 +118,8 @@ class SettingsGTS extends ScrollablePage {
             final label = locale.languageCode.toUpperCase() == 'FR'
                 ? 'Français'
                 : locale.languageCode.toUpperCase() == 'AR'
-                    ? 'عربية'
-                    : 'English';
+                ? 'عربية'
+                : 'English';
             return Padding(
               padding: const EdgeInsetsDirectional.only(bottom: 8.0),
               child: RadioButton<Locale>(value: locale, content: Text(label)),
@@ -117,5 +129,4 @@ class SettingsGTS extends ScrollablePage {
       ),
     ];
   }
-
 }

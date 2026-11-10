@@ -45,11 +45,8 @@ class BehaviorSubject<T> extends Subject<T> implements ValueStream<T> {
   final _Wrapper<T> _wrapper;
   final Stream<T> _stream;
 
-  BehaviorSubject._(
-    StreamController<T> controller,
-    this._stream,
-    this._wrapper,
-  ) : super(controller, _stream);
+  BehaviorSubject._(StreamController<T> controller, this._stream, this._wrapper)
+    : super(controller, _stream);
 
   /// Constructs a [BehaviorSubject], optionally pass handlers for
   /// [onListen], [onCancel] and a flag to handle events [sync].
@@ -70,9 +67,10 @@ class BehaviorSubject<T> extends Subject<T> implements ValueStream<T> {
     final wrapper = _Wrapper<T>();
 
     return BehaviorSubject<T>._(
-        controller,
-        Rx.defer<T>(_deferStream(wrapper, controller, sync), reusable: true),
-        wrapper);
+      controller,
+      Rx.defer<T>(_deferStream(wrapper, controller, sync), reusable: true),
+      wrapper,
+    );
   }
 
   /// Constructs a [BehaviorSubject], optionally pass handlers for
@@ -104,26 +102,29 @@ class BehaviorSubject<T> extends Subject<T> implements ValueStream<T> {
   }
 
   static Stream<T> Function() _deferStream<T>(
-          _Wrapper<T> wrapper, StreamController<T> controller, bool sync) =>
-      () {
-        if (wrapper.latestErrorAndStackTrace != null) {
-          final errorAndStackTrace = wrapper.latestErrorAndStackTrace!;
+    _Wrapper<T> wrapper,
+    StreamController<T> controller,
+    bool sync,
+  ) => () {
+    if (wrapper.latestErrorAndStackTrace != null) {
+      final errorAndStackTrace = wrapper.latestErrorAndStackTrace!;
 
-          return controller.stream.transform(
-            StartWithErrorStreamTransformer(
-              errorAndStackTrace.error,
-              errorAndStackTrace.stackTrace,
-            ),
-          );
-        }
+      return controller.stream.transform(
+        StartWithErrorStreamTransformer(
+          errorAndStackTrace.error,
+          errorAndStackTrace.stackTrace,
+        ),
+      );
+    }
 
-        if (wrapper.latestValue != null) {
-          return controller.stream.transform(
-              StartWithStreamTransformer(wrapper.latestValue!.value));
-        }
+    if (wrapper.latestValue != null) {
+      return controller.stream.transform(
+        StartWithStreamTransformer(wrapper.latestValue!.value),
+      );
+    }
 
-        return controller.stream;
-      };
+    return controller.stream;
+  };
 
   @override
   void onAdd(T event) => _wrapper.setValue(event);
@@ -147,12 +148,7 @@ class BehaviorSubject<T> extends Subject<T> implements ValueStream<T> {
     void Function()? onListen,
     void Function()? onCancel,
     bool sync = false,
-  }) =>
-      BehaviorSubject(
-        onListen: onListen,
-        onCancel: onCancel,
-        sync: sync,
-      );
+  }) => BehaviorSubject(onListen: onListen, onCancel: onCancel, sync: sync);
 
   // Override built-in operators.
 
@@ -173,9 +169,10 @@ class BehaviorSubject<T> extends Subject<T> implements ValueStream<T> {
       _forwardBehaviorSubject<E>((s) => s.asyncExpand(convert));
 
   @override
-  ValueStream<T> handleError(Function onError,
-          {bool Function(dynamic error)? test}) =>
-      _forwardBehaviorSubject<T>((s) => s.handleError(onError, test: test));
+  ValueStream<T> handleError(
+    Function onError, {
+    bool Function(dynamic error)? test,
+  }) => _forwardBehaviorSubject<T>((s) => s.handleError(onError, test: test));
 
   @override
   ValueStream<S> expand<S>(Iterable<S> Function(T element) convert) =>
@@ -209,21 +206,21 @@ class BehaviorSubject<T> extends Subject<T> implements ValueStream<T> {
       _forwardBehaviorSubject<T>((s) => s.distinct(equals));
 
   @override
-  ValueStream<T> timeout(Duration timeLimit,
-          {void Function(EventSink<T> sink)? onTimeout}) =>
-      _forwardBehaviorSubject<T>(
-          (s) => s.timeout(timeLimit, onTimeout: onTimeout));
+  ValueStream<T> timeout(
+    Duration timeLimit, {
+    void Function(EventSink<T> sink)? onTimeout,
+  }) => _forwardBehaviorSubject<T>(
+    (s) => s.timeout(timeLimit, onTimeout: onTimeout),
+  );
 
   ValueStream<R> _forwardBehaviorSubject<R>(
-      Stream<R> Function(Stream<T> s) transformerStream) {
+    Stream<R> Function(Stream<T> s) transformerStream,
+  ) {
     late BehaviorSubject<R> subject;
     late StreamSubscription<R> subscription;
 
-    onListen() => subscription = transformerStream(_stream).listen(
-          subject.add,
-          onError: subject.addError,
-          onDone: subject.close,
-        );
+    onListen() => subscription = transformerStream(_stream)
+        .listen(subject.add, onError: subject.addError, onDone: subject.close);
 
     onCancel() => subscription.cancel();
 

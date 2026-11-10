@@ -15,19 +15,23 @@ class UsersManagementDatasource
     extends ParcOtoDatasourceUsers<String, MapEntry<User, List<String>?>> {
   final bool archive;
 
-  UsersManagementDatasource(
-      {required super.current,
-      super.appTheme,
-      super.searchKey,
-      super.selectC,
-      this.archive = false}) {
+  UsersManagementDatasource({
+    required super.current,
+    super.appTheme,
+    super.searchKey,
+    super.selectC,
+    this.archive = false,
+  }) {
     repo = UsersWebservice(data);
   }
 
   @override
   Future<void> addToActivity(MapEntry<User, List<String>?> c) async {
-    await DatabaseGetter().ajoutActivity(34, c.key.$id,
-        docName: c.key.name.isEmpty ? c.key.email : c.key.name);
+    await DatabaseGetter().ajoutActivity(
+      34,
+      c.key.$id,
+      docName: c.key.name.isEmpty ? c.key.email : c.key.name,
+    );
   }
 
   @override
@@ -46,33 +50,37 @@ class UsersManagementDatasource
           current,
           builder: (co, s) {
             return f.InfoBar(
-                title: const Text('done').tr(),
-                severity: f.InfoBarSeverity.success);
+              title: const Text('done').tr(),
+              severity: f.InfoBarSeverity.success,
+            );
           },
-          alignment:
-          Alignment.lerp(Alignment.topCenter, Alignment.center, 0.6)!,
+          alignment: Alignment.lerp(
+            Alignment.topCenter,
+            Alignment.center,
+            0.6,
+          )!,
         );
-          try{
-            await DatabaseGetter.database!.deleteRow(
-                databaseId: databaseId,
-                tableId: userid,
-                rowId: t.key.$id);
-          }
-          catch(e){
-            //
-          }
-
-          data.remove(MapEntry(c, t));
-          refreshDatasource();
+        try {
+          await DatabaseGetter.database!.deleteRow(
+            databaseId: databaseId,
+            tableId: userid,
+            rowId: t.key.$id,
+          );
+        } catch (e) {
+          //
         }
-      ),
+
+        data.remove(MapEntry(c, t));
+        refreshDatasource();
+      }),
       addToActivity(t),
     ]);
   }
 
   @override
   List<DataCell> getCellsToShow(
-      MapEntry<String, MapEntry<User, List<String>?>> element) {
+    MapEntry<String, MapEntry<User, List<String>?>> element,
+  ) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
     final teams = element.value.value ?? const <String>[];
     final roles = teams.isEmpty
@@ -84,78 +92,79 @@ class UsersManagementDatasource
       DataCell(SelectableText(element.value.key.email, style: rowTextStyle)),
       DataCell(SelectableText(element.value.key.$id, style: rowTextStyle)),
       DataCell(SelectableText((roles), style: rowTextStyle)),
-      DataCell(SelectableText(
+      DataCell(
+        SelectableText(
           dateFormat.format(DateTime.parse(element.value.key.$createdAt)),
-          style: rowTextStyle)),
-      DataCell(f.FlyoutTarget(
-        controller: controllers[element.value.key.$id]!,
-        child: OnTapScaleAndFade(
-          onTap: () {
-            controllers[element.value.key.$id]!.showFlyout(
-              builder: (context) {
-                return f.MenuFlyout(
-                  items: [
-                    f.MenuFlyoutItem(
-                      text: const Text('Gérer les accès'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        Future.delayed(const Duration(milliseconds: 50)).then(
-                          (_) {
-                            if (!current.mounted) return;
-                            f.showDialog(
-                              context: current,
-                            builder: (_) => UserAccessEditor(
-                              userId: element.value.key.$id,
-                              userName: element.value.key.name.isEmpty
-                                  ? element.value.key.email
-                                  : element.value.key.name,
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                    f.MenuFlyoutItem(
-                      text: const Text('Modifier'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        Future.delayed(const Duration(milliseconds: 50))
-                            .then((_) => showUserForm(element.value.key));
-                      },
-                    ),
-                    f.MenuFlyoutItem(
-                      text: const Text('Supprimer'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        showDeleteConfirmation(element.key, element.value);
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-          child: f.Container(
-            decoration: BoxDecoration(
-              color: appTheme?.color.lightest,
-              boxShadow: kElevationToShadow[2],
+          style: rowTextStyle,
+        ),
+      ),
+      DataCell(
+        f.FlyoutTarget(
+          controller: controllers[element.value.key.$id]!,
+          child: OnTapScaleAndFade(
+            onTap: () {
+              controllers[element.value.key.$id]!.showFlyout(
+                builder: (context) {
+                  return f.MenuFlyout(
+                    items: [
+                      f.MenuFlyoutItem(
+                        text: const Text('Gérer les accès'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          Future.delayed(const Duration(milliseconds: 50))
+                              .then((_) {
+                                if (!current.mounted) return;
+                                f.showDialog(
+                                  context: current,
+                                  builder: (_) => UserAccessEditor(
+                                    userId: element.value.key.$id,
+                                    userName: element.value.key.name.isEmpty
+                                        ? element.value.key.email
+                                        : element.value.key.name,
+                                  ),
+                                );
+                              });
+                        },
+                      ),
+                      f.MenuFlyoutItem(
+                        text: const Text('Modifier'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          Future.delayed(const Duration(milliseconds: 50))
+                              .then((_) => showUserForm(element.value.key));
+                        },
+                      ),
+                      f.MenuFlyoutItem(
+                        text: const Text('Supprimer'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          showDeleteConfirmation(element.key, element.value);
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            child: f.Container(
+              decoration: BoxDecoration(
+                color: appTheme?.color.lightest,
+                boxShadow: kElevationToShadow[2],
+              ),
+              child: Icon(Icons.edit, color: appTheme!.color.darkest),
             ),
-            child: Icon(Icons.edit, color: appTheme!.color.darkest),
           ),
         ),
-      )),
+      ),
     ];
   }
 
   void showUserForm(User user) {
     f.showDialog(
-        context: current,
-        builder: (c) {
-          return UserForm(
-            user: user,
-          );
-        });
+      context: current,
+      builder: (c) {
+        return UserForm(user: user);
+      },
+    );
   }
-
-
 }

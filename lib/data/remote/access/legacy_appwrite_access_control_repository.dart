@@ -10,8 +10,7 @@ import '../../../providers/client_database.dart';
 ///
 /// It maps the existing Appwrite Teams into the new permission model.
 /// It will be replaced by the customizable access tables and backend service.
-class LegacyAppwriteAccessControlRepository
-    implements AccessControlRepository {
+class LegacyAppwriteAccessControlRepository implements AccessControlRepository {
   const LegacyAppwriteAccessControlRepository();
 
   @override
@@ -43,7 +42,9 @@ class LegacyAppwriteAccessControlRepository
     }
 
     final teams = await Teams(client).list();
-    final teamNames = teams.teams.map((team) => team.name.toLowerCase()).toSet();
+    final teamNames = teams.teams
+        .map((team) => team.name.toLowerCase())
+        .toSet();
 
     if (teamNames.contains('admins')) {
       return UserAccess(
@@ -68,10 +69,7 @@ class LegacyAppwriteAccessControlRepository
       );
     }
 
-    return UserAccess(
-      userId: userId,
-      companyId: companyId,
-    );
+    return UserAccess(userId: userId, companyId: companyId);
   }
 
   @override

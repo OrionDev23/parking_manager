@@ -51,33 +51,38 @@ class _AcceptInvitationState extends State<AcceptInvitation> {
       ..setEndpoint(endpointU);
     await Teams(client)
         .updateMembershipStatus(
-            teamId: teamId,
-            membershipId: membershipId,
-            userId: userId,
-            secret: secret)
+          teamId: teamId,
+          membershipId: membershipId,
+          userId: userId,
+          secret: secret,
+        )
         .then((value) {
-      setState(() {
-        done = true;
-        linknotvalid = false;
-      });
-    }).onError((error, stackTrace) {
-      displayInfoBar(context, duration: const Duration(seconds: 60),
-          builder: (context, s) {
-        return InfoBar(
-          title: Text('error'.tr()),
-          content: Text(stackTrace.toString()),
-          isLong: true,
-          action: Button(
-            onPressed: () {
-              Navigator.of(context).pop();
+          setState(() {
+            done = true;
+            linknotvalid = false;
+          });
+        })
+        .onError((error, stackTrace) {
+          displayInfoBar(
+            context,
+            duration: const Duration(seconds: 60),
+            builder: (context, s) {
+              return InfoBar(
+                title: Text('error'.tr()),
+                content: Text(stackTrace.toString()),
+                isLong: true,
+                action: Button(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              );
             },
-            child: const Text('OK'),
-          ),
-        );
-      });
-      done = true;
-      linknotvalid = true;
-    });
+          );
+          done = true;
+          linknotvalid = true;
+        });
   }
 
   @override

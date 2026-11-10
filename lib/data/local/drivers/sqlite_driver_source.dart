@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'package:sqlite3/sqlite3.dart';
+
 import '../../../core/database/local_database.dart';
 import '../../../domain/entities/driver.dart';
 import 'local_driver_source.dart';
@@ -35,9 +37,7 @@ class SqliteDriverSource implements LocalDriverSource {
     int offset = 0,
     bool includeArchived = false,
   }) async {
-    final query = StringBuffer(
-      'SELECT * FROM drivers WHERE company_id = ?',
-    );
+    final query = StringBuffer('SELECT * FROM drivers WHERE company_id = ?');
     final args = <Object?>[companyId];
 
     // The archive screen must show archived drivers only, matching Appwrite.
@@ -108,9 +108,9 @@ class SqliteDriverSource implements LocalDriverSource {
 
   @override
   Future<void> deleteDriver(String id) async {
-    _db.execute(
-      'DELETE FROM drivers WHERE id = ? AND company_id = ?',
-      [id, companyId],
-    );
+    _db.execute('DELETE FROM drivers WHERE id = ? AND company_id = ?', [
+      id,
+      companyId,
+    ]);
   }
 }

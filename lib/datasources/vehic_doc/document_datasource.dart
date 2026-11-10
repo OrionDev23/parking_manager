@@ -15,15 +15,20 @@ import '../../widgets/on_tap_scale.dart';
 import 'document_webservice.dart';
 
 class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
-  DocumentsDataSource(
-      {required super.current, super.selectC, required super.collectionID}) {
+  DocumentsDataSource({
+    required super.current,
+    super.selectC,
+    required super.collectionID,
+  }) {
     repo = DocumentWebService(data, collectionID, 1);
   }
 
   void showMyVehicule(String? matricule) {
     if (matricule != null) {
-      PanesListState.index.value = PaneItemsAndFooters.originalItems
-              .indexOf(PaneItemsAndFooters.vehicles) +
+      PanesListState.index.value =
+          PaneItemsAndFooters.originalItems.indexOf(
+            PaneItemsAndFooters.vehicles,
+          ) +
           1;
       VehicleTabsState.currentIndex.value = 0;
       VehicleTableState.filterNow = true;
@@ -37,33 +42,40 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
     final dateFormat2 = DateFormat('y/M/d', 'fr');
 
     return [
-      DataCell(SelectableText(
-        element.value.nom,
-        style: rowTextStyle,
-      )),
-      DataCell(SelectableText(element.value.vehiclemat ?? '', style: rowTextStyle),
-          onTap: () {
-        showMyVehicule(element.value.vehiclemat);
-      }),
-      DataCell(SelectableText(
+      DataCell(SelectableText(element.value.nom, style: rowTextStyle)),
+      DataCell(
+        SelectableText(element.value.vehiclemat ?? '', style: rowTextStyle),
+        onTap: () {
+          showMyVehicule(element.value.vehiclemat);
+        },
+      ),
+      DataCell(
+        SelectableText(
           element.value.dateExpiration != null
               ? dateFormat2.format(element.value.dateExpiration!)
               : '',
-          style: rowTextStyle)),
-      DataCell(SelectableText(
+          style: rowTextStyle,
+        ),
+      ),
+      DataCell(
+        SelectableText(
           element.value.updatedAt != null
               ? dateFormat.format(element.value.updatedAt!)
               : '',
-          style: rowTextStyle)),
-      DataCell(DatabaseGetter().isAdmin() || DatabaseGetter().isManager()
-          ? f.FlyoutTarget(
-              controller: element.value.controller,
-              child: OnTapScaleAndFade(
+          style: rowTextStyle,
+        ),
+      ),
+      DataCell(
+        DatabaseGetter().isAdmin() || DatabaseGetter().isManager()
+            ? f.FlyoutTarget(
+                controller: element.value.controller,
+                child: OnTapScaleAndFade(
                   onTap: () {
-                    element.value.controller.showFlyout(builder: (context) {
-                      return f.MenuFlyout(
-                        items: [
-                          f.MenuFlyoutItem(
+                    element.value.controller.showFlyout(
+                      builder: (context) {
+                        return f.MenuFlyout(
+                          items: [
+                            f.MenuFlyoutItem(
                               text: const Text('mod').tr(),
                               onPressed: () {
                                 Navigator.of(current).pop();
@@ -71,14 +83,13 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
                                 tab = f.Tab(
                                   key: UniqueKey(),
                                   text: Text(
-                                      '${"mod".tr()} ${'document'.tr().toLowerCase()} ${element.value.nom}'),
+                                    '${"mod".tr()} ${'document'.tr().toLowerCase()} ${element.value.nom}',
+                                  ),
                                   semanticLabel:
                                       '${'mod'.tr()} ${element.value.nom}',
                                   icon: const Icon(f.FluentIcons.edit),
                                   body: f.ScaffoldPage(
-                                    content: DocumentForm(
-                                      vd: element.value,
-                                    ),
+                                    content: DocumentForm(vd: element.value),
                                   ),
                                   onClosed: () {
                                     DocumentTabsState.tabs.remove(tab);
@@ -93,26 +104,31 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
                                 DocumentTabsState.tabs.add(tab);
                                 DocumentTabsState.currentIndex.value =
                                     index - 1;
-                              }),
-                          if (DatabaseGetter().isAdmin())
-                            f.MenuFlyoutItem(
+                              },
+                            ),
+                            if (DatabaseGetter().isAdmin())
+                              f.MenuFlyoutItem(
                                 text: const Text('delete').tr(),
                                 onPressed: () {
                                   showDeleteConfirmation(element.value);
-                                }),
-                        ],
-                      );
-                    });
+                                },
+                              ),
+                          ],
+                        );
+                      },
+                    );
                   },
                   child: f.Container(
-                      decoration: BoxDecoration(
-                        color: appTheme?.color.lightest,
-                        boxShadow: kElevationToShadow[2],
-                      ),
-                      child: Icon(Icons.edit,color: appTheme!
-                          .color.darkest,))),
-            )
-          : const Text('')),
+                    decoration: BoxDecoration(
+                      color: appTheme?.color.lightest,
+                      boxShadow: kElevationToShadow[2],
+                    ),
+                    child: Icon(Icons.edit, color: appTheme!.color.darkest),
+                  ),
+                ),
+              )
+            : const Text(''),
+      ),
     ];
   }
 
@@ -123,7 +139,10 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
 
   @override
   Future<void> addToActivity(c) async {
-    await DatabaseGetter()
-        .ajoutActivity(9, c.id, docName: '${c.nom} ${c.vehiclemat}');
+    await DatabaseGetter().ajoutActivity(
+      9,
+      c.id,
+      docName: '${c.nom} ${c.vehiclemat}',
+    );
   }
 }

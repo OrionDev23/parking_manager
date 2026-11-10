@@ -21,7 +21,7 @@ enum WindowStrategy {
 
   /// does not open any windows, rather all events are buffered and emitted
   /// whenever the handler triggers, after this trigger, the buffer is cleared.
-  onHandler
+  onHandler,
 }
 
 class _BackpressureStreamSink<S, T> implements ForwardingSink<S, T> {
@@ -151,7 +151,9 @@ class _BackpressureStreamSink<S, T> implements ForwardingSink<S, T> {
   }
 
   StreamSubscription<dynamic> singleWindow(S event, EventSink<T> sink) =>
-      buildStream(event, sink).take(1).listen(
+      buildStream(event, sink)
+          .take(1)
+          .listen(
             null,
             onError: sink.addError,
             onDone: () => resolveWindowEnd(sink, _mainClosed),

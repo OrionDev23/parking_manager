@@ -26,29 +26,29 @@ class _UserManagementState extends State<UserManagement> {
   @override
   Widget build(BuildContext context) {
     return ScaffoldPage(
-        header: PageTitle(
-          text: 'usermanagement'.tr(),
-          trailing: ButtonContainer(
-            icon: FluentIcons.add,
-            text: 'add'.tr(),
-            showBottom: false,
-            showCounter: false,
-            action: showUserForm,
-          ),
+      header: PageTitle(
+        text: 'usermanagement'.tr(),
+        trailing: ButtonContainer(
+          icon: FluentIcons.add,
+          text: 'add'.tr(),
+          showBottom: false,
+          showCounter: false,
+          action: showUserForm,
         ),
-        content: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: UsersTable(
-            archive: widget.archive,
-          ),
-        ));
+      ),
+      content: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        child: UsersTable(archive: widget.archive),
+      ),
+    );
   }
 
   void showUserForm() async {
     await showDialog(
-        context: context,
-        builder: (c) {
-          return const UserForm();
-        });
+      context: context,
+      builder: (c) {
+        return const UserForm();
+      },
+    );
   }
 }

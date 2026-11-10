@@ -14,8 +14,11 @@ class ReparationTable extends StatefulWidget {
   final bool selectD;
   final bool archive;
 
-  const ReparationTable(
-      {super.key, this.selectD = false, this.archive = false});
+  const ReparationTable({
+    super.key,
+    this.selectD = false,
+    this.archive = false,
+  });
 
   @override
   State<ReparationTable> createState() => ReparationTableState();
@@ -43,19 +46,21 @@ class ReparationTableState extends State<ReparationTable> {
       startedWithFiltersOn = true;
       searchController.text = filterDocument.value!;
       reparationDataSource = ReparationDataSource(
-          current: context,
-          selectC: widget.selectD,
-          collectionID: reparationId,
-          searchKey: filterDocument.value);
+        current: context,
+        selectC: widget.selectD,
+        collectionID: reparationId,
+        searchKey: filterDocument.value,
+      );
       filterDocument.value = null;
     } else {
       startedWithFiltersOn = false;
 
       reparationDataSource = ReparationDataSource(
-          current: context,
-          collectionID: reparationId,
-          selectC: widget.selectD,
-          archive: widget.archive);
+        current: context,
+        collectionID: reparationId,
+        selectC: widget.selectD,
+        archive: widget.archive,
+      );
     }
     initColumns();
     super.initState();
@@ -68,10 +73,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'num',
-            style: tstyle,
-          ).tr(),
+          child: Text('num', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -85,10 +87,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'nchassi',
-            style: tstyle,
-          ).tr(),
+          child: Text('nchassi', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
@@ -102,10 +101,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'matricule',
-            style: tstyle,
-          ).tr(),
+          child: Text('matricule', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
@@ -119,10 +115,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'fichereception',
-            style: tstyle,
-          ).tr(),
+          child: Text('fichereception', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
@@ -137,10 +130,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'prestataire',
-            style: tstyle,
-          ).tr(),
+          child: Text('prestataire', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -154,10 +144,7 @@ class ReparationTableState extends State<ReparationTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'date',
-            style: tstyle,
-          ).tr(),
+          child: Text('date', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
@@ -168,30 +155,24 @@ class ReparationTableState extends State<ReparationTable> {
           setState(() {});
         },
       ),
-      if(!gts)
-      DataColumn2(
-        label: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'montantt',
-            style: tstyle,
-          ).tr(),
+      if (!gts)
+        DataColumn2(
+          label: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Text('montantt', style: tstyle).tr(),
+          ),
+          size: ColumnSize.M,
+          onSort: (s, c) {
+            sortColumn = 4;
+            assending = !assending;
+            reparationDataSource.sort(sortColumn, assending);
+            setState(() {});
+          },
         ),
-        size: ColumnSize.M,
-        onSort: (s, c) {
-          sortColumn = 4;
-          assending = !assending;
-          reparationDataSource.sort(sortColumn, assending);
-          setState(() {});
-        },
-      ),
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'dateModif',
-            style: tstyle,
-          ).tr(),
+          child: Text('dateModif', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -222,82 +203,82 @@ class ReparationTableState extends State<ReparationTable> {
     var appTheme = context.watch<AppTheme>();
     reparationDataSource.appTheme = appTheme;
     return ValueListenableBuilder(
-        valueListenable: filterDocument,
-        builder: (context, v, _) {
-          if (!startedWithFiltersOn && v != null && filterNow) {
-            searchController.text = v;
-            reparationDataSource.search(v);
-            notEmpty = true;
-            filtered = true;
-            filterNow = false;
-          }
-          return DataTableParc(
-            header: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    width: 350.px,
-                    height: 45.px,
-                    child: TextBox(
-                      onChanged: (s){
-                        if(s.isEmpty){
-                          notEmpty=false;
-                          reparationDataSource.search('');
-                        }
-                        else{
-                          notEmpty=true;
-                        }
-                        setState(() {
-                        });
-                      },
-                      controller: searchController,
-                      placeholder: 'search'.tr(),
+      valueListenable: filterDocument,
+      builder: (context, v, _) {
+        if (!startedWithFiltersOn && v != null && filterNow) {
+          searchController.text = v;
+          reparationDataSource.search(v);
+          notEmpty = true;
+          filtered = true;
+          filterNow = false;
+        }
+        return DataTableParc(
+          header: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 350.px,
+                  height: 45.px,
+                  child: TextBox(
+                    onChanged: (s) {
+                      if (s.isEmpty) {
+                        notEmpty = false;
+                        reparationDataSource.search('');
+                      } else {
+                        notEmpty = true;
+                      }
+                      setState(() {});
+                    },
+                    controller: searchController,
+                    placeholder: 'search'.tr(),
 
-
-                      style: appTheme.writingStyle,
-                      cursorColor: appTheme.color.darker,
-                      placeholderStyle: placeStyle,
-                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-                      onSubmitted: (s) {
-                        if (s.isNotEmpty) {
-                          reparationDataSource.search(s);
-                          if (!notEmpty) {
-                            setState(() {
-                              notEmpty = true;
-                            });
-                          }
-                        } else {
-                          if (notEmpty) {
-                            setState(() {
-                              notEmpty = false;
-                            });
-                          }
-                        }
-                      },
-                      suffix: notEmpty
-                          ? IconButton(
-                              icon: const Icon(FluentIcons.cancel),
-                              onPressed: () {
-                                searchController.text = "";
-                                notEmpty = false;
-                                setState(() {});
-                                reparationDataSource.search('');
-                              })
-                          : null,
+                    style: appTheme.writingStyle,
+                    cursorColor: appTheme.color.darker,
+                    placeholderStyle: placeStyle,
+                    decoration: WidgetStatePropertyAll(
+                      BoxDecoration(color: appTheme.fillColor),
                     ),
+                    onSubmitted: (s) {
+                      if (s.isNotEmpty) {
+                        reparationDataSource.search(s);
+                        if (!notEmpty) {
+                          setState(() {
+                            notEmpty = true;
+                          });
+                        }
+                      } else {
+                        if (notEmpty) {
+                          setState(() {
+                            notEmpty = false;
+                          });
+                        }
+                      }
+                    },
+                    suffix: notEmpty
+                        ? IconButton(
+                            icon: const Icon(FluentIcons.cancel),
+                            onPressed: () {
+                              searchController.text = "";
+                              notEmpty = false;
+                              setState(() {});
+                              reparationDataSource.search('');
+                            },
+                          )
+                        : null,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            sortAscending: assending,
-            sortColumnIndex: sortColumn,
-            columns: columns,
-            source: reparationDataSource,
-          );
-        });
+          ),
+          sortAscending: assending,
+          sortColumnIndex: sortColumn,
+          columns: columns,
+          source: reparationDataSource,
+        );
+      },
+    );
   }
 
   @override

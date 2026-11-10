@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:parc_oto/batch_import/import_appartenance.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+
 import '../../domain/entities/company.dart';
 import '../../main.dart';
 import '../../providers/client_database.dart';
@@ -124,9 +125,9 @@ class MyEntrepriseState extends State<MyEntreprise> {
       email.text = p!.email ?? '';
       telephone.text = p!.telephone ?? '';
       adresse.text = p!.adresse;
-      directions=p!.directions??[];
-      filliales=p!.filiales??[];
-      departments=p!.departments??[];
+      directions = p!.directions ?? [];
+      filliales = p!.filiales ?? [];
+      departments = p!.departments ?? [];
     }
   }
 
@@ -140,8 +141,10 @@ class MyEntrepriseState extends State<MyEntreprise> {
           art.text == p!.art &&
           rc.text == p!.rc &&
           descr.text == p!.description &&
-          email.text == p!.email && p!.filiales==filliales && p!
-          .directions==directions && p!.departments==departments) {
+          email.text == p!.email &&
+          p!.filiales == filliales &&
+          p!.directions == directions &&
+          p!.departments == departments) {
         if (changes) {
           setState(() {
             changes = false;
@@ -174,13 +177,14 @@ class MyEntrepriseState extends State<MyEntreprise> {
       pickingFile = true;
     });
     await FilePicker.pickFile(
-      dialogTitle: 'picklogo'.tr(),
-      type: FileType.image,
-    )
+          dialogTitle: 'picklogo'.tr(),
+          type: FileType.image,
+        )
         .then((value) {
-      if (value?.path != null) imageFile = io.File(value!.path!);
-      setState(() {});
-    }).onError((error, stackTrace) {});
+          if (value?.path != null) imageFile = io.File(value!.path!);
+          setState(() {});
+        })
+        .onError((error, stackTrace) {});
     setState(() {
       pickingFile = false;
     });
@@ -220,30 +224,34 @@ class MyEntrepriseState extends State<MyEntreprise> {
     await DatabaseGetter.storage!
         .getFileDownload(bucketId: buckedId, fileId: link)
         .then((value) async {
-      logo = value;
-      if (!kIsWeb) {
-        io.File file = io.File(logoid);
+          logo = value;
+          if (!kIsWeb) {
+            io.File file = io.File(logoid);
 
-        await file.writeAsBytes(value).then((value) {
+            await file
+                .writeAsBytes(value)
+                .then((value) {
+                  downloadingLogo = false;
+                  if (mounted) {
+                    setState(() {});
+                  }
+                })
+                .onError((error, stackTrace) {});
+          } else {
+            MyEntrepriseState.logo = value;
+          }
           downloadingLogo = false;
           if (mounted) {
             setState(() {});
           }
-        }).onError((error, stackTrace) {});
-      } else {
-        MyEntrepriseState.logo = value;
-      }
-      downloadingLogo = false;
-      if (mounted) {
-        setState(() {});
-      }
-    }).onError((error, stackTrace) {
-      logo = null;
-      downloadingLogo = false;
-      if (mounted) {
-        setState(() {});
-      }
-    });
+        })
+        .onError((error, stackTrace) {
+          logo = null;
+          downloadingLogo = false;
+          if (mounted) {
+            setState(() {});
+          }
+        });
   }
 
   static bool checkingFile = false;
@@ -321,23 +329,24 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                               fit: BoxFit.fitWidth,
                                             )
                                           : kIsWeb
-                                              ? MyEntrepriseState.logo != null
-                                                  ? Image.memory(
-                                                      logo!,
-                                                      fit: BoxFit.fitWidth)
-                                                  : Image.asset(
-                                                      'assets/images/logo.webp',
-                                                      fit: BoxFit.fitWidth,
-                                                    )
-                                              : logoExists
-                                                  ? Image.file(
-                                                      io.File(logoid),
-                                                      fit: BoxFit.fitWidth,
-                                                    )
-                                                  : Image.asset(
-                                                      'assets/images/logo.webp',
-                                                      fit: BoxFit.fitWidth,
-                                                    ),
+                                          ? MyEntrepriseState.logo != null
+                                                ? Image.memory(
+                                                    logo!,
+                                                    fit: BoxFit.fitWidth,
+                                                  )
+                                                : Image.asset(
+                                                    'assets/images/logo.webp',
+                                                    fit: BoxFit.fitWidth,
+                                                  )
+                                          : logoExists
+                                          ? Image.file(
+                                              io.File(logoid),
+                                              fit: BoxFit.fitWidth,
+                                            )
+                                          : Image.asset(
+                                              'assets/images/logo.webp',
+                                              fit: BoxFit.fitWidth,
+                                            ),
                                     ),
                                     smallSpace,
                                     Column(
@@ -345,24 +354,28 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                           MainAxisAlignment.center,
                                       children: [
                                         IconButton(
-                                            icon: const Icon(
-                                                FluentIcons.file_image),
-                                            onPressed: checkingFile ||
-                                                    downloadingLogo ||
-                                                    downloading ||
-                                                    pickingFile
-                                                ? null
-                                                : pickImage),
+                                          icon: const Icon(
+                                            FluentIcons.file_image,
+                                          ),
+                                          onPressed:
+                                              checkingFile ||
+                                                  downloadingLogo ||
+                                                  downloading ||
+                                                  pickingFile
+                                              ? null
+                                              : pickImage,
+                                        ),
                                         smallSpace,
                                         IconButton(
-                                            icon:
-                                                const Icon(FluentIcons.refresh),
-                                            onPressed: checkingFile ||
-                                                    downloadingLogo ||
-                                                    downloading ||
-                                                    pickingFile
-                                                ? null
-                                                : downloadLogo),
+                                          icon: const Icon(FluentIcons.refresh),
+                                          onPressed:
+                                              checkingFile ||
+                                                  downloadingLogo ||
+                                                  downloading ||
+                                                  pickingFile
+                                              ? null
+                                              : downloadLogo,
+                                        ),
                                       ],
                                     ),
                                   ],
@@ -382,7 +395,9 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                     style: appTheme.writingStyle,
                                     placeholderStyle: placeStyle,
                                     cursorColor: appTheme.color.darker,
-                                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                    decoration: WidgetStatePropertyAll(
+                                      BoxDecoration(color: appTheme.fillColor),
+                                    ),
 
                                     onChanged: (s) {
                                       checkChanges();
@@ -404,7 +419,9 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                     style: appTheme.writingStyle,
                                     placeholderStyle: placeStyle,
                                     cursorColor: appTheme.color.darker,
-                                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                    decoration: WidgetStatePropertyAll(
+                                      BoxDecoration(color: appTheme.fillColor),
+                                    ),
 
                                     onChanged: (s) {
                                       checkChanges();
@@ -433,7 +450,12 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                               placeholderStyle: placeStyle,
                                               cursorColor:
                                                   appTheme.color.darker,
-                                              decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                              decoration:
+                                                  WidgetStatePropertyAll(
+                                                    BoxDecoration(
+                                                      color: appTheme.fillColor,
+                                                    ),
+                                                  ),
 
                                               onChanged: (s) {
                                                 checkChanges();
@@ -442,37 +464,48 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                           ),
                                           smallSpace,
                                           SizedBox(
-                                              width: 187,
-                                              child: TextBox(
-                                                controller: telephone,
-                                                placeholder: 'telephone'.tr(),
-                                                style: appTheme.writingStyle,
-                                                placeholderStyle: placeStyle,
-                                                cursorColor:
-                                                    appTheme.color.darker,
-                                                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                            width: 187,
+                                            child: TextBox(
+                                              controller: telephone,
+                                              placeholder: 'telephone'.tr(),
+                                              style: appTheme.writingStyle,
+                                              placeholderStyle: placeStyle,
+                                              cursorColor:
+                                                  appTheme.color.darker,
+                                              decoration:
+                                                  WidgetStatePropertyAll(
+                                                    BoxDecoration(
+                                                      color: appTheme.fillColor,
+                                                    ),
+                                                  ),
 
-                                                onChanged: (s) {
-                                                  checkChanges();
-                                                },
-                                              )),
+                                              onChanged: (s) {
+                                                checkChanges();
+                                              },
+                                            ),
+                                          ),
                                         ],
                                       ),
                                       smallSpace,
                                       Flexible(
-                                          child: TextBox(
-                                        controller: adresse,
-                                        placeholder: 'adresse'.tr(),
-                                        maxLines: 3,
-                                        style: appTheme.writingStyle,
-                                        placeholderStyle: placeStyle,
-                                        cursorColor: appTheme.color.darker,
-                                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                        child: TextBox(
+                                          controller: adresse,
+                                          placeholder: 'adresse'.tr(),
+                                          maxLines: 3,
+                                          style: appTheme.writingStyle,
+                                          placeholderStyle: placeStyle,
+                                          cursorColor: appTheme.color.darker,
+                                          decoration: WidgetStatePropertyAll(
+                                            BoxDecoration(
+                                              color: appTheme.fillColor,
+                                            ),
+                                          ),
 
-                                            onChanged: (s) {
-                                          checkChanges();
-                                        },
-                                      )),
+                                          onChanged: (s) {
+                                            checkChanges();
+                                          },
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -492,34 +525,48 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                         child: Row(
                                           children: [
                                             Flexible(
-                                                child: TextBox(
-                                              controller: nif,
-                                              placeholder: 'NIF',
-                                              style: appTheme.writingStyle,
-                                              placeholderStyle: placeStyle,
-                                              cursorColor:
-                                                  appTheme.color.darker,
-                                                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                              child: TextBox(
+                                                controller: nif,
+                                                placeholder: 'NIF',
+                                                style: appTheme.writingStyle,
+                                                placeholderStyle: placeStyle,
+                                                cursorColor:
+                                                    appTheme.color.darker,
+                                                decoration:
+                                                    WidgetStatePropertyAll(
+                                                      BoxDecoration(
+                                                        color:
+                                                            appTheme.fillColor,
+                                                      ),
+                                                    ),
 
-                                                  onChanged: (s) {
-                                                checkChanges();
-                                              },
-                                            )),
+                                                onChanged: (s) {
+                                                  checkChanges();
+                                                },
+                                              ),
+                                            ),
                                             smallSpace,
                                             Flexible(
-                                                child: TextBox(
-                                              controller: nis,
-                                              placeholder: 'NIS',
-                                              style: appTheme.writingStyle,
-                                              placeholderStyle: placeStyle,
-                                              cursorColor:
-                                                  appTheme.color.darker,
-                                                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                              child: TextBox(
+                                                controller: nis,
+                                                placeholder: 'NIS',
+                                                style: appTheme.writingStyle,
+                                                placeholderStyle: placeStyle,
+                                                cursorColor:
+                                                    appTheme.color.darker,
+                                                decoration:
+                                                    WidgetStatePropertyAll(
+                                                      BoxDecoration(
+                                                        color:
+                                                            appTheme.fillColor,
+                                                      ),
+                                                    ),
 
-                                                  onChanged: (s) {
-                                                checkChanges();
-                                              },
-                                            )),
+                                                onChanged: (s) {
+                                                  checkChanges();
+                                                },
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -528,34 +575,48 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                         child: Row(
                                           children: [
                                             Flexible(
-                                                child: TextBox(
-                                              controller: rc,
-                                              placeholder: 'RC',
-                                              style: appTheme.writingStyle,
-                                              placeholderStyle: placeStyle,
-                                              cursorColor:
-                                                  appTheme.color.darker,
-                                                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                              child: TextBox(
+                                                controller: rc,
+                                                placeholder: 'RC',
+                                                style: appTheme.writingStyle,
+                                                placeholderStyle: placeStyle,
+                                                cursorColor:
+                                                    appTheme.color.darker,
+                                                decoration:
+                                                    WidgetStatePropertyAll(
+                                                      BoxDecoration(
+                                                        color:
+                                                            appTheme.fillColor,
+                                                      ),
+                                                    ),
 
-                                                  onChanged: (s) {
-                                                checkChanges();
-                                              },
-                                            )),
+                                                onChanged: (s) {
+                                                  checkChanges();
+                                                },
+                                              ),
+                                            ),
                                             smallSpace,
                                             Flexible(
-                                                child: TextBox(
-                                              controller: art,
-                                              placeholder: 'ART',
-                                              style: appTheme.writingStyle,
-                                              placeholderStyle: placeStyle,
-                                              cursorColor:
-                                                  appTheme.color.darker,
-                                                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                              child: TextBox(
+                                                controller: art,
+                                                placeholder: 'ART',
+                                                style: appTheme.writingStyle,
+                                                placeholderStyle: placeStyle,
+                                                cursorColor:
+                                                    appTheme.color.darker,
+                                                decoration:
+                                                    WidgetStatePropertyAll(
+                                                      BoxDecoration(
+                                                        color:
+                                                            appTheme.fillColor,
+                                                      ),
+                                                    ),
 
-                                                  onChanged: (s) {
-                                                checkChanges();
-                                              },
-                                            )),
+                                                onChanged: (s) {
+                                                  checkChanges();
+                                                },
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -583,17 +644,18 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Button(
-                          onPressed:
-                              uploading || downloading ? null : downloadData,
-                          child: const Text('refresh').tr()),
+                        onPressed: uploading || downloading
+                            ? null
+                            : downloadData,
+                        child: const Text('refresh').tr(),
+                      ),
                       smallSpace,
                       FilledButton(
-                          onPressed: uploading || downloading ? null : upload,
-                          child: uploading
-                              ? ProgressBar(
-                                  value: progress,
-                                )
-                              : const Text('save').tr()),
+                        onPressed: uploading || downloading ? null : upload,
+                        child: uploading
+                            ? ProgressBar(value: progress)
+                            : const Text('save').tr(),
+                      ),
                     ],
                   ),
                 ),
@@ -602,11 +664,10 @@ class MyEntrepriseState extends State<MyEntreprise> {
           ),
           if (downloading)
             Positioned(
-                top: 40.h,
-                left: 35.w,
-                child: const ProgressBar(
-                  strokeWidth: 10,
-                )),
+              top: 40.h,
+              left: 35.w,
+              child: const ProgressBar(strokeWidth: 10),
+            ),
         ],
       ),
     );
@@ -617,10 +678,12 @@ class MyEntrepriseState extends State<MyEntreprise> {
 
   TextEditingController departmentToAdd = TextEditingController();
 
-  double tilesHeight=50.px;
+  double tilesHeight = 50.px;
   Widget fillialeWidget(AppTheme appTheme) {
     return SizedBox(
-      height: filliales.isEmpty?100.px:filliales.length * tilesHeight + 80.px,
+      height: filliales.isEmpty
+          ? 100.px
+          : filliales.length * tilesHeight + 80.px,
       child: ZoneBox(
         label: 'filiales'.tr(),
         child: Padding(
@@ -640,7 +703,9 @@ class MyEntrepriseState extends State<MyEntreprise> {
                         style: appTheme.writingStyle,
                         placeholderStyle: placeStyle,
                         cursorColor: appTheme.color.darker,
-                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                        decoration: WidgetStatePropertyAll(
+                          BoxDecoration(color: appTheme.fillColor),
+                        ),
 
                         onChanged: (s) {
                           setState(() {});
@@ -658,54 +723,59 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     ),
                     smallSpace,
                     FilledButton(
-                        onPressed: fillialeToAdd.text.trim().isEmpty
-                            ? null
-                            : () {
-                                if (fillialeToAdd.text.trim().isNotEmpty) {
-                                  filliales.add(fillialeToAdd.text.trim());
-                                  setState(() {
-                                    fillialeToAdd.clear();
-                                  });
-                                }
-                                checkChanges();
-                              },
-                        child: const Text('add').tr()),
+                      onPressed: fillialeToAdd.text.trim().isEmpty
+                          ? null
+                          : () {
+                              if (fillialeToAdd.text.trim().isNotEmpty) {
+                                filliales.add(fillialeToAdd.text.trim());
+                                setState(() {
+                                  fillialeToAdd.clear();
+                                });
+                              }
+                              checkChanges();
+                            },
+                      child: const Text('add').tr(),
+                    ),
                     smallSpace,
                     FilledButton(
-                        onPressed: ()=>importFiliales(),
-                        child: const Text('importlist').tr()),
-
+                      onPressed: () => importFiliales(),
+                      child: const Text('importlist').tr(),
+                    ),
                   ],
                 ),
               ),
               smallSpace,
               ListView.builder(
-                itemCount: filliales.isEmpty?1:filliales.length,
+                itemCount: filliales.isEmpty ? 1 : filliales.length,
                 shrinkWrap: true,
                 itemBuilder: (BuildContext context, int index) {
-                  if(filliales.isEmpty){
+                  if (filliales.isEmpty) {
                     return Center(
-                        child: SizedBox(
-                          height: 20.px,
-                          child: Text('fillialesempty',
-                              style:TextStyle(color:Colors.grey[100],
-                                  fontStyle: FontStyle.italic))
-                              .tr(),
-                        )
+                      child: SizedBox(
+                        height: 20.px,
+                        child: Text(
+                          'fillialesempty',
+                          style: TextStyle(
+                            color: Colors.grey[100],
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ).tr(),
+                      ),
                     );
                   }
                   return SizedBox(
                     height: tilesHeight,
                     child: ListTile(
-                      tileColor:
-                      WidgetStateColor.resolveWith((states) => appTheme.fillColor),
+                      tileColor: WidgetStateColor.resolveWith(
+                        (states) => appTheme.fillColor,
+                      ),
                       title: Text(
                         filliales[index],
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
                       ),
                       trailing: IconButton(
-                        icon: const Icon(FluentIcons.cancel,size: 15,),
+                        icon: const Icon(FluentIcons.cancel, size: 15),
                         onPressed: () {
                           setState(() {
                             filliales.removeAt(index);
@@ -715,7 +785,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     ),
                   );
                 },
-              )
+              ),
             ],
           ),
         ),
@@ -725,7 +795,9 @@ class MyEntrepriseState extends State<MyEntreprise> {
 
   Widget directionsWidget(AppTheme appTheme) {
     return SizedBox(
-      height: departments.isEmpty?100.px:departments.length * tilesHeight + 80.px,
+      height: departments.isEmpty
+          ? 100.px
+          : departments.length * tilesHeight + 80.px,
       child: ZoneBox(
         label: 'directions'.tr(),
         child: Padding(
@@ -745,7 +817,9 @@ class MyEntrepriseState extends State<MyEntreprise> {
                         style: appTheme.writingStyle,
                         placeholderStyle: placeStyle,
                         cursorColor: appTheme.color.darker,
-                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                        decoration: WidgetStatePropertyAll(
+                          BoxDecoration(color: appTheme.fillColor),
+                        ),
 
                         onChanged: (s) {
                           setState(() {});
@@ -763,46 +837,52 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     ),
                     smallSpace,
                     FilledButton(
-                        onPressed: directionToAdd.text.trim().isEmpty
-                            ? null
-                            : () {
-                                if (directionToAdd.text.trim().isNotEmpty) {
-                                  directions.add(directionToAdd.text.trim());
-                                  setState(() {
-                                    directionToAdd.clear();
-                                  });
-                                }
-                                checkChanges();
-                              },
-                        child: const Text('add').tr()),
+                      onPressed: directionToAdd.text.trim().isEmpty
+                          ? null
+                          : () {
+                              if (directionToAdd.text.trim().isNotEmpty) {
+                                directions.add(directionToAdd.text.trim());
+                                setState(() {
+                                  directionToAdd.clear();
+                                });
+                              }
+                              checkChanges();
+                            },
+                      child: const Text('add').tr(),
+                    ),
                     smallSpace,
                     FilledButton(
-                        onPressed: ()=>importDirections(),
-                        child: const Text('importlist').tr()),
+                      onPressed: () => importDirections(),
+                      child: const Text('importlist').tr(),
+                    ),
                   ],
                 ),
               ),
               smallSpace,
               ListView.builder(
-                itemCount: directions.isEmpty?1:directions.length,
+                itemCount: directions.isEmpty ? 1 : directions.length,
                 shrinkWrap: true,
                 itemBuilder: (BuildContext context, int index) {
-                  if(directions.isEmpty){
+                  if (directions.isEmpty) {
                     return Center(
                       child: SizedBox(
                         height: 20.px,
-                        child: Text('directionssempty',
-                            style:TextStyle(color:Colors.grey[100],
-                            fontStyle: FontStyle.italic))
-                            .tr(),
-                      )
+                        child: Text(
+                          'directionssempty',
+                          style: TextStyle(
+                            color: Colors.grey[100],
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ).tr(),
+                      ),
                     );
                   }
                   return SizedBox(
                     height: tilesHeight,
                     child: ListTile(
-                      tileColor:
-                      WidgetStateColor.resolveWith((states) => appTheme.fillColor),
+                      tileColor: WidgetStateColor.resolveWith(
+                        (states) => appTheme.fillColor,
+                      ),
                       title: Text(
                         directions[index],
                         softWrap: true,
@@ -819,7 +899,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     ),
                   );
                 },
-              )
+              ),
             ],
           ),
         ),
@@ -829,7 +909,9 @@ class MyEntrepriseState extends State<MyEntreprise> {
 
   Widget departmentsWidget(AppTheme appTheme) {
     return SizedBox(
-      height: directions.isEmpty?100.px:directions.length * tilesHeight + 80.px,
+      height: directions.isEmpty
+          ? 100.px
+          : directions.length * tilesHeight + 80.px,
       child: ZoneBox(
         label: 'departements'.tr(),
         child: Padding(
@@ -849,7 +931,9 @@ class MyEntrepriseState extends State<MyEntreprise> {
                         style: appTheme.writingStyle,
                         placeholderStyle: placeStyle,
                         cursorColor: appTheme.color.darker,
-                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                        decoration: WidgetStatePropertyAll(
+                          BoxDecoration(color: appTheme.fillColor),
+                        ),
 
                         onChanged: (s) {
                           setState(() {});
@@ -867,46 +951,52 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     ),
                     smallSpace,
                     FilledButton(
-                        onPressed: departmentToAdd.text.trim().isEmpty
-                            ? null
-                            : () {
-                          if (departmentToAdd.text.trim().isNotEmpty) {
-                            departments.add(departmentToAdd.text.trim());
-                            setState(() {
-                              departmentToAdd.clear();
-                            });
-                          }
-                          checkChanges();
-                        },
-                        child: const Text('add').tr()),
+                      onPressed: departmentToAdd.text.trim().isEmpty
+                          ? null
+                          : () {
+                              if (departmentToAdd.text.trim().isNotEmpty) {
+                                departments.add(departmentToAdd.text.trim());
+                                setState(() {
+                                  departmentToAdd.clear();
+                                });
+                              }
+                              checkChanges();
+                            },
+                      child: const Text('add').tr(),
+                    ),
                     smallSpace,
                     FilledButton(
-                        onPressed: ()=>importDepartments(),
-                        child: const Text('importlist').tr()),
+                      onPressed: () => importDepartments(),
+                      child: const Text('importlist').tr(),
+                    ),
                   ],
                 ),
               ),
               smallSpace,
               ListView.builder(
-                itemCount: departments.isEmpty?1:departments.length,
+                itemCount: departments.isEmpty ? 1 : departments.length,
                 shrinkWrap: true,
                 itemBuilder: (BuildContext context, int index) {
-                  if(departments.isEmpty){
+                  if (departments.isEmpty) {
                     return Center(
-                        child: SizedBox(
-                          height: 20.px,
-                          child: Text('departmentsempty',
-                              style:TextStyle(color:Colors.grey[100],
-                                  fontStyle: FontStyle.italic))
-                              .tr(),
-                        )
+                      child: SizedBox(
+                        height: 20.px,
+                        child: Text(
+                          'departmentsempty',
+                          style: TextStyle(
+                            color: Colors.grey[100],
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ).tr(),
+                      ),
                     );
                   }
                   return SizedBox(
                     height: tilesHeight,
                     child: ListTile(
-                      tileColor:
-                      WidgetStateColor.resolveWith((states) => appTheme.fillColor),
+                      tileColor: WidgetStateColor.resolveWith(
+                        (states) => appTheme.fillColor,
+                      ),
                       title: Text(
                         departments[index],
                         softWrap: true,
@@ -923,7 +1013,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
                     ),
                   );
                 },
-              )
+              ),
             ],
           ),
         ),
@@ -931,43 +1021,45 @@ class MyEntrepriseState extends State<MyEntreprise> {
     );
   }
 
-  void importDepartments() async{
+  void importDepartments() async {
     PlatformFile? pickedFile = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
     );
     if (pickedFile != null) {
-      departments.addAll(await ImportAppartenance(file: pickedFile,type:2)
-          .loadFile());
-      setState(() {
-
-      });
-    }
-  }
-
-  void importDirections() async{
-    PlatformFile? pickedFile = await FilePicker.pickFile(
-      type: FileType.custom,
-      allowedExtensions: ['xlsx'],
-    );
-    if (pickedFile != null) {
-      directions.addAll(await ImportAppartenance(file: pickedFile,type:1)
-          .loadFile());
+      departments.addAll(
+        await ImportAppartenance(file: pickedFile, type: 2).loadFile(),
+      );
       setState(() {});
     }
   }
 
-  void importFiliales() async{
+  void importDirections() async {
     PlatformFile? pickedFile = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['xlsx'],
     );
     if (pickedFile != null) {
-      filliales.addAll(await ImportAppartenance(file: pickedFile,type:0)
-          .loadFile());
+      directions.addAll(
+        await ImportAppartenance(file: pickedFile, type: 1).loadFile(),
+      );
       setState(() {});
     }
   }
+
+  void importFiliales() async {
+    PlatformFile? pickedFile = await FilePicker.pickFile(
+      type: FileType.custom,
+      allowedExtensions: ['xlsx'],
+    );
+    if (pickedFile != null) {
+      filliales.addAll(
+        await ImportAppartenance(file: pickedFile, type: 0).loadFile(),
+      );
+      setState(() {});
+    }
+  }
+
   void upload() async {
     if (nom.value.text.isEmpty || adresse.text.isEmpty) {
       showMessage('nomadresreq', 'erreur');
@@ -1014,7 +1106,6 @@ class MyEntrepriseState extends State<MyEntreprise> {
     }
   }
 
-
   Future<void> uploadEntreprise() async {
     Entreprise prest = Entreprise(
       id: p?.id ?? '1',
@@ -1031,7 +1122,8 @@ class MyEntrepriseState extends State<MyEntreprise> {
       directions: directions,
       departments: departments,
       description: descr.text,
-      search: '${nom.text} ${nif.text} ${nis.text} ${rc.text} ${email.text} '
+      search:
+          '${nom.text} ${nif.text} ${nis.text} ${rc.text} ${email.text} '
           '${telephone.text} ${adresse.text} ${descr.text} 1 $logoid ${art.text}',
     );
     final updated = await companyService.update(
@@ -1075,8 +1167,10 @@ class MyEntrepriseState extends State<MyEntreprise> {
     if (imageFile != null) {
       var bytes = await imageFile!.readAsBytes();
       try {
-        await DatabaseGetter.storage!
-            .deleteFile(bucketId: buckedId, fileId: logoid);
+        await DatabaseGetter.storage!.deleteFile(
+          bucketId: buckedId,
+          fileId: logoid,
+        );
       } catch (e) {
         //
       }
@@ -1087,16 +1181,15 @@ class MyEntrepriseState extends State<MyEntreprise> {
       }
       await DatabaseGetter.storage!
           .createFile(
-              bucketId: buckedId,
-              fileId: logoid,
-              file: InputFile.fromBytes(
-                bytes: bytes,
-                filename: logoid,
-              ))
+            bucketId: buckedId,
+            fileId: logoid,
+            file: InputFile.fromBytes(bytes: bytes, filename: logoid),
+          )
           .then((value) async {
-        io.File file = io.File(logoid);
-        await file.writeAsBytes(bytes, mode: io.FileMode.write);
-      }).onError((AppwriteException error, stackTrace) {});
+            io.File file = io.File(logoid);
+            await file.writeAsBytes(bytes, mode: io.FileMode.write);
+          })
+          .onError((AppwriteException error, stackTrace) {});
     }
   }
 
@@ -1105,9 +1198,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
       context: context,
       builder: (context) => ContentDialog(
         title: Text(title).tr(),
-        content: Text(
-          message,
-        ).tr(),
+        content: Text(message).tr(),
         actions: [
           Button(
             child: const Text('OK').tr(),

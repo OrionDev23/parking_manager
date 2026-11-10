@@ -9,12 +9,10 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../../theme.dart';
 import '../../../data_table_parcoto.dart';
 
-
 class OptionTable extends StatefulWidget {
   final bool selectD;
 
-  const OptionTable(
-      {super.key, this.selectD = false,});
+  const OptionTable({super.key, this.selectD = false});
 
   @override
   State<OptionTable> createState() => OptionTableState();
@@ -55,18 +53,20 @@ class OptionTableState extends State<OptionTable> {
         startedWithFiltersOn = true;
         searchController.text = filterDocument.value!;
         optionDataSource = OptionDatasource(
-            current: context,
-            selectC: widget.selectD,
-            collectionID: getCollectionID(),
-            searchKey: filterDocument.value);
+          current: context,
+          selectC: widget.selectD,
+          collectionID: getCollectionID(),
+          searchKey: filterDocument.value,
+        );
         filterDocument.value = null;
       } else {
         startedWithFiltersOn = false;
 
         optionDataSource = OptionDatasource(
-            current: context,
-            collectionID: getCollectionID(),
-            selectC: widget.selectD,);
+          current: context,
+          collectionID: getCollectionID(),
+          selectC: widget.selectD,
+        );
       }
       initColumns();
     }
@@ -79,10 +79,7 @@ class OptionTableState extends State<OptionTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'code',
-            style: tstyle,
-          ).tr(),
+          child: Text('code', style: tstyle).tr(),
         ),
         size: ColumnSize.S,
         onSort: (s, c) {
@@ -96,10 +93,7 @@ class OptionTableState extends State<OptionTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'name',
-            style: tstyle,
-          ).tr(),
+          child: Text('name', style: tstyle).tr(),
         ),
         size: ColumnSize.S,
         onSort: (s, c) {
@@ -113,10 +107,7 @@ class OptionTableState extends State<OptionTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'values',
-            style: tstyle,
-          ).tr(),
+          child: Text('values', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -130,10 +121,7 @@ class OptionTableState extends State<OptionTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'dateModif',
-            style: tstyle,
-          ).tr(),
+          child: Text('dateModif', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
@@ -163,78 +151,81 @@ class OptionTableState extends State<OptionTable> {
     var appTheme = context.watch<AppTheme>();
     optionDataSource.appTheme = appTheme;
     return ValueListenableBuilder(
-        valueListenable: filterDocument,
-        builder: (context, v, _) {
-          if (!startedWithFiltersOn && v != null && filterNow) {
-            searchController.text = v;
-            optionDataSource.search(v);
-            notEmpty = true;
-            filtered = true;
-            filterNow = false;
-          }
-          return DataTableParc(
-            header: Padding(
-              padding:
-              const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    width: 350.px,
-                    height: 45.px,
-                    child: TextBox(
-                      onChanged: (s) {
-                        if (s.isEmpty) {
-                          notEmpty = false;
-                          optionDataSource.search('');
-                        } else {
-                          notEmpty = true;
-                        }
-                        setState(() {});
-                      },
-                      controller: searchController,
-                      placeholder: 'search'.tr(),
-                      style: appTheme.writingStyle,
-                      cursorColor: appTheme.color.darker,
-                      placeholderStyle: placeStyle,
-                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-                      onSubmitted: (s) {
-                        if (s.isNotEmpty) {
-                          optionDataSource.search(s);
-                          if (!notEmpty) {
-                            setState(() {
-                              notEmpty = true;
-                            });
-                          }
-                        } else {
-                          if (notEmpty) {
-                            setState(() {
-                              notEmpty = false;
-                            });
-                          }
-                        }
-                      },
-                      suffix: notEmpty
-                          ? IconButton(
-                          icon: const Icon(FluentIcons.cancel),
-                          onPressed: () {
-                            searchController.text = "";
-                            notEmpty = false;
-                            setState(() {});
-                            optionDataSource.search('');
-                          })
-                          : null,
+      valueListenable: filterDocument,
+      builder: (context, v, _) {
+        if (!startedWithFiltersOn && v != null && filterNow) {
+          searchController.text = v;
+          optionDataSource.search(v);
+          notEmpty = true;
+          filtered = true;
+          filterNow = false;
+        }
+        return DataTableParc(
+          header: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 350.px,
+                  height: 45.px,
+                  child: TextBox(
+                    onChanged: (s) {
+                      if (s.isEmpty) {
+                        notEmpty = false;
+                        optionDataSource.search('');
+                      } else {
+                        notEmpty = true;
+                      }
+                      setState(() {});
+                    },
+                    controller: searchController,
+                    placeholder: 'search'.tr(),
+                    style: appTheme.writingStyle,
+                    cursorColor: appTheme.color.darker,
+                    placeholderStyle: placeStyle,
+                    decoration: WidgetStatePropertyAll(
+                      BoxDecoration(color: appTheme.fillColor),
                     ),
+                    onSubmitted: (s) {
+                      if (s.isNotEmpty) {
+                        optionDataSource.search(s);
+                        if (!notEmpty) {
+                          setState(() {
+                            notEmpty = true;
+                          });
+                        }
+                      } else {
+                        if (notEmpty) {
+                          setState(() {
+                            notEmpty = false;
+                          });
+                        }
+                      }
+                    },
+                    suffix: notEmpty
+                        ? IconButton(
+                            icon: const Icon(FluentIcons.cancel),
+                            onPressed: () {
+                              searchController.text = "";
+                              notEmpty = false;
+                              setState(() {});
+                              optionDataSource.search('');
+                            },
+                          )
+                        : null,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            sortAscending: assending,
-            sortColumnIndex: sortColumn,
-            columns: columns,
-            source: optionDataSource,
-          );
-        });
+          ),
+          sortAscending: assending,
+          sortColumnIndex: sortColumn,
+          columns: columns,
+          source: optionDataSource,
+        );
+      },
+    );
   }
 
   @override

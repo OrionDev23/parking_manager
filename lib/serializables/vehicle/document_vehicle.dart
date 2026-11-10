@@ -6,7 +6,10 @@ part 'document_vehicle.g.dart';
 @JsonSerializable()
 class DocumentVehicle extends ParcOtoDefault {
   @JsonKey(
-      name: "date_expiration", fromJson: dateFromIntJson, toJson: dateToIntJson)
+    name: "date_expiration",
+    fromJson: dateFromIntJson,
+    toJson: dateToIntJson,
+  )
   DateTime? dateExpiration;
   String nom;
   String? vehicle;
@@ -14,20 +17,20 @@ class DocumentVehicle extends ParcOtoDefault {
   String? vehiclemat;
   String? createdBy;
 
-  DocumentVehicle(
-      {required super.id,
-      required this.nom,
-      this.vehiclemat,
-      this.vehicle,
-      this.dateExpiration,
-      this.createdBy,
-      super.createdAt,
-      super.updatedAt});
+  DocumentVehicle({
+    required super.id,
+    required this.nom,
+    this.vehiclemat,
+    this.vehicle,
+    this.dateExpiration,
+    this.createdBy,
+    super.createdAt,
+    super.updatedAt,
+  });
 
   factory DocumentVehicle.fromJson(Map<String, dynamic> json) =>
       _$DocumentVehicleFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$DocumentVehicleToJson(this);
-
 }

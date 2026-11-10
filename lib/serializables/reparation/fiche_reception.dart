@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+
 import '../parc_oto_serializable.dart';
 import '../../utilities/profil_beautifier.dart';
 
@@ -42,41 +43,43 @@ class FicheReception extends ParcOtoDefault {
   bool showImages;
   bool showEntretien;
   bool showEtat;
-  FicheReception(
-      {required super.id,
-        super.createdAt,
-        super.updatedAt,
-        this.mobile=false,
-        required this.numero,
-        this.anneeUtil,
-        this.couleur,
-        required this.dateEntre,
-        this.dateSortie,
-        this.etatActuel,
-        this.gaz,
-        this.images=const [null,null,null,null],
-        this.kilometrage,
-        this.modele,
-        this.nchassi,
-        this.nmoteur,
-        this.remarque,
-        this.type,
-        this.vehicule,
-        this.entretien,
-        this.vehiculemat,
-        this.marque,
-        this.matriculeConducteur,
-        this.prenomConducteur,
-        this.nomConducteur,
-        this.showImages=true,
-        this.showEntretien=true,
-        this.showEtat=true,
-        this.reparation,this.reparationCost
-      }){
-    search="$id $numero $nomConducteur "
+  FicheReception({
+    required super.id,
+    super.createdAt,
+    super.updatedAt,
+    this.mobile = false,
+    required this.numero,
+    this.anneeUtil,
+    this.couleur,
+    required this.dateEntre,
+    this.dateSortie,
+    this.etatActuel,
+    this.gaz,
+    this.images = const [null, null, null, null],
+    this.kilometrage,
+    this.modele,
+    this.nchassi,
+    this.nmoteur,
+    this.remarque,
+    this.type,
+    this.vehicule,
+    this.entretien,
+    this.vehiculemat,
+    this.marque,
+    this.matriculeConducteur,
+    this.prenomConducteur,
+    this.nomConducteur,
+    this.showImages = true,
+    this.showEntretien = true,
+    this.showEtat = true,
+    this.reparation,
+    this.reparationCost,
+  }) {
+    search =
+        "$id $numero $nomConducteur "
         "$prenomConducteur $reparationNumero $reparationCost"
         "$marque $vehiculemat $nchassi $nmoteur $remarque"
-        " $modele $couleur ${dateEntre.toIso8601String() }"
+        " $modele $couleur ${dateEntre.toIso8601String()}"
         " ${dateSortie?.toIso8601String()} ";
   }
 
@@ -85,6 +88,4 @@ class FicheReception extends ParcOtoDefault {
 
   @override
   Map<String, dynamic> toJson() => _$FicheReceptionToJson(this);
-
-
 }

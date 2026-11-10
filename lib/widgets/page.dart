@@ -6,27 +6,31 @@ import 'deffered_widget.dart';
 
 mixin PageMixin {
   Widget description({required Widget content}) {
-    return Builder(builder: (context) {
-      return Padding(
-        padding: const EdgeInsetsDirectional.only(bottom: 4.0),
-        child: DefaultTextStyle(
-          style: FluentTheme.of(context).typography.body!,
-          child: content,
-        ),
-      );
-    });
+    return Builder(
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsetsDirectional.only(bottom: 4.0),
+          child: DefaultTextStyle(
+            style: FluentTheme.of(context).typography.body!,
+            child: content,
+          ),
+        );
+      },
+    );
   }
 
   Widget subtitle({required Widget content}) {
-    return Builder(builder: (context) {
-      return Padding(
-        padding: const EdgeInsetsDirectional.only(top: 14.0, bottom: 2.0),
-        child: DefaultTextStyle(
-          style: FluentTheme.of(context).typography.subtitle!,
-          child: content,
-        ),
-      );
-    });
+    return Builder(
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsetsDirectional.only(top: 14.0, bottom: 2.0),
+          child: DefaultTextStyle(
+            style: FluentTheme.of(context).typography.subtitle!,
+            child: content,
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -48,27 +52,31 @@ abstract class Page extends StatelessWidget {
   }
 
   Widget description({required Widget content}) {
-    return Builder(builder: (context) {
-      return Padding(
-        padding: const EdgeInsetsDirectional.only(bottom: 4.0),
-        child: DefaultTextStyle(
-          style: FluentTheme.of(context).typography.body!,
-          child: content,
-        ),
-      );
-    });
+    return Builder(
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsetsDirectional.only(bottom: 4.0),
+          child: DefaultTextStyle(
+            style: FluentTheme.of(context).typography.body!,
+            child: content,
+          ),
+        );
+      },
+    );
   }
 
   Widget subtitle({required Widget content}) {
-    return Builder(builder: (context) {
-      return Padding(
-        padding: const EdgeInsetsDirectional.only(top: 14.0, bottom: 2.0),
-        child: DefaultTextStyle(
-          style: FluentTheme.of(context).typography.subtitle!,
-          child: content,
-        ),
-      );
-    });
+    return Builder(
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsetsDirectional.only(top: 14.0, bottom: 2.0),
+          child: DefaultTextStyle(
+            style: FluentTheme.of(context).typography.subtitle!,
+            child: content,
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -100,10 +108,7 @@ abstract class ScrollablePage extends Page {
 class EmptyPage extends Page {
   final Widget? child;
 
-  EmptyPage({
-    this.child,
-    super.key,
-  });
+  EmptyPage({this.child, super.key});
 
   @override
   Widget build(BuildContext context) {

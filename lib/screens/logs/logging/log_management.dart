@@ -13,17 +13,13 @@ class LogActivityManagement extends StatefulWidget {
 
 class _LogActivityManagementState extends State<LogActivityManagement>
     with AutomaticKeepAliveClientMixin<LogActivityManagement> {
-  final tstyle = TextStyle(
-    fontSize: 10.sp,
-  );
+  final tstyle = TextStyle(fontSize: 10.sp);
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
     return ScaffoldPage(
-      header: PageTitle(
-        text: 'journal'.tr(),
-      ),
+      header: PageTitle(text: 'journal'.tr()),
       content: const LogTable(),
     );
   }

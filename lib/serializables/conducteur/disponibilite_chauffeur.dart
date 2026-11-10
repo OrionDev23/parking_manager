@@ -13,20 +13,19 @@ class DisponibiliteChauffeur extends ParcOtoDefault {
   String chauffeurNom;
   String? createdBy;
 
-  DisponibiliteChauffeur(
-      {required super.id,
-      required this.chauffeurNom,
-      super.createdAt,
-      super.updatedAt,
-      required this.type,
-      this.createdBy,
-      required this.chauffeur});
+  DisponibiliteChauffeur({
+    required super.id,
+    required this.chauffeurNom,
+    super.createdAt,
+    super.updatedAt,
+    required this.type,
+    this.createdBy,
+    required this.chauffeur,
+  });
 
   factory DisponibiliteChauffeur.fromJson(Map<String, dynamic> json) =>
       _$DisponibiliteChauffeurFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$DisponibiliteChauffeurToJson(this);
-
-
 }

@@ -16,9 +16,7 @@ class VehiculeDocuments extends StatefulWidget {
 }
 
 class VehiculeDocumentsState extends State<VehiculeDocuments> {
-  final tstyle = TextStyle(
-    fontSize: 10.sp,
-  );
+  final tstyle = TextStyle(fontSize: 10.sp);
 
   @override
   Widget build(BuildContext context) {
@@ -49,9 +47,7 @@ class VehiculeDocumentsState extends State<VehiculeDocuments> {
       text: Text('nouvdocument'.tr()),
       semanticLabel: 'nouvdocument'.tr(),
       icon: const Icon(FluentIcons.document),
-      body:  const ScaffoldPage(
-        content: DocumentForm(),
-      ),
+      body: const ScaffoldPage(content: DocumentForm()),
       onClosed: () {
         DocumentTabsState.tabs.remove(tab);
 

@@ -81,8 +81,10 @@ class _ImportConducteursState extends State<ImportConducteurs> {
   }
 
   void addConducteur(List<Data?> data) {
-    String matricule =
-        data[columnToRead['mat']!]!.value.toString().replaceAll(' ', '').trim();
+    String matricule = data[columnToRead['mat']!]!.value
+        .toString()
+        .replaceAll(' ', '')
+        .trim();
     if (matricule.contains('matricul') ||
         (!matricule.contains('-') && int.tryParse(matricule) == null)) {
       return;
@@ -99,17 +101,13 @@ class _ImportConducteursState extends State<ImportConducteurs> {
         : "";
     String apartenance = columnToRead.containsKey('appartenance')
         ? VehiclesUtilities.getAppartenance(
-                data[columnToRead['appartenance']!]!.value.toString())
-            .replaceAll(' ', '')
-            .trim()
-            .toUpperCase()
+            data[columnToRead['appartenance']!]!.value.toString(),
+          ).replaceAll(' ', '').trim().toUpperCase()
         : "";
     String direction = columnToRead.containsKey('direction')
         ? VehiclesUtilities.getDirection(
-                data[columnToRead['direction']!]!.value.toString())
-            .replaceAll(' ', '')
-            .trim()
-            .toUpperCase()
+            data[columnToRead['direction']!]!.value.toString(),
+          ).replaceAll(' ', '').trim().toUpperCase()
         : "";
     Conducteur conducteur = Conducteur(
       id: id,
@@ -153,28 +151,35 @@ class _ImportConducteursState extends State<ImportConducteurs> {
 
             case TextCellValue():
               final value = cell!.value as TextCellValue;
-              if(value.value.text!=null){
-                if ((value.value.text!.toLowerCase()
-                    .contains
-                  ('matricule employe') ||
-                    value.value.text!.toLowerCase().contains('matricule '
-                        'employé') ||
-                    value.value
-                        .text!.toLowerCase()
-                        .contains('matricule conducteur')) &&
+              if (value.value.text != null) {
+                if ((value.value.text!.toLowerCase().contains(
+                          'matricule employe',
+                        ) ||
+                        value.value.text!.toLowerCase().contains(
+                          'matricule '
+                          'employé',
+                        ) ||
+                        value.value.text!.toLowerCase().contains(
+                          'matricule conducteur',
+                        )) &&
                     !foundMatric) {
                   columnToRead['mat'] = cell.columnIndex;
                   foundMatric = true;
                 }
-                if (value.value.text!.toLowerCase()
-                    .contains('immatriculation')||
-                    value.value.text!.toLowerCase().contains('matricule '
-                        'vehicule'))
-                {
-                  columnToRead['vehicule']=cell.columnIndex;
+                if (value.value.text!.toLowerCase().contains(
+                      'immatriculation',
+                    ) ||
+                    value.value.text!.toLowerCase().contains(
+                      'matricule '
+                      'vehicule',
+                    )) {
+                  columnToRead['vehicule'] = cell.columnIndex;
                 }
-                if (value.value.text!.toLowerCase().replaceAll(' ','').trim()
-                    =='nom' ||
+                if (value.value.text!
+                            .toLowerCase()
+                            .replaceAll(' ', '')
+                            .trim() ==
+                        'nom' ||
                     value.value.text!.toLowerCase().contains('familyname') ||
                     value.value.text!
                         .toLowerCase()
@@ -232,29 +237,28 @@ class _ImportConducteursState extends State<ImportConducteurs> {
       title: const Text("importlist").tr(),
       constraints: BoxConstraints.loose(Size(600.px, 500.px)),
       content: loading
-          ? Center(
-              child: ProgressBar(
-                value: progressLoadingFile,
-              ),
-            )
+          ? Center(child: ProgressBar(value: progressLoadingFile))
           : invalidFile
-              ? invalidFileWidget()
-              : uploading
-                  ? uploadWidget(appTheme)
-                  : getList(),
+          ? invalidFileWidget()
+          : uploading
+          ? uploadWidget(appTheme)
+          : getList(),
       actions: [
         Button(
-            child: doneUploading
-                ? const Text('fermer').tr()
-                : const Text('annuler').tr(),
-            onPressed: () {
-              Navigator.of(context).pop();
-            }),
+          child: doneUploading
+              ? const Text('fermer').tr()
+              : const Text('annuler').tr(),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
         if (!doneUploading)
           FilledButton(
-              onPressed:
-                  loading || invalidFile || uploading ? null : uploadVehicles,
-              child: const Text('confirmer').tr())
+            onPressed: loading || invalidFile || uploading
+                ? null
+                : uploadVehicles,
+            child: const Text('confirmer').tr(),
+          ),
       ],
     );
   }
@@ -287,31 +291,33 @@ class _ImportConducteursState extends State<ImportConducteurs> {
                 content: const Text('selectall').tr(),
               ),
               const Text('lselection')
-                  .tr(namedArgs: {'select': getNumberOfSelected().toString()})
+                  .tr(namedArgs: {'select': getNumberOfSelected().toString()}),
             ],
           ),
         ),
         Flexible(
           child: ListView(
             children: importedConducteurs.entries
-                .map((e) => ListTile.selectable(
-                      selected: e.value.selected,
-                      onSelectionChange: (s) {
+                .map(
+                  (e) => ListTile.selectable(
+                    selected: e.value.selected,
+                    onSelectionChange: (s) {
+                      setState(() {
+                        e.value.selected = s;
+                      });
+                    },
+                    trailing: Checkbox(
+                      checked: e.value.selected,
+                      onChanged: (bool? value) {
                         setState(() {
-                          e.value.selected = s;
+                          e.value.selected = value ?? false;
                         });
                       },
-                      trailing: Checkbox(
-                        checked: e.value.selected,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            e.value.selected = value ?? false;
-                          });
-                        },
-                      ),
-                      title: Text('${e.value.name} ${e.value.prenom}'),
-                      leading: Text(e.value.matricule),
-                    ))
+                    ),
+                    title: Text('${e.value.name} ${e.value.prenom}'),
+                    leading: Text(e.value.matricule),
+                  ),
+                )
                 .toList(),
           ),
         ),
@@ -325,17 +331,12 @@ class _ImportConducteursState extends State<ImportConducteurs> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(
-            FluentIcons.error,
-            color: Colors.grey[100],
-          ),
+          Icon(FluentIcons.error, color: Colors.grey[100]),
           smallSpace,
           const Text(
             'invalidvehiclefile',
             textAlign: TextAlign.justify,
-            style: TextStyle(
-              wordSpacing: 2,
-            ),
+            style: TextStyle(wordSpacing: 2),
           ).tr(),
         ],
       ),
@@ -369,32 +370,34 @@ class _ImportConducteursState extends State<ImportConducteurs> {
   Future<void> uploadConducteur(Conducteur c, TablesDB db) async {
     await db
         .createRow(
-            databaseId: databaseId,
-            tableId: chauffeurid,
-            rowId: c.id,
-            data: c.toJson())
+          databaseId: databaseId,
+          tableId: chauffeurid,
+          rowId: c.id,
+          data: c.toJson(),
+        )
         .then((value) {
-      setState(() {
-        uploaded++;
-      });
-    }).onError((AppwriteException error, stackTrace) {
-      if (kDebugMode) {
-        print('erreur conducteur ${c.matricule} : ${error.message}');
-      }
-      setState(() {
-        notUploaded++;
-      });
-    });
+          setState(() {
+            uploaded++;
+          });
+        })
+        .onError((AppwriteException error, stackTrace) {
+          if (kDebugMode) {
+            print('erreur conducteur ${c.matricule} : ${error.message}');
+          }
+          setState(() {
+            notUploaded++;
+          });
+        });
   }
 
   Widget uploadWidget(AppTheme appTheme) {
     int nSelected = getNumberOfSelected();
     const double fSize = 18;
     return Center(
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -411,41 +414,57 @@ class _ImportConducteursState extends State<ImportConducteurs> {
               Text(
                 '${((uploaded + notUploaded) * 100 / nSelected).toStringAsFixed(2)} %',
                 style: const TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: fSize),
-              )
+                  fontWeight: FontWeight.bold,
+                  fontSize: fSize,
+                ),
+              ),
             ],
           ),
           bigSpace,
           Row(
             children: [
-              Text('uploaded'.tr(),
-                  style: TextStyle(
-                    fontSize: fSize,
-                    fontWeight: FontWeight.bold,
-                    color: appTheme.color.darkest,
-                  )),
+              Text(
+                'uploaded'.tr(),
+                style: TextStyle(
+                  fontSize: fSize,
+                  fontWeight: FontWeight.bold,
+                  color: appTheme.color.darkest,
+                ),
+              ),
               const Spacer(),
-              Text('\t\t\t\t${uploaded.toInt()} / $nSelected',
-                  style: TextStyle(
-                      fontSize: fSize, color: appTheme.color.darkest)),
+              Text(
+                '\t\t\t\t${uploaded.toInt()} / $nSelected',
+                style: TextStyle(
+                  fontSize: fSize,
+                  color: appTheme.color.darkest,
+                ),
+              ),
             ],
           ),
           smallSpace,
           Row(
             children: [
-              Text('skipped'.tr(),
-                  style: TextStyle(
-                    fontSize: fSize,
-                    fontWeight: FontWeight.bold,
-                    color: appTheme.color.lightest,
-                  )),
+              Text(
+                'skipped'.tr(),
+                style: TextStyle(
+                  fontSize: fSize,
+                  fontWeight: FontWeight.bold,
+                  color: appTheme.color.lightest,
+                ),
+              ),
               const Spacer(),
-              Text('\t\t\t\t${notUploaded.toInt()} / $nSelected',
-                  style: TextStyle(
-                      fontSize: fSize, color: appTheme.color.lightest)),
+              Text(
+                '\t\t\t\t${notUploaded.toInt()} / $nSelected',
+                style: TextStyle(
+                  fontSize: fSize,
+                  color: appTheme.color.lightest,
+                ),
+              ),
             ],
           ),
-        ]));
+        ],
+      ),
+    );
   }
 
   bool uploading = false;

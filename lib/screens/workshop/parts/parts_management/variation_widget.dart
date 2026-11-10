@@ -16,13 +16,14 @@ class VariationWidget extends StatefulWidget {
 
   final Function(Map<String, dynamic>? selectedOptions)? onOptionsChanged;
 
-  const VariationWidget(
-      {super.key,
-      this.mod = true,
-      required this.variation,
-      this.sku = "XXXX-XXXX",
-      this.onOptionsChanged,
-      this.options});
+  const VariationWidget({
+    super.key,
+    this.mod = true,
+    required this.variation,
+    this.sku = "XXXX-XXXX",
+    this.onOptionsChanged,
+    this.options,
+  });
 
   @override
   VariationWidgetState createState() => VariationWidgetState();
@@ -49,7 +50,8 @@ class VariationWidgetState extends State<VariationWidget> {
         if (values.containsKey(widget.options![i].id)) {
           if (widget.options![i].values != null) {
             for (int j = 0; j < widget.options![i].values!.length; j++) {
-              if (widget.options![i].values![j] == values[widget.options![i].id]) {
+              if (widget.options![i].values![j] ==
+                  values[widget.options![i].id]) {
                 selectedItems[i] = j;
               }
             }
@@ -73,19 +75,23 @@ class VariationWidgetState extends State<VariationWidget> {
           switch (i) {
             case 0:
               o1 = getFirstTwoLetters(
-                  widget.options![i].values![selectedItems[i]!]);
+                widget.options![i].values![selectedItems[i]!],
+              );
               break;
             case 1:
               o2 = getFirstTwoLetters(
-                  widget.options![i].values![selectedItems[i]!]);
+                widget.options![i].values![selectedItems[i]!],
+              );
               break;
             case 2:
               o3 = getFirstTwoLetters(
-                  widget.options![i].values![selectedItems[i]!]);
+                widget.options![i].values![selectedItems[i]!],
+              );
               break;
             case 3:
               o4 = getFirstTwoLetters(
-                  widget.options![i].values![selectedItems[i]!]);
+                widget.options![i].values![selectedItems[i]!],
+              );
               break;
           }
         }
@@ -102,14 +108,12 @@ class VariationWidgetState extends State<VariationWidget> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Flexible(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: Text(
-                widget.variation.id,
-                style: placeStyle,
-              ),
-            )),
+          flex: 1,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: Text(widget.variation.id, style: placeStyle),
+          ),
+        ),
         bigSpace,
         ...designationsDefault(appTheme),
       ],
@@ -118,9 +122,7 @@ class VariationWidgetState extends State<VariationWidget> {
 
   List<Widget> designationsDefault(AppTheme appTheme) {
     return [
-      VerticalDivider(
-        color: placeStyle.color,
-      ),
+      VerticalDivider(color: placeStyle.color),
       Flexible(
         flex: 3,
         child: TextBox(
@@ -131,8 +133,9 @@ class VariationWidgetState extends State<VariationWidget> {
           style: appTheme.writingStyle,
           cursorColor: appTheme.color.darker,
           maxLength: 60,
-          decoration:
-              WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+          decoration: WidgetStatePropertyAll(
+            BoxDecoration(color: appTheme.fillColor),
+          ),
           onChanged: (s) {
             widget.variation.name = s;
 
@@ -142,17 +145,13 @@ class VariationWidgetState extends State<VariationWidget> {
         ),
       ),
       smallSpace,
-      VerticalDivider(
-        color: placeStyle.color,
-      ),
+      VerticalDivider(color: placeStyle.color),
       smallSpace,
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: getOptions(appTheme),
       ),
-      VerticalDivider(
-        color: placeStyle.color,
-      ),
+      VerticalDivider(color: placeStyle.color),
       smallSpace,
       Flexible(
         flex: 3,
@@ -171,7 +170,8 @@ class VariationWidgetState extends State<VariationWidget> {
                 cursorColor: appTheme.color.darker,
                 maxLength: 6,
                 decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor)),
+                  BoxDecoration(color: appTheme.fillColor),
+                ),
                 onChanged: (s) {
                   setState(() {
                     widget.variation.sku = sku.text;
@@ -194,32 +194,29 @@ class VariationWidgetState extends State<VariationWidget> {
           padding: const EdgeInsets.symmetric(horizontal: 5),
           child: DropDownButton(
             title: Text(
-                selectedItems[index] == null
-                ? widget.options![index].name
-                : widget.options![index].values![selectedItems[index]!]),
-            items: List.generate(widget.options![index].values?.length ?? 0,
-                (ind) {
+              selectedItems[index] == null
+                  ? widget.options![index].name
+                  : widget.options![index].values![selectedItems[index]!],
+            ),
+            items: List.generate(widget.options![index].values?.length ?? 0, (
+              ind,
+            ) {
               return MenuFlyoutItem(
-                  text: Text(widget.options![index].values![ind]),
-                  onPressed: () {
-                    selectedItems[index] = ind;
-                    setSku();
-                    setOptions();
-                    setState(() {});
-                  },
-                  selected: selectedItems[index] == ind);
+                text: Text(widget.options![index].values![ind]),
+                onPressed: () {
+                  selectedItems[index] = ind;
+                  setSku();
+                  setOptions();
+                  setState(() {});
+                },
+                selected: selectedItems[index] == ind,
+              );
             }),
-
           ),
         );
       });
     } else {
-      return [
-        Text(
-          'nooptonadded',
-          style: placeStyle,
-        ).tr()
-      ];
+      return [Text('nooptonadded', style: placeStyle).tr()];
     }
   }
 

@@ -13,8 +13,11 @@ class PrestataireTable extends StatefulWidget {
   final bool selectD;
   final bool archive;
 
-  const PrestataireTable(
-      {super.key, this.selectD = false, this.archive = false});
+  const PrestataireTable({
+    super.key,
+    this.selectD = false,
+    this.archive = false,
+  });
 
   @override
   State<PrestataireTable> createState() => PrestataireTableState();
@@ -55,19 +58,21 @@ class PrestataireTableState extends State<PrestataireTable> {
         startedWithFiltersOn = true;
         searchController.text = filterDocument.value!;
         prestataireDataSource = PrestataireDataSource(
-            current: context,
-            selectC: widget.selectD,
-            collectionID: getCollectionID(),
-            searchKey: filterDocument.value);
+          current: context,
+          selectC: widget.selectD,
+          collectionID: getCollectionID(),
+          searchKey: filterDocument.value,
+        );
         filterDocument.value = null;
       } else {
         startedWithFiltersOn = false;
 
         prestataireDataSource = PrestataireDataSource(
-            current: context,
-            collectionID: getCollectionID(),
-            selectC: widget.selectD,
-            archive: widget.archive);
+          current: context,
+          collectionID: getCollectionID(),
+          selectC: widget.selectD,
+          archive: widget.archive,
+        );
       }
       initColumns();
     }
@@ -80,10 +85,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'nom',
-            style: tstyle,
-          ).tr(),
+          child: Text('nom', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -97,10 +99,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'telephone',
-            style: tstyle,
-          ).tr(),
+          child: Text('telephone', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -114,10 +113,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'email',
-            style: tstyle,
-          ).tr(),
+          child: Text('email', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
@@ -131,10 +127,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'NIF',
-            style: tstyle,
-          ).tr(),
+          child: Text('NIF', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
@@ -148,10 +141,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'RC',
-            style: tstyle,
-          ).tr(),
+          child: Text('RC', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -164,10 +154,7 @@ class PrestataireTableState extends State<PrestataireTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'dateModif',
-            style: tstyle,
-          ).tr(),
+          child: Text('dateModif', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -197,78 +184,81 @@ class PrestataireTableState extends State<PrestataireTable> {
     var appTheme = context.watch<AppTheme>();
     prestataireDataSource.appTheme = appTheme;
     return ValueListenableBuilder(
-        valueListenable: filterDocument,
-        builder: (context, v, _) {
-          if (!startedWithFiltersOn && v != null && filterNow) {
-            searchController.text = v;
-            prestataireDataSource.search(v);
-            notEmpty = true;
-            filtered = true;
-            filterNow = false;
-          }
-          return DataTableParc(
-            header: Padding(
-              padding:
-              const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    width: 350.px,
-                    height: 45.px,
-                    child: TextBox(
-                      onChanged: (s) {
-                        if (s.isEmpty) {
-                          notEmpty = false;
-                          prestataireDataSource.search('');
-                        } else {
-                          notEmpty = true;
-                        }
-                        setState(() {});
-                      },
-                      controller: searchController,
-                      placeholder: 'search'.tr(),
-                      style: appTheme.writingStyle,
-                      cursorColor: appTheme.color.darker,
-                      placeholderStyle: placeStyle,
-                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-                      onSubmitted: (s) {
-                        if (s.isNotEmpty) {
-                          prestataireDataSource.search(s);
-                          if (!notEmpty) {
-                            setState(() {
-                              notEmpty = true;
-                            });
-                          }
-                        } else {
-                          if (notEmpty) {
-                            setState(() {
-                              notEmpty = false;
-                            });
-                          }
-                        }
-                      },
-                      suffix: notEmpty
-                          ? IconButton(
-                          icon: const Icon(FluentIcons.cancel),
-                          onPressed: () {
-                            searchController.text = "";
-                            notEmpty = false;
-                            setState(() {});
-                            prestataireDataSource.search('');
-                          })
-                          : null,
+      valueListenable: filterDocument,
+      builder: (context, v, _) {
+        if (!startedWithFiltersOn && v != null && filterNow) {
+          searchController.text = v;
+          prestataireDataSource.search(v);
+          notEmpty = true;
+          filtered = true;
+          filterNow = false;
+        }
+        return DataTableParc(
+          header: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 350.px,
+                  height: 45.px,
+                  child: TextBox(
+                    onChanged: (s) {
+                      if (s.isEmpty) {
+                        notEmpty = false;
+                        prestataireDataSource.search('');
+                      } else {
+                        notEmpty = true;
+                      }
+                      setState(() {});
+                    },
+                    controller: searchController,
+                    placeholder: 'search'.tr(),
+                    style: appTheme.writingStyle,
+                    cursorColor: appTheme.color.darker,
+                    placeholderStyle: placeStyle,
+                    decoration: WidgetStatePropertyAll(
+                      BoxDecoration(color: appTheme.fillColor),
                     ),
+                    onSubmitted: (s) {
+                      if (s.isNotEmpty) {
+                        prestataireDataSource.search(s);
+                        if (!notEmpty) {
+                          setState(() {
+                            notEmpty = true;
+                          });
+                        }
+                      } else {
+                        if (notEmpty) {
+                          setState(() {
+                            notEmpty = false;
+                          });
+                        }
+                      }
+                    },
+                    suffix: notEmpty
+                        ? IconButton(
+                            icon: const Icon(FluentIcons.cancel),
+                            onPressed: () {
+                              searchController.text = "";
+                              notEmpty = false;
+                              setState(() {});
+                              prestataireDataSource.search('');
+                            },
+                          )
+                        : null,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            sortAscending: assending,
-            sortColumnIndex: sortColumn,
-            columns: columns,
-            source: prestataireDataSource,
-          );
-        });
+          ),
+          sortAscending: assending,
+          sortColumnIndex: sortColumn,
+          columns: columns,
+          source: prestataireDataSource,
+        );
+      },
+    );
   }
 
   @override

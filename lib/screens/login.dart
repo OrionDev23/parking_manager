@@ -15,13 +15,14 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../main.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key,});
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClientMixin{
+class _LoginScreenState extends State<LoginScreen>
+    with AutomaticKeepAliveClientMixin {
   TextEditingController projectName = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
@@ -37,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
 
   @override
   void initState() {
-    projectName.text=prefs.getString('project')??'';
+    projectName.text = prefs.getString('project') ?? '';
     waitForFirstLoading();
     super.initState();
   }
@@ -46,10 +47,9 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
     while (PanesListState.firstLoading) {
       await Future.delayed(const Duration(milliseconds: 100));
     }
-    if(DatabaseGetter.user == null){
+    if (DatabaseGetter.user == null) {
       checkUser();
     }
-
   }
 
   Future<void> checkUser() async {
@@ -80,11 +80,10 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
     super.build(context);
     if (PanesListState.firstLoading) {
       return const Center(child: ProgressRing());
-    }    var appTheme = context.watch<AppTheme>();
+    }
+    var appTheme = context.watch<AppTheme>();
     return ScaffoldPage(
-      header: PageTitle(
-        text: 'connexion'.tr(),
-      ),
+      header: PageTitle(text: 'connexion'.tr()),
       content: Center(
         child: PanesListState.firstLoading
             ? const ProgressRing()
@@ -92,10 +91,7 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
                 children: [
                   bigSpace,
                   bigSpace,
-                  Image.asset(
-                    'assets/images/logo.webp',
-                    width: 300.px,
-                  ),
+                  Image.asset('assets/images/logo.webp', width: 300.px),
                   bigSpace,
                   bigSpace,
                   Flexible(
@@ -120,11 +116,17 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
                                 width: pwidth,
                                 child: TextBox(
                                   prefix: Padding(
-                                    padding: const EdgeInsets.fromLTRB(8,5,
-                                        5,5),
-                                    child: Icon(FluentIcons.external_build,size:14.px,
-                                      color:
-                                      Colors.grey[100],),
+                                    padding: const EdgeInsets.fromLTRB(
+                                      8,
+                                      5,
+                                      5,
+                                      5,
+                                    ),
+                                    child: Icon(
+                                      FluentIcons.external_build,
+                                      size: 14.px,
+                                      color: Colors.grey[100],
+                                    ),
                                   ),
                                   controller: projectName,
                                   placeholder: 'entreprise'.tr(),
@@ -141,11 +143,17 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
                                   labelStyle: TextStyle(color: Colors.red),
                                   child: TextBox(
                                     prefix: Padding(
-                                      padding: const EdgeInsets.fromLTRB(8,5,
-                                        5,5),
-                                      child: Icon(FluentIcons.mail,size:14.px,
-                                        color:
-                                      Colors.grey[100],),
+                                      padding: const EdgeInsets.fromLTRB(
+                                        8,
+                                        5,
+                                        5,
+                                        5,
+                                      ),
+                                      child: Icon(
+                                        FluentIcons.mail,
+                                        size: 14.px,
+                                        color: Colors.grey[100],
+                                      ),
                                     ),
                                     controller: email,
                                     placeholder: 'email'.tr(),
@@ -169,11 +177,17 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
                                 width: pwidth,
                                 child: TextBox(
                                   prefix: Padding(
-                                    padding: const EdgeInsets.fromLTRB(8,5,
-                                        5,5),
-                                    child: Icon(FluentIcons.lock,size:14.px,
-                                      color:
-                                    Colors.grey[100],),
+                                    padding: const EdgeInsets.fromLTRB(
+                                      8,
+                                      5,
+                                      5,
+                                      5,
+                                    ),
+                                    child: Icon(
+                                      FluentIcons.lock,
+                                      size: 14.px,
+                                      color: Colors.grey[100],
+                                    ),
                                   ),
                                   controller: password,
                                   placeholder: 'motdepasse'.tr(),
@@ -205,35 +219,32 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   OnTapScaleAndFade(
-                                      onTap: forgotPassword,
-                                      child: Text(
-                                        'forgot',
-                                        style: TextStyle(color: appTheme.color),
-                                      ).tr()),
+                                    onTap: forgotPassword,
+                                    child: Text(
+                                      'forgot',
+                                      style: TextStyle(color: appTheme.color),
+                                    ).tr(),
+                                  ),
                                 ],
                               ),
                               bigSpace,
                               smallSpace,
 
                               FilledButton(
-                                  onPressed: checking ? null : signIn,
-                                  child: checking
-                                      ? const ProgressRing(strokeWidth: 2.0)
-                                      : const Text('seconnecter').tr()),
+                                onPressed: checking ? null : signIn,
+                                child: checking
+                                    ? const ProgressRing(strokeWidth: 2.0)
+                                    : const Text('seconnecter').tr(),
+                              ),
                             ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(
-                    height: 2.h,
-                  ),
+                  SizedBox(height: 2.h),
                   if (!signedIn && error.isNotEmpty)
-                    Text(
-                      error,
-                      style: TextStyle(color: Colors.red),
-                    )
+                    Text(error, style: TextStyle(color: Colors.red)),
                 ],
               ),
       ),
@@ -292,23 +303,31 @@ class _LoginScreenState extends State<LoginScreen> with AutomaticKeepAliveClient
       ..setProject(project);*/
       await DatabaseGetter.account!
           .createRecovery(
-              email: email.text,
-              url:
-                  'https://app.parcoto.com/recoverpassword?projectid=$project&endpoint=$endpoint')
+            email: email.text,
+            url:
+                'https://app.parcoto.com/recoverpassword?projectid=$project&endpoint=$endpoint',
+          )
           .then((e) {
-        return e;
-      }).onError((AppwriteException error, stackTrace) {
-        if (kDebugMode) {
-          print('message: ${error.message}');
-          print('code: ${error.code}');
-          print('response: ${error.response}');
-          print('type: ${error.type}');
-          print('stacktrace: $stackTrace');
-        }
+            return e;
+          })
+          .onError((AppwriteException error, stackTrace) {
+            if (kDebugMode) {
+              print('message: ${error.message}');
+              print('code: ${error.code}');
+              print('response: ${error.response}');
+              print('type: ${error.type}');
+              print('stacktrace: $stackTrace');
+            }
 
-        return Token(
-            $id: '', $createdAt: '', userId: '', secret: '', expire: '', phrase: '', );
-      });
+            return Token(
+              $id: '',
+              $createdAt: '',
+              userId: '',
+              secret: '',
+              expire: '',
+              phrase: '',
+            );
+          });
       setState(() {
         error = "";
       });

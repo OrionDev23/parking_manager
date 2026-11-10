@@ -1,10 +1,7 @@
 class MultipleItemsBloc<T> {
   final void Function(List<T>)? onMultipleItemsChange;
 
-  MultipleItemsBloc(
-    List<T>? initialSelectedItems,
-    this.onMultipleItemsChange,
-  ) {
+  MultipleItemsBloc(List<T>? initialSelectedItems, this.onMultipleItemsChange) {
     selectedItems = initialSelectedItems ?? <T>[];
   }
 

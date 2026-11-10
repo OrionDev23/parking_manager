@@ -4,7 +4,7 @@ import 'package:parc_oto/utilities/profil_beautifier.dart';
 import '../../../serializables/pieces/option.dart';
 import '../../parcoto_webservice.dart';
 
-class OptionWebservice extends ParcOtoWebService<Option>{
+class OptionWebservice extends ParcOtoWebService<Option> {
   OptionWebservice(super.data, super.collectionID, super.columnForSearch);
 
   @override
@@ -18,7 +18,8 @@ class OptionWebservice extends ParcOtoWebService<Option>{
   }
 
   @override
-  int Function(MapEntry<String, Option> p1, MapEntry<String, Option> p2)? getComparisonFunction(int column, bool ascending){
+  int Function(MapEntry<String, Option> p1, MapEntry<String, Option> p2)?
+  getComparisonFunction(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
       case 0:
@@ -30,20 +31,27 @@ class OptionWebservice extends ParcOtoWebService<Option>{
 
       case 2:
         return (d1, d2) {
-            return coef * listToString(d1.value.values).compareTo(listToString(d2.value.values));
+          return coef *
+              listToString(d1.value.values)
+                  .compareTo(listToString(d2.value.values));
         };
       case 3:
         return (d1, d2) =>
-        coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
+            coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
     }
 
-    return  (d1, d2) =>
-    coef * d1.value.id.compareTo(d2.value.id);
+    return (d1, d2) => coef * d1.value.id.compareTo(d2.value.id);
   }
+
   @override
-  List<String> getFilterQueries(Map<String, String> filters, int count,
-      int startingAt, int sortedBy, bool sortedAsc,
-      {int? index}) {
+  List<String> getFilterQueries(
+    Map<String, String> filters,
+    int count,
+    int startingAt,
+    int sortedBy,
+    bool sortedAsc, {
+    int? index,
+  }) {
     return [];
   }
 
@@ -82,6 +90,4 @@ class OptionWebservice extends ParcOtoWebService<Option>{
         }
     }
   }
-
-
 }

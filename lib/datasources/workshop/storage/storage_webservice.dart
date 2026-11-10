@@ -1,15 +1,16 @@
 import 'package:appwrite/appwrite.dart' hide Storage;
+
 import '../../parcoto_webservice.dart';
 import '../../../utilities/profil_beautifier.dart';
 
 import '../../../serializables/pieces/storage.dart';
 
-class StorageWebservice extends ParcOtoWebService<Storage>{
+class StorageWebservice extends ParcOtoWebService<Storage> {
   StorageWebservice(super.data, super.collectionID, super.columnForSearch);
 
   @override
   Storage fromJsonFunction(Map<String, dynamic> json) {
-   return Storage.fromJson(json);
+    return Storage.fromJson(json);
   }
 
   @override
@@ -18,7 +19,8 @@ class StorageWebservice extends ParcOtoWebService<Storage>{
   }
 
   @override
-  int Function(MapEntry<String, Storage> p1, MapEntry<String, Storage> p2)? getComparisonFunction(int column, bool ascending) {
+  int Function(MapEntry<String, Storage> p1, MapEntry<String, Storage> p2)?
+  getComparisonFunction(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
       case 0:
@@ -30,29 +32,38 @@ class StorageWebservice extends ParcOtoWebService<Storage>{
       case 2:
         return (d1, d2) {
           return coef *
-              (d1.value.fournisseurName ?? '').compareTo(d2.value.fournisseurName ?? '');
+              (d1.value.fournisseurName ?? '').compareTo(
+                d2.value.fournisseurName ?? '',
+              );
         };
       case 3:
         return (d1, d2) {
-          return coef * (dlistToString(d1.value.variations)).compareTo(dlistToString(d2.value.variations));
+          return coef *
+              (dlistToString(d1.value.variations))
+                  .compareTo(dlistToString(d2.value.variations));
         };
 
       case 4:
         return (d1, d2) {
-          return coef *
-              d1.value.qte
-                  .compareTo(d2.value.qte);
+          return coef * d1.value.qte.compareTo(d2.value.qte);
         };
       case 5:
         return (d1, d2) =>
-        coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
+            coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
     }
 
     return (d1, d2) => coef * d1.value.id.compareTo(d2.value.id);
   }
 
   @override
-  List<String> getFilterQueries(Map<String, String> filters, int count, int startingAt, int sortedBy, bool sortedAsc, {int? index}) {
+  List<String> getFilterQueries(
+    Map<String, String> filters,
+    int count,
+    int startingAt,
+    int sortedBy,
+    bool sortedAsc, {
+    int? index,
+  }) {
     return [];
   }
 
@@ -104,5 +115,4 @@ class StorageWebservice extends ParcOtoWebService<Storage>{
         }
     }
   }
-
 }

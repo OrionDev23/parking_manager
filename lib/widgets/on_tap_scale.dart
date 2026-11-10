@@ -65,10 +65,7 @@ class OnTapScaleAndFadeState extends State<OnTapScaleAndFade>
           _controllerA.fling();
         }
       },
-      child: Transform.scale(
-        scale: squareScaleA,
-        child: widget.child,
-      ),
+      child: Transform.scale(scale: squareScaleA, child: widget.child),
     );
   }
 

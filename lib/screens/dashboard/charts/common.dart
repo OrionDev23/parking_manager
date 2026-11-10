@@ -6,15 +6,14 @@ class ChartData {
 }
 
 class ChartDataCategory {
-  ChartDataCategory(this.category,this.values);
+  ChartDataCategory(this.category, this.values);
 
   final String category;
   final List<ChartData> values;
 }
 
-
-class ChartDataTimeSpan{
+class ChartDataTimeSpan {
   final DateTime x;
   final double y;
-  ChartDataTimeSpan(this.x,this.y);
+  ChartDataTimeSpan(this.x, this.y);
 }

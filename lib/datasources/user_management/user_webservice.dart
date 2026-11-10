@@ -52,21 +52,20 @@ class UsersWebservice
     Map<String, String> teamNames,
     Map<String, List<String>> accessByUser,
   ) async {
-    final teamNamesForUser = accessByUser[user.$id]
+    final teamNamesForUser =
+        accessByUser[user.$id]
             ?.map((id) => teamNames[id])
             .whereType<String>()
             .toList() ??
         <String>[];
 
-    users[user.$id] = MapEntry(
-      user,
-      teamNamesForUser,
-    );
+    users[user.$id] = MapEntry(user, teamNamesForUser);
   }
 
   @override
   Future<Map<String, MapEntry<User, List<String>?>>> getSearchResult(
-      String? searchKey) async {
+    String? searchKey,
+  ) async {
     await _ready;
 
     // Never keep users from a previous search/refresh. The old implementation
@@ -110,9 +109,7 @@ class UsersWebservice
     }
 
     await Future.wait(
-      result.users.map(
-        (user) => loadTeams(user, teamNames, accessByUser),
-      ),
+      result.users.map((user) => loadTeams(user, teamNames, accessByUser)),
     );
 
     return users;
@@ -120,9 +117,10 @@ class UsersWebservice
 
   @override
   int Function(
-      MapEntry<String, MapEntry<User, List<String>?>> p1,
-      MapEntry<String, MapEntry<User, List<String>?>> p2)? getComparisonFunction(
-      int column, bool ascending) {
+    MapEntry<String, MapEntry<User, List<String>?>> p1,
+    MapEntry<String, MapEntry<User, List<String>?>> p2,
+  )?
+  getComparisonFunction(int column, bool ascending) {
     final coef = ascending ? 1 : -1;
     switch (column) {
       case 0:
@@ -136,14 +134,12 @@ class UsersWebservice
       case 3:
         return (d1, d2) =>
             coef *
-            (d1.value.value?.isNotEmpty == true
-                    ? d1.value.value!.first
-                    : '')
+            (d1.value.value?.isNotEmpty == true ? d1.value.value!.first : '')
                 .compareTo(
-              d2.value.value?.isNotEmpty == true
-                  ? d2.value.value!.first
-                  : '',
-            );
+                  d2.value.value?.isNotEmpty == true
+                      ? d2.value.value!.first
+                      : '',
+                );
       case 4:
         return (d1, d2) =>
             coef * d1.value.key.$createdAt.compareTo(d2.value.key.$createdAt);

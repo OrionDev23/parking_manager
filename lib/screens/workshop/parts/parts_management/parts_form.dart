@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:flutter/foundation.dart' hide Category;
 
 import 'package:barcode_widget/barcode_widget.dart';
@@ -15,6 +16,7 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/parts_provider.dart';
 import 'package:parc_oto/screens/workshop/inventory/fournisseurs/fournisseur_table.dart';
 import 'package:parc_oto/utilities/form_validators.dart';
+
 import '../../../../serializables/client.dart';
 import '../../../../serializables/pieces/part.dart';
 import '../../../../serializables/pieces/variation.dart';
@@ -24,6 +26,7 @@ import '../categories/category_table.dart';
 import '../../../../serializables/pieces/brand.dart';
 import '../../../../serializables/pieces/category.dart';
 import '../../../../widgets/zone_box.dart';
+
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -70,17 +73,19 @@ class _PartsFormState extends State<PartsForm>
   bool loading = true;
   void initValues() async {
     if (widget.part != null) {
-      partID=widget.part!.id;
+      partID = widget.part!.id;
       name.text = widget.part!.name;
       description.text = widget.part!.description ?? '';
-      prix=widget.part!.price??0;
-      selectedUnit=widget.part!.unitType;
-      barcode.text=widget.part!.barcode??'';
-      sku.text=widget.part!.sku??'';
-      selectedFournisseur =
-          await PartsProvider().getFournisseur(widget.part?.fournisseurID);
-      selectedCategory =
-          await PartsProvider().getCategory(widget.part?.categoryID);
+      prix = widget.part!.price ?? 0;
+      selectedUnit = widget.part!.unitType;
+      barcode.text = widget.part!.barcode ?? '';
+      sku.text = widget.part!.sku ?? '';
+      selectedFournisseur = await PartsProvider().getFournisseur(
+        widget.part?.fournisseurID,
+      );
+      selectedCategory = await PartsProvider().getCategory(
+        widget.part?.categoryID,
+      );
       selectedBrand = await PartsProvider().getBrand(widget.part?.brandID);
       final savedOptionIds = widget.part?.selectedOptions ?? const <String>[];
       final savedOptionNames =
@@ -111,7 +116,7 @@ class _PartsFormState extends State<PartsForm>
             break;
         }
       }
-      variations = widget.part?.variations?? [];
+      variations = widget.part?.variations ?? [];
     }
     loading = false;
     if (mounted) {
@@ -124,13 +129,11 @@ class _PartsFormState extends State<PartsForm>
     super.build(context);
     var appTheme = context.watch<AppTheme>();
     bool portrait = context.orientation == Orientation.portrait;
-    if(loading){
+    if (loading) {
       return const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          ProgressRing()
-        ],
+        children: [ProgressRing()],
       );
     }
     return Column(
@@ -194,57 +197,59 @@ class _PartsFormState extends State<PartsForm>
           boxShadow: kElevationToShadow[2],
           color: appTheme.backGroundColor,
         ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(
-            'generalinformations',
-            style: appTheme.titleStyle,
-          ).tr(),
-          smallSpace,
-          Flexible(
-            flex: 1,
-            child: ZoneBox(
-              label: 'name'.tr(),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: TextBox(
-                  controller: name,
-                  placeholder: 'nom'.tr(),
-                  onChanged: (s) {
-                    setState(() {});
-                  },
-                  style: appTheme.writingStyle,
-                  placeholderStyle: placeStyle,
-                  cursorColor: appTheme.color.darker,
-                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('generalinformations', style: appTheme.titleStyle).tr(),
+            smallSpace,
+            Flexible(
+              flex: 1,
+              child: ZoneBox(
+                label: 'name'.tr(),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: TextBox(
+                    controller: name,
+                    placeholder: 'nom'.tr(),
+                    onChanged: (s) {
+                      setState(() {});
+                    },
+                    style: appTheme.writingStyle,
+                    placeholderStyle: placeStyle,
+                    cursorColor: appTheme.color.darker,
+                    decoration: WidgetStatePropertyAll(
+                      BoxDecoration(color: appTheme.fillColor),
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-          smallSpace,
-          Flexible(
-            flex: 2,
-            child: ZoneBox(
-              label: 'descr'.tr(),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: TextBox(
-                  controller: description,
-                  placeholder: 'descr'.tr(),
-                  onChanged: (s) {
-                    setState(() {});
-                  },
-                  style: appTheme.writingStyle,
-                  placeholderStyle: placeStyle,
-                  cursorColor: appTheme.color.darker,
-                  textAlignVertical: TextAlignVertical.top,
-                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+            smallSpace,
+            Flexible(
+              flex: 2,
+              child: ZoneBox(
+                label: 'descr'.tr(),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: TextBox(
+                    controller: description,
+                    placeholder: 'descr'.tr(),
+                    onChanged: (s) {
+                      setState(() {});
+                    },
+                    style: appTheme.writingStyle,
+                    placeholderStyle: placeStyle,
+                    cursorColor: appTheme.color.darker,
+                    textAlignVertical: TextAlignVertical.top,
+                    decoration: WidgetStatePropertyAll(
+                      BoxDecoration(color: appTheme.fillColor),
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ]),
+          ],
+        ),
       ),
     );
   }
@@ -261,19 +266,18 @@ class _PartsFormState extends State<PartsForm>
           boxShadow: kElevationToShadow[2],
           color: appTheme.backGroundColor,
         ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(
-            'fournisseur',
-            style: appTheme.titleStyle,
-          ).tr(),
-          smallSpace,
-          Flexible(
-            flex: 1,
-            child: ZoneBox(
-              label: 'fournisseur'.tr(),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: FilledButton(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('fournisseur', style: appTheme.titleStyle).tr(),
+            smallSpace,
+            Flexible(
+              flex: 1,
+              child: ZoneBox(
+                label: 'fournisseur'.tr(),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: FilledButton(
                     child: Text(
                       selectedFournisseur?.nom ??
                           (widget.part?.fournisseurID != null
@@ -282,40 +286,45 @@ class _PartsFormState extends State<PartsForm>
                     ),
                     onPressed: () async {
                       final pickedSupplier = await showDialog<Client>(
-                          context: context,
-                          barrierDismissible: true,
-                          builder: (context) {
-                            return ContentDialog(
-                              constraints:
-                                  BoxConstraints.tight(Size(700.px, 550.px)),
-                              title: const Text('fournselect').tr(),
-                              style: ContentDialogThemeData(
-                                  titleStyle: appTheme.writingStyle
-                                      .copyWith(fontWeight: FontWeight.bold)),
-                              content: const FournisseurTable(
-                                selectD: true,
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (context) {
+                          return ContentDialog(
+                            constraints: BoxConstraints.tight(
+                              Size(700.px, 550.px),
+                            ),
+                            title: const Text('fournselect').tr(),
+                            style: ContentDialogThemeData(
+                              titleStyle: appTheme.writingStyle.copyWith(
+                                fontWeight: FontWeight.bold,
                               ),
-                              actions: [
-                                Button(
-                                    child: const Text('fermer').tr(),
-                                    onPressed: () {
-                                      _supplierTouched = true;
-                                      selectedFournisseur = null;
-                                      Navigator.of(context).pop();
-                                    })
-                              ],
-                            );
-                          });
+                            ),
+                            content: const FournisseurTable(selectD: true),
+                            actions: [
+                              Button(
+                                child: const Text('fermer').tr(),
+                                onPressed: () {
+                                  _supplierTouched = true;
+                                  selectedFournisseur = null;
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
                       if (pickedSupplier != null) {
                         selectedFournisseur = pickedSupplier;
                         _supplierTouched = true;
                       }
                       setState(() {});
-                    }),
+                    },
+                  ),
+                ),
               ),
             ),
-          ),
-        ]),
+          ],
+        ),
       ),
     );
   }
@@ -332,14 +341,13 @@ class _PartsFormState extends State<PartsForm>
           boxShadow: kElevationToShadow[2],
           color: appTheme.backGroundColor,
         ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(
-            'tarification',
-            style: appTheme.titleStyle,
-          ).tr(),
-          smallSpace,
-          Flexible(
-            child: MasonryGridView.count(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('tarification', style: appTheme.titleStyle).tr(),
+            smallSpace,
+            Flexible(
+              child: MasonryGridView.count(
                 mainAxisSpacing: 5,
                 crossAxisSpacing: 5,
                 itemCount: 2,
@@ -377,8 +385,9 @@ class _PartsFormState extends State<PartsForm>
                     return SizedBox(
                       height: 75.px,
                       child: ZoneBox(
-                        label:
-                            'prix${units[selectedUnit]}'.tr().uppercaseFirst(),
+                        label: 'prix${units[selectedUnit]}'
+                            .tr()
+                            .uppercaseFirst(),
                         child: Padding(
                           padding: const EdgeInsets.all(10),
                           child: NumberBox<double>(
@@ -398,9 +407,11 @@ class _PartsFormState extends State<PartsForm>
                       ),
                     );
                   }
-                }),
-          ),
-        ]),
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -417,19 +428,18 @@ class _PartsFormState extends State<PartsForm>
           boxShadow: kElevationToShadow[2],
           color: appTheme.backGroundColor,
         ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(
-            'appartenance',
-            style: appTheme.titleStyle,
-          ).tr(),
-          smallSpace,
-          Flexible(
-            flex: 1,
-            child: ZoneBox(
-              label: 'brand'.tr(),
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: FilledButton(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('appartenance', style: appTheme.titleStyle).tr(),
+            smallSpace,
+            Flexible(
+              flex: 1,
+              child: ZoneBox(
+                label: 'brand'.tr(),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: FilledButton(
                     child: Text(
                       selectedBrand?.name ??
                           (widget.part?.brandID != null
@@ -438,47 +448,51 @@ class _PartsFormState extends State<PartsForm>
                     ),
                     onPressed: () async {
                       final pickedBrand = await showDialog<Brand>(
-                          context: context,
-                          barrierDismissible: true,
-                          builder: (context) {
-                            return ContentDialog(
-                              constraints:
-                                  BoxConstraints.tight(Size(700.px, 550.px)),
-                              title: const Text('brand').tr(),
-                              style: ContentDialogThemeData(
-                                  titleStyle: appTheme.writingStyle
-                                      .copyWith(fontWeight: FontWeight.bold)),
-                              content: const BrandTable(
-                                selectD: true,
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (context) {
+                          return ContentDialog(
+                            constraints: BoxConstraints.tight(
+                              Size(700.px, 550.px),
+                            ),
+                            title: const Text('brand').tr(),
+                            style: ContentDialogThemeData(
+                              titleStyle: appTheme.writingStyle.copyWith(
+                                fontWeight: FontWeight.bold,
                               ),
-                              actions: [
-                                Button(
-                                    child: const Text('fermer').tr(),
-                                    onPressed: () {
-                                      _brandTouched = true;
-                                      selectedBrand = null;
-                                      Navigator.of(context).pop();
-                                    })
-                              ],
-                            );
-                          });
+                            ),
+                            content: const BrandTable(selectD: true),
+                            actions: [
+                              Button(
+                                child: const Text('fermer').tr(),
+                                onPressed: () {
+                                  _brandTouched = true;
+                                  selectedBrand = null;
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
                       if (pickedBrand != null) {
                         selectedBrand = pickedBrand;
                         _brandTouched = true;
                       }
                       setState(() {});
-                    }),
+                    },
+                  ),
+                ),
               ),
             ),
-          ),
-          smallSpace,
-          Flexible(
-            flex: 1,
-            child: ZoneBox(
-              label: 'category'.tr(),
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: FilledButton(
+            smallSpace,
+            Flexible(
+              flex: 1,
+              child: ZoneBox(
+                label: 'category'.tr(),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: FilledButton(
                     child: Text(
                       selectedCategory?.name ??
                           (widget.part?.categoryID != null
@@ -487,80 +501,86 @@ class _PartsFormState extends State<PartsForm>
                     ),
                     onPressed: () async {
                       final pickedCategory = await showDialog<Category>(
-                          context: context,
-                          barrierDismissible: true,
-                          builder: (context) {
-                            return ContentDialog(
-                              constraints:
-                                  BoxConstraints.tight(Size(700.px, 550.px)),
-                              title: const Text('category').tr(),
-                              style: ContentDialogThemeData(
-                                  titleStyle: appTheme.writingStyle
-                                      .copyWith(fontWeight: FontWeight.bold)),
-                              content: const CategoryTable(
-                                selectD: true,
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (context) {
+                          return ContentDialog(
+                            constraints: BoxConstraints.tight(
+                              Size(700.px, 550.px),
+                            ),
+                            title: const Text('category').tr(),
+                            style: ContentDialogThemeData(
+                              titleStyle: appTheme.writingStyle.copyWith(
+                                fontWeight: FontWeight.bold,
                               ),
-                              actions: [
-                                Button(
-                                    child: const Text('fermer').tr(),
-                                    onPressed: () {
-                                      _categoryTouched = true;
-                                      selectedCategory = null;
-                                      Navigator.of(context).pop();
-                                    })
-                              ],
-                            );
-                          });
+                            ),
+                            content: const CategoryTable(selectD: true),
+                            actions: [
+                              Button(
+                                child: const Text('fermer').tr(),
+                                onPressed: () {
+                                  _categoryTouched = true;
+                                  selectedCategory = null;
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
                       if (pickedCategory != null) {
                         selectedCategory = pickedCategory;
                         _categoryTouched = true;
                       }
                       setState(() {});
-                    }),
+                    },
+                  ),
+                ),
               ),
             ),
-          ),
-          smallSpace,
-          Flexible(
-            flex: 3,
-            child: ZoneBox(
-              label: 'options'.tr(),
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Button(
-                          onPressed: option1?.selected == true ||
-                                  option2?.selected == true ||
-                                  option3?.selected == true ||
-                                  option4?.selected == true
-                              ? () {
-                                  if (option1?.selected == true) {
-                                    option1 = null;
-                                  }
-                                  if (option2?.selected == true) {
-                                    option2 = null;
-                                  }
-                                  if (option3?.selected == true) {
-                                    option3 = null;
-                                  }
-                                  if (option4?.selected == true) {
-                                    option4 = null;
-                                  }
-                                  toggleFirstOptions();
+            smallSpace,
+            Flexible(
+              flex: 3,
+              child: ZoneBox(
+                label: 'options'.tr(),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Button(
+                            onPressed:
+                                option1?.selected == true ||
+                                    option2?.selected == true ||
+                                    option3?.selected == true ||
+                                    option4?.selected == true
+                                ? () {
+                                    if (option1?.selected == true) {
+                                      option1 = null;
+                                    }
+                                    if (option2?.selected == true) {
+                                      option2 = null;
+                                    }
+                                    if (option3?.selected == true) {
+                                      option3 = null;
+                                    }
+                                    if (option4?.selected == true) {
+                                      option4 = null;
+                                    }
+                                    toggleFirstOptions();
 
-                                  setState(() {});
-                                }
-                              : null,
-                          child: const Text('delete').tr(),
-                        ),
-                        smallSpace,
-                        FilledButton(
-                            onPressed: option1 != null &&
+                                    setState(() {});
+                                  }
+                                : null,
+                            child: const Text('delete').tr(),
+                          ),
+                          smallSpace,
+                          FilledButton(
+                            onPressed:
+                                option1 != null &&
                                     option2 != null &&
                                     option3 != null &&
                                     option4 != null
@@ -568,34 +588,36 @@ class _PartsFormState extends State<PartsForm>
                                 : () async {
                                     Option? option;
                                     option = await showDialog<Option>(
-                                        context: context,
-                                        barrierDismissible: true,
-                                        builder: (context) {
-                                          return ContentDialog(
-                                            constraints: BoxConstraints.tight(
-                                                Size(700.px, 550.px)),
-                                            title: const Text('addoption').tr(),
-                                            style: ContentDialogThemeData(
-                                                titleStyle: appTheme
-                                                    .writingStyle
-                                                    .copyWith(
-                                                        fontWeight:
-                                                            FontWeight.bold)),
-                                            content: const OptionTable(
-                                              selectD: true,
+                                      context: context,
+                                      barrierDismissible: true,
+                                      builder: (context) {
+                                        return ContentDialog(
+                                          constraints: BoxConstraints.tight(
+                                            Size(700.px, 550.px),
+                                          ),
+                                          title: const Text('addoption').tr(),
+                                          style: ContentDialogThemeData(
+                                            titleStyle: appTheme.writingStyle
+                                                .copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                          ),
+                                          content: const OptionTable(
+                                            selectD: true,
+                                          ),
+                                          actions: [
+                                            Button(
+                                              child: const Text('fermer').tr(),
+                                              onPressed: () {
+                                                option = null;
+                                                setState(() {});
+                                                Navigator.of(context).pop();
+                                              },
                                             ),
-                                            actions: [
-                                              Button(
-                                                  child:
-                                                      const Text('fermer').tr(),
-                                                  onPressed: () {
-                                                    option = null;
-                                                    setState(() {});
-                                                    Navigator.of(context).pop();
-                                                  })
-                                            ],
-                                          );
-                                        });
+                                          ],
+                                        );
+                                      },
+                                    );
                                     if (option != null) {
                                       if (option1 == null) {
                                         option1 = option;
@@ -616,61 +638,67 @@ class _PartsFormState extends State<PartsForm>
                                       setState(() {});
                                     }
                                   },
-                            child: const Text('addoption').tr()),
-                      ],
-                    ),
-                    bigSpace,
-                    Material(
-                      color: appTheme.backGroundColor,
-                      child: ChipList(
-                        listOfChipNames: [
-                          if (option1 != null) option1,
-                          if (option2 != null) option2,
-                          if (option3 != null) option3,
-                          if (option4 != null) option4
-                        ]
-                            .map((o) => '${o!.name}'
-                                ' (${o.code})')
-                            .toList(),
-                        supportsMultiSelect: true,
-                        listOfChipIndicesCurrentlySelected: [
-                          if (option1?.selected == true) 0,
-                          if (option2?.selected == true) 1,
-                          if (option3?.selected == true) 2,
-                          if (option4?.selected == true) 3
+                            child: const Text('addoption').tr(),
+                          ),
                         ],
-                        borderRadiiList: const [5],
-                        extraOnToggle: (s) => setState(() {
-                          switch (s) {
-                            case 0:
-                              option1!.selected = !option1!.selected;
-                              break;
-                            case 1:
-                              option2!.selected = !option2!.selected;
-                              break;
-                            case 2:
-                              option3!.selected = !option3!.selected;
-                              break;
-                            case 3:
-                              option4!.selected = !option4!.selected;
-                              break;
-                          }
-                        }),
-                        inactiveBgColorList: [appTheme.color.darkest],
-                        inactiveTextColorList: [appTheme.writingStyle.color!],
-                        inactiveBorderColorList: [appTheme.backGroundColor],
-                        padding: EdgeInsets.zero,
-                        widgetSpacing: 1,
-                        showCheckmark: true,
-                        shouldWrap: true,
                       ),
-                    )
-                  ],
+                      bigSpace,
+                      Material(
+                        color: appTheme.backGroundColor,
+                        child: ChipList(
+                          listOfChipNames:
+                              [
+                                    if (option1 != null) option1,
+                                    if (option2 != null) option2,
+                                    if (option3 != null) option3,
+                                    if (option4 != null) option4,
+                                  ]
+                                  .map(
+                                    (o) =>
+                                        '${o!.name}'
+                                        ' (${o.code})',
+                                  )
+                                  .toList(),
+                          supportsMultiSelect: true,
+                          listOfChipIndicesCurrentlySelected: [
+                            if (option1?.selected == true) 0,
+                            if (option2?.selected == true) 1,
+                            if (option3?.selected == true) 2,
+                            if (option4?.selected == true) 3,
+                          ],
+                          borderRadiiList: const [5],
+                          extraOnToggle: (s) => setState(() {
+                            switch (s) {
+                              case 0:
+                                option1!.selected = !option1!.selected;
+                                break;
+                              case 1:
+                                option2!.selected = !option2!.selected;
+                                break;
+                              case 2:
+                                option3!.selected = !option3!.selected;
+                                break;
+                              case 3:
+                                option4!.selected = !option4!.selected;
+                                break;
+                            }
+                          }),
+                          inactiveBgColorList: [appTheme.color.darkest],
+                          inactiveTextColorList: [appTheme.writingStyle.color!],
+                          inactiveBorderColorList: [appTheme.backGroundColor],
+                          padding: EdgeInsets.zero,
+                          widgetSpacing: 1,
+                          showCheckmark: true,
+                          shouldWrap: true,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ]),
+          ],
+        ),
       ),
     );
   }
@@ -715,18 +743,27 @@ class _PartsFormState extends State<PartsForm>
     if (selectedFournisseur != null || selectedBrand != null) {
       if (selectedFournisseur != null) {
         part1 = part1.replaceRange(
-            0, 1, getFirstTwoLetters(selectedFournisseur!.nom));
+          0,
+          1,
+          getFirstTwoLetters(selectedFournisseur!.nom),
+        );
       }
       if (selectedBrand != null) {
         part1 = part1.replaceRange(
-            2, null, getFirstTwoLetters(selectedBrand!.name));
+          2,
+          null,
+          getFirstTwoLetters(selectedBrand!.name),
+        );
       }
     }
 
     if (selectedCategory != null || name.text.isNotEmpty) {
       if (selectedCategory != null) {
         part2 = part2.replaceRange(
-            0, 1, getFirstTwoLetters(selectedCategory!.name));
+          0,
+          1,
+          getFirstTwoLetters(selectedCategory!.name),
+        );
       }
       if (name.text.isNotEmpty) {
         part2 = part2.replaceRange(2, null, getFirstTwoLetters(name.text));
@@ -750,9 +787,10 @@ class _PartsFormState extends State<PartsForm>
   }
 
   MaskTextInputFormatter maskFormatter = MaskTextInputFormatter(
-      mask: '####-####-##########',
-      filter: {"#": RegExp(r'^[a-zA-Z0-9]+$')},
-      type: MaskAutoCompletionType.lazy);
+    mask: '####-####-##########',
+    filter: {"#": RegExp(r'^[a-zA-Z0-9]+$')},
+    type: MaskAutoCompletionType.lazy,
+  );
 
   Widget inventoryWidget(AppTheme appTheme, bool portrait) {
     return StaggeredGridTile.fit(
@@ -766,173 +804,185 @@ class _PartsFormState extends State<PartsForm>
           boxShadow: kElevationToShadow[2],
           color: appTheme.backGroundColor,
         ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(
-            'inventaire',
-            style: appTheme.titleStyle,
-          ).tr(),
-          smallSpace,
-          Flexible(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('inventaire', style: appTheme.titleStyle).tr(),
+            smallSpace,
+            Flexible(
               child: MasonryGridView.count(
-                  crossAxisCount: portrait ? 1 : 3,
-                  itemCount: 3,
-                  mainAxisSpacing: 5,
-                  crossAxisSpacing: 5,
-                  itemBuilder: (co, ind) {
-                    if (ind == 0) {
-                      return SizedBox(
-                        height: 95.px,
-                        child: ZoneBox(
-                          label: 'SKU',
-                          trailing: IconButton(
-                            style: ButtonStyle(
-                              foregroundColor: WidgetStatePropertyAll<Color>(
-                                  appTheme.writingStyle.color!),
-                              backgroundColor: WidgetStatePropertyAll<Color>(
-                                  appTheme.backGroundColor),
-                              elevation:
-                                  const WidgetStatePropertyAll<double>(10),
+                crossAxisCount: portrait ? 1 : 3,
+                itemCount: 3,
+                mainAxisSpacing: 5,
+                crossAxisSpacing: 5,
+                itemBuilder: (co, ind) {
+                  if (ind == 0) {
+                    return SizedBox(
+                      height: 95.px,
+                      child: ZoneBox(
+                        label: 'SKU',
+                        trailing: IconButton(
+                          style: ButtonStyle(
+                            foregroundColor: WidgetStatePropertyAll<Color>(
+                              appTheme.writingStyle.color!,
                             ),
-                            icon: Icon(Icons.auto_mode,
-                                color: appTheme.color.lightest),
-                            onPressed: () {
-                              sku.text = generateSKU();
+                            backgroundColor: WidgetStatePropertyAll<Color>(
+                              appTheme.backGroundColor,
+                            ),
+                            elevation: const WidgetStatePropertyAll<double>(10),
+                          ),
+                          icon: Icon(
+                            Icons.auto_mode,
+                            color: appTheme.color.lightest,
+                          ),
+                          onPressed: () {
+                            sku.text = generateSKU();
+                            setState(() {});
+                          },
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: TextBox(
+                            controller: sku,
+                            placeholder: 'SKU',
+                            onChanged: (s) {
                               setState(() {});
                             },
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: TextBox(
-                              controller: sku,
-                              placeholder: 'SKU',
-                              onChanged: (s) {
-                                setState(() {});
-                              },
-                              style: appTheme.writingStyle,
-                              placeholderStyle: placeStyle,
-                              inputFormatters: [
-                                maskFormatter,
-                              ],
-                              cursorColor: appTheme.color.darker,
-                              decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                            style: appTheme.writingStyle,
+                            placeholderStyle: placeStyle,
+                            inputFormatters: [maskFormatter],
+                            cursorColor: appTheme.color.darker,
+                            decoration: WidgetStatePropertyAll(
+                              BoxDecoration(color: appTheme.fillColor),
                             ),
                           ),
                         ),
-                      );
-                    } else if (ind == 1) {
-                      return SizedBox(
-                        height: 95.px,
-                        child: ZoneBox(
-                          label: 'barcode'.tr(),
-                          trailing: IconButton(
-                            style: ButtonStyle(
-                              foregroundColor: WidgetStatePropertyAll<Color>(
-                                  appTheme.writingStyle.color!),
-                              backgroundColor: WidgetStatePropertyAll<Color>(
-                                  appTheme.backGroundColor),
-                              elevation:
-                                  const WidgetStatePropertyAll<double>(10),
+                      ),
+                    );
+                  } else if (ind == 1) {
+                    return SizedBox(
+                      height: 95.px,
+                      child: ZoneBox(
+                        label: 'barcode'.tr(),
+                        trailing: IconButton(
+                          style: ButtonStyle(
+                            foregroundColor: WidgetStatePropertyAll<Color>(
+                              appTheme.writingStyle.color!,
                             ),
-                            icon: Icon(Icons.auto_mode,
-                                color: appTheme.color.lightest),
-                            onPressed: () {
-                              barcode.text = generateBC();
+                            backgroundColor: WidgetStatePropertyAll<Color>(
+                              appTheme.backGroundColor,
+                            ),
+                            elevation: const WidgetStatePropertyAll<double>(10),
+                          ),
+                          icon: Icon(
+                            Icons.auto_mode,
+                            color: appTheme.color.lightest,
+                          ),
+                          onPressed: () {
+                            barcode.text = generateBC();
+                            setState(() {});
+                          },
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: TextBox(
+                            controller: barcode,
+                            placeholder: 'barcode'.tr(),
+                            onChanged: (s) {
                               setState(() {});
                             },
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: TextBox(
-                              controller: barcode,
-                              placeholder: 'barcode'.tr(),
-                              onChanged: (s) {
-                                setState(() {});
-                              },
-                              maxLength: 11,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              style: appTheme.writingStyle,
-                              placeholderStyle: placeStyle,
-                              cursorColor: appTheme.color.darker,
-                              decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                            maxLength: 11,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            style: appTheme.writingStyle,
+                            placeholderStyle: placeStyle,
+                            cursorColor: appTheme.color.darker,
+                            decoration: WidgetStatePropertyAll(
+                              BoxDecoration(color: appTheme.fillColor),
                             ),
                           ),
                         ),
-                      );
-                    } else {
-                      return SizedBox(
-                        height: 95.px,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(5.0, 0, 0, 0),
-                              child: Text(sku.text),
+                      ),
+                    );
+                  } else {
+                    return SizedBox(
+                      height: 95.px,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(5.0, 0, 0, 0),
+                            child: Text(sku.text),
+                          ),
+                          Flexible(
+                            child: BarcodeWidget(
+                              color: appTheme.writingStyle.color!,
+                              style: placeStyle,
+                              barcode: Barcode.upcA(),
+                              data: barcode.text.isEmpty
+                                  ? '000000000000'
+                                  : upcFormat.format(
+                                      int.tryParse(
+                                            barcode.text +
+                                                getLastDigitUPC(barcode.text)
+                                                    .toString(),
+                                          ) ??
+                                          0,
+                                    ),
                             ),
-                            Flexible(
-                              child: BarcodeWidget(
-                                  color: appTheme.writingStyle.color!,
-                                  style: placeStyle,
-                                  barcode: Barcode.upcA(),
-                                  data: barcode.text.isEmpty
-                                      ? '000000000000'
-                                      : upcFormat.format(int.tryParse(
-                                              barcode.text +
-                                                  getLastDigitUPC(barcode.text)
-                                                      .toString()) ??
-                                          0)),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-                  })),
-        ]),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget variationsWidget(AppTheme appTheme, bool portrait) {
     return StaggeredGridTile.fit(
-        crossAxisCellCount: 3,
-        child: Container(
-          width: 400.px,
-          height:
-              variations.isEmpty ? 480.px : 50.px * variations.length + 165.px,
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: kElevationToShadow[2],
-            color: appTheme.backGroundColor,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'variations',
-                style: appTheme.titleStyle,
-              ).tr(),
-              smallSpace,
-              designationTable(appTheme),
-            ],
-          ),
-        ));
+      crossAxisCellCount: 3,
+      child: Container(
+        width: 400.px,
+        height: variations.isEmpty
+            ? 480.px
+            : 50.px * variations.length + 165.px,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: kElevationToShadow[2],
+          color: appTheme.backGroundColor,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('variations', style: appTheme.titleStyle).tr(),
+            smallSpace,
+            designationTable(appTheme),
+          ],
+        ),
+      ),
+    );
   }
 
   List<Variation> variations = List.empty(growable: true);
 
   void addDesignation() {
-
-    variations.add(Variation(
-      id: variations.isEmpty
-          ? '1'
-          : (int.parse(variations.last.id) + 1).toString(),
-      name: '',
-      sku: 'XXXX',
-    ));
+    variations.add(
+      Variation(
+        id: variations.isEmpty
+            ? '1'
+            : (int.parse(variations.last.id) + 1).toString(),
+        name: '',
+        sku: 'XXXX',
+      ),
+    );
     setState(() {});
   }
 
@@ -947,12 +997,16 @@ class _PartsFormState extends State<PartsForm>
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Button(
-                    onPressed:
-                        selectedDesignationsExist() ? deleteAllSelected : null,
-                    child: const Text('delete').tr()),
+                  onPressed: selectedDesignationsExist()
+                      ? deleteAllSelected
+                      : null,
+                  child: const Text('delete').tr(),
+                ),
                 smallSpace,
                 FilledButton(
-                    onPressed: addDesignation, child: const Text('add').tr()),
+                  onPressed: addDesignation,
+                  child: const Text('add').tr(),
+                ),
               ],
             ),
           ),
@@ -960,8 +1014,9 @@ class _PartsFormState extends State<PartsForm>
           Container(
             decoration: BoxDecoration(
               color: appTheme.color.lightest,
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(5)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(5),
+              ),
             ),
             padding: const EdgeInsets.all(5),
             child: Table(
@@ -972,28 +1027,31 @@ class _PartsFormState extends State<PartsForm>
                 3: FlexColumnWidth(3),
               },
               children: [
-                TableRow(children: [
-                  TableCell(
+                TableRow(
+                  children: [
+                    TableCell(
+                      child: const Text('N°', textAlign: TextAlign.center).tr(),
+                    ),
+                    TableCell(
                       child: const Text(
-                    'N°',
-                    textAlign: TextAlign.center,
-                  ).tr()),
-                  TableCell(
+                        'nom',
+                        textAlign: TextAlign.center,
+                      ).tr(),
+                    ),
+                    TableCell(
                       child: const Text(
-                    'nom',
-                    textAlign: TextAlign.center,
-                  ).tr()),
-                  TableCell(
+                        'options',
+                        textAlign: TextAlign.center,
+                      ).tr(),
+                    ),
+                    TableCell(
                       child: const Text(
-                    'options',
-                    textAlign: TextAlign.center,
-                  ).tr()),
-                  TableCell(
-                      child: const Text(
-                    'SKU',
-                    textAlign: TextAlign.center,
-                  ).tr()),
-                ]),
+                        'SKU',
+                        textAlign: TextAlign.center,
+                      ).tr(),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -1002,12 +1060,14 @@ class _PartsFormState extends State<PartsForm>
                   padding: const EdgeInsets.all(10),
                   width: 300.px,
                   height: 320.px,
-                  child: const NoDataWidget())
+                  child: const NoDataWidget(),
+                )
               : Container(
                   decoration: BoxDecoration(
                     border: Border.all(color: appTheme.fillColor),
-                    borderRadius:
-                        const BorderRadius.vertical(bottom: Radius.circular(5)),
+                    borderRadius: const BorderRadius.vertical(
+                      bottom: Radius.circular(5),
+                    ),
                   ),
                   child: Column(children: getDesignationList(appTheme)),
                 ),
@@ -1048,12 +1108,13 @@ class _PartsFormState extends State<PartsForm>
             Row(
               children: [
                 Checkbox(
-                    checked: variations[index].selected,
-                    onChanged: (s) {
-                      setState(() {
-                        variations[index].selected = s ?? false;
-                      });
-                    }),
+                  checked: variations[index].selected,
+                  onChanged: (s) {
+                    setState(() {
+                      variations[index].selected = s ?? false;
+                    });
+                  },
+                ),
                 smallSpace,
                 Flexible(
                   child: SizedBox(
@@ -1061,21 +1122,18 @@ class _PartsFormState extends State<PartsForm>
                     child: VariationWidget(
                       key: Key(variations[index].id),
                       variation: variations[index],
-                      sku: sku.text.length > 8 ? sku.text.substring(0, 9) : 'XXXX-XXXX',
-                      options: [
-                        ?option1,
-                        ?option2,
-                        ?option3,
-                        ?option4,
-                      ],
+                      sku: sku.text.length > 8
+                          ? sku.text.substring(0, 9)
+                          : 'XXXX-XXXX',
+                      options: [?option1, ?option2, ?option3, ?option4],
                       onOptionsChanged: (values) {
                         setState(() {
                           variations[index].optionValues = values;
                         });
-
                       },
-                    )),
+                    ),
                   ),
+                ),
               ],
             ),
             smallSpace,
@@ -1119,8 +1177,10 @@ class _PartsFormState extends State<PartsForm>
 
     bool newpart = partID == null;
 
-    partID ??=
-        DateTime.now().difference(DatabaseGetter.ref).inMilliseconds.toString();
+    partID ??= DateTime.now()
+        .difference(DatabaseGetter.ref)
+        .inMilliseconds
+        .toString();
     VehiclePart part = VehiclePart(
       id: partID!,
       name: name.text,
@@ -1202,5 +1262,4 @@ class _PartsFormState extends State<PartsForm>
     barcode.dispose();
     super.dispose();
   }
-
 }

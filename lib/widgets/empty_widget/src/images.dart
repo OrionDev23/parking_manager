@@ -3,12 +3,8 @@
 part of 'widget.dart';
 
 // nodoc
-enum PackageImage {
-  Image_1,
-  Image_2,
-  Image_3,
-  Image_4,
-}
+enum PackageImage { Image_1, Image_2, Image_3, Image_4 }
+
 const _$PackageImageTypeMap = {
   PackageImage.Image_1: 'assets/images/emptyImage.png',
   PackageImage.Image_2: 'assets/images/im_emptyIcon_1.png',

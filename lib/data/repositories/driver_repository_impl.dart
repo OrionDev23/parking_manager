@@ -78,16 +78,18 @@ class DriverRepositoryImpl implements DriverRepository {
     if (existing == null) return;
     _checkCompany(existing);
     final deviceId = await deviceIdentity.getDeviceId();
-    await syncQueue.enqueue(SyncOperation(
-      id: '${deviceId}_${id}_${DateTime.now().microsecondsSinceEpoch}',
-      companyId: companyContext.companyId,
-      deviceId: deviceId,
-      entity: 'driver',
-      entityId: id,
-      type: SyncOperationType.delete,
-      payload: {'id': id, 'companyId': existing.companyId},
-      createdAt: DateTime.now().toUtc(),
-    ));
+    await syncQueue.enqueue(
+      SyncOperation(
+        id: '${deviceId}_${id}_${DateTime.now().microsecondsSinceEpoch}',
+        companyId: companyContext.companyId,
+        deviceId: deviceId,
+        entity: 'driver',
+        entityId: id,
+        type: SyncOperationType.delete,
+        payload: {'id': id, 'companyId': existing.companyId},
+        createdAt: DateTime.now().toUtc(),
+      ),
+    );
     await local.deleteDriver(id);
   }
 
@@ -101,15 +103,17 @@ class DriverRepositoryImpl implements DriverRepository {
 
   Future<void> _enqueue(Driver driver, SyncOperationType type) async {
     final deviceId = await deviceIdentity.getDeviceId();
-    await syncQueue.enqueue(SyncOperation(
-      id: '${deviceId}_${driver.id}_${DateTime.now().microsecondsSinceEpoch}',
-      companyId: driver.companyId,
-      deviceId: deviceId,
-      entity: 'driver',
-      entityId: driver.id,
-      type: type,
-      payload: jsonDecode(jsonEncode(driver.toMap())) as Map<String, dynamic>,
-      createdAt: DateTime.now().toUtc(),
-    ));
+    await syncQueue.enqueue(
+      SyncOperation(
+        id: '${deviceId}_${driver.id}_${DateTime.now().microsecondsSinceEpoch}',
+        companyId: driver.companyId,
+        deviceId: deviceId,
+        entity: 'driver',
+        entityId: driver.id,
+        type: type,
+        payload: jsonDecode(jsonEncode(driver.toMap())) as Map<String, dynamic>,
+        createdAt: DateTime.now().toUtc(),
+      ),
+    );
   }
 }

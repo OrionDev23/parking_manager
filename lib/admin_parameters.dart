@@ -3,11 +3,11 @@ const defaultUserPic =
 
 const demo = false;
 const brandt = false;
-const isManagerUI=false;
-const isAdminUI=false;
-const bool showAtelier=true;
-bool showImportConducteur=true;
+const isManagerUI = false;
+const isAdminUI = false;
+const bool showAtelier = true;
+bool showImportConducteur = true;
 const showImportVehicles = true;
 const conducteurEmploye = false;
-const chassisKey=true;
-bool gts=true;
+const chassisKey = true;
+bool gts = true;

@@ -31,39 +31,39 @@ class Conducteur extends ParcOtoDefault {
   String? direction;
 
   String? departement;
-  List<String>? vehicules=[];
+  List<String>? vehicules = [];
 
   String matricule;
 
-  Conducteur(
-      {required this.name,
-        required this.matricule,
-      required this.prenom,
-        this.vehicules,
-      this.filliale,
-      this.direction,
-      this.etat = 0,
-      this.etatactuel,
-      required super.id,
-      this.createdBy,
-      super.createdAt,
-      super.updatedAt,
-      this.adresse,
-      this.email,
-        this.search,
-      this.dateNaissance,
-        this.departement,
-        this.profession,
-        this.service=false,
-      this.telephone}){
-      search='$name $prenom ${VehiclesUtilities.getDepartment(departement)} '
-          '${VehiclesUtilities.getDirection(direction)} ${VehiclesUtilities
-          .getAppartenance(filliale)} ${DriverProvider
-          .getEtat(etat).tr()} $matricule $adresse $email '
-          '${dateNaissance?.toIso8601String()??''} $telephone $profession ${service?'service':'fonction'}';
+  Conducteur({
+    required this.name,
+    required this.matricule,
+    required this.prenom,
+    this.vehicules,
+    this.filliale,
+    this.direction,
+    this.etat = 0,
+    this.etatactuel,
+    required super.id,
+    this.createdBy,
+    super.createdAt,
+    super.updatedAt,
+    this.adresse,
+    this.email,
+    this.search,
+    this.dateNaissance,
+    this.departement,
+    this.profession,
+    this.service = false,
+    this.telephone,
+  }) {
+    search =
+        '$name $prenom ${VehiclesUtilities.getDepartment(departement)} '
+        '${VehiclesUtilities.getDirection(direction)} ${VehiclesUtilities.getAppartenance(filliale)} ${DriverProvider.getEtat(etat).tr()} $matricule $adresse $email '
+        '${dateNaissance?.toIso8601String() ?? ''} $telephone $profession ${service ? 'service' : 'fonction'}';
   }
 
-  String getName(){
+  String getName() {
     return "$name $prenom";
   }
 
@@ -72,6 +72,4 @@ class Conducteur extends ParcOtoDefault {
 
   @override
   Map<String, dynamic> toJson() => _$ConducteurToJson(this);
-
-
 }

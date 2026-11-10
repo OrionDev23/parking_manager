@@ -16,9 +16,8 @@ import '../core/services/legacy_stock_sync_service.dart';
 import '../core/sync/sync_operation.dart';
 import '../serializables/parc_oto_serializable.dart';
 import '../theme.dart';
-TextStyle rowTextStyle=TextStyle(
-  fontSize: 10.sp,
-);
+
+TextStyle rowTextStyle = TextStyle(fontSize: 10.sp);
 
 abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
   BuildContext current;
@@ -112,33 +111,36 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
     }
   }
 
-  ParcOtoDatasource(
-      {required this.collectionID,
-      required this.current,
-      this.selectC = false,
-      this.appTheme,
-      this.filters,
-      this.searchKey,
-      this.sortColumn = 0,
-      this.sortAscending = false});
+  ParcOtoDatasource({
+    required this.collectionID,
+    required this.current,
+    this.selectC = false,
+    this.appTheme,
+    this.filters,
+    this.searchKey,
+    this.sortColumn = 0,
+    this.sortAscending = false,
+  });
 
-  ParcOtoDatasource.empty(
-      {required this.collectionID,
-      required this.current,
-      this.selectC = false,
-      this.appTheme,
-      this.filters,
-      this.searchKey}) {
+  ParcOtoDatasource.empty({
+    required this.collectionID,
+    required this.current,
+    this.selectC = false,
+    this.appTheme,
+    this.filters,
+    this.searchKey,
+  }) {
     empty = true;
   }
 
-  ParcOtoDatasource.error(
-      {required this.collectionID,
-      required this.current,
-      this.selectC = false,
-      this.appTheme,
-      this.filters,
-      this.searchKey}) {
+  ParcOtoDatasource.error({
+    required this.collectionID,
+    required this.current,
+    this.selectC = false,
+    this.appTheme,
+    this.filters,
+    this.searchKey,
+  }) {
     errorCounter = 0;
   }
 
@@ -160,23 +162,22 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
 
   Future<int> getTotalRecords() {
     return Future<int>.delayed(
-        const Duration(milliseconds: 0), () => empty ? 0 : data.length);
+      const Duration(milliseconds: 0),
+      () => empty ? 0 : data.length,
+    );
   }
 
-  static bool lastPortrait=false;
+  static bool lastPortrait = false;
 
-  List<Map<String,dynamic>> getJsonData(List<dynamic> data){
-    bool isDocument=data.first is Document;
-    List<Map<String,dynamic>> result=[];
-    for(int i=0;i<data.length;i++){
-      if(isDocument){
+  List<Map<String, dynamic>> getJsonData(List<dynamic> data) {
+    bool isDocument = data.first is Document;
+    List<Map<String, dynamic>> result = [];
+    for (int i = 0; i < data.length; i++) {
+      if (isDocument) {
         result.add(data[i].data);
-
-      }
-      else{
+      } else {
         result.add(data[i].value!.toJson());
       }
-
     }
 
     return result;
@@ -184,12 +185,10 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
 
   @override
   Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
-    bool portrait=MediaQuery.of(current).orientation==Orientation.portrait;
-    if(portrait!=lastPortrait){
-      rowTextStyle = TextStyle(
-        fontSize: portrait?13.sp:10.sp,
-      );
-      lastPortrait=portrait;
+    bool portrait = MediaQuery.of(current).orientation == Orientation.portrait;
+    if (portrait != lastPortrait) {
+      rowTextStyle = TextStyle(fontSize: portrait ? 13.sp : 10.sp);
+      lastPortrait = portrait;
     }
     if (errorCounter != null) {
       errorCounter = errorCounter! + 1;
@@ -207,10 +206,18 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
 
     // List returned will be empty is there're fewer items than startingAt
     var x = empty
-        ? await Future.delayed(const Duration(milliseconds: 1000),
-            () => ParcOtoWebServiceResponse<T>(0, []))
-        : await repo.getData(startIndex, count, sortColumn, sortAscending,
-            searchKey: searchKey, filters: filters);
+        ? await Future.delayed(
+            const Duration(milliseconds: 1000),
+            () => ParcOtoWebServiceResponse<T>(0, []),
+          )
+        : await repo.getData(
+            startIndex,
+            count,
+            sortColumn,
+            sortAscending,
+            searchKey: searchKey,
+            filters: filters,
+          );
     var visibleData = List<MapEntry<String, T>>.from(x.data);
     var totalRecords = x.totalRecords;
 
@@ -242,8 +249,10 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
               };
               final localValue = repo.fromJsonFunction(payload);
               if (existingIndex >= 0) {
-                visibleData[existingIndex] =
-                    MapEntry(operation.entityId, localValue);
+                visibleData[existingIndex] = MapEntry(
+                  operation.entityId,
+                  localValue,
+                );
               } else if (operation.type == SyncOperationType.create &&
                   startIndex == 0 &&
                   (searchKey == null || searchKey!.isEmpty) &&
@@ -274,27 +283,26 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
     return r;
   }
 
-  void longPressing(MapEntry<String,T> element){
-
-  }
+  void longPressing(MapEntry<String, T> element) {}
   DataRow rowDisplay(
-      int startIndex, int count, MapEntry<String, dynamic> element) {
-
-
+    int startIndex,
+    int count,
+    MapEntry<String, dynamic> element,
+  ) {
     return DataRow(
       key: ValueKey<String>(element.value.id),
-      onLongPress: ()=>longPressing(element),
+      onLongPress: () => longPressing(element),
       onSelectChanged: selectC == true
           ? (value) {
               if (value == true) {
                 selectRow(element.value);
               }
             }
-          : (value){
-        deselectAll();
-        element.value.selected=true;
-        notifyListeners();
-      },
+          : (value) {
+              deselectAll();
+              element.value.selected = true;
+              notifyListeners();
+            },
       selected: element.value.selected,
       cells: getCellsToShow(element as MapEntry<String, T>),
     );
@@ -307,28 +315,31 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
   }
 
   void showDeleteConfirmation(dynamic c) {
-    Future.delayed(const Duration(milliseconds: 50))
-        .then((value) => f.showDialog(
-            context: current,
-            builder: (context) {
-              return f.ContentDialog(
-                content: Text(deleteConfirmationMessage(c)),
-                actions: [
-                  f.FilledButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('annuler').tr()),
-                  f.Button(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      deleteRow(c);
-                    },
-                    child: const Text('confirmer').tr(),
-                  )
-                ],
-              );
-            }));
+    Future.delayed(const Duration(milliseconds: 50)).then(
+      (value) => f.showDialog(
+        context: current,
+        builder: (context) {
+          return f.ContentDialog(
+            content: Text(deleteConfirmationMessage(c)),
+            actions: [
+              f.FilledButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('annuler').tr(),
+              ),
+              f.Button(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  deleteRow(c);
+                },
+                child: const Text('confirmer').tr(),
+              ),
+            ],
+          );
+        },
+      ),
+    );
   }
 
   String deleteConfirmationMessage(T c);
@@ -359,7 +370,9 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
       try {
         await addToActivity(c);
       } catch (activityError) {
-        debugPrint('[ParcOto] deletion activity could not be recorded: $activityError');
+        debugPrint(
+          '[ParcOto] deletion activity could not be recorded: $activityError',
+        );
       }
       refreshDatasource();
     } catch (error, stackTrace) {
@@ -371,8 +384,7 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
           title: const Text('erreur').tr(),
           severity: f.InfoBarSeverity.error,
         ),
-        alignment:
-            Alignment.lerp(Alignment.topCenter, Alignment.center, 0.6)!,
+        alignment: Alignment.lerp(Alignment.topCenter, Alignment.center, 0.6)!,
       );
     }
   }
@@ -394,25 +406,28 @@ abstract class ParcOtoDatasourceUsers<S, T> extends AsyncDataTableSource {
 
   late final ParcOtoWebServiceUsers<S, T> repo;
 
-  ParcOtoDatasourceUsers(
-      {required this.current,
-      this.selectC = false,
-      this.appTheme,
-      this.searchKey});
+  ParcOtoDatasourceUsers({
+    required this.current,
+    this.selectC = false,
+    this.appTheme,
+    this.searchKey,
+  });
 
-  ParcOtoDatasourceUsers.empty(
-      {required this.current,
-      this.selectC = false,
-      this.appTheme,
-      this.searchKey}) {
+  ParcOtoDatasourceUsers.empty({
+    required this.current,
+    this.selectC = false,
+    this.appTheme,
+    this.searchKey,
+  }) {
     empty = true;
   }
 
-  ParcOtoDatasourceUsers.error(
-      {required this.current,
-      this.selectC = false,
-      this.appTheme,
-      this.searchKey}) {
+  ParcOtoDatasourceUsers.error({
+    required this.current,
+    this.selectC = false,
+    this.appTheme,
+    this.searchKey,
+  }) {
     errorCounter = 0;
   }
 
@@ -429,18 +444,19 @@ abstract class ParcOtoDatasourceUsers<S, T> extends AsyncDataTableSource {
 
   Future<int> getTotalRecords() {
     return Future<int>.delayed(
-        const Duration(milliseconds: 0), () => empty ? 0 : data.length);
+      const Duration(milliseconds: 0),
+      () => empty ? 0 : data.length,
+    );
   }
-  static bool lastPortrait=false;
+
+  static bool lastPortrait = false;
 
   @override
   Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
-    bool portrait=MediaQuery.of(current).orientation==Orientation.portrait;
-    if(portrait!=lastPortrait){
-      rowTextStyle = TextStyle(
-        fontSize: portrait?13.sp:10.sp,
-      );
-      lastPortrait=portrait;
+    bool portrait = MediaQuery.of(current).orientation == Orientation.portrait;
+    if (portrait != lastPortrait) {
+      rowTextStyle = TextStyle(fontSize: portrait ? 13.sp : 10.sp);
+      lastPortrait = portrait;
     }
     if (errorCounter != null) {
       errorCounter = errorCounter! + 1;
@@ -455,16 +471,24 @@ abstract class ParcOtoDatasourceUsers<S, T> extends AsyncDataTableSource {
 
     // List returned will be empty is there're fewer items than startingAt
     var x = empty
-        ? await Future.delayed(const Duration(milliseconds: 500),
-            () => UsersWebServiceResponse<S, T>(0, []))
-        : await repo.getData(startIndex, count, sortColumn, sortAscending,
-            searchKey: searchKey);
+        ? await Future.delayed(
+            const Duration(milliseconds: 500),
+            () => UsersWebServiceResponse<S, T>(0, []),
+          )
+        : await repo.getData(
+            startIndex,
+            count,
+            sortColumn,
+            sortAscending,
+            searchKey: searchKey,
+          );
 
     var r = AsyncRowsResponse(
-        x.totalRecords,
-        x.data.map((element) {
-          return rowDisplay(startIndex, count, element);
-        }).toList());
+      x.totalRecords,
+      x.data.map((element) {
+        return rowDisplay(startIndex, count, element);
+      }).toList(),
+    );
 
     return r;
   }
@@ -472,7 +496,10 @@ abstract class ParcOtoDatasourceUsers<S, T> extends AsyncDataTableSource {
   Map<String, f.FlyoutController> controllers = {};
 
   DataRow rowDisplay(
-      int startIndex, int count, MapEntry<dynamic, dynamic> element) {
+    int startIndex,
+    int count,
+    MapEntry<dynamic, dynamic> element,
+  ) {
     controllers[element.value.key.$id] = f.FlyoutController();
     return DataRow(
       key: ValueKey<String>(element.key),
@@ -489,10 +516,9 @@ abstract class ParcOtoDatasourceUsers<S, T> extends AsyncDataTableSource {
 
   List<DataCell> getCellsToShow(MapEntry<S, T> element);
 
-
-  List<Map<String,dynamic>> getJsonData(List<dynamic> data){
-    List<Map<String,dynamic>> result=[];
-    for(int i=0;i<data.length;i++){
+  List<Map<String, dynamic>> getJsonData(List<dynamic> data) {
+    List<Map<String, dynamic>> result = [];
+    for (int i = 0; i < data.length; i++) {
       result.add(data[i].value!.toJson());
     }
 
@@ -504,28 +530,31 @@ abstract class ParcOtoDatasourceUsers<S, T> extends AsyncDataTableSource {
   }
 
   void showDeleteConfirmation(dynamic c, dynamic t) {
-    Future.delayed(const Duration(milliseconds: 50))
-        .then((value) => f.showDialog(
-            context: current,
-            builder: (context) {
-              return f.ContentDialog(
-                content: Text(deleteConfirmationMessage(t)),
-                actions: [
-                  f.FilledButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text('annuler').tr()),
-                  f.Button(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      deleteRow(c, t);
-                    },
-                    child: const Text('confirmer').tr(),
-                  )
-                ],
-              );
-            }));
+    Future.delayed(const Duration(milliseconds: 50)).then(
+      (value) => f.showDialog(
+        context: current,
+        builder: (context) {
+          return f.ContentDialog(
+            content: Text(deleteConfirmationMessage(t)),
+            actions: [
+              f.FilledButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('annuler').tr(),
+              ),
+              f.Button(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  deleteRow(c, t);
+                },
+                child: const Text('confirmer').tr(),
+              ),
+            ],
+          );
+        },
+      ),
+    );
   }
 
   String deleteConfirmationMessage(T c);

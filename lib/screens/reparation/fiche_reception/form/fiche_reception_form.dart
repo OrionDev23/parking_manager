@@ -4,6 +4,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:image_picker/image_picker.dart';
+
 import '../../../../providers/repair_provider.dart';
 import '../../../../serializables/conducteur/conducteur.dart';
 import '../../../../serializables/reparation/etat_vehicle_gts.dart';
@@ -18,6 +19,7 @@ import '../../../vehicle/manager/vehicles_table.dart';
 import '../../../../serializables/reparation/etat_vehicle.dart';
 import '../../../../theme.dart';
 import '../../../../widgets/big_title_form.dart';
+
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -48,7 +50,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
   static Map<Key, int> reservedFiches = {};
 
   EntretienVehicle entretienVehicle = EntretienVehicle();
-  EtatVehicleInterface etatVehicle = gts?EtatVehicleGTS():EtatVehicle();
+  EtatVehicleInterface etatVehicle = gts ? EtatVehicleGTS() : EtatVehicle();
 
   TextEditingController numOrdre = TextEditingController();
   DateTime dateEntre = DateTime.now();
@@ -113,9 +115,11 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
       matriculeConducteur.text = widget.fiche!.matriculeConducteur ?? '';
       nom.text = widget.fiche!.nomConducteur ?? '';
       prenom.text = widget.fiche!.prenomConducteur ?? '';
-      anneeUtil = DateTime(widget.fiche!.anneeUtil ??
-          selectedVehicle?.anneeUtil ??
-          DateTime.now().year);
+      anneeUtil = DateTime(
+        widget.fiche!.anneeUtil ??
+            selectedVehicle?.anneeUtil ??
+            DateTime.now().year,
+      );
       setState(() {
         assigningFicheNumber = false;
       });
@@ -124,15 +128,17 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
 
   Future<void> getVehicle() async {
     if (widget.fiche != null && widget.fiche!.vehicule != null) {
-      selectedVehicle =
-          await VehicleProvider().getVehicle(widget.fiche!.vehicule!);
+      selectedVehicle = await VehicleProvider().getVehicle(
+        widget.fiche!.vehicule!,
+      );
     }
   }
 
   Future<void> getReparation() async {
     if (widget.fiche != null && widget.fiche!.reparation != null) {
-      selectedReparation =
-          await RepairProvider().getReparation(widget.fiche!.reparation!);
+      selectedReparation = await RepairProvider().getReparation(
+        widget.fiche!.reparation!,
+      );
     }
   }
 
@@ -152,10 +158,11 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
     return await DatabaseGetter.storage!
         .getFileView(bucketId: 'images', fileId: "$documentID$id.jpg")
         .onError((e, s) {
-      return Future.value(Uint8List.fromList([]));
-    }).then((s) {
-      return s;
-    });
+          return Future.value(Uint8List.fromList([]));
+        })
+        .then((s) {
+          return s;
+        });
   }
 
   bool assigningFicheNumber = false;
@@ -168,29 +175,29 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
     if (mounted) {
       setState(() {});
     }
-    await DatabaseGetter.database!.listRows(
-        databaseId: databaseId,
-        tableId: fichesreceptionId,
-        queries: [
-          Query.orderDesc('numero'),
-          Query.limit(1),
-        ]).then((value) {
-      if (value.rows.length == 1) {
-        numOrdre.text = (value.rows[0]
-                    .convertTo((p0) =>
-                        FicheReception.fromJson(p0))
-                    .numero +
-                1)
-            .toString();
-      } else {
-        numOrdre.text = (reservedFiches.length + 1).toString();
-      }
+    await DatabaseGetter.database!
+        .listRows(
+          databaseId: databaseId,
+          tableId: fichesreceptionId,
+          queries: [Query.orderDesc('numero'), Query.limit(1)],
+        )
+        .then((value) {
+          if (value.rows.length == 1) {
+            numOrdre.text =
+                (value.rows[0]
+                            .convertTo((p0) => FicheReception.fromJson(p0))
+                            .numero +
+                        1)
+                    .toString();
+          } else {
+            numOrdre.text = (reservedFiches.length + 1).toString();
+          }
 
-      while (testIfReservedContainedFiches(int.parse(numOrdre.text))) {
-        numOrdre.text = (int.parse(numOrdre.text) + 1).toString();
-      }
-      reservedFiches[widget.key!] = (int.parse(numOrdre.text));
-    });
+          while (testIfReservedContainedFiches(int.parse(numOrdre.text))) {
+            numOrdre.text = (int.parse(numOrdre.text) + 1).toString();
+          }
+          reservedFiches[widget.key!] = (int.parse(numOrdre.text));
+        });
 
     assigningFicheNumber = false;
     if (mounted) {
@@ -207,28 +214,32 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
       });
       result = true;
     } else {
-      result = await DatabaseGetter.database!.listRows(
-          databaseId: databaseId,
-          tableId: fichesreceptionId,
-          queries: [
-            Query.orderDesc('numero'),
-            Query.equal('numero', int.parse(numOrdre.text)),
-            Query.limit(1),
-          ]).then((value) {
-        if (value.rows.length == 1) {
-          setState(() {
-            errorNumFiche = true;
+      result = await DatabaseGetter.database!
+          .listRows(
+            databaseId: databaseId,
+            tableId: fichesreceptionId,
+            queries: [
+              Query.orderDesc('numero'),
+              Query.equal('numero', int.parse(numOrdre.text)),
+              Query.limit(1),
+            ],
+          )
+          .then((value) {
+            if (value.rows.length == 1) {
+              setState(() {
+                errorNumFiche = true;
+              });
+              return true;
+            } else {
+              setState(() {
+                errorNumFiche = false;
+              });
+              return false;
+            }
+          })
+          .onError((error, stackTrace) {
+            return Future.value(false);
           });
-          return true;
-        } else {
-          setState(() {
-            errorNumFiche = false;
-          });
-          return false;
-        }
-      }).onError((error, stackTrace) {
-        return Future.value(false);
-      });
     }
 
     return result;
@@ -258,31 +269,26 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
       nchassi.text = selectedVehicle!.numeroSerie ?? '';
       matricule.text = selectedVehicle!.matricule;
       anneeUtil = DateTime(selectedVehicle!.anneeUtil ?? 2023);
-      if(selectedConducteur==null){
+      if (selectedConducteur == null) {
         nom.text = selectedVehicle!.nom ?? '';
         prenom.text = selectedVehicle!.prenom ?? '';
         matriculeConducteur.text = selectedVehicle!.matriculeConducteur ?? '';
       }
-
     }
     setState(() {});
   }
 
-  void setConducteurValues(){
+  void setConducteurValues() {
     if (selectedConducteur == null) {
       nom.clear();
       prenom.clear();
       matriculeConducteur.clear();
-    }
-    else{
-      nom.text = selectedConducteur!.name ;
-      prenom.text = selectedConducteur!.prenom ;
+    } else {
+      nom.text = selectedConducteur!.name;
+      prenom.text = selectedConducteur!.prenom;
       matriculeConducteur.text = selectedConducteur!.matricule;
-
     }
-    setState(() {
-
-    });
+    setState(() {});
   }
 
   @override
@@ -293,473 +299,539 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
     return ScaffoldPage(
       content: Container(
         padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: appTheme.backGroundColor,
-        ),
+        decoration: BoxDecoration(color: appTheme.backGroundColor),
         clipBehavior: Clip.antiAlias,
-        child: Stack(children: [
-          Positioned.fill(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              children: [
-                Row(
-                  children: [
-                    if (MyEntrepriseState.p != null)
-                      const EntreprisePlacement(),
-                    const Spacer(),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        if (errorNumFiche)
-                          Text(
-                            'numprorder',
-                            style: TextStyle(color: Colors.red),
-                          ).tr(),
-                        if (errorNumFiche) smallSpace,
-                        Row(
-                          children: [
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                children: [
+                  Row(
+                    children: [
+                      if (MyEntrepriseState.p != null)
+                        const EntreprisePlacement(),
+                      const Spacer(),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          if (errorNumFiche)
                             Text(
-                              'fichereception'.tr().toUpperCase(),
-                              style: headerStyle,
-                            ),
-                            smallSpace,
-                            Container(
-                              width: 200.px,
-                              height: 40.px,
-                              decoration: BoxDecoration(
-                                border: Border.all(),
+                              'numprorder',
+                              style: TextStyle(color: Colors.red),
+                            ).tr(),
+                          if (errorNumFiche) smallSpace,
+                          Row(
+                            children: [
+                              Text(
+                                'fichereception'.tr().toUpperCase(),
+                                style: headerStyle,
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      'num',
-                                      style: boldStyle,
-                                    ).tr(),
-                                    smallSpace,
-                                    Flexible(
-                                      child: TextBox(
-                                        controller: numOrdre,
-                                        enabled: widget.fiche == null,
-                                        placeholder: 'num'.tr(),
-                                        placeholderStyle: placeStyle,
-                                        style: appTheme.writingStyle,
-                                        cursorColor: appTheme.color.darker,
-                                        decoration: WidgetStatePropertyAll(
+                              smallSpace,
+                              Container(
+                                width: 200.px,
+                                height: 40.px,
+                                decoration: BoxDecoration(border: Border.all()),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Row(
+                                    children: [
+                                      Text('num', style: boldStyle).tr(),
+                                      smallSpace,
+                                      Flexible(
+                                        child: TextBox(
+                                          controller: numOrdre,
+                                          enabled: widget.fiche == null,
+                                          placeholder: 'num'.tr(),
+                                          placeholderStyle: placeStyle,
+                                          style: appTheme.writingStyle,
+                                          cursorColor: appTheme.color.darker,
+                                          decoration: WidgetStatePropertyAll(
                                             BoxDecoration(
-                                                color: appTheme.fillColor)),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.digitsOnly
-                                        ],
-                                        onChanged: (s) async {
-                                          if (s.isNotEmpty) {
-                                            if (!await testIfFichesNumberExists()) {
-                                              reservedFiches[widget.key!] =
-                                                  int.parse(s);
-                                              setState(() {});
+                                              color: appTheme.fillColor,
+                                            ),
+                                          ),
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter
+                                                .digitsOnly,
+                                          ],
+                                          onChanged: (s) async {
+                                            if (s.isNotEmpty) {
+                                              if (!await testIfFichesNumberExists()) {
+                                                reservedFiches[widget.key!] =
+                                                    int.parse(s);
+                                                setState(() {});
+                                              }
                                             }
-                                          }
-                                        },
+                                          },
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      'dateentre',
-                      style: boldStyle,
-                    ).tr(),
-                    bigSpace,
-                    SizedBox(
-                      width: 200.px,
-                      height: 30.px,
-                      child: DatePicker(
-                        selected: DateTime(dateEntre.year,dateEntre.month,dateEntre.day,dateEntre.hour,dateEntre.minute,dateEntre.second),
-                        onChanged: (s) {
-                          setState(() {
-                            dateEntre = DateTime(s.year,s.month,s.day,dateEntre.hour,dateEntre.minute,dateEntre.second);
-                          });
-                        },
-                      ),
-                    ),
-                    smallSpace,
-                    Text('at',style: boldStyle,).tr(),
-                    smallSpace,
-                    SizedBox(
-                      width: 200.px,
-                      height: 30.px,
-                      child: TimePicker(
-                        selected: DateTime(dateEntre.year,dateEntre.month,dateEntre.day,dateEntre.hour,dateEntre.minute,dateEntre.second),
-                        onChanged: (s) {
-                          setState(() {
-                            dateEntre = DateTime(dateEntre.year,dateEntre.month,dateEntre.day,s.hour,s.minute,s.second);
-                          });
-                        },
-                        hourFormat: HourFormat.HH,
-                      ),
-                    ),
-
-                  ],
-                ),
-                smallSpace,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      'datesortie',
-                      style: boldStyle,
-                    ).tr(),
-                    bigSpace,
-                    SizedBox(
-                      width: 200.px,
-                      height: 30.px,
-                      child: DatePicker(
-                        selected:dateSortie==null?dateSortie: DateTime(dateSortie!.year,dateSortie!.month,dateSortie!.day,dateSortie!.hour,dateSortie!.minute,dateSortie!.second),
-                        startDate: dateEntre,
-                        onChanged: (s) {
-                          setState(() {
-                            dateSortie = dateSortie==null?s:DateTime(s.year,s.month,s.day,dateSortie!.hour,dateSortie!.minute,dateSortie!.second);
-                          });
-                        },
-                      ),
-                    ),
-                    smallSpace,
-                    Text('at',style: boldStyle,).tr(),
-                    smallSpace,
-                    SizedBox(
-                      width: 200.px,
-                      height: 30.px,
-                      child: TimePicker(
-                        selected:dateSortie==null?dateSortie: DateTime(dateSortie!.year,dateSortie!.month,dateSortie!.day,dateSortie!.hour,dateSortie!.minute,dateSortie!.second),
-                        onChanged: (s) {
-                          setState(() {
-                            dateSortie = dateSortie==null?s:DateTime(dateSortie!.year,dateSortie!.month,dateSortie!.day,s.hour,s.minute,s.second);
-                          });
-                        },
-                        hourFormat: HourFormat.HH,
-
-                      ),
-                    ),
-
-                  ],
-                ),
-                smallSpace,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    SizedBox(
-                      width: 250.px,
-                      height: 50.px,
-                      child: ListTile(
-                        leading: Text(
-                          'vehicule',
-                          style: boldStyle,
-                        ).tr(),
-                        title:
-                            Text(selectedVehicle?.matricule ?? 'nonind'.tr()),
-                        onPressed: () async {
-                          selectedVehicle = await showDialog<Vehicle>(
-                              context: context,
-                              barrierDismissible: true,
-                              builder: (context) {
-                                return ContentDialog(
-                                  constraints: BoxConstraints.tight(
-                                      Size(700.px, 550.px)),
-                                  title: const Text('selectvehicle').tr(),
-                                  style: ContentDialogThemeData(
-                                      titleStyle: appTheme.writingStyle
-                                          .copyWith(
-                                              fontWeight: FontWeight.bold)),
-                                  content: const VehicleTable(
-                                    selectV: true,
-                                  ),
-                                  actions: [
-                                    Button(
-                                        child: const Text('fermer').tr(),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        })
-                                  ],
-                                );
-                              });
-                          setVehicleValues();
-                        },
-                      ),
-                    ),
-                    smallSpace,
-                    if (selectedVehicle != null)
-                      IconButton(
-                          icon: const Icon(FluentIcons.cancel),
-                          onPressed: () {
-                            selectedVehicle = null;
-                            setVehicleValues();
-                          }),
-                    const Spacer(),
-                    SizedBox(
-                      width: 545.px,
-                      height: 50.px,
-                      child: ListTile(
-                        leading: Text(
-                          'ordrereparation',
-                          style: boldStyle,
-                        ).tr(),
-                        title:
-                        Text(selectedReparation?.numero==null?'nonind'.tr():NumberFormat("000000").format(selectedReparation!.numero)),
-                        onPressed: () async {
-                          selectedReparation = await showDialog<Reparation>(
-                              context: context,
-                              barrierDismissible: true,
-                              builder: (context) {
-                                return ContentDialog(
-                                  constraints: BoxConstraints.tight(
-                                      Size(700.px, 550.px)),
-                                  title: const Text('selectreparation').tr(),
-                                  style: ContentDialogThemeData(
-                                      titleStyle: appTheme.writingStyle
-                                          .copyWith(
-                                          fontWeight: FontWeight.bold)),
-                                  content: const ReparationTable(
-                                    selectD: true,
-                                  ),
-                                  actions: [
-                                    Button(
-                                        child: const Text('fermer').tr(),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        })
-                                  ],
-                                );
-                              });
-                        },
-                      ),
-                    ),
-                    smallSpace,
-                    if (selectedReparation != null)
-                      IconButton(
-                          icon: const Icon(FluentIcons.cancel),
-                          onPressed: () {
-                            selectedReparation = null;
-                            setState(() {
-
-                            });
-                          }),
-                  ],
-                ),
-                smallSpace,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 250.px,
-                      height: 50.px,
-                      child: ListTile(
-                        leading: Text(
-                          'chauffeur',
-                          style: boldStyle,
-                        ).tr(),
-                        title:
-                        Text(selectedConducteur?.getName() ?? 'nonind'.tr()),
-                        onPressed: () async {
-                          selectedConducteur = await showDialog<Conducteur>(
-                              context: context,
-                              barrierDismissible: true,
-                              builder: (context) {
-                                return ContentDialog(
-                                  constraints: BoxConstraints.tight(
-                                      Size(700.px, 550.px)),
-                                  title: const Text('selectchauffeur').tr(),
-                                  style: ContentDialogThemeData(
-                                      titleStyle: appTheme.writingStyle
-                                          .copyWith(
-                                          fontWeight: FontWeight.bold)),
-                                  content: const ChauffeurTable(
-                                    selectD: true,
-                                  ),
-                                  actions: [
-                                    Button(
-                                        child: const Text('fermer').tr(),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        })
-                                  ],
-                                );
-                              });
-                          setConducteurValues();
-                        },
-                      ),
-                    ),
-                    smallSpace,
-                    if (selectedConducteur != null)
-                      IconButton(
-                          icon: const Icon(FluentIcons.cancel),
-                          onPressed: () {
-                            selectedConducteur = null;
-                            setConducteurValues();
-                          }),
-                  ],
-                ),
-                buildTable(appTheme),
-                smallSpace,
-                Container(
-                  height: 100.px,
-                  padding: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'descriptiondegats',
-                        style: littleStyle,
-                      ).tr(),
-                      smallSpace,
-                      Flexible(
-                        child: TextBox(
-                          controller: remarqueEntretien,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          placeholder: 'descriptiondegats'.tr(),
-                          placeholderStyle: placeStyle.copyWith(),
-                          textAlignVertical: TextAlignVertical.top,
-                          suffix: Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Text('charactersremaining',style:placeStyle).tr(namedArgs: {
-                              'nbr':(100-remarqueEntretien.text.length).toString()
-                            }),
+                            ],
                           ),
-                          maxLines: 4,
-                          maxLength: 100,
-                          onChanged: (s){
+                        ],
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text('dateentre', style: boldStyle).tr(),
+                      bigSpace,
+                      SizedBox(
+                        width: 200.px,
+                        height: 30.px,
+                        child: DatePicker(
+                          selected: DateTime(
+                            dateEntre.year,
+                            dateEntre.month,
+                            dateEntre.day,
+                            dateEntre.hour,
+                            dateEntre.minute,
+                            dateEntre.second,
+                          ),
+                          onChanged: (s) {
                             setState(() {
-
+                              dateEntre = DateTime(
+                                s.year,
+                                s.month,
+                                s.day,
+                                dateEntre.hour,
+                                dateEntre.minute,
+                                dateEntre.second,
+                              );
                             });
                           },
                         ),
                       ),
+                      smallSpace,
+                      Text('at', style: boldStyle).tr(),
+                      smallSpace,
+                      SizedBox(
+                        width: 200.px,
+                        height: 30.px,
+                        child: TimePicker(
+                          selected: DateTime(
+                            dateEntre.year,
+                            dateEntre.month,
+                            dateEntre.day,
+                            dateEntre.hour,
+                            dateEntre.minute,
+                            dateEntre.second,
+                          ),
+                          onChanged: (s) {
+                            setState(() {
+                              dateEntre = DateTime(
+                                dateEntre.year,
+                                dateEntre.month,
+                                dateEntre.day,
+                                s.hour,
+                                s.minute,
+                                s.second,
+                              );
+                            });
+                          },
+                          hourFormat: HourFormat.HH,
+                        ),
+                      ),
                     ],
                   ),
-                ),
-                smallSpace,
-                BigTitleForm(
-                  bigTitle: 'imagesdegats',
-                  littleTitle: 'uploaddimages',
-                  trailing: Row(
+                  smallSpace,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      const Text('afficherquestion').tr(),
+                      Text('datesortie', style: boldStyle).tr(),
+                      bigSpace,
+                      SizedBox(
+                        width: 200.px,
+                        height: 30.px,
+                        child: DatePicker(
+                          selected: dateSortie == null
+                              ? dateSortie
+                              : DateTime(
+                                  dateSortie!.year,
+                                  dateSortie!.month,
+                                  dateSortie!.day,
+                                  dateSortie!.hour,
+                                  dateSortie!.minute,
+                                  dateSortie!.second,
+                                ),
+                          startDate: dateEntre,
+                          onChanged: (s) {
+                            setState(() {
+                              dateSortie = dateSortie == null
+                                  ? s
+                                  : DateTime(
+                                      s.year,
+                                      s.month,
+                                      s.day,
+                                      dateSortie!.hour,
+                                      dateSortie!.minute,
+                                      dateSortie!.second,
+                                    );
+                            });
+                          },
+                        ),
+                      ),
                       smallSpace,
-                      ToggleSwitch(
+                      Text('at', style: boldStyle).tr(),
+                      smallSpace,
+                      SizedBox(
+                        width: 200.px,
+                        height: 30.px,
+                        child: TimePicker(
+                          selected: dateSortie == null
+                              ? dateSortie
+                              : DateTime(
+                                  dateSortie!.year,
+                                  dateSortie!.month,
+                                  dateSortie!.day,
+                                  dateSortie!.hour,
+                                  dateSortie!.minute,
+                                  dateSortie!.second,
+                                ),
+                          onChanged: (s) {
+                            setState(() {
+                              dateSortie = dateSortie == null
+                                  ? s
+                                  : DateTime(
+                                      dateSortie!.year,
+                                      dateSortie!.month,
+                                      dateSortie!.day,
+                                      s.hour,
+                                      s.minute,
+                                      s.second,
+                                    );
+                            });
+                          },
+                          hourFormat: HourFormat.HH,
+                        ),
+                      ),
+                    ],
+                  ),
+                  smallSpace,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      SizedBox(
+                        width: 250.px,
+                        height: 50.px,
+                        child: ListTile(
+                          leading: Text('vehicule', style: boldStyle).tr(),
+                          title: Text(
+                            selectedVehicle?.matricule ?? 'nonind'.tr(),
+                          ),
+                          onPressed: () async {
+                            selectedVehicle = await showDialog<Vehicle>(
+                              context: context,
+                              barrierDismissible: true,
+                              builder: (context) {
+                                return ContentDialog(
+                                  constraints: BoxConstraints.tight(
+                                    Size(700.px, 550.px),
+                                  ),
+                                  title: const Text('selectvehicle').tr(),
+                                  style: ContentDialogThemeData(
+                                    titleStyle: appTheme.writingStyle.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  content: const VehicleTable(selectV: true),
+                                  actions: [
+                                    Button(
+                                      child: const Text('fermer').tr(),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                            setVehicleValues();
+                          },
+                        ),
+                      ),
+                      smallSpace,
+                      if (selectedVehicle != null)
+                        IconButton(
+                          icon: const Icon(FluentIcons.cancel),
+                          onPressed: () {
+                            selectedVehicle = null;
+                            setVehicleValues();
+                          },
+                        ),
+                      const Spacer(),
+                      SizedBox(
+                        width: 545.px,
+                        height: 50.px,
+                        child: ListTile(
+                          leading: Text(
+                            'ordrereparation',
+                            style: boldStyle,
+                          ).tr(),
+                          title: Text(
+                            selectedReparation?.numero == null
+                                ? 'nonind'.tr()
+                                : NumberFormat("000000")
+                                      .format(selectedReparation!.numero),
+                          ),
+                          onPressed: () async {
+                            selectedReparation = await showDialog<Reparation>(
+                              context: context,
+                              barrierDismissible: true,
+                              builder: (context) {
+                                return ContentDialog(
+                                  constraints: BoxConstraints.tight(
+                                    Size(700.px, 550.px),
+                                  ),
+                                  title: const Text('selectreparation').tr(),
+                                  style: ContentDialogThemeData(
+                                    titleStyle: appTheme.writingStyle.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  content: const ReparationTable(selectD: true),
+                                  actions: [
+                                    Button(
+                                      child: const Text('fermer').tr(),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      smallSpace,
+                      if (selectedReparation != null)
+                        IconButton(
+                          icon: const Icon(FluentIcons.cancel),
+                          onPressed: () {
+                            selectedReparation = null;
+                            setState(() {});
+                          },
+                        ),
+                    ],
+                  ),
+                  smallSpace,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: 250.px,
+                        height: 50.px,
+                        child: ListTile(
+                          leading: Text('chauffeur', style: boldStyle).tr(),
+                          title: Text(
+                            selectedConducteur?.getName() ?? 'nonind'.tr(),
+                          ),
+                          onPressed: () async {
+                            selectedConducteur = await showDialog<Conducteur>(
+                              context: context,
+                              barrierDismissible: true,
+                              builder: (context) {
+                                return ContentDialog(
+                                  constraints: BoxConstraints.tight(
+                                    Size(700.px, 550.px),
+                                  ),
+                                  title: const Text('selectchauffeur').tr(),
+                                  style: ContentDialogThemeData(
+                                    titleStyle: appTheme.writingStyle.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  content: const ChauffeurTable(selectD: true),
+                                  actions: [
+                                    Button(
+                                      child: const Text('fermer').tr(),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                            setConducteurValues();
+                          },
+                        ),
+                      ),
+                      smallSpace,
+                      if (selectedConducteur != null)
+                        IconButton(
+                          icon: const Icon(FluentIcons.cancel),
+                          onPressed: () {
+                            selectedConducteur = null;
+                            setConducteurValues();
+                          },
+                        ),
+                    ],
+                  ),
+                  buildTable(appTheme),
+                  smallSpace,
+                  Container(
+                    height: 100.px,
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('descriptiondegats', style: littleStyle).tr(),
+                        smallSpace,
+                        Flexible(
+                          child: TextBox(
+                            controller: remarqueEntretien,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            placeholder: 'descriptiondegats'.tr(),
+                            placeholderStyle: placeStyle.copyWith(),
+                            textAlignVertical: TextAlignVertical.top,
+                            suffix: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child:
+                                  Text(
+                                    'charactersremaining',
+                                    style: placeStyle,
+                                  ).tr(
+                                    namedArgs: {
+                                      'nbr':
+                                          (100 - remarqueEntretien.text.length)
+                                              .toString(),
+                                    },
+                                  ),
+                            ),
+                            maxLines: 4,
+                            maxLength: 100,
+                            onChanged: (s) {
+                              setState(() {});
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  smallSpace,
+                  BigTitleForm(
+                    bigTitle: 'imagesdegats',
+                    littleTitle: 'uploaddimages',
+                    trailing: Row(
+                      children: [
+                        const Text('afficherquestion').tr(),
+                        smallSpace,
+                        ToggleSwitch(
                           checked: showImages,
                           onChanged: (s) {
                             setState(() {
                               showImages = s;
                             });
-                          }),
-                    ],
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                if (showImages) imagesContainer(portrait),
-                smallSpace,
-                BigTitleForm(
-                  bigTitle: 'etatvehicule',
-                  littleTitle: 'selectetat',
-                  trailing: Row(
-                    children: [
-                      const Text('afficherquestion').tr(),
-                      smallSpace,
-                      ToggleSwitch(
+                  if (showImages) imagesContainer(portrait),
+                  smallSpace,
+                  BigTitleForm(
+                    bigTitle: 'etatvehicule',
+                    littleTitle: 'selectetat',
+                    trailing: Row(
+                      children: [
+                        const Text('afficherquestion').tr(),
+                        smallSpace,
+                        ToggleSwitch(
                           checked: showEtat,
                           onChanged: (s) {
                             setState(() {
                               showEtat = s;
                             });
-                          }),
-                    ],
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                if (showEtat)
-                  gts?VehicleDamageGts(
-                    etatVehicle: etatVehicle as EtatVehicleGTS,
-                    vehicleType:
-                        VehiclesUtilities.getGenreNumber(matricule.text),
-                  ):VehicleDamage(
-                    etatVehicle: etatVehicle as EtatVehicle,
-                    vehicleType:
-                    VehiclesUtilities.getGenreNumber(matricule.text),
-                  ),
-                if (showEtat) smallSpace,
-                BigTitleForm(
-                  bigTitle: 'entretienvehicule',
-                  littleTitle: 'selectentretienprec',
-                  trailing: Row(
-                    children: [
-                      const Text('afficherquestion').tr(),
-                      smallSpace,
-                      ToggleSwitch(
+                  if (showEtat)
+                    gts
+                        ? VehicleDamageGts(
+                            etatVehicle: etatVehicle as EtatVehicleGTS,
+                            vehicleType: VehiclesUtilities.getGenreNumber(
+                              matricule.text,
+                            ),
+                          )
+                        : VehicleDamage(
+                            etatVehicle: etatVehicle as EtatVehicle,
+                            vehicleType: VehiclesUtilities.getGenreNumber(
+                              matricule.text,
+                            ),
+                          ),
+                  if (showEtat) smallSpace,
+                  BigTitleForm(
+                    bigTitle: 'entretienvehicule',
+                    littleTitle: 'selectentretienprec',
+                    trailing: Row(
+                      children: [
+                        const Text('afficherquestion').tr(),
+                        smallSpace,
+                        ToggleSwitch(
                           checked: showEtretient,
                           onChanged: (s) {
                             setState(() {
                               showEtretient = s;
                             });
-                          }),
-                    ],
-                  ),
-                ),
-                if (showEtretient)
-                  Container(
-                    height: 260.px,
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      border: Border.all(),
+                          },
+                        ),
+                      ],
                     ),
-                    child: EntretienWidget(entretienVehicle: entretienVehicle),
                   ),
-              ],
+                  if (showEtretient)
+                    Container(
+                      height: 260.px,
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(border: Border.all()),
+                      child: EntretienWidget(
+                        entretienVehicle: entretienVehicle,
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
-          if (assigningFicheNumber)
-            Positioned(
-              top: 40.h,
-              left: 40.w,
-              child: const ProgressBar(),
-            )
-        ]),
+            if (assigningFicheNumber)
+              Positioned(top: 40.h, left: 40.w, child: const ProgressBar()),
+          ],
+        ),
       ),
       bottomBar: Container(
-        decoration: BoxDecoration(
-          color: appTheme.backGroundColor,
-        ),
+        decoration: BoxDecoration(color: appTheme.backGroundColor),
         padding: const EdgeInsets.all(10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             FilledButton(
-                style: ButtonStyle(
-                  backgroundColor:
-                      WidgetStatePropertyAll(appTheme.color.lightest),
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(
+                  appTheme.color.lightest,
                 ),
-                onPressed: uploading ? null : showPdf,
-                child: const Text('voir')),
+              ),
+              onPressed: uploading ? null : showPdf,
+              child: const Text('voir'),
+            ),
             smallSpace,
             FilledButton(
-                style: ButtonStyle(
-                  backgroundColor:
-                      WidgetStatePropertyAll(appTheme.color.darkest),
-                ),
-                onPressed: uploading ? null : uploadForm,
-                child: const Text('save').tr())
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(appTheme.color.darkest),
+              ),
+              onPressed: uploading ? null : uploadForm,
+              child: const Text('save').tr(),
+            ),
           ],
         ),
       ),
@@ -775,93 +847,80 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
 
   Widget imagesContainer(bool portrait) {
     return StaggeredGrid.count(
-        crossAxisCount: portrait ? 1 : 2,
-        mainAxisSpacing: 0,
-        crossAxisSpacing: 0,
-        children: [
-          StaggeredGridTile.fit(
-              crossAxisCellCount: 1,
-              child: OnTapScaleAndFade(
-                onTap: () {
-                  pickImage(0);
-                },
-                child: Container(
-                  height: 200.px,
-                  decoration: BoxDecoration(
-                    border: Border.all(),
-                  ),
-                  child: images[0] == null || images[0]!.isEmpty
-                      ? Icon(FluentIcons.add)
-                      : Image.memory(
-                          images[0]!,
-                          fit: BoxFit.fitHeight,
-                        ),
-                ),
-              )),
-          StaggeredGridTile.fit(
-              crossAxisCellCount: 1,
-              child: OnTapScaleAndFade(
-                onTap: () {
-                  pickImage(1);
-                },
-                child: Container(
-                  height: 200.px,
-                  decoration: BoxDecoration(
-                    border: Border.all(),
-                  ),
-                  child: images[1] == null || images[1]!.isEmpty
-                      ? Icon(FluentIcons.add)
-                      : Image.memory(
-                          images[1]!,
-                          fit: BoxFit.fitHeight,
-                        ),
-                ),
-              )),
-          StaggeredGridTile.fit(
-              crossAxisCellCount: 1,
-              child: OnTapScaleAndFade(
-                onTap: () {
-                  pickImage(2);
-                },
-                child: Container(
-                  height: 200.px,
-                  decoration: BoxDecoration(
-                    border: Border.all(),
-                  ),
-                  child: images[2] == null || images[2]!.isEmpty
-                      ? Icon(FluentIcons.add)
-                      : Image.memory(
-                          images[2]!,
-                          fit: BoxFit.fitHeight,
-                        ),
-                ),
-              )),
-          StaggeredGridTile.fit(
-              crossAxisCellCount: 1,
-              child: OnTapScaleAndFade(
-                onTap: () {
-                  pickImage(3);
-                },
-                child: Container(
-                  height: 200.px,
-                  decoration: BoxDecoration(
-                    border: Border.all(),
-                  ),
-                  child: images[3] == null || images[3]!.isEmpty
-                      ? Icon(FluentIcons.add)
-                      : Image.memory(
-                          images[3]!,
-                          fit: BoxFit.fitHeight,
-                        ),
-                ),
-              )),
-        ]);
+      crossAxisCount: portrait ? 1 : 2,
+      mainAxisSpacing: 0,
+      crossAxisSpacing: 0,
+      children: [
+        StaggeredGridTile.fit(
+          crossAxisCellCount: 1,
+          child: OnTapScaleAndFade(
+            onTap: () {
+              pickImage(0);
+            },
+            child: Container(
+              height: 200.px,
+              decoration: BoxDecoration(border: Border.all()),
+              child: images[0] == null || images[0]!.isEmpty
+                  ? Icon(FluentIcons.add)
+                  : Image.memory(images[0]!, fit: BoxFit.fitHeight),
+            ),
+          ),
+        ),
+        StaggeredGridTile.fit(
+          crossAxisCellCount: 1,
+          child: OnTapScaleAndFade(
+            onTap: () {
+              pickImage(1);
+            },
+            child: Container(
+              height: 200.px,
+              decoration: BoxDecoration(border: Border.all()),
+              child: images[1] == null || images[1]!.isEmpty
+                  ? Icon(FluentIcons.add)
+                  : Image.memory(images[1]!, fit: BoxFit.fitHeight),
+            ),
+          ),
+        ),
+        StaggeredGridTile.fit(
+          crossAxisCellCount: 1,
+          child: OnTapScaleAndFade(
+            onTap: () {
+              pickImage(2);
+            },
+            child: Container(
+              height: 200.px,
+              decoration: BoxDecoration(border: Border.all()),
+              child: images[2] == null || images[2]!.isEmpty
+                  ? Icon(FluentIcons.add)
+                  : Image.memory(images[2]!, fit: BoxFit.fitHeight),
+            ),
+          ),
+        ),
+        StaggeredGridTile.fit(
+          crossAxisCellCount: 1,
+          child: OnTapScaleAndFade(
+            onTap: () {
+              pickImage(3);
+            },
+            child: Container(
+              height: 200.px,
+              decoration: BoxDecoration(border: Border.all()),
+              child: images[3] == null || images[3]!.isEmpty
+                  ? Icon(FluentIcons.add)
+                  : Image.memory(images[3]!, fit: BoxFit.fitHeight),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   void pickImage(int index) async {
     ImagePicker picker = ImagePicker();
-    XFile? image =
-        await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
     if (image != null) {
       images[index] = await image.readAsBytes();
       changedPics = true;
@@ -880,111 +939,110 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
         3: FixedColumnWidth(80.px),
       },
       children: [
-        TableRow(children: [
-          TableCell(
+        TableRow(
+          children: [
+            TableCell(
               child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Text(
-                  'marque',
-                  style: littleStyle,
-                ).tr(),
-                const Spacer(),
-                SizedBox(
-                  width: 160.px,
-                  child: TextBox(
-                    controller: marque,
-                    placeholder: 'marque'.tr(),
-                    style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(
-                        BoxDecoration(color: appTheme.fillColor)),
-                    cursorColor: appTheme.color.darker,
-                    placeholderStyle: placeStyle,
-                  ),
+                padding: const EdgeInsets.all(5),
+                child: Row(
+                  children: [
+                    Text('marque', style: littleStyle).tr(),
+                    const Spacer(),
+                    SizedBox(
+                      width: 160.px,
+                      child: TextBox(
+                        controller: marque,
+                        placeholder: 'marque'.tr(),
+                        style: appTheme.writingStyle,
+                        decoration: WidgetStatePropertyAll(
+                          BoxDecoration(color: appTheme.fillColor),
+                        ),
+                        cursorColor: appTheme.color.darker,
+                        placeholderStyle: placeStyle,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          )),
-          TableCell(
+            TableCell(
               child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Text(
-                  'type',
-                  style: littleStyle,
-                ).tr(),
-                const Spacer(),
-                SizedBox(
-                  width: 160.px,
-                  child: TextBox(
-                    controller: type,
-                    placeholder: 'type'.tr(),
-                    style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(
-                        BoxDecoration(color: appTheme.fillColor)),
-                    cursorColor: appTheme.color.darker,
-                    placeholderStyle: placeStyle,
-                  ),
+                padding: const EdgeInsets.all(5),
+                child: Row(
+                  children: [
+                    Text('type', style: littleStyle).tr(),
+                    const Spacer(),
+                    SizedBox(
+                      width: 160.px,
+                      child: TextBox(
+                        controller: type,
+                        placeholder: 'type'.tr(),
+                        style: appTheme.writingStyle,
+                        decoration: WidgetStatePropertyAll(
+                          BoxDecoration(color: appTheme.fillColor),
+                        ),
+                        cursorColor: appTheme.color.darker,
+                        placeholderStyle: placeStyle,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          )),
-          TableCell(
+            TableCell(
               child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Text(
-                  'nchassi',
-                  style: littleStyle,
-                ).tr(),
-                smallSpace,
-                Flexible(
-                  child: TextBox(
-                    controller: nchassi,
-                    placeholder: 'nchassi'.tr(),
-                    style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(
-                        BoxDecoration(color: appTheme.fillColor)),
-                    cursorColor: appTheme.color.darker,
-                    placeholderStyle: placeStyle,
-                  ),
+                padding: const EdgeInsets.all(5),
+                child: Row(
+                  children: [
+                    Text('nchassi', style: littleStyle).tr(),
+                    smallSpace,
+                    Flexible(
+                      child: TextBox(
+                        controller: nchassi,
+                        placeholder: 'nchassi'.tr(),
+                        style: appTheme.writingStyle,
+                        decoration: WidgetStatePropertyAll(
+                          BoxDecoration(color: appTheme.fillColor),
+                        ),
+                        cursorColor: appTheme.color.darker,
+                        placeholderStyle: placeStyle,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          )),
-          TableCell(
+            TableCell(
               child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: Row(
-              children: [
-                Text(
-                  'matricule',
-                  style: littleStyle,
-                ).tr(),
-                smallSpace,
-                Flexible(
-                  child: TextBox(
-                    controller: matricule,
-                    enabled: selectedVehicle == null,
-                    //readOnly: selectedVehicle!=null,
-                    placeholder: 'matricule'.tr(),
-                    style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(
-                        BoxDecoration(color: appTheme.fillColor)),
+                padding: const EdgeInsets.all(5),
+                child: Row(
+                  children: [
+                    Text('matricule', style: littleStyle).tr(),
+                    smallSpace,
+                    Flexible(
+                      child: TextBox(
+                        controller: matricule,
+                        enabled: selectedVehicle == null,
+                        //readOnly: selectedVehicle!=null,
+                        placeholder: 'matricule'.tr(),
+                        style: appTheme.writingStyle,
+                        decoration: WidgetStatePropertyAll(
+                          BoxDecoration(color: appTheme.fillColor),
+                        ),
 
-                    cursorColor: appTheme.color.darker,
-                    placeholderStyle: placeStyle,
-                  ),
+                        cursorColor: appTheme.color.darker,
+                        placeholderStyle: placeStyle,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          )),
-        ]),
-        TableRow(children: [
-          TableCell(
+          ],
+        ),
+        TableRow(
+          children: [
+            TableCell(
               verticalAlignment: TableCellVerticalAlignment.top,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -993,10 +1051,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                     padding: const EdgeInsets.all(5.0),
                     child: Row(
                       children: [
-                        Text(
-                          'nmoteur',
-                          style: littleStyle,
-                        ).tr(),
+                        Text('nmoteur', style: littleStyle).tr(),
                         const Spacer(),
                         SizedBox(
                           width: 160.px,
@@ -1005,7 +1060,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                             placeholder: 'nmoteur'.tr(),
                             style: appTheme.writingStyle,
                             decoration: WidgetStatePropertyAll(
-                                BoxDecoration(color: appTheme.fillColor)),
+                              BoxDecoration(color: appTheme.fillColor),
+                            ),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -1016,19 +1072,14 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                   Container(
                     height: 1.px,
                     decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(),
-                      ),
+                      border: Border(bottom: BorderSide()),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: Row(
                       children: [
-                        Text(
-                          'kilometrage',
-                          style: littleStyle,
-                        ).tr(),
+                        Text('kilometrage', style: littleStyle).tr(),
                         const Spacer(),
                         SizedBox(
                           width: 160.px,
@@ -1037,10 +1088,11 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                             placeholder: 'KM',
                             style: appTheme.writingStyle,
                             inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
+                              FilteringTextInputFormatter.digitsOnly,
                             ],
                             decoration: WidgetStatePropertyAll(
-                                BoxDecoration(color: appTheme.fillColor)),
+                              BoxDecoration(color: appTheme.fillColor),
+                            ),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -1049,79 +1101,79 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                     ),
                   ),
                 ],
-              )),
-          TableCell(
+              ),
+            ),
+            TableCell(
               child: Padding(
-            padding: const EdgeInsets.all(5),
-            child: SizedBox(
-                height: 120.px,
-                width: 180.px,
-                child: SfRadialGauge(
-                  animationDuration: 500,
-                  title: GaugeTitle(
-                    text: 'carburant'.tr(),
-                    textStyle: littleStyle,
-                    alignment: GaugeAlignment.near,
-                  ),
-                  axes: [
-                    RadialAxis(
-                      canScaleToFit: true,
-                      minimum: 0,
-                      maximum: 8,
-                      radiusFactor: 1,
-                      onAxisTapped: (s) {
-                        setState(() {
-                          carburant = s;
-                        });
-                      },
-                      ranges: [
-                        GaugeRange(
-                          startValue: 0,
-                          endValue: 0.5,
-                          label: 'E',
-                          color: appTheme.color.darkest,
-                        ),
-                        GaugeRange(
-                          startValue: 7.5,
-                          endValue: 8,
-                          label: 'F',
-                          color: appTheme.color.lightest,
-                        ),
-                      ],
-                      annotations: [
-                        GaugeAnnotation(
-                          widget: Text(
-                            '4/8',
-                            style: littleStyle,
+                padding: const EdgeInsets.all(5),
+                child: SizedBox(
+                  height: 120.px,
+                  width: 180.px,
+                  child: SfRadialGauge(
+                    animationDuration: 500,
+                    title: GaugeTitle(
+                      text: 'carburant'.tr(),
+                      textStyle: littleStyle,
+                      alignment: GaugeAlignment.near,
+                    ),
+                    axes: [
+                      RadialAxis(
+                        canScaleToFit: true,
+                        minimum: 0,
+                        maximum: 8,
+                        radiusFactor: 1,
+                        onAxisTapped: (s) {
+                          setState(() {
+                            carburant = s;
+                          });
+                        },
+                        ranges: [
+                          GaugeRange(
+                            startValue: 0,
+                            endValue: 0.5,
+                            label: 'E',
+                            color: appTheme.color.darkest,
                           ),
-                          axisValue: 4,
-                          positionFactor: 0.7,
-                        ),
-                      ],
-                      pointers: [
-                        NeedlePointer(
-                          animationDuration: 500,
-                          needleLength: 0.4,
-                          needleColor: appTheme.color,
-                          needleStartWidth: 1.px,
-                          needleEndWidth: 5.px,
-                          knobStyle: KnobStyle(color: appTheme.color.darkest),
-                          value: carburant,
-                          enableAnimation: true,
-                          enableDragging: true,
-                        ),
-                      ],
-                      interval: 2,
-                      startAngle: 180,
-                      showFirstLabel: false,
-                      showLastLabel: false,
-                      showLabels: false,
-                      endAngle: 360,
-                    )
-                  ],
-                )),
-          )),
-          TableCell(
+                          GaugeRange(
+                            startValue: 7.5,
+                            endValue: 8,
+                            label: 'F',
+                            color: appTheme.color.lightest,
+                          ),
+                        ],
+                        annotations: [
+                          GaugeAnnotation(
+                            widget: Text('4/8', style: littleStyle),
+                            axisValue: 4,
+                            positionFactor: 0.7,
+                          ),
+                        ],
+                        pointers: [
+                          NeedlePointer(
+                            animationDuration: 500,
+                            needleLength: 0.4,
+                            needleColor: appTheme.color,
+                            needleStartWidth: 1.px,
+                            needleEndWidth: 5.px,
+                            knobStyle: KnobStyle(color: appTheme.color.darkest),
+                            value: carburant,
+                            enableAnimation: true,
+                            enableDragging: true,
+                          ),
+                        ],
+                        interval: 2,
+                        startAngle: 180,
+                        showFirstLabel: false,
+                        showLastLabel: false,
+                        showLabels: false,
+                        endAngle: 360,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            TableCell(
               verticalAlignment: TableCellVerticalAlignment.top,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -1130,10 +1182,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                     padding: const EdgeInsets.all(5.0),
                     child: Row(
                       children: [
-                        Text(
-                          'color',
-                          style: littleStyle,
-                        ).tr(),
+                        Text('color', style: littleStyle).tr(),
                         const Spacer(),
                         SizedBox(
                           width: 160.px,
@@ -1142,7 +1191,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                             placeholder: 'color'.tr(),
                             style: appTheme.writingStyle,
                             decoration: WidgetStatePropertyAll(
-                                BoxDecoration(color: appTheme.fillColor)),
+                              BoxDecoration(color: appTheme.fillColor),
+                            ),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -1153,33 +1203,30 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                   Container(
                     height: 1.px,
                     decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(),
-                      ),
+                      border: Border(bottom: BorderSide()),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: Row(
                       children: [
-                        Text(
-                          'anneeutil',
-                          style: littleStyle,
-                        ).tr(),
+                        Text('anneeutil', style: littleStyle).tr(),
                         const Spacer(),
                         SizedBox(
-                            width: 80.px,
-                            child: DatePicker(
-                              selected: anneeUtil,
-                              showDay: false,
-                              showMonth: false,
-                            ))
+                          width: 80.px,
+                          child: DatePicker(
+                            selected: anneeUtil,
+                            showDay: false,
+                            showMonth: false,
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ],
-              )),
-          TableCell(
+              ),
+            ),
+            TableCell(
               verticalAlignment: TableCellVerticalAlignment.top,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -1188,10 +1235,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                     padding: const EdgeInsets.all(5.0),
                     child: Row(
                       children: [
-                        Text(
-                          'matriculeemploye',
-                          style: littleStyle,
-                        ).tr(),
+                        Text('matriculeemploye', style: littleStyle).tr(),
                         const Spacer(),
                         SizedBox(
                           width: 160.px,
@@ -1200,7 +1244,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                             placeholder: 'matriculeemploye'.tr(),
                             style: appTheme.writingStyle,
                             decoration: WidgetStatePropertyAll(
-                                BoxDecoration(color: appTheme.fillColor)),
+                              BoxDecoration(color: appTheme.fillColor),
+                            ),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -1211,19 +1256,14 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                   Container(
                     height: 1.px,
                     decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(),
-                      ),
+                      border: Border(bottom: BorderSide()),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: Row(
                       children: [
-                        Text(
-                          'nom',
-                          style: littleStyle,
-                        ).tr(),
+                        Text('nom', style: littleStyle).tr(),
                         const Spacer(),
                         SizedBox(
                           width: 160.px,
@@ -1232,7 +1272,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                             placeholder: 'nom'.tr(),
                             style: appTheme.writingStyle,
                             decoration: WidgetStatePropertyAll(
-                                BoxDecoration(color: appTheme.fillColor)),
+                              BoxDecoration(color: appTheme.fillColor),
+                            ),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -1243,19 +1284,14 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                   Container(
                     height: 1.px,
                     decoration: const BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(),
-                      ),
+                      border: Border(bottom: BorderSide()),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: Row(
                       children: [
-                        Text(
-                          'prenom',
-                          style: littleStyle,
-                        ).tr(),
+                        Text('prenom', style: littleStyle).tr(),
                         const Spacer(),
                         SizedBox(
                           width: 160.px,
@@ -1264,7 +1300,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                             placeholder: 'prenom'.tr(),
                             style: appTheme.writingStyle,
                             decoration: WidgetStatePropertyAll(
-                                BoxDecoration(color: appTheme.fillColor)),
+                              BoxDecoration(color: appTheme.fillColor),
+                            ),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -1273,8 +1310,10 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                     ),
                   ),
                 ],
-              )),
-        ]),
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -1294,44 +1333,46 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
 
   void showPdf() {
     FicheReception fiche = FicheReception(
-        id: '',
-        numero: int.parse(numOrdre.text),
-        dateEntre: dateEntre,
-        anneeUtil: anneeUtil.year,
-        marque: marque.text,
-        couleur: couleur.text,
-        etatActuel: etatVehicle,
-        showEtat: showEtat,
-        showEntretien: showEtretient,
-        showImages: showImages,
-        entretien: entretienVehicle,
-        gaz: carburant.ceil(),
-        kilometrage: int.tryParse(km.text),
-        modele: type.text,
-        nchassi: nchassi.text,
-        nmoteur: nmoteur.text,
-        vehicule: selectedVehicle?.id,
-        images: changedPics
-            ? [
-                images[0] != null ? 0 : null,
-                images[1] != null ? 1 : null,
-                images[2] != null ? 2 : null,
-                images[3] != null ? 3 : null,
-              ]
-            : widget.fiche != null
-                ? widget.fiche!.images
-                : [null, null, null, null],
-        vehiculemat: selectedVehicle?.matricule,
-        remarque: remarqueEntretien.text,
-        matriculeConducteur: matriculeConducteur.text,
-        nomConducteur: nom.text,
-        prenomConducteur: prenom.text);
+      id: '',
+      numero: int.parse(numOrdre.text),
+      dateEntre: dateEntre,
+      anneeUtil: anneeUtil.year,
+      marque: marque.text,
+      couleur: couleur.text,
+      etatActuel: etatVehicle,
+      showEtat: showEtat,
+      showEntretien: showEtretient,
+      showImages: showImages,
+      entretien: entretienVehicle,
+      gaz: carburant.ceil(),
+      kilometrage: int.tryParse(km.text),
+      modele: type.text,
+      nchassi: nchassi.text,
+      nmoteur: nmoteur.text,
+      vehicule: selectedVehicle?.id,
+      images: changedPics
+          ? [
+              images[0] != null ? 0 : null,
+              images[1] != null ? 1 : null,
+              images[2] != null ? 2 : null,
+              images[3] != null ? 3 : null,
+            ]
+          : widget.fiche != null
+          ? widget.fiche!.images
+          : [null, null, null, null],
+      vehiculemat: selectedVehicle?.matricule,
+      remarque: remarqueEntretien.text,
+      matriculeConducteur: matriculeConducteur.text,
+      nomConducteur: nom.text,
+      prenomConducteur: prenom.text,
+    );
 
     showDialog(
-        context: context,
-        builder: (context) {
-          return PdfPreviewPO(fiche: fiche,images: images,);
-        });
+      context: context,
+      builder: (context) {
+        return PdfPreviewPO(fiche: fiche, images: images);
+      },
+    );
   }
 
   void uploadForm() async {
@@ -1345,91 +1386,107 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
         .abs()
         .toString();
     FicheReception fiche = FicheReception(
-        id: documentID!,
-        marque: marque.text,
-        numero: int.parse(numOrdre.text),
-        dateEntre: dateEntre,
-        anneeUtil: anneeUtil.year,
-        couleur: couleur.text,
-        etatActuel: etatVehicle,
-        entretien: entretienVehicle,
-        gaz: carburant.ceil(),
-        kilometrage: int.tryParse(km.text),
-        modele: type.text,
-        nchassi: nchassi.text,
-        nmoteur: nmoteur.text,
-        showImages: showImages,
-        showEntretien: showEtretient,
-        showEtat: showEtat,
-        vehicule: selectedVehicle?.id,
-        vehiculemat: selectedVehicle?.matricule,
-        remarque: remarqueEntretien.text,
-        matriculeConducteur: matriculeConducteur.text,
-        nomConducteur: nom.text,
-        images: changedPics
-            ? [
-                images[0] != null ? 0 : null,
-                images[1] != null ? 1 : null,
-                images[2] != null ? 2 : null,
-                images[3] != null ? 3 : null,
-              ]
-            : widget.fiche != null
-                ? widget.fiche!.images
-                : [null, null, null, null],
-        prenomConducteur: prenom.text);
+      id: documentID!,
+      marque: marque.text,
+      numero: int.parse(numOrdre.text),
+      dateEntre: dateEntre,
+      anneeUtil: anneeUtil.year,
+      couleur: couleur.text,
+      etatActuel: etatVehicle,
+      entretien: entretienVehicle,
+      gaz: carburant.ceil(),
+      kilometrage: int.tryParse(km.text),
+      modele: type.text,
+      nchassi: nchassi.text,
+      nmoteur: nmoteur.text,
+      showImages: showImages,
+      showEntretien: showEtretient,
+      showEtat: showEtat,
+      vehicule: selectedVehicle?.id,
+      vehiculemat: selectedVehicle?.matricule,
+      remarque: remarqueEntretien.text,
+      matriculeConducteur: matriculeConducteur.text,
+      nomConducteur: nom.text,
+      images: changedPics
+          ? [
+              images[0] != null ? 0 : null,
+              images[1] != null ? 1 : null,
+              images[2] != null ? 2 : null,
+              images[3] != null ? 3 : null,
+            ]
+          : widget.fiche != null
+          ? widget.fiche!.images
+          : [null, null, null, null],
+      prenomConducteur: prenom.text,
+    );
 
     if (!modif) {
       await Future.wait([
-        createFiche(fiche),
-        uploadActivity(modif, fiche),
-        uploadImages(),
-      ]).then((value) {
-        if (mounted) {
-          displayInfoBar(context,
-              builder: (BuildContext context, void Function() close) {
-            return InfoBar(
-              title: const Text('receptionajout').tr(),
-              severity: InfoBarSeverity.success,
-            );
-          }, duration: snackbarShortDuration);
-        }
-      }).onError((error, stackTrace) {
-        if (mounted) {
-          displayInfoBar(context,
-              builder: (BuildContext context, void Function() close) {
-            return InfoBar(
-              title: const Text('echec').tr(),
-              severity: InfoBarSeverity.error,
-            );
-          }, duration: snackbarShortDuration);
-        }
-      });
+            createFiche(fiche),
+            uploadActivity(modif, fiche),
+            uploadImages(),
+          ])
+          .then((value) {
+            if (mounted) {
+              displayInfoBar(
+                context,
+                builder: (BuildContext context, void Function() close) {
+                  return InfoBar(
+                    title: const Text('receptionajout').tr(),
+                    severity: InfoBarSeverity.success,
+                  );
+                },
+                duration: snackbarShortDuration,
+              );
+            }
+          })
+          .onError((error, stackTrace) {
+            if (mounted) {
+              displayInfoBar(
+                context,
+                builder: (BuildContext context, void Function() close) {
+                  return InfoBar(
+                    title: const Text('echec').tr(),
+                    severity: InfoBarSeverity.error,
+                  );
+                },
+                duration: snackbarShortDuration,
+              );
+            }
+          });
     } else {
       await Future.wait([
-        updateFiche(fiche),
-        uploadActivity(modif, fiche),
-        uploadImages()
-      ]).then((value) {
-        if (mounted) {
-          displayInfoBar(context,
-              builder: (BuildContext context, void Function() close) {
-            return InfoBar(
-              title: const Text('receptionmodif').tr(),
-              severity: InfoBarSeverity.success,
-            );
-          }, duration: snackbarShortDuration);
-        }
-      }).onError((error, stackTrace) {
-        if (mounted) {
-          displayInfoBar(context,
-              builder: (BuildContext context, void Function() close) {
-            return InfoBar(
-              title: const Text('echec').tr(),
-              severity: InfoBarSeverity.error,
-            );
+            updateFiche(fiche),
+            uploadActivity(modif, fiche),
+            uploadImages(),
+          ])
+          .then((value) {
+            if (mounted) {
+              displayInfoBar(
+                context,
+                builder: (BuildContext context, void Function() close) {
+                  return InfoBar(
+                    title: const Text('receptionmodif').tr(),
+                    severity: InfoBarSeverity.success,
+                  );
+                },
+                duration: snackbarShortDuration,
+              );
+            }
+          })
+          .onError((error, stackTrace) {
+            if (mounted) {
+              displayInfoBar(
+                context,
+                builder: (BuildContext context, void Function() close) {
+                  return InfoBar(
+                    title: const Text('echec').tr(),
+                    severity: InfoBarSeverity.error,
+                  );
+                },
+              );
+            }
           });
-        }
-      });
     }
 
     uploading = false;
@@ -1448,24 +1505,40 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
             await DatabaseGetter.storage!
                 .deleteFile(bucketId: buckedId, fileId: "$documentID$i.jpg")
                 .onError((s, d) {
-              tasks.add(DatabaseGetter.storage!.createFile(
-                  bucketId: buckedId,
-                  fileId: "$documentID$i.jpg",
-                  file: InputFile.fromBytes(
-                      bytes: images[i]!, filename: "$documentID$i.jpg")));
-            }).then((s) {
-              tasks.add(DatabaseGetter.storage!.createFile(
-                  bucketId: buckedId,
-                  fileId: "$documentID$i.jpg",
-                  file: InputFile.fromBytes(
-                      bytes: images[i]!, filename: "$documentID$i.jpg")));
-            });
+                  tasks.add(
+                    DatabaseGetter.storage!.createFile(
+                      bucketId: buckedId,
+                      fileId: "$documentID$i.jpg",
+                      file: InputFile.fromBytes(
+                        bytes: images[i]!,
+                        filename: "$documentID$i.jpg",
+                      ),
+                    ),
+                  );
+                })
+                .then((s) {
+                  tasks.add(
+                    DatabaseGetter.storage!.createFile(
+                      bucketId: buckedId,
+                      fileId: "$documentID$i.jpg",
+                      file: InputFile.fromBytes(
+                        bytes: images[i]!,
+                        filename: "$documentID$i.jpg",
+                      ),
+                    ),
+                  );
+                });
           } else {
-            tasks.add(DatabaseGetter.storage!.createFile(
+            tasks.add(
+              DatabaseGetter.storage!.createFile(
                 bucketId: buckedId,
                 fileId: "$documentID$i.jpg",
                 file: InputFile.fromBytes(
-                    bytes: images[i]!, filename: "$documentID$i.jpg")));
+                  bytes: images[i]!,
+                  filename: "$documentID$i.jpg",
+                ),
+              ),
+            );
           }
         }
       }
@@ -1476,31 +1549,39 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
   Future<void> updateFiche(FicheReception fiche) async {
     await DatabaseGetter.database!
         .updateRow(
-            databaseId: databaseId,
-            tableId: fichesreceptionId,
-            rowId: documentID!,
-            data: fiche.toJson())
+          databaseId: databaseId,
+          tableId: fichesreceptionId,
+          rowId: documentID!,
+          data: fiche.toJson(),
+        )
         .then((value) {})
         .onError((AppwriteException error, stackTrace) {
-      setState(() {});
-    });
+          setState(() {});
+        });
   }
 
   Future<void> createFiche(FicheReception fiche) async {
     await DatabaseGetter.database!.createRow(
-        databaseId: databaseId,
-        tableId: fichesreceptionId,
-        rowId: documentID!,
-        data: fiche.toJson());
+      databaseId: databaseId,
+      tableId: fichesreceptionId,
+      rowId: documentID!,
+      data: fiche.toJson(),
+    );
   }
 
   Future<void> uploadActivity(bool update, FicheReception fiche) async {
     if (update) {
-      await DatabaseGetter().ajoutActivity(67, fiche.id,
-          docName: pdf_theme.numberFormat.format(fiche.numero));
+      await DatabaseGetter().ajoutActivity(
+        67,
+        fiche.id,
+        docName: pdf_theme.numberFormat.format(fiche.numero),
+      );
     } else {
-      await DatabaseGetter().ajoutActivity(66, fiche.id,
-          docName: pdf_theme.numberFormat.format(fiche.numero));
+      await DatabaseGetter().ajoutActivity(
+        66,
+        fiche.id,
+        docName: pdf_theme.numberFormat.format(fiche.numero),
+      );
     }
   }
 }

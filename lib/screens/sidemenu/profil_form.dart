@@ -46,7 +46,8 @@ class _ProfilFormState extends State<ProfilForm> {
         widget.user!.tel != null &&
         widget.user!.tel!.length > 3) {
       phone = TextEditingController(
-          text: widget.user?.tel?.substring(4, widget.user?.tel?.length));
+        text: widget.user?.tel?.substring(4, widget.user?.tel?.length),
+      );
     } else {
       phone = TextEditingController();
     }
@@ -99,42 +100,36 @@ class _ProfilFormState extends State<ProfilForm> {
               Hero(
                 tag: 'myprofil',
                 child: Container(
-                    width: 15.h,
-                    height: 15.h,
-                    decoration: BoxDecoration(
-                      color: appTheme.color,
-                      shape: BoxShape.circle,
-                      boxShadow: kElevationToShadow[2],
+                  width: 15.h,
+                  height: 15.h,
+                  decoration: BoxDecoration(
+                    color: appTheme.color,
+                    shape: BoxShape.circle,
+                    boxShadow: kElevationToShadow[2],
+                  ),
+                  padding: const EdgeInsets.all(2),
+                  alignment: Alignment.center,
+                  clipBehavior: Clip.antiAlias,
+                  child: Text(
+                    ParcOtoUtilities.getFirstLetters(widget.user).toUpperCase(),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 18.sp,
                     ),
-                    padding: const EdgeInsets.all(2),
-                    alignment: Alignment.center,
-                    clipBehavior: Clip.antiAlias,
-                    child: Text(
-                      ParcOtoUtilities.getFirstLetters(widget.user)
-                          .toUpperCase(),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 18.sp),
-                    )),
+                  ),
+                ),
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
           InfoLabel(
             label: validEmail ? '' : 'entervalidemail'.tr(),
             labelStyle: TextStyle(color: Colors.red, fontSize: 12.sp),
             child: Row(
               children: [
-                Icon(
-                  FluentIcons.mail,
-                  color: Colors.grey[100],
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
+                Icon(FluentIcons.mail, color: Colors.grey[100]),
+                const SizedBox(width: 10),
                 Expanded(
                   child: TextBox(
                     controller: email,
@@ -153,25 +148,19 @@ class _ProfilFormState extends State<ProfilForm> {
                     placeholderStyle: placeStyle,
                     cursorColor: appTheme.color.darker,
                     style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                    decoration: WidgetStatePropertyAll(
+                      BoxDecoration(color: appTheme.fillColor),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(
-            height: 5,
-          ),
+          const SizedBox(height: 5),
           Row(
             children: [
-              Icon(
-                FluentIcons.i_d_badge,
-                color: Colors.grey[100],
-              ),
-              const SizedBox(
-                width: 10,
-              ),
+              Icon(FluentIcons.i_d_badge, color: Colors.grey[100]),
+              const SizedBox(width: 10),
               Expanded(
                 child: TextBox(
                   controller: name,
@@ -182,24 +171,18 @@ class _ProfilFormState extends State<ProfilForm> {
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(
-            height: 5,
-          ),
+          const SizedBox(height: 5),
           Row(
             children: [
-              Icon(
-                FluentIcons.phone,
-                color: Colors.grey[100],
-              ),
-              const SizedBox(
-                width: 10,
-              ),
+              Icon(FluentIcons.phone, color: Colors.grey[100]),
+              const SizedBox(width: 10),
               CountryCodePicker(
                 initialSelection: countrySelected,
                 onChanged: (c) {
@@ -210,30 +193,29 @@ class _ProfilFormState extends State<ProfilForm> {
                   testIfSomethingChanged();
                 },
                 boxDecoration: BoxDecoration(
-                    color: appTheme.backGroundColor,
-                    boxShadow: kElevationToShadow[2]),
+                  color: appTheme.backGroundColor,
+                  boxShadow: kElevationToShadow[2],
+                ),
                 dialogSize: Size(40.w, 45.h),
               ),
-              const SizedBox(
-                width: 5,
-              ),
+              const SizedBox(width: 5),
               Expanded(
-                  child: TextBox(
-                controller: phone,
-                placeholder: 'telephone'.tr(),
-                maxLength: 9,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
-                onChanged: (s) {
-                  testIfSomethingChanged();
-                },
-                placeholderStyle: placeStyle,
-                cursorColor: appTheme.color.darker,
-                style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
-                  )),
+                child: TextBox(
+                  controller: phone,
+                  placeholder: 'telephone'.tr(),
+                  maxLength: 9,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  onChanged: (s) {
+                    testIfSomethingChanged();
+                  },
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
+                ),
+              ),
             ],
           ),
         ],
@@ -242,18 +224,16 @@ class _ProfilFormState extends State<ProfilForm> {
         Button(
           child: const Text('annuler').tr(),
           onPressed: () {
-            Navigator.pop(
-              context,
-            );
+            Navigator.pop(context);
             // Delete file here
           },
         ),
         FilledButton(
-            onPressed: uploading || !validEmail || !somethingChanged
-                ? null
-                : onConfirm,
-            child:
-                uploading ? const ProgressBar() : const Text('confirmer').tr()),
+          onPressed: uploading || !validEmail || !somethingChanged
+              ? null
+              : onConfirm,
+          child: uploading ? const ProgressBar() : const Text('confirmer').tr(),
+        ),
       ],
     );
   }
@@ -275,34 +255,31 @@ class _ProfilFormState extends State<ProfilForm> {
       if (widget.user == null) {
         await DatabaseGetter.database!
             .createRow(
-                databaseId: databaseId,
-                tableId: userid,
-                rowId: userID,
-                data: newme.toJson())
+              databaseId: databaseId,
+              tableId: userid,
+              rowId: userID,
+              data: newme.toJson(),
+            )
             .then((value) {
-          DatabaseGetter.me.value = newme;
-          if(mounted){
-            Navigator.pop(
-              context,
-            );
-          }
-
-        });
+              DatabaseGetter.me.value = newme;
+              if (mounted) {
+                Navigator.pop(context);
+              }
+            });
       } else {
         await DatabaseGetter.database!
             .updateRow(
-                databaseId: databaseId,
-                tableId: userid,
-                rowId: userID,
-                data: newme.toJson())
+              databaseId: databaseId,
+              tableId: userid,
+              rowId: userID,
+              data: newme.toJson(),
+            )
             .then((value) {
-          DatabaseGetter.me.value = newme;
-          if(mounted){
-            Navigator.pop(
-              context,
-            );
-          }
-        });
+              DatabaseGetter.me.value = newme;
+              if (mounted) {
+                Navigator.pop(context);
+              }
+            });
       }
 
       setState(() {

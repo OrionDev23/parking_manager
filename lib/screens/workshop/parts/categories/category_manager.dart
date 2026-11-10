@@ -6,28 +6,30 @@ import '../../../../widgets/page_header.dart';
 import 'category_form.dart';
 import 'category_table.dart';
 import 'category_tabs.dart';
+
 class CategoryManager extends StatelessWidget {
-  const CategoryManager({super.key,});
+  const CategoryManager({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ScaffoldPage(
-        header: PageTitle(
-          text: getTitle().tr(),
-          trailing: ButtonContainer(
-            icon: FluentIcons.add,
-            text: 'add'.tr(),
-            showBottom: false,
-            showCounter: false,
-            action: () {
-              addCategory();
-            },
-          ),
+      header: PageTitle(
+        text: getTitle().tr(),
+        trailing: ButtonContainer(
+          icon: FluentIcons.add,
+          text: 'add'.tr(),
+          showBottom: false,
+          showCounter: false,
+          action: () {
+            addCategory();
+          },
         ),
-        content: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: getTable(),
-        ));
+      ),
+      content: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        child: getTable(),
+      ),
+    );
   }
 
   String getTitle() {

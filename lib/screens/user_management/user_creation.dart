@@ -45,7 +45,6 @@ class _UserFormState extends State<UserForm> {
   bool showPasswordConfirm = false;
 
   void initValues() {
-
     email = TextEditingController(text: widget.user?.email);
     password = TextEditingController(text: widget.user?.password);
     passwordConfirm = TextEditingController(text: widget.user?.password);
@@ -54,7 +53,8 @@ class _UserFormState extends State<UserForm> {
     countrySelected = Countries.getCountryCodeFromPhone(widget.user?.phone);
     if (widget.user != null && widget.user!.phone.length > 3) {
       phone = TextEditingController(
-          text: widget.user?.phone.substring(4, widget.user?.phone.length));
+        text: widget.user?.phone.substring(4, widget.user?.phone.length),
+      );
     } else {
       phone = TextEditingController();
     }
@@ -100,11 +100,13 @@ class _UserFormState extends State<UserForm> {
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
     return ContentDialog(
-      title: Text(widget.user != null
-          ? widget.user!.name.isNotEmpty
-              ? widget.user!.name
-              : widget.user!.email
-          : 'newuser'.tr()),
+      title: Text(
+        widget.user != null
+            ? widget.user!.name.isNotEmpty
+                  ? widget.user!.name
+                  : widget.user!.email
+            : 'newuser'.tr(),
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -116,47 +118,44 @@ class _UserFormState extends State<UserForm> {
               Hero(
                 tag: 'myprofil',
                 child: Container(
-                    width: 15.h,
-                    height: 15.h,
-                    decoration: BoxDecoration(
-                      color: appTheme.color,
-                      shape: BoxShape.circle,
-                      boxShadow: kElevationToShadow[2],
+                  width: 15.h,
+                  height: 15.h,
+                  decoration: BoxDecoration(
+                    color: appTheme.color,
+                    shape: BoxShape.circle,
+                    boxShadow: kElevationToShadow[2],
+                  ),
+                  padding: const EdgeInsets.all(2),
+                  alignment: Alignment.center,
+                  clipBehavior: Clip.antiAlias,
+                  child: Text(
+                    widget.user != null
+                        ? ParcOtoUtilities.getFirstLetters(
+                            ParcUser(
+                              id: '',
+                              email: widget.user!.email,
+                              name: widget.user!.name,
+                            ),
+                          ).toUpperCase()
+                        : '',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 18.sp,
                     ),
-                    padding: const EdgeInsets.all(2),
-                    alignment: Alignment.center,
-                    clipBehavior: Clip.antiAlias,
-                    child: Text(
-                      widget.user != null
-                          ? ParcOtoUtilities.getFirstLetters(ParcUser(
-                                  id: '',
-                                  email: widget.user!.email,
-                                  name: widget.user!.name))
-                              .toUpperCase()
-                          : '',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 18.sp),
-                    )),
+                  ),
+                ),
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
           InfoLabel(
             label: validEmail ? '' : 'entervalidemail'.tr(),
             labelStyle: TextStyle(color: Colors.red, fontSize: 12.sp),
             child: Row(
               children: [
-                Icon(
-                  FluentIcons.mail,
-                  color: Colors.grey[100],
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
+                Icon(FluentIcons.mail, color: Colors.grey[100]),
+                const SizedBox(width: 10),
                 Expanded(
                   child: TextBox(
                     controller: email,
@@ -176,25 +175,19 @@ class _UserFormState extends State<UserForm> {
                     placeholderStyle: placeStyle,
                     cursorColor: appTheme.color.darker,
                     style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                    decoration: WidgetStatePropertyAll(
+                      BoxDecoration(color: appTheme.fillColor),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(
-            height: 5,
-          ),
+          const SizedBox(height: 5),
           Row(
             children: [
-              Icon(
-                FluentIcons.i_d_badge,
-                color: Colors.grey[100],
-              ),
-              const SizedBox(
-                width: 10,
-              ),
+              Icon(FluentIcons.i_d_badge, color: Colors.grey[100]),
+              const SizedBox(width: 10),
               Expanded(
                 child: TextBox(
                   controller: name,
@@ -205,24 +198,18 @@ class _UserFormState extends State<UserForm> {
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(
-            height: 5,
-          ),
+          const SizedBox(height: 5),
           Row(
             children: [
-              Icon(
-                FluentIcons.password_field,
-                color: Colors.grey[100],
-              ),
-              const SizedBox(
-                width: 10,
-              ),
+              Icon(FluentIcons.password_field, color: Colors.grey[100]),
+              const SizedBox(width: 10),
               Expanded(
                 child: TextBox(
                   controller: password,
@@ -244,7 +231,9 @@ class _UserFormState extends State<UserForm> {
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
 
                   onChanged: (s) {
                     testIfSomethingChanged();
@@ -253,18 +242,11 @@ class _UserFormState extends State<UserForm> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 5,
-          ),
+          const SizedBox(height: 5),
           Row(
             children: [
-              Icon(
-                FluentIcons.password_field,
-                color: Colors.grey[100],
-              ),
-              const SizedBox(
-                width: 10,
-              ),
+              Icon(FluentIcons.password_field, color: Colors.grey[100]),
+              const SizedBox(width: 10),
               Expanded(
                 child: TextBox(
                   controller: passwordConfirm,
@@ -290,7 +272,9 @@ class _UserFormState extends State<UserForm> {
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
 
                   onChanged: (s) {
                     testIfSomethingChanged();
@@ -299,18 +283,11 @@ class _UserFormState extends State<UserForm> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 5,
-          ),
+          const SizedBox(height: 5),
           Row(
             children: [
-              Icon(
-                FluentIcons.phone,
-                color: Colors.grey[100],
-              ),
-              const SizedBox(
-                width: 10,
-              ),
+              Icon(FluentIcons.phone, color: Colors.grey[100]),
+              const SizedBox(width: 10),
               CountryCodePicker(
                 initialSelection: countrySelected,
                 onChanged: (c) {
@@ -321,30 +298,29 @@ class _UserFormState extends State<UserForm> {
                   testIfSomethingChanged();
                 },
                 boxDecoration: BoxDecoration(
-                    color: appTheme.backGroundColor,
-                    boxShadow: kElevationToShadow[2]),
+                  color: appTheme.backGroundColor,
+                  boxShadow: kElevationToShadow[2],
+                ),
                 dialogSize: Size(40.w, 45.h),
               ),
-              const SizedBox(
-                width: 5,
-              ),
+              const SizedBox(width: 5),
               Expanded(
-                  child: TextBox(
-                controller: phone,
-                placeholder: 'telephone'.tr(),
-                maxLength: 9,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
-                onChanged: (s) {
-                  testIfSomethingChanged();
-                },
-                placeholderStyle: placeStyle,
-                cursorColor: appTheme.color.darker,
-                style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
-                  )),
+                child: TextBox(
+                  controller: phone,
+                  placeholder: 'telephone'.tr(),
+                  maxLength: 9,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  onChanged: (s) {
+                    testIfSomethingChanged();
+                  },
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
+                ),
+              ),
             ],
           ),
         ],
@@ -353,18 +329,16 @@ class _UserFormState extends State<UserForm> {
         Button(
           child: const Text('annuler').tr(),
           onPressed: () {
-            Navigator.pop(
-              context,
-            );
+            Navigator.pop(context);
             // Delete file here
           },
         ),
         FilledButton(
-            onPressed: uploading || !validEmail || !somethingChanged
-                ? null
-                : onConfirm,
-            child:
-                uploading ? const ProgressBar() : const Text('confirmer').tr()),
+          onPressed: uploading || !validEmail || !somethingChanged
+              ? null
+              : onConfirm,
+          child: uploading ? const ProgressBar() : const Text('confirmer').tr(),
+        ),
       ],
     );
   }
@@ -372,27 +346,30 @@ class _UserFormState extends State<UserForm> {
   bool uploading = false;
 
   void onConfirm() async {
-
-    if(password.text.length<8 || password.text!=passwordConfirm.text){
-      if(password.text.length<8){
-        displayInfoBar(context,
-            builder: (BuildContext context, void Function() close) {
-              return InfoBar(
-                title: const Text('general_argument_invalid').tr(),
-                severity: InfoBarSeverity.warning,
-              );
-            }, duration: snackbarShortDuration);
+    if (password.text.length < 8 || password.text != passwordConfirm.text) {
+      if (password.text.length < 8) {
+        displayInfoBar(
+          context,
+          builder: (BuildContext context, void Function() close) {
+            return InfoBar(
+              title: const Text('general_argument_invalid').tr(),
+              severity: InfoBarSeverity.warning,
+            );
+          },
+          duration: snackbarShortDuration,
+        );
+      } else {
+        displayInfoBar(
+          context,
+          builder: (BuildContext context, void Function() close) {
+            return InfoBar(
+              title: const Text('passwordmatch').tr(),
+              severity: InfoBarSeverity.warning,
+            );
+          },
+          duration: snackbarShortDuration,
+        );
       }
-      else{
-        displayInfoBar(context,
-            builder: (BuildContext context, void Function() close) {
-              return InfoBar(
-                title: const Text('passwordmatch').tr(),
-                severity: InfoBarSeverity.warning,
-              );
-            }, duration: snackbarShortDuration);
-      }
-
     }
 
     if (email.text.isNotEmpty &&
@@ -403,54 +380,74 @@ class _UserFormState extends State<UserForm> {
       setState(() {
         uploading = true;
       });
-      userID ??= widget.user?.$id ?? DateTime.now().difference(DatabaseGetter
-          .ref)
-          .inMilliseconds.abs().toString();
+      userID ??=
+          widget.user?.$id ??
+          DateTime.now()
+              .difference(DatabaseGetter.ref)
+              .inMilliseconds
+              .abs()
+              .toString();
       client = Client()
         ..setEndpoint(endpoint)
         ..setProject(project!)
         ..setKey(secretKey!);
-      await addUserToUsersList().then((value) async {
-        ParcUser newme = ParcUser(
-          email: email.text,
-          name: name.text.isEmpty?null:name.text,
-          id: userID!,
-          tel: phone.text.trim().isEmpty?null:'$phoneDial${phone.text}',
-          avatar: null,
-        );
-        await uploadUserInDB(newme).then((value) {}).then((value) {
-          if(mounted){
-          displayInfoBar(context,
-              builder: (BuildContext context, void Function() close) {
-            return InfoBar(
-              title: const Text('done').tr(),
-              severity: InfoBarSeverity.success,
+      await addUserToUsersList()
+          .then((value) async {
+            ParcUser newme = ParcUser(
+              email: email.text,
+              name: name.text.isEmpty ? null : name.text,
+              id: userID!,
+              tel: phone.text.trim().isEmpty ? null : '$phoneDial${phone.text}',
+              avatar: null,
             );
-          }, duration: snackbarShortDuration);}
-        }).onError(( AppwriteException error, stackTrace) {
-          if(mounted){
-          displayInfoBar(context,
-              builder: (BuildContext context, void Function() close) {
-            return InfoBar(
-              title: const Text('echec').tr(),
-              severity: InfoBarSeverity.error,
-            );
-          }, duration: snackbarShortDuration);}
-        });
-      }).onError((AppwriteException error, stackTrace) {
-
-        if(mounted){
-        displayInfoBar(context,
-            builder: (BuildContext context, void Function() close) {
-          return InfoBar(
-            title: const Text('echec').tr(),
-            severity: InfoBarSeverity.error,
-          );
-        }, duration: snackbarShortDuration);}
-        setState(() {
-          uploading = false;
-        });
-      });
+            await uploadUserInDB(newme)
+                .then((value) {})
+                .then((value) {
+                  if (mounted) {
+                    displayInfoBar(
+                      context,
+                      builder: (BuildContext context, void Function() close) {
+                        return InfoBar(
+                          title: const Text('done').tr(),
+                          severity: InfoBarSeverity.success,
+                        );
+                      },
+                      duration: snackbarShortDuration,
+                    );
+                  }
+                })
+                .onError((AppwriteException error, stackTrace) {
+                  if (mounted) {
+                    displayInfoBar(
+                      context,
+                      builder: (BuildContext context, void Function() close) {
+                        return InfoBar(
+                          title: const Text('echec').tr(),
+                          severity: InfoBarSeverity.error,
+                        );
+                      },
+                      duration: snackbarShortDuration,
+                    );
+                  }
+                });
+          })
+          .onError((AppwriteException error, stackTrace) {
+            if (mounted) {
+              displayInfoBar(
+                context,
+                builder: (BuildContext context, void Function() close) {
+                  return InfoBar(
+                    title: const Text('echec').tr(),
+                    severity: InfoBarSeverity.error,
+                  );
+                },
+                duration: snackbarShortDuration,
+              );
+            }
+            setState(() {
+              uploading = false;
+            });
+          });
 
       setState(() {
         uploading = false;
@@ -460,35 +457,36 @@ class _UserFormState extends State<UserForm> {
 
   Future<void> uploadUserInDB(ParcUser newme) async {
     if (widget.user == null) {
-      await TablesDB(client!).createRow(
-              databaseId: databaseId,
-              tableId: userid,
-              rowId: newme.id,
-              permissions: [
-                Permission.update(Role.user(newme.id)),
-                Permission.delete(Role.user(newme.id)),
-                Permission.write(Role.user(newme.id)),
-              ],
-              data: newme.toJson())
+      await TablesDB(client!)
+          .createRow(
+            databaseId: databaseId,
+            tableId: userid,
+            rowId: newme.id,
+            permissions: [
+              Permission.update(Role.user(newme.id)),
+              Permission.delete(Role.user(newme.id)),
+              Permission.write(Role.user(newme.id)),
+            ],
+            data: newme.toJson(),
+          )
           .then((value) {
-            if(mounted){
-        Navigator.pop(
-          context,
-        );}
-      });
+            if (mounted) {
+              Navigator.pop(context);
+            }
+          });
     } else {
       await TablesDB(client!)
           .updateRow(
-              databaseId: databaseId,
-              tableId: userid,
-              rowId: userID!,
-              data: newme.toJson())
+            databaseId: databaseId,
+            tableId: userid,
+            rowId: userID!,
+            data: newme.toJson(),
+          )
           .then((value) {
-            if(mounted){
-        Navigator.pop(
-          context,
-        );}
-      });
+            if (mounted) {
+              Navigator.pop(context);
+            }
+          });
     }
   }
 
@@ -496,15 +494,13 @@ class _UserFormState extends State<UserForm> {
 
   Client? client;
   Future<void> addUserToUsersList() async {
-
     if (widget.user == null) {
       await Users(client!).create(
-          userId: userID!,
-          name: name.text.isEmpty?null:name.text,
-          email: email.text,
-          password: password.text,
-        phone: phone.text.trim().isEmpty?null:'$phoneDial${phone.text}',
-
+        userId: userID!,
+        name: name.text.isEmpty ? null : name.text,
+        email: email.text,
+        password: password.text,
+        phone: phone.text.trim().isEmpty ? null : '$phoneDial${phone.text}',
       );
       DatabaseGetter().ajoutActivity(32, userID!, docName: name.text);
     } else {
@@ -514,7 +510,9 @@ class _UserFormState extends State<UserForm> {
       }
       if (widget.user!.phone != '$phoneDial${phone.text}') {
         await Users(client!).updatePhone(
-            userId: widget.user!.$id, number: '$phoneDial${phone.text}');
+          userId: widget.user!.$id,
+          number: '$phoneDial${phone.text}',
+        );
       }
       DatabaseGetter().ajoutActivity(33, userID!, docName: name.text);
     }

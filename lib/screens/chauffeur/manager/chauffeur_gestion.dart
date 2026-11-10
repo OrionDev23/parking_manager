@@ -26,9 +26,7 @@ class ChauffeurGestion extends StatefulWidget {
 }
 
 class ChauffeurGestionsState extends State<ChauffeurGestion> {
-  final tstyle = TextStyle(
-    fontSize: 10.sp,
-  );
+  final tstyle = TextStyle(fontSize: 10.sp);
   static ValueNotifier<int> stateChanges = ValueNotifier(0);
 
   @override
@@ -40,38 +38,36 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
         trailing: widget.archive
             ? null
             : Row(
-              children: [
-                if (showImportConducteur && DatabaseGetter().isAdmin())
+                children: [
+                  if (showImportConducteur && DatabaseGetter().isAdmin())
+                    ButtonContainer(
+                      color: appTheme.color.darkest,
+                      icon: FluentIcons.add,
+                      text: 'importlist'.tr(),
+                      showBottom: false,
+                      showCounter: false,
+                      action: importList,
+                    ),
+                  if (showImportConducteur && DatabaseGetter().isAdmin())
+                    smallSpace,
                   ButtonContainer(
-                    color: appTheme.color.darkest,
                     icon: FluentIcons.add,
-                    text: 'importlist'.tr(),
+                    text: 'add'.tr(),
                     showBottom: false,
                     showCounter: false,
-                    action: importList,
+                    action: () {
+                      final index = ChauffeurTabsState.tabs.length + 1;
+                      final tab = generateTab(index);
+                      ChauffeurTabsState.tabs.add(tab);
+                      ChauffeurTabsState.currentIndex.value = index - 1;
+                    },
                   ),
-                if (showImportConducteur && DatabaseGetter().isAdmin()) smallSpace,
-                ButtonContainer(
-                  icon: FluentIcons.add,
-                  text: 'add'.tr(),
-                  showBottom: false,
-                  showCounter: false,
-                  action: () {
-                    final index = ChauffeurTabsState.tabs.length + 1;
-                    final tab = generateTab(index);
-                    ChauffeurTabsState.tabs.add(tab);
-                    ChauffeurTabsState.currentIndex.value = index - 1;
-                  },
-                ),
-              ],
-            ),
+                ],
+              ),
       ),
-      content: ChauffeurTable(
-        archive: widget.archive,
-      )
+      content: ChauffeurTable(archive: widget.archive),
     );
   }
-
 
   void importList() async {
     PlatformFile? pickedFile = await FilePicker.pickFile(
@@ -79,17 +75,18 @@ class ChauffeurGestionsState extends State<ChauffeurGestion> {
       allowedExtensions: ['xlsx'],
     );
     if (pickedFile != null) {
-      Future.delayed(const Duration(milliseconds: 50))
-          .then((value) => showDialog(
+      Future.delayed(const Duration(milliseconds: 50)).then(
+        (value) => showDialog(
           context: context,
           barrierDismissible: true,
           builder: (c) {
-            return ImportConducteurs(
-              file: pickedFile,
-            );
-          }));
+            return ImportConducteurs(file: pickedFile);
+          },
+        ),
+      );
     }
   }
+
   Tab generateTab(int index) {
     late Tab tab;
     tab = Tab(

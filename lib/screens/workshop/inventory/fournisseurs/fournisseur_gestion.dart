@@ -24,9 +24,7 @@ class FournisseurGestion extends PrestataireGestion {
 
   @override
   Widget getTable() {
-    return FournisseurTable(
-      archive: archive,
-    );
+    return FournisseurTable(archive: archive);
   }
 
   @override

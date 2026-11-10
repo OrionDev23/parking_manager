@@ -38,7 +38,7 @@ class _ImportVehiclesState extends State<ImportVehicles> {
 
   bool invalidFile = false;
 
-  int invalidTables=0;
+  int invalidTables = 0;
 
   void loadFile() async {
     if (!loading) {
@@ -67,12 +67,12 @@ class _ImportVehiclesState extends State<ImportVehicles> {
             addVehicle(row);
           }
         } else {
-          invalidTables ++;
+          invalidTables++;
           break;
         }
       }
-      if(invalidTables==excel.tables.length){
-        invalidFile=true;
+      if (invalidTables == excel.tables.length) {
+        invalidFile = true;
       }
     }
 
@@ -83,153 +83,177 @@ class _ImportVehiclesState extends State<ImportVehicles> {
   }
 
   void addVehicle(List<Data?> data) {
-    String matricule =
-        data[columnToRead['mat']!]!.value.toString().replaceAll(' ', '').trim();
+    String matricule = data[columnToRead['mat']!]!.value
+        .toString()
+        .replaceAll(' ', '')
+        .trim();
     if (matricule.contains('matricul') ||
         (!matricule.contains('-') && int.tryParse(matricule) == null)) {
       return;
     }
     bool etrang = matricule.split('-').length != 3;
     String id = columnToRead.containsKey('numero')
-        ?data[columnToRead['numero']!]!.value.toString():matricule;
-    int etat = getEtat(columnToRead.containsKey('etat')
-        ?data[columnToRead['etat']!]!.value
-        .toString():"0");
-    int perimetre=getPerimetre(columnToRead.containsKey('perimetre')
-        ?data[columnToRead['perimetre']!]!.value
-        .toString():null);
-    String model = columnToRead.containsKey('model')? data[columnToRead['model']!]!.value.toString():'';
-    String nom = columnToRead.containsKey('nom')?data[columnToRead['nom']!]!
-        .value.toString():"";
-    String matriculeEmploye=columnToRead.containsKey('matEmp')
-        ?data[columnToRead['matEmp']!]!
-        .value.toString():"";
-    String emplacement=columnToRead.containsKey('emplacement')
-        ?data[columnToRead['emplacement']!]!
-        .value.toString():"";
-    String poste=columnToRead.containsKey('poste')
-        ?data[columnToRead['poste']!]!
-        .value.toString():"";
+        ? data[columnToRead['numero']!]!.value.toString()
+        : matricule;
+    int etat = getEtat(
+      columnToRead.containsKey('etat')
+          ? data[columnToRead['etat']!]!.value.toString()
+          : "0",
+    );
+    int perimetre = getPerimetre(
+      columnToRead.containsKey('perimetre')
+          ? data[columnToRead['perimetre']!]!.value.toString()
+          : null,
+    );
+    String model = columnToRead.containsKey('model')
+        ? data[columnToRead['model']!]!.value.toString()
+        : '';
+    String nom = columnToRead.containsKey('nom')
+        ? data[columnToRead['nom']!]!.value.toString()
+        : "";
+    String matriculeEmploye = columnToRead.containsKey('matEmp')
+        ? data[columnToRead['matEmp']!]!.value.toString()
+        : "";
+    String emplacement = columnToRead.containsKey('emplacement')
+        ? data[columnToRead['emplacement']!]!.value.toString()
+        : "";
+    String poste = columnToRead.containsKey('poste')
+        ? data[columnToRead['poste']!]!.value.toString()
+        : "";
     String prenom = columnToRead.containsKey('prenom')
-        ?data[columnToRead['prenom']!]!.value.toString():"";
-    String filliale=columnToRead.containsKey('filliale')
-        ?VehiclesUtilities.getAppartenance
-      (data[columnToRead['filliale']!]!.value.toString()).replaceAll(' ', ''
-    ).trim().toUpperCase():"";
-    String apartenance=columnToRead.containsKey('appartenance')
-        ?VehiclesUtilities.getAppartenance
-      (data[columnToRead['appartenance']!]!.value
-        .toString())
-      .replaceAll(' ', '').trim().toUpperCase()
-        :"";
-    String apartenanceSalar=columnToRead.containsKey('appartenancesalar')
-        ?VehiclesUtilities.getAppartenance
-      (data[columnToRead['appartenancesalar']!]!.value
-        .toString())
-        .replaceAll(' ', '').trim().toUpperCase()
-        :"";
-    bool service=columnToRead.containsKey('service')
-        ?data[columnToRead['service']!]?.value.toString().toLowerCase()
-    .trim()=='service'?true:false:false;
-    bool decision=columnToRead.containsKey('decision')
-        ?data[columnToRead['decision']!]?.value.toString().toLowerCase()
-        .trim()=='oui'?true:false:false;
-    String departement=columnToRead.containsKey('departement')
-        ?VehiclesUtilities.getDepartment
-      (data[columnToRead['departement']!]!.value
-        .toString())
-        .replaceAll(' ', '').trim().toUpperCase()
-        :"";
-    String direction=columnToRead.containsKey('direction')
-        ?VehiclesUtilities.getDirection
-      (data[columnToRead['direction']!]!.value
-        .toString())
-      .replaceAll(' ', '').trim().toUpperCase()
-        :"";
+        ? data[columnToRead['prenom']!]!.value.toString()
+        : "";
+    String filliale = columnToRead.containsKey('filliale')
+        ? VehiclesUtilities.getAppartenance(
+            data[columnToRead['filliale']!]!.value.toString(),
+          ).replaceAll(' ', '').trim().toUpperCase()
+        : "";
+    String apartenance = columnToRead.containsKey('appartenance')
+        ? VehiclesUtilities.getAppartenance(
+            data[columnToRead['appartenance']!]!.value.toString(),
+          ).replaceAll(' ', '').trim().toUpperCase()
+        : "";
+    String apartenanceSalar = columnToRead.containsKey('appartenancesalar')
+        ? VehiclesUtilities.getAppartenance(
+            data[columnToRead['appartenancesalar']!]!.value.toString(),
+          ).replaceAll(' ', '').trim().toUpperCase()
+        : "";
+    bool service = columnToRead.containsKey('service')
+        ? data[columnToRead['service']!]?.value
+                      .toString()
+                      .toLowerCase()
+                      .trim() ==
+                  'service'
+              ? true
+              : false
+        : false;
+    bool decision = columnToRead.containsKey('decision')
+        ? data[columnToRead['decision']!]?.value
+                      .toString()
+                      .toLowerCase()
+                      .trim() ==
+                  'oui'
+              ? true
+              : false
+        : false;
+    String departement = columnToRead.containsKey('departement')
+        ? VehiclesUtilities.getDepartment(
+            data[columnToRead['departement']!]!.value.toString(),
+          ).replaceAll(' ', '').trim().toUpperCase()
+        : "";
+    String direction = columnToRead.containsKey('direction')
+        ? VehiclesUtilities.getDirection(
+            data[columnToRead['direction']!]!.value.toString(),
+          ).replaceAll(' ', '').trim().toUpperCase()
+        : "";
     List<String> ms = matricule.split('-');
     int? wilaya = etrang ? null : int.tryParse(ms[2]) ?? 16;
-    int genre=etrang ? 1 : (int.tryParse(ms[1]) ?? 100) ~/ 100;
-    bool lourd=columnToRead.containsKey('poids')
-        ?data[columnToRead['poids']!]!.value.toString().toUpperCase()
-        .contains('LOU'):genre==2||genre==4|| genre==5 || genre==6||genre==8 ;
+    int genre = etrang ? 1 : (int.tryParse(ms[1]) ?? 100) ~/ 100;
+    bool lourd = columnToRead.containsKey('poids')
+        ? data[columnToRead['poids']!]!.value.toString().toUpperCase().contains(
+            'LOU',
+          )
+        : genre == 2 || genre == 4 || genre == 5 || genre == 6 || genre == 8;
     Vehicle vehicle = Vehicle(
-        id: id,
-        matricule: matricule,
-        perimetre: perimetre,
-        matriculeEtrang: etrang,
-        etatactuel: etat,
-        nom: nom,
-        prenom: prenom,
-        type: model,
-        emplacement:emplacement,
-        filliale: filliale,
-        appartenance: apartenance,
-        direction: direction,
-        matriculeConducteur: matriculeEmploye,
-        departement: departement,
-        decision: decision,
-        service: service,
-        appartenanceconducteur: apartenanceSalar,
-        profession: poste,
-        wilaya: etrang ? null : wilaya,
-        daira: etrang
-            ? null
-            : AlgeriaList()
+      id: id,
+      matricule: matricule,
+      perimetre: perimetre,
+      matriculeEtrang: etrang,
+      etatactuel: etat,
+      nom: nom,
+      prenom: prenom,
+      type: model,
+      emplacement: emplacement,
+      filliale: filliale,
+      appartenance: apartenance,
+      direction: direction,
+      matriculeConducteur: matriculeEmploye,
+      departement: departement,
+      decision: decision,
+      service: service,
+      appartenanceconducteur: apartenanceSalar,
+      profession: poste,
+      wilaya: etrang ? null : wilaya,
+      daira: etrang
+          ? null
+          : AlgeriaList()
                     .getDairas(
-                        AlgeriaList().getWilayaByNum(wilaya.toString()) ?? '')
+                      AlgeriaList().getWilayaByNum(wilaya.toString()) ?? '',
+                    )
                     .firstOrNull
                     ?.getDairaName(l.Language.FR) ??
                 '',
-        commune: etrang
-            ? null
-            : AlgeriaList()
+      commune: etrang
+          ? null
+          : AlgeriaList()
                     .getCommune(
-                        AlgeriaList().getWilayaByNum(wilaya.toString()) ?? '')
+                      AlgeriaList().getWilayaByNum(wilaya.toString()) ?? '',
+                    )
                     .firstOrNull
                     ?.getDairaName(l.Language.FR) ??
                 '',
-        genre: (genre).toString(),
-        lourd: lourd,
-        anneeUtil: VehiclesUtilities.getAnneeFromMatricule(matricule));
+      genre: (genre).toString(),
+      lourd: lourd,
+      anneeUtil: VehiclesUtilities.getAnneeFromMatricule(matricule),
+    );
 
-    if(kDebugMode){
+    if (kDebugMode) {
       print(vehicle.toJson());
     }
-    if(importedVehicles.containsKey(vehicle.matricule)){
+    if (importedVehicles.containsKey(vehicle.matricule)) {
       replaceVehicleEmptiness(vehicle);
-    }
-    else{
+    } else {
       importedVehicles[vehicle.matricule] = vehicle;
     }
   }
 
-  void replaceVehicleEmptiness(Vehicle v){
-    if(importedVehicles[v.matricule]!.etatactuel==null || importedVehicles[v
-        .matricule]!.etatactuel==0){
-      importedVehicles[v.matricule]!.etatactuel=v.etatactuel;
+  void replaceVehicleEmptiness(Vehicle v) {
+    if (importedVehicles[v.matricule]!.etatactuel == null ||
+        importedVehicles[v.matricule]!.etatactuel == 0) {
+      importedVehicles[v.matricule]!.etatactuel = v.etatactuel;
     }
-    if(importedVehicles[v.matricule]!.perimetre==0){
-      importedVehicles[v.matricule]!.perimetre=v.perimetre;
+    if (importedVehicles[v.matricule]!.perimetre == 0) {
+      importedVehicles[v.matricule]!.perimetre = v.perimetre;
     }
-    if(importedVehicles[v.matricule]!.nom==null || importedVehicles[v
-        .matricule]!.nom!.isEmpty){
-      importedVehicles[v.matricule]!.nom=v.nom;
+    if (importedVehicles[v.matricule]!.nom == null ||
+        importedVehicles[v.matricule]!.nom!.isEmpty) {
+      importedVehicles[v.matricule]!.nom = v.nom;
     }
-    if(importedVehicles[v.matricule]!.prenom==null || importedVehicles[v
-        .matricule]!.prenom!.isEmpty){
-      importedVehicles[v.matricule]!.prenom=v.prenom;
+    if (importedVehicles[v.matricule]!.prenom == null ||
+        importedVehicles[v.matricule]!.prenom!.isEmpty) {
+      importedVehicles[v.matricule]!.prenom = v.prenom;
     }
-    if(importedVehicles[v.matricule]!.type==null || importedVehicles[v
-        .matricule]!.type!.isEmpty){
-      importedVehicles[v.matricule]!.type=v.type;
+    if (importedVehicles[v.matricule]!.type == null ||
+        importedVehicles[v.matricule]!.type!.isEmpty) {
+      importedVehicles[v.matricule]!.type = v.type;
     }
-    if(importedVehicles[v.matricule]!.appartenance==null || importedVehicles[v
-        .matricule]!.appartenance!.isEmpty){
-      importedVehicles[v.matricule]!.appartenance=v.appartenance;
+    if (importedVehicles[v.matricule]!.appartenance == null ||
+        importedVehicles[v.matricule]!.appartenance!.isEmpty) {
+      importedVehicles[v.matricule]!.appartenance = v.appartenance;
     }
-    if(importedVehicles[v.matricule]!.filliale==null || importedVehicles[v
-        .matricule]!.filliale!.isEmpty){
-      importedVehicles[v.matricule]!.filliale=v.filliale;
+    if (importedVehicles[v.matricule]!.filliale == null ||
+        importedVehicles[v.matricule]!.filliale!.isEmpty) {
+      importedVehicles[v.matricule]!.filliale = v.filliale;
     }
   }
 
@@ -270,15 +294,16 @@ class _ImportVehiclesState extends State<ImportVehicles> {
     return etat;
   }
 
-  int getPerimetre(String? perimetre){
-    switch(perimetre?.toUpperCase().trim()){
+  int getPerimetre(String? perimetre) {
+    switch (perimetre?.toUpperCase().trim()) {
       case 'BUSINESS' || 'buisiness':
         return 0;
       case 'HORS PERIMETRE' || 'hors perimetre':
         return 1;
-      case 'INDUSTRIE' || 'industrie' :
+      case 'INDUSTRIE' || 'industrie':
         return 2;
-      default: return 0;
+      default:
+        return 0;
     }
   }
 
@@ -304,15 +329,15 @@ class _ImportVehiclesState extends State<ImportVehicles> {
 
             case TextCellValue():
               final value = cell!.value as TextCellValue;
-              if(value.value.text!=null){
-                if (value.value.text!.toLowerCase()=='immatriculation' &&
+              if (value.value.text != null) {
+                if (value.value.text!.toLowerCase() == 'immatriculation' &&
                     !foundMatric) {
                   columnToRead['mat'] = cell.columnIndex;
                   foundMatric = true;
                 }
 
-                if (value.value.text!.toLowerCase().contains('model')|| value.value.text!
-                    .toLowerCase().contains('modèl')) {
+                if (value.value.text!.toLowerCase().contains('model') ||
+                    value.value.text!.toLowerCase().contains('modèl')) {
                   columnToRead['model'] = cell.columnIndex;
                 }
                 if (value.value.text!.toLowerCase() == 'n') {
@@ -323,7 +348,11 @@ class _ImportVehiclesState extends State<ImportVehicles> {
                     value.value.text!.toLowerCase().contains('state')) {
                   columnToRead['etat'] = cell.columnIndex;
                 }
-                if (value.value.text!.toLowerCase().replaceAll(' ','').trim()=='nom' ||
+                if (value.value.text!
+                            .toLowerCase()
+                            .replaceAll(' ', '')
+                            .trim() ==
+                        'nom' ||
                     value.value.text!.toLowerCase().contains('familyname') ||
                     value.value.text!
                         .toLowerCase()
@@ -339,55 +368,86 @@ class _ImportVehiclesState extends State<ImportVehicles> {
                         .contains('firstname')) {
                   columnToRead['prenom'] = cell.columnIndex;
                 }
-                if(value.value.text!.toLowerCase().trim()=='appartenance vehicule'){
-                  columnToRead['appartenance']=cell.columnIndex;
+                if (value.value.text!.toLowerCase().trim() ==
+                    'appartenance vehicule') {
+                  columnToRead['appartenance'] = cell.columnIndex;
                 }
-                if(value.value.text!.toLowerCase().trim()=='appartenance salarié'){
-                  columnToRead['appartenancesalar']=cell.columnIndex;
+                if (value.value.text!.toLowerCase().trim() ==
+                    'appartenance salarié') {
+                  columnToRead['appartenancesalar'] = cell.columnIndex;
                 }
-                if(value.value.text!.toLowerCase().contains('filiale') && value
-                    .value.text!.toLowerCase().contains('vehicule')){
-                  columnToRead['filliale']=cell.columnIndex;
+                if (value.value.text!.toLowerCase().contains('filiale') &&
+                    value.value.text!.toLowerCase().contains('vehicule')) {
+                  columnToRead['filliale'] = cell.columnIndex;
                 }
-                if(value.value.text!.toLowerCase().contains('direction') ){
-                  columnToRead['direction']=cell.columnIndex;
+                if (value.value.text!.toLowerCase().contains('direction')) {
+                  columnToRead['direction'] = cell.columnIndex;
                 }
-                if(value.value.text!.toLowerCase().contains('departement') ){
-                  columnToRead['departement']=cell.columnIndex;
+                if (value.value.text!.toLowerCase().contains('departement')) {
+                  columnToRead['departement'] = cell.columnIndex;
                 }
-                if(value.value.text!.toLowerCase().contains('matricule employé') ){
-                  columnToRead['matemp']=cell.columnIndex;
+                if (value.value.text!.toLowerCase().contains(
+                  'matricule employé',
+                )) {
+                  columnToRead['matemp'] = cell.columnIndex;
                 }
-                if(value.value.text!.toLowerCase().trim().contains('périmetre') || value
-                    .value.text!.toLowerCase().trim().contains('perimetre')){
-                  columnToRead['perimetre']=cell.columnIndex;
+                if (value.value.text!.toLowerCase().trim().contains(
+                      'périmetre',
+                    ) ||
+                    value.value.text!.toLowerCase().trim().contains(
+                      'perimetre',
+                    )) {
+                  columnToRead['perimetre'] = cell.columnIndex;
                 }
-                if(value.value.text!.toLowerCase().trim().contains('service') || value
-                    .value.text!.toLowerCase().trim().contains('fonction')){
-                  columnToRead['service']=cell.columnIndex;
+                if (value.value.text!.toLowerCase().trim().contains(
+                      'service',
+                    ) ||
+                    value.value.text!.toLowerCase().trim().contains(
+                      'fonction',
+                    )) {
+                  columnToRead['service'] = cell.columnIndex;
                 }
-                if(value.value.text!.toLowerCase().trim().contains('décision') ||
-                    value.value.text!.toLowerCase().trim().contains('decision')){
-                  columnToRead['decision']=cell.columnIndex;
+                if (value.value.text!.toLowerCase().trim().contains(
+                      'décision',
+                    ) ||
+                    value.value.text!.toLowerCase().trim().contains(
+                      'decision',
+                    )) {
+                  columnToRead['decision'] = cell.columnIndex;
                 }
-                if(value.value.text!.toLowerCase().trim().contains('emplacement')){
-                  columnToRead['emplacement']=cell.columnIndex;
+                if (value.value.text!.toLowerCase().trim().contains(
+                  'emplacement',
+                )) {
+                  columnToRead['emplacement'] = cell.columnIndex;
                 }
-                if(value.value.text!.toLowerCase().trim().contains('poids') || value
-                    .value.text!.toLowerCase().trim().replaceAll(' ', '').contains
-                  ('Lourd/Leger')){
-                  columnToRead['poids']=cell.columnIndex;
+                if (value.value.text!.toLowerCase().trim().contains('poids') ||
+                    value.value.text!
+                        .toLowerCase()
+                        .trim()
+                        .replaceAll(' ', '')
+                        .contains('Lourd/Leger')) {
+                  columnToRead['poids'] = cell.columnIndex;
                 }
-                if(value.value.text!.toLowerCase().trim().contains('matricule '
-                    'employé') || value
-                    .value.text!.toLowerCase().trim().replaceAll(' ', '').contains
-                  ('matriculeemploye')){
-                  columnToRead['matEmp']=cell.columnIndex;
+                if (value.value.text!.toLowerCase().trim().contains(
+                      'matricule '
+                      'employé',
+                    ) ||
+                    value.value.text!
+                        .toLowerCase()
+                        .trim()
+                        .replaceAll(' ', '')
+                        .contains('matriculeemploye')) {
+                  columnToRead['matEmp'] = cell.columnIndex;
                 }
-                if(value.value.text!.toLowerCase().trim().contains('poste occupé') || value
-                    .value.text!.toLowerCase().trim().replaceAll(' ', '').contains
-                  ('poste')){
-                  columnToRead['poste']=cell.columnIndex;
+                if (value.value.text!.toLowerCase().trim().contains(
+                      'poste occupé',
+                    ) ||
+                    value.value.text!
+                        .toLowerCase()
+                        .trim()
+                        .replaceAll(' ', '')
+                        .contains('poste')) {
+                  columnToRead['poste'] = cell.columnIndex;
                 }
               }
 
@@ -422,29 +482,28 @@ class _ImportVehiclesState extends State<ImportVehicles> {
       title: const Text("importlist").tr(),
       constraints: BoxConstraints.loose(Size(600.px, 500.px)),
       content: loading
-          ? Center(
-              child: ProgressBar(
-                value: progressLoadingFile,
-              ),
-            )
+          ? Center(child: ProgressBar(value: progressLoadingFile))
           : invalidFile
-              ? invalidFileWidget()
-              : uploading
-                  ? uploadWidget(appTheme)
-                  : getList(),
+          ? invalidFileWidget()
+          : uploading
+          ? uploadWidget(appTheme)
+          : getList(),
       actions: [
         Button(
-            child: doneUploading
-                ? const Text('fermer').tr()
-                : const Text('annuler').tr(),
-            onPressed: () {
-              Navigator.of(context).pop();
-            }),
+          child: doneUploading
+              ? const Text('fermer').tr()
+              : const Text('annuler').tr(),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
         if (!doneUploading)
           FilledButton(
-              onPressed:
-                  loading || invalidFile || uploading ? null : uploadVehicles,
-              child: const Text('confirmer').tr())
+            onPressed: loading || invalidFile || uploading
+                ? null
+                : uploadVehicles,
+            child: const Text('confirmer').tr(),
+          ),
       ],
     );
   }
@@ -477,41 +536,44 @@ class _ImportVehiclesState extends State<ImportVehicles> {
                 content: const Text('selectall').tr(),
               ),
               const Text('lselection')
-                  .tr(namedArgs: {'select': getNumberOfSelected().toString()})
+                  .tr(namedArgs: {'select': getNumberOfSelected().toString()}),
             ],
           ),
         ),
         Flexible(
           child: ListView(
             children: importedVehicles.entries
-                .map((e) => ListTile.selectable(
-                      selected: e.value.selected,
-                      onSelectionChange: (s) {
-                        setState(() {
-                          e.value.selected = s;
-                        });
-                      },
-                      trailing: Row(
-                        children: [
-                          Text(
-                            VehiclesUtilities.getEtatName(
-                                e.value.etatactuel ?? 0),
-                            style: TextStyle(color: Colors.grey[100]),
-                          ).tr(),
-                          smallSpace,
-                          Checkbox(
-                            checked: e.value.selected,
-                            onChanged: (bool? value) {
-                              setState(() {
-                                e.value.selected = value ?? false;
-                              });
-                            },
+                .map(
+                  (e) => ListTile.selectable(
+                    selected: e.value.selected,
+                    onSelectionChange: (s) {
+                      setState(() {
+                        e.value.selected = s;
+                      });
+                    },
+                    trailing: Row(
+                      children: [
+                        Text(
+                          VehiclesUtilities.getEtatName(
+                            e.value.etatactuel ?? 0,
                           ),
-                        ],
-                      ),
-                      title: Text(e.value.type ?? ''),
-                      leading: Text(e.value.matricule),
-                    ))
+                          style: TextStyle(color: Colors.grey[100]),
+                        ).tr(),
+                        smallSpace,
+                        Checkbox(
+                          checked: e.value.selected,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              e.value.selected = value ?? false;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    title: Text(e.value.type ?? ''),
+                    leading: Text(e.value.matricule),
+                  ),
+                )
                 .toList(),
           ),
         ),
@@ -525,17 +587,12 @@ class _ImportVehiclesState extends State<ImportVehicles> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(
-            FluentIcons.error,
-            color: Colors.grey[100],
-          ),
+          Icon(FluentIcons.error, color: Colors.grey[100]),
           smallSpace,
           const Text(
             'invalidvehiclefile',
             textAlign: TextAlign.justify,
-            style: TextStyle(
-              wordSpacing: 2,
-            ),
+            style: TextStyle(wordSpacing: 2),
           ).tr(),
         ],
       ),
@@ -569,32 +626,34 @@ class _ImportVehiclesState extends State<ImportVehicles> {
   Future<void> uploadVehicle(Vehicle v, TablesDB db) async {
     await db
         .createRow(
-            databaseId: databaseId,
-            tableId: vehiculeid,
-            rowId: v.id,
-            data: v.toJson())
+          databaseId: databaseId,
+          tableId: vehiculeid,
+          rowId: v.id,
+          data: v.toJson(),
+        )
         .then((value) {
-      setState(() {
-        uploaded++;
-      });
-    }).onError((AppwriteException error, stackTrace) {
-      if (kDebugMode) {
-        print('erreur vehicule ${v.matricule} : ${error.message}');
-      }
-      setState(() {
-        notUploaded++;
-      });
-    });
+          setState(() {
+            uploaded++;
+          });
+        })
+        .onError((AppwriteException error, stackTrace) {
+          if (kDebugMode) {
+            print('erreur vehicule ${v.matricule} : ${error.message}');
+          }
+          setState(() {
+            notUploaded++;
+          });
+        });
   }
 
   Widget uploadWidget(AppTheme appTheme) {
     int nSelected = getNumberOfSelected();
     const double fSize = 18;
     return Center(
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -611,41 +670,57 @@ class _ImportVehiclesState extends State<ImportVehicles> {
               Text(
                 '${((uploaded + notUploaded) * 100 / nSelected).toStringAsFixed(2)} %',
                 style: const TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: fSize),
-              )
+                  fontWeight: FontWeight.bold,
+                  fontSize: fSize,
+                ),
+              ),
             ],
           ),
           bigSpace,
           Row(
             children: [
-              Text('uploaded'.tr(),
-                  style: TextStyle(
-                    fontSize: fSize,
-                    fontWeight: FontWeight.bold,
-                    color: appTheme.color.darkest,
-                  )),
+              Text(
+                'uploaded'.tr(),
+                style: TextStyle(
+                  fontSize: fSize,
+                  fontWeight: FontWeight.bold,
+                  color: appTheme.color.darkest,
+                ),
+              ),
               const Spacer(),
-              Text('\t\t\t\t${uploaded.toInt()} / $nSelected',
-                  style: TextStyle(
-                      fontSize: fSize, color: appTheme.color.darkest)),
+              Text(
+                '\t\t\t\t${uploaded.toInt()} / $nSelected',
+                style: TextStyle(
+                  fontSize: fSize,
+                  color: appTheme.color.darkest,
+                ),
+              ),
             ],
           ),
           smallSpace,
           Row(
             children: [
-              Text('skipped'.tr(),
-                  style: TextStyle(
-                    fontSize: fSize,
-                    fontWeight: FontWeight.bold,
-                    color: appTheme.color.lightest,
-                  )),
+              Text(
+                'skipped'.tr(),
+                style: TextStyle(
+                  fontSize: fSize,
+                  fontWeight: FontWeight.bold,
+                  color: appTheme.color.lightest,
+                ),
+              ),
               const Spacer(),
-              Text('\t\t\t\t${notUploaded.toInt()} / $nSelected',
-                  style: TextStyle(
-                      fontSize: fSize, color: appTheme.color.lightest)),
+              Text(
+                '\t\t\t\t${notUploaded.toInt()} / $nSelected',
+                style: TextStyle(
+                  fontSize: fSize,
+                  color: appTheme.color.lightest,
+                ),
+              ),
             ],
           ),
-        ]));
+        ],
+      ),
+    );
   }
 
   bool uploading = false;

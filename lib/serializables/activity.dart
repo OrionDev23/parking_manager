@@ -13,20 +13,20 @@ class Activity extends ParcOtoDefault {
   String? createdBy;
   String? docName;
 
-  Activity(
-      {required super.id,
-      super.createdAt,
-      super.updatedAt,
-      required this.type,
-      required this.docID,
-      this.personName,
-      this.createdBy,
-      this.docName});
+  Activity({
+    required super.id,
+    super.createdAt,
+    super.updatedAt,
+    required this.type,
+    required this.docID,
+    this.personName,
+    this.createdBy,
+    this.docName,
+  });
 
   factory Activity.fromJson(Map<String, dynamic> json) =>
       _$ActivityFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$ActivityToJson(this);
-
 }

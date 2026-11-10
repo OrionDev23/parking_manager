@@ -35,31 +35,34 @@ class ClientFormState extends PrestataireFormState {
       nif: nif.text,
       nis: nis.text,
       description: descr.text,
-      search: '${nom.text} ${nif.text} ${nis.text} ${rc.text} ${email.text} '
+      search:
+          '${nom.text} ${nif.text} ${nis.text} ${rc.text} ${email.text} '
           '${telephone.text} ${adresse.text} ${descr.text} $prestID ${art.text}',
     );
     if (widget.prest != null) {
       return await DatabaseGetter()
           .updateDocument(
-              collectionId: clientsID,
-              documentId: prestID!,
-              data: prest.toJson())
+            collectionId: clientsID,
+            documentId: prestID!,
+            data: prest.toJson(),
+          )
           .then((value) {
-        DatabaseGetter().ajoutActivity(37, prestID!, docName: prest.nom);
+            DatabaseGetter().ajoutActivity(37, prestID!, docName: prest.nom);
 
-        return value;
-      });
+            return value;
+          });
     } else {
       return await DatabaseGetter()
           .addDocument(
-              collectionId: clientsID,
-              documentId: prestID!,
-              data: prest.toJson())
+            collectionId: clientsID,
+            documentId: prestID!,
+            data: prest.toJson(),
+          )
           .then((value) {
-        DatabaseGetter().ajoutActivity(36, prestID!, docName: prest.nom);
+            DatabaseGetter().ajoutActivity(36, prestID!, docName: prest.nom);
 
-        return value;
-      });
+            return value;
+          });
     }
   }
 }

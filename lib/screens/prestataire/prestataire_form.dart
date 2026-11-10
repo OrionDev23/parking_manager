@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+
 import '../../providers/client_database.dart';
 
 import '../../serializables/client.dart';
@@ -67,9 +68,7 @@ class PrestataireFormState extends State<PrestataireForm> {
           children: [
             const Text('Sauvegarde en cours ...'),
             smallSpace,
-            ProgressBar(
-              value: progress,
-            ),
+            ProgressBar(value: progress),
           ],
         ),
       );
@@ -99,7 +98,9 @@ class PrestataireFormState extends State<PrestataireForm> {
                               style: appTheme.writingStyle,
                               placeholderStyle: placeStyle,
                               cursorColor: appTheme.color.darker,
-                              decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                              decoration: WidgetStatePropertyAll(
+                                BoxDecoration(color: appTheme.fillColor),
+                              ),
 
                               onChanged: (s) {
                                 checkChanges();
@@ -121,7 +122,9 @@ class PrestataireFormState extends State<PrestataireForm> {
                               style: appTheme.writingStyle,
                               placeholderStyle: placeStyle,
                               cursorColor: appTheme.color.darker,
-                              decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                              decoration: WidgetStatePropertyAll(
+                                BoxDecoration(color: appTheme.fillColor),
+                              ),
 
                               onChanged: (s) {
                                 checkChanges();
@@ -149,7 +152,11 @@ class PrestataireFormState extends State<PrestataireForm> {
                                         style: appTheme.writingStyle,
                                         placeholderStyle: placeStyle,
                                         cursorColor: appTheme.color.darker,
-                                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                        decoration: WidgetStatePropertyAll(
+                                          BoxDecoration(
+                                            color: appTheme.fillColor,
+                                          ),
+                                        ),
 
                                         onChanged: (s) {
                                           checkChanges();
@@ -158,36 +165,44 @@ class PrestataireFormState extends State<PrestataireForm> {
                                     ),
                                     smallSpace,
                                     SizedBox(
-                                        width: 187,
-                                        child: TextBox(
-                                          controller: telephone,
-                                          placeholder: 'telephone'.tr(),
-                                          style: appTheme.writingStyle,
-                                          placeholderStyle: placeStyle,
-                                          cursorColor: appTheme.color.darker,
-                                          decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                      width: 187,
+                                      child: TextBox(
+                                        controller: telephone,
+                                        placeholder: 'telephone'.tr(),
+                                        style: appTheme.writingStyle,
+                                        placeholderStyle: placeStyle,
+                                        cursorColor: appTheme.color.darker,
+                                        decoration: WidgetStatePropertyAll(
+                                          BoxDecoration(
+                                            color: appTheme.fillColor,
+                                          ),
+                                        ),
 
-                                          onChanged: (s) {
-                                            checkChanges();
-                                          },
-                                        )),
+                                        onChanged: (s) {
+                                          checkChanges();
+                                        },
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 smallSpace,
                                 Flexible(
-                                    child: TextBox(
-                                      controller: adresse,
-                                      placeholder: 'adresse'.tr(),
-                                      maxLines: 3,
-                                      style: appTheme.writingStyle,
-                                      placeholderStyle: placeStyle,
-                                      cursorColor: appTheme.color.darker,
-                                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                  child: TextBox(
+                                    controller: adresse,
+                                    placeholder: 'adresse'.tr(),
+                                    maxLines: 3,
+                                    style: appTheme.writingStyle,
+                                    placeholderStyle: placeStyle,
+                                    cursorColor: appTheme.color.darker,
+                                    decoration: WidgetStatePropertyAll(
+                                      BoxDecoration(color: appTheme.fillColor),
+                                    ),
 
-                                      onChanged: (s) {
-                                        checkChanges();
-                                      },
-                                    )),
+                                    onChanged: (s) {
+                                      checkChanges();
+                                    },
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -207,32 +222,42 @@ class PrestataireFormState extends State<PrestataireForm> {
                                   child: Row(
                                     children: [
                                       Flexible(
-                                          child: TextBox(
-                                            controller: nif,
-                                            placeholder: 'NIF',
-                                            style: appTheme.writingStyle,
-                                            placeholderStyle: placeStyle,
-                                            cursorColor: appTheme.color.darker,
-                                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                        child: TextBox(
+                                          controller: nif,
+                                          placeholder: 'NIF',
+                                          style: appTheme.writingStyle,
+                                          placeholderStyle: placeStyle,
+                                          cursorColor: appTheme.color.darker,
+                                          decoration: WidgetStatePropertyAll(
+                                            BoxDecoration(
+                                              color: appTheme.fillColor,
+                                            ),
+                                          ),
 
-                                            onChanged: (s) {
-                                              checkChanges();
-                                            },
-                                          )),
+                                          onChanged: (s) {
+                                            checkChanges();
+                                          },
+                                        ),
+                                      ),
                                       smallSpace,
                                       Flexible(
-                                          child: TextBox(
-                                            controller: nis,
-                                            placeholder: 'NIS',
-                                            style: appTheme.writingStyle,
-                                            placeholderStyle: placeStyle,
-                                            cursorColor: appTheme.color.darker,
-                                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                        child: TextBox(
+                                          controller: nis,
+                                          placeholder: 'NIS',
+                                          style: appTheme.writingStyle,
+                                          placeholderStyle: placeStyle,
+                                          cursorColor: appTheme.color.darker,
+                                          decoration: WidgetStatePropertyAll(
+                                            BoxDecoration(
+                                              color: appTheme.fillColor,
+                                            ),
+                                          ),
 
-                                            onChanged: (s) {
-                                              checkChanges();
-                                            },
-                                          )),
+                                          onChanged: (s) {
+                                            checkChanges();
+                                          },
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -241,32 +266,42 @@ class PrestataireFormState extends State<PrestataireForm> {
                                   child: Row(
                                     children: [
                                       Flexible(
-                                          child: TextBox(
-                                            controller: rc,
-                                            placeholder: 'RC',
-                                            style: appTheme.writingStyle,
-                                            placeholderStyle: placeStyle,
-                                            cursorColor: appTheme.color.darker,
-                                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                        child: TextBox(
+                                          controller: rc,
+                                          placeholder: 'RC',
+                                          style: appTheme.writingStyle,
+                                          placeholderStyle: placeStyle,
+                                          cursorColor: appTheme.color.darker,
+                                          decoration: WidgetStatePropertyAll(
+                                            BoxDecoration(
+                                              color: appTheme.fillColor,
+                                            ),
+                                          ),
 
-                                            onChanged: (s) {
-                                              checkChanges();
-                                            },
-                                          )),
+                                          onChanged: (s) {
+                                            checkChanges();
+                                          },
+                                        ),
+                                      ),
                                       smallSpace,
                                       Flexible(
-                                          child: TextBox(
-                                            controller: art,
-                                            placeholder: 'ART',
-                                            style: appTheme.writingStyle,
-                                            placeholderStyle: placeStyle,
-                                            cursorColor: appTheme.color.darker,
-                                            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                        child: TextBox(
+                                          controller: art,
+                                          placeholder: 'ART',
+                                          style: appTheme.writingStyle,
+                                          placeholderStyle: placeStyle,
+                                          cursorColor: appTheme.color.darker,
+                                          decoration: WidgetStatePropertyAll(
+                                            BoxDecoration(
+                                              color: appTheme.fillColor,
+                                            ),
+                                          ),
 
-                                            onChanged: (s) {
-                                              checkChanges();
-                                            },
-                                          )),
+                                          onChanged: (s) {
+                                            checkChanges();
+                                          },
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -393,31 +428,34 @@ class PrestataireFormState extends State<PrestataireForm> {
       nif: nif.text,
       nis: nis.text,
       description: descr.text,
-      search: '${nom.text} ${nif.text} ${nis.text} ${rc.text} ${email.text} '
+      search:
+          '${nom.text} ${nif.text} ${nis.text} ${rc.text} ${email.text} '
           '${telephone.text} ${adresse.text} ${descr.text} $prestID ${art.text}',
     );
     if (widget.prest != null) {
       return await DatabaseGetter()
           .updateDocument(
-          collectionId: prestataireId,
-          documentId: prestID!,
-          data: prest.toJson())
+            collectionId: prestataireId,
+            documentId: prestID!,
+            data: prest.toJson(),
+          )
           .then((value) {
-        DatabaseGetter().ajoutActivity(14, prestID!, docName: prest.nom);
+            DatabaseGetter().ajoutActivity(14, prestID!, docName: prest.nom);
 
-        return value;
-      });
+            return value;
+          });
     } else {
       return await DatabaseGetter()
           .addDocument(
-          collectionId: prestataireId,
-          documentId: prestID!,
-          data: prest.toJson())
+            collectionId: prestataireId,
+            documentId: prestID!,
+            data: prest.toJson(),
+          )
           .then((value) {
-        DatabaseGetter().ajoutActivity(13, prestID!, docName: prest.nom);
+            DatabaseGetter().ajoutActivity(13, prestID!, docName: prest.nom);
 
-        return value;
-      });
+            return value;
+          });
     }
   }
 
@@ -426,9 +464,7 @@ class PrestataireFormState extends State<PrestataireForm> {
       context: context,
       builder: (context) => ContentDialog(
         title: Text(title).tr(),
-        content: Text(
-          message,
-        ).tr(),
+        content: Text(message).tr(),
         actions: [
           Button(
             child: const Text('OK').tr(),
@@ -440,6 +476,4 @@ class PrestataireFormState extends State<PrestataireForm> {
       ),
     );
   }
-
-
 }

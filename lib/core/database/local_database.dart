@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart';
 
@@ -10,7 +11,8 @@ class LocalDatabase {
   factory LocalDatabase() => instance;
 
   LocalDatabase._();
-  Database get database => _database ??
+  Database get database =>
+      _database ??
       (throw StateError('LocalDatabase has not been initialized.'));
 
   Future<void> open() async {
@@ -30,17 +32,25 @@ class LocalDatabase {
       'CREATE TABLE IF NOT EXISTS schema_migrations '
       '(version INTEGER PRIMARY KEY, applied_at TEXT NOT NULL)',
     );
-    final version = db
-        .select('SELECT COALESCE(MAX(version), 0) AS version FROM schema_migrations')
-        .first['version'] as int;
+    final version =
+        db
+                .select(
+                  'SELECT COALESCE(MAX(version), 0) AS version FROM schema_migrations',
+                )
+                .first['version']
+            as int;
 
     if (version < 1) {
-      db.execute('''CREATE TABLE vehicles (
+      db.execute(
+        '''CREATE TABLE vehicles (
         id TEXT PRIMARY KEY, company_id TEXT NOT NULL, site_id TEXT,
         registration TEXT NOT NULL, brand TEXT, model TEXT, color TEXT,
-        status TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)''');
+        status TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)''',
+      );
       db.execute('CREATE INDEX idx_vehicles_company ON vehicles(company_id)');
-      db.execute('CREATE INDEX idx_vehicles_registration ON vehicles(registration)');
+      db.execute(
+        'CREATE INDEX idx_vehicles_registration ON vehicles(registration)',
+      );
       db.execute('CREATE INDEX idx_vehicles_site ON vehicles(site_id)');
       db.execute('''CREATE TABLE sync_operations (
         id TEXT PRIMARY KEY, company_id TEXT NOT NULL, device_id TEXT NOT NULL,
@@ -79,8 +89,12 @@ class LocalDatabase {
         updated_at TEXT NOT NULL,
         payload TEXT NOT NULL DEFAULT '{}'
       )''');
-      db.execute('CREATE INDEX IF NOT EXISTS idx_drivers_company ON drivers(company_id)');
-      db.execute('CREATE INDEX IF NOT EXISTS idx_drivers_registration ON drivers(registration)');
+      db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_drivers_company ON drivers(company_id)',
+      );
+      db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_drivers_registration ON drivers(registration)',
+      );
       db.execute(
         "INSERT INTO schema_migrations(version, applied_at) VALUES (3, datetime('now'))",
       );
@@ -282,7 +296,9 @@ class LocalDatabase {
       [companyId, entity],
     );
     return rows
-        .map((row) => jsonDecode(row['payload'] as String) as Map<String, dynamic>)
+        .map(
+          (row) => jsonDecode(row['payload'] as String) as Map<String, dynamic>,
+        )
         .toList(growable: false);
   }
 

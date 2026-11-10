@@ -11,37 +11,41 @@ class NoDataWidget extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  const NoDataWidget(
-      {super.key,
-      this.datasource,
-      this.icon = FluentIcons.database_block,
-      this.text = 'lvide'});
+  const NoDataWidget({
+    super.key,
+    this.datasource,
+    this.icon = FluentIcons.database_block,
+    this.text = 'lvide',
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(10),
       width: 80.w,
-      child: Column(children: [
-        bigSpace,
-        Flexible(
-          child: EmptyWidget(
-            title: text.tr(),
-            titleTextStyle: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
+      child: Column(
+        children: [
+          bigSpace,
+          Flexible(
+            child: EmptyWidget(
+              title: text.tr(),
+              titleTextStyle: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+              image: PackageImage.Image_3.encode(),
             ),
-            image: PackageImage.Image_3.encode(),
           ),
-        ),
-        if (datasource != null) bigSpace,
-        if (datasource != null)
-          FilledButton(
+          if (datasource != null) bigSpace,
+          if (datasource != null)
+            FilledButton(
               child: const Text('refresh').tr(),
               onPressed: () {
                 datasource?.refreshDatasource();
-              })
-      ]),
+              },
+            ),
+        ],
+      ),
     );
   }
 }

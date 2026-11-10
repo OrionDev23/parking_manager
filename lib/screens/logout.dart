@@ -22,15 +22,11 @@ class _LogoutScreenState extends State<LogoutScreen> {
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
     return ScaffoldPage(
-      header: PageTitle(
-        text: 'deconnexion'.tr(),
-      ),
+      header: PageTitle(text: 'deconnexion'.tr()),
       content: Center(
         child: Column(
           children: [
-            SizedBox(
-              height: 20.h,
-            ),
+            SizedBox(height: 20.h),
             Container(
               padding: const EdgeInsets.all(10),
               alignment: Alignment.center,
@@ -41,10 +37,10 @@ class _LogoutScreenState extends State<LogoutScreen> {
                 color: appTheme.mode == ThemeMode.dark
                     ? Colors.grey
                     : appTheme.mode == ThemeMode.light
-                        ? Colors.white
-                        : ThemeMode.system == ThemeMode.light
-                            ? Colors.white
-                            : Colors.grey,
+                    ? Colors.white
+                    : ThemeMode.system == ThemeMode.light
+                    ? Colors.white
+                    : Colors.grey,
                 boxShadow: kElevationToShadow[2],
               ),
               child: Column(
@@ -54,38 +50,42 @@ class _LogoutScreenState extends State<LogoutScreen> {
                 children: [
                   Text(
                     'disconnectconfirm',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14.sp,
+                    ),
                   ).tr(),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Button(
-                            onPressed: loginOut ? null : logout,
-                            child: loginOut
-                                ? const Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: ProgressRing(),
-                                  )
-                                : Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: const Text('oui').tr(),
-                                  )),
+                          onPressed: loginOut ? null : logout,
+                          child: loginOut
+                              ? const Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                  ),
+                                  child: ProgressRing(),
+                                )
+                              : Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                  ),
+                                  child: const Text('oui').tr(),
+                                ),
+                        ),
                         FilledButton(
                           onPressed: loginOut ? null : cancel,
                           child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
                             child: const Text('non').tr(),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),

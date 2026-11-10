@@ -8,8 +8,10 @@ class DocumentWebService extends ParcOtoWebService<DocumentVehicle> {
 
   @override
   int Function(
-          MapEntry<String, DocumentVehicle>, MapEntry<String, DocumentVehicle>)?
-      getComparisonFunction(int column, bool ascending) {
+    MapEntry<String, DocumentVehicle>,
+    MapEntry<String, DocumentVehicle>,
+  )?
+  getComparisonFunction(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
       case 0:
@@ -80,16 +82,25 @@ class DocumentWebService extends ParcOtoWebService<DocumentVehicle> {
   }
 
   @override
-  List<String> getFilterQueries(Map<String, String> filters, int count,
-      int startingAt, int sortedBy, bool sortedAsc,
-      {int? index}) {
+  List<String> getFilterQueries(
+    Map<String, String> filters,
+    int count,
+    int startingAt,
+    int sortedBy,
+    bool sortedAsc, {
+    int? index,
+  }) {
     return [
       if (filters.containsKey('datemin'))
         Query.greaterThanEqual(
-            'date_expiration', int.tryParse(filters['datemin']!)),
+          'date_expiration',
+          int.tryParse(filters['datemin']!),
+        ),
       if (filters.containsKey('datemax'))
         Query.lessThanEqual(
-            'date_expiration', int.tryParse(filters['datemax']!)),
+          'date_expiration',
+          int.tryParse(filters['datemax']!),
+        ),
       if (filters.containsKey('createdBy'))
         Query.equal('createdBy', filters['createdBy']),
       if (filters.containsKey('vehicle'))

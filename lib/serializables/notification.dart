@@ -4,11 +4,12 @@ class PNotification {
   final int type;
   final DateTime date;
 
-  PNotification(
-      {required this.id,
-      required this.title,
-      required this.type,
-      required this.date});
+  PNotification({
+    required this.id,
+    required this.title,
+    required this.type,
+    required this.date,
+  });
 
   @override
   bool operator ==(Object other) {

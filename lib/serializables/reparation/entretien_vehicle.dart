@@ -13,16 +13,16 @@ class EntretienVehicle {
   bool liquideFrein = false;
   bool liquideRefroidissement = false;
   bool liquideTransmission = false;
-  bool systemSuspension=false;
-  bool systemFreinage=false;
+  bool systemSuspension = false;
+  bool systemFreinage = false;
   bool inspectionAmortisseurs = false;
   bool bougies = false;
   bool equilibrageRoues = false;
   bool controleNiveaux = false;
   bool changerPneux = false;
   bool differentielAvAr = false;
-  bool tuyaux=false;
-  bool echappement=false;
+  bool tuyaux = false;
+  bool echappement = false;
   bool batterie = false;
   bool courroies = false;
   bool eclairage = false;
@@ -53,13 +53,12 @@ class EntretienVehicle {
     this.differentielAvAr = false,
     this.inspectionAmortisseurs = false,
     this.liquideTransmission = false,
-    this.tuyaux=false,
-    this.echappement=false,
-    this.systemFreinage=false,
-    this.systemSuspension=false,
+    this.tuyaux = false,
+    this.echappement = false,
+    this.systemFreinage = false,
+    this.systemSuspension = false,
     this.balaisEssuieGlace = false,
     this.obd = false,
-
   });
 
   factory EntretienVehicle.fromJson(Map<String, dynamic> json) =>

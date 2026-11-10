@@ -4,12 +4,7 @@ import 'package:flutter_randomcolor/flutter_randomcolor.dart';
 import '../theme.dart';
 
 class ThemeColors {
-  static List<AccentColor> accentColors = [
-    orange,
-    red,
-    blue,
-    green
-  ];
+  static List<AccentColor> accentColors = [orange, red, blue, green];
 
   static final AccentColor orange = AccentColor.swatch(const <String, Color>{
     'darkest': Color(0xff993d07),
@@ -65,13 +60,9 @@ class ThemeColors {
     'lighter': Color(0xff4b9c4b),
     'lightest': Color(0xff6aad6a),
   });
-
 }
-Color getRandomColorFromTheme(AppTheme appTheme,int index){
-var options = Options(
-    format: Format.hex,
-    colorType: appTheme.color
 
-);
-return RandomColor.getColor(options);
+Color getRandomColorFromTheme(AppTheme appTheme, int index) {
+  var options = Options(format: Format.hex, colorType: appTheme.color);
+  return RandomColor.getColor(options);
 }

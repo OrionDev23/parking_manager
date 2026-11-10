@@ -73,7 +73,10 @@ class Settings extends ScrollablePage {
         ),
       ),
       biggerSpacer,
-      Text('dispositionpaneau', style: FluentTheme.of(context).typography.subtitle).tr(),
+      Text(
+        'dispositionpaneau',
+        style: FluentTheme.of(context).typography.subtitle,
+      ).tr(),
       spacer,
       RadioGroup<PaneDisplayMode>(
         groupValue: appTheme.displayMode,
@@ -90,25 +93,31 @@ class Settings extends ScrollablePage {
               padding: const EdgeInsetsDirectional.only(bottom: 8.0),
               child: RadioButton<PaneDisplayMode>(
                 value: mode,
-                content: Text(mode.toString().replaceAll('PaneDisplayMode.', '')).tr(),
+                content: Text(
+                  mode.toString().replaceAll('PaneDisplayMode.', ''),
+                ).tr(),
               ),
             );
           }),
         ),
       ),
       biggerSpacer,
-      Text('couleurprincipale',
-          style: FluentTheme.of(context).typography.subtitle).tr(),
+      Text(
+        'couleurprincipale',
+        style: FluentTheme.of(context).typography.subtitle,
+      ).tr(),
       spacer,
-      Wrap(children: [
-        ...List.generate(ThemeColors.accentColors.length, (index) {
-          final color = ThemeColors.accentColors[index];
-          return Tooltip(
-            message: accentColorNames[index],
-            child: _buildColorBlock(appTheme, color, index),
-          );
-        }),
-      ]),
+      Wrap(
+        children: [
+          ...List.generate(ThemeColors.accentColors.length, (index) {
+            final color = ThemeColors.accentColors[index];
+            return Tooltip(
+              message: accentColorNames[index],
+              child: _buildColorBlock(appTheme, color, index),
+            );
+          }),
+        ],
+      ),
       biggerSpacer,
       biggerSpacer,
       Text('langue', style: FluentTheme.of(context).typography.subtitle).tr(),
@@ -128,14 +137,11 @@ class Settings extends ScrollablePage {
             final label = locale.languageCode.toUpperCase() == 'FR'
                 ? 'Français'
                 : locale.languageCode.toUpperCase() == 'AR'
-                    ? 'عربية'
-                    : 'English';
+                ? 'عربية'
+                : 'English';
             return Padding(
               padding: const EdgeInsetsDirectional.only(bottom: 8.0),
-              child: RadioButton<Locale>(
-                value: locale,
-                content: Text(label),
-              ),
+              child: RadioButton<Locale>(value: locale, content: Text(label)),
             );
           }).toList(),
         ),

@@ -23,13 +23,20 @@ class MergeStream<T> extends Stream<T> {
   /// Constructs a [Stream] which flattens all events in [streams] and emits
   /// them in a single sequence.
   MergeStream(Iterable<Stream<T>> streams)
-      : _controller = _buildController(streams);
+    : _controller = _buildController(streams);
 
   @override
-  StreamSubscription<T> listen(void Function(T event)? onData,
-          {Function? onError, void Function()? onDone, bool? cancelOnError}) =>
-      _controller.stream.listen(onData,
-          onError: onError, onDone: onDone, cancelOnError: cancelOnError);
+  StreamSubscription<T> listen(
+    void Function(T event)? onData, {
+    Function? onError,
+    void Function()? onDone,
+    bool? cancelOnError,
+  }) => _controller.stream.listen(
+    onData,
+    onError: onError,
+    onDone: onDone,
+    cancelOnError: cancelOnError,
+  );
 
   static StreamController<T> _buildController<T>(Iterable<Stream<T>> streams) {
     if (streams.isEmpty) {
@@ -41,27 +48,34 @@ class MergeStream<T> extends Stream<T> {
     late StreamController<T> controller;
 
     controller = StreamController<T>(
-        sync: true,
-        onListen: () {
-          var completed = 0;
+      sync: true,
+      onListen: () {
+        var completed = 0;
 
-          onDone() {
-            completed++;
+        onDone() {
+          completed++;
 
-            if (completed == len) controller.close();
-          }
+          if (completed == len) controller.close();
+        }
 
-          subscriptions = streams
-              .map((s) => s.listen(controller.add,
-                  onError: controller.addError, onDone: onDone))
-              .toList(growable: false);
-        },
-        onPause: () =>
-            subscriptions.forEach((subscription) => subscription.pause()),
-        onResume: () =>
-            subscriptions.forEach((subscription) => subscription.resume()),
-        onCancel: () => Future.wait(
-            subscriptions.map((subscription) => subscription.cancel())));
+        subscriptions = streams
+            .map(
+              (s) => s.listen(
+                controller.add,
+                onError: controller.addError,
+                onDone: onDone,
+              ),
+            )
+            .toList(growable: false);
+      },
+      onPause: () =>
+          subscriptions.forEach((subscription) => subscription.pause()),
+      onResume: () =>
+          subscriptions.forEach((subscription) => subscription.resume()),
+      onCancel: () => Future.wait(
+        subscriptions.map((subscription) => subscription.cancel()),
+      ),
+    );
 
     return controller;
   }

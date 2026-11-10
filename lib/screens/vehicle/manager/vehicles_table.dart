@@ -46,66 +46,63 @@ class VehicleTableState extends State<VehicleTable> {
 
   @override
   void initState() {
-    if (filterMarque.value == null && filterVehicule.value == null)
-    {
+    if (filterMarque.value == null && filterVehicule.value == null) {
       startedWithFiltersOn = false;
       vehicleDataSource = VehiculeDataSource(
         current: context,
         selectC: widget.selectV,
         collectionID: vehiculeid,
       );
-    }
-    else {
+    } else {
       startedWithFiltersOn = true;
       if (filterMarque.value != null) {
         marque = filterMarque.value;
         filtered = true;
         filters['marque'] = filterMarque.value.toString();
         vehicleDataSource = VehiculeDataSource(
-            current: context,
-            selectC: widget.selectV,
-            collectionID: vehiculeid,
-            filters: filters);
+          current: context,
+          selectC: widget.selectV,
+          collectionID: vehiculeid,
+          filters: filters,
+        );
       } else {
         searchController.text = filterVehicule.value!;
         vehicleDataSource = VehiculeDataSource(
-            current: context,
-            selectC: widget.selectV,
-            collectionID: vehiculeid,
-            searchKey: filterVehicule.value);
+          current: context,
+          selectC: widget.selectV,
+          collectionID: vehiculeid,
+          searchKey: filterVehicule.value,
+        );
       }
       filterMarque.value = null;
       filterVehicule.value = null;
     }
     initColumns();
-    sortColumn=columns.length-1;
+    sortColumn = columns.length - 1;
 
     super.initState();
   }
 
-  int sortColumn = conducteurEmploye?11:6;
+  int sortColumn = conducteurEmploye ? 11 : 6;
 
-  double large=250.px;
-  double medium=150.px;
-  double small=80.px;
+  double large = 250.px;
+  double medium = 150.px;
+  double small = 80.px;
 
   void initColumns() {
-    if(conducteurEmploye){
-      initColumnsEmploye();}
-    else{
+    if (conducteurEmploye) {
+      initColumnsEmploye();
+    } else {
       initColumnsNonEmploye();
     }
   }
 
-  void initColumnsNonEmploye(){
+  void initColumnsNonEmploye() {
     columns = [
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'N',
-            style: tstyle,
-          ).tr(),
+          child: Text('N', style: tstyle).tr(),
         ),
         fixedWidth: small,
         onSort: (s, c) {
@@ -118,10 +115,7 @@ class VehicleTableState extends State<VehicleTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'nchassi',
-            style: tstyle,
-          ).tr(),
+          child: Text('nchassi', style: tstyle).tr(),
         ),
         fixedWidth: medium,
         onSort: (s, c) {
@@ -134,10 +128,7 @@ class VehicleTableState extends State<VehicleTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'matricule',
-            style: tstyle,
-          ).tr(),
+          child: Text('matricule', style: tstyle).tr(),
         ),
         fixedWidth: medium,
         onSort: (s, c) {
@@ -150,10 +141,7 @@ class VehicleTableState extends State<VehicleTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'type',
-            style: tstyle,
-          ).tr(),
+          child: Text('type', style: tstyle).tr(),
         ),
         fixedWidth: large,
         onSort: (s, c) {
@@ -168,10 +156,7 @@ class VehicleTableState extends State<VehicleTable> {
         numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'etat',
-            style: tstyle,
-          ).tr(),
+          child: Text('etat', style: tstyle).tr(),
         ),
         fixedWidth: small,
         onSort: (s, c) {
@@ -186,10 +171,7 @@ class VehicleTableState extends State<VehicleTable> {
         numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'perimetre',
-            style: tstyle,
-          ).tr(),
+          child: Text('perimetre', style: tstyle).tr(),
         ),
         fixedWidth: small,
         onSort: (s, c) {
@@ -204,10 +186,7 @@ class VehicleTableState extends State<VehicleTable> {
         numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'dateModif',
-            style: tstyle,
-          ).tr(),
+          child: Text('dateModif', style: tstyle).tr(),
         ),
         fixedWidth: large,
         onSort: (s, c) {
@@ -226,15 +205,13 @@ class VehicleTableState extends State<VehicleTable> {
         ),
     ];
   }
-  void initColumnsEmploye(){
+
+  void initColumnsEmploye() {
     columns = [
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'N',
-            style: tstyle,
-          ).tr(),
+          child: Text('N', style: tstyle).tr(),
         ),
         fixedWidth: small,
         onSort: (s, c) {
@@ -247,10 +224,7 @@ class VehicleTableState extends State<VehicleTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'matricule',
-            style: tstyle,
-          ).tr(),
+          child: Text('matricule', style: tstyle).tr(),
         ),
         fixedWidth: medium,
         onSort: (s, c) {
@@ -263,10 +237,7 @@ class VehicleTableState extends State<VehicleTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'type',
-            style: tstyle,
-          ).tr(),
+          child: Text('type', style: tstyle).tr(),
         ),
         fixedWidth: large,
         onSort: (s, c) {
@@ -281,10 +252,7 @@ class VehicleTableState extends State<VehicleTable> {
         numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'etat',
-            style: tstyle,
-          ).tr(),
+          child: Text('etat', style: tstyle).tr(),
         ),
         fixedWidth: small,
         onSort: (s, c) {
@@ -299,10 +267,7 @@ class VehicleTableState extends State<VehicleTable> {
         numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'perimetre',
-            style: tstyle,
-          ).tr(),
+          child: Text('perimetre', style: tstyle).tr(),
         ),
         fixedWidth: small,
         onSort: (s, c) {
@@ -317,10 +282,7 @@ class VehicleTableState extends State<VehicleTable> {
         numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'appartenancevehiculesingle',
-            style: tstyle,
-          ).tr(),
+          child: Text('appartenancevehiculesingle', style: tstyle).tr(),
         ),
         fixedWidth: medium,
         onSort: (s, c) {
@@ -335,10 +297,7 @@ class VehicleTableState extends State<VehicleTable> {
         numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'direction',
-            style: tstyle,
-          ).tr(),
+          child: Text('direction', style: tstyle).tr(),
         ),
         fixedWidth: large,
         onSort: (s, c) {
@@ -353,10 +312,7 @@ class VehicleTableState extends State<VehicleTable> {
         numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'matriculeemploye',
-            style: tstyle,
-          ).tr(),
+          child: Text('matriculeemploye', style: tstyle).tr(),
         ),
         fixedWidth: medium,
         onSort: (s, c) {
@@ -371,10 +327,7 @@ class VehicleTableState extends State<VehicleTable> {
         numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'nom',
-            style: tstyle,
-          ).tr(),
+          child: Text('nom', style: tstyle).tr(),
         ),
         fixedWidth: small,
         onSort: (s, c) {
@@ -389,10 +342,7 @@ class VehicleTableState extends State<VehicleTable> {
         numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'prenom',
-            style: tstyle,
-          ).tr(),
+          child: Text('prenom', style: tstyle).tr(),
         ),
         fixedWidth: small,
         onSort: (s, c) {
@@ -407,10 +357,7 @@ class VehicleTableState extends State<VehicleTable> {
         numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'poste',
-            style: tstyle,
-          ).tr(),
+          child: Text('poste', style: tstyle).tr(),
         ),
         fixedWidth: medium,
         onSort: (s, c) {
@@ -425,10 +372,7 @@ class VehicleTableState extends State<VehicleTable> {
         numeric: true,
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'dateModif',
-            style: tstyle,
-          ).tr(),
+          child: Text('dateModif', style: tstyle).tr(),
         ),
         fixedWidth: large,
         onSort: (s, c) {
@@ -462,766 +406,707 @@ class VehicleTableState extends State<VehicleTable> {
   TextEditingController yearMax = TextEditingController();
   Map<String, String> filters = {};
 
-
-
-
   FlyoutController export = FlyoutController();
-
 
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
     vehicleDataSource.appTheme = appTheme;
     return ValueListenableBuilder(
-        valueListenable: filterMarque,
-        builder: (context, v, _) {
-          if (!startedWithFiltersOn &&  filterNow && v != null) {
-            marque = v;
-            filters['marque'] = v.toString();
-            filtered = true;
-            vehicleDataSource.filter(filters);
-            filterNow = false;
-          }
-          return ValueListenableBuilder(
-              valueListenable: filterVehicule,
-              builder: (context, v, _) {
-                if (!startedWithFiltersOn &&  filterNow && v != null ) {
-                  searchController.text = v;
-                  vehicleDataSource.search(v);
-                  notEmpty = true;
-                  filtered = true;
-                  filterNow = false;
-                }
-                return DataTableParc(
-                  horizontalScroll: true,
-                  header: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: appTheme.backGroundColor,
-                      border: Border(
-                        bottom: BorderSide(color: Colors.grey[30]),
+      valueListenable: filterMarque,
+      builder: (context, v, _) {
+        if (!startedWithFiltersOn && filterNow && v != null) {
+          marque = v;
+          filters['marque'] = v.toString();
+          filtered = true;
+          vehicleDataSource.filter(filters);
+          filterNow = false;
+        }
+        return ValueListenableBuilder(
+          valueListenable: filterVehicule,
+          builder: (context, v, _) {
+            if (!startedWithFiltersOn && filterNow && v != null) {
+              searchController.text = v;
+              vehicleDataSource.search(v);
+              notEmpty = true;
+              filtered = true;
+              filterNow = false;
+            }
+            return DataTableParc(
+              horizontalScroll: true,
+              header: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: appTheme.backGroundColor,
+                  border: Border(bottom: BorderSide(color: Colors.grey[30])),
+                ),
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 10,
+                  runSpacing: 8,
+                  children: [
+                    FlyoutTarget(
+                      controller: filterFlyout,
+                      child: Button(
+                        onPressed: () => showFilters(appTheme),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              filtered
+                                  ? FluentIcons.filter_solid
+                                  : FluentIcons.filter,
+                              size: 14,
+                              color: filtered ? appTheme.color : null,
+                            ),
+                            const SizedBox(width: 7),
+                            const Text('filter').tr(),
+                            if (filtered) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: appTheme.color,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  '${filters.length}',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     ),
-                    child: Wrap(
-                      alignment: WrapAlignment.end,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 10,
-                      runSpacing: 8,
-                      children: [
-                        FlyoutTarget(
-                          controller: filterFlyout,
-                          child: Button(
-                            onPressed: () => showFilters(appTheme),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  filtered
-                                      ? FluentIcons.filter_solid
-                                      : FluentIcons.filter,
-                                  size: 14,
-                                  color: filtered ? appTheme.color : null,
-                                ),
-                                const SizedBox(width: 7),
-                                const Text('filter').tr(),
-                                if (filtered) ...[
-                                  const SizedBox(width: 6),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: appTheme.color,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      '${filters.length}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
+                    FlyoutTarget(
+                      controller: export,
+                      child: Button(
+                        onPressed: () {
+                          export.showFlyout(
+                            builder: (context) {
+                              return MenuFlyout(
+                                items: [
+                                  MenuFlyoutSubItem(
+                                    text: const Text('listcomplete').tr(),
+                                    items: (context) => [
+                                      MenuFlyoutItem(
+                                        text: const Text('PDF'),
+                                        onPressed: showPdf,
                                       ),
-                                    ),
+                                      MenuFlyoutItem(
+                                        text: const Text('EXCEL'),
+                                        onPressed: saveExcell,
+                                      ),
+                                    ],
+                                  ),
+                                  MenuFlyoutSubItem(
+                                    text: const Text('costpervehic').tr(),
+                                    items: (context) => [
+                                      MenuFlyoutItem(
+                                        text: const Text('PDF'),
+                                        onPressed: showCostPdf,
+                                      ),
+                                      MenuFlyoutItem(
+                                        text: const Text('EXCEL'),
+                                        onPressed: saveExcelCost,
+                                      ),
+                                    ],
                                   ),
                                 ],
-                              ],
-                            ),
-                          ),
-                        ),
-                        FlyoutTarget(
-                          controller: export,
-                          child: Button(
-                            onPressed: () {
-                              export.showFlyout(builder: (context) {
-                                return MenuFlyout(
-                                  items: [
-                                    MenuFlyoutSubItem(
-                                      text: const Text('listcomplete').tr(),
-                                      items: (context) => [
-                                        MenuFlyoutItem(
-                                          text: const Text('PDF'),
-                                          onPressed: showPdf,
-                                        ),
-                                        MenuFlyoutItem(
-                                          text: const Text('EXCEL'),
-                                          onPressed: saveExcell,
-                                        ),
-                                      ],
-                                    ),
-                                    MenuFlyoutSubItem(
-                                      text: const Text('costpervehic').tr(),
-                                      items: (context) => [
-                                        MenuFlyoutItem(
-                                          text: const Text('PDF'),
-                                          onPressed: showCostPdf,
-                                        ),
-                                        MenuFlyoutItem(
-                                          text: const Text('EXCEL'),
-                                          onPressed: saveExcelCost,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                );
-                              });
+                              );
                             },
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(FluentIcons.download, size: 14),
-                                const SizedBox(width: 7),
-                                const Text('export').tr(),
-                              ],
-                            ),
-                          ),
+                          );
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(FluentIcons.download, size: 14),
+                            const SizedBox(width: 7),
+                            const Text('export').tr(),
+                          ],
                         ),
-                        SizedBox(
-                          width: 300,
-                          height: 38,
-                          child: TextBox(
-                            controller: searchController,
-                            placeholder: 'search'.tr(),
-                            style: appTheme.writingStyle,
-                            cursorColor: appTheme.color.darker,
-                            placeholderStyle: placeStyle,
-                            decoration: WidgetStatePropertyAll(
-                              BoxDecoration(
-                                color: appTheme.fillColor,
-                                borderRadius: BorderRadius.circular(7),
-                              ),
-                            ),
-                            onSubmitted: (s) {
-                              final query = s.trim();
-                              vehicleDataSource.search(query);
-                              setState(() {
-                                notEmpty = query.isNotEmpty;
-                              });
-                            },
-                            onChanged: (s) {
-                              if (s.isEmpty) {
-                                notEmpty = false;
-                                vehicleDataSource.search('');
-                              } else {
-                                notEmpty = true;
-                              }
-                              setState(() {});
-                            },
-                            suffix: notEmpty
-                                ? IconButton(
-                                    icon: const Icon(FluentIcons.cancel),
-                                    onPressed: () {
-                                      searchController.clear();
-                                      notEmpty = false;
-                                      vehicleDataSource.search('');
-                                      setState(() {});
-                                    },
-                                  )
-                                : const Icon(FluentIcons.search),
-                          ),
-                        ),
-                        Tooltip(
-                          message: 'Actualiser',
-                          child: IconButton(
-                            icon: const Icon(FluentIcons.refresh),
-                            onPressed: vehicleDataSource.refreshDatasource,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                  sortAscending: assending,
-                  sortColumnIndex: sortColumn,
-                  columns: columns,
-                  source: vehicleDataSource,
-                );
-              });
-        });
+                    SizedBox(
+                      width: 300,
+                      height: 38,
+                      child: TextBox(
+                        controller: searchController,
+                        placeholder: 'search'.tr(),
+                        style: appTheme.writingStyle,
+                        cursorColor: appTheme.color.darker,
+                        placeholderStyle: placeStyle,
+                        decoration: WidgetStatePropertyAll(
+                          BoxDecoration(
+                            color: appTheme.fillColor,
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                        ),
+                        onSubmitted: (s) {
+                          final query = s.trim();
+                          vehicleDataSource.search(query);
+                          setState(() {
+                            notEmpty = query.isNotEmpty;
+                          });
+                        },
+                        onChanged: (s) {
+                          if (s.isEmpty) {
+                            notEmpty = false;
+                            vehicleDataSource.search('');
+                          } else {
+                            notEmpty = true;
+                          }
+                          setState(() {});
+                        },
+                        suffix: notEmpty
+                            ? IconButton(
+                                icon: const Icon(FluentIcons.cancel),
+                                onPressed: () {
+                                  searchController.clear();
+                                  notEmpty = false;
+                                  vehicleDataSource.search('');
+                                  setState(() {});
+                                },
+                              )
+                            : const Icon(FluentIcons.search),
+                      ),
+                    ),
+                    Tooltip(
+                      message: 'Actualiser',
+                      child: IconButton(
+                        icon: const Icon(FluentIcons.refresh),
+                        onPressed: vehicleDataSource.refreshDatasource,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              sortAscending: assending,
+              sortColumnIndex: sortColumn,
+              columns: columns,
+              source: vehicleDataSource,
+            );
+          },
+        );
+      },
+    );
   }
 
-
-  void showPdf() async{
-
-    if(!VehicleProvider.downloadedVehicles){
+  void showPdf() async {
+    if (!VehicleProvider.downloadedVehicles) {
       VehicleProvider();
-      while(!VehicleProvider.downloadedVehicles){
+      while (!VehicleProvider.downloadedVehicles) {
         await Future.delayed(const Duration(milliseconds: 300));
       }
     }
     Future.delayed(const Duration(milliseconds: 50)).then((value) {
-
-      if(mounted){
-      showDialog(
+      if (mounted) {
+        showDialog(
           context: context,
           barrierDismissible: true,
-          builder: (context){
+          builder: (context) {
             return PdfPreviewListing(
               firstPageLimit: 30,
               midPagesLimit: 35,
               list: vehicleDataSource.getJsonData(
-                  VehicleProvider.vehicles.entries.toList()),
+                VehicleProvider.vehicles.entries.toList(),
+              ),
               orientation: PageOrientation.landscape,
-              keysToInclude: conducteurEmploye?const ['matricule','type','apparten'
-                  'ance','nom','prenom','direction']:const ['numeroSerie','matricule','type','etatactuel'],
+              keysToInclude: conducteurEmploye
+                  ? const [
+                      'matricule',
+                      'type',
+                      'apparten'
+                          'ance',
+                      'nom',
+                      'prenom',
+                      'direction',
+                    ]
+                  : const ['numeroSerie', 'matricule', 'type', 'etatactuel'],
               name: 'Liste des véhicules',
             );
-          });}
-  });
-
+          },
+        );
+      }
+    });
   }
 
-  void saveExcell() async{
-
-    if(!VehicleProvider.downloadedVehicles){
+  void saveExcell() async {
+    if (!VehicleProvider.downloadedVehicles) {
       VehicleProvider();
-      while(!VehicleProvider.downloadedVehicles){
+      while (!VehicleProvider.downloadedVehicles) {
         await Future.delayed(const Duration(milliseconds: 300));
       }
     }
     Future.delayed(const Duration(milliseconds: 50)).then((value) {
       List2Excel(
-              list: vehicleDataSource.getJsonData(VehicleProvider.vehicles
-                  .entries.toList()),
-              keysToInclude: conducteurEmploye?const ['matricule','type','apparten'
-                  'ance','matriculeConducteur','nom','prenom','direction','departement',
-                'etatactuel','appartenanceconducteur','service','decision','perimetre','emplacement']:const['numeroSerie','matricule','type','etatactuel','perimetre','emplacement'],
-              title: 'Liste des véhicules',
-            ).getExcel();
-          });
+        list: vehicleDataSource.getJsonData(
+          VehicleProvider.vehicles.entries.toList(),
+        ),
+        keysToInclude: conducteurEmploye
+            ? const [
+                'matricule',
+                'type',
+                'apparten'
+                    'ance',
+                'matriculeConducteur',
+                'nom',
+                'prenom',
+                'direction',
+                'departement',
+                'etatactuel',
+                'appartenanceconducteur',
+                'service',
+                'decision',
+                'perimetre',
+                'emplacement',
+              ]
+            : const [
+                'numeroSerie',
+                'matricule',
+                'type',
+                'etatactuel',
+                'perimetre',
+                'emplacement',
+              ],
+        title: 'Liste des véhicules',
+      ).getExcel();
+    });
   }
 
-  void showCostPdf() async{
-    if(!VehicleProvider.downloadedVehicles){
+  void showCostPdf() async {
+    if (!VehicleProvider.downloadedVehicles) {
       VehicleProvider();
-      while(!VehicleProvider.downloadedVehicles){
+      while (!VehicleProvider.downloadedVehicles) {
         await Future.delayed(const Duration(milliseconds: 300));
       }
     }
     await RepairProvider.downloadFicheReparations();
 
-    Future.delayed(const Duration(milliseconds: 50)).then((value){
-      if(mounted){
-      showDialog(
+    Future.delayed(const Duration(milliseconds: 50)).then((value) {
+      if (mounted) {
+        showDialog(
           context: context,
           barrierDismissible: true,
-          builder: (context){
+          builder: (context) {
             return PdfPreviewListing(
               firstPageLimit: 30,
               midPagesLimit: 35,
-              list: RepairProvider.prepareListVehicleImmob(RepairProvider
-                  .repPerVeh,VehicleProvider.vehicles.values.toList(growable: false)),
+              list: RepairProvider.prepareListVehicleImmob(
+                RepairProvider.repPerVeh,
+                VehicleProvider.vehicles.values.toList(growable: false),
+              ),
               orientation: PageOrientation.landscape,
-              keysToInclude: conducteurEmploye?const ['vehicule','modele','mat. conducteur','nom conducteur','nbr. rep','cost','dern. '
-            'rep']:['vehicule','modele','nbr. rep',gts?'immob':'cost','dern. rep'],
-              name: gts?'Immobilisation des véhicules':"Couts par véhicule",
+              keysToInclude: conducteurEmploye
+                  ? const [
+                      'vehicule',
+                      'modele',
+                      'mat. conducteur',
+                      'nom conducteur',
+                      'nbr. rep',
+                      'cost',
+                      'dern. '
+                          'rep',
+                    ]
+                  : [
+                      'vehicule',
+                      'modele',
+                      'nbr. rep',
+                      gts ? 'immob' : 'cost',
+                      'dern. rep',
+                    ],
+              name: gts ? 'Immobilisation des véhicules' : "Couts par véhicule",
             );
-          });}
+          },
+        );
+      }
     });
-
   }
 
-  void saveExcelCost() async{
-    if(!VehicleProvider.downloadedVehicles){
+  void saveExcelCost() async {
+    if (!VehicleProvider.downloadedVehicles) {
       VehicleProvider();
-      while(!VehicleProvider.downloadedVehicles){
+      while (!VehicleProvider.downloadedVehicles) {
         await Future.delayed(const Duration(milliseconds: 300));
       }
     }
     await RepairProvider.downloadFicheReparations();
     Future.delayed(const Duration(milliseconds: 50)).then((value) {
       List2Excel(
-        list: RepairProvider.prepareListVehicleImmob(RepairProvider
-            .repPerVeh,VehicleProvider.vehicles.values.toList(growable: false)),
-        keysToInclude: conducteurEmploye?const ['vehicule','modele','mat. conducteur','nom conducteur','nbr. rep','cost','dern. '
-            'rep']:['vehicule','modele','nbr. rep',gts?'immob':'cost','dern. rep'],
-        title: gts?'Immobilisation des véhicules':"Couts par véhicule",
+        list: RepairProvider.prepareListVehicleImmob(
+          RepairProvider.repPerVeh,
+          VehicleProvider.vehicles.values.toList(growable: false),
+        ),
+        keysToInclude: conducteurEmploye
+            ? const [
+                'vehicule',
+                'modele',
+                'mat. conducteur',
+                'nom conducteur',
+                'nbr. rep',
+                'cost',
+                'dern. '
+                    'rep',
+              ]
+            : [
+                'vehicule',
+                'modele',
+                'nbr. rep',
+                gts ? 'immob' : 'cost',
+                'dern. rep',
+              ],
+        title: gts ? 'Immobilisation des véhicules' : "Couts par véhicule",
       ).getExcel();
     });
-
   }
 
-
-  void showFilters(AppTheme appTheme){
+  void showFilters(AppTheme appTheme) {
     filterFlyout.showFlyout(
-        builder: (context) {
-          return FlyoutContent(
-              color: appTheme.backGroundColor,
-              child: StatefulBuilder(
-                  builder: (context, setS) {
-                    return SizedBox(
-                      width: 30.w,
-                      height: 45.h,
-                      child: Column(
-                        children: [
-                          Flexible(
-                            child: ZoneBox(
-                              label: 'year'.tr(),
-                              child: Padding(
-                                padding:
-                                const EdgeInsets
-                                    .all(10.0),
-                                child: Row(
-                                  children: [
-                                    const Text(
-                                        'min')
-                                        .tr(),
-                                    smallSpace,
-                                    Flexible(
-                                      child:
-                                      TextBox(
-                                        controller:
-                                        yearMin,
-                                        placeholder:
-                                        'min'
-                                            .tr(),
-                                        placeholderStyle:
-                                        placeStyle,
-                                        style: appTheme
-                                            .writingStyle,
-                                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
-                                        cursorColor:
-                                        appTheme
-                                            .color
-                                            .darker,
-                                      ),
-                                    ),
-                                    smallSpace,
-                                    const Text(
-                                        'max')
-                                        .tr(),
-                                    smallSpace,
-                                    Flexible(
-                                      child:
-                                      TextBox(
-                                        controller:
-                                        yearMax,
-                                        placeholder:
-                                        'max'
-                                            .tr(),
-                                        placeholderStyle:
-                                        placeStyle,
-                                        style: appTheme
-                                            .writingStyle,
-                                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
-                                        cursorColor:
-                                        appTheme
-                                            .color
-                                            .darker,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          smallSpace,
-                          Flexible(
-                            child: ZoneBox(
-                              label: 'marque'.tr(),
-                              child: Padding(
-                                padding:
-                                const EdgeInsets
-                                    .all(10.0),
-                                child: Row(
-                                  children: [
-                                    Flexible(
-                                      child:
-                                      ListTile(
-                                        leading: Image
-                                            .asset(
-                                          'assets/images/marques/${marque ?? 'default'}.webp',
-                                          width:
-                                          4.h,
-                                          height:
-                                          4.h,
-                                        ),
-                                        title:
-                                        AutoSizeText(
-                                          VehiclesUtilities.marques![marque ??
-                                              0] ??
-                                              'nonind'
-                                                  .tr(),
-                                          minFontSize:
-                                          5,
-                                          maxLines:
-                                          1,
-                                        ),
-                                        onPressed:
-                                            () {
-                                          SelectDialog
-                                              .showModal<
-                                              int?>(
-                                            context,
-                                            selectedValue:
-                                            marque,
-                                            backgroundColor:
-                                            appTheme.backGroundColor,
-                                            gridView:
-                                            true,
-                                            numberOfGridCross:
-                                            3,
-                                            constraints: BoxConstraints.loose(Size(
-                                                60.w,
-                                                70.h)),
-                                            items: VehiclesUtilities
-                                                .marques!
-                                                .keys
-                                                .toList(),
-                                            itemBuilder: (c,
-                                                v,
-                                                e) {
-                                              return Card(
-                                                  child: Image.asset('assets/images/marques/${v ?? 'default'}.webp'));
-                                            },
-                                            onChange:
-                                                (s) {
-                                              marque =
-                                                  s;
-                                              setState(
-                                                      () {});
-                                              setS(
-                                                      () {});
-                                            },
-                                            onFind:
-                                            VehiclesUtilities.findMarque,
-                                            emptyBuilder:
-                                                (s) {
-                                              return Center(
-                                                child:
-                                                Text(
-                                                  'lvide',
-                                                  style: TextStyle(color: Colors.grey[100]),
-                                                ).tr(),
-                                              );
-                                            },
-                                            loadingBuilder:
-                                                (s) {
-                                              return Center(
-                                                child:
-                                                Text('telechargement', style: TextStyle(color: Colors.grey[100])).tr(),
-                                              );
-                                            },
-                                            searchBoxDecoration: appTheme
-                                                .inputDecoration
-                                                .copyWith(
-                                              labelText:
-                                              'search'.tr(),
-                                              labelStyle:
-                                              placeStyle,
-                                            ),
-                                            searchTextStyle:
-                                            appTheme.writingStyle,
-                                            searchCursorColor:
-                                            appTheme.color,
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    smallSpace,
-                                    smallSpace,
-                                    if (marque !=
-                                        null)
-                                      IconButton(
-                                          icon:
-                                          Icon(
-                                            FluentIcons
-                                                .cancel,
-                                            color: appTheme
-                                                .color,
-                                          ),
-                                          onPressed:
-                                              () {
-                                            marque =
-                                            null;
-
-                                            setState(
-                                                    () {});
-                                            setS(
-                                                    () {});
-                                          })
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          Flexible(
-                            child: ZoneBox(
-                              label: 'genre'.tr(),
-                              child: Padding(
-                                padding:
-                                const EdgeInsets
-                                    .all(10.0),
-                                child: Row(
-                                  children: [
-                                    Flexible(
-                                      child:
-                                      ListTile(
-                                        title:
-                                        AutoSizeText(
-                                          (VehiclesUtilities.genres![genre ?? -1] ??
-                                              'nonind')
-                                              .tr(),
-                                          minFontSize:
-                                          5,
-                                          softWrap:
-                                          true,
-                                          maxLines:
-                                          1,
-                                        ),
-                                        onPressed:
-                                            () {
-                                          SelectDialog
-                                              .showModal<
-                                              int>(
-                                            context,
-                                            selectedValue:
-                                            genre,
-                                            items: VehiclesUtilities
-                                                .genres!
-                                                .keys
-                                                .toList(),
-                                            backgroundColor:
-                                            appTheme.backGroundColor,
-                                            itemBuilder: (c,
-                                                v,
-                                                e) {
-                                              return Container(
-                                                padding:
-                                                const EdgeInsets.all(5.0),
-                                                color: v % 2 == 0
-                                                    ? Colors.transparent
-                                                    : appTheme.color.lightest,
-                                                child:
-                                                Row(
-                                                  children: [
-                                                    Text(v.toString()),
-                                                    smallSpace,
-                                                    smallSpace,
-                                                    smallSpace,
-                                                    Text(VehiclesUtilities.genres?[v] ?? '').tr(),
-                                                  ],
-                                                ),
-                                              );
-                                            },
-                                            onChange:
-                                                (s) {
-                                              genre =
-                                                  s;
-                                              setState(
-                                                      () {});
-                                              setS(
-                                                      () {});
-                                            },
-                                            onFind:
-                                            VehiclesUtilities.findGenres,
-                                            emptyBuilder:
-                                                (s) {
-                                              return Center(
-                                                child:
-                                                Text(
-                                                  'lvide',
-                                                  style: TextStyle(color: Colors.grey[100]),
-                                                ).tr(),
-                                              );
-                                            },
-                                            loadingBuilder:
-                                                (s) {
-                                              return Center(
-                                                child:
-                                                Text('telechargement', style: TextStyle(color: Colors.grey[100])).tr(),
-                                              );
-                                            },
-                                            searchBoxDecoration: appTheme
-                                                .inputDecoration
-                                                .copyWith(
-                                              labelText:
-                                              'search'.tr(),
-                                              labelStyle:
-                                              placeStyle,
-                                            ),
-                                            searchTextStyle:
-                                            appTheme.writingStyle,
-                                            searchCursorColor:
-                                            appTheme.color,
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    smallSpace,
-                                    smallSpace,
-                                    if (genre !=
-                                        null)
-                                      IconButton(
-                                          icon:
-                                          Icon(
-                                            FluentIcons
-                                                .cancel,
-                                            color: appTheme
-                                                .color,
-                                          ),
-                                          onPressed:
-                                              () {
-                                            genre =
-                                            null;
-                                            setState(
-                                                    () {});
-                                            setS(
-                                                    () {});
-                                          })
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          smallSpace,
-                          smallSpace,
-                          Padding(
-                            padding:
-                            const EdgeInsets
-                                .all(8.0),
-                            child: Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment
-                                  .end,
-                              children: [
-                                FilledButton(
-                                  style:
-                                  ButtonStyle(
-                                    backgroundColor:
-                                    WidgetStateProperty.all<
-                                        Color>(
-                                        appTheme
-                                            .color
-                                            .lightest),
+      builder: (context) {
+        return FlyoutContent(
+          color: appTheme.backGroundColor,
+          child: StatefulBuilder(
+            builder: (context, setS) {
+              return SizedBox(
+                width: 30.w,
+                height: 45.h,
+                child: Column(
+                  children: [
+                    Flexible(
+                      child: ZoneBox(
+                        label: 'year'.tr(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Row(
+                            children: [
+                              const Text('min').tr(),
+                              smallSpace,
+                              Flexible(
+                                child: TextBox(
+                                  controller: yearMin,
+                                  placeholder: 'min'.tr(),
+                                  placeholderStyle: placeStyle,
+                                  style: appTheme.writingStyle,
+                                  decoration: WidgetStatePropertyAll(
+                                    BoxDecoration(color: appTheme.fillColor),
                                   ),
-                                  onPressed:
-                                  filtered
-                                      ? () {
-                                    Navigator.of(context)
-                                        .pop();
-                                    setState(
-                                            () {
-                                          filtered =
-                                          false;
-                                          filters.clear();
-                                        });
-                                    vehicleDataSource
-                                        .filter(filters);
-                                  }
-                                      : null,
-                                  child: const Text(
-                                      'clear')
-                                      .tr(),
+
+                                  cursorColor: appTheme.color.darker,
                                 ),
-                                const Spacer(),
-                                Button(
-                                    onPressed: () {
-                                      Navigator.of(
-                                          context)
-                                          .pop();
-                                    },
-                                    child: const Text(
-                                        'annuler')
-                                        .tr()),
-                                smallSpace,
-                                smallSpace,
-                                FilledButton(
-                                    style:
-                                    ButtonStyle(
-                                      backgroundColor: WidgetStateProperty.all<
-                                          Color>(
-                                          appTheme
-                                              .color
-                                              .lighter),
-                                    ),
-                                    child: const Text(
-                                        'confirmer')
+                              ),
+                              smallSpace,
+                              const Text('max').tr(),
+                              smallSpace,
+                              Flexible(
+                                child: TextBox(
+                                  controller: yearMax,
+                                  placeholder: 'max'.tr(),
+                                  placeholderStyle: placeStyle,
+                                  style: appTheme.writingStyle,
+                                  decoration: WidgetStatePropertyAll(
+                                    BoxDecoration(color: appTheme.fillColor),
+                                  ),
+
+                                  cursorColor: appTheme.color.darker,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    smallSpace,
+                    Flexible(
+                      child: ZoneBox(
+                        label: 'marque'.tr(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Row(
+                            children: [
+                              Flexible(
+                                child: ListTile(
+                                  leading: Image.asset(
+                                    'assets/images/marques/${marque ?? 'default'}.webp',
+                                    width: 4.h,
+                                    height: 4.h,
+                                  ),
+                                  title: AutoSizeText(
+                                    VehiclesUtilities.marques![marque ?? 0] ??
+                                        'nonind'.tr(),
+                                    minFontSize: 5,
+                                    maxLines: 1,
+                                  ),
+                                  onPressed: () {
+                                    SelectDialog.showModal<int?>(
+                                      context,
+                                      selectedValue: marque,
+                                      backgroundColor: appTheme.backGroundColor,
+                                      gridView: true,
+                                      numberOfGridCross: 3,
+                                      constraints: BoxConstraints.loose(
+                                        Size(60.w, 70.h),
+                                      ),
+                                      items: VehiclesUtilities.marques!.keys
+                                          .toList(),
+                                      itemBuilder: (c, v, e) {
+                                        return Card(
+                                          child: Image.asset(
+                                            'assets/images/marques/${v ?? 'default'}.webp',
+                                          ),
+                                        );
+                                      },
+                                      onChange: (s) {
+                                        marque = s;
+                                        setState(() {});
+                                        setS(() {});
+                                      },
+                                      onFind: VehiclesUtilities.findMarque,
+                                      emptyBuilder: (s) {
+                                        return Center(
+                                          child: Text(
+                                            'lvide',
+                                            style: TextStyle(
+                                              color: Colors.grey[100],
+                                            ),
+                                          ).tr(),
+                                        );
+                                      },
+                                      loadingBuilder: (s) {
+                                        return Center(
+                                          child: Text(
+                                            'telechargement',
+                                            style: TextStyle(
+                                              color: Colors.grey[100],
+                                            ),
+                                          ).tr(),
+                                        );
+                                      },
+                                      searchBoxDecoration: appTheme
+                                          .inputDecoration
+                                          .copyWith(
+                                            labelText: 'search'.tr(),
+                                            labelStyle: placeStyle,
+                                          ),
+                                      searchTextStyle: appTheme.writingStyle,
+                                      searchCursorColor: appTheme.color,
+                                    );
+                                  },
+                                ),
+                              ),
+                              smallSpace,
+                              smallSpace,
+                              if (marque != null)
+                                IconButton(
+                                  icon: Icon(
+                                    FluentIcons.cancel,
+                                    color: appTheme.color,
+                                  ),
+                                  onPressed: () {
+                                    marque = null;
+
+                                    setState(() {});
+                                    setS(() {});
+                                  },
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      child: ZoneBox(
+                        label: 'genre'.tr(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Row(
+                            children: [
+                              Flexible(
+                                child: ListTile(
+                                  title: AutoSizeText(
+                                    (VehiclesUtilities.genres![genre ?? -1] ??
+                                            'nonind')
                                         .tr(),
-                                    onPressed: () {
-                                      Navigator.of(
-                                          context)
-                                          .pop();
-
-                                      if (yearMin
-                                          .text
-                                          .isNotEmpty) {
-                                        filters['yearmin'] =
-                                            yearMin
-                                                .text;
-                                      } else {
-                                        filters.remove(
-                                            'yearmin');
-                                      }
-                                      if (yearMax
-                                          .text
-                                          .isNotEmpty) {
-                                        filters['yearmax'] =
-                                            yearMax
-                                                .text;
-                                      } else {
-                                        filters.remove(
-                                            'yearmax');
-                                      }
-                                      if (genre !=
-                                          null) {
-                                        filters['genre'] =
-                                            genre
-                                                .toString();
-                                      } else {
-                                        filters.remove(
-                                            'genre');
-                                      }
-                                      if (marque !=
-                                          null) {
-                                        filters['marque'] =
-                                            marque
-                                                .toString();
-                                      } else {
-                                        filters.remove(
-                                            'marque');
-                                      }
-
-                                      filtered =
-                                      true;
-                                      setState(
-                                              () {});
-                                      vehicleDataSource
-                                          .filter(
-                                          filters);
-                                    }),
-                              ],
+                                    minFontSize: 5,
+                                    softWrap: true,
+                                    maxLines: 1,
+                                  ),
+                                  onPressed: () {
+                                    SelectDialog.showModal<int>(
+                                      context,
+                                      selectedValue: genre,
+                                      items: VehiclesUtilities.genres!.keys
+                                          .toList(),
+                                      backgroundColor: appTheme.backGroundColor,
+                                      itemBuilder: (c, v, e) {
+                                        return Container(
+                                          padding: const EdgeInsets.all(5.0),
+                                          color: v % 2 == 0
+                                              ? Colors.transparent
+                                              : appTheme.color.lightest,
+                                          child: Row(
+                                            children: [
+                                              Text(v.toString()),
+                                              smallSpace,
+                                              smallSpace,
+                                              smallSpace,
+                                              Text(
+                                                VehiclesUtilities.genres?[v] ??
+                                                    '',
+                                              ).tr(),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                      onChange: (s) {
+                                        genre = s;
+                                        setState(() {});
+                                        setS(() {});
+                                      },
+                                      onFind: VehiclesUtilities.findGenres,
+                                      emptyBuilder: (s) {
+                                        return Center(
+                                          child: Text(
+                                            'lvide',
+                                            style: TextStyle(
+                                              color: Colors.grey[100],
+                                            ),
+                                          ).tr(),
+                                        );
+                                      },
+                                      loadingBuilder: (s) {
+                                        return Center(
+                                          child: Text(
+                                            'telechargement',
+                                            style: TextStyle(
+                                              color: Colors.grey[100],
+                                            ),
+                                          ).tr(),
+                                        );
+                                      },
+                                      searchBoxDecoration: appTheme
+                                          .inputDecoration
+                                          .copyWith(
+                                            labelText: 'search'.tr(),
+                                            labelStyle: placeStyle,
+                                          ),
+                                      searchTextStyle: appTheme.writingStyle,
+                                      searchCursorColor: appTheme.color,
+                                    );
+                                  },
+                                ),
+                              ),
+                              smallSpace,
+                              smallSpace,
+                              if (genre != null)
+                                IconButton(
+                                  icon: Icon(
+                                    FluentIcons.cancel,
+                                    color: appTheme.color,
+                                  ),
+                                  onPressed: () {
+                                    genre = null;
+                                    setState(() {});
+                                    setS(() {});
+                                  },
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    smallSpace,
+                    smallSpace,
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          FilledButton(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all<Color>(
+                                appTheme.color.lightest,
+                              ),
                             ),
+                            onPressed: filtered
+                                ? () {
+                                    Navigator.of(context).pop();
+                                    setState(() {
+                                      filtered = false;
+                                      filters.clear();
+                                    });
+                                    vehicleDataSource.filter(filters);
+                                  }
+                                : null,
+                            child: const Text('clear').tr(),
+                          ),
+                          const Spacer(),
+                          Button(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('annuler').tr(),
+                          ),
+                          smallSpace,
+                          smallSpace,
+                          FilledButton(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all<Color>(
+                                appTheme.color.lighter,
+                              ),
+                            ),
+                            child: const Text('confirmer').tr(),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+
+                              if (yearMin.text.isNotEmpty) {
+                                filters['yearmin'] = yearMin.text;
+                              } else {
+                                filters.remove('yearmin');
+                              }
+                              if (yearMax.text.isNotEmpty) {
+                                filters['yearmax'] = yearMax.text;
+                              } else {
+                                filters.remove('yearmax');
+                              }
+                              if (genre != null) {
+                                filters['genre'] = genre.toString();
+                              } else {
+                                filters.remove('genre');
+                              }
+                              if (marque != null) {
+                                filters['marque'] = marque.toString();
+                              } else {
+                                filters.remove('marque');
+                              }
+
+                              filtered = true;
+                              setState(() {});
+                              vehicleDataSource.filter(filters);
+                            },
                           ),
                         ],
                       ),
-                    );
-                  }));
-        });
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 
   @override

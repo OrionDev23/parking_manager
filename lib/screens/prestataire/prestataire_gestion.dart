@@ -15,24 +15,25 @@ class PrestataireGestion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScaffoldPage(
-        header: PageTitle(
-          text: getTitle().tr(),
-          trailing: archive
-              ? null
-              : ButtonContainer(
-            icon: FluentIcons.add,
-            text: 'add'.tr(),
-            showBottom: false,
-            showCounter: false,
-            action: () {
-              addPrestataire();
-            },
-          ),
-        ),
-        content: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: getTable(),
-        ));
+      header: PageTitle(
+        text: getTitle().tr(),
+        trailing: archive
+            ? null
+            : ButtonContainer(
+                icon: FluentIcons.add,
+                text: 'add'.tr(),
+                showBottom: false,
+                showCounter: false,
+                action: () {
+                  addPrestataire();
+                },
+              ),
+      ),
+      content: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        child: getTable(),
+      ),
+    );
   }
 
   String getTitle() {
@@ -47,9 +48,7 @@ class PrestataireGestion extends StatelessWidget {
   }
 
   Widget getTable() {
-    return PrestataireTable(
-      archive: archive,
-    );
+    return PrestataireTable(archive: archive);
   }
 
   Tab generateTab(int index) {

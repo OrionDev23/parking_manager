@@ -10,14 +10,11 @@ class AccessControlService {
   Future<List<AccessTeam>> getTeams(String companyId) =>
       repository.getTeams(companyId);
 
-  Future<AccessTeam> createTeam(AccessTeam team) =>
-      repository.createTeam(team);
+  Future<AccessTeam> createTeam(AccessTeam team) => repository.createTeam(team);
 
-  Future<AccessTeam> updateTeam(AccessTeam team) =>
-      repository.updateTeam(team);
+  Future<AccessTeam> updateTeam(AccessTeam team) => repository.updateTeam(team);
 
-  Future<void> deleteTeam(String teamId) =>
-      repository.deleteTeam(teamId);
+  Future<void> deleteTeam(String teamId) => repository.deleteTeam(teamId);
 
   Future<UserAccess> getUserAccess(String companyId, String userId) =>
       repository.getUserAccess(companyId, userId);
@@ -28,6 +25,5 @@ class AccessControlService {
   Future<Set<String>> getEffectivePermissions(
     String companyId,
     String userId,
-  ) =>
-      repository.getEffectivePermissions(companyId, userId);
+  ) => repository.getEffectivePermissions(companyId, userId);
 }

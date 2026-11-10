@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:material_ui/material_ui.dart' hide Colors, VisualDensity, ThemeMode;
+import 'package:material_ui/material_ui.dart'
+    hide Colors, VisualDensity, ThemeMode;
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -55,7 +56,7 @@ void main() async {
   packageInfo = await PackageInfo.fromPlatform();
   VideoPlayerMediaKit.ensureInitialized(
     windows: true,
-    macOS:true,
+    macOS: true,
     linux: true,
   );
   tz.initializeTimeZones();
@@ -69,14 +70,18 @@ void main() async {
   launchApp();
 }
 
-void displayMessage(BuildContext context,String msg,InfoBarSeverity severity){
-  displayInfoBar(context,
-      builder: (BuildContext context, void Function() close) {
-        return InfoBar(
-          title: Text(msg).tr(),
-          severity: severity,
-        );
-      }, duration: snackbarShortDuration);
+void displayMessage(
+  BuildContext context,
+  String msg,
+  InfoBarSeverity severity,
+) {
+  displayInfoBar(
+    context,
+    builder: (BuildContext context, void Function() close) {
+      return InfoBar(title: Text(msg).tr(), severity: severity);
+    },
+    duration: snackbarShortDuration,
+  );
 }
 
 void launchApp() async {
@@ -92,7 +97,8 @@ void launchApp() async {
   companyService = const CompanyService(
     repository: LegacyAppwriteCompanyRepository(),
   );
-  const AccessControlRepository accessRepository = AppwriteAccessControlRepository();
+  const AccessControlRepository accessRepository =
+      AppwriteAccessControlRepository();
   accessControlService = AccessControlService(repository: accessRepository);
 
   // Restore the existing Appwrite session before building the UI.
@@ -120,7 +126,9 @@ void launchApp() async {
       driverServices.migrateRemoteCache(),
     ]);
   } catch (error, stackTrace) {
-    debugPrint('[ParcOto Migration] remote cache migration failed: $error\\n$stackTrace');
+    debugPrint(
+      '[ParcOto Migration] remote cache migration failed: $error\\n$stackTrace',
+    );
     // Keep startup available even when Appwrite is temporarily unreachable.
   }
 
@@ -133,7 +141,9 @@ void launchApp() async {
       companyId: activeCompanyId,
     ).migrate();
   } catch (error, stackTrace) {
-    debugPrint('[ParcOto Migration] legacy module cache failed: $error\\n$stackTrace');
+    debugPrint(
+      '[ParcOto Migration] legacy module cache failed: $error\\n$stackTrace',
+    );
   }
 
   legacyStockSyncService = LegacyStockSyncService(
@@ -159,9 +169,15 @@ void launchApp() async {
       'supplier': legacyStockSyncService.applySyncOperation,
     },
     pullHandlers: {
-      'vehicle': () async { await vehicleServices.pullRemoteChanges(); },
-      'driver': () async { await driverServices.pullRemoteChanges(); },
-      'stock': () async { await legacyStockSyncService.pullRemoteChanges(); },
+      'vehicle': () async {
+        await vehicleServices.pullRemoteChanges();
+      },
+      'driver': () async {
+        await driverServices.pullRemoteChanges();
+      },
+      'stock': () async {
+        await legacyStockSyncService.pullRemoteChanges();
+      },
     },
   );
   await syncEngine.start();
@@ -169,12 +185,15 @@ void launchApp() async {
   VehiclesUtilities();
   EasyLocalization.logger.enableBuildModes = [];
   await EasyLocalization.ensureInitialized();
-  runApp(EasyLocalization(
+  runApp(
+    EasyLocalization(
       supportedLocales: const [Locale('fr'), Locale('ar'), Locale('en')],
       path: 'assets/translations',
       fallbackLocale: const Locale('fr'),
       useOnlyLangCode: true,
-      child: MyApp(navigatorKey: GlobalKey<NavigatorState>(),)));
+      child: MyApp(navigatorKey: GlobalKey<NavigatorState>()),
+    ),
+  );
 }
 
 Future<void> initWindow() async {
@@ -183,7 +202,7 @@ Future<void> initWindow() async {
 
   WindowOptions windowOptions = WindowOptions(
     title: "ParcOto",
-    minimumSize: Size(pr.size.width/2,pr.size.height-50),
+    minimumSize: Size(pr.size.width / 2, pr.size.height - 50),
     size: Size(pr.size.width - 50, pr.size.height - 50),
     center: true,
     backgroundColor: Colors.grey,
@@ -197,23 +216,22 @@ Future<void> initWindow() async {
     await windowManager.focus();
   });
   await windowManager.maximize();
-
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key,required this.navigatorKey});
-
+  const MyApp({super.key, required this.navigatorKey});
 
   List<LocalizationsDelegate<dynamic>> getDelegates(BuildContext context) {
-    List<LocalizationsDelegate> results =
-        List.from(context.localizationDelegates);
+    List<LocalizationsDelegate> results = List.from(
+      context.localizationDelegates,
+    );
     results.addAll([
       // Avoid loading the package's missing i18n JSON assets at startup.
       // Country names in this picker remain English; app UI localization is unchanged.
       CountryLocalizations.getDelegate(enableLocalization: false),
       FluentLocalizations.delegate,
       ...GlobalMaterialLocalizations.delegates,
-      SfGlobalLocalizations.delegate
+      SfGlobalLocalizations.delegate,
     ]);
     return results;
   }
@@ -223,69 +241,72 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveSizer(builder: (context, orientation, deviceType) {
-      return ChangeNotifierProvider(
-        create: (_) => AppTheme(),
-        builder: (context, _) {
-          final appTheme = context.watch<AppTheme>();
-          bool portrait=MediaQuery.of(context).orientation==Orientation
-              .portrait;
-          if(portrait){
-            tstyle=tstyle.copyWith(fontSize: 13.sp);
-          }
-          else{
-            tstyle=tstyle.copyWith(fontSize: 10.sp);
-          }
-          return FluentApp.router(
-            key: navigatorKey,
-            title: appTitle,
-            themeMode: appTheme.mode,
-            debugShowCheckedModeBanner: false,
-            color: appTheme.color,
-            localizationsDelegates: getDelegates(context),
-            localeResolutionCallback: (locale, supportedLocales) {
-              for (var supportedLocale in supportedLocales) {
-                if (supportedLocale.languageCode == locale!.languageCode &&
-                    supportedLocale.countryCode == locale.countryCode) {
-                  return supportedLocale;
+    return ResponsiveSizer(
+      builder: (context, orientation, deviceType) {
+        return ChangeNotifierProvider(
+          create: (_) => AppTheme(),
+          builder: (context, _) {
+            final appTheme = context.watch<AppTheme>();
+            bool portrait =
+                MediaQuery.of(context).orientation == Orientation.portrait;
+            if (portrait) {
+              tstyle = tstyle.copyWith(fontSize: 13.sp);
+            } else {
+              tstyle = tstyle.copyWith(fontSize: 10.sp);
+            }
+            return FluentApp.router(
+              key: navigatorKey,
+              title: appTitle,
+              themeMode: appTheme.mode,
+              debugShowCheckedModeBanner: false,
+              color: appTheme.color,
+              localizationsDelegates: getDelegates(context),
+              localeResolutionCallback: (locale, supportedLocales) {
+                for (var supportedLocale in supportedLocales) {
+                  if (supportedLocale.languageCode == locale!.languageCode &&
+                      supportedLocale.countryCode == locale.countryCode) {
+                    return supportedLocale;
+                  }
                 }
-              }
 
-              return supportedLocales.first;
-            },
-            darkTheme: FluentThemeData(
-              brightness: Brightness.dark,
-              accentColor: appTheme.color,
-              visualDensity: VisualDensity.standard,
-              focusTheme: FocusThemeData(
-                glowFactor: is10footScreen(context) ? 2.0 : 0.0,
-              ),
-            ),
-            theme: FluentThemeData(
-              accentColor: appTheme.color,
-              visualDensity: VisualDensity.standard,
-              focusTheme: FocusThemeData(
-                glowFactor: is10footScreen(context) ? 2.0 : 0.0,
-              ),
-            ),
-            supportedLocales: const [
-              Locale('fr'),
-              Locale('en'),
-              Locale('ar'),
-            ],
-            locale: appTheme.locale,
-            builder: (context, child) {
-              return NavigationPaneTheme(
-                data: NavigationPaneThemeData(
-                  backgroundColor: appTheme.mode==ThemeMode.dark?Colors.grey[220]:Colors.white,
+                return supportedLocales.first;
+              },
+              darkTheme: FluentThemeData(
+                brightness: Brightness.dark,
+                accentColor: appTheme.color,
+                visualDensity: VisualDensity.standard,
+                focusTheme: FocusThemeData(
+                  glowFactor: is10footScreen(context) ? 2.0 : 0.0,
                 ),
-                child: child!,
-              );
-            },
-            routerConfig: Routes(appTheme).router,
-          );
-        },
-      );
-    });
+              ),
+              theme: FluentThemeData(
+                accentColor: appTheme.color,
+                visualDensity: VisualDensity.standard,
+                focusTheme: FocusThemeData(
+                  glowFactor: is10footScreen(context) ? 2.0 : 0.0,
+                ),
+              ),
+              supportedLocales: const [
+                Locale('fr'),
+                Locale('en'),
+                Locale('ar'),
+              ],
+              locale: appTheme.locale,
+              builder: (context, child) {
+                return NavigationPaneTheme(
+                  data: NavigationPaneThemeData(
+                    backgroundColor: appTheme.mode == ThemeMode.dark
+                        ? Colors.grey[220]
+                        : Colors.white,
+                  ),
+                  child: child!,
+                );
+              },
+              routerConfig: Routes(appTheme).router,
+            );
+          },
+        );
+      },
+    );
   }
 }

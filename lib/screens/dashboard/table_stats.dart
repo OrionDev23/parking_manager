@@ -17,15 +17,16 @@ class TableStats extends StatelessWidget {
   final double? width;
   final void Function()? onTap;
 
-  const TableStats(
-      {super.key,
-      this.title,
-      this.icon,
-      this.content,
-      this.onTap,
-      this.width,
-      this.additionalWidget,
-      this.height});
+  const TableStats({
+    super.key,
+    this.title,
+    this.icon,
+    this.content,
+    this.onTap,
+    this.width,
+    this.additionalWidget,
+    this.height,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +36,10 @@ class TableStats extends StatelessWidget {
       width: width ?? double.infinity,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-          boxShadow: kElevationToShadow[2],
-          borderRadius: BorderRadius.circular(5),
-          color: appTheme.backGroundColor),
+        boxShadow: kElevationToShadow[2],
+        borderRadius: BorderRadius.circular(5),
+        color: appTheme.backGroundColor,
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,10 +49,7 @@ class TableStats extends StatelessWidget {
             children: <Widget>[
               makeTransactionsIcon(context),
               bigSpace,
-              Text(
-                title ?? '',
-                style: TextStyle(fontSize: 18.px),
-              ),
+              Text(title ?? '', style: TextStyle(fontSize: 18.px)),
             ],
           ),
           smallSpace,
@@ -67,7 +66,9 @@ class TableStats extends StatelessWidget {
               ?additionalWidget,
               if (additionalWidget != null) smallSpace,
               FilledButton(
-                  onPressed: onTap, child: const Text('voirplus').tr()),
+                onPressed: onTap,
+                child: const Text('voirplus').tr(),
+              ),
             ],
           ),
         ],
@@ -87,16 +88,9 @@ class TableStats extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.transparent,
             shape: BoxShape.circle,
-            border: Border.all(
-              color: appTheme.color.light,
-              width: 3,
-            ),
+            border: Border.all(color: appTheme.color.light, width: 3),
           ),
-          child: icon ??
-              Icon(
-                FluentIcons.note_pinned,
-                color: appTheme.color,
-              ),
+          child: icon ?? Icon(FluentIcons.note_pinned, color: appTheme.color),
         ),
       ],
     );

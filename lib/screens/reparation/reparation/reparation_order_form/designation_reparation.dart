@@ -45,7 +45,9 @@ class DesignationReparationState extends State<DesignationReparation> {
             style: appTheme.writingStyle,
             cursorColor: appTheme.color.darker,
             maxLength: 60,
-            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+            decoration: WidgetStatePropertyAll(
+              BoxDecoration(color: appTheme.fillColor),
+            ),
 
             onChanged: (s) {
               setState(() {
@@ -55,9 +57,7 @@ class DesignationReparationState extends State<DesignationReparation> {
           ),
         ),
         smallSpace,
-        VerticalDivider(
-          color: placeStyle.color,
-        ),
+        VerticalDivider(color: placeStyle.color),
         smallSpace,
         Expanded(
           child: NumberBox<int>(
@@ -76,17 +76,12 @@ class DesignationReparationState extends State<DesignationReparation> {
           ),
         ),
         smallSpace,
-        VerticalDivider(
-          color: placeStyle.color,
-        ),
+        VerticalDivider(color: placeStyle.color),
         smallSpace,
         Expanded(
           child: TextBox(
             controller: tva,
-            suffix: Text(
-              '%',
-              style: placeStyle,
-            ),
+            suffix: Text('%', style: placeStyle),
             onChanged: (s) => setState(() {
               double value = double.tryParse(s) ?? 0;
               if (value < 0) {
@@ -101,36 +96,34 @@ class DesignationReparationState extends State<DesignationReparation> {
             }),
             placeholderStyle: placeStyle,
             inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'^(\d+)?\.?\d{0,2}'))
+              FilteringTextInputFormatter.allow(RegExp(r'^(\d+)?\.?\d{0,2}')),
             ],
             placeholder: 'TVA'.tr(),
             style: appTheme.writingStyle,
             cursorColor: appTheme.color.darker,
-            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+            decoration: WidgetStatePropertyAll(
+              BoxDecoration(color: appTheme.fillColor),
+            ),
           ),
         ),
         smallSpace,
-        VerticalDivider(
-          color: placeStyle.color,
-        ),
+        VerticalDivider(color: placeStyle.color),
         smallSpace,
         Expanded(
           flex: 1,
           child: TextBox(
             controller: prix,
             placeholderStyle: placeStyle,
-            suffix: Text(
-              'DA',
-              style: placeStyle,
-            ),
+            suffix: Text('DA', style: placeStyle),
             placeholder: 'prix'.tr(),
             style: appTheme.writingStyle,
             cursorColor: appTheme.color.darker,
             inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'^(\d+)?\.?\d{0,2}'))
+              FilteringTextInputFormatter.allow(RegExp(r'^(\d+)?\.?\d{0,2}')),
             ],
-            decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+            decoration: WidgetStatePropertyAll(
+              BoxDecoration(color: appTheme.fillColor),
+            ),
 
             onChanged: (s) {
               setState(() {

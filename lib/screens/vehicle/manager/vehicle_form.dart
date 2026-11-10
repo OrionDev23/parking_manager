@@ -29,7 +29,7 @@ class VehicleForm extends StatefulWidget {
 
   final bool readOnly;
 
-  const VehicleForm({super.key, this.vehicle, this.tab,this.readOnly=false});
+  const VehicleForm({super.key, this.vehicle, this.tab, this.readOnly = false});
 
   @override
   State<VehicleForm> createState() => _VehicleFormState();
@@ -47,7 +47,7 @@ class _VehicleFormState extends State<VehicleForm>
   TextEditingController quittance = TextEditingController(text: '800');
   TextEditingController numero = TextEditingController();
 
-  TextEditingController matempl=TextEditingController();
+  TextEditingController matempl = TextEditingController();
   TextEditingController lname = TextEditingController();
   TextEditingController fname = TextEditingController();
   TextEditingController profession = TextEditingController();
@@ -78,21 +78,20 @@ class _VehicleFormState extends State<VehicleForm>
   DateTime selectedDate = DateTime.now();
 
   bool lourd = false;
-  bool service=false;
+  bool service = false;
 
   TextEditingController selectedAppartenance = TextEditingController();
   TextEditingController selectedAppartenanceEmploye = TextEditingController();
   TextEditingController selectedDepartment = TextEditingController();
   TextEditingController selectedDirection = TextEditingController();
   TextEditingController selectedFiliale = TextEditingController();
-  List<String> matriculesPrec=[];
+  List<String> matriculesPrec = [];
 
   @override
   void initState() {
     initValues();
     super.initState();
   }
-
 
   void initValues() {
     AlgeriaList();
@@ -111,8 +110,10 @@ class _VehicleFormState extends State<VehicleForm>
         }
       }
       pays = widget.vehicle!.pays ?? 'DZ';
-      wilayaCont.text = AlgeriaList()
-              .getWilayaByNum(widget.vehicle!.wilaya?.toString() ?? '16') ??
+      wilayaCont.text =
+          AlgeriaList().getWilayaByNum(
+            widget.vehicle!.wilaya?.toString() ?? '16',
+          ) ??
           '';
       wilaya = widget.vehicle!.wilaya?.toString() ?? '';
       communeCont.text = widget.vehicle!.commune ?? '';
@@ -134,24 +135,30 @@ class _VehicleFormState extends State<VehicleForm>
       places.text = widget.vehicle!.placesAssises?.toString() ?? '';
       poidsT.text = widget.vehicle!.poidsTotal?.toString() ?? '';
       charg.text = widget.vehicle!.charegeUtile?.toString() ?? '';
-      matriculesPrec.addAll(widget.vehicle!.matriculePrec??[]);
+      matriculesPrec.addAll(widget.vehicle!.matriculePrec ?? []);
       selectedDate = widget.vehicle!.date ?? DateTime.now();
       lourd = widget.vehicle!.lourd;
-      matempl.text=widget.vehicle!.matriculeConducteur??'';
-      service=widget.vehicle!.decision;
+      matempl.text = widget.vehicle!.matriculeConducteur ?? '';
+      service = widget.vehicle!.decision;
 
-      selectedDepartment.text= VehiclesUtilities
-          .getDepartment(widget.vehicle!.departement);
-      selectedAppartenanceEmploye.text=          VehiclesUtilities
-        .getAppartenance(widget.vehicle!.appartenanceconducteur);
-      selectedFiliale.text =
-          VehiclesUtilities.getAppartenance(widget.vehicle!.filliale);
-      selectedAppartenance.text =
-          VehiclesUtilities.getAppartenance(widget.vehicle!.appartenance);
-      selectedDirection.text =
-          VehiclesUtilities.getDirection(widget.vehicle!.direction);
-      selectedAnnee =
-          DateTime(widget.vehicle!.anneeUtil ?? DateTime.now().year);
+      selectedDepartment.text = VehiclesUtilities.getDepartment(
+        widget.vehicle!.departement,
+      );
+      selectedAppartenanceEmploye.text = VehiclesUtilities.getAppartenance(
+        widget.vehicle!.appartenanceconducteur,
+      );
+      selectedFiliale.text = VehiclesUtilities.getAppartenance(
+        widget.vehicle!.filliale,
+      );
+      selectedAppartenance.text = VehiclesUtilities.getAppartenance(
+        widget.vehicle!.appartenance,
+      );
+      selectedDirection.text = VehiclesUtilities.getDirection(
+        widget.vehicle!.direction,
+      );
+      selectedAnnee = DateTime(
+        widget.vehicle!.anneeUtil ?? DateTime.now().year,
+      );
     }
     documentID ??= DatabaseGetter.ref
         .difference(DateTime.now())
@@ -166,64 +173,70 @@ class _VehicleFormState extends State<VehicleForm>
     var appTheme = context.watch<AppTheme>();
 
     return ScaffoldPage(
-        content: Center(
-          child: ListView(
-            shrinkWrap: true,
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            children: [
-              Container(
-                  decoration: BoxDecoration(
-                    color: appTheme.backGroundColor,
-                    boxShadow: kElevationToShadow[3],
-                  ),
-                  padding: const EdgeInsets.all(10),
-                  width: 1080.px,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: StaggeredGrid.count(
-                                crossAxisCount:
-                                    MediaQuery.of(context).orientation ==
-                                            Orientation.portrait
-                                        ? 1
-                                        : 12,
-                                mainAxisSpacing: 0,
-                                crossAxisSpacing: 0,
-                                children: gridChildren(appTheme)),
-                          ),
+      content: Center(
+        child: ListView(
+          shrinkWrap: true,
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: appTheme.backGroundColor,
+                boxShadow: kElevationToShadow[3],
+              ),
+              padding: const EdgeInsets.all(10),
+              width: 1080.px,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Container(
+                      decoration: BoxDecoration(border: Border.all()),
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: StaggeredGrid.count(
+                          crossAxisCount:
+                              MediaQuery.of(context).orientation ==
+                                  Orientation.portrait
+                              ? 1
+                              : 12,
+                          mainAxisSpacing: 0,
+                          crossAxisSpacing: 0,
+                          children: gridChildren(appTheme),
                         ),
                       ),
-                    ],
-                  )),
-            ],
-          ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        bottomBar: widget.readOnly?null:Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              if (errorUploading)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child:
-                      Text('errupld', style: TextStyle(color: Colors.red)).tr(),
-                ),
-              FilledButton(
-                  onPressed: uploading ? null : confirmAndUpload,
-                  child: uploading
-                      ? const ProgressRing()
-                      : const Text('confirmer').tr()),
-            ],
-          ),
-        ));
+      ),
+      bottomBar: widget.readOnly
+          ? null
+          : Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if (errorUploading)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Text(
+                        'errupld',
+                        style: TextStyle(color: Colors.red),
+                      ).tr(),
+                    ),
+                  FilledButton(
+                    onPressed: uploading ? null : confirmAndUpload,
+                    child: uploading
+                        ? const ProgressRing()
+                        : const Text('confirmer').tr(),
+                  ),
+                ],
+              ),
+            ),
+    );
   }
 
   List<Widget> gridChildren(AppTheme appTheme) {
@@ -231,10 +244,8 @@ class _VehicleFormState extends State<VehicleForm>
       ...firstLine(appTheme),
       ...getWilayaCommuneWidget(appTheme),
       ...secondLine(appTheme),
-      if(conducteurEmploye)
-      ...thirdLine(appTheme),
-      if(conducteurEmploye)
-      ...forthLine(appTheme),
+      if (conducteurEmploye) ...thirdLine(appTheme),
+      if (conducteurEmploye) ...forthLine(appTheme),
       ...fifthLine(appTheme),
       ...sixthLine(appTheme),
       ...seventhLine(appTheme),
@@ -242,36 +253,31 @@ class _VehicleFormState extends State<VehicleForm>
     ];
   }
 
-
   List<Widget> firstLine(AppTheme appTheme) {
     return [
-      if(chassisKey)
-        getChassisWidget(appTheme),
+      if (chassisKey) getChassisWidget(appTheme),
       StaggeredGridTile.fit(
         crossAxisCellCount: 6,
         child: Container(
           decoration: BoxDecoration(
             border: Border(
-              top:  Device.orientation==Orientation
-                  .portrait?BorderSide.none:BorderSide(
-                color: appTheme.color,
-              ),
-                right:  Device.orientation==Orientation.portrait?BorderSide(
-                  color: appTheme.color,
-                ):BorderSide.none,
-                left:  Device.orientation==Orientation.portrait?BorderSide(
-                  color: appTheme.color,
-                ):BorderSide.none
+              top: Device.orientation == Orientation.portrait
+                  ? BorderSide.none
+                  : BorderSide(color: appTheme.color),
+              right: Device.orientation == Orientation.portrait
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
+              left: Device.orientation == Orientation.portrait
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
             ),
           ),
           height: heightFirst,
-          padding: const EdgeInsets.symmetric(horizontal: chassisKey?0:10),
+          padding: const EdgeInsets.symmetric(horizontal: chassisKey ? 0 : 10),
           child: Container(
             padding: EdgeInsets.zero,
             decoration: BoxDecoration(
-              border: Border.all(
-                color: appTheme.color,
-              ),
+              border: Border.all(color: appTheme.color),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -280,14 +286,18 @@ class _VehicleFormState extends State<VehicleForm>
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Text(
                     'nummat',
-                    style: formHintStyle.copyWith(fontSize: 12,color: Colors.red),
+                    style: formHintStyle.copyWith(
+                      fontSize: 12,
+                      color: Colors.red,
+                    ),
                   ).tr(),
                 ),
                 const Spacer(),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 5.0),
                   child: autreMat
-                      ? TextBox(enabled:!widget.readOnly,
+                      ? TextBox(
+                          enabled: !widget.readOnly,
                           controller: matriculeEtr,
                           maxLength: 30,
                           cursorColor: appTheme.color.darker,
@@ -295,11 +305,14 @@ class _VehicleFormState extends State<VehicleForm>
                           placeholder: 'XXXXXXXXXXXXXX',
                           textAlign: TextAlign.center,
                           placeholderStyle: placeStyle,
-                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                          decoration: WidgetStatePropertyAll(
+                            BoxDecoration(color: appTheme.fillColor),
+                          ),
 
-                    inputFormatters: <TextInputFormatter>[
+                          inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.allow(
-                                RegExp("[0-9a-zA-Z.-]")),
+                              RegExp("[0-9a-zA-Z.-]"),
+                            ),
                           ],
                         )
                       : Row(
@@ -307,41 +320,44 @@ class _VehicleFormState extends State<VehicleForm>
                           children: [
                             Flexible(
                               flex: 6,
-                              child: TextBox(enabled:!widget.readOnly,
+                              child: TextBox(
+                                enabled: !widget.readOnly,
                                 controller: matr1,
                                 cursorColor: appTheme.color.darker,
                                 style: appTheme.writingStyle,
                                 placeholder: '123456',
                                 placeholderStyle: placeStyle,
-                                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                decoration: WidgetStatePropertyAll(
+                                  BoxDecoration(color: appTheme.fillColor),
+                                ),
 
                                 maxLength: 6,
                                 textAlign: TextAlign.center,
                                 inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
+                                  FilteringTextInputFormatter.digitsOnly,
                                 ],
                               ),
                             ),
                             smallSpace,
-                            Text(
-                              '-',
-                              style: formHintStyle,
-                            ),
+                            Text('-', style: formHintStyle),
                             smallSpace,
                             Flexible(
                               flex: 3,
-                              child: TextBox(enabled:!widget.readOnly,
+                              child: TextBox(
+                                enabled: !widget.readOnly,
                                 controller: matr2,
                                 cursorColor: appTheme.color.darker,
                                 style: appTheme.writingStyle,
                                 placeholder: '123',
                                 maxLength: 3,
                                 placeholderStyle: placeStyle,
-                                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                decoration: WidgetStatePropertyAll(
+                                  BoxDecoration(color: appTheme.fillColor),
+                                ),
 
                                 textAlign: TextAlign.center,
                                 inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
+                                  FilteringTextInputFormatter.digitsOnly,
                                 ],
                                 onChanged: (s) {
                                   updateOverMatricule(appTheme);
@@ -349,25 +365,25 @@ class _VehicleFormState extends State<VehicleForm>
                               ),
                             ),
                             smallSpace,
-                            Text(
-                              '-',
-                              style: formHintStyle,
-                            ),
+                            Text('-', style: formHintStyle),
                             smallSpace,
                             Flexible(
                               flex: 2,
-                              child: TextBox(enabled:!widget.readOnly,
+                              child: TextBox(
+                                enabled: !widget.readOnly,
                                 controller: matr3,
                                 cursorColor: appTheme.color.darker,
                                 style: appTheme.writingStyle,
                                 placeholder: '12',
                                 maxLength: 2,
                                 placeholderStyle: placeStyle,
-                                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                                decoration: WidgetStatePropertyAll(
+                                  BoxDecoration(color: appTheme.fillColor),
+                                ),
 
                                 textAlign: TextAlign.center,
                                 inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
+                                  FilteringTextInputFormatter.digitsOnly,
                                 ],
                                 onChanged: (s) {
                                   updateOverMatricule(appTheme);
@@ -384,26 +400,27 @@ class _VehicleFormState extends State<VehicleForm>
                     if (erreurMatricule)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                        child:
-                        Text('erreurmat', style: TextStyle(color: Colors.red))
-                            .tr(),
+                        child: Text(
+                          'erreurmat',
+                          style: TextStyle(color: Colors.red),
+                        ).tr(),
                       ),
-                    if(erreurMatricule)
-                    Spacer(),
+                    if (erreurMatricule) Spacer(),
                     Checkbox(
-
                       checked: autreMat,
                       content: Text(
                         'autremat',
                         style: appTheme.writingStyle,
                       ).tr(),
-                      onChanged: widget.readOnly?null:(s) {
-                        if (s != null) {
-                          setState(() {
-                            autreMat = s;
-                          });
-                        }
-                      },
+                      onChanged: widget.readOnly
+                          ? null
+                          : (s) {
+                              if (s != null) {
+                                setState(() {
+                                  autreMat = s;
+                                });
+                              }
+                            },
                     ),
                     smallSpace,
                   ],
@@ -416,39 +433,34 @@ class _VehicleFormState extends State<VehicleForm>
       ),
     ];
   }
-  List<Widget> getWilayaCommuneWidget(AppTheme appTheme){
+
+  List<Widget> getWilayaCommuneWidget(AppTheme appTheme) {
     return [
-    StaggeredGridTile.fit(
-        crossAxisCellCount: chassisKey?6:4,
+      StaggeredGridTile.fit(
+        crossAxisCellCount: chassisKey ? 6 : 4,
         child: Container(
           height: heightFirst,
 
           decoration: BoxDecoration(
             border: Border(
-                top:BorderSide(
-                  color: appTheme.color,
-                ),
-                left: BorderSide(
-                  color: appTheme.color,
-                ),
-                right:  Device.orientation==Orientation.portrait?BorderSide(
-                  color: appTheme.color,
-                ):BorderSide.none
+              top: BorderSide(color: appTheme.color),
+              left: BorderSide(color: appTheme.color),
+              right: Device.orientation == Orientation.portrait
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
             ),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'pays',
-                style: formHintStyle,
-              ).tr(),
+              Text('pays', style: formHintStyle).tr(),
               CountryCodePicker(
                 enabled: !widget.readOnly,
                 boxDecoration: BoxDecoration(
-                    color: appTheme.backGroundColor,
-                    boxShadow: kElevationToShadow[2]),
+                  color: appTheme.backGroundColor,
+                  boxShadow: kElevationToShadow[2],
+                ),
                 padding: const EdgeInsets.all(3),
                 searchDecoration: appTheme.inputDecoration,
                 dialogSize: Size(40.w, 60.h),
@@ -463,10 +475,7 @@ class _VehicleFormState extends State<VehicleForm>
                   });
                 },
               ),
-              Text(
-                'wilaya',
-                style: formHintStyle,
-              ).tr(),
+              Text('wilaya', style: formHintStyle).tr(),
               SizedBox(
                 height: 5.h,
                 child: AutoSuggestBox<String>(
@@ -476,30 +485,34 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
 
                   items: AlgeriaList.dzair!.getWilayat()!.map((wilaya) {
                     return AutoSuggestBoxItem<String>(
                       value: wilaya!.getWilayaCode()!,
                       label: wilaya.getWilayaName(
-                          appTheme.locale!.languageCode.toUpperCase() == "AR"
-                              ? Language.AR
-                              : Language.FR)!,
+                        appTheme.locale!.languageCode.toUpperCase() == "AR"
+                            ? Language.AR
+                            : Language.FR,
+                      )!,
                     );
                   }).toList(),
                   onSelected: (item) {
                     setState(() {
                       wilaya = item.value!;
-                      wilayaCont.text = AlgeriaList.dzair!
-                          .searchWilayatByName(
-                          item.label,
-                          appTheme.locale!.languageCode
-                              .toUpperCase() ==
-                              "AR"
-                              ? Language.AR
-                              : Language.FR)
-                          ?.first
-                          ?.getWilayaName(Language.FR) ??
+                      wilayaCont.text =
+                          AlgeriaList.dzair!
+                              .searchWilayatByName(
+                                item.label,
+                                appTheme.locale!.languageCode.toUpperCase() ==
+                                        "AR"
+                                    ? Language.AR
+                                    : Language.FR,
+                              )
+                              ?.first
+                              ?.getWilayaName(Language.FR) ??
                           '';
                     });
                   },
@@ -512,164 +525,156 @@ class _VehicleFormState extends State<VehicleForm>
               ),
             ],
           ),
-        )),
+        ),
+      ),
       StaggeredGridTile.fit(
-          crossAxisCellCount: chassisKey?6:4,
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border(
-                  top: Device.orientation==Orientation
-                      .portrait?BorderSide.none:BorderSide(
-                    color: appTheme.color,
-                  ),
-                  right:  BorderSide(
-                    color: appTheme.color,
-                  ),
-                  left:  Device.orientation==Orientation.portrait?BorderSide(
-                    color: appTheme.color,
-                  ):BorderSide.none
-              ),
+        crossAxisCellCount: chassisKey ? 6 : 4,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              top: Device.orientation == Orientation.portrait
+                  ? BorderSide.none
+                  : BorderSide(color: appTheme.color),
+              right: BorderSide(color: appTheme.color),
+              left: Device.orientation == Orientation.portrait
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
             ),
-            height: heightFirst,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'daira',
-                  style: formHintStyle,
-                ).tr(),
-                SizedBox(
-                  height: 5.h,
-                  child: AutoSuggestBox<String>(
-                    enabled: !widget.readOnly,
-                    controller: dairaCont,
-                    placeholder: 'daira'.tr(),
-                    cursorColor: appTheme.color.darker,
-                    style: appTheme.writingStyle,
-                    placeholderStyle: placeStyle,
-                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+          ),
+          height: heightFirst,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('daira', style: formHintStyle).tr(),
+              SizedBox(
+                height: 5.h,
+                child: AutoSuggestBox<String>(
+                  enabled: !widget.readOnly,
+                  controller: dairaCont,
+                  placeholder: 'daira'.tr(),
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  placeholderStyle: placeStyle,
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
 
-                    items:
-                    AlgeriaList().getDairas(wilayaCont.text).map((daira) {
-                      return AutoSuggestBoxItem<String>(
-                        value: daira?.getDairaName(Language.FR) ?? '',
-                        label: daira?.getDairaName(
-                            appTheme.locale?.languageCode.toUpperCase() ==
-                                "AR"
+                  items: AlgeriaList().getDairas(wilayaCont.text).map((daira) {
+                    return AutoSuggestBoxItem<String>(
+                      value: daira?.getDairaName(Language.FR) ?? '',
+                      label:
+                          daira?.getDairaName(
+                            appTheme.locale?.languageCode.toUpperCase() == "AR"
                                 ? Language.AR
-                                : Language.FR) ??
-                            '',
-                      );
-                    }).toList(),
-                    onSelected: (item) {
-                      setState(() => dairaCont.text = item.value ?? "");
-                    },
-                    onChanged: (s, r) {
-                      if (r == TextChangedReason.userInput) {
-                        setState(() => dairaCont.text = s);
-                      }
-                    },
-                  ),
+                                : Language.FR,
+                          ) ??
+                          '',
+                    );
+                  }).toList(),
+                  onSelected: (item) {
+                    setState(() => dairaCont.text = item.value ?? "");
+                  },
+                  onChanged: (s, r) {
+                    if (r == TextChangedReason.userInput) {
+                      setState(() => dairaCont.text = s);
+                    }
+                  },
                 ),
-                Text(
-                  'commune',
-                  style: formHintStyle,
-                ).tr(),
-                SizedBox(
-                  height: 5.h,
-                  child: AutoSuggestBox<String>(
-                    enabled: !widget.readOnly,
-                    controller: communeCont,
-                    placeholder: 'commune'.tr(),
-                    placeholderStyle: placeStyle,
-                    cursorColor: appTheme.color.darker,
-                    style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
-                    items: AlgeriaList()
-                        .getCommune(wilayaCont.text)
-                        .map((commune) {
-                      return AutoSuggestBoxItem<String>(
-                        value: commune == null
-                            ? ''
-                            : commune.getCommuneName(Language.FR) ?? '',
-                        label: commune == null
-                            ? ''
-                            : commune.getCommuneName(appTheme
-                            .locale?.languageCode
-                            .toUpperCase() ==
-                            "AR"
-                            ? Language.AR
-                            : Language.FR) ??
-                            '',
-                      );
-                    }).toList(),
-                    onSelected: (item) {
-                      setState(() => communeCont.text = item.value ?? "");
-                    },
-                    onChanged: (s, r) {
-                      if (r == TextChangedReason.userInput) {
-                        setState(() => communeCont.text = s);
-                      }
-                    },
+              ),
+              Text('commune', style: formHintStyle).tr(),
+              SizedBox(
+                height: 5.h,
+                child: AutoSuggestBox<String>(
+                  enabled: !widget.readOnly,
+                  controller: communeCont,
+                  placeholder: 'commune'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
                   ),
-                ),
-              ],
-            ),
-          )),
 
+                  items: AlgeriaList().getCommune(wilayaCont.text).map((
+                    commune,
+                  ) {
+                    return AutoSuggestBoxItem<String>(
+                      value: commune == null
+                          ? ''
+                          : commune.getCommuneName(Language.FR) ?? '',
+                      label: commune == null
+                          ? ''
+                          : commune.getCommuneName(
+                                  appTheme.locale?.languageCode.toUpperCase() ==
+                                          "AR"
+                                      ? Language.AR
+                                      : Language.FR,
+                                ) ??
+                                '',
+                    );
+                  }).toList(),
+                  onSelected: (item) {
+                    setState(() => communeCont.text = item.value ?? "");
+                  },
+                  onChanged: (s, r) {
+                    if (r == TextChangedReason.userInput) {
+                      setState(() => communeCont.text = s);
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     ];
   }
 
   List<Widget> secondLine(AppTheme appTheme) {
     return [
       StaggeredGridTile.fit(
-          crossAxisCellCount: 4,
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border(
-                left:  BorderSide(
-                  color: appTheme.color,
-                ),
-                right: Device.orientation==Orientation.portrait?BorderSide(
-                  color: appTheme.color,
-                ):BorderSide.none,
+        crossAxisCellCount: 4,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              left: BorderSide(color: appTheme.color),
+              right: Device.orientation == Orientation.portrait
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
+            ),
+          ),
+          height: height,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('datecartegrise', style: formHintStyle).tr(),
+              DatePicker(
+                selected: selectedDate,
+                onChanged: widget.readOnly
+                    ? null
+                    : (s) {
+                        setState(() {
+                          selectedDate = s;
+                        });
+                      },
               ),
-            ),
-            height: height,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'datecartegrise',
-                  style: formHintStyle,
-                ).tr(),
-                DatePicker(
-                  selected: selectedDate,
-                  onChanged: widget.readOnly?null:(s) {
-                    setState(() {
-                      selectedDate = s;
-                    });
-                  },
-                ),
-              ],
-            ),
-          )),
+            ],
+          ),
+        ),
+      ),
       StaggeredGridTile.fit(
         crossAxisCellCount: 4,
         child: Container(
           decoration: BoxDecoration(
-            border: Device.orientation==Orientation.portrait?Border(
-              left:  BorderSide(
-                color: appTheme.color,
-              ),
-              right: BorderSide(
-                color: appTheme.color,
-              ),
-            ):const Border(),
+            border: Device.orientation == Orientation.portrait
+                ? Border(
+                    left: BorderSide(color: appTheme.color),
+                    right: BorderSide(color: appTheme.color),
+                  )
+                : const Border(),
           ),
 
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -678,19 +683,18 @@ class _VehicleFormState extends State<VehicleForm>
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'numcartegrise',
-                style: formHintStyle,
-              ).tr(),
-              TextBox(enabled:!widget.readOnly,
+              Text('numcartegrise', style: formHintStyle).tr(),
+              TextBox(
+                enabled: !widget.readOnly,
                 controller: numero,
                 placeholder: 'numcartegrise'.tr(),
                 maxLength: 30,
                 placeholderStyle: placeStyle,
                 cursorColor: appTheme.color.darker,
                 style: appTheme.writingStyle,
-                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                decoration: WidgetStatePropertyAll(
+                  BoxDecoration(color: appTheme.fillColor),
+                ),
               ),
             ],
           ),
@@ -699,10 +703,7 @@ class _VehicleFormState extends State<VehicleForm>
       if (MediaQuery.of(context).orientation == Orientation.landscape)
         StaggeredGridTile.fit(
           crossAxisCellCount: 2,
-          child: SizedBox(
-
-            height: height,
-          ),
+          child: SizedBox(height: height),
         ),
       StaggeredGridTile.fit(
         crossAxisCellCount: 2,
@@ -710,42 +711,39 @@ class _VehicleFormState extends State<VehicleForm>
           height: height,
           decoration: BoxDecoration(
             border: Border(
-              right:  BorderSide(
-                color: appTheme.color,
-              ),
-              left: Device.orientation==Orientation.portrait?BorderSide(
-                color: appTheme.color,
-              ):BorderSide.none,
+              right: BorderSide(color: appTheme.color),
+              left: Device.orientation == Orientation.portrait
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
             ),
-
           ),
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'quittance',
-                style: formHintStyle,
-              ).tr(),
-              TextBox(enabled:!widget.readOnly,
+              Text('quittance', style: formHintStyle).tr(),
+              TextBox(
+                enabled: !widget.readOnly,
                 controller: quittance,
                 placeholder: 'quittance'.tr(),
                 cursorColor: appTheme.color.darker,
                 style: appTheme.writingStyle,
                 placeholderStyle: placeStyle,
-                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                decoration: WidgetStatePropertyAll(
+                  BoxDecoration(color: appTheme.fillColor),
+                ),
 
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(
-                      RegExp(r'^(\d+)?\.?\d{0,2}'))
+                    RegExp(r'^(\d+)?\.?\d{0,2}'),
+                  ),
                 ],
               ),
             ],
           ),
         ),
       ),
-
     ];
   }
 
@@ -756,34 +754,25 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           decoration: BoxDecoration(
             border: Border(
-
-              top: BorderSide(
-                color: appTheme.color,
-              ),
-              left:  BorderSide(
-                color: appTheme.color,
-              ),
-              right: Device.orientation==Orientation.portrait?BorderSide(
-                color: appTheme.color,
-              ):BorderSide.none,
+              top: BorderSide(color: appTheme.color),
+              left: BorderSide(color: appTheme.color),
+              right: Device.orientation == Orientation.portrait
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
             ),
           ),
 
-          padding: const EdgeInsets.symmetric(horizontal: 10,),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           height: height,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
-              Text(
-                'existingdriver',
-                style: formHintStyle,
-              ).tr(),
+              Text('existingdriver', style: formHintStyle).tr(),
               SizedBox(
                 width: 500.px,
                 child: Button(
-                  onPressed: ()=>selectConducteur(appTheme),
+                  onPressed: () => selectConducteur(appTheme),
                   child: const Text('select').tr(),
                 ),
               ),
@@ -795,18 +784,12 @@ class _VehicleFormState extends State<VehicleForm>
         crossAxisCellCount: 2,
         child: Container(
           decoration: BoxDecoration(
-            border: Device.orientation==Orientation.portrait?Border(
-              left:  BorderSide(
-                color: appTheme.color,
-              ),
-              right: BorderSide(
-                color: appTheme.color,
-              ),
-            ):Border(
-              top: BorderSide(
-                color: appTheme.color,
-              ),
-            ),
+            border: Device.orientation == Orientation.portrait
+                ? Border(
+                    left: BorderSide(color: appTheme.color),
+                    right: BorderSide(color: appTheme.color),
+                  )
+                : Border(top: BorderSide(color: appTheme.color)),
           ),
 
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -815,22 +798,22 @@ class _VehicleFormState extends State<VehicleForm>
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'matriculeemploye',
-                style: formHintStyle,
-              ).tr(),
+              Text('matriculeemploye', style: formHintStyle).tr(),
               SizedBox(
-                  height: 5.h,
-                  child: TextBox(enabled:!widget.readOnly,
-                    controller: matempl,
-                    maxLength: 30,
-                    placeholder: 'matriculeemploye'.tr(),
-                    placeholderStyle: placeStyle,
-                    cursorColor: appTheme.color.darker,
-                    style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
-                  )),
+                height: 5.h,
+                child: TextBox(
+                  enabled: !widget.readOnly,
+                  controller: matempl,
+                  maxLength: 30,
+                  placeholder: 'matriculeemploye'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -839,18 +822,12 @@ class _VehicleFormState extends State<VehicleForm>
         crossAxisCellCount: 2,
         child: Container(
           decoration: BoxDecoration(
-            border: Device.orientation==Orientation.portrait?Border(
-              left:  BorderSide(
-                color: appTheme.color,
-              ),
-              right: BorderSide(
-                color: appTheme.color,
-              ),
-            ):Border(
-              top: BorderSide(
-                color: appTheme.color,
-              ),
-            ),
+            border: Device.orientation == Orientation.portrait
+                ? Border(
+                    left: BorderSide(color: appTheme.color),
+                    right: BorderSide(color: appTheme.color),
+                  )
+                : Border(top: BorderSide(color: appTheme.color)),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 10),
           height: height,
@@ -858,22 +835,22 @@ class _VehicleFormState extends State<VehicleForm>
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'nomf',
-                style: formHintStyle,
-              ).tr(),
+              Text('nomf', style: formHintStyle).tr(),
               SizedBox(
-                  height: 5.h,
-                  child: TextBox(enabled:!widget.readOnly,
-                    controller: lname,
-                    maxLength: 30,
-                    placeholder: 'nomf'.tr(),
-                    placeholderStyle: placeStyle,
-                    cursorColor: appTheme.color.darker,
-                    style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
-                  )),
+                height: 5.h,
+                child: TextBox(
+                  enabled: !widget.readOnly,
+                  controller: lname,
+                  maxLength: 30,
+                  placeholder: 'nomf'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -884,41 +861,36 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
-            border: Device.orientation==Orientation.portrait?Border(
-              left:  BorderSide(
-                color: appTheme.color,
-              ),
-              right: BorderSide(
-                color: appTheme.color,
-              ),
-            ):Border(
-              top: BorderSide(
-                color: appTheme.color,
-              ),
-            ),
+            border: Device.orientation == Orientation.portrait
+                ? Border(
+                    left: BorderSide(color: appTheme.color),
+                    right: BorderSide(color: appTheme.color),
+                  )
+                : Border(top: BorderSide(color: appTheme.color)),
           ),
           height: height,
           child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'prenom',
-                  style: formHintStyle,
-                ).tr(),
-                SizedBox(
-                    height: 5.h,
-                    child: TextBox(enabled:!widget.readOnly,
-                      controller: fname,
-                      maxLength: 30,
-                      placeholder: 'prenom'.tr(),
-                      placeholderStyle: placeStyle,
-                      cursorColor: appTheme.color.darker,
-                      style: appTheme.writingStyle,
-                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
-                    )),
-              ]),
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('prenom', style: formHintStyle).tr(),
+              SizedBox(
+                height: 5.h,
+                child: TextBox(
+                  enabled: !widget.readOnly,
+                  controller: fname,
+                  maxLength: 30,
+                  placeholder: 'prenom'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       StaggeredGridTile.fit(
@@ -926,16 +898,13 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           decoration: BoxDecoration(
             border: Border(
-              top: Device.orientation==Orientation
-                  .portrait?BorderSide.none:BorderSide(
-                color: appTheme.color,
-              ),
-              right:  BorderSide(
-                color: appTheme.color,
-              ),
-              left: Device.orientation==Orientation.portrait?BorderSide(
-                color: appTheme.color,
-              ):BorderSide.none,
+              top: Device.orientation == Orientation.portrait
+                  ? BorderSide.none
+                  : BorderSide(color: appTheme.color),
+              right: BorderSide(color: appTheme.color),
+              left: Device.orientation == Orientation.portrait
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
             ),
           ),
 
@@ -945,27 +914,26 @@ class _VehicleFormState extends State<VehicleForm>
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'poste',
-                style: formHintStyle,
-              ).tr(),
+              Text('poste', style: formHintStyle).tr(),
               SizedBox(
-                  height: 5.h,
-                  child: TextBox(enabled:!widget.readOnly,
-                    controller: profession,
-                    maxLength: 40,
-                    placeholder: 'poste'.tr(),
-                    placeholderStyle: placeStyle,
-                    cursorColor: appTheme.color.darker,
-                    style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
-                  )),
+                height: 5.h,
+                child: TextBox(
+                  enabled: !widget.readOnly,
+                  controller: profession,
+                  maxLength: 40,
+                  placeholder: 'poste'.tr(),
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
       ),
-
     ];
   }
 
@@ -976,16 +944,13 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           decoration: BoxDecoration(
             border: Border(
-              bottom: Device.orientation==Orientation
-                  .portrait?BorderSide.none:BorderSide(
-                color: appTheme.color,
-              ),
-              left:  BorderSide(
-                color: appTheme.color,
-              ),
-              right: Device.orientation==Orientation.portrait?BorderSide(
-                color: appTheme.color,
-              ):BorderSide.none,
+              bottom: Device.orientation == Orientation.portrait
+                  ? BorderSide.none
+                  : BorderSide(color: appTheme.color),
+              left: BorderSide(color: appTheme.color),
+              right: Device.orientation == Orientation.portrait
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
             ),
           ),
 
@@ -995,29 +960,26 @@ class _VehicleFormState extends State<VehicleForm>
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'servicefonction',
-                style: formHintStyle,
-              ).tr(),
+              Text('servicefonction', style: formHintStyle).tr(),
               SizedBox(
-                  height: 5.h,
-                  child: Row(
-                    children: [
-                      const Text('fonction').tr(),
-                      smallSpace,
-                      ToggleSwitch(
-                        checked: service,
-                        onChanged: (s){
-                          setState(() {
-                            service=s;
-                          });
-                        },
-
-                      ),
-                      smallSpace,
-                      const Text('service').tr(),
-                    ],
-                  )),
+                height: 5.h,
+                child: Row(
+                  children: [
+                    const Text('fonction').tr(),
+                    smallSpace,
+                    ToggleSwitch(
+                      checked: service,
+                      onChanged: (s) {
+                        setState(() {
+                          service = s;
+                        });
+                      },
+                    ),
+                    smallSpace,
+                    const Text('service').tr(),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -1026,22 +988,15 @@ class _VehicleFormState extends State<VehicleForm>
         crossAxisCellCount: 6,
         child: Container(
           decoration: BoxDecoration(
-            border: Device.orientation==Orientation.portrait?Border(
-              bottom: Device.orientation==Orientation
-                  .portrait?BorderSide.none:BorderSide(
-                color: appTheme.color,
-              ),
-              left:  BorderSide(
-                color: appTheme.color,
-              ),
-              right: BorderSide(
-                color: appTheme.color,
-              ),
-            ):Border(
-              bottom: BorderSide(
-                color: appTheme.color,
-              ),
-            ),
+            border: Device.orientation == Orientation.portrait
+                ? Border(
+                    bottom: Device.orientation == Orientation.portrait
+                        ? BorderSide.none
+                        : BorderSide(color: appTheme.color),
+                    left: BorderSide(color: appTheme.color),
+                    right: BorderSide(color: appTheme.color),
+                  )
+                : Border(bottom: BorderSide(color: appTheme.color)),
           ),
 
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -1050,22 +1005,22 @@ class _VehicleFormState extends State<VehicleForm>
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'adresse',
-                style: formHintStyle,
-              ).tr(),
+              Text('adresse', style: formHintStyle).tr(),
               SizedBox(
-                  height: 5.h,
-                  child: TextBox(enabled:!widget.readOnly,
-                    controller: adresse,
-                    placeholder: 'adresse'.tr(),
-                    maxLength: 100,
-                    placeholderStyle: placeStyle,
-                    cursorColor: appTheme.color.darker,
-                    style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
-                  )),
+                height: 5.h,
+                child: TextBox(
+                  enabled: !widget.readOnly,
+                  controller: adresse,
+                  placeholder: 'adresse'.tr(),
+                  maxLength: 100,
+                  placeholderStyle: placeStyle,
+                  cursorColor: appTheme.color.darker,
+                  style: appTheme.writingStyle,
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -1077,15 +1032,11 @@ class _VehicleFormState extends State<VehicleForm>
           padding: EdgeInsets.zero,
           decoration: BoxDecoration(
             border: Border(
-              bottom: BorderSide(
-                color: appTheme.color,
-              ),
-              right:  BorderSide(
-                color: appTheme.color,
-              ),
-              left: Device.orientation==Orientation.portrait?BorderSide(
-                color: appTheme.color,
-              ):BorderSide.none,
+              bottom: BorderSide(color: appTheme.color),
+              right: BorderSide(color: appTheme.color),
+              left: Device.orientation == Orientation.portrait
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
             ),
           ),
           child: Padding(
@@ -1093,21 +1044,20 @@ class _VehicleFormState extends State<VehicleForm>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'appartenanceconducteursingle',
-                  style: formHintStyle,
-                ).tr(),
+                Text('appartenanceconducteursingle', style: formHintStyle).tr(),
                 AutoSuggestBox<String>(
                   enabled: !widget.readOnly,
                   placeholder: 'appartenanceconducteursingle'.tr(),
                   placeholderStyle: placeStyle,
                   controller: selectedAppartenanceEmploye,
                   items: List.generate(
-                      MyEntrepriseState.p!.filiales!.length,
-                          (index) => AutoSuggestBoxItem(
-                          value: MyEntrepriseState.p!.filiales![index],
-                          label: MyEntrepriseState.p!.filiales![index]
-                              .toUpperCase())),
+                    MyEntrepriseState.p!.filiales!.length,
+                    (index) => AutoSuggestBoxItem(
+                      value: MyEntrepriseState.p!.filiales![index],
+                      label: MyEntrepriseState.p!.filiales![index]
+                          .toUpperCase(),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -1126,12 +1076,10 @@ class _VehicleFormState extends State<VehicleForm>
           padding: EdgeInsets.zero,
           decoration: BoxDecoration(
             border: Border(
-              left:  BorderSide(
-                color: appTheme.color,
-              ),
-              right: Device.orientation==Orientation.portrait?BorderSide(
-                color: appTheme.color,
-              ):BorderSide.none,
+              left: BorderSide(color: appTheme.color),
+              right: Device.orientation == Orientation.portrait
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
             ),
           ),
           child: Padding(
@@ -1139,21 +1087,20 @@ class _VehicleFormState extends State<VehicleForm>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'appartenancevehiculesingle',
-                  style: formHintStyle,
-                ).tr(),
+                Text('appartenancevehiculesingle', style: formHintStyle).tr(),
                 AutoSuggestBox<String>(
                   enabled: !widget.readOnly,
                   placeholder: 'appartenancevehiculesingle'.tr(),
                   placeholderStyle: placeStyle,
                   controller: selectedAppartenance,
                   items: List.generate(
-                      MyEntrepriseState.p!.filiales!.length,
-                          (index) => AutoSuggestBoxItem(
-                          value: MyEntrepriseState.p!.filiales![index],
-                          label: MyEntrepriseState.p!.filiales![index]
-                              .toUpperCase())),
+                    MyEntrepriseState.p!.filiales!.length,
+                    (index) => AutoSuggestBoxItem(
+                      value: MyEntrepriseState.p!.filiales![index],
+                      label: MyEntrepriseState.p!.filiales![index]
+                          .toUpperCase(),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -1166,35 +1113,32 @@ class _VehicleFormState extends State<VehicleForm>
           height: height,
           padding: EdgeInsets.zero,
           decoration: BoxDecoration(
-            border: Device.orientation==Orientation.portrait?Border(
-              left:  BorderSide(
-                color: appTheme.color,
-              ),
-              right: BorderSide(
-                color: appTheme.color,
-              ),
-            ):const Border(),
+            border: Device.orientation == Orientation.portrait
+                ? Border(
+                    left: BorderSide(color: appTheme.color),
+                    right: BorderSide(color: appTheme.color),
+                  )
+                : const Border(),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'filialeexploit',
-                  style: formHintStyle,
-                ).tr(),
+                Text('filialeexploit', style: formHintStyle).tr(),
                 AutoSuggestBox<String>(
                   enabled: !widget.readOnly,
                   placeholder: 'filialeexploit'.tr(),
                   placeholderStyle: placeStyle,
                   controller: selectedFiliale,
                   items: List.generate(
-                      MyEntrepriseState.p!.filiales!.length,
-                          (index) => AutoSuggestBoxItem(
-                          value: MyEntrepriseState.p!.filiales![index],
-                          label: MyEntrepriseState.p!.filiales![index]
-                              .toUpperCase())),
+                    MyEntrepriseState.p!.filiales!.length,
+                    (index) => AutoSuggestBoxItem(
+                      value: MyEntrepriseState.p!.filiales![index],
+                      label: MyEntrepriseState.p!.filiales![index]
+                          .toUpperCase(),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -1207,35 +1151,32 @@ class _VehicleFormState extends State<VehicleForm>
           height: height,
           padding: EdgeInsets.zero,
           decoration: BoxDecoration(
-            border: Device.orientation==Orientation.portrait?Border(
-              left:  BorderSide(
-                color: appTheme.color,
-              ),
-              right: BorderSide(
-                color: appTheme.color,
-              ),
-            ):const Border(),
+            border: Device.orientation == Orientation.portrait
+                ? Border(
+                    left: BorderSide(color: appTheme.color),
+                    right: BorderSide(color: appTheme.color),
+                  )
+                : const Border(),
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'direction',
-                  style: formHintStyle,
-                ).tr(),
+                Text('direction', style: formHintStyle).tr(),
                 AutoSuggestBox<String>(
                   enabled: !widget.readOnly,
                   placeholder: 'direction'.tr(),
                   placeholderStyle: placeStyle,
                   controller: selectedDirection,
                   items: List.generate(
-                      MyEntrepriseState.p!.directions!.length,
-                          (index) => AutoSuggestBoxItem(
-                          value: MyEntrepriseState.p!.directions![index],
-                          label: MyEntrepriseState.p!.directions![index]
-                              .toUpperCase())),
+                    MyEntrepriseState.p!.directions!.length,
+                    (index) => AutoSuggestBoxItem(
+                      value: MyEntrepriseState.p!.directions![index],
+                      label: MyEntrepriseState.p!.directions![index]
+                          .toUpperCase(),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -1249,12 +1190,10 @@ class _VehicleFormState extends State<VehicleForm>
           padding: EdgeInsets.zero,
           decoration: BoxDecoration(
             border: Border(
-              right:  BorderSide(
-                color: appTheme.color,
-              ),
-              left: Device.orientation==Orientation.portrait?BorderSide(
-                color: appTheme.color,
-              ):BorderSide.none,
+              right: BorderSide(color: appTheme.color),
+              left: Device.orientation == Orientation.portrait
+                  ? BorderSide(color: appTheme.color)
+                  : BorderSide.none,
             ),
           ),
           child: Padding(
@@ -1262,21 +1201,20 @@ class _VehicleFormState extends State<VehicleForm>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'departement',
-                  style: formHintStyle,
-                ).tr(),
+                Text('departement', style: formHintStyle).tr(),
                 AutoSuggestBox<String>(
                   enabled: !widget.readOnly,
                   placeholder: 'departement'.tr(),
                   placeholderStyle: placeStyle,
                   controller: selectedDepartment,
                   items: List.generate(
-                      MyEntrepriseState.p!.departments!.length,
-                          (index) => AutoSuggestBoxItem(
-                          value: MyEntrepriseState.p!.departments![index],
-                          label: MyEntrepriseState.p!.departments![index]
-                              .toUpperCase())),
+                    MyEntrepriseState.p!.departments!.length,
+                    (index) => AutoSuggestBoxItem(
+                      value: MyEntrepriseState.p!.departments![index],
+                      label: MyEntrepriseState.p!.departments![index]
+                          .toUpperCase(),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -1293,19 +1231,12 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: appTheme.color,
-            ),
-          ),
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                Text(
-                  'genre',
-                  style: formHintStyle,
-                ).tr(),
+                Text('genre', style: formHintStyle).tr(),
                 Flexible(
                   child: ListTile(
                     title: AutoSizeText(
@@ -1314,62 +1245,68 @@ class _VehicleFormState extends State<VehicleForm>
                       softWrap: true,
                       maxLines: 1,
                     ),
-                    onPressed: widget.readOnly?null:() {
-                      SelectDialog.showModal<int>(context,
-                          selectedValue: genre,
-                          backgroundColor: appTheme.backGroundColor,
-                          items: VehiclesUtilities.genres!.keys.toList(),
-                          itemBuilder: (c, v, e) {
-                            return Container(
-                              padding: const EdgeInsets.all(5.0),
-                              color: v % 2 == 0
-                                  ? Colors.transparent
-                                  : appTheme.color.lightest,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(v.toString()),
-                                  smallSpace,
-                                  smallSpace,
-                                  smallSpace,
-                                  Text(VehiclesUtilities.genres?[v] ?? '').tr(),
-                                ],
+                    onPressed: widget.readOnly
+                        ? null
+                        : () {
+                            SelectDialog.showModal<int>(
+                              context,
+                              selectedValue: genre,
+                              backgroundColor: appTheme.backGroundColor,
+                              items: VehiclesUtilities.genres!.keys.toList(),
+                              itemBuilder: (c, v, e) {
+                                return Container(
+                                  padding: const EdgeInsets.all(5.0),
+                                  color: v % 2 == 0
+                                      ? Colors.transparent
+                                      : appTheme.color.lightest,
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(v.toString()),
+                                      smallSpace,
+                                      smallSpace,
+                                      smallSpace,
+                                      Text(VehiclesUtilities.genres?[v] ?? '')
+                                          .tr(),
+                                    ],
+                                  ),
+                                );
+                              },
+                              onChange: (s) {
+                                setState(() {
+                                  genre = s;
+                                });
+                              },
+                              onFind: VehiclesUtilities.findGenres,
+                              emptyBuilder: (s) {
+                                return Center(
+                                  child: Text(
+                                    'lvide',
+                                    style: TextStyle(color: Colors.grey[100]),
+                                  ).tr(),
+                                );
+                              },
+                              loadingBuilder: (s) {
+                                return Center(
+                                  child: Text(
+                                    'telechargement',
+                                    style: TextStyle(color: Colors.grey[100]),
+                                  ).tr(),
+                                );
+                              },
+                              searchBoxDecoration: appTheme.inputDecoration
+                                  .copyWith(
+                                    labelText: 'search'.tr(),
+                                    labelStyle: placeStyle,
+                                  ),
+                              searchTextStyle: appTheme.writingStyle,
+                              searchCursorColor: appTheme.color,
+                              constraints: BoxConstraints.loose(
+                                Size(400.px, 400.px),
                               ),
                             );
                           },
-                          onChange: (s) {
-                            setState(() {
-                              genre = s;
-                            });
-                          },
-                          onFind: VehiclesUtilities.findGenres,
-                          emptyBuilder: (s) {
-                            return Center(
-                              child: Text(
-                                'lvide',
-                                style: TextStyle(color: Colors.grey[100]),
-                              ).tr(),
-                            );
-                          },
-                          loadingBuilder: (s) {
-                            return Center(
-                              child: Text('telechargement',
-                                      style: TextStyle(color: Colors.grey[100]))
-                                  .tr(),
-                            );
-                          },
-                          searchBoxDecoration:
-                              appTheme.inputDecoration.copyWith(
-                            labelText: 'search'.tr(),
-                            labelStyle: placeStyle,
-                          ),
-                          searchTextStyle: appTheme.writingStyle,
-                          searchCursorColor: appTheme.color,
-                          constraints: BoxConstraints.loose(Size(
-                            400.px,
-                            400.px,
-                          )));
-                    },
                   ),
                 ),
               ],
@@ -1382,19 +1319,12 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: appTheme.color,
-            ),
-          ),
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                Text(
-                  'marque',
-                  style: formHintStyle,
-                ).tr(),
+                Text('marque', style: formHintStyle).tr(),
                 Flexible(
                   child: ListTile(
                     leading: Image.asset(
@@ -1403,55 +1333,64 @@ class _VehicleFormState extends State<VehicleForm>
                       height: 4.h,
                     ),
                     title: AutoSizeText(
-                      VehiclesUtilities.marques![
-                              marque == null || marque! <= 0 ? 0 : marque!] ??
+                      VehiclesUtilities.marques![marque == null || marque! <= 0
+                              ? 0
+                              : marque!] ??
                           'nonind'.tr(),
                       minFontSize: 5,
                       maxLines: 1,
                     ),
-                    onPressed: widget.readOnly?null:() {
-                      SelectDialog.showModal<int?>(
-                        context,
-                        selectedValue: marque,
-                        backgroundColor: appTheme.backGroundColor,
-                        gridView: true,
-                        numberOfGridCross: 3,
-                        constraints: BoxConstraints.loose(Size(60.w, 70.h)),
-                        items: VehiclesUtilities.marques!.keys.toList(),
-                        itemBuilder: (c, v, e) {
-                          return Card(
-                              child: Image.asset(
-                                  'assets/images/marques/${v ?? 'default'}.webp'));
-                        },
-                        onChange: (s) {
-                          setState(() {
-                            marque = s;
-                          });
-                        },
-                        onFind: VehiclesUtilities.findMarque,
-                        emptyBuilder: (s) {
-                          return Center(
-                            child: Text(
-                              'lvide',
-                              style: TextStyle(color: Colors.grey[100]),
-                            ).tr(),
-                          );
-                        },
-                        loadingBuilder: (s) {
-                          return Center(
-                            child: Text('telechargement',
-                                    style: TextStyle(color: Colors.grey[100]))
-                                .tr(),
-                          );
-                        },
-                        searchBoxDecoration: appTheme.inputDecoration.copyWith(
-                          labelText: 'search'.tr(),
-                          labelStyle: placeStyle,
-                        ),
-                        searchTextStyle: appTheme.writingStyle,
-                        searchCursorColor: appTheme.color,
-                      );
-                    },
+                    onPressed: widget.readOnly
+                        ? null
+                        : () {
+                            SelectDialog.showModal<int?>(
+                              context,
+                              selectedValue: marque,
+                              backgroundColor: appTheme.backGroundColor,
+                              gridView: true,
+                              numberOfGridCross: 3,
+                              constraints: BoxConstraints.loose(
+                                Size(60.w, 70.h),
+                              ),
+                              items: VehiclesUtilities.marques!.keys.toList(),
+                              itemBuilder: (c, v, e) {
+                                return Card(
+                                  child: Image.asset(
+                                    'assets/images/marques/${v ?? 'default'}.webp',
+                                  ),
+                                );
+                              },
+                              onChange: (s) {
+                                setState(() {
+                                  marque = s;
+                                });
+                              },
+                              onFind: VehiclesUtilities.findMarque,
+                              emptyBuilder: (s) {
+                                return Center(
+                                  child: Text(
+                                    'lvide',
+                                    style: TextStyle(color: Colors.grey[100]),
+                                  ).tr(),
+                                );
+                              },
+                              loadingBuilder: (s) {
+                                return Center(
+                                  child: Text(
+                                    'telechargement',
+                                    style: TextStyle(color: Colors.grey[100]),
+                                  ).tr(),
+                                );
+                              },
+                              searchBoxDecoration: appTheme.inputDecoration
+                                  .copyWith(
+                                    labelText: 'search'.tr(),
+                                    labelStyle: placeStyle,
+                                  ),
+                              searchTextStyle: appTheme.writingStyle,
+                              searchCursorColor: appTheme.color,
+                            );
+                          },
                   ),
                 ),
               ],
@@ -1464,36 +1403,30 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: appTheme.color,
-            ),
-          ),
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                Text(
-                  'type',
-                  style: formHintStyle,
-                ).tr(),
-                TextBox(enabled:!widget.readOnly,
+                Text('type', style: formHintStyle).tr(),
+                TextBox(
+                  enabled: !widget.readOnly,
                   controller: type,
                   placeholder: 'type'.tr(),
                   maxLength: 30,
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
                 ),
               ],
             ),
           ),
         ),
       ),
-      if(!chassisKey)
-      getChassisWidget(appTheme),
+      if (!chassisKey) getChassisWidget(appTheme),
     ];
   }
 
@@ -1501,24 +1434,26 @@ class _VehicleFormState extends State<VehicleForm>
     return StaggeredGridTile.fit(
       crossAxisCellCount: 6,
       child: Container(
-        height: chassisKey?heightFirst:height,
+        height: chassisKey ? heightFirst : height,
         padding: EdgeInsets.zero,
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: appTheme.color,
-          ),
-        ),
+        decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: Column(
-            crossAxisAlignment: chassisKey?CrossAxisAlignment.start:CrossAxisAlignment.center,
+            crossAxisAlignment: chassisKey
+                ? CrossAxisAlignment.start
+                : CrossAxisAlignment.center,
             children: [
               Text(
                 'nchassi',
-                style: formHintStyle.copyWith(fontSize:chassisKey?12:10,color: Colors.red),
+                style: formHintStyle.copyWith(
+                  fontSize: chassisKey ? 12 : 10,
+                  color: Colors.red,
+                ),
               ).tr(),
-              if(chassisKey) const Spacer(),
-              TextBox(enabled: !widget.readOnly,
+              if (chassisKey) const Spacer(),
+              TextBox(
+                enabled: !widget.readOnly,
                 controller: numSer,
                 maxLength: 30,
                 placeholder: 'nchassi'.tr(),
@@ -1526,23 +1461,29 @@ class _VehicleFormState extends State<VehicleForm>
                 cursorColor: appTheme.color.darker,
                 style: appTheme.writingStyle,
                 decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor)),
-
+                  BoxDecoration(color: appTheme.fillColor),
+                ),
               ),
-              if(chassisKey) const Spacer(),
-              if(chassisKey)
-                Padding(padding: EdgeInsets.symmetric(horizontal: 5),child:
-                  SizedBox(
+              if (chassisKey) const Spacer(),
+              if (chassisKey)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5),
+                  child: SizedBox(
                     height: 22.px,
-                    child: errorChassis?Text('chassReq',style: TextStyle(color: Colors.red)).tr():null,
-                  ),),
+                    child: errorChassis
+                        ? Text(
+                            'chassReq',
+                            style: TextStyle(color: Colors.red),
+                          ).tr()
+                        : null,
+                  ),
+                ),
             ],
           ),
         ),
       ),
     );
   }
-
 
   List<Widget> seventhLine(AppTheme appTheme) {
     return [
@@ -1551,28 +1492,23 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: appTheme.color,
-            ),
-          ),
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                Text(
-                  'caross',
-                  style: formHintStyle,
-                ).tr(),
-                TextBox(enabled:!widget.readOnly,
+                Text('caross', style: formHintStyle).tr(),
+                TextBox(
+                  enabled: !widget.readOnly,
                   controller: caross,
                   maxLength: 30,
                   placeholder: 'caross'.tr(),
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
                 ),
               ],
             ),
@@ -1584,28 +1520,23 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: appTheme.color,
-            ),
-          ),
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                Text(
-                  'energie',
-                  style: formHintStyle,
-                ).tr(),
-                TextBox(enabled:!widget.readOnly,
+                Text('energie', style: formHintStyle).tr(),
+                TextBox(
+                  enabled: !widget.readOnly,
                   controller: energie,
                   maxLength: 20,
                   placeholder: 'energie'.tr(),
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
                 ),
               ],
             ),
@@ -1617,27 +1548,23 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: appTheme.color,
-            ),
-          ),
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                Text(
-                  'puissance',
-                  style: formHintStyle,
-                ).tr(),
-                TextBox(enabled:!widget.readOnly,
+                Text('puissance', style: formHintStyle).tr(),
+                TextBox(
+                  enabled: !widget.readOnly,
                   placeholder: '0000',
                   controller: puissance,
                   maxLength: 4,
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
 
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 ),
@@ -1651,27 +1578,23 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: appTheme.color,
-            ),
-          ),
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                Text(
-                  'placeassise',
-                  style: formHintStyle,
-                ).tr(),
-                TextBox(enabled:!widget.readOnly,
+                Text('placeassise', style: formHintStyle).tr(),
+                TextBox(
+                  enabled: !widget.readOnly,
                   placeholder: '000',
                   controller: places,
                   maxLength: 3,
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
 
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 ),
@@ -1685,20 +1608,14 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: appTheme.color,
-            ),
-          ),
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                Text(
-                  'poidstotal',
-                  style: formHintStyle,
-                ).tr(),
-                TextBox(enabled:!widget.readOnly,
+                Text('poidstotal', style: formHintStyle).tr(),
+                TextBox(
+                  enabled: !widget.readOnly,
                   placeholder: '000000',
                   controller: poidsT,
                   maxLength: 15,
@@ -1706,8 +1623,9 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
                 ),
               ],
             ),
@@ -1719,27 +1637,22 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: appTheme.color,
-            ),
-          ),
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Row(
               children: [
-                Text(
-                  'lourd?',
-                  style: formHintStyle,
-                ).tr(),
+                Text('lourd?', style: formHintStyle).tr(),
                 const Spacer(),
                 Checkbox(
                   checked: lourd,
-                  onChanged:widget.readOnly?null: (s) {
-                    setState(() {
-                      lourd = s ?? false;
-                    });
-                  },
+                  onChanged: widget.readOnly
+                      ? null
+                      : (s) {
+                          setState(() {
+                            lourd = s ?? false;
+                          });
+                        },
                 ),
               ],
             ),
@@ -1756,20 +1669,14 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: appTheme.color,
-            ),
-          ),
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                Text(
-                  'chargeutil',
-                  style: formHintStyle,
-                ).tr(),
-                TextBox(enabled:!widget.readOnly,
+                Text('chargeutil', style: formHintStyle).tr(),
+                TextBox(
+                  enabled: !widget.readOnly,
                   placeholder: '000000',
                   controller: charg,
                   maxLength: 15,
@@ -1777,8 +1684,9 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
+                  decoration: WidgetStatePropertyAll(
+                    BoxDecoration(color: appTheme.fillColor),
+                  ),
                 ),
               ],
             ),
@@ -1790,30 +1698,26 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: appTheme.color,
-            ),
-          ),
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                Text(
-                  'anneeutil',
-                  style: formHintStyle,
-                ).tr(),
+                Text('anneeutil', style: formHintStyle).tr(),
                 Flexible(
-                    child: DatePicker(
-                  showDay: false,
-                  showMonth: false,
-                  selected: selectedAnnee,
-                  onChanged:widget.readOnly?null: (s) {
-                    setState(() {
-                      selectedAnnee = s;
-                    });
-                  },
-                )),
+                  child: DatePicker(
+                    showDay: false,
+                    showMonth: false,
+                    selected: selectedAnnee,
+                    onChanged: widget.readOnly
+                        ? null
+                        : (s) {
+                            setState(() {
+                              selectedAnnee = s;
+                            });
+                          },
+                  ),
+                ),
               ],
             ),
           ),
@@ -1824,25 +1728,18 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           height: heightFirst,
           padding: EdgeInsets.zero,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: appTheme.color,
-            ),
-          ),
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                Text(
-                  'precmat',
-                  style: formHintStyle,
-                ).tr(),
+                Text('precmat', style: formHintStyle).tr(),
                 Flexible(
-                  child:ListView(
+                  child: ListView(
                     children: [
                       m.Material(
                         color: appTheme.backGroundColor,
-                        child:  ChipTags(
+                        child: ChipTags(
                           list: matriculesPrec,
                           iconColor: appTheme.color.darkest,
                           chipColor: appTheme.color.lightest,
@@ -1854,88 +1751,89 @@ class _VehicleFormState extends State<VehicleForm>
                           ),
                           createTagOnSubmit: true,
                         ),
-                      )
-
+                      ),
                     ],
                   ),
                 ),
-
               ],
             ),
           ),
         ),
       ),
-
     ];
   }
 
-
-  void selectConducteur(AppTheme appTheme) async{
+  void selectConducteur(AppTheme appTheme) async {
     Conducteur? conducteur = await showDialog<Conducteur>(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) {
-          return ContentDialog(
-            constraints: BoxConstraints.tight(
-                Size(700.px, 550.px)),
-            title: const Text('selectchauffeur').tr(),
-            style: ContentDialogThemeData(
-                titleStyle: appTheme.writingStyle
-                    .copyWith(
-                    fontWeight:
-                    FontWeight.bold)),
-            content: const ChauffeurTable(
-              selectD: true,
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return ContentDialog(
+          constraints: BoxConstraints.tight(Size(700.px, 550.px)),
+          title: const Text('selectchauffeur').tr(),
+          style: ContentDialogThemeData(
+            titleStyle: appTheme.writingStyle.copyWith(
+              fontWeight: FontWeight.bold,
             ),
-            actions: [Button(child: const Text('fermer').tr(),
-                onPressed: (){
-                  Navigator.of(context).pop();
-                })],
-          );
-        });
-    if(conducteur!=null){
-      selectedAppartenanceEmploye.text=VehiclesUtilities.getAppartenance(conducteur.filliale);
-      adresse.text=conducteur.adresse??'';
-      fname.text=conducteur.prenom;
-      matempl.text=conducteur.matricule;
-      lname.text=conducteur.name;
-      service=conducteur.service;
-      profession.text=conducteur.profession??'';
-      setState(() {
-
-      });
-
+          ),
+          content: const ChauffeurTable(selectD: true),
+          actions: [
+            Button(
+              child: const Text('fermer').tr(),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+    if (conducteur != null) {
+      selectedAppartenanceEmploye.text = VehiclesUtilities.getAppartenance(
+        conducteur.filliale,
+      );
+      adresse.text = conducteur.adresse ?? '';
+      fname.text = conducteur.prenom;
+      matempl.text = conducteur.matricule;
+      lname.text = conducteur.name;
+      service = conducteur.service;
+      profession.text = conducteur.profession ?? '';
+      setState(() {});
     }
   }
-
 
   void updateOverMatricule(AppTheme appTheme) {
     if (!autreMat) {
       if (matr3.text.isNotEmpty) {
         wilaya = matr3.text;
         wilayaCont.text = AlgeriaList().getWilayaByNum(matr3.text) ?? '';
-        dairaCont.text = AlgeriaList()
+        dairaCont.text =
+            AlgeriaList()
                 .getDairas(wilayaCont.text)
                 .firstOrNull
                 ?.getDairaName(
-                    appTheme.locale?.languageCode.toUpperCase() == "AR"
-                        ? Language.AR
-                        : Language.FR) ??
+                  appTheme.locale?.languageCode.toUpperCase() == "AR"
+                      ? Language.AR
+                      : Language.FR,
+                ) ??
             '';
-        communeCont.text = AlgeriaList()
+        communeCont.text =
+            AlgeriaList()
                 .getCommune(wilayaCont.text)
                 .firstOrNull
                 ?.getDairaName(
-                    appTheme.locale?.languageCode.toUpperCase() == "AR"
-                        ? Language.AR
-                        : Language.FR) ??
+                  appTheme.locale?.languageCode.toUpperCase() == "AR"
+                      ? Language.AR
+                      : Language.FR,
+                ) ??
             '';
         setState(() {});
       }
       if (matr2.text.isNotEmpty) {
         genre = (int.tryParse(matr2.text) ?? 100) ~/ 100;
         selectedAnnee = DateTime(
-            VehiclesUtilities.getAnneeFromMatricule('0000-${matr2.text}-00'));
+          VehiclesUtilities.getAnneeFromMatricule('0000-${matr2.text}-00'),
+        );
         setState(() {});
       }
     }
@@ -1944,7 +1842,7 @@ class _VehicleFormState extends State<VehicleForm>
   String? documentID;
   bool uploading = false;
   bool errorUploading = false;
-  bool errorChassis=false;
+  bool errorChassis = false;
   void confirmAndUpload() async {
     if (autreMat) {
       if (matriculeEtr.text.isEmpty || matriculeEtr.text.length < 4) {
@@ -1977,17 +1875,15 @@ class _VehicleFormState extends State<VehicleForm>
         }
       }
     }
-    if(numSer.text.trim().isEmpty){
-      errorChassis=true;
-      if(!errorChassis){
-        setState(() {
-        });
+    if (numSer.text.trim().isEmpty) {
+      errorChassis = true;
+      if (!errorChassis) {
+        setState(() {});
       }
-    }
-    else{
-      if(errorChassis){
+    } else {
+      if (errorChassis) {
         setState(() {
-          errorChassis=false;
+          errorChassis = false;
         });
       }
     }
@@ -2028,13 +1924,22 @@ class _VehicleFormState extends State<VehicleForm>
         charegeUtile: int.tryParse(charg.text),
         createdBy: DatabaseGetter.me.value?.id,
         lourd: lourd,
-        direction:
-            selectedDirection.text.toUpperCase().replaceAll(' ', '').trim(),
-        appartenance:
-            selectedAppartenance.text.toUpperCase().replaceAll(' ', '').trim(),
+        direction: selectedDirection.text
+            .toUpperCase()
+            .replaceAll(' ', '')
+            .trim(),
+        appartenance: selectedAppartenance.text
+            .toUpperCase()
+            .replaceAll(' ', '')
+            .trim(),
         filliale: selectedFiliale.text.toUpperCase().replaceAll(' ', '').trim(),
-        departement: selectedDepartment.text.toUpperCase().replaceAll(' ', '').trim(),
-        appartenanceconducteur: selectedAppartenanceEmploye.text.toUpperCase().replaceAll(' ', '')
+        departement: selectedDepartment.text
+            .toUpperCase()
+            .replaceAll(' ', '')
+            .trim(),
+        appartenanceconducteur: selectedAppartenanceEmploye.text
+            .toUpperCase()
+            .replaceAll(' ', '')
             .trim(),
         service: service,
         matriculeConducteur: matempl.text,
@@ -2111,11 +2016,17 @@ class _VehicleFormState extends State<VehicleForm>
 
   Future<void> uploadActivity(bool update, Vehicle vehicle) async {
     if (update) {
-      await DatabaseGetter()
-          .ajoutActivity(1, vehicle.id, docName: vehicle.matricule);
+      await DatabaseGetter().ajoutActivity(
+        1,
+        vehicle.id,
+        docName: vehicle.matricule,
+      );
     } else {
-      await DatabaseGetter()
-          .ajoutActivity(0, vehicle.id, docName: vehicle.matricule);
+      await DatabaseGetter().ajoutActivity(
+        0,
+        vehicle.id,
+        docName: vehicle.matricule,
+      );
     }
   }
 

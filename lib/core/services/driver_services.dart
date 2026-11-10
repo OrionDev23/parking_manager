@@ -46,10 +46,7 @@ class DriverServices {
       idFactory: () => 'desktop_${DateTime.now().microsecondsSinceEpoch}',
     );
     final syncQueue = SqliteSyncQueue(localDatabase);
-    final localSource = SqliteDriverSource(
-      localDatabase,
-      companyId: companyId,
-    );
+    final localSource = SqliteDriverSource(localDatabase, companyId: companyId);
     final backend = AppwriteBackend(
       BackendConfig(
         type: BackendType.appwrite,
@@ -115,10 +112,8 @@ class DriverServices {
   /// mutations that have not yet been acknowledged by Appwrite.
   Future<int> pullRemoteChanges() async {
     final startedAt = DateTime.now().toUtc();
-    final cursor = localDatabase.readSyncCursor(
-          companyId: companyId,
-          entity: 'driver',
-        ) ??
+    final cursor =
+        localDatabase.readSyncCursor(companyId: companyId, entity: 'driver') ??
         DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
     final since = cursor.subtract(const Duration(seconds: 5));
     var offset = 0;
@@ -189,7 +184,9 @@ class DriverServices {
     final secondScan = await scanRemoteIds();
     if (firstScan.length != secondScan.length ||
         !firstScan.containsAll(secondScan)) {
-      debugPrint('[ParcOto Sync] driver reconciliation deferred: unstable snapshot');
+      debugPrint(
+        '[ParcOto Sync] driver reconciliation deferred: unstable snapshot',
+      );
       return 0;
     }
 

@@ -98,10 +98,10 @@ class VehicleDashboard extends StatelessWidget {
           final moduleColumns = constraints.maxWidth >= 1400
               ? 4
               : constraints.maxWidth >= 1000
-                  ? 3
-                  : constraints.maxWidth >= 620
-                      ? 2
-                      : 1;
+              ? 3
+              : constraints.maxWidth >= 620
+              ? 2
+              : 1;
 
           final moduleActions = <ButtonContainer>[
             ButtonContainer(
@@ -294,11 +294,26 @@ class VehicleDashboard extends StatelessWidget {
                     title: 'vstates'.tr(),
                     child: ParcOtoPie(
                       labels: [
-                        MapEntry('gstate', DatabaseCounters().countVehicles(etat: 0)),
-                        MapEntry('bstate', DatabaseCounters().countVehicles(etat: 1)),
-                        MapEntry('rstate', DatabaseCounters().countVehicles(etat: 2)),
-                        MapEntry('ostate', DatabaseCounters().countVehicles(etat: 3)),
-                        MapEntry('restate', DatabaseCounters().countVehicles(etat: 4)),
+                        MapEntry(
+                          'gstate',
+                          DatabaseCounters().countVehicles(etat: 0),
+                        ),
+                        MapEntry(
+                          'bstate',
+                          DatabaseCounters().countVehicles(etat: 1),
+                        ),
+                        MapEntry(
+                          'rstate',
+                          DatabaseCounters().countVehicles(etat: 2),
+                        ),
+                        MapEntry(
+                          'ostate',
+                          DatabaseCounters().countVehicles(etat: 3),
+                        ),
+                        MapEntry(
+                          'restate',
+                          DatabaseCounters().countVehicles(etat: 4),
+                        ),
                       ],
                     ),
                   ),
@@ -316,10 +331,7 @@ class _VehicleDashboardPanel extends StatelessWidget {
   final String title;
   final Widget child;
 
-  const _VehicleDashboardPanel({
-    required this.title,
-    required this.child,
-  });
+  const _VehicleDashboardPanel({required this.title, required this.child});
 
   @override
   Widget build(BuildContext context) {

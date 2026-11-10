@@ -5,11 +5,7 @@ import '../../serializables/activity.dart';
 import '../parcoto_webservice.dart';
 
 class LogWebService extends ParcOtoWebService<Activity> {
-  LogWebService(
-      super.data,
-      super.collectionID,
-      super.columnForSearch,
-      );
+  LogWebService(super.data, super.collectionID, super.columnForSearch);
 
   @override
   Activity fromJsonFunction(Map<String, dynamic> json) {
@@ -26,26 +22,26 @@ class LogWebService extends ParcOtoWebService<Activity> {
   getComparisonFunction(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
-    //type
+      //type
       case 0:
         return (d1, d2) =>
-        coef *
+            coef *
             DatabaseGetter()
                 .getActivityType(d1.value.type)
                 .compareTo(DatabaseGetter().getActivityType(d2.value.type));
-    //vehicle
+      //vehicle
       case 1:
         return (d1, d2) {
           return coef *
               (d1.value.docName ?? '').compareTo(d2.value.docName ?? '');
         };
-    //date modif
+      //date modif
       case 2:
         return (d1, d2) =>
-        coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
+            coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
       case 3:
         return (d1, d2) =>
-        coef *
+            coef *
             (d1.value.personName ?? '').compareTo(d2.value.personName ?? '');
     }
 
@@ -53,13 +49,21 @@ class LogWebService extends ParcOtoWebService<Activity> {
   }
 
   @override
-  List<String> getFilterQueries(Map<String, String> filters, int count,
-      int startingAt, int sortedBy, bool sortedAsc,
-      {int? index}) {
+  List<String> getFilterQueries(
+    Map<String, String> filters,
+    int count,
+    int startingAt,
+    int sortedBy,
+    bool sortedAsc, {
+    int? index,
+  }) {
     return [
       if (filters.containsKey('datemin') || filters.containsKey('datemax'))
-        Query.between(r'$createdAt', filters['datemin']??DateTime(2000).toIso8601String(),
-            filters['datemax']??DateTime(2400).toIso8601String()),
+        Query.between(
+          r'$createdAt',
+          filters['datemin'] ?? DateTime(2000).toIso8601String(),
+          filters['datemax'] ?? DateTime(2400).toIso8601String(),
+        ),
       if (filters.containsKey('createdBy'))
         Query.equal('createdBy', filters['createdBy']),
       if (filters.containsKey('type'))
@@ -73,8 +77,8 @@ class LogWebService extends ParcOtoWebService<Activity> {
     ];
   }
 
-  List<int> getTypeList(Map<String, String> filters){
-    if(filters.containsKey('typelist')){
+  List<int> getTypeList(Map<String, String> filters) {
+    if (filters.containsKey('typelist')) {
       return filters['typelist']!.split(',').map((e) => int.parse(e)).toList();
     }
     return [];

@@ -19,24 +19,23 @@ class Etat extends ParcOtoDefault {
   @JsonKey(toJson: dateToIntJson, fromJson: dateFromIntJson)
   DateTime? date;
 
-  Etat(
-      {required super.id,
-      super.createdAt,
-      super.updatedAt,
-      required this.type,
-      this.valeur,
-      this.remarque,
-      this.createdBy,
-      required this.vehicle,
-      this.date,
-      this.ordreID,
-      this.ordreNum,
-      required this.vehicleMat});
+  Etat({
+    required super.id,
+    super.createdAt,
+    super.updatedAt,
+    required this.type,
+    this.valeur,
+    this.remarque,
+    this.createdBy,
+    required this.vehicle,
+    this.date,
+    this.ordreID,
+    this.ordreNum,
+    required this.vehicleMat,
+  });
 
   factory Etat.fromJson(Map<String, dynamic> json) => _$EtatFromJson(json);
 
   @override
   Map<String, dynamic> toJson() => _$EtatToJson(this);
-
-
 }

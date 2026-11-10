@@ -27,7 +27,7 @@ class VehicleStateWebservice extends ParcOtoWebService<Etat> {
 
   @override
   int Function(MapEntry<String, Etat> p1, MapEntry<String, Etat> p2)?
-      getComparisonFunction(int column, bool ascending) {
+  getComparisonFunction(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
       case 0:
@@ -39,8 +39,9 @@ class VehicleStateWebservice extends ParcOtoWebService<Etat> {
       case 2:
         return (d1, d2) =>
             coef *
-            (d1.value.date ?? d1.value.createdAt!)
-                .compareTo(d2.value.date ?? d1.value.createdAt!);
+            (d1.value.date ?? d1.value.createdAt!).compareTo(
+              d2.value.date ?? d1.value.createdAt!,
+            );
       case 3:
         return (d1, d2) =>
             coef * (d1.value.remarque ?? '').compareTo(d2.value.remarque ?? '');
@@ -98,9 +99,14 @@ class VehicleStateWebservice extends ParcOtoWebService<Etat> {
   }
 
   @override
-  List<String> getFilterQueries(Map<String, String> filters, int count,
-      int startingAt, int sortedBy, bool sortedAsc,
-      {int? index}) {
+  List<String> getFilterQueries(
+    Map<String, String> filters,
+    int count,
+    int startingAt,
+    int sortedBy,
+    bool sortedAsc, {
+    int? index,
+  }) {
     return [
       if (filters.containsKey('type'))
         Query.equal('type', int.tryParse(filters['type']!)),

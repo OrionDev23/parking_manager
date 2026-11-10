@@ -25,7 +25,9 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
       queries: [Query.equal('companyId', companyId), Query.limit(500)],
     );
     return result.rows
-        .map((row) => _teamFromMap(Map<String, dynamic>.from(row.data), row.$id))
+        .map(
+          (row) => _teamFromMap(Map<String, dynamic>.from(row.data), row.$id),
+        )
         .toList(growable: false);
   }
 
@@ -115,7 +117,9 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
       final client = DatabaseGetter.client;
       if (client != null) {
         final teams = await Teams(client).list();
-        final names = teams.teams.map((team) => team.name.toLowerCase()).toSet();
+        final names = teams.teams
+            .map((team) => team.name.toLowerCase())
+            .toSet();
 
         if (names.contains('admins')) {
           return UserAccess(
@@ -207,12 +211,12 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
   }
 
   Map<String, dynamic> _teamToMap(AccessTeam team) => {
-        'companyId': team.companyId,
-        'name': team.name,
-        'description': team.description,
-        'permissions': team.permissions.toList(),
-        'isSystem': team.isSystem,
-      };
+    'companyId': team.companyId,
+    'name': team.name,
+    'description': team.description,
+    'permissions': team.permissions.toList(),
+    'isSystem': team.isSystem,
+  };
 
   UserAccess _userAccessFromMap(Map<String, dynamic> data, String id) {
     return UserAccess(
@@ -225,12 +229,12 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
   }
 
   Map<String, dynamic> _userAccessToMap(UserAccess access) => {
-        'companyId': access.companyId,
-        'userId': access.userId,
-        'teamIds': access.teamIds.toList(),
-        'grantedPermissions': access.grantedPermissions.toList(),
-        'deniedPermissions': access.deniedPermissions.toList(),
-      };
+    'companyId': access.companyId,
+    'userId': access.userId,
+    'teamIds': access.teamIds.toList(),
+    'grantedPermissions': access.grantedPermissions.toList(),
+    'deniedPermissions': access.deniedPermissions.toList(),
+  };
 
   Set<String> _stringSet(dynamic value) {
     if (value is List) {

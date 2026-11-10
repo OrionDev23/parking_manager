@@ -32,7 +32,10 @@ class StateTableState extends State<StateTable> {
   @override
   void initState() {
     vehicleStateDatasource = VStatesDatasource(
-        current: context, collectionID: etatId, selectC: widget.selectD);
+      current: context,
+      collectionID: etatId,
+      selectC: widget.selectD,
+    );
     initColumns();
     super.initState();
   }
@@ -44,10 +47,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'vehicule',
-            style: tstyle,
-          ).tr(),
+          child: Text('vehicule', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -61,10 +61,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'etat',
-            style: tstyle,
-          ).tr(),
+          child: Text('etat', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
@@ -78,10 +75,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'date',
-            style: tstyle,
-          ).tr(),
+          child: Text('date', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -95,10 +89,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'notes',
-            style: tstyle,
-          ).tr(),
+          child: Text('notes', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -112,10 +103,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'reparation',
-            style: tstyle,
-          ).tr(),
+          child: Text('reparation', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
@@ -129,10 +117,7 @@ class StateTableState extends State<StateTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'dateModif',
-            style: tstyle,
-          ).tr(),
+          child: Text('dateModif', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -185,75 +170,79 @@ class StateTableState extends State<StateTable> {
                     child: FlyoutTarget(
                       controller: filterFlyout,
                       child: IconButton(
-                          icon: Row(
-                            children: [
-                              Text(
-                                'filter',
-                                style: TextStyle(fontSize: 12.sp),
-                              ).tr(),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              filtered
-                                  ? Icon(
-                                      FluentIcons.filter_solid,
-                                      color: appTheme.color,
-                                    )
-                                  : const Icon(FluentIcons.filter),
-                            ],
-                          ),
-                          onPressed: () {
-                            filterFlyout.showFlyout(builder: (context) {
+                        icon: Row(
+                          children: [
+                            Text(
+                              'filter',
+                              style: TextStyle(fontSize: 12.sp),
+                            ).tr(),
+                            const SizedBox(width: 5),
+                            filtered
+                                ? Icon(
+                                    FluentIcons.filter_solid,
+                                    color: appTheme.color,
+                                  )
+                                : const Icon(FluentIcons.filter),
+                          ],
+                        ),
+                        onPressed: () {
+                          filterFlyout.showFlyout(
+                            builder: (context) {
                               return FlyoutContent(
-                                  color: appTheme.backGroundColor,
-                                  child: filterBuilder(appTheme));
-                            });
-                          }),
+                                color: appTheme.backGroundColor,
+                                child: filterBuilder(appTheme),
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ),
                   if (filtered)
                     Positioned(
-                        bottom: 10,
-                        right: 0,
-                        child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 2, horizontal: 4),
-                            decoration: BoxDecoration(
-                              color: appTheme.color,
-                              borderRadius: BorderRadius.circular(5),
-                              boxShadow: kElevationToShadow[2],
-                            ),
-                            child: Text(
-                              '${filters.length}',
-                              style: TextStyle(fontSize: 10.sp),
-                            ))),
+                      bottom: 10,
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 2,
+                          horizontal: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: appTheme.color,
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: kElevationToShadow[2],
+                        ),
+                        child: Text(
+                          '${filters.length}',
+                          style: TextStyle(fontSize: 10.sp),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
-            const SizedBox(
-              width: 10,
-            ),
+            const SizedBox(width: 10),
             SizedBox(
               width: 350.px,
               height: 45.px,
               child: TextBox(
-                onChanged: (s){
-                  if(s.isEmpty){
-                    notEmpty=false;
+                onChanged: (s) {
+                  if (s.isEmpty) {
+                    notEmpty = false;
                     vehicleStateDatasource.search('');
+                  } else {
+                    notEmpty = true;
                   }
-                  else{
-                    notEmpty=true;
-                  }
-                  setState(() {
-                  });
+                  setState(() {});
                 },
                 controller: searchController,
                 placeholder: 'search'.tr(),
                 style: appTheme.writingStyle,
                 cursorColor: appTheme.color.darker,
                 placeholderStyle: placeStyle,
-                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                decoration: WidgetStatePropertyAll(
+                  BoxDecoration(color: appTheme.fillColor),
+                ),
                 onSubmitted: (s) {
                   if (s.isNotEmpty) {
                     vehicleStateDatasource.search(s);
@@ -278,7 +267,8 @@ class StateTableState extends State<StateTable> {
                           notEmpty = false;
                           setState(() {});
                           vehicleStateDatasource.search('');
-                        })
+                        },
+                      )
                     : null,
               ),
             ),
@@ -294,180 +284,191 @@ class StateTableState extends State<StateTable> {
   }
 
   Widget filterBuilder(AppTheme appTheme) {
-    return StatefulBuilder(builder: (context, setS) {
-      return SizedBox(
-        width: 30.w,
-        height: 49.h,
-        child: Column(
-          children: [
-            ListTile(
-              contentPadding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
-              leading: Row(
-                children: [
-                  Icon(FluentIcons.category_classification,
-                      color: appTheme.color.lightest),
-                  bigSpace,
-                  Text('chstates',
-                          style:
-                              placeStyle.copyWith(fontWeight: FontWeight.bold))
-                      .tr(),
-                ],
-              ),
-              title: ComboBox<int>(
-                items: List.generate(
+    return StatefulBuilder(
+      builder: (context, setS) {
+        return SizedBox(
+          width: 30.w,
+          height: 49.h,
+          child: Column(
+            children: [
+              ListTile(
+                contentPadding: const EdgeInsets.fromLTRB(5, 2, 5, 2),
+                leading: Row(
+                  children: [
+                    Icon(
+                      FluentIcons.category_classification,
+                      color: appTheme.color.lightest,
+                    ),
+                    bigSpace,
+                    Text(
+                      'chstates',
+                      style: placeStyle.copyWith(fontWeight: FontWeight.bold),
+                    ).tr(),
+                  ],
+                ),
+                title: ComboBox<int>(
+                  items: List.generate(
                     5,
                     (index) => ComboBoxItem<int>(
-                          value: index,
-                          child:
-                              Text(VehiclesUtilities.getEtatName(index)).tr(),
-                        )),
-                value: type,
-                onChanged: (s) {
-                  setState(() {
-                    type = s ?? 0;
-                  });
-                  setS(() {});
-                },
+                      value: index,
+                      child: Text(VehiclesUtilities.getEtatName(index)).tr(),
+                    ),
+                  ),
+                  value: type,
+                  onChanged: (s) {
+                    setState(() {
+                      type = s ?? 0;
+                    });
+                    setS(() {});
+                  },
+                ),
+                trailing: type != null
+                    ? IconButton(
+                        icon: const Icon(FluentIcons.cancel),
+                        onPressed: () {
+                          setState(() {
+                            type = null;
+                          });
+                          setS(() {});
+                        },
+                      )
+                    : null,
               ),
-              trailing: type != null
-                  ? IconButton(
-                      icon: const Icon(FluentIcons.cancel),
-                      onPressed: () {
-                        setState(() {
-                          type = null;
-                        });
-                        setS(() {});
-                      })
-                  : null,
-            ),
-            smallSpace,
-            Flexible(
-              child: ZoneBox(
-                label: 'dateexp'.tr(),
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          SizedBox(width: 5.w, child: const Text('min').tr()),
-                          smallSpace,
-                          smallSpace,
-                          Flexible(
-                            child: DatePicker(
-                              selected: dateMin,
-                              endDate: dateMax,
-                              onChanged: (d) {
-                                dateMin = d;
-                                setState(() {});
-                                setS(() {});
-                              },
+              smallSpace,
+              Flexible(
+                child: ZoneBox(
+                  label: 'dateexp'.tr(),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            SizedBox(width: 5.w, child: const Text('min').tr()),
+                            smallSpace,
+                            smallSpace,
+                            Flexible(
+                              child: DatePicker(
+                                selected: dateMin,
+                                endDate: dateMax,
+                                onChanged: (d) {
+                                  dateMin = d;
+                                  setState(() {});
+                                  setS(() {});
+                                },
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      smallSpace,
-                      Row(
-                        children: [
-                          SizedBox(width: 5.w, child: const Text('max').tr()),
-                          smallSpace,
-                          smallSpace,
-                          Flexible(
-                            child: DatePicker(
-                              selected: dateMax,
-                              startDate: dateMin,
-                              onChanged: (d) {
-                                dateMax = d;
-                                setState(() {});
-                                setS(() {});
-                              },
+                          ],
+                        ),
+                        smallSpace,
+                        Row(
+                          children: [
+                            SizedBox(width: 5.w, child: const Text('max').tr()),
+                            smallSpace,
+                            smallSpace,
+                            Flexible(
+                              child: DatePicker(
+                                selected: dateMax,
+                                startDate: dateMin,
+                                onChanged: (d) {
+                                  dateMax = d;
+                                  setState(() {});
+                                  setS(() {});
+                                },
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            smallSpace,
-            Flexible(
-              child: ZoneBox(
-                label: 'vehicule'.tr(),
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: ListTile(
-                    title: Text(selectedVehicle?.matricule ?? '/'),
-                    onPressed: () async {
-                      selectedVehicle = await showDialog<Vehicle>(
+              smallSpace,
+              Flexible(
+                child: ZoneBox(
+                  label: 'vehicule'.tr(),
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: ListTile(
+                      title: Text(selectedVehicle?.matricule ?? '/'),
+                      onPressed: () async {
+                        selectedVehicle = await showDialog<Vehicle>(
                           context: context,
                           barrierDismissible: true,
                           builder: (context) {
                             return ContentDialog(
                               constraints: BoxConstraints.tight(
-                                  Size(700.px, 550.px)),
+                                Size(700.px, 550.px),
+                              ),
                               title: const Text('selectvehicle').tr(),
                               style: ContentDialogThemeData(
-                                  titleStyle: appTheme.writingStyle
-                                      .copyWith(
-                                      fontWeight:
-                                      FontWeight.bold)),
-                              content: const VehicleTable(
-                                selectV: true,
+                                titleStyle: appTheme.writingStyle.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              actions: [Button(child: const Text('fermer').tr(),
-                                  onPressed: (){
+                              content: const VehicleTable(selectV: true),
+                              actions: [
+                                Button(
+                                  child: const Text('fermer').tr(),
+                                  onPressed: () {
                                     Navigator.of(context).pop();
-                                  })],
+                                  },
+                                ),
+                              ],
                             );
-                          });
-                      setState(() {});
-                      setS(() {});
-                    },
+                          },
+                        );
+                        setState(() {});
+                        setS(() {});
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
-            smallSpace,
-            smallSpace,
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  FilledButton(
-                    style: ButtonStyle(
-                      backgroundColor:
-                      WidgetStatePropertyAll<Color>(appTheme.color.lightest),
+              smallSpace,
+              smallSpace,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    FilledButton(
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStatePropertyAll<Color>(
+                          appTheme.color.lightest,
+                        ),
+                      ),
+                      onPressed: filtered
+                          ? () {
+                              Navigator.of(context).pop();
+                              setState(() {
+                                type = null;
+                                dateMax = null;
+                                dateMin = null;
+                                selectedVehicle = null;
+                                filtered = false;
+                                filters.clear();
+                              });
+                              vehicleStateDatasource.filter(filters);
+                            }
+                          : null,
+                      child: const Text('clear').tr(),
                     ),
-                    onPressed: filtered
-                        ? () {
-                            Navigator.of(context).pop();
-                            setState(() {
-                              type = null;
-                              dateMax = null;
-                              dateMin = null;
-                              selectedVehicle = null;
-                              filtered = false;
-                              filters.clear();
-                            });
-                            vehicleStateDatasource.filter(filters);
-                          }
-                        : null,
-                    child: const Text('clear').tr(),
-                  ),
-                  const Spacer(),
-                  Button(
+                    const Spacer(),
+                    Button(
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: const Text('annuler').tr()),
-                  smallSpace,
-                  smallSpace,
-                  FilledButton(
+                      child: const Text('annuler').tr(),
+                    ),
+                    smallSpace,
+                    smallSpace,
+                    FilledButton(
                       style: ButtonStyle(
-                        backgroundColor:
-                        WidgetStatePropertyAll<Color>(appTheme.color.lighter),
+                        backgroundColor: WidgetStatePropertyAll<Color>(
+                          appTheme.color.lighter,
+                        ),
                       ),
                       child: const Text('confirmer').tr(),
                       onPressed: () {
@@ -502,14 +503,16 @@ class StateTableState extends State<StateTable> {
                         filtered = true;
                         setState(() {});
                         vehicleStateDatasource.filter(filters);
-                      }),
-                ],
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      );
-    });
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override

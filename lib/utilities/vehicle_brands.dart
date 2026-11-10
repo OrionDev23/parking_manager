@@ -1,5 +1,4 @@
-List<String> vehiculeBrands=[
-
+List<String> vehiculeBrands = [
   'nonind',
   "Toyota",
   "Peugeot",
@@ -72,5 +71,4 @@ List<String> vehiculeBrands=[
   "Kawasaki",
   "MV Agusta",
   "Renault Trucks",
-  
 ];

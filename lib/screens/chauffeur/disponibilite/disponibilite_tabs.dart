@@ -17,13 +17,15 @@ class DisponbiliteTabsState extends State<DisponbiliteTabs> {
   void initState() {
     currentIndex.value = 0;
     if (tabs.isEmpty) {
-      tabs.add(Tab(
-        text: Text('disponibilite'.tr()),
-        closeIcon: null,
-        icon: const Icon(FluentIcons.settings),
-        body: const DisponibiliteGestion(),
-        onClosed: null,
-      ));
+      tabs.add(
+        Tab(
+          text: Text('disponibilite'.tr()),
+          closeIcon: null,
+          icon: const Icon(FluentIcons.settings),
+          body: const DisponibiliteGestion(),
+          onClosed: null,
+        ),
+      );
     }
     super.initState();
   }
@@ -31,32 +33,33 @@ class DisponbiliteTabsState extends State<DisponbiliteTabs> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: currentIndex,
-        builder: (context, value, _) {
-          return TabView(
-            tabs: tabs,
-            currentIndex: value,
-            onChanged: (index) => currentIndex.value = index,
-            tabWidthBehavior: TabWidthBehavior.equal,
-            closeButtonVisibility: CloseButtonVisibilityMode.always,
-            showScrollButtons: true,
-            onNewPressed: null,
-            onReorder: (oldIndex, newIndex) {
-              setState(() {
-                if (oldIndex < newIndex) {
-                  newIndex -= 1;
-                }
-                final item = tabs.removeAt(oldIndex);
-                tabs.insert(newIndex, item);
+      valueListenable: currentIndex,
+      builder: (context, value, _) {
+        return TabView(
+          tabs: tabs,
+          currentIndex: value,
+          onChanged: (index) => currentIndex.value = index,
+          tabWidthBehavior: TabWidthBehavior.equal,
+          closeButtonVisibility: CloseButtonVisibilityMode.always,
+          showScrollButtons: true,
+          onNewPressed: null,
+          onReorder: (oldIndex, newIndex) {
+            setState(() {
+              if (oldIndex < newIndex) {
+                newIndex -= 1;
+              }
+              final item = tabs.removeAt(oldIndex);
+              tabs.insert(newIndex, item);
 
-                if (currentIndex.value == newIndex) {
-                  currentIndex.value = oldIndex;
-                } else if (currentIndex.value == oldIndex) {
-                  currentIndex.value = newIndex;
-                }
-              });
-            },
-          );
-        });
+              if (currentIndex.value == newIndex) {
+                currentIndex.value = oldIndex;
+              } else if (currentIndex.value == oldIndex) {
+                currentIndex.value = newIndex;
+              }
+            });
+          },
+        );
+      },
+    );
   }
 }

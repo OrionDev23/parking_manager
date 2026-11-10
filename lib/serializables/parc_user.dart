@@ -28,6 +28,4 @@ class ParcUser extends ParcOtoDefault {
 
   @override
   Map<String, dynamic> toJson() => _$ParcUserToJson(this);
-
-
 }

@@ -1,4 +1,5 @@
 enum SyncOperationType { create, update, delete }
+
 enum SyncOperationStatus { pending, processing, completed, failed, conflict }
 
 class SyncOperation {

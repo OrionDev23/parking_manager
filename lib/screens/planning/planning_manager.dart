@@ -44,7 +44,8 @@ class _PlanningManagerState extends State<PlanningManager> {
               text: 'delete'.tr(),
               showBottom: false,
               showCounter: false,
-              action: selectedPlanning != null &&
+              action:
+                  selectedPlanning != null &&
                       (selectedPlanning!.createdBy ==
                               DatabaseGetter.me.value!.id ||
                           DatabaseGetter().isAdmin())
@@ -53,44 +54,49 @@ class _PlanningManagerState extends State<PlanningManager> {
             ),
             smallSpace,
             ButtonContainer(
-                icon: f.FluentIcons.add,
-                text: 'add'.tr(),
-                showBottom: false,
-                showCounter: false,
-                action: showPlanningCreation),
+              icon: f.FluentIcons.add,
+              text: 'add'.tr(),
+              showBottom: false,
+              showCounter: false,
+              action: showPlanningCreation,
+            ),
           ],
         ),
       ),
-      content: Row(children: <Widget>[
-        Expanded(
+      content: Row(
+        children: <Widget>[
+          Expanded(
             child: Scrollbar(
-                thumbVisibility: true,
+              thumbVisibility: true,
+              controller: _controller,
+              child: ListView(
                 controller: _controller,
-                child: ListView(
-                  controller: _controller,
-                  children: <Widget>[
-                    Container(
-                      color: appTheme.backGroundColor,
-                      height: 500.px,
-                      child: PlanningCalendar(
-                        controller: controller,
-                        datasource: datasource,
-                        toDo: (s) {
-                          setState(() {
-                            selectedDate = s.date;
-                            if (s.appointments != null &&
-                                s.appointments!.isNotEmpty) {
-                              selectedPlanning = s.appointments!.first;
-                            } else {
-                              selectedPlanning = null;
-                            }
-                          });
-                        },
-                      ),
-                    )
-                  ],
-                )))
-      ]),
+                children: <Widget>[
+                  Container(
+                    color: appTheme.backGroundColor,
+                    height: 500.px,
+                    child: PlanningCalendar(
+                      controller: controller,
+                      datasource: datasource,
+                      toDo: (s) {
+                        setState(() {
+                          selectedDate = s.date;
+                          if (s.appointments != null &&
+                              s.appointments!.isNotEmpty) {
+                            selectedPlanning = s.appointments!.first;
+                          } else {
+                            selectedPlanning = null;
+                          }
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -98,31 +104,34 @@ class _PlanningManagerState extends State<PlanningManager> {
     if (selectedPlanning != null) {
       DatabaseGetter.database!
           .deleteRow(
-              databaseId: databaseId,
-              tableId: planningID,
-              rowId: selectedPlanning!.id)
+            databaseId: databaseId,
+            tableId: planningID,
+            rowId: selectedPlanning!.id,
+          )
           .then((value) {
-        datasource.appointments?.remove(selectedPlanning);
-        datasource.notifyListeners(
-            CalendarDataSourceAction.remove, [selectedPlanning]);
-        selectedPlanning = null;
-      });
+            datasource.appointments?.remove(selectedPlanning);
+            datasource.notifyListeners(CalendarDataSourceAction.remove, [
+              selectedPlanning,
+            ]);
+            selectedPlanning = null;
+          });
     }
   }
 
   void showPlanningCreation() {
     f.showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (c) {
-          return f.ContentDialog(
-            title: const Text("createevent").tr(),
-            constraints: BoxConstraints.loose(f.Size(800.px, 500.px)),
-            content: AppointmentForm(
-              startDate: selectedDate,
-              datasource: datasource,
-            ),
-          );
-        });
+      context: context,
+      barrierDismissible: true,
+      builder: (c) {
+        return f.ContentDialog(
+          title: const Text("createevent").tr(),
+          constraints: BoxConstraints.loose(f.Size(800.px, 500.px)),
+          content: AppointmentForm(
+            startDate: selectedDate,
+            datasource: datasource,
+          ),
+        );
+      },
+    );
   }
 }

@@ -1,9 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+
 import '../../../../admin_parameters.dart';
 import '../reparation_order_form/reparation_form.dart';
 import '../reparation_order_gts_form/reparation_form_gts.dart';
 import 'reparation_gestion.dart';
+
 class ReparationTabs extends StatefulWidget {
   final bool archive;
 
@@ -26,9 +28,9 @@ class ReparationTabsState extends State<ReparationTabs> {
       text: Text('nouvrepar'.tr()),
       semanticLabel: 'nouvrepar'.tr(),
       icon: const Icon(FluentIcons.shop),
-      body: gts?ReparationFormGts(key: UniqueKey(),):ReparationForm(
-        key: UniqueKey(),
-      ),
+      body: gts
+          ? ReparationFormGts(key: UniqueKey())
+          : ReparationForm(key: UniqueKey()),
       onClosed: () {
         if (widget.archive) {
           tabs2.remove(tab);
@@ -48,28 +50,28 @@ class ReparationTabsState extends State<ReparationTabs> {
     if (widget.archive) {
       currentIndex2.value = 0;
       if (tabs2.isEmpty) {
-        tabs2.add(Tab(
-          text: Text('reparations'.tr()),
-          closeIcon: null,
-          icon: const Icon(FluentIcons.settings),
-          body: ReparationGestion(
-            archive: widget.archive,
+        tabs2.add(
+          Tab(
+            text: Text('reparations'.tr()),
+            closeIcon: null,
+            icon: const Icon(FluentIcons.settings),
+            body: ReparationGestion(archive: widget.archive),
+            onClosed: null,
           ),
-          onClosed: null,
-        ));
+        );
       }
     } else {
       currentIndex.value = 0;
       if (tabs.isEmpty) {
-        tabs.add(Tab(
-          text: Text('reparations'.tr()),
-          closeIcon: null,
-          icon: const Icon(FluentIcons.settings),
-          body: ReparationGestion(
-            archive: widget.archive,
+        tabs.add(
+          Tab(
+            text: Text('reparations'.tr()),
+            closeIcon: null,
+            icon: const Icon(FluentIcons.settings),
+            body: ReparationGestion(archive: widget.archive),
+            onClosed: null,
           ),
-          onClosed: null,
-        ));
+        );
       }
     }
     super.initState();
@@ -78,54 +80,55 @@ class ReparationTabsState extends State<ReparationTabs> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: widget.archive ? currentIndex2 : currentIndex,
-        builder: (context, value, _) {
-          return TabView(
-            tabs: widget.archive ? tabs2 : tabs,
-            currentIndex: value,
-            onChanged: (index) => widget.archive
-                ? currentIndex2.value = index
-                : currentIndex.value = index,
-            tabWidthBehavior: TabWidthBehavior.equal,
-            closeButtonVisibility: CloseButtonVisibilityMode.always,
-            showScrollButtons: true,
-            onNewPressed: widget.archive
-                ? null
-                : () {
-                    setState(() {
-                      final index = tabs.length + 1;
-                      final tab = generateTab(index);
-                      tabs.add(tab);
-                      currentIndex.value = index - 1;
-                    });
-                  },
-            onReorder: (oldIndex, newIndex) {
-              setState(() {
-                if (oldIndex < newIndex) {
-                  newIndex -= 1;
-                }
-                if (widget.archive) {
-                  final item = tabs2.removeAt(oldIndex);
-                  tabs2.insert(newIndex, item);
+      valueListenable: widget.archive ? currentIndex2 : currentIndex,
+      builder: (context, value, _) {
+        return TabView(
+          tabs: widget.archive ? tabs2 : tabs,
+          currentIndex: value,
+          onChanged: (index) => widget.archive
+              ? currentIndex2.value = index
+              : currentIndex.value = index,
+          tabWidthBehavior: TabWidthBehavior.equal,
+          closeButtonVisibility: CloseButtonVisibilityMode.always,
+          showScrollButtons: true,
+          onNewPressed: widget.archive
+              ? null
+              : () {
+                  setState(() {
+                    final index = tabs.length + 1;
+                    final tab = generateTab(index);
+                    tabs.add(tab);
+                    currentIndex.value = index - 1;
+                  });
+                },
+          onReorder: (oldIndex, newIndex) {
+            setState(() {
+              if (oldIndex < newIndex) {
+                newIndex -= 1;
+              }
+              if (widget.archive) {
+                final item = tabs2.removeAt(oldIndex);
+                tabs2.insert(newIndex, item);
 
-                  if (currentIndex2.value == newIndex) {
-                    currentIndex2.value = oldIndex;
-                  } else if (currentIndex2.value == oldIndex) {
-                    currentIndex2.value = newIndex;
-                  }
-                } else {
-                  final item = tabs.removeAt(oldIndex);
-                  tabs.insert(newIndex, item);
-
-                  if (currentIndex.value == newIndex) {
-                    currentIndex.value = oldIndex;
-                  } else if (currentIndex.value == oldIndex) {
-                    currentIndex.value = newIndex;
-                  }
+                if (currentIndex2.value == newIndex) {
+                  currentIndex2.value = oldIndex;
+                } else if (currentIndex2.value == oldIndex) {
+                  currentIndex2.value = newIndex;
                 }
-              });
-            },
-          );
-        });
+              } else {
+                final item = tabs.removeAt(oldIndex);
+                tabs.insert(newIndex, item);
+
+                if (currentIndex.value == newIndex) {
+                  currentIndex.value = oldIndex;
+                } else if (currentIndex.value == oldIndex) {
+                  currentIndex.value = newIndex;
+                }
+              }
+            });
+          },
+        );
+      },
+    );
   }
 }

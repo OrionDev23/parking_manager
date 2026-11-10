@@ -2,6 +2,7 @@ import 'package:appwrite/appwrite.dart' hide Client;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
+
 import '../../../../providers/client_database.dart';
 import '../../../../providers/repair_provider.dart';
 import '../../../../providers/vehicle_provider.dart';
@@ -15,6 +16,7 @@ import '../../../../serializables/reparation/etat_vehicle.dart';
 import '../../../../theme.dart';
 import '../../../../widgets/big_title_form.dart';
 import '../../../../widgets/zone_box.dart';
+
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -90,12 +92,15 @@ class ReparationFormState extends State<ReparationForm>
       matricule.text = widget.reparation!.vehiculemat ?? '';
       nchassi.text = widget.reparation!.nchassi ?? '';
       selectedDate = widget.reparation!.date;
-      designations =
-          List.generate(widget.reparation!.designations?.length ?? 0, (index) {
-        return DesignationReparation(
+      designations = List.generate(
+        widget.reparation!.designations?.length ?? 0,
+        (index) {
+          return DesignationReparation(
             key: UniqueKey(),
-            designation: widget.reparation!.designations![index]);
-      });
+            designation: widget.reparation!.designations![index],
+          );
+        },
+      );
       setState(() {
         assigningOrederNumber = false;
       });
@@ -104,65 +109,66 @@ class ReparationFormState extends State<ReparationForm>
 
   Future<void> getPrestatataire() async {
     if (widget.reparation != null && widget.reparation!.prestataire != null) {
-      selectedPrest = await RepairProvider()
-          .getPrestataire(widget.reparation!.prestataire!);
+      selectedPrest = await RepairProvider().getPrestataire(
+        widget.reparation!.prestataire!,
+      );
     }
   }
 
   Future<void> getVehicle({String? vehicleFromFiche}) async {
-    if(vehicleFromFiche!=null && selectedFicheReception!=null){
+    if (vehicleFromFiche != null && selectedFicheReception != null) {
       selectedVehicle = await VehicleProvider().getVehicle(vehicleFromFiche);
-    }
-    else{
+    } else {
       if (widget.reparation != null && widget.reparation!.vehicule != null) {
-        selectedVehicle =
-        await VehicleProvider().getVehicle(widget.reparation!.vehicule!);
+        selectedVehicle = await VehicleProvider().getVehicle(
+          widget.reparation!.vehicule!,
+        );
       }
     }
-
   }
+
   Future<void> getFicheReception() async {
-    if (widget.reparation != null && widget.reparation!.ficheReception != null) {
-      selectedFicheReception =
-          await RepairProvider().getFiche(widget.reparation!.ficheReception!);
+    if (widget.reparation != null &&
+        widget.reparation!.ficheReception != null) {
+      selectedFicheReception = await RepairProvider().getFiche(
+        widget.reparation!.ficheReception!,
+      );
     }
   }
-
-
 
   bool assigningOrederNumber = false;
 
   bool errorNumOrder = false;
-  bool changedPics=false;
+  bool changedPics = false;
 
   void assignOrderNumber() async {
     assigningOrederNumber = true;
     if (mounted) {
       setState(() {});
     }
-    await DatabaseGetter.database!.listRows(
-        databaseId: databaseId,
-        tableId: reparationId,
-        queries: [
-          Query.orderDesc('numero'),
-          Query.limit(1),
-        ]).then((value) {
-      if (value.rows.length == 1) {
-        numOrdre.text = (value.rows[0]
-                    .convertTo(
-                        (p0) => Reparation.fromJson(p0))
-                    .numero +
-                1)
-            .toString();
-      } else {
-        numOrdre.text = (reservedOrders.length + 1).toString();
-      }
+    await DatabaseGetter.database!
+        .listRows(
+          databaseId: databaseId,
+          tableId: reparationId,
+          queries: [Query.orderDesc('numero'), Query.limit(1)],
+        )
+        .then((value) {
+          if (value.rows.length == 1) {
+            numOrdre.text =
+                (value.rows[0]
+                            .convertTo((p0) => Reparation.fromJson(p0))
+                            .numero +
+                        1)
+                    .toString();
+          } else {
+            numOrdre.text = (reservedOrders.length + 1).toString();
+          }
 
-      while (testIfReservedContained(int.parse(numOrdre.text))) {
-        numOrdre.text = (int.parse(numOrdre.text) + 1).toString();
-      }
-      reservedOrders[widget.key!] = (int.parse(numOrdre.text));
-    });
+          while (testIfReservedContained(int.parse(numOrdre.text))) {
+            numOrdre.text = (int.parse(numOrdre.text) + 1).toString();
+          }
+          reservedOrders[widget.key!] = (int.parse(numOrdre.text));
+        });
 
     assigningOrederNumber = false;
     if (mounted) {
@@ -179,28 +185,32 @@ class ReparationFormState extends State<ReparationForm>
       });
       result = true;
     } else {
-      result = await DatabaseGetter.database!.listRows(
-          databaseId: databaseId,
-          tableId: reparationId,
-          queries: [
-            Query.orderDesc('numero'),
-            Query.equal('numero', int.parse(numOrdre.text)),
-            Query.limit(1),
-          ]).then((value) {
-        if (value.rows.length == 1) {
-          setState(() {
-            errorNumOrder = true;
+      result = await DatabaseGetter.database!
+          .listRows(
+            databaseId: databaseId,
+            tableId: reparationId,
+            queries: [
+              Query.orderDesc('numero'),
+              Query.equal('numero', int.parse(numOrdre.text)),
+              Query.limit(1),
+            ],
+          )
+          .then((value) {
+            if (value.rows.length == 1) {
+              setState(() {
+                errorNumOrder = true;
+              });
+              return true;
+            } else {
+              setState(() {
+                errorNumOrder = false;
+              });
+              return false;
+            }
+          })
+          .onError((error, stackTrace) {
+            return Future.value(false);
           });
-          return true;
-        } else {
-          setState(() {
-            errorNumOrder = false;
-          });
-          return false;
-        }
-      }).onError((error, stackTrace) {
-        return Future.value(false);
-      });
     }
 
     return result;
@@ -218,18 +228,17 @@ class ReparationFormState extends State<ReparationForm>
     return result;
   }
 
-  void getVehicleThenSetValues() async{
+  void getVehicleThenSetValues() async {
     setState(() {
-      assigningOrederNumber=true;
+      assigningOrederNumber = true;
     });
     await getVehicle(vehicleFromFiche: selectedFicheReception?.vehicule);
-    if(selectedVehicle!=null){
+    if (selectedVehicle != null) {
       setVehicleValues();
     }
     setState(() {
-      assigningOrederNumber=false;
+      assigningOrederNumber = false;
     });
-
   }
 
   void setVehicleValues() {
@@ -258,302 +267,303 @@ class ReparationFormState extends State<ReparationForm>
     return ScaffoldPage(
       content: Container(
         padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: appTheme.backGroundColor,
-        ),
+        decoration: BoxDecoration(color: appTheme.backGroundColor),
         clipBehavior: Clip.antiAlias,
-        child: Stack(children: [
-          Positioned.fill(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              children: [
-                Row(
-                  children: [
-                    if (MyEntrepriseState.p != null)
-                      const EntreprisePlacement(),
-                    const Spacer(),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        if (errorNumOrder)
-                          Text(
-                            'numprorder',
-                            style: TextStyle(color: Colors.red),
-                          ).tr(),
-                        if (errorNumOrder) smallSpace,
-                        Row(
-                          children: [
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                children: [
+                  Row(
+                    children: [
+                      if (MyEntrepriseState.p != null)
+                        const EntreprisePlacement(),
+                      const Spacer(),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          if (errorNumOrder)
                             Text(
-                              'ordrereparation'.tr().toUpperCase(),
-                              style: headerStyle,
-                            ),
-                            smallSpace,
-                            Container(
-                              width: 200.px,
-                              height: 40.px,
-                              decoration: BoxDecoration(
-                                border: Border.all(),
+                              'numprorder',
+                              style: TextStyle(color: Colors.red),
+                            ).tr(),
+                          if (errorNumOrder) smallSpace,
+                          Row(
+                            children: [
+                              Text(
+                                'ordrereparation'.tr().toUpperCase(),
+                                style: headerStyle,
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      'num',
-                                      style: boldStyle,
-                                    ).tr(),
-                                    smallSpace,
-                                    Flexible(
-                                      child: TextBox(
-                                        controller: numOrdre,
-                                        enabled: widget.reparation == null,
-                                        placeholder: 'num'.tr(),
-                                        placeholderStyle: placeStyle,
-                                        style: appTheme.writingStyle,
-                                        cursorColor: appTheme.color.darker,
-                                        decoration: WidgetStatePropertyAll(
+                              smallSpace,
+                              Container(
+                                width: 200.px,
+                                height: 40.px,
+                                decoration: BoxDecoration(border: Border.all()),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Row(
+                                    children: [
+                                      Text('num', style: boldStyle).tr(),
+                                      smallSpace,
+                                      Flexible(
+                                        child: TextBox(
+                                          controller: numOrdre,
+                                          enabled: widget.reparation == null,
+                                          placeholder: 'num'.tr(),
+                                          placeholderStyle: placeStyle,
+                                          style: appTheme.writingStyle,
+                                          cursorColor: appTheme.color.darker,
+                                          decoration: WidgetStatePropertyAll(
                                             BoxDecoration(
-                                                color: appTheme.fillColor)),
-                                        inputFormatters: [
-                                          FilteringTextInputFormatter.digitsOnly
-                                        ],
-                                        onChanged: (s) async {
-                                          if (s.isNotEmpty) {
-                                            if (!await testIfOrderNumberExists()) {
-                                              reservedOrders[widget.key!] =
-                                                  int.parse(s);
-                                              setState(() {});
+                                              color: appTheme.fillColor,
+                                            ),
+                                          ),
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter
+                                                .digitsOnly,
+                                          ],
+                                          onChanged: (s) async {
+                                            if (s.isNotEmpty) {
+                                              if (!await testIfOrderNumberExists()) {
+                                                reservedOrders[widget.key!] =
+                                                    int.parse(s);
+                                                setState(() {});
+                                              }
                                             }
-                                          }
-                                        },
+                                          },
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      'date',
-                      style: boldStyle,
-                    ).tr(),
-                    smallSpace,
-                    SizedBox(
-                      width: 200.px,
-                      height: 30.px,
-                      child: DatePicker(
-                        selected: selectedDate,
-                        onChanged: (s) {
-                          setState(() {
-                            selectedDate = s;
-                          });
-                        },
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-                smallSpace,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    SizedBox(
-                      width: 350.px,
-                      height: 50.px,
-                      child: ListTile(
-                        leading: Text(
-                          'fichereception',
-                          style: boldStyle,
-                        ).tr(),
-                        title:
-                            Text(selectedFicheReception!=null?NumberFormat('00000000', 'fr').format(selectedFicheReception?.numero) : 'nonind'.tr()),
-                        onPressed: () async {
-                          selectedFicheReception = await showDialog<FicheReception>(
-                              context: context,
-                              barrierDismissible: true,
-                              builder: (context) {
-                                return ContentDialog(
-                                  constraints: BoxConstraints.tight(
-                                      Size(700.px, 550.px)),
-                                  title: const Text('selectedfiche').tr(),
-                                  style: ContentDialogThemeData(
-                                      titleStyle: appTheme.writingStyle
-                                          .copyWith(
-                                              fontWeight: FontWeight.bold)),
-                                  content: const FicheReceptionTable(
-                                    selectD: true,
-                                  ),
-                                  actions: [
-                                    Button(
-                                        child: const Text('fermer').tr(),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        })
-                                  ],
-                                );
-                              });
-                          getVehicleThenSetValues();
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text('date', style: boldStyle).tr(),
+                      smallSpace,
+                      SizedBox(
+                        width: 200.px,
+                        height: 30.px,
+                        child: DatePicker(
+                          selected: selectedDate,
+                          onChanged: (s) {
+                            setState(() {
+                              selectedDate = s;
+                            });
                           },
+                        ),
                       ),
-                    ),
-                    smallSpace,
-                    if (selectedVehicle != null)
-                      IconButton(
+                    ],
+                  ),
+                  smallSpace,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      SizedBox(
+                        width: 350.px,
+                        height: 50.px,
+                        child: ListTile(
+                          leading: Text(
+                            'fichereception',
+                            style: boldStyle,
+                          ).tr(),
+                          title: Text(
+                            selectedFicheReception != null
+                                ? NumberFormat(
+                                    '00000000',
+                                    'fr',
+                                  ).format(selectedFicheReception?.numero)
+                                : 'nonind'.tr(),
+                          ),
+                          onPressed: () async {
+                            selectedFicheReception =
+                                await showDialog<FicheReception>(
+                                  context: context,
+                                  barrierDismissible: true,
+                                  builder: (context) {
+                                    return ContentDialog(
+                                      constraints: BoxConstraints.tight(
+                                        Size(700.px, 550.px),
+                                      ),
+                                      title: const Text('selectedfiche').tr(),
+                                      style: ContentDialogThemeData(
+                                        titleStyle: appTheme.writingStyle
+                                            .copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
+                                      content: const FicheReceptionTable(
+                                        selectD: true,
+                                      ),
+                                      actions: [
+                                        Button(
+                                          child: const Text('fermer').tr(),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                            getVehicleThenSetValues();
+                          },
+                        ),
+                      ),
+                      smallSpace,
+                      if (selectedVehicle != null)
+                        IconButton(
                           icon: const Icon(FluentIcons.cancel),
                           onPressed: () {
                             selectedVehicle = null;
                             setVehicleValues();
-                          }),
-                    const Spacer(),
-                    SizedBox(
-                      width: 250.px,
-                      height: 50.px,
-                      child: ListTile(
-                        leading: Text(
-                          'prestataire',
-                          style: boldStyle,
-                        ).tr(),
-                        title: Text(selectedPrest?.nom ?? 'nonind'.tr()),
-                        onPressed: () async {
-                          selectedPrest = await showDialog<Client>(
+                          },
+                        ),
+                      const Spacer(),
+                      SizedBox(
+                        width: 250.px,
+                        height: 50.px,
+                        child: ListTile(
+                          leading: Text('prestataire', style: boldStyle).tr(),
+                          title: Text(selectedPrest?.nom ?? 'nonind'.tr()),
+                          onPressed: () async {
+                            selectedPrest = await showDialog<Client>(
                               context: context,
                               barrierDismissible: true,
                               builder: (context) {
                                 return ContentDialog(
                                   constraints: BoxConstraints.tight(
-                                      Size(700.px, 550.px)),
+                                    Size(700.px, 550.px),
+                                  ),
                                   title: const Text('selectprestataire').tr(),
                                   style: ContentDialogThemeData(
-                                      titleStyle: appTheme.writingStyle
-                                          .copyWith(
-                                              fontWeight: FontWeight.bold)),
+                                    titleStyle: appTheme.writingStyle.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                   content: const PrestataireTable(
                                     selectD: true,
                                   ),
                                   actions: [
                                     Button(
-                                        child: const Text('fermer').tr(),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        })
+                                      child: const Text('fermer').tr(),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
                                   ],
                                 );
-                              });
-                          setState(() {});
-                        },
+                              },
+                            );
+                            setState(() {});
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                smallSpace,
-                BigTitleForm(
-                  bigTitle: 'entretienvehicule',
-                  littleTitle: 'selectentretien',
-                  trailing: Row(
-                    children: [
-                      const Text('afficherquestion').tr(),
-                      smallSpace,
-                      ToggleSwitch(
+                    ],
+                  ),
+                  smallSpace,
+                  BigTitleForm(
+                    bigTitle: 'entretienvehicule',
+                    littleTitle: 'selectentretien',
+                    trailing: Row(
+                      children: [
+                        const Text('afficherquestion').tr(),
+                        smallSpace,
+                        ToggleSwitch(
                           checked: showEtretient,
                           onChanged: (s) {
                             setState(() {
                               showEtretient = s;
                             });
-                          }),
-                    ],
-                  ),
-                ),
-                if (showEtretient)
-                  Container(
-                    height: 260.px,
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      border: Border.all(),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        EntretienWidget(entretienVehicle: entretienVehicle),
-                        bigSpace,
-                        SizedBox(
-                          height: 180.px,
-                          width: 400.px,
-                          child: ZoneBox(
-                            label: 'remarqueplus'.tr(),
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: TextBox(
-                                controller: remarqueEntretien,
-                                placeholder: 'remarqueplus'.tr(),
-                                maxLines: 4,
-                                placeholderStyle: placeStyle,
-                                style: appTheme.writingStyle,
-                                cursorColor: appTheme.color.darker,
-                                decoration: WidgetStatePropertyAll(
-                                    BoxDecoration(color: appTheme.fillColor)),
-                              ),
-                            ),
-                          ),
+                          },
                         ),
                       ],
                     ),
                   ),
-                smallSpace,
-                const BigTitleForm(
-                  bigTitle: 'travaileffect',
-                  littleTitle: 'ajoutertaches',
-                ),
-                designationTable(appTheme),
-              ],
+                  if (showEtretient)
+                    Container(
+                      height: 260.px,
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(border: Border.all()),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          EntretienWidget(entretienVehicle: entretienVehicle),
+                          bigSpace,
+                          SizedBox(
+                            height: 180.px,
+                            width: 400.px,
+                            child: ZoneBox(
+                              label: 'remarqueplus'.tr(),
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: TextBox(
+                                  controller: remarqueEntretien,
+                                  placeholder: 'remarqueplus'.tr(),
+                                  maxLines: 4,
+                                  placeholderStyle: placeStyle,
+                                  style: appTheme.writingStyle,
+                                  cursorColor: appTheme.color.darker,
+                                  decoration: WidgetStatePropertyAll(
+                                    BoxDecoration(color: appTheme.fillColor),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  smallSpace,
+                  const BigTitleForm(
+                    bigTitle: 'travaileffect',
+                    littleTitle: 'ajoutertaches',
+                  ),
+                  designationTable(appTheme),
+                ],
+              ),
             ),
-          ),
-          if (assigningOrederNumber)
-            Positioned(
-              top: 40.h,
-              left: 40.w,
-              child: const ProgressBar(),
-            )
-        ]),
+            if (assigningOrederNumber)
+              Positioned(top: 40.h, left: 40.w, child: const ProgressBar()),
+          ],
+        ),
       ),
       bottomBar: Container(
-        decoration: BoxDecoration(
-          color: appTheme.backGroundColor,
-        ),
+        decoration: BoxDecoration(color: appTheme.backGroundColor),
         padding: const EdgeInsets.all(10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             FilledButton(
-                style: ButtonStyle(
-                  backgroundColor:
-                      WidgetStatePropertyAll(appTheme.color.lightest),
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(
+                  appTheme.color.lightest,
                 ),
-                onPressed: uploading ? null : showPdf,
-                child: const Text('voir')),
+              ),
+              onPressed: uploading ? null : showPdf,
+              child: const Text('voir'),
+            ),
             smallSpace,
             FilledButton(
-                style: ButtonStyle(
-                  backgroundColor:
-                      WidgetStatePropertyAll(appTheme.color.darkest),
-                ),
-                onPressed: uploading ? null : uploadForm,
-                child: const Text('save').tr())
+              style: ButtonStyle(
+                backgroundColor: WidgetStatePropertyAll(appTheme.color.darkest),
+              ),
+              onPressed: uploading ? null : uploadForm,
+              child: const Text('save').tr(),
+            ),
           ],
         ),
       ),
     );
   }
-
-
-
-
 
   @override
   void dispose() {
@@ -567,16 +577,18 @@ class ReparationFormState extends State<ReparationForm>
   List<DesignationReparation> designations = List.empty(growable: true);
 
   void addDesignation() {
-    designations.add(DesignationReparation(
-        key: UniqueKey(), designation: Designation(designation: '')));
+    designations.add(
+      DesignationReparation(
+        key: UniqueKey(),
+        designation: Designation(designation: ''),
+      ),
+    );
     setState(() {});
   }
 
   Widget designationTable(AppTheme appTheme) {
     return Container(
-      decoration: BoxDecoration(
-        border: Border.all(),
-      ),
+      decoration: BoxDecoration(border: Border.all()),
       padding: const EdgeInsets.all(10),
       child: Column(
         children: [
@@ -586,12 +598,16 @@ class ReparationFormState extends State<ReparationForm>
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Button(
-                    onPressed:
-                        selectedDesignationsExist() ? deleteAllSelected : null,
-                    child: const Text('delete').tr()),
+                  onPressed: selectedDesignationsExist()
+                      ? deleteAllSelected
+                      : null,
+                  child: const Text('delete').tr(),
+                ),
                 smallSpace,
                 FilledButton(
-                    onPressed: addDesignation, child: const Text('add').tr()),
+                  onPressed: addDesignation,
+                  child: const Text('add').tr(),
+                ),
               ],
             ),
           ),
@@ -599,8 +615,9 @@ class ReparationFormState extends State<ReparationForm>
           Container(
             decoration: BoxDecoration(
               color: appTheme.color.lightest,
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(5)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(5),
+              ),
             ),
             padding: const EdgeInsets.all(5),
             child: Table(
@@ -611,28 +628,34 @@ class ReparationFormState extends State<ReparationForm>
                 3: FlexColumnWidth(),
               },
               children: [
-                TableRow(children: [
-                  TableCell(
+                TableRow(
+                  children: [
+                    TableCell(
                       child: const Text(
-                    'desi',
-                    textAlign: TextAlign.center,
-                  ).tr()),
-                  TableCell(
+                        'desi',
+                        textAlign: TextAlign.center,
+                      ).tr(),
+                    ),
+                    TableCell(
                       child: const Text(
-                    'qte',
-                    textAlign: TextAlign.center,
-                  ).tr()),
-                  TableCell(
+                        'qte',
+                        textAlign: TextAlign.center,
+                      ).tr(),
+                    ),
+                    TableCell(
                       child: const Text(
-                    'TVA',
-                    textAlign: TextAlign.center,
-                  ).tr()),
-                  TableCell(
+                        'TVA',
+                        textAlign: TextAlign.center,
+                      ).tr(),
+                    ),
+                    TableCell(
                       child: const Text(
-                    'prix',
-                    textAlign: TextAlign.center,
-                  ).tr()),
-                ]),
+                        'prix',
+                        textAlign: TextAlign.center,
+                      ).tr(),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -641,12 +664,14 @@ class ReparationFormState extends State<ReparationForm>
                   padding: const EdgeInsets.all(10),
                   width: 300.px,
                   height: 320.px,
-                  child: const NoDataWidget())
+                  child: const NoDataWidget(),
+                )
               : Container(
                   decoration: BoxDecoration(
                     border: Border.all(color: appTheme.fillColor),
-                    borderRadius:
-                        const BorderRadius.vertical(bottom: Radius.circular(5)),
+                    borderRadius: const BorderRadius.vertical(
+                      bottom: Radius.circular(5),
+                    ),
                   ),
                   child: Column(children: getDesignationList(appTheme)),
                 ),
@@ -687,18 +712,16 @@ class ReparationFormState extends State<ReparationForm>
             Row(
               children: [
                 Checkbox(
-                    checked: designations[index].designation.selected,
-                    onChanged: (s) {
-                      setState(() {
-                        designations[index].designation.selected = s ?? false;
-                      });
-                    }),
+                  checked: designations[index].designation.selected,
+                  onChanged: (s) {
+                    setState(() {
+                      designations[index].designation.selected = s ?? false;
+                    });
+                  },
+                ),
                 smallSpace,
                 Flexible(
-                  child: SizedBox(
-                    height: 35.px,
-                    child: designations[index],
-                  ),
+                  child: SizedBox(height: 35.px, child: designations[index]),
                 ),
               ],
             ),
@@ -715,47 +738,55 @@ class ReparationFormState extends State<ReparationForm>
 
   void showPdf() {
     Reparation reparation = Reparation(
-        id: '',
-        numero: int.parse(numOrdre.text),
-        ficheReception: selectedFicheReception?.id??'',
-        date: selectedDate,
-        designations: designations.map((e) => e.designation).toList(),
-        entretien: entretienVehicle,
-        nchassi: nchassi.text,
-        showEntretien: showEtretient,
-        prestataire: selectedPrest?.id,
-        prestatairenom: selectedPrest?.nom,
-        vehicule: selectedVehicle?.id,
-        vehiculemat: selectedVehicle?.matricule,
-        remarque: remarqueEntretien.text, ficheReceptionNumber: selectedFicheReception?.numero??0,);
+      id: '',
+      numero: int.parse(numOrdre.text),
+      ficheReception: selectedFicheReception?.id ?? '',
+      date: selectedDate,
+      designations: designations.map((e) => e.designation).toList(),
+      entretien: entretienVehicle,
+      nchassi: nchassi.text,
+      showEntretien: showEtretient,
+      prestataire: selectedPrest?.id,
+      prestatairenom: selectedPrest?.nom,
+      vehicule: selectedVehicle?.id,
+      vehiculemat: selectedVehicle?.matricule,
+      remarque: remarqueEntretien.text,
+      ficheReceptionNumber: selectedFicheReception?.numero ?? 0,
+    );
 
     showDialog(
-        context: context,
-        builder: (context) {
-          return PdfPreviewPO(reparation: reparation);
-        });
+      context: context,
+      builder: (context) {
+        return PdfPreviewPO(reparation: reparation);
+      },
+    );
   }
 
   void uploadForm() async {
-    if(selectedFicheReception==null){
-      displayInfoBar(context,
-          builder: (BuildContext context, void Function() close) {
-        return InfoBar(
-          title: const Text('ficherequired').tr(),
-          severity: InfoBarSeverity.error,
-        );
-      }, duration: snackbarShortDuration);
+    if (selectedFicheReception == null) {
+      displayInfoBar(
+        context,
+        builder: (BuildContext context, void Function() close) {
+          return InfoBar(
+            title: const Text('ficherequired').tr(),
+            severity: InfoBarSeverity.error,
+          );
+        },
+        duration: snackbarShortDuration,
+      );
       return;
     }
-    if(selectedVehicle==null){
-
-      displayInfoBar(context,
-          builder: (BuildContext context, void Function() close) {
-        return InfoBar(
-          title: const Text('vehiclenotfound').tr(),
-          severity: InfoBarSeverity.error,
-        );
-      }, duration: snackbarShortDuration);
+    if (selectedVehicle == null) {
+      displayInfoBar(
+        context,
+        builder: (BuildContext context, void Function() close) {
+          return InfoBar(
+            title: const Text('vehiclenotfound').tr(),
+            severity: InfoBarSeverity.error,
+          );
+        },
+        duration: snackbarShortDuration,
+      );
       return;
     }
     setState(() {
@@ -768,68 +799,87 @@ class ReparationFormState extends State<ReparationForm>
         .abs()
         .toString();
     Reparation reparation = Reparation(
-        id: documentID!,
-        numero: int.parse(numOrdre.text),
-        date: selectedDate,
-        designations: designations.map((e) => e.designation).toList(),
-        entretien: entretienVehicle,
-        showEntretien: showEtretient,
-        nchassi: nchassi.text,
-        prestataire: selectedPrest?.id,
-        prestatairenom: selectedPrest?.nom,
-        vehicule: selectedVehicle?.id,
-        vehiculemat: selectedVehicle?.matricule,
-        remarque: remarqueEntretien.text, ficheReception: selectedFicheReception?.id??'', ficheReceptionNumber: selectedFicheReception?.numero??0,);
+      id: documentID!,
+      numero: int.parse(numOrdre.text),
+      date: selectedDate,
+      designations: designations.map((e) => e.designation).toList(),
+      entretien: entretienVehicle,
+      showEntretien: showEtretient,
+      nchassi: nchassi.text,
+      prestataire: selectedPrest?.id,
+      prestatairenom: selectedPrest?.nom,
+      vehicule: selectedVehicle?.id,
+      vehiculemat: selectedVehicle?.matricule,
+      remarque: remarqueEntretien.text,
+      ficheReception: selectedFicheReception?.id ?? '',
+      ficheReceptionNumber: selectedFicheReception?.numero ?? 0,
+    );
 
     if (!modif) {
       await Future.wait([
-        createReparation(reparation),
-        uploadActivity(modif, reparation),
-      ]).then((value) {
-        if (mounted) {
-          displayInfoBar(context,
-              builder: (BuildContext context, void Function() close) {
-            return InfoBar(
-              title: const Text('reparationajout').tr(),
-              severity: InfoBarSeverity.success,
-            );
-          }, duration: snackbarShortDuration);
-        }
-      }).onError((error, stackTrace) {
-        if (mounted) {
-          displayInfoBar(context,
-              builder: (BuildContext context, void Function() close) {
-            return InfoBar(
-              title: const Text('echec').tr(),
-              severity: InfoBarSeverity.error,
-            );
-          }, duration: snackbarShortDuration);
-        }
-      });
-    } else {
-      await Future.wait(
-              [updateReparation(reparation), uploadActivity(modif, reparation),])
+            createReparation(reparation),
+            uploadActivity(modif, reparation),
+          ])
           .then((value) {
-        if (mounted) {
-          displayInfoBar(context,
-              builder: (BuildContext context, void Function() close) {
-            return InfoBar(
-              title: const Text('reparationmodif').tr(),
-              severity: InfoBarSeverity.success,
-            );
-          }, duration: snackbarShortDuration);
-        }
-      }).onError((error, stackTrace) {
-        if (mounted) {
-          displayInfoBar(context,
-              builder: (BuildContext context, void Function() close) {
-            return InfoBar(
-              title: const Text('echec').tr(),
-              severity: InfoBarSeverity.error,
-            );
+            if (mounted) {
+              displayInfoBar(
+                context,
+                builder: (BuildContext context, void Function() close) {
+                  return InfoBar(
+                    title: const Text('reparationajout').tr(),
+                    severity: InfoBarSeverity.success,
+                  );
+                },
+                duration: snackbarShortDuration,
+              );
+            }
+          })
+          .onError((error, stackTrace) {
+            if (mounted) {
+              displayInfoBar(
+                context,
+                builder: (BuildContext context, void Function() close) {
+                  return InfoBar(
+                    title: const Text('echec').tr(),
+                    severity: InfoBarSeverity.error,
+                  );
+                },
+                duration: snackbarShortDuration,
+              );
+            }
           });
-        }
-      });
+    } else {
+      await Future.wait([
+            updateReparation(reparation),
+            uploadActivity(modif, reparation),
+          ])
+          .then((value) {
+            if (mounted) {
+              displayInfoBar(
+                context,
+                builder: (BuildContext context, void Function() close) {
+                  return InfoBar(
+                    title: const Text('reparationmodif').tr(),
+                    severity: InfoBarSeverity.success,
+                  );
+                },
+                duration: snackbarShortDuration,
+              );
+            }
+          })
+          .onError((error, stackTrace) {
+            if (mounted) {
+              displayInfoBar(
+                context,
+                builder: (BuildContext context, void Function() close) {
+                  return InfoBar(
+                    title: const Text('echec').tr(),
+                    severity: InfoBarSeverity.error,
+                  );
+                },
+              );
+            }
+          });
     }
 
     uploading = false;
@@ -839,36 +889,42 @@ class ReparationFormState extends State<ReparationForm>
     }
   }
 
-
   Future<void> updateReparation(Reparation reparation) async {
     await DatabaseGetter.database!
         .updateRow(
-            databaseId: databaseId,
-            tableId: reparationId,
-            rowId: documentID!,
-            data: reparation.toJson())
+          databaseId: databaseId,
+          tableId: reparationId,
+          rowId: documentID!,
+          data: reparation.toJson(),
+        )
         .then((value) {})
         .onError((AppwriteException error, stackTrace) {
-      setState(() {});
-    });
+          setState(() {});
+        });
   }
 
   Future<void> createReparation(Reparation reparation) async {
     await DatabaseGetter.database!.createRow(
-        databaseId: databaseId,
-        tableId: reparationId,
-        rowId: documentID!,
-        data: reparation.toJson());
+      databaseId: databaseId,
+      tableId: reparationId,
+      rowId: documentID!,
+      data: reparation.toJson(),
+    );
   }
 
   Future<void> uploadActivity(bool update, Reparation reparation) async {
     if (update) {
-      await DatabaseGetter().ajoutActivity(11, reparation.id,
-          docName: pdf_theme.numberFormat.format(reparation.numero));
+      await DatabaseGetter().ajoutActivity(
+        11,
+        reparation.id,
+        docName: pdf_theme.numberFormat.format(reparation.numero),
+      );
     } else {
-      await DatabaseGetter().ajoutActivity(10, reparation.id,
-          docName: pdf_theme.numberFormat.format(reparation.numero));
+      await DatabaseGetter().ajoutActivity(
+        10,
+        reparation.id,
+        docName: pdf_theme.numberFormat.format(reparation.numero),
+      );
     }
   }
-
 }

@@ -5,7 +5,10 @@ import 'package:parc_oto/serializables/conducteur/disponibilite_chauffeur.dart';
 class DisponibiliteWebService
     extends ParcOtoWebService<DisponibiliteChauffeur> {
   DisponibiliteWebService(
-      super.data, super.collectionID, super.columnForSearch);
+    super.data,
+    super.collectionID,
+    super.columnForSearch,
+  );
 
   @override
   DisponibiliteChauffeur fromJsonFunction(Map<String, dynamic> json) {
@@ -18,9 +21,11 @@ class DisponibiliteWebService
   }
 
   @override
-  int Function(MapEntry<String, DisponibiliteChauffeur> p1,
-          MapEntry<String, DisponibiliteChauffeur> p2)?
-      getComparisonFunction(int column, bool ascending) {
+  int Function(
+    MapEntry<String, DisponibiliteChauffeur> p1,
+    MapEntry<String, DisponibiliteChauffeur> p2,
+  )?
+  getComparisonFunction(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
       //id
@@ -41,9 +46,14 @@ class DisponibiliteWebService
   }
 
   @override
-  List<String> getFilterQueries(Map<String, String> filters, int count,
-      int startingAt, int sortedBy, bool sortedAsc,
-      {int? index}) {
+  List<String> getFilterQueries(
+    Map<String, String> filters,
+    int count,
+    int startingAt,
+    int sortedBy,
+    bool sortedAsc, {
+    int? index,
+  }) {
     return [
       if (filters.containsKey('type'))
         Query.equal('type', int.parse(filters['type']!)),

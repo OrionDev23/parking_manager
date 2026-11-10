@@ -18,20 +18,21 @@ class Client extends ParcOtoDefault {
   String? email;
   String? search;
 
-  Client(
-      {required super.id,
-      super.createdAt,
-      super.updatedAt,
-      this.description,
-      required this.nom,
-      required this.adresse,
-      this.email,
-      this.telephone,
-      this.search,
-      this.art,
-      this.nif,
-      this.nis,
-      this.rc});
+  Client({
+    required super.id,
+    super.createdAt,
+    super.updatedAt,
+    this.description,
+    required this.nom,
+    required this.adresse,
+    this.email,
+    this.telephone,
+    this.search,
+    this.art,
+    this.nif,
+    this.nis,
+    this.rc,
+  });
 
   factory Client.fromJson(Map<String, dynamic> json) => _$ClientFromJson(json);
 

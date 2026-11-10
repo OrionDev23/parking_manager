@@ -7,11 +7,11 @@ part of 'designation.dart';
 // **************************************************************************
 
 Designation _$DesignationFromJson(Map<String, dynamic> json) => Designation(
-      designation: json['designation'] as String,
-      prix: (json['prix'] as num?)?.toDouble() ?? 0,
-      qte: (json['qte'] as num?)?.toInt() ?? 1,
-      tva: (json['tva'] as num?)?.toDouble() ?? 0,
-    );
+  designation: json['designation'] as String,
+  prix: (json['prix'] as num?)?.toDouble() ?? 0,
+  qte: (json['qte'] as num?)?.toInt() ?? 1,
+  tva: (json['tva'] as num?)?.toDouble() ?? 0,
+);
 
 Map<String, dynamic> _$DesignationToJson(Designation instance) =>
     <String, dynamic>{

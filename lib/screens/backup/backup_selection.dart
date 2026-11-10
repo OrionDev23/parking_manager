@@ -1,4 +1,3 @@
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:go_router/go_router.dart';
@@ -20,7 +19,6 @@ class BackupSelection extends StatefulWidget {
 }
 
 class _BackupSelectionState extends State<BackupSelection> {
-
   @override
   void initState() {
     if (!VehicleProvider.downloadedVehicles) {
@@ -40,25 +38,31 @@ class _BackupSelectionState extends State<BackupSelection> {
     }
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-
-    if(result!=null && !loading){
-      return BackupUploader(data: result!, date: DateTime.now(),
-        vehicCount: checkers[0]?VehicleProvider.vehicles.length:0,
-        vehicDocCount: checkers[0]?VehicleProvider.documentsVehicules.length:0,
-        vehicStatesCount: checkers[0]?VehicleProvider.etats.length:0,
-        condCount: checkers[1]?DriverProvider.conducteurs.length:0,
-        condDocCount: checkers[1]?DriverProvider.documentConducteurs.length:0,
-        condStateCount: checkers[1]?DriverProvider.disponibiliteConducteurs.length:0,
-        repairCount: checkers[2]?RepairProvider.reparations.length:0,
-        prestCount: checkers[2]?RepairProvider.prestataires.length:0,
-        planCount: checkers[3]?PlanningProvider.plannings.length:0,
-        logCount: checkers[4]?LogProvider.activities.length:0,
-
+    if (result != null && !loading) {
+      return BackupUploader(
+        data: result!,
+        date: DateTime.now(),
+        vehicCount: checkers[0] ? VehicleProvider.vehicles.length : 0,
+        vehicDocCount: checkers[0]
+            ? VehicleProvider.documentsVehicules.length
+            : 0,
+        vehicStatesCount: checkers[0] ? VehicleProvider.etats.length : 0,
+        condCount: checkers[1] ? DriverProvider.conducteurs.length : 0,
+        condDocCount: checkers[1]
+            ? DriverProvider.documentConducteurs.length
+            : 0,
+        condStateCount: checkers[1]
+            ? DriverProvider.disponibiliteConducteurs.length
+            : 0,
+        repairCount: checkers[2] ? RepairProvider.reparations.length : 0,
+        prestCount: checkers[2] ? RepairProvider.prestataires.length : 0,
+        planCount: checkers[3] ? PlanningProvider.plannings.length : 0,
+        logCount: checkers[4] ? LogProvider.activities.length : 0,
       );
-    }
-    else{
+    } else {
       return ContentDialog(
         title: const Text('backupnow').tr(),
         content: Column(
@@ -74,23 +78,23 @@ class _BackupSelectionState extends State<BackupSelection> {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: FilledButton(
-                            child:
-                            checkers.every((element) => element == true)
-                                ? const Text('clear').tr()
-                                : const Text('selectall').tr(),
-                            onPressed: () {
-                              if (checkers.every((element) => element)) {
-                                for (int i = 0; i < checkers.length; i++) {
-                                  checkers[i] = false;
-                                }
-                              } else {
-                                for (int i = 0; i < checkers.length; i++) {
-                                  checkers[i] = true;
-                                }
+                          child: checkers.every((element) => element == true)
+                              ? const Text('clear').tr()
+                              : const Text('selectall').tr(),
+                          onPressed: () {
+                            if (checkers.every((element) => element)) {
+                              for (int i = 0; i < checkers.length; i++) {
+                                checkers[i] = false;
                               }
-                              setState(() {});
-                            }),
-                      )
+                            } else {
+                              for (int i = 0; i < checkers.length; i++) {
+                                checkers[i] = true;
+                              }
+                            }
+                            setState(() {});
+                          },
+                        ),
+                      ),
                     ],
                   ),
                   vehicleElement(),
@@ -105,25 +109,28 @@ class _BackupSelectionState extends State<BackupSelection> {
         ),
         actions: [
           Button(
-              onPressed: () {
-                context.pop();
-              },
-              child: const Text('annuler').tr()),
+            onPressed: () {
+              context.pop();
+            },
+            child: const Text('annuler').tr(),
+          ),
           FilledButton(
-              onPressed: checkers.every((element) => !element) || loading
-                  ? null:() {saveBackup();},
-              child: loading?const ProgressRing():const Text
-                ('confirmer')
-                  .tr())
+            onPressed: checkers.every((element) => !element) || loading
+                ? null
+                : () {
+                    saveBackup();
+                  },
+            child: loading
+                ? const ProgressRing()
+                : const Text('confirmer').tr(),
+          ),
         ],
       );
     }
-
   }
 
   List<bool> checkers = [false, false, false, false, false];
   List<bool> refreshers = [false, false, false, false, false];
-
 
   Future<void> refreshVehicles() async {
     if (!refreshers[0]) {
@@ -133,7 +140,7 @@ class _BackupSelectionState extends State<BackupSelection> {
       await Future.wait([
         VehicleProvider().refreshVehicles(),
         VehicleProvider().refreshStates(),
-        VehicleProvider().refreshDocuments()
+        VehicleProvider().refreshDocuments(),
       ]);
       setState(() {
         refreshers[0] = false;
@@ -149,7 +156,7 @@ class _BackupSelectionState extends State<BackupSelection> {
       await Future.wait([
         DriverProvider().refreshConducteurs(),
         DriverProvider().refreshDocuments(),
-        DriverProvider().refreshDisp()
+        DriverProvider().refreshDisp(),
       ]);
       setState(() {
         refreshers[1] = false;
@@ -164,7 +171,7 @@ class _BackupSelectionState extends State<BackupSelection> {
       });
       await Future.wait([
         RepairProvider().refreshReparations(),
-        RepairProvider().refreshPrestataires()
+        RepairProvider().refreshPrestataires(),
       ]);
       setState(() {
         refreshers[2] = false;
@@ -177,9 +184,7 @@ class _BackupSelectionState extends State<BackupSelection> {
       setState(() {
         refreshers[3] = true;
       });
-      await Future.wait([
-        PlanningProvider().refreshPlannings(),
-      ]);
+      await Future.wait([PlanningProvider().refreshPlannings()]);
       setState(() {
         refreshers[3] = false;
       });
@@ -191,9 +196,7 @@ class _BackupSelectionState extends State<BackupSelection> {
       setState(() {
         refreshers[4] = true;
       });
-      await Future.wait([
-        LogProvider().refreshLogs(),
-      ]);
+      await Future.wait([LogProvider().refreshLogs()]);
       setState(() {
         refreshers[4] = false;
       });
@@ -227,13 +230,19 @@ class _BackupSelectionState extends State<BackupSelection> {
       },
       subTitle: checkers[0]
           ? prepareText({
-        'vehiclescount': MapEntry<String, String>(
-            'v', VehicleProvider.vehicles.length.toString()),
-        'doccount': MapEntry<String, String>(
-            'd', VehicleProvider.documentsVehicules.length.toString()),
-        'statecount': MapEntry<String, String>(
-            's', VehicleProvider.etats.length.toString()),
-      })
+              'vehiclescount': MapEntry<String, String>(
+                'v',
+                VehicleProvider.vehicles.length.toString(),
+              ),
+              'doccount': MapEntry<String, String>(
+                'd',
+                VehicleProvider.documentsVehicules.length.toString(),
+              ),
+              'statecount': MapEntry<String, String>(
+                's',
+                VehicleProvider.etats.length.toString(),
+              ),
+            })
           : null,
     );
   }
@@ -253,13 +262,19 @@ class _BackupSelectionState extends State<BackupSelection> {
       },
       subTitle: checkers[1]
           ? prepareText({
-        'conducteurcount':
-        MapEntry('c', DriverProvider.conducteurs.length.toString()),
-        'doccount': MapEntry(
-            'd', DriverProvider.documentConducteurs.length.toString()),
-        'dispcount': MapEntry('d',
-            DriverProvider.disponibiliteConducteurs.length.toString()),
-      })
+              'conducteurcount': MapEntry(
+                'c',
+                DriverProvider.conducteurs.length.toString(),
+              ),
+              'doccount': MapEntry(
+                'd',
+                DriverProvider.documentConducteurs.length.toString(),
+              ),
+              'dispcount': MapEntry(
+                'd',
+                DriverProvider.disponibiliteConducteurs.length.toString(),
+              ),
+            })
           : null,
     );
   }
@@ -279,11 +294,15 @@ class _BackupSelectionState extends State<BackupSelection> {
       },
       subTitle: checkers[2]
           ? prepareText({
-        'reparationcount':
-        MapEntry('r', RepairProvider.reparations.length.toString()),
-        'prestcount':
-        MapEntry('p', RepairProvider.prestataires.length.toString()),
-      })
+              'reparationcount': MapEntry(
+                'r',
+                RepairProvider.reparations.length.toString(),
+              ),
+              'prestcount': MapEntry(
+                'p',
+                RepairProvider.prestataires.length.toString(),
+              ),
+            })
           : null,
     );
   }
@@ -303,9 +322,11 @@ class _BackupSelectionState extends State<BackupSelection> {
       },
       subTitle: checkers[3]
           ? prepareText({
-        'planningcount':
-        MapEntry('p', PlanningProvider.plannings.length.toString()),
-      })
+              'planningcount': MapEntry(
+                'p',
+                PlanningProvider.plannings.length.toString(),
+              ),
+            })
           : null,
     );
   }
@@ -325,90 +346,86 @@ class _BackupSelectionState extends State<BackupSelection> {
       },
       subTitle: checkers[4]
           ? prepareText({
-        'logcount':
-        MapEntry('l', LogProvider.activities.length.toString()),
-      })
+              'logcount': MapEntry(
+                'l',
+                LogProvider.activities.length.toString(),
+              ),
+            })
           : null,
     );
   }
 
-
-  bool loading=false;
-  void saveBackup(){
-    if(loading || checkers.every((element) => !element)){
+  bool loading = false;
+  void saveBackup() {
+    if (loading || checkers.every((element) => !element)) {
       return;
     }
     setState(() {
-      loading=true;
+      loading = true;
     });
-    result="{";
-    if(checkers[0]){
-
-      result='$result ${addList("vehicles", VehicleProvider.vehicles, true)}';
-      result='$result ${addList("vehicledocs", VehicleProvider
-          .documentsVehicules, true)}';
-      result='$result ${addList("vehiclestates", VehicleProvider
-          .etats, false)} ]';
+    result = "{";
+    if (checkers[0]) {
+      result = '$result ${addList("vehicles", VehicleProvider.vehicles, true)}';
+      result =
+          '$result ${addList("vehicledocs", VehicleProvider.documentsVehicules, true)}';
+      result =
+          '$result ${addList("vehiclestates", VehicleProvider.etats, false)} ]';
     }
-    if(checkers[1]){
-      if(checkers[0]){
-        result='$result,';
+    if (checkers[1]) {
+      if (checkers[0]) {
+        result = '$result,';
       }
-      result='$result ${addList("drivers", DriverProvider.conducteurs, true)}';
-      result='$result ${addList("driversdocs", DriverProvider
-          .documentConducteurs, true)}';
-      result='$result ${addList("driversstates", DriverProvider
-          .disponibiliteConducteurs, false)} ]';
+      result =
+          '$result ${addList("drivers", DriverProvider.conducteurs, true)}';
+      result =
+          '$result ${addList("driversdocs", DriverProvider.documentConducteurs, true)}';
+      result =
+          '$result ${addList("driversstates", DriverProvider.disponibiliteConducteurs, false)} ]';
     }
-    if(checkers[2]){
-      if(checkers[0] || checkers[1]){
-        result='$result,';
+    if (checkers[2]) {
+      if (checkers[0] || checkers[1]) {
+        result = '$result,';
       }
-      result='$result ${addList("repairs", RepairProvider.reparations, true)}';
-      result='$result ${addList("providers", RepairProvider
-          .prestataires, false)} ]';
+      result =
+          '$result ${addList("repairs", RepairProvider.reparations, true)}';
+      result =
+          '$result ${addList("providers", RepairProvider.prestataires, false)} ]';
     }
-    if(checkers[3]){
-      if(checkers[0] || checkers[1] || checkers[2]){
-        result='$result,';
+    if (checkers[3]) {
+      if (checkers[0] || checkers[1] || checkers[2]) {
+        result = '$result,';
       }
-      result='$result ${addList("plannings", PlanningProvider.plannings,
-          false)} ]';
+      result =
+          '$result ${addList("plannings", PlanningProvider.plannings, false)} ]';
     }
-    if(checkers[4]){
-      if(checkers[0] || checkers[1] || checkers[2]|| checkers[3]){
-        result='$result,';
+    if (checkers[4]) {
+      if (checkers[0] || checkers[1] || checkers[2] || checkers[3]) {
+        result = '$result,';
       }
-      result='$result ${addList("logs", LogProvider.activities,
-          false)} ]';
+      result = '$result ${addList("logs", LogProvider.activities, false)} ]';
     }
-    result='$result }';
+    result = '$result }';
 
     setState(() {
-      loading=false;
+      loading = false;
     });
-
-
   }
 
   String? result;
 
-
-
-  String addList(String title,Map<String,dynamic> elements,bool next){
-    String result='"$title" :[';
-    bool first=true;
+  String addList(String title, Map<String, dynamic> elements, bool next) {
+    String result = '"$title" :[';
+    bool first = true;
     elements.forEach((key, value) {
-      if(first){
-        first=false;
-        result='$result ${jsonify(value.toJsonWithId())}';
-      }
-      else{
-        result='$result, ${jsonify(value.toJsonWithId())}';
+      if (first) {
+        first = false;
+        result = '$result ${jsonify(value.toJsonWithId())}';
+      } else {
+        result = '$result, ${jsonify(value.toJsonWithId())}';
       }
     });
-    if(next){
-      result='$result ],';
+    if (next) {
+      result = '$result ],';
     }
 
     return result;

@@ -20,28 +20,27 @@ class ReparationDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
-    bool portrait=Device.orientation==Orientation.portrait;
+    bool portrait = Device.orientation == Orientation.portrait;
     return ScaffoldPage(
       padding: const EdgeInsets.all(10),
-      header: PageTitle(
-        text: 'reparations'.tr(),
-      ),
+      header: PageTitle(text: 'reparations'.tr()),
       content: ListView(
         padding: const EdgeInsets.all(10),
         children: [
           StaggeredGrid.count(
-            crossAxisCount:
-            portrait?2 : 4,
+            crossAxisCount: portrait ? 2 : 4,
             mainAxisSpacing: 5,
             crossAxisSpacing: 5,
             children: [
               ButtonContainer(
                 color: appTheme.color,
                 action: () {
-                  PanesListState.index.value = PaneItemsAndFooters
-                          .originalItems
-                          .indexOf(PaneItemsAndFooters.reparations) +
-                      PaneItemsAndFooters.vehicles.items.length+1;
+                  PanesListState.index.value =
+                      PaneItemsAndFooters.originalItems.indexOf(
+                        PaneItemsAndFooters.reparations,
+                      ) +
+                      PaneItemsAndFooters.vehicles.items.length +
+                      1;
                 },
                 icon: FluentIcons.list,
                 text: 'greparations'.tr(),
@@ -51,33 +50,33 @@ class ReparationDashboard extends StatelessWidget {
               ),
               ButtonContainer(
                 action: () {
-                  PanesListState.index.value = PaneItemsAndFooters
-                          .originalItems
-                          .indexOf(PaneItemsAndFooters.reparations) +
-                      PaneItemsAndFooters.vehicles.items.length+1;
+                  PanesListState.index.value =
+                      PaneItemsAndFooters.originalItems.indexOf(
+                        PaneItemsAndFooters.reparations,
+                      ) +
+                      PaneItemsAndFooters.vehicles.items.length +
+                      1;
                   Future.delayed(const Duration(milliseconds: 300))
                       .whenComplete(() {
-                    late Tab tab;
-                    tab = Tab(
-                      key: UniqueKey(),
-                      text: Text('nouvrepar'.tr()),
-                      semanticLabel: 'nouvrepar'.tr(),
-                      icon: const Icon(FluentIcons.document),
-                      body: ReparationForm(
-                        key: UniqueKey(),
-                      ),
-                      onClosed: () {
-                        ReparationTabsState.tabs.remove(tab);
+                        late Tab tab;
+                        tab = Tab(
+                          key: UniqueKey(),
+                          text: Text('nouvrepar'.tr()),
+                          semanticLabel: 'nouvrepar'.tr(),
+                          icon: const Icon(FluentIcons.document),
+                          body: ReparationForm(key: UniqueKey()),
+                          onClosed: () {
+                            ReparationTabsState.tabs.remove(tab);
 
-                        if (ReparationTabsState.currentIndex.value > 0) {
-                          ReparationTabsState.currentIndex.value--;
-                        }
-                      },
-                    );
-                    final index = ReparationTabsState.tabs.length + 1;
-                    ReparationTabsState.tabs.add(tab);
-                    ReparationTabsState.currentIndex.value = index - 1;
-                  });
+                            if (ReparationTabsState.currentIndex.value > 0) {
+                              ReparationTabsState.currentIndex.value--;
+                            }
+                          },
+                        );
+                        final index = ReparationTabsState.tabs.length + 1;
+                        ReparationTabsState.tabs.add(tab);
+                        ReparationTabsState.currentIndex.value = index - 1;
+                      });
                 },
                 color: appTheme.color,
                 icon: FluentIcons.repair,
@@ -89,10 +88,12 @@ class ReparationDashboard extends StatelessWidget {
               ButtonContainer(
                 color: appTheme.color,
                 action: () {
-                  PanesListState.index.value = PaneItemsAndFooters
-                          .originalItems
-                          .indexOf(PaneItemsAndFooters.reparations) +
-                      PaneItemsAndFooters.vehicles.items.length+2;
+                  PanesListState.index.value =
+                      PaneItemsAndFooters.originalItems.indexOf(
+                        PaneItemsAndFooters.reparations,
+                      ) +
+                      PaneItemsAndFooters.vehicles.items.length +
+                      2;
                 },
                 icon: FluentIcons.list,
                 text: 'prestataires'.tr(),
@@ -102,31 +103,33 @@ class ReparationDashboard extends StatelessWidget {
               ),
               ButtonContainer(
                 action: () {
-                  PanesListState.index.value = PaneItemsAndFooters
-                          .originalItems
-                          .indexOf(PaneItemsAndFooters.reparations) +
-                      PaneItemsAndFooters.vehicles.items.length+2;
+                  PanesListState.index.value =
+                      PaneItemsAndFooters.originalItems.indexOf(
+                        PaneItemsAndFooters.reparations,
+                      ) +
+                      PaneItemsAndFooters.vehicles.items.length +
+                      2;
                   Future.delayed(const Duration(milliseconds: 300))
                       .whenComplete(() {
-                    late Tab tab;
-                    tab = Tab(
-                      key: UniqueKey(),
-                      text: Text('nouvprest'.tr()),
-                      semanticLabel: 'nouvprest'.tr(),
-                      icon: const Icon(FluentIcons.document),
-                      body: const PrestataireForm(),
-                      onClosed: () {
-                        PrestataireTabsState.tabs.remove(tab);
+                        late Tab tab;
+                        tab = Tab(
+                          key: UniqueKey(),
+                          text: Text('nouvprest'.tr()),
+                          semanticLabel: 'nouvprest'.tr(),
+                          icon: const Icon(FluentIcons.document),
+                          body: const PrestataireForm(),
+                          onClosed: () {
+                            PrestataireTabsState.tabs.remove(tab);
 
-                        if (PrestataireTabsState.currentIndex.value > 0) {
-                          PrestataireTabsState.currentIndex.value--;
-                        }
-                      },
-                    );
-                    final index = PrestataireTabsState.tabs.length + 1;
-                    PrestataireTabsState.tabs.add(tab);
-                    PrestataireTabsState.currentIndex.value = index - 1;
-                  });
+                            if (PrestataireTabsState.currentIndex.value > 0) {
+                              PrestataireTabsState.currentIndex.value--;
+                            }
+                          },
+                        );
+                        final index = PrestataireTabsState.tabs.length + 1;
+                        PrestataireTabsState.tabs.add(tab);
+                        PrestataireTabsState.currentIndex.value = index - 1;
+                      });
                 },
                 color: appTheme.color,
                 icon: FluentIcons.service_activity,
@@ -145,9 +148,10 @@ class ReparationDashboard extends StatelessWidget {
                 Text(
                   'lactivities',
                   style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: appTheme.writingStyle.color),
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: appTheme.writingStyle.color,
+                  ),
                 ).tr(),
                 smallSpace,
                 const Flexible(

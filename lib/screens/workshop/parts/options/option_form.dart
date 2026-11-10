@@ -12,6 +12,7 @@ import '../../../../main.dart' show legacyStockSyncService;
 import '../../../../providers/parts_provider.dart';
 import '../../../../serializables/pieces/option.dart';
 import '../../../../theme.dart';
+
 class OptionForm extends StatefulWidget {
   final Option? option;
   const OptionForm({super.key, this.option});
@@ -20,8 +21,8 @@ class OptionForm extends StatefulWidget {
   State<OptionForm> createState() => _OptionFormState();
 }
 
-class _OptionFormState extends State<OptionForm> with
-    AutomaticKeepAliveClientMixin<OptionForm>{
+class _OptionFormState extends State<OptionForm>
+    with AutomaticKeepAliveClientMixin<OptionForm> {
   TextEditingController optionName = TextEditingController();
   TextEditingController optionCode = TextEditingController();
   late String optionKey;
@@ -34,9 +35,9 @@ class _OptionFormState extends State<OptionForm> with
     optionName.text = widget.option?.name ?? '';
     optionCode.text = widget.option?.code ?? '';
     values = widget.option?.values ?? List.empty(growable: true);
-    optionKey = widget.option?.id??DateTime.now()
-        .difference(DatabaseGetter.ref)
-        .inMilliseconds.toString();
+    optionKey =
+        widget.option?.id ??
+        DateTime.now().difference(DatabaseGetter.ref).inMilliseconds.toString();
     super.initState();
   }
 
@@ -51,9 +52,7 @@ class _OptionFormState extends State<OptionForm> with
       return SizedBox(
         width: 20.w,
         height: 20.h,
-        child: const Center(
-          child: ProgressRing(),
-        ),
+        child: const Center(child: ProgressRing()),
       );
     }
     var appTheme = context.watch<AppTheme>();
@@ -77,82 +76,80 @@ class _OptionFormState extends State<OptionForm> with
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Flexible(
+                    flex: 2,
+                    child: ZoneBox(
+                      label: 'code'.tr(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: TextBox(
+                                controller: optionCode,
+                                placeholder: 'code'.tr(),
+                                onChanged: (s) {
+                                  if (PartsProvider.options.containsKey(s)) {
+                                    setState(() {
+                                      errorCode = true;
+                                    });
+                                  } else {
+                                    errorCode = false;
+                                    setState(() {});
+                                  }
+                                },
+                                enabled: widget.option == null,
+                                style: appTheme.writingStyle,
+                                placeholderStyle: placeStyle,
+                                cursorColor: appTheme.color.darker,
+                                decoration: WidgetStatePropertyAll(
+                                  BoxDecoration(color: appTheme.fillColor),
+                                ),
+                              ),
+                            ),
+                            smallSpace,
+                            Button(
+                              onPressed: widget.option == null
+                                  ? () {
+                                      setState(() {
+                                        optionCode.text =
+                                            PartsProvider.getUniqueCodeOption();
+                                      });
+                                    }
+                                  : null,
+                              child: const Text('generer').tr(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  smallSpace,
+                  if (errorCode) smallSpace,
+                  if (errorCode)
+                    Text('codetaken', style: TextStyle(color: Colors.red)).tr(),
+                  smallSpace,
 
                   Flexible(
                     flex: 2,
                     child: ZoneBox(
-                        label: 'code'.tr(),
-                        child:  Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Row(
-                            children: [
-                              Flexible(
-                                child: TextBox(
-                                  controller: optionCode,
-                                  placeholder: 'code'.tr(),
-                                  onChanged: (s) {
-                                    if (PartsProvider.options.containsKey(s)) {
-                                      setState(() {
-                                        errorCode = true;
-                                      });
-                                    } else {
-                                      errorCode = false;
-                                      setState(() {});
-                                    }
-                                  },
-                                  enabled: widget.option == null,
-                                  style: appTheme.writingStyle,
-                                  placeholderStyle: placeStyle,
-                                  cursorColor: appTheme.color.darker,
-                                  decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
-                                ),
-                              ),
-                              smallSpace,
-                              Button(
-                                  onPressed: widget.option == null
-                                      ? () {
-                                    setState(() {
-                                      optionCode.text =
-                                          PartsProvider.getUniqueCodeOption();
-                                    });
-                                  }
-                                      : null,
-                                  child: const Text('generer').tr())
-                            ],
+                      label: 'nom'.tr(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: TextBox(
+                          controller: optionName,
+                          placeholder: 'nom'.tr(),
+                          onChanged: (s) {
+                            setState(() {});
+                          },
+                          style: appTheme.writingStyle,
+                          placeholderStyle: placeStyle,
+                          cursorColor: appTheme.color.darker,
+                          decoration: WidgetStatePropertyAll(
+                            BoxDecoration(color: appTheme.fillColor),
                           ),
                         ),
-
-                    ),
-                  ),
-                  smallSpace,
-                  if (errorCode)
-                    smallSpace,
-                  if (errorCode)
-                    Text(
-                      'codetaken',
-                      style: TextStyle(color: Colors.red),
-                    ).tr(),
-                  smallSpace,
-
-                  Flexible(
-                    flex: 2,
-                    child: ZoneBox(label: 'nom'.tr(),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: TextBox(
-                        controller: optionName,
-                        placeholder: 'nom'.tr(),
-                        onChanged: (s) {
-                          setState(() {});
-                        },
-                        style: appTheme.writingStyle,
-                        placeholderStyle: placeStyle,
-                        cursorColor: appTheme.color.darker,
-                        decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
                       ),
-                    ),
                     ),
                   ),
 
@@ -167,7 +164,7 @@ class _OptionFormState extends State<OptionForm> with
                           children: [
                             m.Material(
                               color: appTheme.backGroundColor,
-                              child:  ChipTags(
+                              child: ChipTags(
                                 list: values,
                                 iconColor: appTheme.color.darkest,
                                 chipColor: appTheme.color.lightest,
@@ -180,8 +177,7 @@ class _OptionFormState extends State<OptionForm> with
 
                                 createTagOnSubmit: true,
                               ),
-                            )
-
+                            ),
                           ],
                         ),
                       ),
@@ -211,15 +207,13 @@ class _OptionFormState extends State<OptionForm> with
                         return;
                       }
                     } else {
-                      createOption()
-                          .whenComplete(() {
-                      });
+                      createOption().whenComplete(() {});
                     }
                   },
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -231,16 +225,16 @@ class _OptionFormState extends State<OptionForm> with
     });
     DateTime date = DateTime.now();
 
-    Option option=Option(
-        id: optionKey.toString(),
-        name: optionName.text,
-        code: optionCode.text,
-        values: values,
-        updatedAt: date,
-        createdAt:widget.option == null ||
-            widget.option!.createdAt == null
-            ? date
-            : widget.option!.createdAt);
+    Option option = Option(
+      id: optionKey.toString(),
+      name: optionName.text,
+      code: optionCode.text,
+      values: values,
+      updatedAt: date,
+      createdAt: widget.option == null || widget.option!.createdAt == null
+          ? date
+          : widget.option!.createdAt,
+    );
     try {
       await legacyStockSyncService.save(
         entity: 'part_option',
@@ -261,16 +255,12 @@ class _OptionFormState extends State<OptionForm> with
         datasource.refreshDatasource();
       }
       if (mounted) {
-        showMessage(
-          widget.option == null ? 'optionadd' : 'optionmod',
-          'fait',
-        );
+        showMessage(widget.option == null ? 'optionadd' : 'optionmod', 'fait');
       }
     } catch (error) {
       debugPrint('[ParcOto Stock] option save failed: $error');
       if (mounted) showMessage('errupld', 'erreur');
     }
-
 
     setState(() {
       loading = false;
@@ -282,9 +272,7 @@ class _OptionFormState extends State<OptionForm> with
       context: context,
       builder: (context) => ContentDialog(
         title: Text(title).tr(),
-        content: Text(
-          message,
-        ).tr(),
+        content: Text(message).tr(),
         actions: [
           Button(
             child: const Text('ok').tr(),

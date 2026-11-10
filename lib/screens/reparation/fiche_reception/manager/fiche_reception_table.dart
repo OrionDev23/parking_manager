@@ -1,8 +1,10 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+
 import '../../../../datasources/fiche_reception/fiche_reception_datasource.dart';
 import '../../../../providers/client_database.dart';
+
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -13,8 +15,11 @@ class FicheReceptionTable extends StatefulWidget {
   final bool selectD;
   final bool archive;
 
-  const FicheReceptionTable(
-      {super.key, this.selectD = false, this.archive = false});
+  const FicheReceptionTable({
+    super.key,
+    this.selectD = false,
+    this.archive = false,
+  });
 
   @override
   State<FicheReceptionTable> createState() => FicheReceptionTableState();
@@ -42,19 +47,21 @@ class FicheReceptionTableState extends State<FicheReceptionTable> {
       startedWithFiltersOn = true;
       searchController.text = filterDocument.value!;
       ficheReceptionDatasource = FicheReceptionDatasource(
-          current: context,
-          selectC: widget.selectD,
-          collectionID: fichesreceptionId,
-          searchKey: filterDocument.value);
+        current: context,
+        selectC: widget.selectD,
+        collectionID: fichesreceptionId,
+        searchKey: filterDocument.value,
+      );
       filterDocument.value = null;
     } else {
       startedWithFiltersOn = false;
 
       ficheReceptionDatasource = FicheReceptionDatasource(
-          current: context,
-          collectionID: fichesreceptionId,
-          selectC: widget.selectD,
-          archive: widget.archive);
+        current: context,
+        collectionID: fichesreceptionId,
+        selectC: widget.selectD,
+        archive: widget.archive,
+      );
     }
     initColumns();
     super.initState();
@@ -67,10 +74,7 @@ class FicheReceptionTableState extends State<FicheReceptionTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'num',
-            style: tstyle,
-          ).tr(),
+          child: Text('num', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -84,10 +88,7 @@ class FicheReceptionTableState extends State<FicheReceptionTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'nchassi',
-            style: tstyle,
-          ).tr(),
+          child: Text('nchassi', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -101,10 +102,7 @@ class FicheReceptionTableState extends State<FicheReceptionTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'matricule',
-            style: tstyle,
-          ).tr(),
+          child: Text('matricule', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
@@ -118,10 +116,7 @@ class FicheReceptionTableState extends State<FicheReceptionTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'ordrereparation',
-            style: tstyle,
-          ).tr(),
+          child: Text('ordrereparation', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -135,10 +130,7 @@ class FicheReceptionTableState extends State<FicheReceptionTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'dateentre',
-            style: tstyle,
-          ).tr(),
+          child: Text('dateentre', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
@@ -152,10 +144,7 @@ class FicheReceptionTableState extends State<FicheReceptionTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'datesortie',
-            style: tstyle,
-          ).tr(),
+          child: Text('datesortie', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
@@ -169,10 +158,7 @@ class FicheReceptionTableState extends State<FicheReceptionTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'dateModif',
-            style: tstyle,
-          ).tr(),
+          child: Text('dateModif', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -203,82 +189,82 @@ class FicheReceptionTableState extends State<FicheReceptionTable> {
     var appTheme = context.watch<AppTheme>();
     ficheReceptionDatasource.appTheme = appTheme;
     return ValueListenableBuilder(
-        valueListenable: filterDocument,
-        builder: (context, v, _) {
-          if (!startedWithFiltersOn && v != null && filterNow) {
-            searchController.text = v;
-            ficheReceptionDatasource.search(v);
-            notEmpty = true;
-            filtered = true;
-            filterNow = false;
-          }
-          return DataTableParc(
-            header: Padding(
-              padding:
-              const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    width: 350.px,
-                    height: 45.px,
-                    child: TextBox(
-                      onChanged: (s){
-                        if(s.isEmpty){
-                          notEmpty=false;
-                          ficheReceptionDatasource.search('');
-                        }
-                        else{
-                          notEmpty=true;
-                        }
-                        setState(() {
-                        });
-                      },
-                      controller: searchController,
-                      placeholder: 'search'.tr(),
+      valueListenable: filterDocument,
+      builder: (context, v, _) {
+        if (!startedWithFiltersOn && v != null && filterNow) {
+          searchController.text = v;
+          ficheReceptionDatasource.search(v);
+          notEmpty = true;
+          filtered = true;
+          filterNow = false;
+        }
+        return DataTableParc(
+          header: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 350.px,
+                  height: 45.px,
+                  child: TextBox(
+                    onChanged: (s) {
+                      if (s.isEmpty) {
+                        notEmpty = false;
+                        ficheReceptionDatasource.search('');
+                      } else {
+                        notEmpty = true;
+                      }
+                      setState(() {});
+                    },
+                    controller: searchController,
+                    placeholder: 'search'.tr(),
 
-
-                      style: appTheme.writingStyle,
-                      cursorColor: appTheme.color.darker,
-                      placeholderStyle: placeStyle,
-                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-                      onSubmitted: (s) {
-                        if (s.isNotEmpty) {
-                          ficheReceptionDatasource.search(s);
-                          if (!notEmpty) {
-                            setState(() {
-                              notEmpty = true;
-                            });
-                          }
-                        } else {
-                          if (notEmpty) {
-                            setState(() {
-                              notEmpty = false;
-                            });
-                          }
-                        }
-                      },
-                      suffix: notEmpty
-                          ? IconButton(
-                          icon: const Icon(FluentIcons.cancel),
-                          onPressed: () {
-                            searchController.text = "";
-                            notEmpty = false;
-                            setState(() {});
-                            ficheReceptionDatasource.search('');
-                          })
-                          : null,
+                    style: appTheme.writingStyle,
+                    cursorColor: appTheme.color.darker,
+                    placeholderStyle: placeStyle,
+                    decoration: WidgetStatePropertyAll(
+                      BoxDecoration(color: appTheme.fillColor),
                     ),
+                    onSubmitted: (s) {
+                      if (s.isNotEmpty) {
+                        ficheReceptionDatasource.search(s);
+                        if (!notEmpty) {
+                          setState(() {
+                            notEmpty = true;
+                          });
+                        }
+                      } else {
+                        if (notEmpty) {
+                          setState(() {
+                            notEmpty = false;
+                          });
+                        }
+                      }
+                    },
+                    suffix: notEmpty
+                        ? IconButton(
+                            icon: const Icon(FluentIcons.cancel),
+                            onPressed: () {
+                              searchController.text = "";
+                              notEmpty = false;
+                              setState(() {});
+                              ficheReceptionDatasource.search('');
+                            },
+                          )
+                        : null,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            sortAscending: assending,
-            sortColumnIndex: sortColumn,
-            columns: columns,
-            source: ficheReceptionDatasource,
-          );
-        });
+          ),
+          sortAscending: assending,
+          sortColumnIndex: sortColumn,
+          columns: columns,
+          source: ficheReceptionDatasource,
+        );
+      },
+    );
   }
 
   @override

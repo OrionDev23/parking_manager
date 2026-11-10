@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:pdf/widgets.dart' show PageOrientation;
 import 'package:universal_html/html.dart' as html;
 import 'package:document_file_save_plus/document_file_save_plus.dart';
@@ -15,21 +16,29 @@ import 'package:share_plus/share_plus.dart';
 import 'generate_list.dart';
 
 class PdfPreviewListing extends StatelessWidget {
-  final List<Map<String,dynamic>> list;
-  final List<String>keysToInclude;
+  final List<Map<String, dynamic>> list;
+  final List<String> keysToInclude;
   final PageOrientation orientation;
   final String name;
   final int firstPageLimit;
   final int midPagesLimit;
-  const PdfPreviewListing({super.key,this.orientation=PageOrientation.portrait,
-  required this.list,this
-      .name='List', required this.keysToInclude, required this.firstPageLimit, required this.midPagesLimit});
+  const PdfPreviewListing({
+    super.key,
+    this.orientation = PageOrientation.portrait,
+    required this.list,
+    this.name = 'List',
+    required this.keysToInclude,
+    required this.firstPageLimit,
+    required this.midPagesLimit,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ContentDialog(
       content: PdfPreview(
-        maxPageWidth: orientation==PageOrientation.portrait?550.px:2000.px,
+        maxPageWidth: orientation == PageOrientation.portrait
+            ? 550.px
+            : 2000.px,
         shouldRepaint: false,
         pdfFileName: name,
         initialPageFormat: PdfPageFormat.a4.landscape,
@@ -40,9 +49,7 @@ class PdfPreviewListing extends StatelessWidget {
         allowSharing: false,
         dpi: 200,
         dynamicLayout: true,
-        loadingWidget: const ProgressBar(
-          strokeWidth: 8,
-        ),
+        loadingWidget: const ProgressBar(strokeWidth: 8),
         build: (PdfPageFormat format) {
           return List2PDF(
             keysToInclude: keysToInclude,
@@ -55,26 +62,23 @@ class PdfPreviewListing extends StatelessWidget {
         },
         actions: [
           const PdfPrintAction(
-            icon: Icon(
-              FluentIcons.print,
-              color: Colors.white,
-            ),
+            icon: Icon(FluentIcons.print, color: Colors.white),
           ),
           PdfPreviewAction(
-            icon: const Icon(
-              FluentIcons.save,
-              color: Colors.white,
-            ),
+            icon: const Icon(FluentIcons.save, color: Colors.white),
             onPressed: saveThisFile,
           ),
           PdfPreviewAction(
-              icon: const Icon(
-                FluentIcons.share,
-                color: Colors.white,
-              ),
-              onPressed: (context, futureFile, pageFormat) async {
-                SharePlus.instance.share(ShareParams(files: [XFile.fromData(await futureFile(pageFormat))], subject: name));
-              }),
+            icon: const Icon(FluentIcons.share, color: Colors.white),
+            onPressed: (context, futureFile, pageFormat) async {
+              SharePlus.instance.share(
+                ShareParams(
+                  files: [XFile.fromData(await futureFile(pageFormat))],
+                  subject: name,
+                ),
+              );
+            },
+          ),
           PdfPreviewAction(
             icon: const Text(
               'fermer',
@@ -86,28 +90,26 @@ class PdfPreviewListing extends StatelessWidget {
           ),
         ],
       ),
-      constraints: orientation==PageOrientation.portrait?BoxConstraints.loose
-        (Size(600
-          .px, 700.px)):BoxConstraints.loose
-        (Size(800
-          .px, 600.px)),
+      constraints: orientation == PageOrientation.portrait
+          ? BoxConstraints.loose(Size(600.px, 700.px))
+          : BoxConstraints.loose(Size(800.px, 600.px)),
     );
   }
 
   void saveThisFile(
-      BuildContext s,
-      FutureOr<Uint8List> Function(PdfPageFormat) futureFile,
-      PdfPageFormat pageFormat) async {
+    BuildContext s,
+    FutureOr<Uint8List> Function(PdfPageFormat) futureFile,
+    PdfPageFormat pageFormat,
+  ) async {
     if (DeviceType.android == Device.deviceType ||
         Device.deviceType == DeviceType.ios) {
       DocumentFileSavePlus().saveFile(
-          await futureFile(pageFormat),
-          '$name.pdf',
-          "appliation/pdf");
+        await futureFile(pageFormat),
+        '$name.pdf',
+        "appliation/pdf",
+      );
     } else if (kIsWeb) {
-      saveFileWeb(
-          await futureFile(pageFormat),
-          '$name.pdf');
+      saveFileWeb(await futureFile(pageFormat), '$name.pdf');
     } else {
       await FilePicker.saveFile(
         dialogTitle: "save".tr(),
@@ -128,10 +130,10 @@ class PdfPreviewListing extends StatelessWidget {
       ..download = name;
     html.document.body?.children.add(anchor);
 
-// download
+    // download
     anchor.click();
 
-// cleanup
+    // cleanup
     html.document.body?.children.remove(anchor);
     html.Url.revokeObjectUrl(url);
   }

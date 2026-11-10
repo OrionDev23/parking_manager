@@ -14,10 +14,7 @@ import '../../data_table_parcoto.dart';
 class DisponibliteTable extends StatefulWidget {
   final bool selectD;
 
-  const DisponibliteTable({
-    super.key,
-    this.selectD = false,
-  });
+  const DisponibliteTable({super.key, this.selectD = false});
 
   @override
   State<DisponibliteTable> createState() => DisponibliteTableState();
@@ -33,7 +30,10 @@ class DisponibliteTableState extends State<DisponibliteTable> {
   @override
   void initState() {
     disponibiliteDataSource = DisponibiliteDataSource(
-        current: context, collectionID: chaufDispID, selectC: widget.selectD);
+      current: context,
+      collectionID: chaufDispID,
+      selectC: widget.selectD,
+    );
     initColumns();
     super.initState();
   }
@@ -45,10 +45,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'nom',
-            style: tstyle,
-          ).tr(),
+          child: Text('nom', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -62,10 +59,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'disponibilite',
-            style: tstyle,
-          ).tr(),
+          child: Text('disponibilite', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
@@ -79,10 +73,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child:  Text(
-            'dateajout',
-            style: tstyle,
-          ).tr(),
+          child: Text('dateajout', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
@@ -134,29 +125,28 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                     child: FlyoutTarget(
                       controller: filterFlyout,
                       child: IconButton(
-                          icon: Row(
-                            children: [
-                              Text(
-                                'filter',
-                                style: TextStyle(fontSize: 12.sp),
-                              ).tr(),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              filtered
-                                  ? Icon(
-                                      FluentIcons.filter_solid,
-                                      color: appTheme.color,
-                                    )
-                                  : const Icon(FluentIcons.filter),
-                            ],
-                          ),
-                          onPressed: () {
-                            filterFlyout.showFlyout(builder: (context) {
+                        icon: Row(
+                          children: [
+                            Text(
+                              'filter',
+                              style: TextStyle(fontSize: 12.sp),
+                            ).tr(),
+                            const SizedBox(width: 5),
+                            filtered
+                                ? Icon(
+                                    FluentIcons.filter_solid,
+                                    color: appTheme.color,
+                                  )
+                                : const Icon(FluentIcons.filter),
+                          ],
+                        ),
+                        onPressed: () {
+                          filterFlyout.showFlyout(
+                            builder: (context) {
                               return FlyoutContent(
-                                  color: appTheme.backGroundColor,
-                                  child:
-                                      StatefulBuilder(builder: (context, setS) {
+                                color: appTheme.backGroundColor,
+                                child: StatefulBuilder(
+                                  builder: (context, setS) {
                                     return SizedBox(
                                       width: 30.w,
                                       height: 42.h,
@@ -166,17 +156,19 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                             child: ZoneBox(
                                               label: 'date'.tr(),
                                               child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: const EdgeInsets.all(
+                                                  10.0,
+                                                ),
                                                 child: Column(
                                                   children: [
                                                     Row(
                                                       children: [
                                                         SizedBox(
-                                                            width: 5.w,
-                                                            child: const Text(
-                                                                    'min')
-                                                                .tr()),
+                                                          width: 5.w,
+                                                          child: const Text(
+                                                            'min',
+                                                          ).tr(),
+                                                        ),
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
@@ -196,10 +188,11 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                     Row(
                                                       children: [
                                                         SizedBox(
-                                                            width: 5.w,
-                                                            child: const Text(
-                                                                    'max')
-                                                                .tr()),
+                                                          width: 5.w,
+                                                          child: const Text(
+                                                            'max',
+                                                          ).tr(),
+                                                        ),
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
@@ -225,21 +218,24 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                             child: ZoneBox(
                                               label: 'disponibilite'.tr(),
                                               child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: const EdgeInsets.all(
+                                                  10.0,
+                                                ),
                                                 child: DropDownButton(
-                                                  title: Text(type == null
-                                                          ? ''
-                                                          : DriverProvider
-                                                      .getEtat(type))
-                                                      .tr(),
+                                                  title: Text(
+                                                    type == null
+                                                        ? ''
+                                                        : DriverProvider.getEtat(
+                                                            type,
+                                                          ),
+                                                  ).tr(),
                                                   placement: FlyoutPlacementMode
                                                       .bottomLeft,
                                                   items: [
                                                     MenuFlyoutItem(
                                                       text: const Text(
-                                                              'disponible')
-                                                          .tr(),
+                                                        'disponible',
+                                                      ).tr(),
                                                       onPressed: () {
                                                         setState(() {
                                                           type = 0;
@@ -250,9 +246,9 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                     ),
                                                     const MenuFlyoutSeparator(),
                                                     MenuFlyoutItem(
-                                                      text:
-                                                          const Text('mission')
-                                                              .tr(),
+                                                      text: const Text(
+                                                        'mission',
+                                                      ).tr(),
                                                       onPressed: () {
                                                         setState(() {
                                                           type = 1;
@@ -276,8 +272,8 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                     const MenuFlyoutSeparator(),
                                                     MenuFlyoutItem(
                                                       text: const Text(
-                                                              'quitteentre')
-                                                          .tr(),
+                                                        'quitteentre',
+                                                      ).tr(),
                                                       onPressed: () {
                                                         setState(() {
                                                           type = 3;
@@ -301,9 +297,13 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                 FilledButton(
                                                   style: ButtonStyle(
                                                     backgroundColor:
-                                                        WidgetStatePropertyAll<Color>(
-                                                            appTheme.color
-                                                                .lightest),
+                                                        WidgetStatePropertyAll<
+                                                          Color
+                                                        >(
+                                                          appTheme
+                                                              .color
+                                                              .lightest,
+                                                        ),
                                                   ),
                                                   onPressed: filtered
                                                       ? () {
@@ -320,116 +320,122 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                               .filter(filters);
                                                         }
                                                       : null,
-                                                  child:
-                                                      const Text('clear').tr(),
+                                                  child: const Text('clear')
+                                                      .tr(),
                                                 ),
                                                 const Spacer(),
                                                 Button(
-                                                    onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    child: const Text('annuler')
-                                                        .tr()),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: const Text('annuler')
+                                                      .tr(),
+                                                ),
                                                 smallSpace,
                                                 smallSpace,
                                                 FilledButton(
-                                                    style: ButtonStyle(
-                                                      backgroundColor:
-                                                          WidgetStateProperty.all<
-                                                                  Color>(
-                                                              appTheme.color
-                                                                  .lighter),
-                                                    ),
-                                                    child:
-                                                        const Text('confirmer')
-                                                            .tr(),
-                                                    onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pop();
+                                                  style: ButtonStyle(
+                                                    backgroundColor:
+                                                        WidgetStateProperty.all<
+                                                          Color
+                                                        >(
+                                                          appTheme
+                                                              .color
+                                                              .lighter,
+                                                        ),
+                                                  ),
+                                                  child: const Text('confirmer')
+                                                      .tr(),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
 
-                                                      if (dateMin != null) {
-                                                        filters['dateMin'] =
-                                                            dateMin!
-                                                                .toIso8601String();
-                                                      } else {
-                                                        filters
-                                                            .remove('dateMin');
-                                                      }
-                                                      if (dateMax != null) {
-                                                        filters['dateMax'] =
-                                                            dateMax!
-                                                                .toIso8601String();
-                                                      } else {
-                                                        filters
-                                                            .remove('dateMax');
-                                                      }
-                                                      if (type != null) {
-                                                        filters['type'] =
-                                                            type.toString();
-                                                      } else {
-                                                        filters.remove('type');
-                                                      }
+                                                    if (dateMin != null) {
+                                                      filters['dateMin'] =
+                                                          dateMin!
+                                                              .toIso8601String();
+                                                    } else {
+                                                      filters.remove('dateMin');
+                                                    }
+                                                    if (dateMax != null) {
+                                                      filters['dateMax'] =
+                                                          dateMax!
+                                                              .toIso8601String();
+                                                    } else {
+                                                      filters.remove('dateMax');
+                                                    }
+                                                    if (type != null) {
+                                                      filters['type'] = type
+                                                          .toString();
+                                                    } else {
+                                                      filters.remove('type');
+                                                    }
 
-                                                      filtered = true;
-                                                      setState(() {});
-                                                      disponibiliteDataSource
-                                                          .filter(filters);
-                                                    }),
+                                                    filtered = true;
+                                                    setState(() {});
+                                                    disponibiliteDataSource
+                                                        .filter(filters);
+                                                  },
+                                                ),
                                               ],
                                             ),
                                           ),
                                         ],
                                       ),
                                     );
-                                  }));
-                            });
-                          }),
+                                  },
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ),
                   if (filtered)
                     Positioned(
-                        bottom: 10,
-                        right: 0,
-                        child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 2, horizontal: 4),
-                            decoration: BoxDecoration(
-                              color: appTheme.color,
-                              borderRadius: BorderRadius.circular(5),
-                              boxShadow: kElevationToShadow[2],
-                            ),
-                            child: Text(
-                              '${filters.length}',
-                              style: TextStyle(fontSize: 10.sp),
-                            ))),
+                      bottom: 10,
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 2,
+                          horizontal: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: appTheme.color,
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: kElevationToShadow[2],
+                        ),
+                        child: Text(
+                          '${filters.length}',
+                          style: TextStyle(fontSize: 10.sp),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
-            const SizedBox(
-              width: 10,
-            ),
+            const SizedBox(width: 10),
             SizedBox(
               width: 350.px,
               height: 45.px,
               child: TextBox(
-                onChanged: (s){
-                  if(s.isEmpty){
-                    notEmpty=false;
+                onChanged: (s) {
+                  if (s.isEmpty) {
+                    notEmpty = false;
                     disponibiliteDataSource.search('');
+                  } else {
+                    notEmpty = true;
                   }
-                  else{
-                    notEmpty=true;
-                  }
-                  setState(() {
-                  });
+                  setState(() {});
                 },
                 controller: searchController,
                 placeholder: 'search'.tr(),
                 style: appTheme.writingStyle,
                 cursorColor: appTheme.color.darker,
                 placeholderStyle: placeStyle,
-                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                decoration: WidgetStatePropertyAll(
+                  BoxDecoration(color: appTheme.fillColor),
+                ),
                 onSubmitted: (s) {
                   if (s.isNotEmpty) {
                     disponibiliteDataSource.search(s);
@@ -454,7 +460,8 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                           notEmpty = false;
                           setState(() {});
                           disponibiliteDataSource.search('');
-                        })
+                        },
+                      )
                     : null,
               ),
             ),

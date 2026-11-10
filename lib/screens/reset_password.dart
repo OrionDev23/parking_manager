@@ -82,16 +82,9 @@ class _ResetScreenState extends State<ResetScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(
-              height: 5.h,
-            ),
-            Image.asset(
-              'assets/images/favIcon.webp',
-              width: 30.w,
-            ),
-            SizedBox(
-              height: 5.h,
-            ),
+            SizedBox(height: 5.h),
+            Image.asset('assets/images/favIcon.webp', width: 30.w),
+            SizedBox(height: 5.h),
             Container(
               padding: const EdgeInsets.all(10),
               alignment: Alignment.center,
@@ -102,10 +95,10 @@ class _ResetScreenState extends State<ResetScreen> {
                 color: appTheme.mode == ThemeMode.dark
                     ? Colors.grey
                     : appTheme.mode == ThemeMode.light
-                        ? Colors.white
-                        : ThemeMode.system == ThemeMode.light
-                            ? Colors.white
-                            : Colors.grey,
+                    ? Colors.white
+                    : ThemeMode.system == ThemeMode.light
+                    ? Colors.white
+                    : Colors.grey,
                 boxShadow: kElevationToShadow[2],
               ),
               child: Column(
@@ -121,8 +114,9 @@ class _ResetScreenState extends State<ResetScreen> {
                       suffix: IconButton(
                         icon: Icon(
                           showPassword ? FluentIcons.hide : FluentIcons.red_eye,
-                          color:
-                              !showPassword ? appTheme.color : Colors.grey[100],
+                          color: !showPassword
+                              ? appTheme.color
+                              : Colors.grey[100],
                           size: 12.sp,
                         ),
                         onPressed: () {
@@ -148,9 +142,7 @@ class _ResetScreenState extends State<ResetScreen> {
                       },
                     ),
                   ),
-                  SizedBox(
-                    height: 2.h,
-                  ),
+                  SizedBox(height: 2.h),
                   SizedBox(
                     width: pwidth,
                     child: TextBox(
@@ -159,8 +151,9 @@ class _ResetScreenState extends State<ResetScreen> {
                       suffix: IconButton(
                         icon: Icon(
                           showPassword ? FluentIcons.hide : FluentIcons.red_eye,
-                          color:
-                              !showPassword ? appTheme.color : Colors.grey[100],
+                          color: !showPassword
+                              ? appTheme.color
+                              : Colors.grey[100],
                           size: 12.sp,
                         ),
                         onPressed: () {
@@ -186,28 +179,20 @@ class _ResetScreenState extends State<ResetScreen> {
                       },
                     ),
                   ),
-                  SizedBox(
-                    height: 2.h,
-                  ),
-                  SizedBox(
-                    height: 2.h,
-                  ),
+                  SizedBox(height: 2.h),
+                  SizedBox(height: 2.h),
                   FilledButton(
-                      onPressed: checking ? null : confirm,
-                      child: checking
-                          ? const ProgressRing(strokeWidth: 2.0)
-                          : const Text('confirmer').tr()),
+                    onPressed: checking ? null : confirm,
+                    child: checking
+                        ? const ProgressRing(strokeWidth: 2.0)
+                        : const Text('confirmer').tr(),
+                  ),
                 ],
               ),
             ),
-            SizedBox(
-              height: 2.h,
-            ),
+            SizedBox(height: 2.h),
             if (!signedIn && error.isNotEmpty)
-              Text(
-                error,
-                style: TextStyle(color: Colors.red),
-              )
+              Text(error, style: TextStyle(color: Colors.red)),
           ],
         ),
       ),
@@ -230,21 +215,21 @@ class _ResetScreenState extends State<ResetScreen> {
         ..setProject(projectId);
       await Account(client)
           .updateRecovery(
-              userId: userId,
-              secret: secret,
-              password: password.text,
-
-      )
+            userId: userId,
+            secret: secret,
+            password: password.text,
+          )
           .then((value) async {
-        setState(() {
-          done = true;
-        });
-      }).onError<AppwriteException>((e, s) {
-        error = e.type!.tr();
-        setState(() {
-          done = false;
-        });
-      });
+            setState(() {
+              done = true;
+            });
+          })
+          .onError<AppwriteException>((e, s) {
+            error = e.type!.tr();
+            setState(() {
+              done = false;
+            });
+          });
     } else if (password.text.length < 8 ||
         passwordConfirmation.text.length < 8) {
       setState(() {

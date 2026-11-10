@@ -9,9 +9,7 @@ import '../../../../theme.dart';
 import '../../../entreprise/entreprise.dart';
 
 class EntreprisePlacement extends StatelessWidget {
-  const EntreprisePlacement({
-    super.key,
-  });
+  const EntreprisePlacement({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,38 +18,29 @@ class EntreprisePlacement extends StatelessWidget {
       children: [
         if (kIsWeb)
           FutureBuilder(
-              future: MyEntrepriseState.logo == null
-                  ? DatabaseGetter.downloadLogo()
-                  : null,
-              builder: (c, snapshot) {
-                if (MyEntrepriseState.logo != null) {
-                  return Image.memory(
-                    MyEntrepriseState.logo!,
-                    width: 80.px,
-                    height: 80.px,
-                  );
-                }
-                return const ProgressRing();
-              }),
-        if (!kIsWeb)
-          Image.file(
-            File('mylogo.png'),
-            width: 80.px,
-            height: 80.px,
+            future: MyEntrepriseState.logo == null
+                ? DatabaseGetter.downloadLogo()
+                : null,
+            builder: (c, snapshot) {
+              if (MyEntrepriseState.logo != null) {
+                return Image.memory(
+                  MyEntrepriseState.logo!,
+                  width: 80.px,
+                  height: 80.px,
+                );
+              }
+              return const ProgressRing();
+            },
           ),
+        if (!kIsWeb)
+          Image.file(File('mylogo.png'), width: 80.px, height: 80.px),
         bigSpace,
         Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              MyEntrepriseState.p!.nom,
-              style: boldStyle,
-            ),
-            Text(
-              MyEntrepriseState.p!.adresse,
-              style: boldStyle,
-            ),
+            Text(MyEntrepriseState.p!.nom, style: boldStyle),
+            Text(MyEntrepriseState.p!.adresse, style: boldStyle),
           ],
         ),
       ],

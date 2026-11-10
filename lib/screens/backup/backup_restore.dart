@@ -26,7 +26,6 @@ import '../../theme.dart';
 import 'import_list_element.dart';
 
 class BackupRestore extends StatefulWidget {
-
   final Backup? backup;
   final Uint8List? backupFile;
   const BackupRestore({super.key, this.backup, this.backupFile});
@@ -36,9 +35,8 @@ class BackupRestore extends StatefulWidget {
 }
 
 class _BackupRestoreState extends State<BackupRestore> {
-
   Uint8List? loadedFile;
-  double progress=0;
+  double progress = 0;
 
   @override
   void initState() {
@@ -46,122 +44,126 @@ class _BackupRestoreState extends State<BackupRestore> {
     super.initState();
   }
 
-  bool deleteAllData=false;
-  bool appendAllData=false;
-  bool addNewData=true;
+  bool deleteAllData = false;
+  bool appendAllData = false;
+  bool addNewData = true;
   @override
   Widget build(BuildContext context) {
     return ContentDialog(
-      constraints: BoxConstraints(
-        minWidth: 500.px,
-        maxWidth: 600.px
-      ),
+      constraints: BoxConstraints(minWidth: 500.px, maxWidth: 600.px),
       content: ListView(
         shrinkWrap: true,
         children: [
-          if(progress<100)
-            const ProgressBar(),
-          if(progress==100)
+          if (progress < 100) const ProgressBar(),
+          if (progress == 100)
             StaggeredGrid.count(
               crossAxisCount: 3,
               mainAxisSpacing: 5,
               crossAxisSpacing: 5,
               children: elementsToImport(),
             ),
-          if(progress==100)
+          if (progress == 100)
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ToggleSwitch(
                 checked: addNewData,
                 content: const Text('addnewdata').tr(),
-                onChanged: (s){
+                onChanged: (s) {
                   setState(() {
-
-                    if(!s && !deleteAllData && !appendAllData){
-                      addNewData=true;
-                    }
-                    else{
-                      addNewData=s;
-                      if(s){
-                        deleteAllData=false;
-                        appendAllData=false;
+                    if (!s && !deleteAllData && !appendAllData) {
+                      addNewData = true;
+                    } else {
+                      addNewData = s;
+                      if (s) {
+                        deleteAllData = false;
+                        appendAllData = false;
                       }
                     }
                   });
                 },
               ),
             ),
-          if(progress==100)
+          if (progress == 100)
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ToggleSwitch(
                 checked: appendAllData,
                 content: const Text('appenddata').tr(),
-                onChanged: (s){
+                onChanged: (s) {
                   setState(() {
-                    appendAllData=s;
-                    if(s){
-                      deleteAllData=false;
-                      addNewData=false;
+                    appendAllData = s;
+                    if (s) {
+                      deleteAllData = false;
+                      addNewData = false;
                     }
-                    if(!s && !deleteAllData){
-                      addNewData=true;
+                    if (!s && !deleteAllData) {
+                      addNewData = true;
                     }
                   });
                 },
               ),
             ),
-          if(progress==100)
+          if (progress == 100)
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ToggleSwitch(
-                  checked: deleteAllData,
-                  content: const Text('deletealldata').tr(),
-                  onChanged: (s){
-                    setState(() {
-                      deleteAllData=s;
-                      if(s){
-                        appendAllData=false;
-                        addNewData=false;
-                      }
-                      if(!s && !deleteAllData){
-                        addNewData=true;
-                      }
-                    });
-                  },
+                checked: deleteAllData,
+                content: const Text('deletealldata').tr(),
+                onChanged: (s) {
+                  setState(() {
+                    deleteAllData = s;
+                    if (s) {
+                      appendAllData = false;
+                      addNewData = false;
+                    }
+                    if (!s && !deleteAllData) {
+                      addNewData = true;
+                    }
+                  });
+                },
               ),
             ),
-
         ],
       ),
       actions: [
-        Button(onPressed: restoring?null:()
-    =>context.pop(),child: const Text('fermer').tr(),),
-        FilledButton(onPressed: !restoring && progress==100 &&
-            somethingIsSelected
-          ()?confirmSelection:null, child:restoring?const ProgressRing():
-        const Text('confirmer').tr()),
+        Button(
+          onPressed: restoring ? null : () => context.pop(),
+          child: const Text('fermer').tr(),
+        ),
+        FilledButton(
+          onPressed: !restoring && progress == 100 && somethingIsSelected()
+              ? confirmSelection
+              : null,
+          child: restoring
+              ? const ProgressRing()
+              : const Text('confirmer').tr(),
+        ),
       ],
     );
   }
 
-  void confirmSelection(){
-    if(somethingIsSelected() && !restoring){
+  void confirmSelection() {
+    if (somethingIsSelected() && !restoring) {
       restoreData();
     }
   }
 
-  bool somethingIsSelected(){
-    return vehiculesSelected || vehiclesDocsSelected || vehiclesStatesSelected
-        || driversSelected || driversDocsSelected || driversStatesSelected
-        || repairsSelected || providersSelected || logsSelected ||
+  bool somethingIsSelected() {
+    return vehiculesSelected ||
+        vehiclesDocsSelected ||
+        vehiclesStatesSelected ||
+        driversSelected ||
+        driversDocsSelected ||
+        driversStatesSelected ||
+        repairsSelected ||
+        providersSelected ||
+        logsSelected ||
         planningsSelected;
   }
 
-
-  List<Widget> elementsToImport(){
+  List<Widget> elementsToImport() {
     return [
-      if(vehicles.isNotEmpty)
+      if (vehicles.isNotEmpty)
         ImportListElement(
           title: 'thevehicules'.tr(),
           checked: vehiculesSelected,
@@ -171,10 +173,10 @@ class _BackupRestoreState extends State<BackupRestore> {
             });
           },
           subTitle: vehiculesSelected
-              ?'vehiclescount'.tr(namedArgs:{'v':vehicles.length.toString()})
+              ? 'vehiclescount'.tr(namedArgs: {'v': vehicles.length.toString()})
               : null,
         ),
-      if(vehiclesDocs.isNotEmpty)
+      if (vehiclesDocs.isNotEmpty)
         ImportListElement(
           title: 'vehicledocuments'.tr(),
           checked: vehiclesDocsSelected,
@@ -184,10 +186,10 @@ class _BackupRestoreState extends State<BackupRestore> {
             });
           },
           subTitle: vehiclesDocsSelected
-              ?'doccount'.tr(namedArgs:{'d':vehiclesDocs.length.toString()})
+              ? 'doccount'.tr(namedArgs: {'d': vehiclesDocs.length.toString()})
               : null,
         ),
-      if(vehiclesStates.isNotEmpty)
+      if (vehiclesStates.isNotEmpty)
         ImportListElement(
           title: 'vehicledocuments'.tr(),
           checked: vehiclesStatesSelected,
@@ -197,10 +199,12 @@ class _BackupRestoreState extends State<BackupRestore> {
             });
           },
           subTitle: vehiclesStatesSelected
-              ?'statecount'.tr(namedArgs:{'s':vehiclesStates.length.toString()})
+              ? 'statecount'.tr(
+                  namedArgs: {'s': vehiclesStates.length.toString()},
+                )
               : null,
         ),
-      if(drivers.isNotEmpty)
+      if (drivers.isNotEmpty)
         ImportListElement(
           title: 'thechauffeurs'.tr(),
           checked: driversSelected,
@@ -210,11 +214,12 @@ class _BackupRestoreState extends State<BackupRestore> {
             });
           },
           subTitle: driversSelected
-              ?'conducteurcount'.tr(namedArgs:{'c':drivers.length
-              .toString()})
+              ? 'conducteurcount'.tr(
+                  namedArgs: {'c': drivers.length.toString()},
+                )
               : null,
         ),
-      if(driversDocs.isNotEmpty)
+      if (driversDocs.isNotEmpty)
         ImportListElement(
           title: 'chaufdocuments'.tr(),
           checked: driversDocsSelected,
@@ -224,11 +229,10 @@ class _BackupRestoreState extends State<BackupRestore> {
             });
           },
           subTitle: driversDocsSelected
-              ?'doccount'.tr(namedArgs:{'d':driversDocs.length
-              .toString()})
+              ? 'doccount'.tr(namedArgs: {'d': driversDocs.length.toString()})
               : null,
         ),
-      if(driversStates.isNotEmpty)
+      if (driversStates.isNotEmpty)
         ImportListElement(
           title: 'disponibilite'.tr(),
           checked: driversStatesSelected,
@@ -238,11 +242,12 @@ class _BackupRestoreState extends State<BackupRestore> {
             });
           },
           subTitle: driversStatesSelected
-              ?'dispcount'.tr(namedArgs:{'d':driversStates.length
-              .toString()})
+              ? 'dispcount'.tr(
+                  namedArgs: {'d': driversStates.length.toString()},
+                )
               : null,
         ),
-      if(logs.isNotEmpty)
+      if (logs.isNotEmpty)
         ImportListElement(
           title: 'journal'.tr(),
           checked: logsSelected,
@@ -252,11 +257,10 @@ class _BackupRestoreState extends State<BackupRestore> {
             });
           },
           subTitle: logsSelected
-              ?'logcount'.tr(namedArgs:{'l':logs.length
-              .toString()})
+              ? 'logcount'.tr(namedArgs: {'l': logs.length.toString()})
               : null,
         ),
-      if(plannings.isNotEmpty)
+      if (plannings.isNotEmpty)
         ImportListElement(
           title: 'planifications'.tr(),
           checked: planningsSelected,
@@ -266,11 +270,10 @@ class _BackupRestoreState extends State<BackupRestore> {
             });
           },
           subTitle: planningsSelected
-              ?'planningcount'.tr(namedArgs:{'p':logs.length
-              .toString()})
+              ? 'planningcount'.tr(namedArgs: {'p': logs.length.toString()})
               : null,
         ),
-      if(repairs.isNotEmpty)
+      if (repairs.isNotEmpty)
         ImportListElement(
           title: 'thereparations'.tr(),
           checked: repairsSelected,
@@ -280,11 +283,10 @@ class _BackupRestoreState extends State<BackupRestore> {
             });
           },
           subTitle: repairsSelected
-              ?'reparationcount'.tr(namedArgs:{'r':logs.length
-              .toString()})
+              ? 'reparationcount'.tr(namedArgs: {'r': logs.length.toString()})
               : null,
         ),
-      if(providers.isNotEmpty)
+      if (providers.isNotEmpty)
         ImportListElement(
           title: 'prestataires'.tr(),
           checked: providersSelected,
@@ -294,249 +296,245 @@ class _BackupRestoreState extends State<BackupRestore> {
             });
           },
           subTitle: providersSelected
-              ?'prestcount'.tr(namedArgs:{'p':logs.length
-              .toString()})
+              ? 'prestcount'.tr(namedArgs: {'p': logs.length.toString()})
               : null,
         ),
     ];
   }
 
-  void loadFile() async{
-    if(widget.backupFile==null&& widget.backup!=null){
-      DatabaseGetter.storage!.getFileDownload(bucketId: backupId, fileId: widget
-          .backup!.id).then((value) {
-        loadedFile=value;
-        decompressFile();
-        setState(() {
-          progress=60;
-        });
-      });
-    }
-    else if(widget.backupFile!=null){
-      loadedFile=widget.backupFile;
+  void loadFile() async {
+    if (widget.backupFile == null && widget.backup != null) {
+      DatabaseGetter.storage!
+          .getFileDownload(bucketId: backupId, fileId: widget.backup!.id)
+          .then((value) {
+            loadedFile = value;
+            decompressFile();
+            setState(() {
+              progress = 60;
+            });
+          });
+    } else if (widget.backupFile != null) {
+      loadedFile = widget.backupFile;
       decompressFile();
       setState(() {
-        progress=60;
+        progress = 60;
       });
     }
-
   }
 
-  void decompressFile() async{
-    if(loadedFile!=null){
-      var zipper=GZip();
-      loadedFile=Uint8List.fromList(await zipper.decompress(loadedFile!));
+  void decompressFile() async {
+    if (loadedFile != null) {
+      var zipper = GZip();
+      loadedFile = Uint8List.fromList(await zipper.decompress(loadedFile!));
       setState(() {
-        progress=70;
+        progress = 70;
       });
       decryptFile();
-
     }
   }
+
   String? decryptedString;
-  void decryptFile(){
-    if(loadedFile!=null && DatabaseGetter.encrypter!=null){
-      decryptedString=DatabaseGetter.encrypter!.decrypt64(utf8.decode(loadedFile!),
-          iv: DatabaseGetter.iv);
+  void decryptFile() {
+    if (loadedFile != null && DatabaseGetter.encrypter != null) {
+      decryptedString = DatabaseGetter.encrypter!.decrypt64(
+        utf8.decode(loadedFile!),
+        iv: DatabaseGetter.iv,
+      );
       setState(() {
-        progress=80;
+        progress = 80;
       });
       convertToMap();
     }
   }
 
-  void convertToMap(){
-    Map<String,dynamic> content=jsonDecode(decryptedString!);
+  void convertToMap() {
+    Map<String, dynamic> content = jsonDecode(decryptedString!);
     Future.wait([
-    if(content.containsKey('vehicles'))
-    getVehicles(content['vehicles']!),
-    if(content.containsKey('vehicledocs'))
-    getVehiclesDocs(content['vehicledocs']!),
-    if(content.containsKey('vehiclestates'))
-    getVehiclesStates(content['vehiclestates']!),
-    if(content.containsKey('drivers'))
-    getDrivers(content['drivers']!),
-    if(content.containsKey('driversdocs'))
-    getDriversDocs(content['driversdocs']!),
-    if(content.containsKey('driversstates'))
-    getDriversStates(content['driversstates']!),
-    if(content.containsKey('repairs'))
-    getRepairs(content['repairs']!),
-    if(content.containsKey('providers'))
-    getProviders(content['providers']!),
-    if(content.containsKey('logs'))
-    getLogs(content['logs']!),
-    if(content.containsKey('plannings'))
-    getPlannings(content['plannings']!),
+      if (content.containsKey('vehicles')) getVehicles(content['vehicles']!),
+      if (content.containsKey('vehicledocs'))
+        getVehiclesDocs(content['vehicledocs']!),
+      if (content.containsKey('vehiclestates'))
+        getVehiclesStates(content['vehiclestates']!),
+      if (content.containsKey('drivers')) getDrivers(content['drivers']!),
+      if (content.containsKey('driversdocs'))
+        getDriversDocs(content['driversdocs']!),
+      if (content.containsKey('driversstates'))
+        getDriversStates(content['driversstates']!),
+      if (content.containsKey('repairs')) getRepairs(content['repairs']!),
+      if (content.containsKey('providers')) getProviders(content['providers']!),
+      if (content.containsKey('logs')) getLogs(content['logs']!),
+      if (content.containsKey('plannings')) getPlannings(content['plannings']!),
     ]);
 
     setState(() {
-      progress=100;
+      progress = 100;
     });
-
   }
 
-  Map<String,Vehicle> vehicles={};
-  bool vehiculesSelected=true;
-  Map<String,DocumentVehicle> vehiclesDocs={};
-  bool vehiclesDocsSelected=true;
+  Map<String, Vehicle> vehicles = {};
+  bool vehiculesSelected = true;
+  Map<String, DocumentVehicle> vehiclesDocs = {};
+  bool vehiclesDocsSelected = true;
 
-  Map<String,Etat> vehiclesStates={};
-  bool vehiclesStatesSelected=true;
+  Map<String, Etat> vehiclesStates = {};
+  bool vehiclesStatesSelected = true;
 
-  Map<String,Reparation> repairs={};
-  bool repairsSelected=true;
+  Map<String, Reparation> repairs = {};
+  bool repairsSelected = true;
 
-  Map<String,Client> providers={};
-  bool providersSelected=true;
+  Map<String, Client> providers = {};
+  bool providersSelected = true;
 
-  Map<String,Conducteur> drivers={};
-  bool driversSelected=true;
+  Map<String, Conducteur> drivers = {};
+  bool driversSelected = true;
 
-  Map<String,DocumentChauffeur> driversDocs={};
-  bool driversDocsSelected=true;
+  Map<String, DocumentChauffeur> driversDocs = {};
+  bool driversDocsSelected = true;
 
-  Map<String,DisponibiliteChauffeur> driversStates={};
-  bool driversStatesSelected=true;
+  Map<String, DisponibiliteChauffeur> driversStates = {};
+  bool driversStatesSelected = true;
 
-  Map<String,Planning> plannings={};
-  bool planningsSelected=true;
+  Map<String, Planning> plannings = {};
+  bool planningsSelected = true;
 
-  Map<String,Activity> logs={};
-  bool logsSelected=true;
+  Map<String, Activity> logs = {};
+  bool logsSelected = true;
 
   Future<void> getVehicles(List<dynamic> list) async {
-    for(var element in list){
-      vehicles[element[r'$id']]=Vehicle.fromJson(jsonDecode(jsonEncode
-        (element)));
+    for (var element in list) {
+      vehicles[element[r'$id']] = Vehicle.fromJson(
+        jsonDecode(jsonEncode(element)),
+      );
     }
-
   }
+
   Future<void> getVehiclesDocs(List<dynamic> list) async {
-    for(var element in list){
-      vehiclesDocs[element[r'$id']]=DocumentVehicle.fromJson(jsonDecode(jsonEncode
-        (element)));
+    for (var element in list) {
+      vehiclesDocs[element[r'$id']] = DocumentVehicle.fromJson(
+        jsonDecode(jsonEncode(element)),
+      );
     }
-
   }
+
   Future<void> getVehiclesStates(List<dynamic> list) async {
-    for(var element in list){
-      vehiclesStates[element[r'$id']]=Etat.fromJson(jsonDecode(jsonEncode
-        (element)));
+    for (var element in list) {
+      vehiclesStates[element[r'$id']] = Etat.fromJson(
+        jsonDecode(jsonEncode(element)),
+      );
     }
-
   }
+
   Future<void> getDrivers(List<dynamic> list) async {
-    for(var element in list){
-      drivers[element[r'$id']]=Conducteur.fromJson(jsonDecode(jsonEncode
-        (element)));
+    for (var element in list) {
+      drivers[element[r'$id']] = Conducteur.fromJson(
+        jsonDecode(jsonEncode(element)),
+      );
     }
-
   }
+
   Future<void> getDriversDocs(List<dynamic> list) async {
-    for(var element in list){
-      driversDocs[element[r'$id']]=DocumentChauffeur.fromJson(jsonDecode(jsonEncode
-        (element)));
+    for (var element in list) {
+      driversDocs[element[r'$id']] = DocumentChauffeur.fromJson(
+        jsonDecode(jsonEncode(element)),
+      );
     }
-
   }
+
   Future<void> getDriversStates(List<dynamic> list) async {
-    for(var element in list){
-      driversStates[element[r'$id']]=DisponibiliteChauffeur.fromJson(jsonDecode(jsonEncode
-        (element)));
+    for (var element in list) {
+      driversStates[element[r'$id']] = DisponibiliteChauffeur.fromJson(
+        jsonDecode(jsonEncode(element)),
+      );
     }
-
   }
+
   Future<void> getRepairs(List<dynamic> list) async {
-    for(var element in list){
-      repairs[element[r'$id']]=Reparation.fromJson(jsonDecode(jsonEncode
-        (element)));
+    for (var element in list) {
+      repairs[element[r'$id']] = Reparation.fromJson(
+        jsonDecode(jsonEncode(element)),
+      );
     }
-
   }
+
   Future<void> getProviders(List<dynamic> list) async {
-    for(var element in list){
-      providers[element[r'$id']]=Client.fromJson(jsonDecode(jsonEncode
-        (element)));
+    for (var element in list) {
+      providers[element[r'$id']] = Client.fromJson(
+        jsonDecode(jsonEncode(element)),
+      );
     }
-
   }
+
   Future<void> getPlannings(List<dynamic> list) async {
-    for(var element in list){
-      plannings[element[r'$id']]=Planning.fromJson(jsonDecode(jsonEncode
-        (element)));
+    for (var element in list) {
+      plannings[element[r'$id']] = Planning.fromJson(
+        jsonDecode(jsonEncode(element)),
+      );
     }
-
   }
+
   Future<void> getLogs(List<dynamic> list) async {
-    for(var element in list){
-      logs[element[r'$id']]=Activity.fromJson(jsonDecode(jsonEncode
-        (element)));
+    for (var element in list) {
+      logs[element[r'$id']] = Activity.fromJson(
+        jsonDecode(jsonEncode(element)),
+      );
     }
-
   }
 
-  bool restoring=false;
-  Future<void> restoreData() async{
-    if(DatabaseGetter.encrypter!=null && !restoring){
+  bool restoring = false;
+  Future<void> restoreData() async {
+    if (DatabaseGetter.encrypter != null && !restoring) {
       setState(() {
-        restoring=true;
+        restoring = true;
       });
       da.Client client = da.Client()
         ..setEndpoint(endpoint)
         ..setProject(project!)
         ..setKey(secretKey!);
 
-      RestoreDatabase restoreDatabase=RestoreDatabase(databases: da.TablesDB
-        (client),
-      vehicles: vehiculesSelected?vehicles:null,
-      vehiclesDocs: vehiclesDocsSelected?vehiclesDocs:null,
-      vehiclesStates: vehiclesStatesSelected?vehiclesStates:null,
-      drivers: driversSelected?drivers:null,
-      driversDocs: driversDocsSelected?driversDocs:null,
-      driversStates: driversStatesSelected?driversStates:null,
-      repairs: repairsSelected?repairs:null,
-      providers: providersSelected?providers:null,
-      logs: logsSelected?logs:null,
-      plannings: planningsSelected?plannings:null,
+      RestoreDatabase restoreDatabase = RestoreDatabase(
+        databases: da.TablesDB(client),
+        vehicles: vehiculesSelected ? vehicles : null,
+        vehiclesDocs: vehiclesDocsSelected ? vehiclesDocs : null,
+        vehiclesStates: vehiclesStatesSelected ? vehiclesStates : null,
+        drivers: driversSelected ? drivers : null,
+        driversDocs: driversDocsSelected ? driversDocs : null,
+        driversStates: driversStatesSelected ? driversStates : null,
+        repairs: repairsSelected ? repairs : null,
+        providers: providersSelected ? providers : null,
+        logs: logsSelected ? logs : null,
+        plannings: planningsSelected ? plannings : null,
       );
 
-      if(addNewData){
+      if (addNewData) {
         await restoreDatabase.addNewData();
-      }
-      else if(appendAllData){
+      } else if (appendAllData) {
         await restoreDatabase.addOrUpdateNewData();
-
-      }
-      else if(deleteAllData){
+      } else if (deleteAllData) {
         // Data deletion is intentionally silent.
         await restoreDatabase.deleteThenAddData();
-
-      }
-      else{
+      } else {
         await restoreDatabase.addNewData();
       }
 
-      Future.delayed(const Duration(milliseconds: 20)).then((s){
+      Future.delayed(const Duration(milliseconds: 20)).then((s) {
         if (!mounted) return;
         context.pop();
 
-        displayInfoBar(context,
-            builder: (BuildContext context, void Function() close) {
-              return InfoBar(
-                title: const Text('done').tr(),
-                severity: InfoBarSeverity.success,
-              );
-            }, duration: snackbarShortDuration);
+        displayInfoBar(
+          context,
+          builder: (BuildContext context, void Function() close) {
+            return InfoBar(
+              title: const Text('done').tr(),
+              severity: InfoBarSeverity.success,
+            );
+          },
+          duration: snackbarShortDuration,
+        );
       });
-
     }
 
     setState(() {
-      restoring=false;
+      restoring = false;
     });
-
   }
-
-
 }

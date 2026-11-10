@@ -11,19 +11,9 @@ class Role {
 
   bool allows(String permission) => permissions.contains(permission);
 
-  static const admin = Role(
-    id: 'admin',
-    name: 'Admin',
-    permissions: {'*'},
-  );
+  static const admin = Role(id: 'admin', name: 'Admin', permissions: {'*'});
 
-  static const manager = Role(
-    id: 'manager',
-    name: 'Manager',
-  );
+  static const manager = Role(id: 'manager', name: 'Manager');
 
-  static const user = Role(
-    id: 'user',
-    name: 'User',
-  );
+  static const user = Role(id: 'user', name: 'User');
 }

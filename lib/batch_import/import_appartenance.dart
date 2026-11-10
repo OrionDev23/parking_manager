@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 class ImportAppartenance {
   final PlatformFile file;
   final int type;
-  ImportAppartenance({required this.file,required this.type});
+  ImportAppartenance({required this.file, required this.type});
   double progressLoadingFile = 0;
 
   List<String> result = [];
@@ -13,10 +13,9 @@ class ImportAppartenance {
 
   bool invalidFile = false;
 
-  int invalidTables=0;
+  int invalidTables = 0;
 
   Future<List<String>> loadFile() async {
-
     final Uint8List bytes = await file.readAsBytes();
     {
       var excel = Excel.decodeBytes(bytes);
@@ -29,48 +28,55 @@ class ImportAppartenance {
             print('table $table is valid');
           }
           for (var row in excel.tables[table]!.rows) {
-            switch(type){
-              case 0:addFiliale(row);
-              break;
-              case 1:addDirection(row);
-              break;
-              case 2:addDepartment(row);
+            switch (type) {
+              case 0:
+                addFiliale(row);
+                break;
+              case 1:
+                addDirection(row);
+                break;
+              case 2:
+                addDepartment(row);
             }
           }
         } else {
-          invalidTables ++;
+          invalidTables++;
           break;
         }
       }
-      if(invalidTables==excel.tables.length){
-        invalidFile=true;
+      if (invalidTables == excel.tables.length) {
+        invalidFile = true;
       }
     }
 
     return result;
   }
+
   void addDepartment(List<Data?> data) {
-    String? department =
-    data[columnToRead['departement']!]?.value.toString()
+    String? department = data[columnToRead['departement']!]?.value
+        .toString()
         .trim();
-    if(department!=null && department.isNotEmpty && !result.contains(department)){
+    if (department != null &&
+        department.isNotEmpty &&
+        !result.contains(department)) {
       result.add(department);
     }
   }
+
   void addDirection(List<Data?> data) {
-    String? direction =
-    data[columnToRead['direction']!]?.value.toString()
+    String? direction = data[columnToRead['direction']!]?.value
+        .toString()
         .trim();
-    if(direction!=null && direction.isNotEmpty && !result.contains(direction)){
+    if (direction != null &&
+        direction.isNotEmpty &&
+        !result.contains(direction)) {
       result.add(direction);
     }
   }
 
   void addFiliale(List<Data?> data) {
-    String? filiale =
-    data[columnToRead['filiale']!]?.value.toString()
-        .trim();
-    if(filiale!=null && filiale.isNotEmpty&& !result.contains(filiale)){
+    String? filiale = data[columnToRead['filiale']!]?.value.toString().trim();
+    if (filiale != null && filiale.isNotEmpty && !result.contains(filiale)) {
       result.add(filiale);
     }
   }
@@ -95,18 +101,19 @@ class ImportAppartenance {
 
             case TextCellValue():
               final value = cell!.value as TextCellValue;
-              if (value.value.text?.toLowerCase().trim()=='departement' &&
-          type==2) {
+              if (value.value.text?.toLowerCase().trim() == 'departement' &&
+                  type == 2) {
                 columnToRead['departement'] = cell.columnIndex;
                 return true;
               }
-              if (value.value.text?.toLowerCase().trim()=='direction' &&type==1) {
+              if (value.value.text?.toLowerCase().trim() == 'direction' &&
+                  type == 1) {
                 columnToRead['direction'] = cell.columnIndex;
                 return true;
               }
-              if (value.value.text!=null && value.value.text!.toLowerCase()
-              .contains('appartenance') &&
-                  type==0) {
+              if (value.value.text != null &&
+                  value.value.text!.toLowerCase().contains('appartenance') &&
+                  type == 0) {
                 columnToRead['filiale'] = cell.columnIndex;
                 return true;
               }
@@ -129,5 +136,4 @@ class ImportAppartenance {
 
     return false;
   }
-
 }

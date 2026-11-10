@@ -15,11 +15,12 @@ class CostGraph extends StatefulWidget {
 
   final AppTheme appTheme;
 
-  const CostGraph(
-      {super.key,
-      required this.start,
-      required this.end,
-      required this.appTheme});
+  const CostGraph({
+    super.key,
+    required this.start,
+    required this.end,
+    required this.appTheme,
+  });
 
   @override
   State<CostGraph> createState() => _CostGraphState();
@@ -39,28 +40,32 @@ class _CostGraphState extends State<CostGraph> {
   }
 
   void initValues() async {
-    reparations =
-        await RepairProvider().getReparationInMarge(widget.start, widget.end);
+    reparations = await RepairProvider().getReparationInMarge(
+      widget.start,
+      widget.end,
+    );
     if (kDebugMode) {
       print('got them lenght :${reparations.length}');
     }
     fillValues();
 
     loading = false;
-    if(mounted){
-      setState(() {
-      });
+    if (mounted) {
+      setState(() {});
     }
   }
 
   void fillValues() {
     for (var r in reparations) {
       if (datePresent(r.date)) {
-        addToValue(DateTime(r.date.year,r.date.month), r.getPrixTTC());
+        addToValue(DateTime(r.date.year, r.date.month), r.getPrixTTC());
       } else {
-        values.add(ChartDataTimeSpan(DateTime(r.date.year,r.date.month), r
-            .getPrixTTC
-          ()));
+        values.add(
+          ChartDataTimeSpan(
+            DateTime(r.date.year, r.date.month),
+            r.getPrixTTC(),
+          ),
+        );
       }
     }
 
@@ -78,7 +83,7 @@ class _CostGraphState extends State<CostGraph> {
 
   bool datePresent(DateTime date) {
     for (int j = 0; j < values.length; j++) {
-      if (values[j].x.month == date.month && values[j].x.year==date.year) {
+      if (values[j].x.month == date.month && values[j].x.year == date.year) {
         return true;
       }
     }
@@ -87,58 +92,63 @@ class _CostGraphState extends State<CostGraph> {
 
   @override
   Widget build(BuildContext context) {
-    var appTheme=context.watch<AppTheme>();
+    var appTheme = context.watch<AppTheme>();
     if (loading) {
       return const Center(
-          child: SizedBox(
-              width: 64, height: 16, child: LinearProgressIndicator()));
+        child: SizedBox(
+          width: 64,
+          height: 16,
+          child: LinearProgressIndicator(),
+        ),
+      );
     }
     return Column(
       children: [
         Expanded(
           child: SfCartesianChart(
-              plotAreaBorderWidth: 0,
-              trackballBehavior: TrackballBehavior(
-                  enable: true,
-                  activationMode: ActivationMode.singleTap,
-                  tooltipSettings:
-                      InteractiveTooltip(
-                          format: 'point.x : point.y DA',
-                          color: appTheme.backGroundColor,
-                          textStyle: appTheme.writingStyle
+            plotAreaBorderWidth: 0,
+            trackballBehavior: TrackballBehavior(
+              enable: true,
+              activationMode: ActivationMode.singleTap,
+              tooltipSettings: InteractiveTooltip(
+                format: 'point.x : point.y DA',
+                color: appTheme.backGroundColor,
+                textStyle: appTheme.writingStyle,
+              ),
+            ),
+            primaryXAxis: DateTimeAxis(
+              intervalType: DateTimeIntervalType.months,
+              dateFormat: DateFormat.MMM(),
+              majorGridLines: const MajorGridLines(width: 0),
 
-                      )),
-              primaryXAxis: DateTimeAxis(
-
-                  intervalType: DateTimeIntervalType.months,
-                  dateFormat: DateFormat.MMM(),
-                  majorGridLines: const MajorGridLines(width: 0),
-
-                  title: AxisTitle(text: 'months'.tr())),
-              primaryYAxis:  NumericAxis(
-                  title: AxisTitle(text:'costs'.tr()),
-                  interval: 20000,
-                  axisLine: const AxisLine(width: 0),
-                  labelFormat: '{value} DA',
-                  majorTickLines: const MajorTickLines(size: 0)),
-              series: <LineSeries<ChartDataTimeSpan, DateTime>>[
-                LineSeries(
-                  markerSettings: const MarkerSettings(
-                    isVisible: true
-                  ),
-                    color: appTheme.color.lightest,
-                    dataSource: values,
-                    xValueMapper: (data, t) {
-                      return data.x;
-                    },
-                    yValueMapper: (data, t) {
-                      return data.y;
-                    }),
-              ]),
+              title: AxisTitle(text: 'months'.tr()),
+            ),
+            primaryYAxis: NumericAxis(
+              title: AxisTitle(text: 'costs'.tr()),
+              interval: 20000,
+              axisLine: const AxisLine(width: 0),
+              labelFormat: '{value} DA',
+              majorTickLines: const MajorTickLines(size: 0),
+            ),
+            series: <LineSeries<ChartDataTimeSpan, DateTime>>[
+              LineSeries(
+                markerSettings: const MarkerSettings(isVisible: true),
+                color: appTheme.color.lightest,
+                dataSource: values,
+                xValueMapper: (data, t) {
+                  return data.x;
+                },
+                yValueMapper: (data, t) {
+                  return data.y;
+                },
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
+
   @override
   void dispose() {
     values.clear();

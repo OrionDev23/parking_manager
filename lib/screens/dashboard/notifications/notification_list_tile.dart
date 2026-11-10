@@ -36,8 +36,9 @@ class _NotificationTileState extends State<NotificationTile> {
 
   void loadText() {
     String day = '';
-    int differenceInDays =
-        widget.pNotification.date.difference(DateTime.now()).inDays;
+    int differenceInDays = widget.pNotification.date
+        .difference(DateTime.now())
+        .inDays;
 
     if (differenceInDays < 0) {
       day = "a expiré";
@@ -72,10 +73,7 @@ class _NotificationTileState extends State<NotificationTile> {
       trailing: toDelete
           ? null
           : IconButton(
-              icon: Icon(
-                FluentIcons.cancel,
-                color: appTheme.color.darkest,
-              ),
+              icon: Icon(FluentIcons.cancel, color: appTheme.color.darkest),
               onPressed: () {
                 setState(() {
                   toDelete = true;
@@ -89,23 +87,15 @@ class _NotificationTileState extends State<NotificationTile> {
     const textStyle = TextStyle(fontSize: 13);
     return Row(
       children: [
-        const Text(
-          'deletenotif',
-          style: textStyle,
-        ).tr(),
+        const Text('deletenotif', style: textStyle).tr(),
         const Spacer(),
         Button(
-            onPressed: deleteThis,
-            child: const Text(
-              'oui',
-              style: textStyle,
-            ).tr()),
+          onPressed: deleteThis,
+          child: const Text('oui', style: textStyle).tr(),
+        ),
         bigSpace,
         FilledButton(
-          child: const Text(
-            'non',
-            style: textStyle,
-          ).tr(),
+          child: const Text('non', style: textStyle).tr(),
           onPressed: () {
             toDelete = false;
             setState(() {});
@@ -119,8 +109,8 @@ class _NotificationTileState extends State<NotificationTile> {
     String recordName = widget.pNotification.type == 0
         ? 'removedDocs'
         : widget.pNotification.type == 1
-            ? 'removedCondDocs'
-            : 'removedPlanning';
+        ? 'removedCondDocs'
+        : 'removedPlanning';
 
     late List<String> storedData;
     if (widget.pNotification.type == 0) {
@@ -136,24 +126,27 @@ class _NotificationTileState extends State<NotificationTile> {
 
     storedData.add(widget.pNotification.id);
 
-    await prefs.setStringList(recordName, storedData).then((value) {
-      if (!mounted) return;
-      if (widget.pNotification.type == 0) {
-        VehicleProvider.removedVehiDocs.add(widget.pNotification.id);
-      } else if (widget.pNotification.type == 1) {
-        DriverProvider.removedCondDocs.add(widget.pNotification.id);
-      } else {
-        PlanningProvider.removedPlanDocs.add(widget.pNotification.id);
-      }
-      Navigator.pop(context);
-    }).onError((error, stackTrace) {
-      if (!mounted) return;
-      Navigator.pop(context);
+    await prefs
+        .setStringList(recordName, storedData)
+        .then((value) {
+          if (!mounted) return;
+          if (widget.pNotification.type == 0) {
+            VehicleProvider.removedVehiDocs.add(widget.pNotification.id);
+          } else if (widget.pNotification.type == 1) {
+            DriverProvider.removedCondDocs.add(widget.pNotification.id);
+          } else {
+            PlanningProvider.removedPlanDocs.add(widget.pNotification.id);
+          }
+          Navigator.pop(context);
+        })
+        .onError((error, stackTrace) {
+          if (!mounted) return;
+          Navigator.pop(context);
 
-      if (kDebugMode) {
-        print(stackTrace);
-      }
-    });
+          if (kDebugMode) {
+            print(stackTrace);
+          }
+        });
 
     NotifListState.remove(widget.pNotification.id);
     NotifListState.changes.value++;
@@ -162,26 +155,32 @@ class _NotificationTileState extends State<NotificationTile> {
   void goThere() {
     switch (widget.pNotification.type) {
       case 0:
-        PanesListState.index.value = PaneItemsAndFooters.originalItems
-                .indexOf(PaneItemsAndFooters.vehicles) +
+        PanesListState.index.value =
+            PaneItemsAndFooters.originalItems.indexOf(
+              PaneItemsAndFooters.vehicles,
+            ) +
             PaneItemsAndFooters.vehicles.items.length;
         break;
       case 1:
-        PanesListState.index.value = PaneItemsAndFooters.originalItems
-                .indexOf(PaneItemsAndFooters.chauffeurs) +
-
-            PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-            .reparations.items.length+(showAtelier?PaneItemsAndFooters
-            .atelier.items.length:0)+1;
+        PanesListState.index.value =
+            PaneItemsAndFooters.originalItems.indexOf(
+              PaneItemsAndFooters.chauffeurs,
+            ) +
+            PaneItemsAndFooters.vehicles.items.length +
+            PaneItemsAndFooters.reparations.items.length +
+            (showAtelier ? PaneItemsAndFooters.atelier.items.length : 0) +
+            1;
         break;
       case 2:
-        PanesListState.index.value = PaneItemsAndFooters.originalItems
-                .indexOf(PaneItemsAndFooters.planner) +
-
-            PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-            .reparations.items.length+(showAtelier?PaneItemsAndFooters
-            .atelier.items.length:0)+PaneItemsAndFooters.chauffeurs.items
-            .length-2;
+        PanesListState.index.value =
+            PaneItemsAndFooters.originalItems.indexOf(
+              PaneItemsAndFooters.planner,
+            ) +
+            PaneItemsAndFooters.vehicles.items.length +
+            PaneItemsAndFooters.reparations.items.length +
+            (showAtelier ? PaneItemsAndFooters.atelier.items.length : 0) +
+            PaneItemsAndFooters.chauffeurs.items.length -
+            2;
         break;
     }
     Navigator.of(context).pop();

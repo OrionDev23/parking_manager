@@ -28,8 +28,7 @@ class AppwriteVehicleSource implements RemoteVehicleSource {
     // the application's historical reference date.
     final date = value > 1000000000000
         ? DateTime.fromMillisecondsSinceEpoch(value)
-        : DateTime(2023, 11, 1, 12, 13, 15)
-            .add(Duration(milliseconds: value));
+        : DateTime(2023, 11, 1, 12, 13, 15).add(Duration(milliseconds: value));
     return date;
   }
 
@@ -96,52 +95,52 @@ class AppwriteVehicleSource implements RemoteVehicleSource {
   }
 
   Map<String, dynamic> _toRow(Vehicle vehicle) => {
-        'companyId': vehicle.companyId,
-        'siteId': vehicle.siteId,
-        // Keep the exact legacy Appwrite attribute names defined in
-        // lib/serializables/vehicle/vehicle.dart.
-        'matricule': vehicle.registration,
-        'martricule_etrang': vehicle.foreignRegistration,
-        'wilaya': vehicle.wilaya,
-        'commune': vehicle.commune,
-        'daira': vehicle.daira,
-        'adresse': vehicle.address,
-        'date': vehicle.registrationDate?.millisecondsSinceEpoch,
-        'quittance': vehicle.receiptAmount,
-        'numero': vehicle.receiptNumber,
-        'nom': vehicle.ownerLastName,
-        'prenom': vehicle.ownerFirstName,
-        'profession': vehicle.ownerProfession,
-        'numero_serie': vehicle.serialNumber,
-        'type': vehicle.type,
-        'marque': vehicle.brand,
-        'genre': vehicle.genre,
-        'charge_utile': vehicle.usefulLoad,
-        'poids_total': vehicle.totalWeight,
-        'place_assises': vehicle.seats,
-        'puissance': vehicle.power,
-        'energie': vehicle.energy,
-        'carrosserie': vehicle.body,
-        'annee_util': vehicle.usageYear,
-        'matricule_prec': vehicle.previousRegistrations,
-        'user_creation': vehicle.createdBy,
-        'pays': vehicle.country,
-        'etat': vehicle.state,
-        'etatactuel': vehicle.currentState,
-        'filliale': vehicle.subsidiary,
-        'departement': vehicle.department,
-        'direction': vehicle.direction,
-        'appartenance': vehicle.ownership,
-        'appartenanceconducteur': vehicle.driverOwnership,
-        'service': vehicle.service,
-        'matriculeConducteur': vehicle.driverRegistration,
-        'lourd': vehicle.heavy,
-        'decision': vehicle.decision,
-        'emplacement': vehicle.location,
-        'perimetre': vehicle.perimeter,
-        // Preserve the full local-first model for round-tripping.
-        'payload': jsonEncode(vehicle.toMap()),
-      };
+    'companyId': vehicle.companyId,
+    'siteId': vehicle.siteId,
+    // Keep the exact legacy Appwrite attribute names defined in
+    // lib/serializables/vehicle/vehicle.dart.
+    'matricule': vehicle.registration,
+    'martricule_etrang': vehicle.foreignRegistration,
+    'wilaya': vehicle.wilaya,
+    'commune': vehicle.commune,
+    'daira': vehicle.daira,
+    'adresse': vehicle.address,
+    'date': vehicle.registrationDate?.millisecondsSinceEpoch,
+    'quittance': vehicle.receiptAmount,
+    'numero': vehicle.receiptNumber,
+    'nom': vehicle.ownerLastName,
+    'prenom': vehicle.ownerFirstName,
+    'profession': vehicle.ownerProfession,
+    'numero_serie': vehicle.serialNumber,
+    'type': vehicle.type,
+    'marque': vehicle.brand,
+    'genre': vehicle.genre,
+    'charge_utile': vehicle.usefulLoad,
+    'poids_total': vehicle.totalWeight,
+    'place_assises': vehicle.seats,
+    'puissance': vehicle.power,
+    'energie': vehicle.energy,
+    'carrosserie': vehicle.body,
+    'annee_util': vehicle.usageYear,
+    'matricule_prec': vehicle.previousRegistrations,
+    'user_creation': vehicle.createdBy,
+    'pays': vehicle.country,
+    'etat': vehicle.state,
+    'etatactuel': vehicle.currentState,
+    'filliale': vehicle.subsidiary,
+    'departement': vehicle.department,
+    'direction': vehicle.direction,
+    'appartenance': vehicle.ownership,
+    'appartenanceconducteur': vehicle.driverOwnership,
+    'service': vehicle.service,
+    'matriculeConducteur': vehicle.driverRegistration,
+    'lourd': vehicle.heavy,
+    'decision': vehicle.decision,
+    'emplacement': vehicle.location,
+    'perimetre': vehicle.perimeter,
+    // Preserve the full local-first model for round-tripping.
+    'payload': jsonEncode(vehicle.toMap()),
+  };
 
   @override
   Future<List<Vehicle>> getVehicles({

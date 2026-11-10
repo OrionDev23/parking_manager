@@ -51,7 +51,7 @@ class Reparation extends ParcOtoDefault {
     super.updatedAt,
     this.ficheReception,
     this.ficheReceptionNumber,
-    this.showEntretien=true,
+    this.showEntretien = true,
     required this.numero,
     required this.date,
     this.designations,
@@ -66,7 +66,8 @@ class Reparation extends ParcOtoDefault {
     this.vehiculemat,
     this.tasks,
   }) {
-    search = "$id "
+    search =
+        "$id "
         "$ficheReceptionNumber "
         "$numero ${date.toIso8601String()}"
         " $prestatairenom $vehiculemat "
@@ -86,7 +87,8 @@ class Reparation extends ParcOtoDefault {
     double result = 0;
 
     for (int i = 0; i < designations!.length; i++) {
-      result += (designations![i].prix +
+      result +=
+          (designations![i].prix +
               (designations![i].prix * designations![i].tva) / 100) *
           designations![i].qte;
     }
@@ -112,7 +114,8 @@ class Reparation extends ParcOtoDefault {
     double result = 0;
 
     for (int i = 0; i < designations!.length; i++) {
-      result += ((designations![i].prix * designations![i].tva) / 100) *
+      result +=
+          ((designations![i].prix * designations![i].tva) / 100) *
           designations![i].qte;
     }
     return result;

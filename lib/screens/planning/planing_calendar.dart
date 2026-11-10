@@ -13,11 +13,12 @@ class PlanningCalendar extends StatefulWidget {
 
   final CalendarTapCallback? toDo;
 
-  const PlanningCalendar(
-      {super.key,
-      required this.controller,
-      required this.datasource,
-      this.toDo});
+  const PlanningCalendar({
+    super.key,
+    required this.controller,
+    required this.datasource,
+    this.toDo,
+  });
 
   @override
   State<PlanningCalendar> createState() => _PlanningCalendarState();
@@ -32,7 +33,7 @@ class _PlanningCalendarState extends State<PlanningCalendar> {
   List<CalendarView> views = const [
     CalendarView.month,
     CalendarView.timelineMonth,
-    CalendarView.schedule
+    CalendarView.schedule,
   ];
 
   @override
@@ -42,24 +43,21 @@ class _PlanningCalendarState extends State<PlanningCalendar> {
       view: currentView,
       firstDayOfWeek: DateTime.saturday,
       controller: widget.controller,
-      onTap: (details){
-        if(details.targetElement==CalendarElement.appointment || details
-            .targetElement==CalendarElement.calendarCell || details
-            .targetElement==CalendarElement.agenda && widget.toDo!=null){
+      onTap: (details) {
+        if (details.targetElement == CalendarElement.appointment ||
+            details.targetElement == CalendarElement.calendarCell ||
+            details.targetElement == CalendarElement.agenda &&
+                widget.toDo != null) {
           widget.toDo!(details);
         }
       },
-      appointmentBuilder: (c, d) => AppointmentWidget(
-        calendarController: widget.controller,
-        details: d,
-      ),
+      appointmentBuilder: (c, d) =>
+          AppointmentWidget(calendarController: widget.controller, details: d),
       showNavigationArrow: true,
       showTodayButton: true,
       showDatePickerButton: true,
       allowViewNavigation: true,
-      headerStyle: const CalendarHeaderStyle(
-        textAlign: TextAlign.center,
-      ),
+      headerStyle: const CalendarHeaderStyle(textAlign: TextAlign.center),
       allowedViews: views,
       monthViewSettings: MonthViewSettings(
         appointmentDisplayCount: 3,
@@ -88,13 +86,16 @@ class _PlanningCalendarState extends State<PlanningCalendar> {
   }
 
   Widget loadMoreWidget(
-      BuildContext context, LoadMoreCallback loadMoreAppointments) {
+    BuildContext context,
+    LoadMoreCallback loadMoreAppointments,
+  ) {
     return FutureBuilder<void>(
       future: loadMoreAppointments(),
       builder: (context, snapShot) {
         return Container(
-            alignment: Alignment.center,
-            child: const CircularProgressIndicator());
+          alignment: Alignment.center,
+          child: const CircularProgressIndicator(),
+        );
       },
     );
   }

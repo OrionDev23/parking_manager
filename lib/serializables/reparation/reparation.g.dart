@@ -7,25 +7,25 @@ part of 'reparation.dart';
 // **************************************************************************
 
 Reparation _$ReparationFromJson(Map<String, dynamic> json) => Reparation(
-      id: json[r'$id'] as String,
-      createdAt: createdAtJson(json[r'$createdAt'] as String),
-      updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
-      ficheReception: json['ficheReception'] as String?,
-      ficheReceptionNumber: (json['ficheReceptionNumber'] as num?)?.toInt(),
-      showEntretien: json['showEntretien'] as bool? ?? true,
-      numero: (json['numero'] as num).toInt(),
-      date: dateFromIntJsonNonNull((json['date'] as num).toInt()),
-      designations: designationsFromJson(json['designations'] as List),
-      mobile: json['mobile'] as bool? ?? false,
-      etat: (json['etat'] as num?)?.toInt(),
-      nchassi: json['nchassi'] as String?,
-      prestataire: json['prestataire'] as String?,
-      prestatairenom: json['prestatairenom'] as String?,
-      entretien: entretienFromJson(json['entretien'] as String?),
-      remarque: json['remarque'] as String?,
-      vehicule: json['vehicule'] as String?,
-      vehiculemat: json['vehiculemat'] as String?,
-    )..search = json['search'] as String?;
+  id: json[r'$id'] as String,
+  createdAt: createdAtJson(json[r'$createdAt'] as String),
+  updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
+  ficheReception: json['ficheReception'] as String?,
+  ficheReceptionNumber: (json['ficheReceptionNumber'] as num?)?.toInt(),
+  showEntretien: json['showEntretien'] as bool? ?? true,
+  numero: (json['numero'] as num).toInt(),
+  date: dateFromIntJsonNonNull((json['date'] as num).toInt()),
+  designations: designationsFromJson(json['designations'] as List),
+  mobile: json['mobile'] as bool? ?? false,
+  etat: (json['etat'] as num?)?.toInt(),
+  nchassi: json['nchassi'] as String?,
+  prestataire: json['prestataire'] as String?,
+  prestatairenom: json['prestatairenom'] as String?,
+  entretien: entretienFromJson(json['entretien'] as String?),
+  remarque: json['remarque'] as String?,
+  vehicule: json['vehicule'] as String?,
+  vehiculemat: json['vehiculemat'] as String?,
+)..search = json['search'] as String?;
 
 Map<String, dynamic> _$ReparationToJson(Reparation instance) =>
     <String, dynamic>{

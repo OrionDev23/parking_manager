@@ -1,9 +1,11 @@
 import 'dart:math';
+
 import 'package:provider/provider.dart';
 
 import '../../../theme.dart';
 import 'helper.dart';
 import 'utility.dart';
+
 import 'package:flutter/material.dart';
 part 'images.dart';
 
@@ -31,7 +33,8 @@ part 'images.dart';
 /// {@end-tool}
 
 class EmptyWidget extends StatefulWidget {
-  const EmptyWidget({super.key,
+  const EmptyWidget({
+    super.key,
     this.title,
     this.subTitle,
     this.image,
@@ -92,24 +95,25 @@ class _EmptyListWidgetState extends State<EmptyWidget>
   @override
   void initState() {
     _backgroundController = AnimationController(
-        duration: const Duration(minutes: 1),
-        vsync: this,
-        lowerBound: 0,
-        upperBound: 20)
-      ..repeat();
+      duration: const Duration(minutes: 1),
+      vsync: this,
+      lowerBound: 0,
+      upperBound: 20,
+    )..repeat();
     _widgetController = AnimationController(
-        duration: const Duration(seconds: 1),
-        vsync: this,
-        lowerBound: 0,
-        upperBound: 1)
-      ..forward();
+      duration: const Duration(seconds: 1),
+      vsync: this,
+      lowerBound: 0,
+      upperBound: 1,
+    )..forward();
     _imageController = AnimationController(
       duration: const Duration(seconds: 4),
       vsync: this,
     )..repeat();
-    _imageAnimation = Tween<double>(begin: 0, end: 10).animate(
-      CurvedAnimation(parent: _imageController!, curve: Curves.linear),
-    );
+    _imageAnimation = Tween<double>(
+      begin: 0,
+      end: 10,
+    ).animate(CurvedAnimation(parent: _imageController!, curve: Curves.linear));
     super.initState();
   }
 
@@ -137,10 +141,13 @@ class _EmptyListWidgetState extends State<EmptyWidget>
         builder: (BuildContext context, Widget? child) {
           return Transform.translate(
             offset: Offset(
-                0,
-                sin(_imageAnimation.value > .9
+              0,
+              sin(
+                _imageAnimation.value > .9
                     ? 1 - _imageAnimation.value
-                    : _imageAnimation.value)),
+                    : _imageAnimation.value,
+              ),
+            ),
             child: child,
           );
         },
@@ -157,55 +164,55 @@ class _EmptyListWidgetState extends State<EmptyWidget>
   }
 
   Widget _imageBackground() {
-    var appTheme =context.watch<AppTheme>();
+    var appTheme = context.watch<AppTheme>();
     return Container(
       width: EmptyWidgetUtility.getHeightDimention(
-          context, EmptyWidgetUtility.fullWidth(context) * .95),
+        context,
+        EmptyWidgetUtility.fullWidth(context) * .95,
+      ),
       height: EmptyWidgetUtility.getHeightDimention(
-          context, EmptyWidgetUtility.fullWidth(context) * .95),
+        context,
+        EmptyWidgetUtility.fullWidth(context) * .95,
+      ),
       decoration: BoxDecoration(
-          boxShadow: <BoxShadow>[
-        BoxShadow(
-          offset: const Offset(0, 0),
-          color: appTheme.fillColor,
-        ),
-        BoxShadow(
+        boxShadow: <BoxShadow>[
+          BoxShadow(offset: const Offset(0, 0), color: appTheme.fillColor),
+          BoxShadow(
             blurRadius: 30,
             offset: const Offset(20, 0),
             color: appTheme.fillColor,
-            spreadRadius: -5),
-      ],
-          shape: BoxShape.circle),
+            spreadRadius: -5,
+          ),
+        ],
+        shape: BoxShape.circle,
+      ),
     );
   }
 
   Widget _shell({Widget? child}) {
     return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-      if (constraints.maxHeight > constraints.maxWidth) {
-        return SizedBox(
-          height: constraints.maxWidth,
-          width: constraints.maxWidth,
-          child: child,
-        );
-      } else {
-        return child!;
-      }
-    });
+      builder: (BuildContext context, BoxConstraints constraints) {
+        if (constraints.maxHeight > constraints.maxWidth) {
+          return SizedBox(
+            height: constraints.maxWidth,
+            width: constraints.maxWidth,
+            child: child,
+          );
+        } else {
+          return child!;
+        }
+      },
+    );
   }
 
   Widget _shellChild() {
-    _titleTextStyle = widget.titleTextStyle ??
-        Theme.of(context)
-            .typography
-            .dense
-            .headlineSmall!
+    _titleTextStyle =
+        widget.titleTextStyle ??
+        Theme.of(context).typography.dense.headlineSmall!
             .copyWith(color: const Color(0xff9da9c7));
-    _subtitleTextStyle = widget.subtitleTextStyle ??
-        Theme.of(context)
-            .typography
-            .dense
-            .bodyLarge!
+    _subtitleTextStyle =
+        widget.subtitleTextStyle ??
+        Theme.of(context).typography.dense.bodyLarge!
             .copyWith(color: const Color(0xffabb8d6));
     _packageImage = widget.packageImage;
 
@@ -214,18 +221,18 @@ class _EmptyListWidgetState extends State<EmptyWidget>
     return FadeTransition(
       opacity: _widgetController,
       child: Container(
+        alignment: Alignment.center,
+        color: Colors.transparent,
+        child: Stack(
           alignment: Alignment.center,
-          color: Colors.transparent,
-          child: Stack(
-            alignment: Alignment.center,
-            children: <Widget>[
-              if (!widget.hideBackgroundAnimation!)
-                RotationTransition(
-                  turns: _backgroundController,
-                  child: _imageBackground(),
-                ),
-              LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints constraints) {
+          children: <Widget>[
+            if (!widget.hideBackgroundAnimation!)
+              RotationTransition(
+                turns: _backgroundController,
+                child: _imageBackground(),
+              ),
+            LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
                 return Container(
                   height: constraints.maxWidth,
                   width: constraints.maxWidth - 30,
@@ -237,10 +244,7 @@ class _EmptyListWidgetState extends State<EmptyWidget>
                     children: <Widget>[
                       anyImageProvided
                           ? const SizedBox()
-                          : Expanded(
-                              flex: 1,
-                              child: Container(),
-                            ),
+                          : Expanded(flex: 1, child: Container()),
                       anyImageProvided ? const SizedBox() : _imageWidget(),
                       Column(
                         children: <Widget>[
@@ -251,29 +255,27 @@ class _EmptyListWidgetState extends State<EmptyWidget>
                             overflow: TextOverflow.clip,
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(
-                            height: 10,
-                          ),
+                          const SizedBox(height: 10),
                           CustomText(
-                              msg: widget.subTitle,
-                              style: _subtitleTextStyle,
-                              context: context,
-                              overflow: TextOverflow.clip,
-                              textAlign: TextAlign.center)
+                            msg: widget.subTitle,
+                            style: _subtitleTextStyle,
+                            context: context,
+                            overflow: TextOverflow.clip,
+                            textAlign: TextAlign.center,
+                          ),
                         ],
                       ),
                       anyImageProvided
                           ? const SizedBox()
-                          : Expanded(
-                              flex: 1,
-                              child: Container(),
-                            )
+                          : Expanded(flex: 1, child: Container()),
                     ],
                   ),
                 );
-              }),
-            ],
-          )),
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 

@@ -37,9 +37,7 @@ class SqliteVehicleSource implements LocalVehicleSource {
     int? limit,
     int offset = 0,
   }) async {
-    final query = StringBuffer(
-      'SELECT * FROM vehicles WHERE company_id = ?',
-    );
+    final query = StringBuffer('SELECT * FROM vehicles WHERE company_id = ?');
     final args = <Object?>[companyId];
 
     if (search != null && search.trim().isNotEmpty) {
@@ -112,9 +110,9 @@ class SqliteVehicleSource implements LocalVehicleSource {
 
   @override
   Future<void> deleteVehicle(String id) async {
-    _db.execute(
-      'DELETE FROM vehicles WHERE id = ? AND company_id = ?',
-      [id, companyId],
-    );
+    _db.execute('DELETE FROM vehicles WHERE id = ? AND company_id = ?', [
+      id,
+      companyId,
+    ]);
   }
 }

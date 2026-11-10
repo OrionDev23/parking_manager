@@ -21,9 +21,14 @@ class BackupWebService extends ParcOtoWebService<Backup> {
   }
 
   @override
-  List<String> getFilterQueries(Map<String, String> filters, int count,
-      int startingAt, int sortedBy, bool sortedAsc,
-      {int? index}) {
+  List<String> getFilterQueries(
+    Map<String, String> filters,
+    int count,
+    int startingAt,
+    int sortedBy,
+    bool sortedAsc, {
+    int? index,
+  }) {
     return [
       if (filters.containsKey('datemin'))
         Query.greaterThanEqual('\$id', filters['datemin']!),
@@ -53,15 +58,14 @@ class BackupWebService extends ParcOtoWebService<Backup> {
         } else {
           return Query.orderDesc('createdBy');
         }
-        default:
-          if (sortedAsc) {
-            return Query.orderAsc('\$id');
-          } else {
-            return Query.orderDesc('\$id');
-          }
+      default:
+        if (sortedAsc) {
+          return Query.orderAsc('\$id');
+        } else {
+          return Query.orderDesc('\$id');
+        }
     }
   }
-
 
   @override
   Backup fromJsonFunction(Map<String, dynamic> json) {
@@ -69,33 +73,46 @@ class BackupWebService extends ParcOtoWebService<Backup> {
   }
 
   @override
-  int Function(MapEntry<String, Backup> p1, MapEntry<String, Backup> p2)? getComparisonFunction(int column, bool ascending) {
+  int Function(MapEntry<String, Backup> p1, MapEntry<String, Backup> p2)?
+  getComparisonFunction(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
-    switch(column){
+    switch (column) {
       case 0:
-        return (d1, d2) =>
-        coef * d1.value.id.compareTo(d2.value.id);
+        return (d1, d2) => coef * d1.value.id.compareTo(d2.value.id);
       case 1:
-        return (d1,d2){
-          int count1=d1.value.vehicles+d1.value.drivers+d1.value.repairs+d1
-              .value.providers+d1.value.plannings+d1.value.logs+d1.value
-              .vehicledocs+d1.value.vehiclesstates+d1.value.driversdocs+d1
-              .value.driversstates;
-          int count2=d2.value.vehicles+d2.value.drivers+d2.value.repairs+d2
-              .value.providers+d2.value.plannings+d2.value.logs+d2.value
-              .vehicledocs+d2.value.vehiclesstates+d2.value.driversdocs+d2
-              .value.driversstates;
+        return (d1, d2) {
+          int count1 =
+              d1.value.vehicles +
+              d1.value.drivers +
+              d1.value.repairs +
+              d1.value.providers +
+              d1.value.plannings +
+              d1.value.logs +
+              d1.value.vehicledocs +
+              d1.value.vehiclesstates +
+              d1.value.driversdocs +
+              d1.value.driversstates;
+          int count2 =
+              d2.value.vehicles +
+              d2.value.drivers +
+              d2.value.repairs +
+              d2.value.providers +
+              d2.value.plannings +
+              d2.value.logs +
+              d2.value.vehicledocs +
+              d2.value.vehiclesstates +
+              d2.value.driversdocs +
+              d2.value.driversstates;
 
           return coef * count1.compareTo(count2);
         };
 
       case 2:
-        return (d1,d2)=>
-        coef * (d1.value.createdBy??'').compareTo(d2.value.createdBy??'');
-      default:
         return (d1, d2) =>
-        coef * d1.value.id.compareTo(d2.value.id);
+            coef *
+            (d1.value.createdBy ?? '').compareTo(d2.value.createdBy ?? '');
+      default:
+        return (d1, d2) => coef * d1.value.id.compareTo(d2.value.id);
     }
   }
-
 }

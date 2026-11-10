@@ -1,6 +1,1 @@
-enum ParcotoEdition {
-  offline,
-  online,
-  hybrid,
-  onPremise,
-}
+enum ParcotoEdition { offline, online, hybrid, onPremise }

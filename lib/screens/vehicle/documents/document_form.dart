@@ -48,21 +48,21 @@ class DocumentFormState extends State<DocumentForm>
     } else if (widget.vehicle != null) {
       selectedVehicle = widget.vehicle;
     }
-    documentID ??=
-        DateTime.now().difference(DatabaseGetter.ref).inMilliseconds.toString();
+    documentID ??= DateTime.now()
+        .difference(DatabaseGetter.ref)
+        .inMilliseconds
+        .toString();
   }
 
   void downloadVehicle(String id) async {
     loadingVehicle = true;
     await DatabaseGetter.database!
-        .getRow(
-            databaseId: databaseId, tableId: vehiculeid, rowId: id)
+        .getRow(databaseId: databaseId, tableId: vehiculeid, rowId: id)
         .then((value) {
-      if (value.data.isNotEmpty) {
-        selectedVehicle = value
-            .convertTo((p0) => Vehicle.fromJson(p0));
-      }
-    });
+          if (value.data.isNotEmpty) {
+            selectedVehicle = value.convertTo((p0) => Vehicle.fromJson(p0));
+          }
+        });
     if (mounted) {
       setState(() {
         loadingVehicle = false;
@@ -82,114 +82,129 @@ class DocumentFormState extends State<DocumentForm>
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-              decoration: BoxDecoration(
-                  color: appTheme.backGroundColor,
-                  boxShadow: kElevationToShadow[2],
-                  borderRadius: BorderRadius.circular(10)),
-              padding: const EdgeInsets.all(5),
-              width: 420.px,
-              height: 300.px,
-              child: Column(
-                children: [
-                  Flexible(
-                    child: ZoneBox(
-                      label: 'vehicule'.tr(),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: ListTile(
-                          title: Text(selectedVehicle?.matricule ??
+            decoration: BoxDecoration(
+              color: appTheme.backGroundColor,
+              boxShadow: kElevationToShadow[2],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            padding: const EdgeInsets.all(5),
+            width: 420.px,
+            height: 300.px,
+            child: Column(
+              children: [
+                Flexible(
+                  child: ZoneBox(
+                    label: 'vehicule'.tr(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: ListTile(
+                        title: Text(
+                          selectedVehicle?.matricule ??
                               widget.vehicle?.matricule ??
                               widget.vd?.vehiclemat ??
-                              '/'),
-                          onPressed: widget.vehicle != null ||
-                                  loadingVehicle ||
-                                  widget.vd?.vehicle != null
-                              ? null
-                              : () async {
-                                  selectedVehicle = await showDialog<Vehicle>(
-                                      context: context,
-                                      barrierDismissible: true,
-                                      builder: (context) {
-                                        return ContentDialog(
-                                          constraints: BoxConstraints.tight(
-                                              Size(700.px, 550.px)),
-                                          title: const Text('selectvehicle').tr(),
-                                          style: ContentDialogThemeData(
-                                              titleStyle: appTheme.writingStyle
-                                                  .copyWith(
-                                                  fontWeight:
-                                                  FontWeight.bold)),
-                                          content: const VehicleTable(
-                                            selectV: true,
-                                          ),
-                                          actions: [Button(child: const Text('fermer').tr(),
-                                              onPressed: (){
-                                                Navigator.of(context).pop();
-                                              })],
-                                        );
-                                      });
-                                  setState(() {});
-                                  checkForChanges();
-                                },
+                              '/',
                         ),
+                        onPressed:
+                            widget.vehicle != null ||
+                                loadingVehicle ||
+                                widget.vd?.vehicle != null
+                            ? null
+                            : () async {
+                                selectedVehicle = await showDialog<Vehicle>(
+                                  context: context,
+                                  barrierDismissible: true,
+                                  builder: (context) {
+                                    return ContentDialog(
+                                      constraints: BoxConstraints.tight(
+                                        Size(700.px, 550.px),
+                                      ),
+                                      title: const Text('selectvehicle').tr(),
+                                      style: ContentDialogThemeData(
+                                        titleStyle: appTheme.writingStyle
+                                            .copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
+                                      content: const VehicleTable(
+                                        selectV: true,
+                                      ),
+                                      actions: [
+                                        Button(
+                                          child: const Text('fermer').tr(),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                                setState(() {});
+                                checkForChanges();
+                              },
                       ),
                     ),
                   ),
-                  bigSpace,
-                  Flexible(
-                    child: ZoneBox(
-                      label: 'nom'.tr(),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: TextBox(
-                          controller: nom,
-                          style: appTheme.writingStyle,
-                          decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-                          cursorColor: appTheme.color.darker,
-                          placeholderStyle: placeStyle,
-                          placeholder: 'nom'.tr(),
-                          onChanged: (s) {
-                            checkForChanges();
-                          },
+                ),
+                bigSpace,
+                Flexible(
+                  child: ZoneBox(
+                    label: 'nom'.tr(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: TextBox(
+                        controller: nom,
+                        style: appTheme.writingStyle,
+                        decoration: WidgetStatePropertyAll(
+                          BoxDecoration(color: appTheme.fillColor),
                         ),
+                        cursorColor: appTheme.color.darker,
+                        placeholderStyle: placeStyle,
+                        placeholder: 'nom'.tr(),
+                        onChanged: (s) {
+                          checkForChanges();
+                        },
                       ),
                     ),
                   ),
-                  bigSpace,
-                  Flexible(
-                    child: ZoneBox(
-                      label: 'dateexp'.tr(),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: DatePicker(
-                          selected: selectedDate,
-                          onChanged: (d) {
-                            setState(() {
-                              selectedDate = d;
-                            });
-                            checkForChanges();
-                          },
-                        ),
+                ),
+                bigSpace,
+                Flexible(
+                  child: ZoneBox(
+                    label: 'dateexp'.tr(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: DatePicker(
+                        selected: selectedDate,
+                        onChanged: (d) {
+                          setState(() {
+                            selectedDate = d;
+                          });
+                          checkForChanges();
+                        },
                       ),
                     ),
-                  )
-                ],
-              )),
+                  ),
+                ),
+              ],
+            ),
+          ),
           bigSpace,
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               FilledButton(
-                  onPressed: changes ? () => confirm(appTheme) : null,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20.0, vertical: 5),
-                    child: uploading
-                        ? const ProgressRing()
-                        : const Text(
-                      'confirmer',
-                    ).tr(),
-                  )),
+                onPressed: changes ? () => confirm(appTheme) : null,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                    vertical: 5,
+                  ),
+                  child: uploading
+                      ? const ProgressRing()
+                      : const Text('confirmer').tr(),
+                ),
+              ),
             ],
           ),
         ],
@@ -249,28 +264,37 @@ class DocumentFormState extends State<DocumentForm>
       });
 
       DocumentVehicle dv = DocumentVehicle(
-          id: documentID!,
-          nom: nom.text,
-          vehicle: selectedVehicle?.id,
-          vehiclemat: selectedVehicle?.matricule,
-          dateExpiration: selectedDate,
-          createdBy: DatabaseGetter.me.value?.id);
+        id: documentID!,
+        nom: nom.text,
+        vehicle: selectedVehicle?.id,
+        vehiclemat: selectedVehicle?.matricule,
+        dateExpiration: selectedDate,
+        createdBy: DatabaseGetter.me.value?.id,
+      );
       if (widget.vd != null) {
         await DatabaseGetter.database!.updateRow(
-            databaseId: databaseId,
-            tableId: vehicDoc,
-            rowId: documentID!,
-            data: dv.toJson());
-        DatabaseGetter()
-            .ajoutActivity(8, documentID!, docName: selectedVehicle?.matricule);
+          databaseId: databaseId,
+          tableId: vehicDoc,
+          rowId: documentID!,
+          data: dv.toJson(),
+        );
+        DatabaseGetter().ajoutActivity(
+          8,
+          documentID!,
+          docName: selectedVehicle?.matricule,
+        );
       } else {
         await DatabaseGetter.database!.createRow(
-            databaseId: databaseId,
-            tableId: vehicDoc,
-            rowId: documentID!,
-            data: dv.toJson());
-        DatabaseGetter()
-            .ajoutActivity(7, documentID!, docName: selectedVehicle?.matricule);
+          databaseId: databaseId,
+          tableId: vehicDoc,
+          rowId: documentID!,
+          data: dv.toJson(),
+        );
+        DatabaseGetter().ajoutActivity(
+          7,
+          documentID!,
+          docName: selectedVehicle?.matricule,
+        );
       }
 
       setState(() {
@@ -279,25 +303,32 @@ class DocumentFormState extends State<DocumentForm>
       });
 
       Future.delayed(Duration.zero).whenComplete(() {
-        if(mounted){
-        displayInfoBar(context,
+        if (mounted) {
+          displayInfoBar(
+            context,
             builder: (BuildContext context, void Function() close) {
-          return InfoBar(
-              title: const Text('done').tr(),
-              severity: InfoBarSeverity.success,
-              style: InfoBarThemeData(iconColor: (c) {
-                switch (c) {
-                  case InfoBarSeverity.success:
-                    return appTheme.color.lightest;
-                  case InfoBarSeverity.error:
-                    return appTheme.color.darkest;
-                  case InfoBarSeverity.info:
-                    return appTheme.color;
-                  default:
-                    return appTheme.color;
-                }
-              }));
-        }, duration: snackbarShortDuration);}
+              return InfoBar(
+                title: const Text('done').tr(),
+                severity: InfoBarSeverity.success,
+                style: InfoBarThemeData(
+                  iconColor: (c) {
+                    switch (c) {
+                      case InfoBarSeverity.success:
+                        return appTheme.color.lightest;
+                      case InfoBarSeverity.error:
+                        return appTheme.color.darkest;
+                      case InfoBarSeverity.info:
+                        return appTheme.color;
+                      default:
+                        return appTheme.color;
+                    }
+                  },
+                ),
+              );
+            },
+            duration: snackbarShortDuration,
+          );
+        }
         Future.delayed(snackbarShortDuration).whenComplete(() {
           if (widget.vehicle != null && mounted) {
             Navigator.pop(context);

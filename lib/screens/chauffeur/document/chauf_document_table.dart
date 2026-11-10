@@ -31,7 +31,10 @@ class CDocumentTableState extends State<CDocumentTable> {
   @override
   void initState() {
     documentsDataSource = ChaufDocumentsDataSource(
-        current: context, collectionID: chaufDoc, selectC: widget.selectD);
+      current: context,
+      collectionID: chaufDoc,
+      selectC: widget.selectD,
+    );
     initColumns();
     super.initState();
   }
@@ -43,10 +46,7 @@ class CDocumentTableState extends State<CDocumentTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'nom',
-            style: tstyle,
-          ).tr(),
+          child: Text('nom', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -60,10 +60,7 @@ class CDocumentTableState extends State<CDocumentTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'vehicule',
-            style: tstyle,
-          ).tr(),
+          child: Text('vehicule', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -77,10 +74,7 @@ class CDocumentTableState extends State<CDocumentTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'dateexp',
-            style: tstyle,
-          ).tr(),
+          child: Text('dateexp', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
@@ -94,10 +88,7 @@ class CDocumentTableState extends State<CDocumentTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'dateModif',
-            style: tstyle,
-          ).tr(),
+          child: Text('dateModif', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -147,29 +138,28 @@ class CDocumentTableState extends State<CDocumentTable> {
                     child: FlyoutTarget(
                       controller: filterFlyout,
                       child: IconButton(
-                          icon: Row(
-                            children: [
-                              Text(
-                                'filter',
-                                style: TextStyle(fontSize: 12.sp),
-                              ).tr(),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              filtered
-                                  ? Icon(
-                                      FluentIcons.filter_solid,
-                                      color: appTheme.color,
-                                    )
-                                  : const Icon(FluentIcons.filter),
-                            ],
-                          ),
-                          onPressed: () {
-                            filterFlyout.showFlyout(builder: (context) {
+                        icon: Row(
+                          children: [
+                            Text(
+                              'filter',
+                              style: TextStyle(fontSize: 12.sp),
+                            ).tr(),
+                            const SizedBox(width: 5),
+                            filtered
+                                ? Icon(
+                                    FluentIcons.filter_solid,
+                                    color: appTheme.color,
+                                  )
+                                : const Icon(FluentIcons.filter),
+                          ],
+                        ),
+                        onPressed: () {
+                          filterFlyout.showFlyout(
+                            builder: (context) {
                               return FlyoutContent(
-                                  color: appTheme.backGroundColor,
-                                  child:
-                                      StatefulBuilder(builder: (context, setS) {
+                                color: appTheme.backGroundColor,
+                                child: StatefulBuilder(
+                                  builder: (context, setS) {
                                     return SizedBox(
                                       width: 30.w,
                                       height: 42.h,
@@ -179,17 +169,19 @@ class CDocumentTableState extends State<CDocumentTable> {
                                             child: ZoneBox(
                                               label: 'dateexp'.tr(),
                                               child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: const EdgeInsets.all(
+                                                  10.0,
+                                                ),
                                                 child: Column(
                                                   children: [
                                                     Row(
                                                       children: [
                                                         SizedBox(
-                                                            width: 5.w,
-                                                            child: const Text(
-                                                                    'min')
-                                                                .tr()),
+                                                          width: 5.w,
+                                                          child: const Text(
+                                                            'min',
+                                                          ).tr(),
+                                                        ),
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
@@ -209,10 +201,11 @@ class CDocumentTableState extends State<CDocumentTable> {
                                                     Row(
                                                       children: [
                                                         SizedBox(
-                                                            width: 5.w,
-                                                            child: const Text(
-                                                                    'max')
-                                                                .tr()),
+                                                          width: 5.w,
+                                                          child: const Text(
+                                                            'max',
+                                                          ).tr(),
+                                                        ),
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
@@ -238,44 +231,51 @@ class CDocumentTableState extends State<CDocumentTable> {
                                             child: ZoneBox(
                                               label: 'vehicule'.tr(),
                                               child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
+                                                padding: const EdgeInsets.all(
+                                                  10.0,
+                                                ),
                                                 child: ListTile(
                                                   title: Text(
-                                                      '${selectedConducteur?.name} ${selectedConducteur?.prenom}'),
+                                                    '${selectedConducteur?.name} ${selectedConducteur?.prenom}',
+                                                  ),
                                                   onPressed: () async {
-                                                    selectedConducteur =
-                                                        await showDialog<
-                                                                Conducteur>(
-                                                            context: context,
-                                                            barrierDismissible:
-                                                                true,
-                                                            builder: (context) {
-                                                              return ContentDialog(
-                                                                constraints:
-                                                                    BoxConstraints
-                                                                        .tight(Size(
-                                                                            60.w,
-                                                                            60.h)),
-                                                                title: const Text(
-                                                                        'selectvehicle')
-                                                                    .tr(),
-                                                                style: ContentDialogThemeData(
-                                                                    titleStyle: appTheme
-                                                                        .writingStyle
-                                                                        .copyWith(
-                                                                            fontWeight:
-                                                                                FontWeight.bold)),
-                                                                content: Container(
-                                                                    color: appTheme.backGroundColor,
-                                                                    width: 60.w,
-                                                                    height: 60.h,
-                                                                    child: const ChauffeurTable(
-                                                                      selectD:
-                                                                          true,
-                                                                    )),
-                                                              );
-                                                            });
+                                                    selectedConducteur = await showDialog<Conducteur>(
+                                                      context: context,
+                                                      barrierDismissible: true,
+                                                      builder: (context) {
+                                                        return ContentDialog(
+                                                          constraints:
+                                                              BoxConstraints.tight(
+                                                                Size(
+                                                                  60.w,
+                                                                  60.h,
+                                                                ),
+                                                              ),
+                                                          title: const Text(
+                                                            'selectvehicle',
+                                                          ).tr(),
+                                                          style: ContentDialogThemeData(
+                                                            titleStyle: appTheme
+                                                                .writingStyle
+                                                                .copyWith(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                          ),
+                                                          content: Container(
+                                                            color: appTheme
+                                                                .backGroundColor,
+                                                            width: 60.w,
+                                                            height: 60.h,
+                                                            child:
+                                                                const ChauffeurTable(
+                                                                  selectD: true,
+                                                                ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    );
                                                     setState(() {});
                                                     setS(() {});
                                                   },
@@ -294,9 +294,13 @@ class CDocumentTableState extends State<CDocumentTable> {
                                                 FilledButton(
                                                   style: ButtonStyle(
                                                     backgroundColor:
-                                                    WidgetStatePropertyAll<Color>(
-                                                            appTheme.color
-                                                                .lightest),
+                                                        WidgetStatePropertyAll<
+                                                          Color
+                                                        >(
+                                                          appTheme
+                                                              .color
+                                                              .lightest,
+                                                        ),
                                                   ),
                                                   onPressed: filtered
                                                       ? () {
@@ -314,127 +318,135 @@ class CDocumentTableState extends State<CDocumentTable> {
                                                               .filter(filters);
                                                         }
                                                       : null,
-                                                  child:
-                                                      const Text('clear').tr(),
+                                                  child: const Text('clear')
+                                                      .tr(),
                                                 ),
                                                 const Spacer(),
                                                 Button(
-                                                    onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    child: const Text('annuler')
-                                                        .tr()),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                  child: const Text('annuler')
+                                                      .tr(),
+                                                ),
                                                 smallSpace,
                                                 smallSpace,
                                                 FilledButton(
-                                                    style: ButtonStyle(
-                                                      backgroundColor:
-                                                      WidgetStatePropertyAll<
-                                                                  Color>(
-                                                              appTheme.color
-                                                                  .lighter),
-                                                    ),
-                                                    child:
-                                                        const Text('confirmer')
-                                                            .tr(),
-                                                    onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pop();
+                                                  style: ButtonStyle(
+                                                    backgroundColor:
+                                                        WidgetStatePropertyAll<
+                                                          Color
+                                                        >(
+                                                          appTheme
+                                                              .color
+                                                              .lighter,
+                                                        ),
+                                                  ),
+                                                  child: const Text('confirmer')
+                                                      .tr(),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
 
-                                                      if (dateMin != null) {
-                                                        filters['datemin'] =
-                                                            dateMin!
-                                                                .difference(
-                                                                    DatabaseGetter
-                                                                        .ref)
-                                                                .inMilliseconds
-                                                                .toString();
-                                                      } else {
-                                                        filters
-                                                            .remove('datemin');
-                                                      }
-                                                      if (dateMax != null) {
-                                                        filters['datemax'] =
-                                                            dateMax!
-                                                                .difference(
-                                                                    DatabaseGetter
-                                                                        .ref)
-                                                                .inMilliseconds
-                                                                .toString();
-                                                      } else {
-                                                        filters
-                                                            .remove('datemax');
-                                                      }
-                                                      if (selectedConducteur !=
-                                                          null) {
-                                                        filters['vehicle'] =
-                                                            selectedConducteur!
-                                                                .id;
-                                                      } else {
-                                                        filters
-                                                            .remove('vehicle');
-                                                      }
+                                                    if (dateMin != null) {
+                                                      filters['datemin'] =
+                                                          dateMin!
+                                                              .difference(
+                                                                DatabaseGetter
+                                                                    .ref,
+                                                              )
+                                                              .inMilliseconds
+                                                              .toString();
+                                                    } else {
+                                                      filters.remove('datemin');
+                                                    }
+                                                    if (dateMax != null) {
+                                                      filters['datemax'] =
+                                                          dateMax!
+                                                              .difference(
+                                                                DatabaseGetter
+                                                                    .ref,
+                                                              )
+                                                              .inMilliseconds
+                                                              .toString();
+                                                    } else {
+                                                      filters.remove('datemax');
+                                                    }
+                                                    if (selectedConducteur !=
+                                                        null) {
+                                                      filters['vehicle'] =
+                                                          selectedConducteur!
+                                                              .id;
+                                                    } else {
+                                                      filters.remove('vehicle');
+                                                    }
 
-                                                      filtered = true;
-                                                      setState(() {});
-                                                      documentsDataSource
-                                                          .filter(filters);
-                                                    }),
+                                                    filtered = true;
+                                                    setState(() {});
+                                                    documentsDataSource.filter(
+                                                      filters,
+                                                    );
+                                                  },
+                                                ),
                                               ],
                                             ),
                                           ),
                                         ],
                                       ),
                                     );
-                                  }));
-                            });
-                          }),
+                                  },
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ),
                   if (filtered)
                     Positioned(
-                        bottom: 10,
-                        right: 0,
-                        child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 2, horizontal: 4),
-                            decoration: BoxDecoration(
-                              color: appTheme.color,
-                              borderRadius: BorderRadius.circular(5),
-                              boxShadow: kElevationToShadow[2],
-                            ),
-                            child: Text(
-                              '${filters.length}',
-                              style: TextStyle(fontSize: 10.sp),
-                            ))),
+                      bottom: 10,
+                      right: 0,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 2,
+                          horizontal: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: appTheme.color,
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: kElevationToShadow[2],
+                        ),
+                        child: Text(
+                          '${filters.length}',
+                          style: TextStyle(fontSize: 10.sp),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
-            const SizedBox(
-              width: 10,
-            ),
+            const SizedBox(width: 10),
             SizedBox(
               width: 350.px,
               height: 45.px,
               child: TextBox(
-                onChanged: (s){
-                  if(s.isEmpty){
-                    notEmpty=false;
+                onChanged: (s) {
+                  if (s.isEmpty) {
+                    notEmpty = false;
                     documentsDataSource.search('');
+                  } else {
+                    notEmpty = true;
                   }
-                  else{
-                    notEmpty=true;
-                  }
-                  setState(() {
-                  });
+                  setState(() {});
                 },
                 controller: searchController,
                 placeholder: 'search'.tr(),
                 style: appTheme.writingStyle,
                 cursorColor: appTheme.color.darker,
                 placeholderStyle: placeStyle,
-                decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
+                decoration: WidgetStatePropertyAll(
+                  BoxDecoration(color: appTheme.fillColor),
+                ),
                 onSubmitted: (s) {
                   if (s.isNotEmpty) {
                     documentsDataSource.search(s);
@@ -459,7 +471,8 @@ class CDocumentTableState extends State<CDocumentTable> {
                           notEmpty = false;
                           setState(() {});
                           documentsDataSource.search('');
-                        })
+                        },
+                      )
                     : null,
               ),
             ),

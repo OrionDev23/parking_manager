@@ -3,7 +3,7 @@ import 'package:appwrite/appwrite.dart';
 import '../../../serializables/pieces/brand.dart';
 import '../../parcoto_webservice.dart';
 
-class BrandWebservice extends ParcOtoWebService<Brand>{
+class BrandWebservice extends ParcOtoWebService<Brand> {
   BrandWebservice(super.data, super.collectionID, super.columnForSearch);
 
   @override
@@ -17,7 +17,8 @@ class BrandWebservice extends ParcOtoWebService<Brand>{
   }
 
   @override
-  int Function(MapEntry<String, Brand> p1, MapEntry<String, Brand> p2)? getComparisonFunction(int column, bool ascending){
+  int Function(MapEntry<String, Brand> p1, MapEntry<String, Brand> p2)?
+  getComparisonFunction(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
       case 0:
@@ -29,16 +30,21 @@ class BrandWebservice extends ParcOtoWebService<Brand>{
 
       case 2:
         return (d1, d2) =>
-        coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
+            coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
     }
 
-    return  (d1, d2) =>
-    coef * d1.value.id.compareTo(d2.value.id);
+    return (d1, d2) => coef * d1.value.id.compareTo(d2.value.id);
   }
+
   @override
-  List<String> getFilterQueries(Map<String, String> filters, int count,
-      int startingAt, int sortedBy, bool sortedAsc,
-      {int? index}) {
+  List<String> getFilterQueries(
+    Map<String, String> filters,
+    int count,
+    int startingAt,
+    int sortedBy,
+    bool sortedAsc, {
+    int? index,
+  }) {
     return [];
   }
 
@@ -71,6 +77,4 @@ class BrandWebservice extends ParcOtoWebService<Brand>{
         }
     }
   }
-
-
 }

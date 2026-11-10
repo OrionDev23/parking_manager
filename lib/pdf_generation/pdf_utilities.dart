@@ -14,17 +14,21 @@ import '../serializables/reparation/reparation.dart';
 
 Widget dotsSpacer() {
   return Flexible(
-      child: Row(children: [
-    SizedBox(width: PdfPageFormat.cm * 0.08),
-    Flexible(
-      child: Container(
-          height: 2,
-          decoration: const BoxDecoration(
-            border: Border(top: BorderSide(style: BorderStyle.dotted)),
-          )),
+    child: Row(
+      children: [
+        SizedBox(width: PdfPageFormat.cm * 0.08),
+        Flexible(
+          child: Container(
+            height: 2,
+            decoration: const BoxDecoration(
+              border: Border(top: BorderSide(style: BorderStyle.dotted)),
+            ),
+          ),
+        ),
+        SizedBox(width: PdfPageFormat.cm * 0.08),
+      ],
     ),
-    SizedBox(width: PdfPageFormat.cm * 0.08),
-  ]));
+  );
 }
 
 class PdfUtilities {
@@ -47,62 +51,69 @@ class PdfUtilities {
       List<Future<Uint8List?>> tasks = [];
       for (int i = 0; i < fiche.images.length; i++) {
         if (fiche.images[i] != null) {
-          tasks.add(downloadImage(fiche.id,fiche.images[i].toString()));
+          tasks.add(downloadImage(fiche.id, fiche.images[i].toString()));
         }
       }
       images = await Future.wait(tasks);
-
     }
   }
 
-
-  Future<Uint8List> downloadImage(String documentID,String id) async {
+  Future<Uint8List> downloadImage(String documentID, String id) async {
     return await DatabaseGetter.storage!
         .getFileView(bucketId: 'images', fileId: "$documentID$id.jpg")
         .onError((e, s) {
-      return Future.value(Uint8List.fromList([]));
-    }).then((s) {
-      return s;
-    });
+          return Future.value(Uint8List.fromList([]));
+        })
+        .then((s) {
+          return s;
+        });
   }
+
   static List<Widget> getTextListFromMap(
-      Map<String, dynamic> map, int debut, int fin,
-      {double width = 3.7}) {
+    Map<String, dynamic> map,
+    int debut,
+    int fin, {
+    double width = 3.7,
+  }) {
     List<Widget> result = List.empty(growable: true);
     map.forEach((key, value) {
       if (key != 'showOnList') {
-        result.add(SizedBox(
+        result.add(
+          SizedBox(
             width: width * PdfPageFormat.cm,
             child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  key.uppercaseFirst(),
+                  style: smallText.copyWith(fontSize: 9),
+                ),
+                dotsSpacer(),
+                if (value is num)
                   Text(
-                    key.uppercaseFirst(),
-                    style: smallText.copyWith(
-                      fontSize: 9,
-                    ),
+                    '${value.ceil()} %',
+                    style: smallText.copyWith(fontSize: 9),
                   ),
-                  dotsSpacer(),
-                  if (value is num)
-                    Text('${value.ceil()} %',
-                        style: smallText.copyWith(fontSize: 9)),
-                  if (value is bool)
-                    Container(
-                      width: 7,
-                      height: 7,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: orange),
-                      ),
-                      child: value
-                          ? Icon(
-                              IconData(iconCodePoint, matchTextDirection: true),
-                              color: orangeDeep,
-                              size: 6,
-                            )
-                          : null,
+                if (value is bool)
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: orange),
                     ),
-                ])));
+                    child: value
+                        ? Icon(
+                            IconData(iconCodePoint, matchTextDirection: true),
+                            color: orangeDeep,
+                            size: 6,
+                          )
+                        : null,
+                  ),
+              ],
+            ),
+          ),
+        );
       }
     });
     return result
@@ -111,40 +122,42 @@ class PdfUtilities {
   }
 
   static List<Widget> getTextListFromMapGts(
-      Map<String, dynamic> map, int debut, int fin,
-      {double width = 12.5}) {
+    Map<String, dynamic> map,
+    int debut,
+    int fin, {
+    double width = 12.5,
+  }) {
     List<Widget> result = List.empty(growable: true);
     map.forEach((key, value) {
       if (key != 'showOnList') {
-        result.add(SizedBox(
+        result.add(
+          SizedBox(
             width: width * PdfPageFormat.cm,
             child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    key.tr(),
-                    style: smallText.copyWith(
-                      fontSize: 9,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(key.tr(), style: smallText.copyWith(fontSize: 9)),
+                dotsSpacer(),
+                if (value is bool)
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: orange),
                     ),
+                    child: value
+                        ? Icon(
+                            IconData(checkCodePoint, matchTextDirection: true),
+                            color: orangeDeep,
+                            size: 6,
+                          )
+                        : null,
                   ),
-                  dotsSpacer(),
-                  if (value is bool)
-                    Container(
-                      width: 7,
-                      height: 7,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: orange),
-                      ),
-                      child: value
-                          ? Icon(
-                        IconData(checkCodePoint, matchTextDirection: true),
-                        color: orangeDeep,
-                        size: 6,
-                      )
-                          : null,
-                    ),
-                ])));
+              ],
+            ),
+          ),
+        );
       }
     });
     return result

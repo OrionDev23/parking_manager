@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+
 import '../../../serializables/pieces/part.dart';
 
 import '../../parcoto_webservice.dart';
@@ -18,8 +19,10 @@ class PartsWebservice extends ParcOtoWebService<VehiclePart> {
 
   @override
   int Function(
-          MapEntry<String, VehiclePart> p1, MapEntry<String, VehiclePart> p2)?
-      getComparisonFunction(int column, bool ascending) {
+    MapEntry<String, VehiclePart> p1,
+    MapEntry<String, VehiclePart> p2,
+  )?
+  getComparisonFunction(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
       case 0:
@@ -41,8 +44,9 @@ class PartsWebservice extends ParcOtoWebService<VehiclePart> {
       case 4:
         return (d1, d2) {
           return coef *
-              (d1.value.variations?.first.name??"")
-                  .compareTo((d2.value.variations?.first.name??''));
+              (d1.value.variations?.first.name ?? "").compareTo(
+                (d2.value.variations?.first.name ?? ''),
+              );
         };
       case 5:
         return (d1, d2) =>
@@ -53,9 +57,14 @@ class PartsWebservice extends ParcOtoWebService<VehiclePart> {
   }
 
   @override
-  List<String> getFilterQueries(Map<String, String> filters, int count,
-      int startingAt, int sortedBy, bool sortedAsc,
-      {int? index}) {
+  List<String> getFilterQueries(
+    Map<String, String> filters,
+    int count,
+    int startingAt,
+    int sortedBy,
+    bool sortedAsc, {
+    int? index,
+  }) {
     return [];
   }
 

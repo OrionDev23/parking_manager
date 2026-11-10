@@ -134,7 +134,8 @@ class VehicleRepositoryImpl implements VehicleRepository {
         entity: 'vehicle',
         entityId: vehicle.id,
         type: type,
-        payload: jsonDecode(jsonEncode(vehicle.toMap())) as Map<String, dynamic>,
+        payload:
+            jsonDecode(jsonEncode(vehicle.toMap())) as Map<String, dynamic>,
         createdAt: DateTime.now().toUtc(),
       ),
     );

@@ -20,12 +20,14 @@ class LegacyAppwritePermissionRepository implements PermissionRepository {
 
     final teams = await Teams(client).list();
 
-    final isAdmin =
-        teams.teams.any((team) => team.name.toLowerCase() == 'admins');
+    final isAdmin = teams.teams.any(
+      (team) => team.name.toLowerCase() == 'admins',
+    );
     if (isAdmin) return Role.admin;
 
-    final isManager =
-        teams.teams.any((team) => team.name.toLowerCase() == 'managers');
+    final isManager = teams.teams.any(
+      (team) => team.name.toLowerCase() == 'managers',
+    );
     if (isManager) return Role.manager;
 
     return Role.user;

@@ -39,24 +39,23 @@ class LegacyStockSyncService {
     required Map<String, dynamic> data,
     required bool isNew,
   }) async {
-    final payload = <String, dynamic>{
-      ...data,
-      r'$id': id,
-    };
+    final payload = <String, dynamic>{...data, r'$id': id};
     final deviceId = await deviceIdentity.getDeviceId();
     final now = DateTime.now().toUtc();
     // The outbox is the source of truth. Queue first so a cache write failure
     // can never leave a visible local row with no operation to synchronize.
-    await queue.enqueue(SyncOperation(
-      id: '${deviceId}_${entity}_${id}_${now.microsecondsSinceEpoch}',
-      companyId: companyId,
-      deviceId: deviceId,
-      entity: entity,
-      entityId: id,
-      type: isNew ? SyncOperationType.create : SyncOperationType.update,
-      payload: data,
-      createdAt: now,
-    ));
+    await queue.enqueue(
+      SyncOperation(
+        id: '${deviceId}_${entity}_${id}_${now.microsecondsSinceEpoch}',
+        companyId: companyId,
+        deviceId: deviceId,
+        entity: entity,
+        entityId: id,
+        type: isNew ? SyncOperationType.create : SyncOperationType.update,
+        payload: data,
+        createdAt: now,
+      ),
+    );
     localDatabase.cacheLegacyRow(
       companyId: companyId,
       entity: entity,
@@ -65,23 +64,22 @@ class LegacyStockSyncService {
     );
   }
 
-  Future<void> delete({
-    required String entity,
-    required String id,
-  }) async {
+  Future<void> delete({required String entity, required String id}) async {
     final deviceId = await deviceIdentity.getDeviceId();
     final now = DateTime.now().toUtc();
     // Queue first: never discard the only local copy of a pending deletion.
-    await queue.enqueue(SyncOperation(
-      id: '${deviceId}_${entity}_${id}_${now.microsecondsSinceEpoch}',
-      companyId: companyId,
-      deviceId: deviceId,
-      entity: entity,
-      entityId: id,
-      type: SyncOperationType.delete,
-      payload: <String, dynamic>{r'$id': id},
-      createdAt: now,
-    ));
+    await queue.enqueue(
+      SyncOperation(
+        id: '${deviceId}_${entity}_${id}_${now.microsecondsSinceEpoch}',
+        companyId: companyId,
+        deviceId: deviceId,
+        entity: entity,
+        entityId: id,
+        type: SyncOperationType.delete,
+        payload: <String, dynamic>{r'$id': id},
+        createdAt: now,
+      ),
+    );
     localDatabase.deleteLegacyRow(
       companyId: companyId,
       entity: entity,
@@ -103,10 +101,8 @@ class LegacyStockSyncService {
     for (final entry in tableByEntity.entries) {
       final entity = entry.key;
       final tableId = entry.value;
-      final cursor = localDatabase.readSyncCursor(
-            companyId: companyId,
-            entity: entity,
-          ) ??
+      final cursor =
+          localDatabase.readSyncCursor(companyId: companyId, entity: entity) ??
           DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
       final since = cursor.subtract(const Duration(seconds: 5));
       String? lastId;
@@ -173,7 +169,9 @@ class LegacyStockSyncService {
 
     final database = legacy.DatabaseGetter.database;
     if (database == null) {
-      throw StateError('Appwrite database unavailable for stock reconciliation.');
+      throw StateError(
+        'Appwrite database unavailable for stock reconciliation.',
+      );
     }
 
     Future<Map<String, Set<String>>> scan() async {

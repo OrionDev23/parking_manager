@@ -9,8 +9,7 @@ class ReparationWebService extends ParcOtoWebService<Reparation> {
 
   @override
   fromJsonFunction(Map<String, dynamic> json) {
-
-      return Reparation.fromJson(json);
+    return Reparation.fromJson(json);
   }
 
   @override
@@ -20,13 +19,18 @@ class ReparationWebService extends ParcOtoWebService<Reparation> {
 
   @override
   String getSearchQueryPerIndex(int index, String searchKey) {
-        return Query.search(getAttributeForSearch(index), searchKey);
+    return Query.search(getAttributeForSearch(index), searchKey);
   }
 
   @override
-  List<String> getFilterQueries(Map<String, String> filters, int count,
-      int startingAt, int sortedBy, bool sortedAsc,
-      {int? index}) {
+  List<String> getFilterQueries(
+    Map<String, String> filters,
+    int count,
+    int startingAt,
+    int sortedBy,
+    bool sortedAsc, {
+    int? index,
+  }) {
     return [
       if (filters.containsKey('datemin'))
         Query.greaterThanEqual('date', int.tryParse(filters['datemin']!)),
@@ -44,7 +48,7 @@ class ReparationWebService extends ParcOtoWebService<Reparation> {
         } else {
           return Query.orderDesc('numero');
         }
-        case 1:
+      case 1:
         if (sortedAsc) {
           return Query.orderAsc('nchassi');
         } else {
@@ -92,32 +96,32 @@ class ReparationWebService extends ParcOtoWebService<Reparation> {
 
   @override
   int Function(
-          MapEntry<String, Reparation> p1, MapEntry<String, Reparation> p2)?
-      getComparisonFunction(int column, bool ascending) {
-    if(gts) {
+    MapEntry<String, Reparation> p1,
+    MapEntry<String, Reparation> p2,
+  )?
+  getComparisonFunction(int column, bool ascending) {
+    if (gts) {
       return getComparisonFunctionGts(column, ascending);
-    }
-    else{
+    } else {
       return getComparisonFunctionNormal(column, ascending);
     }
   }
 
-
-  int Function(MapEntry<String,Reparation>,MapEntry<String,Reparation>) getComparisonFunctionNormal(int column, bool ascending,) {
+  int Function(MapEntry<String, Reparation>, MapEntry<String, Reparation>)
+  getComparisonFunctionNormal(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
-    //matricule
+      //matricule
       case 0:
         return (d1, d2) => coef * d1.value.numero.compareTo(d2.value.numero);
-    //marque
+      //marque
       case 1:
         return (d1, d2) {
           if (d1.value.nchassi == null && d2.value.nchassi == null) {
             return 0;
           }
           return coef *
-              (d1.value.nchassi ?? '')
-                  .compareTo((d2.value.nchassi ?? ''));
+              (d1.value.nchassi ?? '').compareTo((d2.value.nchassi ?? ''));
         };
       case 2:
         return (d1, d2) {
@@ -125,17 +129,20 @@ class ReparationWebService extends ParcOtoWebService<Reparation> {
             return 0;
           }
           return coef *
-              (d1.value.vehiculemat ?? '')
-                  .compareTo((d2.value.vehiculemat ?? ''));
+              (d1.value.vehiculemat ?? '').compareTo(
+                (d2.value.vehiculemat ?? ''),
+              );
         };
       case 3:
         return (d1, d2) {
-          if (d1.value.ficheReceptionNumber == null && d2.value.ficheReceptionNumber == null) {
+          if (d1.value.ficheReceptionNumber == null &&
+              d2.value.ficheReceptionNumber == null) {
             return 0;
           }
           return coef *
-              (d1.value.ficheReceptionNumber ?? 0)
-                  .compareTo((d2.value.ficheReceptionNumber ?? 0));
+              (d1.value.ficheReceptionNumber ?? 0).compareTo(
+                (d2.value.ficheReceptionNumber ?? 0),
+              );
         };
       case 4:
         return (d1, d2) {
@@ -144,8 +151,9 @@ class ReparationWebService extends ParcOtoWebService<Reparation> {
             return 0;
           }
           return coef *
-              (d1.value.prestatairenom ?? '')
-                  .compareTo((d2.value.prestatairenom ?? ''));
+              (d1.value.prestatairenom ?? '').compareTo(
+                (d2.value.prestatairenom ?? ''),
+              );
         };
       case 5:
         return (d1, d2) {
@@ -155,29 +163,30 @@ class ReparationWebService extends ParcOtoWebService<Reparation> {
         return (d1, d2) {
           return coef * d1.value.getPrixTTC().compareTo(d2.value.getPrixTTC());
         };
-    //date modif
+      //date modif
       case 7:
         return (d1, d2) =>
-        coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
+            coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
       default:
         return (d1, d2) => coef * d1.value.numero.compareTo(d2.value.numero);
     }
   }
-  int Function(MapEntry<String,Reparation>,MapEntry<String,Reparation>) getComparisonFunctionGts(int column, bool ascending,) {
+
+  int Function(MapEntry<String, Reparation>, MapEntry<String, Reparation>)
+  getComparisonFunctionGts(int column, bool ascending) {
     int coef = ascending ? 1 : -1;
     switch (column) {
-    //matricule
+      //matricule
       case 0:
         return (d1, d2) => coef * d1.value.numero.compareTo(d2.value.numero);
-    //marque
+      //marque
       case 1:
         return (d1, d2) {
           if (d1.value.nchassi == null && d2.value.nchassi == null) {
             return 0;
           }
           return coef *
-              (d1.value.nchassi ?? '')
-                  .compareTo((d2.value.nchassi ?? ''));
+              (d1.value.nchassi ?? '').compareTo((d2.value.nchassi ?? ''));
         };
       case 2:
         return (d1, d2) {
@@ -185,17 +194,20 @@ class ReparationWebService extends ParcOtoWebService<Reparation> {
             return 0;
           }
           return coef *
-              (d1.value.vehiculemat ?? '')
-                  .compareTo((d2.value.vehiculemat ?? ''));
+              (d1.value.vehiculemat ?? '').compareTo(
+                (d2.value.vehiculemat ?? ''),
+              );
         };
       case 3:
         return (d1, d2) {
-          if (d1.value.ficheReceptionNumber == null && d2.value.ficheReceptionNumber == null) {
+          if (d1.value.ficheReceptionNumber == null &&
+              d2.value.ficheReceptionNumber == null) {
             return 0;
           }
           return coef *
-              (d1.value.ficheReceptionNumber ?? 0)
-                  .compareTo((d2.value.ficheReceptionNumber ?? 0));
+              (d1.value.ficheReceptionNumber ?? 0).compareTo(
+                (d2.value.ficheReceptionNumber ?? 0),
+              );
         };
       case 4:
         return (d1, d2) {
@@ -204,17 +216,18 @@ class ReparationWebService extends ParcOtoWebService<Reparation> {
             return 0;
           }
           return coef *
-              (d1.value.prestatairenom ?? '')
-                  .compareTo((d2.value.prestatairenom ?? ''));
+              (d1.value.prestatairenom ?? '').compareTo(
+                (d2.value.prestatairenom ?? ''),
+              );
         };
       case 5:
         return (d1, d2) {
           return coef * d1.value.date.compareTo(d2.value.date);
         };
-    //date modif
+      //date modif
       case 6:
         return (d1, d2) =>
-        coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
+            coef * d1.value.updatedAt!.compareTo(d2.value.updatedAt!);
       default:
         return (d1, d2) => coef * d1.value.numero.compareTo(d2.value.numero);
     }

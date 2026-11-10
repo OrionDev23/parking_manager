@@ -1,5 +1,3 @@
-
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -10,6 +8,7 @@ import 'package:parc_oto/widgets/page_header.dart';
 import '../../theme.dart';
 import 'backup_restore.dart';
 import 'backup_selection.dart';
+
 class BackupManager extends StatefulWidget {
   const BackupManager({super.key});
 
@@ -30,7 +29,7 @@ class _BackupManagerState extends State<BackupManager> {
               text: 'importfile'.tr(),
               showBottom: false,
               showCounter: false,
-              action: pickingFile?null:showImportScreen,
+              action: pickingFile ? null : showImportScreen,
             ),
             smallSpace,
             ButtonContainer(
@@ -43,10 +42,9 @@ class _BackupManagerState extends State<BackupManager> {
           ],
         ),
       ),
-      content: const BackupTable(selectD: false,),
+      content: const BackupTable(selectD: false),
     );
   }
-
 
   bool pickingFile = false;
 
@@ -83,18 +81,17 @@ class _BackupManagerState extends State<BackupManager> {
   }
 
   void showSaveScreen() {
-
     Future.delayed(const Duration(milliseconds: 30)).then((value) {
-      if(mounted) {
+      if (mounted) {
         showDialog(
-            context: context,
-            barrierDismissible: false,
-            dismissWithEsc: false,
-            builder: (c) {
-              return const BackupSelection();
-            });
+          context: context,
+          barrierDismissible: false,
+          dismissWithEsc: false,
+          builder: (c) {
+            return const BackupSelection();
+          },
+        );
       }
-
     });
   }
 }

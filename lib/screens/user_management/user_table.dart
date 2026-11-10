@@ -46,15 +46,19 @@ class _UsersTableState extends State<UsersTable> {
       startedWithFiltersOn = true;
       searchController.text = filterDocument.value!;
       userDataSource = UsersManagementDatasource(
-          current: context,
-          selectC: widget.selectD,
-          searchKey: filterDocument.value);
+        current: context,
+        selectC: widget.selectD,
+        searchKey: filterDocument.value,
+      );
       filterDocument.value = null;
     } else {
       startedWithFiltersOn = false;
 
       userDataSource = UsersManagementDatasource(
-          current: context, selectC: widget.selectD, archive: widget.archive);
+        current: context,
+        selectC: widget.selectD,
+        archive: widget.archive,
+      );
     }
     initColumns();
     super.initState();
@@ -65,10 +69,7 @@ class _UsersTableState extends State<UsersTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'nom',
-            style: tstyle,
-          ).tr(),
+          child: Text('nom', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -82,10 +83,7 @@ class _UsersTableState extends State<UsersTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'email',
-            style: tstyle,
-          ).tr(),
+          child: Text('email', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
@@ -99,10 +97,7 @@ class _UsersTableState extends State<UsersTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'ID',
-            style: tstyle,
-          ).tr(),
+          child: Text('ID', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -116,10 +111,7 @@ class _UsersTableState extends State<UsersTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'role',
-            style: tstyle,
-          ).tr(),
+          child: Text('role', style: tstyle).tr(),
         ),
         size: ColumnSize.M,
         onSort: (s, c) {
@@ -133,10 +125,7 @@ class _UsersTableState extends State<UsersTable> {
       DataColumn2(
         label: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: Text(
-            'dateajout',
-            style: tstyle,
-          ).tr(),
+          child: Text('dateajout', style: tstyle).tr(),
         ),
         size: ColumnSize.L,
         onSort: (s, c) {
@@ -160,87 +149,89 @@ class _UsersTableState extends State<UsersTable> {
     var appTheme = context.watch<AppTheme>();
     userDataSource.appTheme = appTheme;
     return ValueListenableBuilder(
-        valueListenable: filterDocument,
-        builder: (context, v, _) {
-          if (!startedWithFiltersOn && v != null && filterNow) {
-            searchController.text = v;
-            userDataSource.search(v);
-            notEmpty = true;
-            filtered = true;
-            filterNow = false;
-          }
-          return DataTableParc(
-            header: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    width: 350.px,
-                    height: 45.px,
-                    child: TextBox(
-                      onChanged: (s){
-                        if(s.isEmpty){
-                          notEmpty=false;
-                          userDataSource.search('');
-                        }
-                        else{
-                          notEmpty=true;
-                        }
-                        setState(() {
-                        });
-                      },
-                      controller: searchController,
-                      placeholder: 'search'.tr(),
-                      style: appTheme.writingStyle,
-                      cursorColor: appTheme.color.darker,
-                      placeholderStyle: placeStyle,
-                      decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-                      onSubmitted: (s) {
-                        if (s.isNotEmpty) {
-                          userDataSource.search(s);
-                          if (!notEmpty) {
-                            setState(() {
-                              notEmpty = true;
-                            });
-                          }
-                        } else {
-                          if (notEmpty) {
-                            setState(() {
-                              notEmpty = false;
-                            });
-                          }
-                        }
-                      },
-                      suffix: notEmpty
-                          ? IconButton(
-                              icon: const Icon(FluentIcons.cancel),
-                              onPressed: () {
-                                searchController.text = "";
-                                notEmpty = false;
-                                setState(() {});
-                                userDataSource.search('');
-                              })
-                          : null,
+      valueListenable: filterDocument,
+      builder: (context, v, _) {
+        if (!startedWithFiltersOn && v != null && filterNow) {
+          searchController.text = v;
+          userDataSource.search(v);
+          notEmpty = true;
+          filtered = true;
+          filterNow = false;
+        }
+        return DataTableParc(
+          header: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 350.px,
+                  height: 45.px,
+                  child: TextBox(
+                    onChanged: (s) {
+                      if (s.isEmpty) {
+                        notEmpty = false;
+                        userDataSource.search('');
+                      } else {
+                        notEmpty = true;
+                      }
+                      setState(() {});
+                    },
+                    controller: searchController,
+                    placeholder: 'search'.tr(),
+                    style: appTheme.writingStyle,
+                    cursorColor: appTheme.color.darker,
+                    placeholderStyle: placeStyle,
+                    decoration: WidgetStatePropertyAll(
+                      BoxDecoration(color: appTheme.fillColor),
                     ),
+                    onSubmitted: (s) {
+                      if (s.isNotEmpty) {
+                        userDataSource.search(s);
+                        if (!notEmpty) {
+                          setState(() {
+                            notEmpty = true;
+                          });
+                        }
+                      } else {
+                        if (notEmpty) {
+                          setState(() {
+                            notEmpty = false;
+                          });
+                        }
+                      }
+                    },
+                    suffix: notEmpty
+                        ? IconButton(
+                            icon: const Icon(FluentIcons.cancel),
+                            onPressed: () {
+                              searchController.text = "";
+                              notEmpty = false;
+                              setState(() {});
+                              userDataSource.search('');
+                            },
+                          )
+                        : null,
                   ),
-                  smallSpace,
-                  IconButton(icon: const Icon(FluentIcons.refresh), onPressed: (){
+                ),
+                smallSpace,
+                IconButton(
+                  icon: const Icon(FluentIcons.refresh),
+                  onPressed: () {
                     userDataSource.refreshDatasource();
-                    setState(() {
-
-                    });
-                  })
-                ],
-              ),
+                    setState(() {});
+                  },
+                ),
+              ],
             ),
-            sortAscending: assending,
-            sortColumnIndex: sortColumn,
-            columns: columns,
-            source: userDataSource,
-            hidePaginator: false,
-          );
-        });
+          ),
+          sortAscending: assending,
+          sortColumnIndex: sortColumn,
+          columns: columns,
+          source: userDataSource,
+          hidePaginator: false,
+        );
+      },
+    );
   }
 }

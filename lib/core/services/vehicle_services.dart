@@ -15,7 +15,8 @@ import '../database/local_database.dart';
 import '../device/shared_preferences_device_identity.dart';
 import '../sync/sqlite_sync_queue.dart';
 import '../tenancy/company_context.dart';
-import '../../providers/client_database.dart' show databaseId, vehiculeid, endpoint;
+import '../../providers/client_database.dart'
+    show databaseId, vehiculeid, endpoint;
 
 class VehicleServices {
   final LocalDatabase localDatabase;
@@ -43,8 +44,7 @@ class VehicleServices {
 
     final deviceIdentity = SharedPreferencesDeviceIdentity(
       Future.value(preferences),
-      idFactory: () =>
-          'desktop_${DateTime.now().microsecondsSinceEpoch}',
+      idFactory: () => 'desktop_${DateTime.now().microsecondsSinceEpoch}',
     );
     final syncQueue = SqliteSyncQueue(localDatabase);
     final localSource = SqliteVehicleSource(
@@ -113,10 +113,8 @@ class VehicleServices {
   /// pagination resilient to writes committed while a pull is in progress.
   Future<int> pullRemoteChanges() async {
     final startedAt = DateTime.now().toUtc();
-    final cursor = localDatabase.readSyncCursor(
-          companyId: companyId,
-          entity: 'vehicle',
-        ) ??
+    final cursor =
+        localDatabase.readSyncCursor(companyId: companyId, entity: 'vehicle') ??
         DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
     final since = cursor.subtract(const Duration(seconds: 5));
     var offset = 0;
@@ -182,7 +180,9 @@ class VehicleServices {
     final secondScan = await scanRemoteIds();
     if (firstScan.length != secondScan.length ||
         !firstScan.containsAll(secondScan)) {
-      debugPrint('[ParcOto Sync] vehicle reconciliation deferred: unstable snapshot');
+      debugPrint(
+        '[ParcOto Sync] vehicle reconciliation deferred: unstable snapshot',
+      );
       return 0;
     }
 

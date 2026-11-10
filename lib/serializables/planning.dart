@@ -27,21 +27,22 @@ class Planning extends ParcOtoDefault {
   String? location;
   List<String>? resourceIds;
 
-  Planning(
-      {required super.id,
-      super.createdAt,
-      super.updatedAt,
-      required this.subject,
-      required this.startTime,
-      required this.endTime,
-      this.resourceIds,
-      this.type = 0,
-      this.location,
-      this.notes,
-      this.color,
-      this.createdBy,
-      this.isAllDay = false,
-      this.recurrenceRule});
+  Planning({
+    required super.id,
+    super.createdAt,
+    super.updatedAt,
+    required this.subject,
+    required this.startTime,
+    required this.endTime,
+    this.resourceIds,
+    this.type = 0,
+    this.location,
+    this.notes,
+    this.color,
+    this.createdBy,
+    this.isAllDay = false,
+    this.recurrenceRule,
+  });
 
   factory Planning.fromJson(Map<String, dynamic> json) =>
       _$PlanningFromJson(json);

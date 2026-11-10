@@ -6,28 +6,30 @@ import '../../../../widgets/page_header.dart';
 import 'brand_form.dart';
 import 'brand_table.dart';
 import 'brand_tabs.dart';
+
 class BrandManager extends StatelessWidget {
-  const BrandManager({super.key,});
+  const BrandManager({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ScaffoldPage(
-        header: PageTitle(
-          text: getTitle().tr(),
-          trailing: ButtonContainer(
-            icon: FluentIcons.add,
-            text: 'add'.tr(),
-            showBottom: false,
-            showCounter: false,
-            action: () {
-              addBrand();
-            },
-          ),
+      header: PageTitle(
+        text: getTitle().tr(),
+        trailing: ButtonContainer(
+          icon: FluentIcons.add,
+          text: 'add'.tr(),
+          showBottom: false,
+          showCounter: false,
+          action: () {
+            addBrand();
+          },
         ),
-        content: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: getTable(),
-        ));
+      ),
+      content: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        child: getTable(),
+      ),
+    );
   }
 
   String getTitle() {

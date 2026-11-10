@@ -37,7 +37,8 @@ class FournisseurFormState extends ClientFormState {
       nif: nif.text,
       nis: nis.text,
       description: descr.text,
-      search: '${nom.text} ${nif.text} ${nis.text} ${rc.text} ${email.text} '
+      search:
+          '${nom.text} ${nif.text} ${nis.text} ${rc.text} ${email.text} '
           '${telephone.text} ${adresse.text} ${descr.text} $prestID ${art.text}',
     );
 
@@ -47,10 +48,6 @@ class FournisseurFormState extends ClientFormState {
       data: prest.toJson(),
       isNew: widget.prest == null,
     );
-    await DatabaseGetter().ajoutActivity(
-      48,
-      prestID!,
-      docName: prest.nom,
-    );
+    await DatabaseGetter().ajoutActivity(48, prestID!, docName: prest.nom);
   }
 }

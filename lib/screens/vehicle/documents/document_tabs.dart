@@ -22,9 +22,7 @@ class DocumentTabsState extends State<DocumentTabs> {
       text: Text('nouvdocument'.tr()),
       semanticLabel: 'nouvdocument'.tr(),
       icon: const Icon(FluentIcons.new_folder),
-      body: const ScaffoldPage(
-        content: DocumentForm(),
-      ),
+      body: const ScaffoldPage(content: DocumentForm()),
       onClosed: () {
         tabs.remove(tab);
 
@@ -38,13 +36,15 @@ class DocumentTabsState extends State<DocumentTabs> {
   void initState() {
     currentIndex.value = 0;
     if (tabs.isEmpty) {
-      tabs.add(Tab(
-        text: Text('gestiondocument'.tr()),
-        closeIcon: null,
-        icon: const Icon(FluentIcons.settings),
-        body: const VehiculeDocuments(),
-        onClosed: null,
-      ));
+      tabs.add(
+        Tab(
+          text: Text('gestiondocument'.tr()),
+          closeIcon: null,
+          icon: const Icon(FluentIcons.settings),
+          body: const VehiculeDocuments(),
+          onClosed: null,
+        ),
+      );
     }
     super.initState();
   }
@@ -52,39 +52,40 @@ class DocumentTabsState extends State<DocumentTabs> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: currentIndex,
-        builder: (context, value, _) {
-          return TabView(
-            tabs: tabs,
-            currentIndex: value,
-            onChanged: (index) => currentIndex.value = index,
-            tabWidthBehavior: TabWidthBehavior.equal,
-            closeButtonVisibility: CloseButtonVisibilityMode.always,
-            showScrollButtons: true,
-            onNewPressed: () {
-              setState(() {
-                final index = tabs.length + 1;
-                final tab = generateTab(index);
-                tabs.add(tab);
-                currentIndex.value = index - 1;
-              });
-            },
-            onReorder: (oldIndex, newIndex) {
-              setState(() {
-                if (oldIndex < newIndex) {
-                  newIndex -= 1;
-                }
-                final item = tabs.removeAt(oldIndex);
-                tabs.insert(newIndex, item);
+      valueListenable: currentIndex,
+      builder: (context, value, _) {
+        return TabView(
+          tabs: tabs,
+          currentIndex: value,
+          onChanged: (index) => currentIndex.value = index,
+          tabWidthBehavior: TabWidthBehavior.equal,
+          closeButtonVisibility: CloseButtonVisibilityMode.always,
+          showScrollButtons: true,
+          onNewPressed: () {
+            setState(() {
+              final index = tabs.length + 1;
+              final tab = generateTab(index);
+              tabs.add(tab);
+              currentIndex.value = index - 1;
+            });
+          },
+          onReorder: (oldIndex, newIndex) {
+            setState(() {
+              if (oldIndex < newIndex) {
+                newIndex -= 1;
+              }
+              final item = tabs.removeAt(oldIndex);
+              tabs.insert(newIndex, item);
 
-                if (currentIndex.value == newIndex) {
-                  currentIndex.value = oldIndex;
-                } else if (currentIndex.value == oldIndex) {
-                  currentIndex.value = newIndex;
-                }
-              });
-            },
-          );
-        });
+              if (currentIndex.value == newIndex) {
+                currentIndex.value = oldIndex;
+              } else if (currentIndex.value == oldIndex) {
+                currentIndex.value = newIndex;
+              }
+            });
+          },
+        );
+      },
+    );
   }
 }

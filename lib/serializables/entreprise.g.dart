@@ -7,30 +7,30 @@ part of 'entreprise.dart';
 // **************************************************************************
 
 Entreprise _$EntrepriseFromJson(Map<String, dynamic> json) => Entreprise(
-      id: json[r'$id'] as String,
-      nom: json['nom'] as String,
-      adresse: json['adresse'] as String,
-      art: json['art'] as String?,
-      createdAt: createdAtJson(json[r'$createdAt'] as String),
-      description: json['description'] as String?,
-      email: json['email'] as String?,
-      nif: json['nif'] as String?,
-      nis: json['nis'] as String?,
-      rc: json['rc'] as String?,
-      search: json['search'] as String?,
-      telephone: json['telephone'] as String?,
-      updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
-      directions: (json['directions'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
-      filiales: (json['filiales'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
-      departments: (json['departments'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
-      logo: json['logo'] as String?,
-    );
+  id: json[r'$id'] as String,
+  nom: json['nom'] as String,
+  adresse: json['adresse'] as String,
+  art: json['art'] as String?,
+  createdAt: createdAtJson(json[r'$createdAt'] as String),
+  description: json['description'] as String?,
+  email: json['email'] as String?,
+  nif: json['nif'] as String?,
+  nis: json['nis'] as String?,
+  rc: json['rc'] as String?,
+  search: json['search'] as String?,
+  telephone: json['telephone'] as String?,
+  updatedAt: updatedAtJson(json[r'$updatedAt'] as String),
+  directions: (json['directions'] as List<dynamic>?)
+      ?.map((e) => e as String)
+      .toList(),
+  filiales: (json['filiales'] as List<dynamic>?)
+      ?.map((e) => e as String)
+      .toList(),
+  departments: (json['departments'] as List<dynamic>?)
+      ?.map((e) => e as String)
+      .toList(),
+  logo: json['logo'] as String?,
+);
 
 Map<String, dynamic> _$EntrepriseToJson(Entreprise instance) =>
     <String, dynamic>{

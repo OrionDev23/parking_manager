@@ -15,9 +15,7 @@ class EtatManager extends StatefulWidget {
 }
 
 class EtatManagerState extends State<EtatManager> {
-  final tstyle = TextStyle(
-    fontSize: 10.sp,
-  );
+  final tstyle = TextStyle(fontSize: 10.sp);
 
   static BuildContext? current;
 
@@ -33,11 +31,12 @@ class EtatManagerState extends State<EtatManager> {
       header: PageTitle(
         text: 'vstates'.tr(),
         trailing: ButtonContainer(
-            icon: FluentIcons.add,
-            text: 'add'.tr(),
-            showBottom: false,
-            showCounter: false,
-            action: showStateForm),
+          icon: FluentIcons.add,
+          text: 'add'.tr(),
+          showBottom: false,
+          showCounter: false,
+          action: showStateForm,
+        ),
       ),
       content: const StateTable(),
     );
@@ -45,14 +44,15 @@ class EtatManagerState extends State<EtatManager> {
 
   void showStateForm() {
     showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (c) {
-          return ContentDialog(
-            title: const Text("nouvetat").tr(),
-            constraints: BoxConstraints.loose(Size(800.px, 500.px)),
-            content: const StateForm(),
-          );
-        });
+      context: context,
+      barrierDismissible: true,
+      builder: (c) {
+        return ContentDialog(
+          title: const Text("nouvetat").tr(),
+          constraints: BoxConstraints.loose(Size(800.px, 500.px)),
+          content: const StateForm(),
+        );
+      },
+    );
   }
 }

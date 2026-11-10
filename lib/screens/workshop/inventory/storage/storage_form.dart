@@ -2,13 +2,17 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart' hide Trans;
+
 import '../fournisseurs/fournisseur_table.dart';
 import '../../parts/parts_management/parts_table.dart';
 import '../../../../serializables/client.dart';
 import '../../../../serializables/pieces/storage_variations.dart';
+
 import 'package:responsive_sizer/responsive_sizer.dart';
+
 import '../../../../providers/parts_provider.dart';
 import '../../../../serializables/pieces/part.dart';
+
 import 'package:provider/provider.dart';
 
 import '../../../../serializables/pieces/storage.dart';
@@ -18,7 +22,6 @@ import '../../../../widgets/zone_box.dart';
 import 'variation_storage.dart';
 
 class StorageForm extends StatefulWidget {
-
   final Storage? storage;
   const StorageForm({super.key, this.storage});
 
@@ -27,17 +30,16 @@ class StorageForm extends StatefulWidget {
 }
 
 class _StorageFormState extends State<StorageForm> {
-
   VehiclePart? selectedPart;
   Client? selectedF;
-  double qte=1;
-  DateTime? expirationDate=DateTime.now().add(Duration(days: 30));
-  bool differentDate=false;
-  bool expire=true;
+  double qte = 1;
+  DateTime? expirationDate = DateTime.now().add(Duration(days: 30));
+  bool differentDate = false;
+  bool expire = true;
 
   String? storageID;
 
-  bool loading=true;
+  bool loading = true;
 
   @override
   void initState() {
@@ -45,44 +47,41 @@ class _StorageFormState extends State<StorageForm> {
     super.initState();
   }
 
-  Future<void> loadPart() async{
-    if(widget.storage!=null){
-        selectedPart=await PartsProvider().getPart(widget.storage!.partID);
-    }
-  }
-  Future<void> loadFourn() async{
-    if(widget.storage!=null && widget.storage!.fournisseurID!=null){
-      selectedF=await PartsProvider().getFournisseur(widget.storage!.fournisseurID);
+  Future<void> loadPart() async {
+    if (widget.storage != null) {
+      selectedPart = await PartsProvider().getPart(widget.storage!.partID);
     }
   }
 
-  void initStorage() async{
-    if(widget.storage!=null){
-      loading=true;
-      if(mounted){
-        setState(() {
+  Future<void> loadFourn() async {
+    if (widget.storage != null && widget.storage!.fournisseurID != null) {
+      selectedF = await PartsProvider().getFournisseur(
+        widget.storage!.fournisseurID,
+      );
+    }
+  }
 
-        });
+  void initStorage() async {
+    if (widget.storage != null) {
+      loading = true;
+      if (mounted) {
+        setState(() {});
       }
-      storageID=widget.storage!.id;
-      qte=widget.storage!.qte;
-      expirationDate=widget.storage!.expirationDate;
-      expire=widget.storage!.expirationDate!=null;
-      if(widget.storage!.variations!=null && widget.storage!.variations!.isNotEmpty){
+      storageID = widget.storage!.id;
+      qte = widget.storage!.qte;
+      expirationDate = widget.storage!.expirationDate;
+      expire = widget.storage!.expirationDate != null;
+      if (widget.storage!.variations != null &&
+          widget.storage!.variations!.isNotEmpty) {
         variations.addAll(widget.storage!.variations!);
       }
-      await Future.wait([
-        loadPart(),
-        loadFourn()
-      ]);
-
-
+      await Future.wait([loadPart(), loadFourn()]);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    var appTheme=context.watch<AppTheme>();
+    var appTheme = context.watch<AppTheme>();
     bool portrait = context.orientation == Orientation.portrait;
 
     return Column(
@@ -110,10 +109,7 @@ class _StorageFormState extends State<StorageForm> {
                       ),
                       child: Column(
                         children: [
-                          Text(
-                            'fournselect',
-                            style: appTheme.titleStyle,
-                          ).tr(),
+                          Text('fournselect', style: appTheme.titleStyle).tr(),
                           smallSpace,
                           Flexible(
                             flex: 1,
@@ -122,37 +118,46 @@ class _StorageFormState extends State<StorageForm> {
                               child: Padding(
                                 padding: const EdgeInsets.all(20.0),
                                 child: FilledButton(
-                                    child: Text(selectedF == null
+                                  child: Text(
+                                    selectedF == null
                                         ? 'nonind'.tr()
-                                        : selectedF!.nom),
-                                    onPressed: () async {
-                                      selectedF = await showDialog<Client?>(
-                                          context: context,
-                                          barrierDismissible: true,
-                                          builder: (context) {
-                                            return ContentDialog(
-                                              constraints:
-                                              BoxConstraints.tight(Size(700.px, 550.px)),
-                                              title: const Text('fournselect').tr(),
-                                              style: ContentDialogThemeData(
-                                                  titleStyle: appTheme.writingStyle
-                                                      .copyWith(fontWeight: FontWeight.bold)),
-                                              content: const FournisseurTable(
-                                                selectD: true,
-                                              ),
-                                              actions: [
-                                                Button(
-                                                    child: const Text('fermer').tr(),
-                                                    onPressed: () {
-                                                      selectedF = null;
-                                                      setState(() {});
-                                                      Navigator.of(context).pop();
-                                                    })
-                                              ],
-                                            );
-                                          });
-                                      setState(() {});
-                                    }),
+                                        : selectedF!.nom,
+                                  ),
+                                  onPressed: () async {
+                                    selectedF = await showDialog<Client?>(
+                                      context: context,
+                                      barrierDismissible: true,
+                                      builder: (context) {
+                                        return ContentDialog(
+                                          constraints: BoxConstraints.tight(
+                                            Size(700.px, 550.px),
+                                          ),
+                                          title: const Text('fournselect').tr(),
+                                          style: ContentDialogThemeData(
+                                            titleStyle: appTheme.writingStyle
+                                                .copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                          ),
+                                          content: const FournisseurTable(
+                                            selectD: true,
+                                          ),
+                                          actions: [
+                                            Button(
+                                              child: const Text('fermer').tr(),
+                                              onPressed: () {
+                                                selectedF = null;
+                                                setState(() {});
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                    setState(() {});
+                                  },
+                                ),
                               ),
                             ),
                           ),
@@ -173,10 +178,7 @@ class _StorageFormState extends State<StorageForm> {
                       ),
                       child: Column(
                         children: [
-                          Text(
-                            'slcprd',
-                            style: appTheme.titleStyle,
-                          ).tr(),
+                          Text('slcprd', style: appTheme.titleStyle).tr(),
                           smallSpace,
                           Flexible(
                             flex: 1,
@@ -185,86 +187,50 @@ class _StorageFormState extends State<StorageForm> {
                               child: Padding(
                                 padding: const EdgeInsets.all(20.0),
                                 child: FilledButton(
-                                    child: Text(selectedPart == null
+                                  child: Text(
+                                    selectedPart == null
                                         ? 'nonind'.tr()
-                                        : selectedPart!.name),
-                                    onPressed: () async {
-                                      selectedPart = await showDialog<VehiclePart>(
+                                        : selectedPart!.name,
+                                  ),
+                                  onPressed: () async {
+                                    selectedPart =
+                                        await showDialog<VehiclePart>(
                                           context: context,
                                           barrierDismissible: true,
                                           builder: (context) {
                                             return ContentDialog(
-                                              constraints:
-                                              BoxConstraints.tight(Size(700.px, 550.px)),
+                                              constraints: BoxConstraints.tight(
+                                                Size(700.px, 550.px),
+                                              ),
                                               title: const Text('slcprd').tr(),
                                               style: ContentDialogThemeData(
-                                                  titleStyle: appTheme.writingStyle
-                                                      .copyWith(fontWeight: FontWeight.bold)),
+                                                titleStyle: appTheme
+                                                    .writingStyle
+                                                    .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                              ),
                                               content: const PartsTable(
                                                 selectD: true,
                                               ),
                                               actions: [
                                                 Button(
-                                                    child: const Text('fermer').tr(),
-                                                    onPressed: () {
-                                                      selectedPart = null;
-                                                      setState(() {});
-                                                      Navigator.of(context).pop();
-                                                    })
+                                                  child: const Text('fermer')
+                                                      .tr(),
+                                                  onPressed: () {
+                                                    selectedPart = null;
+                                                    setState(() {});
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
                                               ],
                                             );
-                                          });
-                                      setState(() {});
-                                    }),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  if(selectedPart!=null)
-                  StaggeredGridTile.fit(
-                    crossAxisCellCount: 2,
-                    child: Container(
-                      width: 200.px,
-                      height: 170.px,
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: kElevationToShadow[2],
-                        color: appTheme.backGroundColor,
-                      ),
-                      child: Column(
-                        children: [
-                          Text(
-                            'quantity',
-                            style: appTheme.titleStyle,
-                          ).tr(),
-                          smallSpace,
-                          Flexible(
-                            flex: 1,
-                            child: ZoneBox(
-                              label: 'quantity'.tr(),
-                              child: Padding(
-                                padding: const EdgeInsets.all(20.0),
-                                child: selectedPart!.unitType==0?NumberBox<int>(
-                                  value: qte.toInt(),
-                                  onChanged: (int? value) {
-                                    setState(() {
-                                      qte=value?.toDouble()??0;
-                                    });
-                                    updateQteRestant();
-              
+                                          },
+                                        );
+                                    setState(() {});
                                   },
-                                  min: 0,
-                                )
-                                :NumberBox<double>(value: qte, onChanged: (s){
-                                  setState(() {
-                                    qte=s??0;
-                                  });
-                                  updateQteRestant();
-                                }),
+                                ),
                               ),
                             ),
                           ),
@@ -272,12 +238,61 @@ class _StorageFormState extends State<StorageForm> {
                       ),
                     ),
                   ),
-                  if(selectedPart!=null )
+                  if (selectedPart != null)
+                    StaggeredGridTile.fit(
+                      crossAxisCellCount: 2,
+                      child: Container(
+                        width: 200.px,
+                        height: 170.px,
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: kElevationToShadow[2],
+                          color: appTheme.backGroundColor,
+                        ),
+                        child: Column(
+                          children: [
+                            Text('quantity', style: appTheme.titleStyle).tr(),
+                            smallSpace,
+                            Flexible(
+                              flex: 1,
+                              child: ZoneBox(
+                                label: 'quantity'.tr(),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: selectedPart!.unitType == 0
+                                      ? NumberBox<int>(
+                                          value: qte.toInt(),
+                                          onChanged: (int? value) {
+                                            setState(() {
+                                              qte = value?.toDouble() ?? 0;
+                                            });
+                                            updateQteRestant();
+                                          },
+                                          min: 0,
+                                        )
+                                      : NumberBox<double>(
+                                          value: qte,
+                                          onChanged: (s) {
+                                            setState(() {
+                                              qte = s ?? 0;
+                                            });
+                                            updateQteRestant();
+                                          },
+                                        ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  if (selectedPart != null)
                     StaggeredGridTile.fit(
                       crossAxisCellCount: 4,
                       child: Container(
                         width: 200.px,
-                        height: expire?170.px:70.px,
+                        height: expire ? 170.px : 70.px,
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
@@ -296,68 +311,61 @@ class _StorageFormState extends State<StorageForm> {
                                 ).tr(),
                                 Checkbox(
                                   checked: expire,
-                                  onChanged: (s){
+                                  onChanged: (s) {
                                     setState(() {
-                                      expire=s??false;
+                                      expire = s ?? false;
                                     });
                                   },
-                                  content: Text(
-                                    'toexpire'
-                                  ).tr(),
+                                  content: Text('toexpire').tr(),
                                 ),
                               ],
                             ),
-                            if(expire)
-                            smallSpace,
-                            if(expire)
+                            if (expire) smallSpace,
+                            if (expire)
                               Flexible(
-                              flex: 1,
-                              child: ZoneBox(
-                                label: 'dateexp'.tr(),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      if(differentDate==false)
-                                      DatePicker(
-                                        selected: expirationDate,
-                                        onChanged: (d){
-                                          expirationDate=d;
-                                          setState(() {
-              
-                                          });
-                                        },
-              
-                                      ),
-                                      if(qte>1)
-                                            Checkbox(
-                                              checked: differentDate,
-                                              onChanged: (bool? value) {
-                                                differentDate=value??false;
-                                                setState(() {
-              
-                                                });
-                                              },
-                                              content: Text(
-                                                'differentDates'
-                                              ).tr(),
-              
-                                            ),
-                                    ],
-                                  )
+                                flex: 1,
+                                child: ZoneBox(
+                                  label: 'dateexp'.tr(),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        if (differentDate == false)
+                                          DatePicker(
+                                            selected: expirationDate,
+                                            onChanged: (d) {
+                                              expirationDate = d;
+                                              setState(() {});
+                                            },
+                                          ),
+                                        if (qte > 1)
+                                          Checkbox(
+                                            checked: differentDate,
+                                            onChanged: (bool? value) {
+                                              differentDate = value ?? false;
+                                              setState(() {});
+                                            },
+                                            content: Text('differentDates')
+                                                .tr(),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
                           ],
                         ),
                       ),
                     ),
-                  if(selectedPart!=null && selectedPart!.variations!=null &&
-                  selectedPart!.variations!.isNotEmpty)
-                    variationsWidget(appTheme,portrait)
+                  if (selectedPart != null &&
+                      selectedPart!.variations != null &&
+                      selectedPart!.variations!.isNotEmpty)
+                    variationsWidget(appTheme, portrait),
                 ],
-              ),],
+              ),
+            ],
           ),
         ),
 
@@ -365,7 +373,8 @@ class _StorageFormState extends State<StorageForm> {
           padding: const EdgeInsets.all(10.0),
           decoration: BoxDecoration(
             color: appTheme.backGroundColor,
-            boxShadow: kElevationToShadow[2],),
+            boxShadow: kElevationToShadow[2],
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -373,50 +382,53 @@ class _StorageFormState extends State<StorageForm> {
                 onPressed: confirmUpload,
                 child: const Text('confirmer').tr(),
               ),
-            ],),),
+            ],
+          ),
+        ),
       ],
     );
   }
 
   Widget variationsWidget(AppTheme appTheme, bool portrait) {
     return StaggeredGridTile.fit(
-        crossAxisCellCount: 6,
-        child: Container(
-          width: 400.px,
-          height:
-          variations.isEmpty ? 480.px : 50.px * variations.length + 165.px,
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: kElevationToShadow[2],
-            color: appTheme.backGroundColor,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'variations',
-                style: appTheme.titleStyle,
-              ).tr(),
-              smallSpace,
-              designationTable(appTheme),
-            ],
-          ),
-        ));
+      crossAxisCellCount: 6,
+      child: Container(
+        width: 400.px,
+        height: variations.isEmpty
+            ? 480.px
+            : 50.px * variations.length + 165.px,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: kElevationToShadow[2],
+          color: appTheme.backGroundColor,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('variations', style: appTheme.titleStyle).tr(),
+            smallSpace,
+            designationTable(appTheme),
+          ],
+        ),
+      ),
+    );
   }
 
   List<StorageVariation> variations = List.empty(growable: true);
 
-  double qteRestant=1;
+  double qteRestant = 1;
   void addDesignation() {
     variations.add(
-        StorageVariation(
-            id: variations.isEmpty
-                ? '1'
-                : (int.parse(variations.last.id) + 1).toString(),
-            name: '',
-            sku: 'XXXX',
-            qte: 1));
+      StorageVariation(
+        id: variations.isEmpty
+            ? '1'
+            : (int.parse(variations.last.id) + 1).toString(),
+        name: '',
+        sku: 'XXXX',
+        qte: 1,
+      ),
+    );
     updateQteRestant();
   }
 
@@ -431,12 +443,16 @@ class _StorageFormState extends State<StorageForm> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Button(
-                    onPressed:
-                    selectedDesignationsExist() ? deleteAllSelected : null,
-                    child: const Text('delete').tr()),
+                  onPressed: selectedDesignationsExist()
+                      ? deleteAllSelected
+                      : null,
+                  child: const Text('delete').tr(),
+                ),
                 smallSpace,
                 FilledButton(
-                    onPressed: qteRestant>0?addDesignation:null, child: const Text('add').tr()),
+                  onPressed: qteRestant > 0 ? addDesignation : null,
+                  child: const Text('add').tr(),
+                ),
               ],
             ),
           ),
@@ -444,80 +460,86 @@ class _StorageFormState extends State<StorageForm> {
           Container(
             decoration: BoxDecoration(
               color: appTheme.color.lightest,
-              borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(5)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(5),
+              ),
             ),
             padding: const EdgeInsets.all(5),
             child: Table(
-              columnWidths:
-              differentDate?
-              {
-                0: FlexColumnWidth(1),
-                1: FlexColumnWidth(5),
-                2: FlexColumnWidth(3),
-                3: FlexColumnWidth(2),
-                4: FlexColumnWidth(3),
-              }
-              :const {
-                0: FlexColumnWidth(1),
-                1: FlexColumnWidth(5),
-                2: FlexColumnWidth(3),
-            3: FlexColumnWidth(3),
-            4: FlexColumnWidth(2),
-            5: FlexColumnWidth(3),
-
-              },
+              columnWidths: differentDate
+                  ? {
+                      0: FlexColumnWidth(1),
+                      1: FlexColumnWidth(5),
+                      2: FlexColumnWidth(3),
+                      3: FlexColumnWidth(2),
+                      4: FlexColumnWidth(3),
+                    }
+                  : const {
+                      0: FlexColumnWidth(1),
+                      1: FlexColumnWidth(5),
+                      2: FlexColumnWidth(3),
+                      3: FlexColumnWidth(3),
+                      4: FlexColumnWidth(2),
+                      5: FlexColumnWidth(3),
+                    },
               children: [
-                TableRow(children: [
-                  TableCell(
-                      child: const Text(
-                        'N°',
-                        textAlign: TextAlign.center,
-                      ).tr()),
-                  TableCell(
+                TableRow(
+                  children: [
+                    TableCell(
+                      child: const Text('N°', textAlign: TextAlign.center).tr(),
+                    ),
+                    TableCell(
                       child: const Text(
                         'nom',
                         textAlign: TextAlign.center,
-                      ).tr()),
-                  TableCell(
+                      ).tr(),
+                    ),
+                    TableCell(
                       child: const Text(
                         'options',
                         textAlign: TextAlign.center,
-                      ).tr()),
-                  if(differentDate)
-                  TableCell(
-                      child: const Text(
-                        'dateexp',
-                        textAlign: TextAlign.center,
-                      ).tr()),
-                  TableCell(
+                      ).tr(),
+                    ),
+                    if (differentDate)
+                      TableCell(
+                        child: const Text(
+                          'dateexp',
+                          textAlign: TextAlign.center,
+                        ).tr(),
+                      ),
+                    TableCell(
                       child: const Text(
                         'prix',
                         textAlign: TextAlign.center,
-                      ).tr()),
-                  TableCell(
+                      ).tr(),
+                    ),
+                    TableCell(
                       child: const Text(
                         'qte',
                         textAlign: TextAlign.center,
-                      ).tr()),
-                ]),
+                      ).tr(),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
           variations.isEmpty
               ? Container(
-              padding: const EdgeInsets.all(10),
-              width: 300.px,
-              height: 320.px,
-              child: const NoDataWidget())
+                  padding: const EdgeInsets.all(10),
+                  width: 300.px,
+                  height: 320.px,
+                  child: const NoDataWidget(),
+                )
               : Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: appTheme.fillColor),
-              borderRadius:
-              const BorderRadius.vertical(bottom: Radius.circular(5)),
-            ),
-            child: Column(children: getDesignationList(appTheme)),
-          ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: appTheme.fillColor),
+                    borderRadius: const BorderRadius.vertical(
+                      bottom: Radius.circular(5),
+                    ),
+                  ),
+                  child: Column(children: getDesignationList(appTheme)),
+                ),
         ],
       ),
     );
@@ -555,33 +577,34 @@ class _StorageFormState extends State<StorageForm> {
             Row(
               children: [
                 Checkbox(
-                    checked: variations[index].selected,
-                    onChanged: (s) {
-                      setState(() {
-                        variations[index].selected=s??false;
-                      });
-                    }),
+                  checked: variations[index].selected,
+                  onChanged: (s) {
+                    setState(() {
+                      variations[index].selected = s ?? false;
+                    });
+                  },
+                ),
                 smallSpace,
                 Flexible(
                   child: SizedBox(
                     height: 35.px,
                     child: VariationStorageWidget(
-                        differentDate: differentDate,
-                        key: Key(variations[index].id),
-                        expirationDate: expirationDate,
-                        part: selectedPart!,
-                        variation: variations[index],
-                        onQteChanged: (s){
-                          variations[index].qte=s;
-                          updateQteRestant();
-                        },
-                       onDateChanged: (d){
-                          variations[index].expirationDate=d;
-                       },
-                      onOptionsChanged: (s){
-                          variations[index].optionValues=s;
-                      }, maxQte: qteRestant,
-
+                      differentDate: differentDate,
+                      key: Key(variations[index].id),
+                      expirationDate: expirationDate,
+                      part: selectedPart!,
+                      variation: variations[index],
+                      onQteChanged: (s) {
+                        variations[index].qte = s;
+                        updateQteRestant();
+                      },
+                      onDateChanged: (d) {
+                        variations[index].expirationDate = d;
+                      },
+                      onOptionsChanged: (s) {
+                        variations[index].optionValues = s;
+                      },
+                      maxQte: qteRestant,
                     ),
                   ),
                 ),
@@ -594,32 +617,26 @@ class _StorageFormState extends State<StorageForm> {
     });
   }
 
-  void updateQteRestant(){
-    qteRestant=qte;
-    for(int i=0;i<variations.length;i++){
-      qteRestant-=variations[i].qte;
+  void updateQteRestant() {
+    qteRestant = qte;
+    for (int i = 0; i < variations.length; i++) {
+      qteRestant -= variations[i].qte;
     }
-    setState(() {
-
-    });
+    setState(() {});
   }
 
-  void confirmUpload() async{
-
-    if(selectedPart==null){
+  void confirmUpload() async {
+    if (selectedPart == null) {
       return;
     }
-    if(qte<=0){
+    if (qte <= 0) {
       return;
     }
 
-    for(int i=0;i<variations.length;i++){
-      if(variations[i].qte<=0){
+    for (int i = 0; i < variations.length; i++) {
+      if (variations[i].qte <= 0) {
         return;
       }
     }
-
   }
-
-
 }

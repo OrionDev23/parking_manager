@@ -16,19 +16,24 @@ import '../../widgets/on_tap_scale.dart';
 import 'cdocument_webservice.dart';
 
 class ChaufDocumentsDataSource extends ParcOtoDatasource<DocumentChauffeur> {
-  ChaufDocumentsDataSource(
-      {required super.current, super.selectC, required super.collectionID}) {
+  ChaufDocumentsDataSource({
+    required super.current,
+    super.selectC,
+    required super.collectionID,
+  }) {
     repo = ChaufDocumentWebService(data, collectionID, 2);
   }
 
   void showMyChauffeur(String? chauffeur) {
     if (chauffeur != null) {
-      PanesListState.index.value = PaneItemsAndFooters.originalItems
-              .indexOf(PaneItemsAndFooters.chauffeurs) +
-
-          PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-          .reparations.items.length+(showAtelier?PaneItemsAndFooters
-          .atelier.items.length:0)-1;
+      PanesListState.index.value =
+          PaneItemsAndFooters.originalItems.indexOf(
+            PaneItemsAndFooters.chauffeurs,
+          ) +
+          PaneItemsAndFooters.vehicles.items.length +
+          PaneItemsAndFooters.reparations.items.length +
+          (showAtelier ? PaneItemsAndFooters.atelier.items.length : 0) -
+          1;
       ChauffeurTabsState.currentIndex.value = 0;
 
       ChauffeurTableState.filterNow = true;
@@ -42,33 +47,40 @@ class ChaufDocumentsDataSource extends ParcOtoDatasource<DocumentChauffeur> {
     final dateFormat2 = DateFormat('y/M/d', 'fr');
 
     return [
-      DataCell(SelectableText(
-        element.value.nom,
-        style: rowTextStyle,
-      )),
-      DataCell(SelectableText(element.value.chauffeurNom ?? '', style: rowTextStyle),
-          onTap: () {
-        showMyChauffeur(element.value.chauffeurNom);
-      }),
-      DataCell(SelectableText(
+      DataCell(SelectableText(element.value.nom, style: rowTextStyle)),
+      DataCell(
+        SelectableText(element.value.chauffeurNom ?? '', style: rowTextStyle),
+        onTap: () {
+          showMyChauffeur(element.value.chauffeurNom);
+        },
+      ),
+      DataCell(
+        SelectableText(
           element.value.dateExpiration != null
               ? dateFormat2.format(element.value.dateExpiration!)
               : '',
-          style: rowTextStyle)),
-      DataCell(SelectableText(
+          style: rowTextStyle,
+        ),
+      ),
+      DataCell(
+        SelectableText(
           element.value.updatedAt != null
               ? dateFormat.format(element.value.updatedAt!)
               : '',
-          style: rowTextStyle)),
-      DataCell(DatabaseGetter().isAdmin() || DatabaseGetter().isManager()
-          ? f.FlyoutTarget(
-              controller: element.value.controller,
-              child: OnTapScaleAndFade(
+          style: rowTextStyle,
+        ),
+      ),
+      DataCell(
+        DatabaseGetter().isAdmin() || DatabaseGetter().isManager()
+            ? f.FlyoutTarget(
+                controller: element.value.controller,
+                child: OnTapScaleAndFade(
                   onTap: () {
-                    element.value.controller.showFlyout(builder: (context) {
-                      return f.MenuFlyout(
-                        items: [
-                          f.MenuFlyoutItem(
+                    element.value.controller.showFlyout(
+                      builder: (context) {
+                        return f.MenuFlyout(
+                          items: [
+                            f.MenuFlyoutItem(
                               text: const Text('mod').tr(),
                               onPressed: () {
                                 Navigator.of(current).pop();
@@ -76,13 +88,14 @@ class ChaufDocumentsDataSource extends ParcOtoDatasource<DocumentChauffeur> {
                                 tab = f.Tab(
                                   key: UniqueKey(),
                                   text: Text(
-                                      '${"mod".tr()} ${'document'.tr().toLowerCase()} ${element.value.nom}'),
+                                    '${"mod".tr()} ${'document'.tr().toLowerCase()} ${element.value.nom}',
+                                  ),
                                   semanticLabel:
                                       '${'mod'.tr()} ${element.value.nom}',
                                   icon: const Icon(f.FluentIcons.edit),
-                                  body: f.ScaffoldPage(content: CDocumentForm(
-                                    dc: element.value,
-                                  ),),
+                                  body: f.ScaffoldPage(
+                                    content: CDocumentForm(dc: element.value),
+                                  ),
                                   onClosed: () {
                                     CDocumentTabsState.tabs.remove(tab);
 
@@ -97,27 +110,31 @@ class ChaufDocumentsDataSource extends ParcOtoDatasource<DocumentChauffeur> {
                                 CDocumentTabsState.tabs.add(tab);
                                 CDocumentTabsState.currentIndex.value =
                                     index - 1;
-                              }),
-                          if (DatabaseGetter().isAdmin())
-                            f.MenuFlyoutItem(
+                              },
+                            ),
+                            if (DatabaseGetter().isAdmin())
+                              f.MenuFlyoutItem(
                                 text: const Text('delete').tr(),
                                 onPressed: () {
                                   showDeleteConfirmation(element.value);
-                                }),
-                        ],
-                      );
-                    });
+                                },
+                              ),
+                          ],
+                        );
+                      },
+                    );
                   },
                   child: f.Container(
-                      decoration: BoxDecoration(
-                        color: appTheme?.color.lightest,
-                        boxShadow: kElevationToShadow[2],
-                      ),
-                      child: Icon(Icons.edit,color: appTheme!
-                          .color.darkest,))
+                    decoration: BoxDecoration(
+                      color: appTheme?.color.lightest,
+                      boxShadow: kElevationToShadow[2],
+                    ),
+                    child: Icon(Icons.edit, color: appTheme!.color.darkest),
+                  ),
+                ),
               )
-      )
-          : const Text('')),
+            : const Text(''),
+      ),
     ];
   }
 

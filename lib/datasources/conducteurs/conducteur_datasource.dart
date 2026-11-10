@@ -19,14 +19,15 @@ import '../../widgets/on_tap_scale.dart';
 class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
   final bool archive;
 
-  ConducteurDataSource(
-      {this.archive = false,
-      required super.collectionID,
-      super.selectC,
-      super.searchKey,
-      super.appTheme,
-      super.filters,
-      required super.current}) {
+  ConducteurDataSource({
+    this.archive = false,
+    required super.collectionID,
+    super.selectC,
+    super.searchKey,
+    super.appTheme,
+    super.filters,
+    required super.current,
+  }) {
     repo = ConducteurWebService(data, collectionID, 1, archive: archive);
   }
 
@@ -39,38 +40,42 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
   List<DataCell> getCellsToShow(MapEntry<String, Conducteur> element) {
     final dateFormat = DateFormat('y/M/d HH:mm:ss', 'fr');
     return [
-      DataCell(SelectableText(
-        '${element.value.name} ${element.value.prenom}',
-        style: rowTextStyle,
-      )),
-      DataCell(SelectableText(
-        element.value.email ?? '',
-        style: rowTextStyle,
-      )),
-      DataCell(SelectableText(
-        element.value.telephone ?? '',
-        style: rowTextStyle,
-      )),
-      DataCell(SelectableText(
-        DriverProvider.getEtat(element.value.etat).tr(),
-        style: rowTextStyle,
-      )),
-      DataCell(SelectableText(
-        element.value.updatedAt == null
-            ? ''
-            : dateFormat.format(element.value.updatedAt!),
-        style: rowTextStyle,
-      )),
-      DataCell(DatabaseGetter().isAdmin() || DatabaseGetter().isManager()
-          ? f.FlyoutTarget(
-              controller: element.value.controller,
-              child: OnTapScaleAndFade(
+      DataCell(
+        SelectableText(
+          '${element.value.name} ${element.value.prenom}',
+          style: rowTextStyle,
+        ),
+      ),
+      DataCell(SelectableText(element.value.email ?? '', style: rowTextStyle)),
+      DataCell(
+        SelectableText(element.value.telephone ?? '', style: rowTextStyle),
+      ),
+      DataCell(
+        SelectableText(
+          DriverProvider.getEtat(element.value.etat).tr(),
+          style: rowTextStyle,
+        ),
+      ),
+      DataCell(
+        SelectableText(
+          element.value.updatedAt == null
+              ? ''
+              : dateFormat.format(element.value.updatedAt!),
+          style: rowTextStyle,
+        ),
+      ),
+      DataCell(
+        DatabaseGetter().isAdmin() || DatabaseGetter().isManager()
+            ? f.FlyoutTarget(
+                controller: element.value.controller,
+                child: OnTapScaleAndFade(
                   onTap: () {
-                    element.value.controller.showFlyout(builder: (context) {
-                      return f.MenuFlyout(
-                        items: [
-                          if (!archive || DatabaseGetter().isAdmin())
-                            f.MenuFlyoutItem(
+                    element.value.controller.showFlyout(
+                      builder: (context) {
+                        return f.MenuFlyout(
+                          items: [
+                            if (!archive || DatabaseGetter().isAdmin())
+                              f.MenuFlyoutItem(
                                 text: const Text('mod').tr(),
                                 onPressed: () {
                                   Navigator.of(current).pop();
@@ -79,103 +84,118 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
                                   } else {
                                     modifyChauffeur(element.value);
                                   }
-                                }),
-                          if (DatabaseGetter().isAdmin() && archive)
-                            f.MenuFlyoutItem(
+                                },
+                              ),
+                            if (DatabaseGetter().isAdmin() && archive)
+                              f.MenuFlyoutItem(
                                 text: const Text('delete').tr(),
                                 onPressed: () {
                                   showDeleteConfirmation(element.value);
-                                }),
-                          const f.MenuFlyoutSeparator(),
-                          f.MenuFlyoutItem(
+                                },
+                              ),
+                            const f.MenuFlyoutSeparator(),
+                            f.MenuFlyoutItem(
                               text: const Text('nouvdocument').tr(),
                               onPressed: () {
-                                Future.delayed(const Duration(milliseconds: 50))
-                                    .then((value) => f.showDialog(
-                                        context: current,
-                                        barrierDismissible: true,
-                                        builder: (context) {
-                                          return f.ContentDialog(
-                                            title: Row(
-                                              mainAxisAlignment:
+                                Future.delayed(
+                                  const Duration(milliseconds: 50),
+                                ).then(
+                                  (value) => f.showDialog(
+                                    context: current,
+                                    barrierDismissible: true,
+                                    builder: (context) {
+                                      return f.ContentDialog(
+                                        title: Row(
+                                          mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                const Text('nouvdocument').tr(),
-                                                f.Button(child:
-                                                const Icon(f.FluentIcons
-                                                    .cancel),
-                                                    onPressed: ()
-                                                    {Navigator.of
-                                                      (context).pop();}),
-                                              ],
+                                          children: [
+                                            const Text('nouvdocument').tr(),
+                                            f.Button(
+                                              child: const Icon(
+                                                f.FluentIcons.cancel,
+                                              ),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
                                             ),
-                                            constraints: BoxConstraints
-                                                .loose(Size(420.px,450.px)),
+                                          ],
+                                        ),
+                                        constraints: BoxConstraints.loose(
+                                          Size(420.px, 450.px),
+                                        ),
 
-                                            content: CDocumentForm(
-                                                  c: element.value,
-                                                ),
-                                          );
-                                        }));
-                              }),
-                          if (!archive || DatabaseGetter().isAdmin())
-                            f.MenuFlyoutSubItem(
-                              text: const Text('disponibilite').tr(),
-                              items: (BuildContext context) {
-                                return [
-                                  f.MenuFlyoutItem(
-                                    text: const Text('disponible').tr(),
-                                    onPressed: () {
-                                      uploadEtat(element.value, 0);
+                                        content: CDocumentForm(
+                                          c: element.value,
+                                        ),
+                                      );
                                     },
-                                    selected: element.value.etat == 0,
                                   ),
-                                  f.MenuFlyoutItem(
-                                    text: const Text('mission').tr(),
-                                    onPressed: () {
-                                      uploadEtat(element.value, 1);
-                                    },
-                                    selected: element.value.etat == 1,
-                                  ),
-                                  f.MenuFlyoutItem(
-                                    text: const Text('absent').tr(),
-                                    onPressed: () {
-                                      uploadEtat(element.value, 2);
-                                    },
-                                    selected: element.value.etat == 2,
-                                  ),
-                                  if (DatabaseGetter().isAdmin())
-                                    f.MenuFlyoutItem(
-                                      text: const Text('quitteentre').tr(),
-                                      onPressed: () {
-                                        uploadEtat(element.value, 3);
-                                      },
-                                      selected: element.value.etat == 3,
-                                    ),
-                                ];
+                                );
                               },
                             ),
-                        ],
-                      );
-                    });
+                            if (!archive || DatabaseGetter().isAdmin())
+                              f.MenuFlyoutSubItem(
+                                text: const Text('disponibilite').tr(),
+                                items: (BuildContext context) {
+                                  return [
+                                    f.MenuFlyoutItem(
+                                      text: const Text('disponible').tr(),
+                                      onPressed: () {
+                                        uploadEtat(element.value, 0);
+                                      },
+                                      selected: element.value.etat == 0,
+                                    ),
+                                    f.MenuFlyoutItem(
+                                      text: const Text('mission').tr(),
+                                      onPressed: () {
+                                        uploadEtat(element.value, 1);
+                                      },
+                                      selected: element.value.etat == 1,
+                                    ),
+                                    f.MenuFlyoutItem(
+                                      text: const Text('absent').tr(),
+                                      onPressed: () {
+                                        uploadEtat(element.value, 2);
+                                      },
+                                      selected: element.value.etat == 2,
+                                    ),
+                                    if (DatabaseGetter().isAdmin())
+                                      f.MenuFlyoutItem(
+                                        text: const Text('quitteentre').tr(),
+                                        onPressed: () {
+                                          uploadEtat(element.value, 3);
+                                        },
+                                        selected: element.value.etat == 3,
+                                      ),
+                                  ];
+                                },
+                              ),
+                          ],
+                        );
+                      },
+                    );
                   },
                   child: f.Container(
-                      decoration: BoxDecoration(
-                        color: appTheme?.color.lightest,
-                        boxShadow: kElevationToShadow[2],
-                      ),
-                      child: Icon(Icons.edit,color: appTheme!
-                          .color.darkest,))
-              ),
-            )
-          : const Text('')),
+                    decoration: BoxDecoration(
+                      color: appTheme?.color.lightest,
+                      boxShadow: kElevationToShadow[2],
+                    ),
+                    child: Icon(Icons.edit, color: appTheme!.color.darkest),
+                  ),
+                ),
+              )
+            : const Text(''),
+      ),
     ];
   }
 
   @override
   Future<void> addToActivity(c) async {
-    await DatabaseGetter()
-        .ajoutActivity(18, c.id, docName: '${c.name} ${c.prenom}');
+    await DatabaseGetter().ajoutActivity(
+      18,
+      c.id,
+      docName: '${c.name} ${c.prenom}',
+    );
   }
 
   void modifyChauffeur(Conducteur conducteur) {
@@ -183,12 +203,11 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
     tab = f.Tab(
       key: UniqueKey(),
       text: Text(
-          '${"mod".tr()} ${'chauffeur'.tr().toLowerCase()} ${conducteur.name}'),
+        '${"mod".tr()} ${'chauffeur'.tr().toLowerCase()} ${conducteur.name}',
+      ),
       semanticLabel: '${'mod'.tr()} ${conducteur.name} ${conducteur.prenom}',
       icon: const Icon(f.FluentIcons.edit),
-      body: ChauffeurForm(
-        chauf: conducteur,
-      ),
+      body: ChauffeurForm(chauf: conducteur),
       onClosed: () {
         ChauffeurTabsState.tabs.remove(tab);
 
@@ -203,32 +222,32 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
   }
 
   void showDialogChauffeur(Conducteur conducteur) {
-    Future.delayed(const Duration(milliseconds: 50))
-        .then((value) => f.showDialog(
-            context: current,
-            barrierDismissible: true,
-            builder: (c) {
-              return f.ContentDialog(
-                title: f.Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                        '${"mod".tr()} ${'chauffeur'.tr().toLowerCase()} ${conducteur.name}'),
-                    f.Button(child:
-                    const Icon(f.FluentIcons
-                        .cancel),
-                        onPressed: ()
-                        {Navigator.of
-                          (current).pop();}),
-                  ],
+    Future.delayed(const Duration(milliseconds: 50)).then(
+      (value) => f.showDialog(
+        context: current,
+        barrierDismissible: true,
+        builder: (c) {
+          return f.ContentDialog(
+            title: f.Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${"mod".tr()} ${'chauffeur'.tr().toLowerCase()} ${conducteur.name}',
                 ),
-                constraints: BoxConstraints.loose(f.Size(550.px, 520.px)),
-                content: ChauffeurForm(
-                  chauf: conducteur,
+                f.Button(
+                  child: const Icon(f.FluentIcons.cancel),
+                  onPressed: () {
+                    Navigator.of(current).pop();
+                  },
                 ),
-
-              );
-            }));
+              ],
+            ),
+            constraints: BoxConstraints.loose(f.Size(550.px, 520.px)),
+            content: ChauffeurForm(chauf: conducteur),
+          );
+        },
+      ),
+    );
   }
 
   Future<void> uploadEtat(Conducteur c, int etat) async {
@@ -239,41 +258,51 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
           .abs()
           .toString();
       DisponibiliteChauffeur disp = DisponibiliteChauffeur(
-          id: etatID,
-          type: etat,
-          createdBy: DatabaseGetter.me.value?.id,
-          chauffeur: c.id,
-          chauffeurNom: '${c.name} ${c.prenom}');
+        id: etatID,
+        type: etat,
+        createdBy: DatabaseGetter.me.value?.id,
+        chauffeur: c.id,
+        chauffeurNom: '${c.name} ${c.prenom}',
+      );
       await DatabaseGetter.database!
           .createRow(
-              databaseId: databaseId,
-              tableId: chaufDispID,
-              rowId: etatID,
-              data: disp.toJson())
-          .then((value) async {
-        await DatabaseGetter.database!.updateRow(
             databaseId: databaseId,
-            tableId: chauffeurid,
-            rowId: c.id,
-            data: {
-              'etatactuel': etatID,
-              'etat': etat,
-            }).then((value) {
-          if (etat == 3) {
-            DatabaseGetter()
-                .ajoutActivity(19, c.id, docName: '${c.name} ${c.prenom}');
-          } else {
-            DatabaseGetter()
-                .ajoutActivity(21, c.id, docName: '${c.name} ${c.prenom}');
-          }
-          displayMessageDone();
-          changeEtat(c, disp);
-        }).onError((error, stackTrace) {
-          displayMessageError();
-        });
-      }).onError((error, stackTrace) {
-        displayMessageError();
-      });
+            tableId: chaufDispID,
+            rowId: etatID,
+            data: disp.toJson(),
+          )
+          .then((value) async {
+            await DatabaseGetter.database!
+                .updateRow(
+                  databaseId: databaseId,
+                  tableId: chauffeurid,
+                  rowId: c.id,
+                  data: {'etatactuel': etatID, 'etat': etat},
+                )
+                .then((value) {
+                  if (etat == 3) {
+                    DatabaseGetter().ajoutActivity(
+                      19,
+                      c.id,
+                      docName: '${c.name} ${c.prenom}',
+                    );
+                  } else {
+                    DatabaseGetter().ajoutActivity(
+                      21,
+                      c.id,
+                      docName: '${c.name} ${c.prenom}',
+                    );
+                  }
+                  displayMessageDone();
+                  changeEtat(c, disp);
+                })
+                .onError((error, stackTrace) {
+                  displayMessageError();
+                });
+          })
+          .onError((error, stackTrace) {
+            displayMessageError();
+          });
     }
   }
 
@@ -289,20 +318,26 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
   }
 
   void displayMessageDone() {
-    f.displayInfoBar(current, builder: (co, s) {
-      return f.InfoBar(
-        severity: f.InfoBarSeverity.success,
-        title: const Text('etatmodif').tr(),
-      );
-    });
+    f.displayInfoBar(
+      current,
+      builder: (co, s) {
+        return f.InfoBar(
+          severity: f.InfoBarSeverity.success,
+          title: const Text('etatmodif').tr(),
+        );
+      },
+    );
   }
 
   void displayMessageError() {
-    f.displayInfoBar(current, builder: (co, s) {
-      return f.InfoBar(
-        severity: f.InfoBarSeverity.error,
-        title: const Text('erreur').tr(),
-      );
-    });
+    f.displayInfoBar(
+      current,
+      builder: (co, s) {
+        return f.InfoBar(
+          severity: f.InfoBarSeverity.error,
+          title: const Text('erreur').tr(),
+        );
+      },
+    );
   }
 }
