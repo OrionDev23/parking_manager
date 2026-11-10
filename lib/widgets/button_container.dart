@@ -60,112 +60,113 @@ class _ButtonContainerState extends State<ButtonContainer> {
 
   @override
   Widget build(BuildContext context) {
-    var appTheme = context.watch<AppTheme>();
-    bool portrait=MediaQuery.of(context).orientation==Orientation.portrait;
-    TextStyle textStyle = TextStyle(
-        fontSize: portrait?16.sp:12.sp, color:
-        appTheme.writingStyle.color,
-    );
-    TextStyle textStyleButton = TextStyle(fontSize: portrait?14.sp:10.sp,
-        color: appTheme.writingStyle.color);
+    final appTheme = context.watch<AppTheme>();
+    final accent = widget.color ?? appTheme.color;
+    final textColor = appTheme.writingStyle.color;
+
+    final countLabel = loadingCount
+        ? '-${widget.maxCounter != null ? ' / ${widget.maxCounter}' : ''}'
+        : widget.counter != null
+            ? '${widget.counter}${widget.maxCounter != null ? ' / ${widget.maxCounter}' : ''}'
+            : widget.getCount != null
+                ? '$count${widget.maxCounter != null ? ' / ${widget.maxCounter}' : ''}'
+                : null;
 
     return OnTapScaleAndFade(
       onTap: widget.action,
       child: Container(
-        clipBehavior: Clip.hardEdge,
+        height: 112,
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: appTheme.backGroundColor,
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(
-            color: appTheme.color.lightest,
-            width: 1,
-          ),
-          boxShadow: kElevationToShadow[4],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey[30]),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(.035),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        width: 240.px,
-        height: 80.px,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              height: 80.px,
-              color:widget.color ?? appTheme.color.dark,
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: Icon(
-                  widget.icon,
-                  size: 20.sp,
-                  color: Colors.white,
-                ),
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                color: accent.withOpacity(.12),
+                borderRadius: BorderRadius.circular(11),
+              ),
+              child: Icon(widget.icon, size: 22, color: accent),
+            ),
+            const SizedBox(width: 13),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (widget.showCounter && countLabel != null)
+                    Text(
+                      countLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: accent,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  const SizedBox(height: 3),
+                  Text(
+                    widget.text,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (widget.showBottom) ...[
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 12,
+                      children: [
+                        if (widget.actionList != null)
+                          HyperlinkButton(
+                            onPressed: widget.actionList,
+                            style: ButtonStyle(
+                              padding: ButtonState.all(EdgeInsets.zero),
+                            ),
+                            child: Text(
+                              widget.textList,
+                              style: TextStyle(fontSize: 11, color: accent),
+                            ),
+                          ),
+                        if (widget.showBothLN && widget.actionNouveau != null)
+                          HyperlinkButton(
+                            onPressed: widget.actionNouveau,
+                            style: ButtonStyle(
+                              padding: ButtonState.all(EdgeInsets.zero),
+                            ),
+                            child: Text(
+                              widget.textNouveau,
+                              style: TextStyle(fontSize: 11, color: accent),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ],
               ),
             ),
-            smallSpace,
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    if(widget.showCounter)
-                    Text(
-                      widget.showCounter == true
-                          ? (widget.counter==null&&widget.getCount==null)  ||
-                          loadingCount
-                          ? '- ${widget.maxCounter!=null ?'/ ${widget
-                          .maxCounter}':''}'
-                          :widget.counter!=null?
-                          '${widget.counter} ${widget.maxCounter!=null
-                              ?'/ ${widget
-                              .maxCounter}':''}'
-                          :'$count ${widget.maxCounter!=null
-                          ?'/ ${widget
-                          .maxCounter}':''}'
-                          : '- ${widget.maxCounter!=null ?'/ ${widget
-                          .maxCounter}':''}',
-                      style: textStyle.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    if(widget.showCounter)
-                      smallSpace,
-                    Text(
-                      widget.text,
-                      style: textStyle,
-                    ),
-
-                  ],
-                ),
-                bigSpace,
-                if (widget.showBottom)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      HyperlinkButton(
-                        onPressed: widget.actionList,
-                        child: Text(
-                          widget.textList,
-                          style: textStyleButton,
-                        ),
-                      ),
-                      smallSpace,
-                      if (widget.showBothLN)
-                        Container(
-                          color: Colors.grey[100],
-                          width: 0.05.w,
-                          height: 30,
-                        ),
-                      if (widget.showBothLN) smallSpace,
-                      if (widget.showBothLN)
-                        HyperlinkButton(
-                          onPressed: widget.actionNouveau,
-                          child: Text(
-                            widget.textNouveau,
-                            style: textStyleButton,
-                          ),
-                        ),
-                    ],
-                  ),
-              ],
-            ),
+            if (widget.action != null)
+              Icon(
+                FluentIcons.chevron_right,
+                size: 13,
+                color: Colors.grey[100],
+              ),
           ],
         ),
       ),
