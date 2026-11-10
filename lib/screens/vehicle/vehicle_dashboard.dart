@@ -138,7 +138,7 @@ class VehicleDashboard extends StatelessWidget {
               icon: FluentIcons.document,
               onPressed: _openNewDocument,
             ),
-          ];;
+          ];
 
           return ListView(
             padding: EdgeInsets.symmetric(
