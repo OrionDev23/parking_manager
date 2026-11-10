@@ -18,11 +18,15 @@ class PartsProvider extends ChangeNotifier {
   static Map<String, VehiclePart> parts = {};
   static Map<String, Client> fournisseurs = {};
 
-  static bool errorCategories = true;
-  static bool errorBrands = true;
-  static bool errorOptions = true;
-  static bool errorParts = true;
-  static bool errorFournisseurs = true;
+  static bool errorCategories = false;
+  static bool errorBrands = false;
+  static bool errorOptions = false;
+  static bool errorParts = false;
+  static bool errorFournisseurs = false;
+
+  /// Last remote refresh failures, keyed by the legacy collection/entity.
+  /// Cached rows remain usable; a failed remote refresh is still reported.
+  static final Map<String, String> refreshErrors = {};
   static bool downloadingCategories = false;
   static bool downloadingBrands = false;
   static bool downloadingOptions = false;
@@ -176,8 +180,12 @@ class PartsProvider extends ChangeNotifier {
         ..clear()
         ..addAll(refreshed);
       setError(false);
+      refreshErrors.remove(entity);
     } catch (error, stackTrace) {
-      setError(target.isEmpty);
+      // A populated local cache must not hide a failed remote refresh.
+      // Keep the cached values, but expose the synchronization failure.
+      setError(true);
+      refreshErrors[entity] = error.toString();
       debugPrint('[ParcOto Stock] $entity refresh failed: $error');
       if (kDebugMode) debugPrintStack(stackTrace: stackTrace);
     } finally {
