@@ -178,8 +178,23 @@ class LegacyStockSyncService {
     Future<Map<String, Set<String>>> scan() async {
       final result = <String, Set<String>>{};
       for (final entry in tableByEntity.entries) {
-        final rows = await legacy.DatabaseGetter().listDocuments(entry.value);
-        result[entry.key] = rows.map((row) => row.$id).toSet();
+        final ids = <String>{};
+        var offset = 0;
+        while (true) {
+          final page = await database.listRows(
+            databaseId: legacy.databaseId,
+            tableId: entry.value,
+            queries: [
+              Query.orderAsc(r'$id'),
+              Query.limit(100),
+              Query.offset(offset),
+            ],
+          );
+          ids.addAll(page.rows.map((row) => row.$id));
+          if (page.rows.length < 100) break;
+          offset += page.rows.length;
+        }
+        result[entry.key] = ids;
       }
       return result;
     }
