@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 
 import '../device/device_identity.dart';
 import '../sync/sync_operation.dart';
