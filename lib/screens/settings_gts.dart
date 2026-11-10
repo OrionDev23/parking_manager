@@ -8,8 +8,6 @@ import '../theme.dart';
 import '../widgets/page.dart';
 import '../widgets/page_header.dart';
 
-enum GtsTheme { gtsDark, gtsLight }
-
 bool get kIsWindowEffectsSupported {
   return !kIsWeb &&
       [
@@ -43,40 +41,39 @@ class SettingsGTS extends ScrollablePage {
     return [
       Text('theme', style: FluentTheme.of(context).typography.subtitle).tr(),
       spacer,
-      RadioGroup<GtsTheme>(
-        groupValue: appTheme.mode == ThemeMode.dark
-            ? GtsTheme.gtsDark
-            : GtsTheme.gtsLight,
+      RadioGroup<ThemeMode>(
+        groupValue: appTheme.mode,
         onChanged: (value) {
           if (value != null) {
-            appTheme.mode = value == GtsTheme.gtsDark
-                ? ThemeMode.dark
-                : ThemeMode.light;
-            prefs.setInt('themeMode', value.index);
+            appTheme.mode = value;
+            // Preserve the persisted mapping: 0 = dark, 1 = light.
+            prefs.setInt('themeMode', value == ThemeMode.dark ? 0 : 1);
           }
         },
         child: Column(
-          children: GtsTheme.values
-              .map(
-                (mode) => Padding(
-                  padding: const EdgeInsetsDirectional.only(bottom: 8.0),
-                  child: RadioButton<GtsTheme>(
-                    value: mode,
-                    content: Text('$mode'.replaceAll('GtsTheme.', '')).tr(),
-                  ),
-                ),
-              )
-              .toList(),
+          children: [
+            Padding(
+              padding: const EdgeInsetsDirectional.only(bottom: 8.0),
+              child: RadioButton<ThemeMode>(
+                value: ThemeMode.light,
+                content: const Text('Clair'),
+              ),
+            ),
+            RadioButton<ThemeMode>(
+              value: ThemeMode.dark,
+              content: const Text('Sombre'),
+            ),
+          ],
         ),
       ),
       const SizedBox(height: 24),
       Text(
-        'Palette de l’application',
+        'Identité visuelle',
         style: FluentTheme.of(context).typography.subtitle,
       ),
       const SizedBox(height: 6),
       Text(
-        'Choisis une identité visuelle. Chaque palette existe en mode clair et sombre.',
+        'Chaque thème possède sa propre signature : formes, densité, profondeur, contrastes et accents. Le mode clair ou sombre adapte ensuite toute l’interface.',
         style: FluentTheme.of(context).typography.caption,
       ),
       const SizedBox(height: 14),
@@ -110,7 +107,7 @@ class SettingsGTS extends ScrollablePage {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: previewBackground,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(palette.cardRadius),
                     border: Border.all(
                       color: selected
                           ? palette.accent
@@ -126,7 +123,7 @@ class SettingsGTS extends ScrollablePage {
                         height: 48,
                         decoration: BoxDecoration(
                           color: previewSurface,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(palette.tableRadius),
                           border: Border.all(
                             color: isDark
                                 ? palette.darkBorder
