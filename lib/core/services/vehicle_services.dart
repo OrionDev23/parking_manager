@@ -109,6 +109,47 @@ class VehicleServices {
     return migrated;
   }
 
+  /// Pulls remote changes into SQLite. A small overlap on the cursor makes
+  /// pagination resilient to writes committed while a pull is in progress.
+  Future<int> pullRemoteChanges() async {
+    final startedAt = DateTime.now().toUtc();
+    final cursor = localDatabase.readSyncCursor(
+          companyId: companyId,
+          entity: 'vehicle',
+        ) ??
+        DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
+    final since = cursor.subtract(const Duration(seconds: 5));
+    var offset = 0;
+    var imported = 0;
+    while (true) {
+      final page = await remoteSource.getVehiclesUpdatedSince(
+        since,
+        limit: 100,
+        offset: offset,
+      );
+      if (page.isEmpty) break;
+      for (final vehicle in page) {
+        final hasLocalMutation = await syncQueue.hasUnresolvedMutation(
+          companyId: companyId,
+          entity: 'vehicle',
+          entityId: vehicle.id,
+        );
+        if (hasLocalMutation) continue;
+        await localSource.upsertVehicle(vehicle);
+        imported++;
+      }
+      offset += page.length;
+      if (page.length < 100) break;
+    }
+    localDatabase.saveSyncCursor(
+      companyId: companyId,
+      entity: 'vehicle',
+      cursor: startedAt.subtract(const Duration(seconds: 5)),
+    );
+    debugPrint('[ParcOto Sync] vehicles pulled=$imported');
+    return imported;
+  }
+
   Future<void> applySyncOperation(SyncOperation operation) async {
     if (operation.companyId != companyId) {
       throw StateError('Vehicle sync operation belongs to another company.');
