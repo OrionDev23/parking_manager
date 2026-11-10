@@ -7,7 +7,8 @@ abstract class SyncQueue {
   Future<void> recoverInterrupted({String? companyId});
   Future<void> markCompleted(String operationId);
   Future<void> markFailed(String operationId);
-  Future<void> markConflict(String operationId);
+  Future<void> markConflict(String operationId, {required String reason});
+  Future<List<SyncOperation>> conflicts({String? companyId, int limit = 100});
 
   /// Atomically acquires the company-wide sync lease if it is free or expired.
   Future<bool> acquireEngineLease({
