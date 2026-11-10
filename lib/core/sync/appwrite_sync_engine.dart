@@ -170,7 +170,10 @@ class AppwriteSyncEngine implements SyncEngine {
         } on AppwriteException catch (error, stackTrace) {
           debugPrint('[ParcOto Sync] APPWRITE ERROR entity=${operation.entity} op=${operation.type.name} id=${operation.entityId} code=${error.code} type=${error.type} message=${error.message}\n$stackTrace');
           if (error.code == 409) {
-            await queue.markConflict(operation.id);
+            await queue.markConflict(
+              operation.id,
+              reason: 'Appwrite ${error.code} (${error.type ?? 'unknown'}): ${error.message ?? 'Conflit distant'}',
+            );
           } else {
             await queue.markFailed(operation.id);
           }
