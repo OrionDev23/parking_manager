@@ -57,6 +57,10 @@ class _PartsFormState extends State<PartsForm>
   final List<String> originalOptionNames = [];
   int selectedUnit = 0;
   Brand? selectedBrand;
+  bool _supplierTouched = false;
+  bool _brandTouched = false;
+  bool _categoryTouched = false;
+
   @override
   void initState() {
     initValues();
@@ -270,11 +274,14 @@ class _PartsFormState extends State<PartsForm>
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: FilledButton(
-                    child: Text(selectedFournisseur == null
-                        ? 'nonind'.tr()
-                        : selectedFournisseur!.nom),
+                    child: Text(
+                      selectedFournisseur?.nom ??
+                          (widget.part?.fournisseurID != null
+                              ? '${widget.part?.fournisseurName ?? 'nonind'.tr()} (indisponible)'
+                              : 'nonind'.tr()),
+                    ),
                     onPressed: () async {
-                      selectedFournisseur = await showDialog<Client>(
+                      final pickedSupplier = await showDialog<Client>(
                           context: context,
                           barrierDismissible: true,
                           builder: (context) {
@@ -292,13 +299,25 @@ class _PartsFormState extends State<PartsForm>
                                 Button(
                                     child: const Text('fermer').tr(),
                                     onPressed: () {
+                                      _supplierTouched = true;
                                       selectedFournisseur = null;
-                                      setState(() {});
                                       Navigator.of(context).pop();
                                     })
                               ],
                             );
                           });
+                      if (pickedSupplier != null) {
+                        selectedFournisseur = pickedSupplier;
+                        _supplierTouched = true;
+                      }
+                      if (pickedBrand != null) {
+                        selectedBrand = pickedBrand;
+                        _brandTouched = true;
+                      }
+                      if (pickedCategory != null) {
+                        selectedCategory = pickedCategory;
+                        _categoryTouched = true;
+                      }
                       setState(() {});
                     }),
               ),
@@ -419,11 +438,14 @@ class _PartsFormState extends State<PartsForm>
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: FilledButton(
-                    child: Text(selectedBrand == null
-                        ? 'nonind'.tr()
-                        : selectedBrand!.name),
+                    child: Text(
+                      selectedBrand?.name ??
+                          (widget.part?.brandID != null
+                              ? '${widget.part?.brandName ?? 'nonind'.tr()} (indisponible)'
+                              : 'nonind'.tr()),
+                    ),
                     onPressed: () async {
-                      selectedBrand = await showDialog<Brand>(
+                      final pickedBrand = await showDialog<Brand>(
                           context: context,
                           barrierDismissible: true,
                           builder: (context) {
@@ -441,8 +463,8 @@ class _PartsFormState extends State<PartsForm>
                                 Button(
                                     child: const Text('fermer').tr(),
                                     onPressed: () {
+                                      _brandTouched = true;
                                       selectedBrand = null;
-                                      setState(() {});
                                       Navigator.of(context).pop();
                                     })
                               ],
@@ -461,11 +483,14 @@ class _PartsFormState extends State<PartsForm>
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: FilledButton(
-                    child: Text(selectedCategory == null
-                        ? 'nonind'.tr()
-                        : selectedCategory!.name),
+                    child: Text(
+                      selectedCategory?.name ??
+                          (widget.part?.categoryID != null
+                              ? '${widget.part?.categoryName ?? 'nonind'.tr()} (indisponible)'
+                              : 'nonind'.tr()),
+                    ),
                     onPressed: () async {
-                      selectedCategory = await showDialog<Category>(
+                      final pickedCategory = await showDialog<Category>(
                           context: context,
                           barrierDismissible: true,
                           builder: (context) {
@@ -483,8 +508,8 @@ class _PartsFormState extends State<PartsForm>
                                 Button(
                                     child: const Text('fermer').tr(),
                                     onPressed: () {
+                                      _categoryTouched = true;
                                       selectedCategory = null;
-                                      setState(() {});
                                       Navigator.of(context).pop();
                                     })
                               ],
@@ -1082,9 +1107,11 @@ class _PartsFormState extends State<PartsForm>
 
   bool uploading = false;
   void confirm() async {
-    if (name.text.isEmpty) {
+    if (name.text.trim().isEmpty) {
       displayMessage(context, 'nomrequired', InfoBarSeverity.error);
+      return;
     }
+    if (uploading) return;
     setState(() {
       uploading = true;
     });
@@ -1119,12 +1146,24 @@ class _PartsFormState extends State<PartsForm>
       ],
       price: prix,
       unitType: selectedUnit,
-      brandID: selectedBrand?.id,
-      brandName: selectedBrand?.name,
-      categoryID: selectedCategory?.id,
-      categoryName: selectedCategory?.name,
-      fournisseurID: selectedFournisseur?.id,
-      fournisseurName: selectedFournisseur?.nom,
+      brandID: _brandTouched
+          ? selectedBrand?.id
+          : selectedBrand?.id ?? widget.part?.brandID,
+      brandName: _brandTouched
+          ? selectedBrand?.name
+          : selectedBrand?.name ?? widget.part?.brandName,
+      categoryID: _categoryTouched
+          ? selectedCategory?.id
+          : selectedCategory?.id ?? widget.part?.categoryID,
+      categoryName: _categoryTouched
+          ? selectedCategory?.name
+          : selectedCategory?.name ?? widget.part?.categoryName,
+      fournisseurID: _supplierTouched
+          ? selectedFournisseur?.id
+          : selectedFournisseur?.id ?? widget.part?.fournisseurID,
+      fournisseurName: _supplierTouched
+          ? selectedFournisseur?.nom
+          : selectedFournisseur?.nom ?? widget.part?.fournisseurName,
     );
 
     try {
@@ -1148,9 +1187,20 @@ class _PartsFormState extends State<PartsForm>
         displayMessage(context, 'errupld', InfoBarSeverity.error);
       }
     }
-    setState(() {
-      uploading = false;
-    });
+    if (mounted) {
+      setState(() {
+        uploading = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    name.dispose();
+    description.dispose();
+    sku.dispose();
+    barcode.dispose();
+    super.dispose();
   }
 
 }
