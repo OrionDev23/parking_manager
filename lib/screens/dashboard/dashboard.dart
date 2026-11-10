@@ -94,44 +94,26 @@ class _DashboardState extends State<Dashboard>
                   ),
                   ModuleDashboardSectionHeader(
                     title: 'Actions courantes',
-                    subtitle: 'Accédez directement aux fonctions les plus utilisées.',
+                    subtitle:
+                        'Accédez directement aux fonctions les plus utilisées.',
                   ),
-                                    Text(
-                                      'Accès rapides',
-                                      style: TextStyle(
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w700,
-                                        color: appTheme.writingStyle.color,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Wrap(
-                                      spacing: 12,
-                                      runSpacing: 12,
-                                      children: buttonList(),
-                                    ),
-                  const SizedBox(height: 24),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: buttonList(),
+                  ),
+                  const SizedBox(height: 28),
                   ModuleDashboardSectionHeader(
                     title: 'Indicateurs de votre activité',
-                    subtitle: 'Une vue synthétique de la flotte, des opérations et des mouvements récents.',
+                    subtitle:
+                        'Une vue synthétique de la flotte, des opérations et des mouvements récents.',
                   ),
-                  const SizedBox(height: 8),
-
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      color: appTheme.writingStyle.color,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
                   StaggeredGrid.count(
                     crossAxisCount: compact ? 1 : 2,
                     mainAxisSpacing: 14,
                     crossAxisSpacing: 14,
                     children: widgetList(appTheme),
                   ),
-                  const SizedBox(height: 28),
-
                 ],
               );
             },
