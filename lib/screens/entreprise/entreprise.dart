@@ -1076,15 +1076,27 @@ class MyEntrepriseState extends State<MyEntreprise> {
     try {
       setState(() => progress = 10);
       await uploadLogo();
-      if (!mounted || !DatabaseGetter.isCurrentTenant(projectId)) return;
+      if (!mounted) return;
+      if (!DatabaseGetter.isCurrentTenant(projectId)) {
+        setState(() => uploading = false);
+        return;
+      }
 
       setState(() => progress = 50);
       await uploadEntreprise();
-      if (!mounted || !DatabaseGetter.isCurrentTenant(projectId)) return;
+      if (!mounted) return;
+      if (!DatabaseGetter.isCurrentTenant(projectId)) {
+        setState(() => uploading = false);
+        return;
+      }
 
       setState(() => progress = 90);
       await Future.delayed(const Duration(milliseconds: 300));
-      if (!mounted || !DatabaseGetter.isCurrentTenant(projectId)) return;
+      if (!mounted) return;
+      if (!DatabaseGetter.isCurrentTenant(projectId)) {
+        setState(() => uploading = false);
+        return;
+      }
 
       setState(() {
         progress = 100;
