@@ -398,25 +398,54 @@ class PaneItemsAndFooters {
     ];
   }
 
-  /// Resolves a destination from the current, permission-filtered navigation
-  /// tree. The flattened index is derived from the actual menu structure.
+  /// Resolves a destination using the same selectable-item ordering as
+  /// NavigationPane. Headers and separators are structural and do not occupy
+  /// a selected index.
   static int? indexForPaneKey(String value) {
-    var flatIndex = 0;
-    for (final item in originalItems) {
-      if (item.key is ValueKey && (item.key as ValueKey).value == value) {
-        return flatIndex;
+    return _findPaneIndex(originalItems, value, 0);
+  }
+
+  static int? _findPaneIndex(
+    List<NavigationPaneItem> items,
+    String value,
+    int startIndex,
+  ) {
+    var currentIndex = startIndex;
+    for (final item in items) {
+      if (item is PaneItemHeader || item is PaneItemSeparator) {
+        continue;
       }
-      flatIndex++;
+
+      if (item.key is ValueKey && (item.key as ValueKey).value == value) {
+        return currentIndex;
+      }
+
+      currentIndex++;
       if (item is PaneItemExpander) {
-        for (final child in item.items) {
-          if (child.key is ValueKey && (child.key as ValueKey).value == value) {
-            return flatIndex;
-          }
-          flatIndex++;
-        }
+        final childIndex = _findPaneIndex(
+          item.items,
+          value,
+          currentIndex,
+        );
+        if (childIndex != null) return childIndex;
+        currentIndex += _selectablePaneCount(item.items);
       }
     }
     return null;
+  }
+
+  static int _selectablePaneCount(List<NavigationPaneItem> items) {
+    var count = 0;
+    for (final item in items) {
+      if (item is PaneItemHeader || item is PaneItemSeparator) {
+        continue;
+      }
+      count++;
+      if (item is PaneItemExpander) {
+        count += _selectablePaneCount(item.items);
+      }
+    }
+    return count;
   }
 
   static bool selectPane(String value) {
