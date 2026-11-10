@@ -158,6 +158,10 @@ void launchApp() async {
       'part_option': legacyStockSyncService.applySyncOperation,
       'supplier': legacyStockSyncService.applySyncOperation,
     },
+    pullHandlers: {
+      'vehicle': () async { await vehicleServices.pullRemoteChanges(); },
+      'driver': () async { await driverServices.pullRemoteChanges(); },
+    },
   );
   await syncEngine.start();
 
