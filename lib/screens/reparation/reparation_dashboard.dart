@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../theme.dart';
-import '../../widgets/button_container.dart';
+import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
 import '../logs/logging/log_table.dart';
 import '../prestataire/prestataire_form.dart';
@@ -37,14 +37,15 @@ class ReparationDashboard extends StatelessWidget {
             icon: FluentIcons.repair,
           ),
           const SizedBox(height: 26),
-          StaggeredGrid.count(
-            crossAxisCount: portrait ? 2 : 4,
-            mainAxisSpacing: 5,
-            crossAxisSpacing: 5,
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
             children: [
-              ButtonContainer(
-                color: appTheme.color,
-                action: () {
+              ModuleDashboardAction(
+            label: 'greparations'.tr(),
+            detail: 'Suivi des interventions',
+            icon: FluentIcons.list,
+            onPressed: () {
                   PanesListState.index.value =
                       PaneItemsAndFooters.originalItems.indexOf(
                         PaneItemsAndFooters.reparations,
@@ -52,14 +53,12 @@ class ReparationDashboard extends StatelessWidget {
                       PaneItemsAndFooters.vehicles.items.length +
                       1;
                 },
-                icon: FluentIcons.list,
-                text: 'greparations'.tr(),
-                showBothLN: false,
-                showBottom: false,
-                showCounter: false,
-              ),
-              ButtonContainer(
-                action: () {
+          ),
+              ModuleDashboardAction(
+            label: 'nouvrepar'.tr(),
+            detail: 'Créer un nouvel élément',
+            icon: FluentIcons.repair,
+            onPressed: () {
                   PanesListState.index.value =
                       PaneItemsAndFooters.originalItems.indexOf(
                         PaneItemsAndFooters.reparations,
@@ -88,16 +87,12 @@ class ReparationDashboard extends StatelessWidget {
                         ReparationTabsState.currentIndex.value = index - 1;
                       });
                 },
-                color: appTheme.color,
-                icon: FluentIcons.repair,
-                text: 'nouvrepar'.tr(),
-                showBothLN: false,
-                showBottom: false,
-                showCounter: false,
-              ),
-              ButtonContainer(
-                color: appTheme.color,
-                action: () {
+          ),
+              ModuleDashboardAction(
+            label: 'prestataires'.tr(),
+            detail: 'Gestion des prestataires',
+            icon: FluentIcons.list,
+            onPressed: () {
                   PanesListState.index.value =
                       PaneItemsAndFooters.originalItems.indexOf(
                         PaneItemsAndFooters.reparations,
@@ -105,14 +100,12 @@ class ReparationDashboard extends StatelessWidget {
                       PaneItemsAndFooters.vehicles.items.length +
                       2;
                 },
-                icon: FluentIcons.list,
-                text: 'prestataires'.tr(),
-                showBothLN: false,
-                showBottom: false,
-                showCounter: false,
-              ),
-              ButtonContainer(
-                action: () {
+          ),
+              ModuleDashboardAction(
+            label: 'nouvprest'.tr(),
+            detail: 'Créer un nouvel élément',
+            icon: FluentIcons.service_activity,
+            onPressed: () {
                   PanesListState.index.value =
                       PaneItemsAndFooters.originalItems.indexOf(
                         PaneItemsAndFooters.reparations,
@@ -141,13 +134,7 @@ class ReparationDashboard extends StatelessWidget {
                         PrestataireTabsState.currentIndex.value = index - 1;
                       });
                 },
-                color: appTheme.color,
-                icon: FluentIcons.service_activity,
-                text: 'nouvprest'.tr(),
-                showBothLN: false,
-                showBottom: false,
-                showCounter: false,
-              ),
+          ),
             ],
           ),
           bigSpace,
