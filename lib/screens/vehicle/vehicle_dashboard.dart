@@ -1,10 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:provider/provider.dart';
 
 import '../../providers/counters.dart';
-import '../../theme.dart';
 import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
 import '../../widgets/module_dashboard_section_header.dart';
@@ -90,7 +88,6 @@ class VehicleDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = context.watch<AppTheme>();
 
     return ScaffoldPage(
       padding: EdgeInsets.zero,
