@@ -34,16 +34,7 @@ class ModuleDashboardAction extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                color: theme.color.withValues(alpha: .12),
-                borderRadius: BorderRadius.circular(9),
-              ),
-              alignment: Alignment.center,
-              child: Icon(icon, color: theme.color, size: 18),
-            ),
+            Icon(icon, color: theme.color, size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
