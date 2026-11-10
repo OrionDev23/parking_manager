@@ -158,20 +158,6 @@ Future<void> _initializeBackgroundData(String companyId) async {
   await syncEngine.start();
 }
 
-void displayMessage(
-  BuildContext context,
-  String msg,
-  InfoBarSeverity severity,
-) {
-  displayInfoBar(
-    context,
-    builder: (BuildContext context, void Function() close) {
-      return InfoBar(title: Text(msg).tr(), severity: severity);
-    },
-    duration: snackbarShortDuration,
-  );
-}
-
 Future<void> launchApp() async {
   final startupWatch = Stopwatch()..start();
   prefs = await SharedPreferences.getInstance();
@@ -253,15 +239,15 @@ Future<void> launchApp() async {
     ),
   );
 
-  debugPrint(
-    '[ParcOto Startup] first frame requested after ${startupWatch.elapsedMilliseconds} ms',
-  );
-  if (!kIsWeb &&
-      (Platform.isMacOS || Platform.isLinux || Platform.isWindows)) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    debugPrint(
+      '[ParcOto Startup] first Flutter frame rendered after ${startupWatch.elapsedMilliseconds} ms',
+    );
+    if (!kIsWeb &&
+        (Platform.isMacOS || Platform.isLinux || Platform.isWindows)) {
       unawaited(_showMainWindow());
-    });
-  }
+    }
+  });
 }
 
 Future<void> _showMainWindow() async {
