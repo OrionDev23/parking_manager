@@ -89,16 +89,16 @@ class SettingsGTS extends ScrollablePage {
           spacing: 12,
           runSpacing: 12,
           children: AppThemePreset.values.map((preset) {
-            final palette = appThemePalettes[preset]!;
+            final themeDefinition = appThemes[preset]!;
             final selected = appTheme.preset == preset;
             final isDark = appTheme.mode == ThemeMode.dark;
             final previewBackground = isDark
-                ? palette.darkBackground
-                : palette.lightBackground;
+                ? themeDefinition.darkBackground
+                : themeDefinition.lightBackground;
             final previewSurface = isDark
-                ? palette.darkSurface
-                : palette.lightSurface;
-            final previewText = isDark ? palette.darkText : palette.lightText;
+                ? themeDefinition.darkSurface
+                : themeDefinition.lightSurface;
+            final previewText = isDark ? themeDefinition.darkText : themeDefinition.lightText;
             return SizedBox(
               width: 245,
               child: RadioButton<AppThemePreset>(
@@ -107,11 +107,11 @@ class SettingsGTS extends ScrollablePage {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: previewBackground,
-                    borderRadius: BorderRadius.circular(palette.cardRadius),
+                    borderRadius: BorderRadius.circular(themeDefinition.cardRadius),
                     border: Border.all(
                       color: selected
-                          ? palette.accent
-                          : (isDark ? palette.darkBorder : palette.lightBorder),
+                          ? themeDefinition.accent
+                          : (isDark ? themeDefinition.darkBorder : themeDefinition.lightBorder),
                       width: selected ? 2 : 1,
                     ),
                   ),
@@ -123,11 +123,11 @@ class SettingsGTS extends ScrollablePage {
                         height: 48,
                         decoration: BoxDecoration(
                           color: previewSurface,
-                          borderRadius: BorderRadius.circular(palette.tableRadius),
+                          borderRadius: BorderRadius.circular(themeDefinition.tableRadius),
                           border: Border.all(
                             color: isDark
-                                ? palette.darkBorder
-                                : palette.lightBorder,
+                                ? themeDefinition.darkBorder
+                                : themeDefinition.lightBorder,
                           ),
                         ),
                         padding: const EdgeInsets.all(8),
@@ -136,7 +136,7 @@ class SettingsGTS extends ScrollablePage {
                             Container(
                               width: 7,
                               decoration: BoxDecoration(
-                                color: palette.accent,
+                                color: themeDefinition.accent,
                                 borderRadius: BorderRadius.circular(4),
                               ),
                             ),
@@ -170,7 +170,7 @@ class SettingsGTS extends ScrollablePage {
                               width: 25,
                               height: 25,
                               decoration: BoxDecoration(
-                                color: palette.accent,
+                                color: themeDefinition.accent,
                                 borderRadius: BorderRadius.circular(7),
                               ),
                             ),
@@ -179,7 +179,7 @@ class SettingsGTS extends ScrollablePage {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        palette.name,
+                        themeDefinition.name,
                         style: TextStyle(
                           color: previewText,
                           fontWeight: FontWeight.w700,
@@ -187,11 +187,11 @@ class SettingsGTS extends ScrollablePage {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        palette.description,
+                        themeDefinition.description,
                         style: TextStyle(
                           color: isDark
-                              ? palette.darkMutedText
-                              : palette.lightMutedText,
+                              ? themeDefinition.darkMutedText
+                              : themeDefinition.lightMutedText,
                           fontSize: 11,
                         ),
                       ),
