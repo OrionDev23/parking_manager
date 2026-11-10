@@ -148,8 +148,77 @@ class DriverServices {
       entity: 'driver',
       cursor: startedAt.subtract(const Duration(seconds: 5)),
     );
-    debugPrint('[ParcOto Sync] drivers pulled=$imported');
+    final reconciled = await _reconcileRemoteDeletions(startedAt);
+    debugPrint(
+      '[ParcOto Sync] drivers pulled=$imported, remote deletions=$reconciled',
+    );
     return imported;
+  }
+
+  /// Driver state 3 is an archive state, not a deletion. Both active and
+  /// archived rows are included in each complete remote snapshot.
+  Future<int> _reconcileRemoteDeletions(DateTime now) async {
+    final lastRun = localDatabase.readReconciliationTime(
+      companyId: companyId,
+      entity: 'driver',
+    );
+    if (lastRun != null &&
+        now.difference(lastRun) < const Duration(hours: 24)) {
+      return 0;
+    }
+
+    Future<Set<String>> scanRemoteIds() async {
+      final ids = <String>{};
+      for (final includeArchived in [false, true]) {
+        var offset = 0;
+        while (true) {
+          final page = await remoteSource.getDrivers(
+            limit: 100,
+            offset: offset,
+            includeArchived: includeArchived,
+          );
+          ids.addAll(page.map((item) => item.id));
+          if (page.length < 100) break;
+          offset += page.length;
+        }
+      }
+      return ids;
+    }
+
+    final firstScan = await scanRemoteIds();
+    final secondScan = await scanRemoteIds();
+    if (firstScan.length != secondScan.length ||
+        !firstScan.containsAll(secondScan)) {
+      debugPrint('[ParcOto Sync] driver reconciliation deferred: unstable snapshot');
+      return 0;
+    }
+
+    final localDrivers = [
+      ...await localSource.getDrivers(),
+      ...await localSource.getDrivers(includeArchived: true),
+    ];
+    final checkedIds = <String>{};
+    var deleted = 0;
+    for (final driver in localDrivers) {
+      if (!checkedIds.add(driver.id) || secondScan.contains(driver.id)) {
+        continue;
+      }
+      final hasLocalMutation = await syncQueue.hasUnresolvedMutation(
+        companyId: companyId,
+        entity: 'driver',
+        entityId: driver.id,
+      );
+      if (hasLocalMutation) continue;
+      await localSource.deleteDriver(driver.id);
+      deleted++;
+    }
+
+    localDatabase.saveReconciliationTime(
+      companyId: companyId,
+      entity: 'driver',
+      reconciledAt: now,
+    );
+    return deleted;
   }
 
   Future<void> applySyncOperation(SyncOperation operation) async {
