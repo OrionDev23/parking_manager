@@ -33,6 +33,7 @@ class AppwriteSyncEngine implements SyncEngine {
   bool _syncing = false;
   bool _leaseLost = false;
   bool _leaseRenewing = false;
+  Completer<void>? _syncCompletion;
 
   AppwriteSyncEngine({
     required this.queue,
@@ -76,6 +77,9 @@ class AppwriteSyncEngine implements SyncEngine {
     _leaseTimer = null;
     await _subscription?.cancel();
     _subscription = null;
+    // Do not swap the global Appwrite project while a previous tenant's
+    // remote request is still running.
+    await _syncCompletion?.future;
   }
 
   void _startLeaseRenewal() {
@@ -117,6 +121,7 @@ class AppwriteSyncEngine implements SyncEngine {
       return;
     }
     _syncing = true;
+    _syncCompletion = Completer<void>();
     var leaseAcquired = false;
     debugPrint('[ParcOto Sync] syncNow started — companyId=$companyId');
     try {
@@ -245,6 +250,11 @@ class AppwriteSyncEngine implements SyncEngine {
       }
       _syncing = false;
       debugPrint('[ParcOto Sync] syncNow finished');
+      final completion = _syncCompletion;
+      _syncCompletion = null;
+      if (completion != null && !completion.isCompleted) {
+        completion.complete();
+      }
     }
   }
 }
