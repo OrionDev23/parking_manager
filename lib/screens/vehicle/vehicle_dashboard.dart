@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../providers/counters.dart';
 import '../../theme.dart';
 import '../../widgets/button_container.dart';
+import '../../widgets/module_dashboard_header.dart';
 import '../dashboard/charts/pie_chart.dart';
 import '../logs/logging/log_table.dart';
 import '../sidemenu/pane_items.dart';
@@ -174,79 +175,15 @@ class VehicleDashboard extends StatelessWidget {
               vertical: 22,
             ),
             children: [
-              Text(
-                'vehicules'.tr(),
-                style: TextStyle(
-                  fontSize: compact ? 25 : 30,
-                  fontWeight: FontWeight.w700,
-                  color: appTheme.writingStyle.color,
-                ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                'Gérez votre parc, ses documents et ses états depuis un seul espace.',
-                style: TextStyle(fontSize: 13, color: Colors.grey[100]),
-              ),
-              const SizedBox(height: 22),
-              Container(
-                padding: EdgeInsets.all(compact ? 16 : 22),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      appTheme.color.dark,
-                      appTheme.color,
-                      appTheme.color.light,
-                    ],
-                    begin: AlignmentDirectional.centerStart,
-                    end: AlignmentDirectional.centerEnd,
-                  ),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'GESTION DE FLOTTE',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: .78),
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.6,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Votre parc automobile, en un coup d’œil',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: compact ? 17 : 21,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            'Accédez aux véhicules, aux états et aux documents administratifs.',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: .86),
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (!compact) ...[
-                      const SizedBox(width: 20),
-                      Icon(
-                        FluentIcons.car,
-                        size: 58,
-                        color: Colors.white.withValues(alpha: .9),
-                      ),
-                    ],
-                  ],
-                ),
+              ModuleDashboardHeader(
+                title: 'vehicules'.tr(),
+                subtitle:
+                    'Gérez votre parc, ses documents et ses états depuis un seul espace.',
+                eyebrow: 'Gestion de flotte',
+                heroTitle: 'Votre parc automobile, en un coup d’œil',
+                heroDescription:
+                    'Accédez aux véhicules, aux états et aux documents administratifs.',
+                icon: FluentIcons.car,
               ),
               const SizedBox(height: 26),
               Text(
