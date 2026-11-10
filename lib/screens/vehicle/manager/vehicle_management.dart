@@ -3,12 +3,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../admin_parameters.dart';
 import '../../../batch_import/import_vehicles.dart';
 import '../../../theme.dart';
-import '../../../widgets/button_container.dart';
 import '../../../widgets/page_header.dart';
 import 'vehicle_form.dart';
 import 'vehicle_tabs.dart';
@@ -24,10 +22,6 @@ class VehicleManagement extends StatefulWidget {
 
 class VehicleManagementState extends State<VehicleManagement>
     with AutomaticKeepAliveClientMixin<VehicleManagement> {
-  final tstyle = TextStyle(
-    fontSize: 10.sp,
-  );
-
   static ValueNotifier<int> stateChanges = ValueNotifier(0);
 
   @override
@@ -35,36 +29,57 @@ class VehicleManagementState extends State<VehicleManagement>
     super.build(context);
     var appTheme = context.watch<AppTheme>();
     return ScaffoldPage(
+      padding: const EdgeInsets.fromLTRB(18, 8, 18, 16),
       header: PageTitle(
         text: 'gestionvehicles'.tr(),
-        trailing: Row(
-          children: [
-            if (showImportVehicles && DatabaseGetter().isAdmin())
-              ButtonContainer(
-                color: appTheme.color.darkest,
-                icon: FluentIcons.add,
-                text: 'importlist'.tr(),
-                showBottom: false,
-                showCounter: false,
-                action: importList,
+        trailing: Padding(
+          padding: const EdgeInsets.only(right: 10),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (showImportVehicles && DatabaseGetter().isAdmin()) ...[
+                Button(
+                  onPressed: importList,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(FluentIcons.open_file, size: 14),
+                      const SizedBox(width: 7),
+                      const Text('importlist').tr(),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+              FilledButton(
+                onPressed: () {
+                  final index = VehicleTabsState.tabs.length + 1;
+                  final tab = generateTab(index);
+                  VehicleTabsState.tabs.add(tab);
+                  VehicleTabsState.currentIndex.value = index - 1;
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(FluentIcons.add, size: 14),
+                    const SizedBox(width: 7),
+                    const Text('add').tr(),
+                  ],
+                ),
               ),
-            if (showImportVehicles && DatabaseGetter().isAdmin()) smallSpace,
-            ButtonContainer(
-              icon: FluentIcons.add,
-              text: 'add'.tr(),
-              showBottom: false,
-              showCounter: false,
-              action: () {
-                final index = VehicleTabsState.tabs.length + 1;
-                final tab = generateTab(index);
-                VehicleTabsState.tabs.add(tab);
-                VehicleTabsState.currentIndex.value = index - 1;
-              },
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-      content: const VehicleTable()
+      content: Container(
+        decoration: BoxDecoration(
+          color: appTheme.backGroundColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey[30]),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: const VehicleTable(),
+      ),
     );
   }
 
