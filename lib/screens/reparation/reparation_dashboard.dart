@@ -7,11 +7,11 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../theme.dart';
 import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
+import '../../widgets/module_dashboard_panel.dart';
 import '../logs/logging/log_table.dart';
 import '../prestataire/prestataire_form.dart';
 import '../prestataire/prestataire_tabs.dart';
 import '../sidemenu/pane_items.dart';
-import '../sidemenu/sidemenu.dart';
 import 'reparation/manager/reparation_tabs.dart';
 import 'reparation/reparation_order_form/reparation_form.dart';
 
@@ -45,29 +45,15 @@ class ReparationDashboard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          SizedBox(
+          ModuleDashboardPanel(
+            title: 'Activité récente',
             height: 380.px,
-            child: Column(
-              children: [
-                Text(
-                  'lactivities',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: appTheme.writingStyle.color,
-                  ),
-                ).tr(),
-                smallSpace,
-                const Flexible(
-                  child: LogTable(
-                    statTable: true,
-                    pages: false,
-                    numberOfRows: 3,
-                    filters: {'typemin': '10', 'typemax': '15'},
-                    fieldsToShow: ['act', 'date'],
-                  ),
-                ),
-              ],
+            child: const LogTable(
+              statTable: true,
+              pages: false,
+              numberOfRows: 3,
+              filters: {'typemin': '10', 'typemax': '15'},
+              fieldsToShow: ['act', 'date'],
             ),
           ),
           const SizedBox(height: 28),
