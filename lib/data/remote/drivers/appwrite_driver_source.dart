@@ -143,6 +143,26 @@ class AppwriteDriverSource implements RemoteDriverSource {
   }
 
   @override
+  Future<List<Driver>> getDriversUpdatedSince(
+    DateTime since, {
+    int limit = 100,
+    int offset = 0,
+  }) async {
+    final result = await backend.database.listRows(
+      databaseId: databaseId,
+      tableId: tableId,
+      queries: [
+        Query.equal('companyId', companyContext.companyId),
+        Query.greaterThan(r'$updatedAt', since.toUtc().toIso8601String()),
+        Query.orderAsc(r'$updatedAt'),
+        Query.limit(limit),
+        Query.offset(offset),
+      ],
+    );
+    return result.rows.map<Driver>(_fromRow).toList(growable: false);
+  }
+
+  @override
   Future<Driver?> getDriver(String id) async {
     try {
       final row = await backend.database.getRow(
