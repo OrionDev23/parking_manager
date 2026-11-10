@@ -67,16 +67,26 @@ class PanesListState extends State<PanesList>
     super.initState();
   }
 
-  void getProfil() async {
+  Future<void> getProfil() async {
     loading = true;
     firstLoading = true;
     if (mounted) {
       setState(() {});
     }
-    await DatabaseGetter().getUser();
-    if (DatabaseGetter.user != null) {
-      signedIn.value = true;
+
+    try {
+      final isSignedIn = await restoreInitialSession();
+      signedIn.value = isSignedIn;
+      if (isSignedIn) {
+        startBackgroundInitialization(
+          authService.session!.company.companyId,
+        );
+      }
+    } catch (error, stackTrace) {
+      debugPrint('[ParcOto Startup] session restore failed: $error\\n$stackTrace');
+      signedIn.value = false;
     }
+
     widget.paneList.initPanes();
     loading = false;
     firstLoading = false;
