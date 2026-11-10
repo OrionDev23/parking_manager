@@ -25,7 +25,14 @@ class _AccessManagementState extends State<AccessManagement> {
 
   Future<void> _load() async {
     final companyId = authService.session?.company.companyId;
-    if (companyId == null) return;
+    if (companyId == null) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _error = 'Aucune entreprise active n’est associée à cette session.';
+      });
+      return;
+    }
     setState(() {
       _loading = true;
       _error = null;
