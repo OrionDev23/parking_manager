@@ -167,6 +167,53 @@ class LocalDatabase {
         "INSERT INTO schema_migrations(version, applied_at) VALUES (9, datetime('now'))",
       );
     }
+
+    if (version < 10) {
+      db.execute('''CREATE TABLE IF NOT EXISTS sync_remote_snapshot (
+        company_id TEXT NOT NULL,
+        entity TEXT NOT NULL,
+        entity_id TEXT NOT NULL,
+        PRIMARY KEY (company_id, entity, entity_id)
+      )''');
+      db.execute(
+        "INSERT INTO schema_migrations(version, applied_at) VALUES (10, datetime('now'))",
+      );
+    }
+  }
+
+  Set<String> readRemoteSnapshotIds({
+    required String companyId,
+    required String entity,
+  }) {
+    final rows = database.select(
+      'SELECT entity_id FROM sync_remote_snapshot WHERE company_id=? AND entity=?',
+      [companyId, entity],
+    );
+    return rows.map((row) => row['entity_id'] as String).toSet();
+  }
+
+  void replaceRemoteSnapshot({
+    required String companyId,
+    required String entity,
+    required Set<String> entityIds,
+  }) {
+    database.execute('BEGIN IMMEDIATE');
+    try {
+      database.execute(
+        'DELETE FROM sync_remote_snapshot WHERE company_id=? AND entity=?',
+        [companyId, entity],
+      );
+      for (final id in entityIds) {
+        database.execute(
+          'INSERT INTO sync_remote_snapshot(company_id, entity, entity_id) VALUES (?, ?, ?)',
+          [companyId, entity, id],
+        );
+      }
+      database.execute('COMMIT');
+    } catch (_) {
+      database.execute('ROLLBACK');
+      rethrow;
+    }
   }
 
   DateTime? readReconciliationTime({
