@@ -524,7 +524,7 @@ class AppTheme extends ChangeNotifier {
         isDense: true,
         enabledBorder: m.OutlineInputBorder(
           borderSide: m.BorderSide(color: borderColor),
-          borderRadius: m.BorderRadius.circular(8),
+          borderRadius: m.BorderRadius.circular(definition.controlRadius),
         ),
         focusedBorder: m.OutlineInputBorder(
           borderSide: m.BorderSide(color: p.accent, width: 1.5),
