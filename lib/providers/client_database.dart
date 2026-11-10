@@ -81,6 +81,10 @@ class DatabaseGetter {
       settingSecretKey = false;
       encrypter = null;
       iv = null;
+      MyEntrepriseState.p = null;
+      MyEntrepriseState.logo = null;
+      MyEntrepriseState.imageFile = null;
+      MyEntrepriseState.downloading = false;
 
       client = Client()
         ..setEndpoint(endpoint)
