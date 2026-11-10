@@ -86,12 +86,14 @@ class _PartsFormState extends State<PartsForm>
         for (final option in options) {
           resolvedOptionIds.add(option.id);
           option1 ??= option;
-          if (option1?.id != option.id && option2 == null) {
-            option2 = option;
-          } else if (option3 == null) {
-            option3 = option;
-          } else if (option4 == null) {
-            option4 = option;
+          if (option1!.id != option.id) {
+            option2 ??= option;
+          }
+          if (option2 != null && option2!.id != option.id) {
+            option3 ??= option;
+          }
+          if (option3 != null && option3!.id != option.id) {
+            option4 ??= option;
           }
         }
       }
