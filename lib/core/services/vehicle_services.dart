@@ -146,8 +146,66 @@ class VehicleServices {
       entity: 'vehicle',
       cursor: startedAt.subtract(const Duration(seconds: 5)),
     );
-    debugPrint('[ParcOto Sync] vehicles pulled=$imported');
+    final reconciled = await _reconcileRemoteDeletions(startedAt);
+    debugPrint(
+      '[ParcOto Sync] vehicles pulled=$imported, remote deletions=$reconciled',
+    );
     return imported;
+  }
+
+  /// Appwrite hard deletes have no incremental event. A daily full-ID
+  /// reconciliation detects them without requiring a server-side tombstone
+  /// table. Two identical complete scans are required before local deletion.
+  Future<int> _reconcileRemoteDeletions(DateTime now) async {
+    final lastRun = localDatabase.readReconciliationTime(
+      companyId: companyId,
+      entity: 'vehicle',
+    );
+    if (lastRun != null &&
+        now.difference(lastRun) < const Duration(hours: 24)) {
+      return 0;
+    }
+
+    Future<Set<String>> scanRemoteIds() async {
+      final ids = <String>{};
+      var offset = 0;
+      while (true) {
+        final page = await remoteSource.getVehicles(limit: 100, offset: offset);
+        ids.addAll(page.map((item) => item.id));
+        if (page.length < 100) break;
+        offset += page.length;
+      }
+      return ids;
+    }
+
+    final firstScan = await scanRemoteIds();
+    final secondScan = await scanRemoteIds();
+    if (firstScan.length != secondScan.length ||
+        !firstScan.containsAll(secondScan)) {
+      debugPrint('[ParcOto Sync] vehicle reconciliation deferred: unstable snapshot');
+      return 0;
+    }
+
+    final localVehicles = await localSource.getVehicles();
+    var deleted = 0;
+    for (final vehicle in localVehicles) {
+      if (secondScan.contains(vehicle.id)) continue;
+      final hasLocalMutation = await syncQueue.hasUnresolvedMutation(
+        companyId: companyId,
+        entity: 'vehicle',
+        entityId: vehicle.id,
+      );
+      if (hasLocalMutation) continue;
+      await localSource.deleteVehicle(vehicle.id);
+      deleted++;
+    }
+
+    localDatabase.saveReconciliationTime(
+      companyId: companyId,
+      entity: 'vehicle',
+      reconciledAt: now,
+    );
+    return deleted;
   }
 
   Future<void> applySyncOperation(SyncOperation operation) async {
