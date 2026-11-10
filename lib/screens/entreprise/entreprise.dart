@@ -1165,33 +1165,52 @@ class MyEntrepriseState extends State<MyEntreprise> {
   }
 
   Future<void> uploadLogo() async {
-    if (imageFile != null) {
-      var bytes = await imageFile!.readAsBytes();
-      try {
-        await DatabaseGetter.storage!.deleteFile(
-          bucketId: buckedId,
-          fileId: logoid,
-        );
-      } catch (e) {
-        //
-      }
-      try {
-        await FileImage(io.File('mylogo.png')).evict();
-      } catch (e) {
-        //
-      }
-      await DatabaseGetter.storage!
-          .createFile(
-            bucketId: buckedId,
-            fileId: logoid,
-            file: InputFile.fromBytes(bytes: bytes, filename: logoid),
-          )
-          .then((value) async {
-            io.File file = io.File(logoid);
-            await file.writeAsBytes(bytes, mode: io.FileMode.write);
-          })
-          .onError((AppwriteException error, stackTrace) {});
+    final selectedImage = imageFile;
+    if (selectedImage == null) return;
+
+    final projectId = DatabaseGetter.activeProjectId;
+    final activeStorage = DatabaseGetter.storage;
+    if (projectId == null || activeStorage == null) {
+      throw StateError('No active Appwrite tenant.');
     }
+
+    final bytes = await selectedImage.readAsBytes();
+    if (!DatabaseGetter.isCurrentTenant(projectId)) {
+      throw StateError('Tenant changed while reading the company logo.');
+    }
+
+    try {
+      await activeStorage.deleteFile(
+        bucketId: buckedId,
+        fileId: logoid,
+      );
+    } on AppwriteException {
+      // The logo may not exist yet.
+    }
+    if (!DatabaseGetter.isCurrentTenant(projectId)) {
+      throw StateError('Tenant changed while replacing the company logo.');
+    }
+
+    try {
+      await FileImage(io.File(logoid)).evict();
+    } catch (_) {
+      // Cache eviction is best-effort.
+    }
+
+    await activeStorage.createFile(
+      bucketId: buckedId,
+      fileId: logoid,
+      file: InputFile.fromBytes(bytes: bytes, filename: logoid),
+    );
+    if (!DatabaseGetter.isCurrentTenant(projectId)) {
+      throw StateError('Tenant changed while uploading the company logo.');
+    }
+
+    if (!kIsWeb) {
+      await io.File(logoid).writeAsBytes(bytes, mode: io.FileMode.write);
+    }
+    logo = bytes;
+    MyEntrepriseState.logo = bytes;
   }
 
   void showMessage(String message, String title) {
