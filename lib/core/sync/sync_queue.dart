@@ -10,6 +10,7 @@ abstract class SyncQueue {
   Future<void> markConflict(String operationId, {required String reason});
   Future<List<SyncOperation>> conflicts({String? companyId, int limit = 100});
   Future<void> retryConflict(String operationId);
+  Future<bool> hasUnresolvedMutation({required String companyId, required String entity, required String entityId});
 
   /// Atomically acquires the company-wide sync lease if it is free or expired.
   Future<bool> acquireEngineLease({
