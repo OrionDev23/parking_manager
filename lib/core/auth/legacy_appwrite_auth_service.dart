@@ -17,6 +17,7 @@ class LegacyAppwriteAuthService implements AuthService {
   final SharedPreferences preferences;
   final ParcotoEdition edition;
   final AccessControlRepository accessControlRepository;
+  final Future<void> Function()? onSessionEnding;
 
   AuthState _state = AuthState.unknown;
   AuthSession? _session;
@@ -26,6 +27,7 @@ class LegacyAppwriteAuthService implements AuthService {
   LegacyAppwriteAuthService({
     required this.preferences,
     required this.accessControlRepository,
+    this.onSessionEnding,
     this.edition = ParcotoEdition.online,
   });
 
@@ -58,6 +60,7 @@ class LegacyAppwriteAuthService implements AuthService {
     }
 
     try {
+      await onSessionEnding?.call();
       project = configuredProject;
       final databaseGetter = DatabaseGetter();
       await databaseGetter.getUser();
@@ -98,6 +101,9 @@ class LegacyAppwriteAuthService implements AuthService {
     }
 
     try {
+      // Stop the previous tenant's sync before changing the global legacy
+      // Appwrite client. An in-flight stock sync must not use the new project.
+      await onSessionEnding?.call();
       project = resolvedProject;
       final databaseGetter = DatabaseGetter();
       final account = DatabaseGetter.account;
@@ -176,6 +182,7 @@ class LegacyAppwriteAuthService implements AuthService {
   Future<void> signOut() async {
     _setState(AuthState.signingOut);
     try {
+      await onSessionEnding?.call();
       await DatabaseGetter.account?.deleteSession(sessionId: 'current');
     } finally {
       DatabaseGetter.user = null;
