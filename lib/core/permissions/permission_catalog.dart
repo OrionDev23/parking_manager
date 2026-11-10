@@ -235,8 +235,9 @@ abstract final class PermissionCatalog {
   static Set<String> preset(String name) {
     final permissions = presets[name];
     if (permissions == null) return <String>{};
-    if (permissions.contains('*'))
+    if (permissions.contains('*')) {
       return all.map((permission) => permission.id).toSet();
+    }
     return {...permissions};
   }
 
