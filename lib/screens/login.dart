@@ -271,6 +271,9 @@ class _LoginScreenState extends State<LoginScreen>
 
         PanesListState.signedIn.value = true;
         signedIn = true;
+        startBackgroundInitialization(
+          authService.session!.company.companyId,
+        );
       } on AppwriteException catch (e) {
         error = e.type?.tr() ?? e.message ?? 'connexionerror'.tr();
         signedIn = false;
