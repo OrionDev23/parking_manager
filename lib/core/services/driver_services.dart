@@ -111,6 +111,47 @@ class DriverServices {
     return migrated;
   }
 
+  /// Pulls remote changes into SQLite while preserving records with local
+  /// mutations that have not yet been acknowledged by Appwrite.
+  Future<int> pullRemoteChanges() async {
+    final startedAt = DateTime.now().toUtc();
+    final cursor = localDatabase.readSyncCursor(
+          companyId: companyId,
+          entity: 'driver',
+        ) ??
+        DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
+    final since = cursor.subtract(const Duration(seconds: 5));
+    var offset = 0;
+    var imported = 0;
+    while (true) {
+      final page = await remoteSource.getDriversUpdatedSince(
+        since,
+        limit: 100,
+        offset: offset,
+      );
+      if (page.isEmpty) break;
+      for (final driver in page) {
+        final hasLocalMutation = await syncQueue.hasUnresolvedMutation(
+          companyId: companyId,
+          entity: 'driver',
+          entityId: driver.id,
+        );
+        if (hasLocalMutation) continue;
+        await localSource.upsertDriver(driver);
+        imported++;
+      }
+      offset += page.length;
+      if (page.length < 100) break;
+    }
+    localDatabase.saveSyncCursor(
+      companyId: companyId,
+      entity: 'driver',
+      cursor: startedAt.subtract(const Duration(seconds: 5)),
+    );
+    debugPrint('[ParcOto Sync] drivers pulled=$imported');
+    return imported;
+  }
+
   Future<void> applySyncOperation(SyncOperation operation) async {
     if (operation.companyId != companyId) {
       throw StateError('Driver sync operation belongs to another company.');
