@@ -11,18 +11,26 @@ import 'sync_queue.dart';
 typedef SyncOperationHandler = Future<void> Function(SyncOperation operation);
 
 /// Drains the local SQLite outbox while an internet connection is available.
-/// Operations are sent directly to remote sources, never back through
-/// repositories, so syncing cannot enqueue duplicate operations.
+/// A SQLite lease prevents independent engine instances from draining the same
+/// company's queue or recovering one another's in-flight operations.
 class AppwriteSyncEngine implements SyncEngine {
+  static const _leaseDuration = Duration(minutes: 2);
+  static const _leaseRenewInterval = Duration(seconds: 30);
+
   final SyncQueue queue;
   final String companyId;
   final Map<String, SyncOperationHandler> handlers;
   final InternetConnection _connection;
+  late final String _ownerId =
+      '${DateTime.now().microsecondsSinceEpoch}-${identityHashCode(this)}';
 
   StreamSubscription<InternetStatus>? _subscription;
   Timer? _retryTimer;
+  Timer? _leaseTimer;
   bool _running = false;
   bool _syncing = false;
+  bool _leaseLost = false;
+  bool _leaseRenewing = false;
 
   AppwriteSyncEngine({
     required this.queue,
@@ -51,7 +59,6 @@ class AppwriteSyncEngine implements SyncEngine {
       unawaited(syncNow());
     });
 
-    // Never block startup on network reachability or remote requests.
     unawaited(syncNow());
   }
 
@@ -60,8 +67,38 @@ class AppwriteSyncEngine implements SyncEngine {
     _running = false;
     _retryTimer?.cancel();
     _retryTimer = null;
+    _leaseTimer?.cancel();
+    _leaseTimer = null;
     await _subscription?.cancel();
     _subscription = null;
+  }
+
+  void _startLeaseRenewal() {
+    _leaseLost = false;
+    _leaseTimer?.cancel();
+    _leaseTimer = Timer.periodic(_leaseRenewInterval, (_) {
+      if (_leaseRenewing || _leaseLost) return;
+      _leaseRenewing = true;
+      unawaited(() async {
+        try {
+          final renewed = await queue.renewEngineLease(
+            companyId: companyId,
+            ownerId: _ownerId,
+            now: DateTime.now().toUtc(),
+            leaseDuration: _leaseDuration,
+          );
+          if (!renewed) {
+            _leaseLost = true;
+            debugPrint('[ParcOto Sync] lease lost — stopping this sync batch');
+          }
+        } catch (error, stackTrace) {
+          _leaseLost = true;
+          debugPrint('[ParcOto Sync] lease renewal failed: $error\n$stackTrace');
+        } finally {
+          _leaseRenewing = false;
+        }
+      }());
+    });
   }
 
   @override
@@ -71,42 +108,48 @@ class AppwriteSyncEngine implements SyncEngine {
       return;
     }
     _syncing = true;
+    var leaseAcquired = false;
     debugPrint('[ParcOto Sync] syncNow started — companyId=$companyId');
     try {
-      // A process may have terminated after marking an operation as
-      // processing. Return those leases to pending before checking network.
-      await queue.recoverInterrupted(companyId: companyId);
-
       try {
         final hasInternet = await _connection.hasInternetAccess;
         debugPrint('[ParcOto Sync] hasInternetAccess=$hasInternet');
-        if (!hasInternet) return;
+        if (!hasInternet || !_running) return;
       } catch (error, stackTrace) {
         debugPrint('[ParcOto Sync] connectivity check failed: $error\n$stackTrace');
         return;
       }
 
+      leaseAcquired = await queue.acquireEngineLease(
+        companyId: companyId,
+        ownerId: _ownerId,
+        now: DateTime.now().toUtc(),
+        leaseDuration: _leaseDuration,
+      );
+      if (!leaseAcquired) {
+        debugPrint('[ParcOto Sync] another engine owns the company lease; skipping');
+        return;
+      }
+      _startLeaseRenewal();
+
+      // Recovery must happen only after acquiring the company lease; otherwise
+      // one engine could reset another engine's active operations.
+      await queue.recoverInterrupted(companyId: companyId);
       final operations = await queue.pending(limit: 5000, companyId: companyId);
       debugPrint('[ParcOto Sync] pending operations=${operations.length}');
 
       final blockedRecords = <String>{};
       for (final operation in operations) {
-        if (!_running) break;
+        if (!_running || _leaseLost) break;
         final recordKey = '${operation.companyId}:${operation.entity}:${operation.entityId}';
         if (blockedRecords.contains(recordKey)) continue;
         if (operation.status == SyncOperationStatus.conflict) {
-          // A conflict is not retried automatically, but later mutations for
-          // the same record must wait until the conflict is resolved.
           blockedRecords.add(recordKey);
           debugPrint('[ParcOto Sync] blocked by unresolved conflict: ${operation.entity} id=${operation.entityId}');
           continue;
         }
-        debugPrint('[ParcOto Sync] processing ${operation.entity} ${operation.type.name} id=${operation.entityId} status=${operation.status} attempts=${operation.attempts}');
         final handler = handlers[operation.entity];
         if (handler == null) {
-          // Leave the row pending. A later app version may register its
-          // handler; marking it as a conflict would make that impossible
-          // without manual database repair.
           debugPrint('[ParcOto Sync] no handler for entity=${operation.entity}; operation left pending');
           blockedRecords.add(recordKey);
           continue;
@@ -134,6 +177,15 @@ class AppwriteSyncEngine implements SyncEngine {
     } catch (error, stackTrace) {
       debugPrint('[ParcOto Sync] syncNow crashed: $error\n$stackTrace');
     } finally {
+      _leaseTimer?.cancel();
+      _leaseTimer = null;
+      if (leaseAcquired) {
+        try {
+          await queue.releaseEngineLease(companyId: companyId, ownerId: _ownerId);
+        } catch (error, stackTrace) {
+          debugPrint('[ParcOto Sync] lease release failed: $error\n$stackTrace');
+        }
+      }
       _syncing = false;
       debugPrint('[ParcOto Sync] syncNow finished');
     }
