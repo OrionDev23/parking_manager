@@ -35,6 +35,32 @@ class ReparationDashboard extends StatelessWidget {
             icon: FluentIcons.repair,
           ),
           const SizedBox(height: 26),
+          bigSpace,
+          SizedBox(
+            height: 380.px,
+            child: Column(
+              children: [
+                Text(
+                  'lactivities',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: appTheme.writingStyle.color,
+                  ),
+                ).tr(),
+                smallSpace,
+                const Flexible(
+                  child: LogTable(
+                    statTable: true,
+                    pages: false,
+                    numberOfRows: 3,
+                    filters: {'typemin': '10', 'typemax': '15'},
+                    fieldsToShow: ['act', 'date'],
+                  ),
+                ),
+              ],
+            ),
+          ),
           Text(
             'Accès rapides',
             style: TextStyle(
@@ -123,32 +149,6 @@ class ReparationDashboard extends StatelessWidget {
                 },
           ),
             ],
-          ),
-          bigSpace,
-          SizedBox(
-            height: 380.px,
-            child: Column(
-              children: [
-                Text(
-                  'lactivities',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: appTheme.writingStyle.color,
-                  ),
-                ).tr(),
-                smallSpace,
-                const Flexible(
-                  child: LogTable(
-                    statTable: true,
-                    pages: false,
-                    numberOfRows: 3,
-                    filters: {'typemin': '10', 'typemax': '15'},
-                    fieldsToShow: ['act', 'date'],
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ),
