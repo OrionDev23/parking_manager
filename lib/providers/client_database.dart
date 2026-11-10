@@ -58,6 +58,14 @@ class DatabaseGetter {
 
   static ValueNotifier<ParcUser?> me = ValueNotifier(null);
   static String? _configuredProjectId;
+  static int _projectGeneration = 0;
+
+  /// Called when the authenticated tenant expires while the legacy auth
+  /// adapter is loading its profile. Keeps session teardown centralized.
+  static Future<void> Function()? onSessionExpired;
+
+  static bool _isCurrentProject(int generation, String projectId) =>
+      generation == _projectGeneration && _configuredProjectId == projectId;
 
   DatabaseGetter() {
     final requestedProject = project ?? prefs.getString('project');
@@ -67,6 +75,7 @@ class DatabaseGetter {
     // changes. Never carry profile, licensing, team or encryption state
     // from one project into another.
     if (_configuredProjectId != requestedProject) {
+      _projectGeneration++;
       _configuredProjectId = requestedProject;
       project = requestedProject;
       user = null;
@@ -172,53 +181,84 @@ class DatabaseGetter {
   static bool gettingUser = false;
 
   Future<void> getUser() async {
+    final projectId = _configuredProjectId;
+    if (projectId == null) return;
+    final generation = _projectGeneration;
+
     if (user == null && !gettingUser) {
       gettingUser = true;
-      await account
-          ?.get()
-          .then((value) async {
-            user = value;
-            await getTrialDate();
-            if (trialDate == null ||
-                trialDate!.difference(DateTime.now()).inMilliseconds <= 0) {
-              await account!.deleteSession(sessionId: 'current');
-              user = null;
-              PanesListState.signedIn.value = false;
-              PanesListState.index.value = 0;
-              return;
-            }
-            await database!
-                .getRow(
-                  databaseId: databaseId,
-                  tableId: userid,
-                  rowId: user!.$id,
-                )
-                .then((result) {
-                  me.value = ParcUser.fromJson(result.data);
-                })
-                .catchError((error) {
-                  me.value = ParcUser(
-                    email: user!.email,
-                    id: user!.$id,
-                    name: user!.name,
-                    tel: user!.phone,
-                  );
-                  uploadUser(me.value!);
-                });
-          })
-          .onError((AppwriteException error, stacktrace) {
-            if (kDebugMode) {
-              print(error.message);
-              print(error.response);
-            }
-            user = null;
-          });
-      gettingUser = false;
+      try {
+        final activeAccount = account;
+        final activeDatabase = database;
+        if (activeAccount == null || activeDatabase == null) return;
+
+        final loadedUser = await activeAccount.get();
+        if (!_isCurrentProject(generation, projectId)) return;
+        user = loadedUser;
+
+        await getTrialDate(loadedUser.$id, generation, projectId);
+        if (!_isCurrentProject(generation, projectId)) return;
+
+        if (trialDate == null ||
+            trialDate!.difference(DateTime.now()).inMilliseconds <= 0) {
+          await onSessionExpired?.call();
+          if (!_isCurrentProject(generation, projectId)) return;
+          await activeAccount.deleteSession(sessionId: 'current');
+          if (!_isCurrentProject(generation, projectId)) return;
+          user = null;
+          me.value = null;
+          myTeams = List.empty(growable: true);
+          PanesListState.signedIn.value = false;
+          PanesListState.index.value = 0;
+          return;
+        }
+
+        try {
+          final result = await activeDatabase.getRow(
+            databaseId: databaseId,
+            tableId: userid,
+            rowId: loadedUser.$id,
+          );
+          if (!_isCurrentProject(generation, projectId)) return;
+          me.value = ParcUser.fromJson(result.data);
+        } catch (_) {
+          if (!_isCurrentProject(generation, projectId)) return;
+          final fallbackProfile = ParcUser(
+            email: loadedUser.email,
+            id: loadedUser.$id,
+            name: loadedUser.name,
+            tel: loadedUser.phone,
+          );
+          me.value = fallbackProfile;
+          uploadUser(fallbackProfile);
+        }
+      } on AppwriteException catch (error, stackTrace) {
+        if (_isCurrentProject(generation, projectId)) {
+          if (kDebugMode) {
+            print(error.message);
+            print(error.response);
+            print(stackTrace);
+          }
+          user = null;
+        }
+      } finally {
+        if (_isCurrentProject(generation, projectId)) {
+          gettingUser = false;
+        }
+      }
     }
-    if (user != null) {
-      await Teams(client!).list().then((t) {
-        myTeams = t.teams;
-      });
+
+    if (_isCurrentProject(generation, projectId) && user != null) {
+      final activeClient = client;
+      if (activeClient == null) return;
+      try {
+        final teams = await Teams(activeClient).list();
+        if (_isCurrentProject(generation, projectId)) {
+          myTeams = teams.teams;
+        }
+      } catch (error) {
+        if (kDebugMode) debugPrint('Unable to load Appwrite teams: $error');
+      }
     }
   }
 
@@ -229,65 +269,106 @@ class DatabaseGetter {
   static bool gotLimit = false;
 
   Future<void> getLimits() async {
-    if (!gotLimit) {
-      await database!
-          .getRow(databaseId: databaseId, tableId: limitsID, rowId: '1')
-          .then((value) {
-            if (value.data.containsKey('vehicles')) {
-              limits['vehicles'] = value.data['vehicles'];
-            }
-            if (value.data.containsKey('users')) {
-              limits['users'] = value.data['users'];
-            }
-            gotLimit = true;
-          })
-          .onError((AppwriteException error, stackTrace) {
-            gotLimit = false;
-          });
+    final projectId = _configuredProjectId;
+    final activeDatabase = database;
+    if (projectId == null || activeDatabase == null || gotLimit) return;
+    final generation = _projectGeneration;
+
+    try {
+      final value = await activeDatabase.getRow(
+        databaseId: databaseId,
+        tableId: limitsID,
+        rowId: '1',
+      );
+      if (!_isCurrentProject(generation, projectId)) return;
+      if (value.data.containsKey('vehicles')) {
+        limits['vehicles'] = value.data['vehicles'];
+      }
+      if (value.data.containsKey('users')) {
+        limits['users'] = value.data['users'];
+      }
+      gotLimit = true;
+    } on AppwriteException {
+      if (_isCurrentProject(generation, projectId)) gotLimit = false;
     }
   }
 
-  Future<void> getTrialDate() async {
-    if (user!.$id == '999') {
-      trialDate = DateTime(2100);
-    } else {
-      await database!
-          .getRow(databaseId: databaseId, tableId: trialID, rowId: '1')
-          .then((value) {
-            trialDate = DateTime.tryParse(value.data['date']);
-          })
-          .onError((AppwriteException error, stackTrace) {});
+  Future<void> getTrialDate(
+    String userId,
+    int generation,
+    String projectId,
+  ) async {
+    if (userId == '999') {
+      if (_isCurrentProject(generation, projectId)) {
+        trialDate = DateTime(2100);
+      }
+      return;
+    }
+
+    final activeDatabase = database;
+    if (activeDatabase == null) return;
+    try {
+      final value = await activeDatabase.getRow(
+        databaseId: databaseId,
+        tableId: trialID,
+        rowId: '1',
+      );
+      if (_isCurrentProject(generation, projectId)) {
+        trialDate = DateTime.tryParse(value.data['date']);
+      }
+    } on AppwriteException {
+      // A missing trial record remains an invalid/expired trial.
     }
   }
 
   Future<void> getEntreprise() async {
+    final projectId = _configuredProjectId;
+    final activeDatabase = database;
+    if (projectId == null || activeDatabase == null) return;
+    final generation = _projectGeneration;
+
     if (MyEntrepriseState.p == null && !MyEntrepriseState.downloading) {
       MyEntrepriseState.downloading = true;
       try {
-        await database!
-            .getRow(databaseId: databaseId, tableId: entrepriseid, rowId: "1")
-            .then((value) {
-              MyEntrepriseState.p = value.convertTo(
-                (p0) => Entreprise.fromJson(p0),
-              );
-            });
-      } catch (e) {
-        //
+        final value = await activeDatabase.getRow(
+          databaseId: databaseId,
+          tableId: entrepriseid,
+          rowId: '1',
+        );
+        if (_isCurrentProject(generation, projectId)) {
+          MyEntrepriseState.p = value.convertTo(
+            (p0) => Entreprise.fromJson(p0),
+          );
+        }
+      } catch (_) {
+        // The company profile is optional during initial rendering.
+      } finally {
+        if (_isCurrentProject(generation, projectId)) {
+          MyEntrepriseState.downloading = false;
+        }
       }
-      MyEntrepriseState.downloading = false;
     }
-    if (kIsWeb) {
-      downloadLogo();
+    if (kIsWeb && _isCurrentProject(generation, projectId)) {
+      await downloadLogo();
     }
   }
 
   static Future<void> downloadLogo() async {
-    await DatabaseGetter.storage!
-        .getFileDownload(bucketId: buckedId, fileId: 'mylogo.png')
-        .then((value) async {
-          MyEntrepriseState.logo = value;
-        })
-        .onError((error, stackTrace) {});
+    final projectId = _configuredProjectId;
+    final activeStorage = storage;
+    if (projectId == null || activeStorage == null) return;
+    final generation = _projectGeneration;
+    try {
+      final value = await activeStorage.getFileDownload(
+        bucketId: buckedId,
+        fileId: 'mylogo.png',
+      );
+      if (_isCurrentProject(generation, projectId)) {
+        MyEntrepriseState.logo = value;
+      }
+    } catch (_) {
+      // A missing logo must not block the application.
+    }
   }
 
   void uploadUser(ParcUser u) {
