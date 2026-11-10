@@ -56,8 +56,8 @@ class _DataTableParcState extends State<DataTableParc> {
     final primaryText = appTheme.textColor;
     final borderColor = appTheme.borderColor;
 
-    // DataTable2 inherits the application-wide Material theme. Explicit row
-    // fills prevent the package's default light row from clashing with dark text.
+    // The package's table controls inherit the material_ui theme at the app root.
+    // This local Flutter theme remains for legacy Material widgets in the table subtree.
     final materialTheme = appTheme.materialTheme;
 
     return Theme(
