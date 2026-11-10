@@ -7,6 +7,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../theme.dart';
 import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
+import '../../widgets/module_dashboard_section_header.dart';
 import '../../widgets/module_dashboard_panel.dart';
 import '../logs/logging/log_table.dart';
 import '../prestataire/prestataire_form.dart';
@@ -36,27 +37,10 @@ class ReparationDashboard extends StatelessWidget {
             icon: FluentIcons.repair,
           ),
           const SizedBox(height: 26),
-          Text(
-            'Suivi des interventions',
-            style: TextStyle(
-              color: appTheme.writingStyle.color,
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
-            ),
+          ModuleDashboardSectionHeader(
+            title: 'Actions courantes',
+            subtitle: 'Créez une intervention ou ouvrez directement les ordres et les prestataires.',
           ),
-          const SizedBox(height: 12),
-          ModuleDashboardPanel(
-            title: 'Activité récente',
-            height: 380.px,
-            child: const LogTable(
-              statTable: true,
-              pages: false,
-              numberOfRows: 3,
-              filters: {'typemin': '10', 'typemax': '15'},
-              fieldsToShow: ['act', 'date'],
-            ),
-          ),
-          const SizedBox(height: 28),
           Text(
             'Accès rapides',
             style: TextStyle(
@@ -144,7 +128,26 @@ class ReparationDashboard extends StatelessWidget {
                       });
                 },
           ),
-            ],
+            ]
+          const SizedBox(height: 28),
+          ModuleDashboardSectionHeader(
+            title: 'Maintenance et interventions',
+            subtitle: 'Consultez l’activité récente et gardez le suivi des réparations sous contrôle.',
+          ),
+
+          ModuleDashboardPanel(
+            title: 'Activité récente',
+            height: 380.px,
+            child: const LogTable(
+              statTable: true,
+              pages: false,
+              numberOfRows: 3,
+              filters: {'typemin': '10', 'typemax': '15'},
+              fieldsToShow: ['act', 'date'],
+            ),
+          ),
+          const SizedBox(height: 28),
+,
           ),
         ],
       ),
