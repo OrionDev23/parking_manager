@@ -11,6 +11,7 @@ import '../logs/logging/log_table.dart';
 import '../prestataire/prestataire_form.dart';
 import '../prestataire/prestataire_tabs.dart';
 import '../sidemenu/pane_items.dart';
+import '../sidemenu/sidemenu.dart';
 import 'reparation/manager/reparation_tabs.dart';
 import 'reparation/reparation_order_form/reparation_form.dart';
 
@@ -35,7 +36,15 @@ class ReparationDashboard extends StatelessWidget {
             icon: FluentIcons.repair,
           ),
           const SizedBox(height: 26),
-          bigSpace,
+          Text(
+            'Suivi des interventions',
+            style: TextStyle(
+              color: appTheme.writingStyle.color,
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 12),
           SizedBox(
             height: 380.px,
             child: Column(
@@ -61,6 +70,7 @@ class ReparationDashboard extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 28),
           Text(
             'Accès rapides',
             style: TextStyle(
