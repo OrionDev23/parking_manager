@@ -190,7 +190,7 @@ class AppwriteSyncEngine implements SyncEngine {
 
       // Pull only after the outbound queue has been drained. This ordering
       // prevents a remote snapshot from overwriting an acknowledged local edit.
-      if (_running && !_leaseLost && blockedRecords.isEmpty) {
+      if (_running && !_leaseLost) {
         for (final entry in pullHandlers.entries) {
           if (!_running || _leaseLost) break;
           try {
