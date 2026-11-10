@@ -85,9 +85,8 @@ class _PartsFormState extends State<PartsForm>
       if (options != null) {
         for (final option in options) {
           resolvedOptionIds.add(option.id);
-          if (option1 == null) {
-            option1 = option;
-          } else if (option2 == null) {
+          option1 ??= option;
+          if (option1?.id != option.id && option2 == null) {
             option2 = option;
           } else if (option3 == null) {
             option3 = option;
@@ -98,16 +97,20 @@ class _PartsFormState extends State<PartsForm>
       }
       // Keep references whose option record is temporarily unavailable.
       // Otherwise merely editing a part would silently erase those IDs.
-      unresolvedOptionIds = [
-        for (final id in savedOptionIds)
-          if (!resolvedOptionIds.contains(id)) id,
-      ];
-      unresolvedOptionNames = [
-        for (var i = 0; i < savedOptionIds.length; i++)
-          if (!resolvedOptionIds.contains(savedOptionIds[i]) &&
-              i < savedOptionNames.length)
-            savedOptionNames[i],
-      ];
+      unresolvedOptionIds
+        ..clear()
+        ..addAll([
+          for (final id in savedOptionIds)
+            if (!resolvedOptionIds.contains(id)) id,
+        ]);
+      unresolvedOptionNames
+        ..clear()
+        ..addAll([
+          for (var i = 0; i < savedOptionIds.length; i++)
+            if (!resolvedOptionIds.contains(savedOptionIds[i]) &&
+                i < savedOptionNames.length)
+              savedOptionNames[i],
+        ]);
       variations = widget.part?.variations?? [];
     }
     loading = false;
