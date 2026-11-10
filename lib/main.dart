@@ -181,9 +181,16 @@ Future<bool> _restoreInitialSession() async {
 /// Configures services for the authenticated tenant, then starts remote
 /// backfills after the first frame. The Future is scoped to the active company.
 Future<void> startBackgroundInitialization(String companyId) async {
-  await _configureSessionRuntime(companyId);
-  _backgroundInitialization ??= _initializeBackgroundData(companyId);
-  await _backgroundInitialization;
+  try {
+    await _configureSessionRuntime(companyId);
+    _backgroundInitialization ??= _initializeBackgroundData(companyId);
+    await _backgroundInitialization;
+  } catch (error, stackTrace) {
+    // Authentication remains valid even if an optional cache backfill fails.
+    // Keep the failure visible in logs and allow a later retry.
+    _backgroundInitialization = null;
+    debugPrint('[ParcOto Runtime] initialization failed: $error\\n$stackTrace');
+  }
 }
 
 Future<void> _initializeBackgroundData(String companyId) async {
