@@ -94,6 +94,9 @@ bool _runtimeReady = false;
 Future<void>? _runtimeConfiguration;
 
 Future<void> stopSessionRuntime() async {
+  // Invalidate callbacks from the previous session even when the next login
+  // reuses the same project ID.
+  DatabaseGetter.invalidatePendingRequests();
   if (!_runtimeReady) return;
   await syncEngine.stop();
   // A later login, including one in the same project, must start the engine
