@@ -241,13 +241,22 @@ class DatabaseGetter {
           // The callback invalidates pending requests, so use the captured
           // account to revoke this expired session even after generation changes.
           if (_configuredProjectId != projectId) return;
-          await activeAccount.deleteSession(sessionId: 'current');
-          if (_configuredProjectId == projectId) {
-            user = null;
-            me.value = null;
-            myTeams = List.empty(growable: true);
-            PanesListState.signedIn.value = false;
-            PanesListState.index.value = 0;
+          try {
+            await activeAccount.deleteSession(sessionId: 'current');
+          } catch (error) {
+            // The session may already have been revoked server-side.
+            if (kDebugMode) {
+              debugPrint('Expired session revocation failed: $error');
+            }
+          } finally {
+            if (_configuredProjectId == projectId) {
+              user = null;
+              me.value = null;
+              myTeams = List.empty(growable: true);
+              trialDate = null;
+              PanesListState.signedIn.value = false;
+              PanesListState.index.value = 0;
+            }
           }
           return;
         }
