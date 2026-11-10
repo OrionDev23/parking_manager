@@ -277,6 +277,7 @@ class AppTheme extends ChangeNotifier {
   );
 
   FluentThemeData fluentTheme(Brightness brightness) {
+    final isDark = brightness == Brightness.dark;
     final foreground = brightness == Brightness.dark
         ? definition.darkText
         : definition.lightText;
