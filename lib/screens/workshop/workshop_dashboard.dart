@@ -5,6 +5,7 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import '../../providers/parts_provider.dart';
 import '../../theme.dart';
 import '../../widgets/module_dashboard_header.dart';
+import '../../widgets/module_dashboard_action.dart';
 import '../sidemenu/pane_items.dart';
 
 class WorkshopDashboard extends StatefulWidget {
@@ -192,21 +193,21 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                     spacing: 12,
                     runSpacing: 12,
                     children: [
-                      _WorkshopAction(
+                      ModuleDashboardAction(
                         label: 'Gestion des pièces',
                         detail: 'Catalogue et références',
                         icon: FluentIcons.list,
                         onPressed: () =>
                             PaneItemsAndFooters.selectPane('workshop-parts'),
                       ),
-                      _WorkshopAction(
+                      ModuleDashboardAction(
                         label: 'Stock',
                         detail: 'Quantités et emplacements',
                         icon: FluentIcons.database,
                         onPressed: () =>
                             PaneItemsAndFooters.selectPane('workshop-stock'),
                       ),
-                      _WorkshopAction(
+                      ModuleDashboardAction(
                         label: 'Fournisseurs',
                         detail: 'Partenaires et approvisionnement',
                         icon: FluentIcons.people,
@@ -214,14 +215,14 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                           'workshop-suppliers',
                         ),
                       ),
-                      _WorkshopAction(
+                      ModuleDashboardAction(
                         label: 'Marques',
                         detail: 'Référentiels fabricants',
                         icon: FluentIcons.verified_brand,
                         onPressed: () =>
                             PaneItemsAndFooters.selectPane('workshop-brands'),
                       ),
-                      _WorkshopAction(
+                      ModuleDashboardAction(
                         label: 'Catégories',
                         detail: 'Organisation du catalogue',
                         icon: FluentIcons.category_classification,
@@ -229,7 +230,7 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                           'workshop-categories',
                         ),
                       ),
-                      _WorkshopAction(
+                      ModuleDashboardAction(
                         label: 'Options',
                         detail: 'Variantes et caractéristiques',
                         icon: FluentIcons.settings,
@@ -313,56 +314,3 @@ class _WorkshopMetric extends StatelessWidget {
   }
 }
 
-class _WorkshopAction extends StatelessWidget {
-  final String label;
-  final String detail;
-  final IconData icon;
-  final VoidCallback onPressed;
-
-  const _WorkshopAction({
-    required this.label,
-    required this.detail,
-    required this.icon,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = context.watch<AppTheme>();
-    return SizedBox(
-      width: 245,
-      child: Button(
-        onPressed: onPressed,
-        style: ButtonStyle(
-          padding: WidgetStatePropertyAll(
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: theme.color, size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    label,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    detail,
-                    style: TextStyle(color: Colors.grey[100], fontSize: 10),
-                  ),
-                ],
-              ),
-            ),
-            const Icon(FluentIcons.chevron_right, size: 12),
-          ],
-        ),
-      ),
-    );
-  }
-}
