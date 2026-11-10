@@ -49,7 +49,7 @@ class ReparationDashboard extends StatelessWidget {
             );
             ReparationTabsState.tabs.add(tab);
             ReparationTabsState.currentIndex.value =
-                ReparationTabsState.tabs.length;
+                ReparationTabsState.tabs.length - 1;
           });
         },
       ),
@@ -82,7 +82,7 @@ class ReparationDashboard extends StatelessWidget {
             );
             PrestataireTabsState.tabs.add(tab);
             PrestataireTabsState.currentIndex.value =
-                PrestataireTabsState.tabs.length;
+                PrestataireTabsState.tabs.length - 1;
           });
         },
       ),
