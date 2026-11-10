@@ -82,7 +82,7 @@ class _ButtonContainerState extends State<ButtonContainer> {
           border: Border.all(color: Colors.grey[30]),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(.035),
+              color: Colors.black.withValues(alpha: .035),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -94,7 +94,7 @@ class _ButtonContainerState extends State<ButtonContainer> {
               width: 46,
               height: 46,
               decoration: BoxDecoration(
-                color: accent.withOpacity(.12),
+                color: accent.withValues(alpha: .12),
                 borderRadius: BorderRadius.circular(11),
               ),
               child: Icon(widget.icon, size: 22, color: accent),
@@ -135,9 +135,6 @@ class _ButtonContainerState extends State<ButtonContainer> {
                         if (widget.actionList != null)
                           HyperlinkButton(
                             onPressed: widget.actionList,
-                            style: ButtonStyle(
-                              padding: ButtonState.all(EdgeInsets.zero),
-                            ),
                             child: Text(
                               widget.textList,
                               style: TextStyle(fontSize: 11, color: accent),
@@ -146,9 +143,6 @@ class _ButtonContainerState extends State<ButtonContainer> {
                         if (widget.showBothLN && widget.actionNouveau != null)
                           HyperlinkButton(
                             onPressed: widget.actionNouveau,
-                            style: ButtonStyle(
-                              padding: ButtonState.all(EdgeInsets.zero),
-                            ),
                             child: Text(
                               widget.textNouveau,
                               style: TextStyle(fontSize: 11, color: accent),
