@@ -279,9 +279,32 @@ class AppTheme extends ChangeNotifier {
     final foreground = brightness == Brightness.dark
         ? palette.darkText
         : palette.lightText;
+    final background = isDark ? palette.darkBackground : palette.lightBackground;
+    final surface = isDark ? palette.darkSurface : palette.lightSurface;
+    final muted = isDark ? palette.darkMutedText : palette.lightMutedText;
+    final border = isDark ? palette.darkBorder : palette.lightBorder;
+    final fill = isDark
+        ? Color.lerp(surface, Colors.white, .055)!
+        : Color.lerp(surface, background, .55)!;
     return FluentThemeData(
       brightness: brightness,
       accentColor: color,
+      activeColor: foreground,
+      inactiveColor: muted,
+      inactiveBackgroundColor: fill,
+      scaffoldBackgroundColor: background,
+      acrylicBackgroundColor: surface,
+      micaBackgroundColor: background,
+      shadowColor: Colors.black.withValues(
+        alpha: palette.shadowOpacity * (isDark ? 1.25 : 1),
+      ),
+      menuColor: surface,
+      cardColor: surface,
+      selectionColor: color.withValues(alpha: .24),
+      iconTheme: IconThemeData(color: muted),
+      navigationPaneTheme: NavigationPaneThemeData(
+        backgroundColor: background,
+      ),
       visualDensity: VisualDensity.standard,
       focusTheme: const FocusThemeData(glowFactor: 0),
       typography: Typography.fromBrightness(
