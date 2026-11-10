@@ -69,6 +69,143 @@ class SettingsGTS extends ScrollablePage {
               .toList(),
         ),
       ),
+      const SizedBox(height: 24),
+      Text(
+        'Palette de l’application',
+        style: FluentTheme.of(context).typography.subtitle,
+      ),
+      const SizedBox(height: 6),
+      Text(
+        'Choisis une identité visuelle. Chaque palette existe en mode clair et sombre.',
+        style: FluentTheme.of(context).typography.caption,
+      ),
+      const SizedBox(height: 14),
+      RadioGroup<AppThemePreset>(
+        groupValue: appTheme.preset,
+        onChanged: (value) async {
+          if (value != null) {
+            appTheme.preset = value;
+            await prefs.setInt('appThemePreset', value.index);
+          }
+        },
+        child: Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: AppThemePreset.values.map((preset) {
+            final palette = appThemePalettes[preset]!;
+            final selected = appTheme.preset == preset;
+            final isDark = appTheme.mode == ThemeMode.dark;
+            final previewBackground = isDark
+                ? palette.darkBackground
+                : palette.lightBackground;
+            final previewSurface = isDark
+                ? palette.darkSurface
+                : palette.lightSurface;
+            final previewText = isDark ? palette.darkText : palette.lightText;
+            return SizedBox(
+              width: 245,
+              child: RadioButton<AppThemePreset>(
+                value: preset,
+                content: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: previewBackground,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: selected
+                          ? palette.accent
+                          : (isDark ? palette.darkBorder : palette.lightBorder),
+                      width: selected ? 2 : 1,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: previewSurface,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: isDark
+                                ? palette.darkBorder
+                                : palette.lightBorder,
+                          ),
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 7,
+                              decoration: BoxDecoration(
+                                color: palette.accent,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    height: 5,
+                                    width: 62,
+                                    decoration: BoxDecoration(
+                                      color: previewText,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Container(
+                                    height: 4,
+                                    width: 100,
+                                    decoration: BoxDecoration(
+                                      color: previewText.withValues(alpha: .35),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width: 25,
+                              height: 25,
+                              decoration: BoxDecoration(
+                                color: palette.accent,
+                                borderRadius: BorderRadius.circular(7),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        palette.name,
+                        style: TextStyle(
+                          color: previewText,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        palette.description,
+                        style: TextStyle(
+                          color: isDark
+                              ? palette.darkMutedText
+                              : palette.lightMutedText,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
       biggerSpacer,
       Text(
         'dispositionpaneau',
