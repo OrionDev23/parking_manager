@@ -51,8 +51,10 @@ class _PartsFormState extends State<PartsForm>
   Category? selectedCategory;
   Client? selectedFournisseur;
   Option? option1, option2, option3, option4;
-  final List<String> unresolvedOptionIds = [];
-  final List<String> unresolvedOptionNames = [];
+  // Preserve the original four option slots. A missing remote option must
+  // not shift later options into a different slot when the part is edited.
+  final List<String> originalOptionIds = [];
+  final List<String> originalOptionNames = [];
   int selectedUnit = 0;
   Brand? selectedBrand;
   @override
@@ -79,40 +81,32 @@ class _PartsFormState extends State<PartsForm>
       final savedOptionIds = widget.part?.selectedOptions ?? const <String>[];
       final savedOptionNames =
           widget.part?.selectedOptionsNames ?? const <String>[];
-      final options =
-          await PartsProvider().getOptionsList(savedOptionIds);
-      final resolvedOptionIds = <String>{};
-      if (options != null) {
-        for (final option in options) {
-          resolvedOptionIds.add(option.id);
-          option1 ??= option;
-          if (option1!.id != option.id) {
-            option2 ??= option;
-          }
-          if (option2 != null && option2!.id != option.id) {
-            option3 ??= option;
-          }
-          if (option3 != null && option3!.id != option.id) {
-            option4 ??= option;
-          }
+      originalOptionIds
+        ..clear()
+        ..addAll(savedOptionIds.take(4));
+      originalOptionNames
+        ..clear()
+        ..addAll(savedOptionNames.take(4));
+
+      // Resolve each option into its original slot instead of compacting the
+      // result. For example, [A, missing, C] must remain A / empty / C.
+      for (var i = 0; i < savedOptionIds.length && i < 4; i++) {
+        final option = await PartsProvider().getOption(savedOptionIds[i]);
+        switch (i) {
+          case 0:
+            option1 = option;
+            break;
+          case 1:
+            option2 = option;
+            break;
+          case 2:
+            option3 = option;
+            break;
+          case 3:
+            option4 = option;
+            break;
         }
       }
-      // Keep references whose option record is temporarily unavailable.
-      // Otherwise merely editing a part would silently erase those IDs.
-      unresolvedOptionIds
-        ..clear()
-        ..addAll([
-          for (final id in savedOptionIds)
-            if (!resolvedOptionIds.contains(id)) id,
-        ]);
-      unresolvedOptionNames
-        ..clear()
-        ..addAll([
-          for (var i = 0; i < savedOptionIds.length; i++)
-            if (!resolvedOptionIds.contains(savedOptionIds[i]) &&
-                i < savedOptionNames.length)
-              savedOptionNames[i],
-        ]);
       variations = widget.part?.variations?? [];
     }
     loading = false;
@@ -1066,6 +1060,21 @@ class _PartsFormState extends State<PartsForm>
     });
   }
 
+  Option? _optionAt(int index) {
+    switch (index) {
+      case 0:
+        return option1;
+      case 1:
+        return option2;
+      case 2:
+        return option3;
+      case 3:
+        return option4;
+      default:
+        return null;
+    }
+  }
+
   String? partID;
 
   @override
@@ -1095,18 +1104,18 @@ class _PartsFormState extends State<PartsForm>
       variations: variations,
       barcode: barcode.text,
       selectedOptions: [
-        if (option1 != null) option1!.id,
-        if (option2 != null) option2!.id,
-        if (option3 != null) option3!.id,
-        if (option4 != null) option4!.id,
-        ...unresolvedOptionIds,
+        for (var i = 0; i < 4; i++)
+          if (_optionAt(i) != null)
+            _optionAt(i)!.id
+          else if (i < originalOptionIds.length)
+            originalOptionIds[i],
       ],
       selectedOptionsNames: [
-        if (option1 != null) option1!.name,
-        if (option2 != null) option2!.name,
-        if (option3 != null) option3!.name,
-        if (option4 != null) option4!.name,
-        ...unresolvedOptionNames,
+        for (var i = 0; i < 4; i++)
+          if (_optionAt(i) != null)
+            _optionAt(i)!.name
+          else if (i < originalOptionIds.length)
+            (i < originalOptionNames.length ? originalOptionNames[i] : ''),
       ],
       price: prix,
       unitType: selectedUnit,
