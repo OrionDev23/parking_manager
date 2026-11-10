@@ -1,10 +1,7 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/screens/user_management/user_creation.dart';
 import 'package:parc_oto/screens/user_management/user_table.dart';
 import '../../widgets/module_dashboard_header.dart';
-
-
 
 class UserManagement extends StatefulWidget {
   final bool archive;
@@ -16,8 +13,6 @@ class UserManagement extends StatefulWidget {
 }
 
 class _UserManagementState extends State<UserManagement> {
-  bool loading = false;
-
   @override
   void initState() {
     super.initState();
