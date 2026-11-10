@@ -47,6 +47,12 @@ class AppThemePalette {
   final Color lightText;
   final Color lightMutedText;
   final Color lightBorder;
+  final double cardRadius;
+  final double controlRadius;
+  final double tableRadius;
+  final double shadowBlur;
+  final double shadowOpacity;
+  final double headerAccentOpacity;
 
   const AppThemePalette({
     required this.name,
@@ -62,6 +68,12 @@ class AppThemePalette {
     required this.lightText,
     required this.lightMutedText,
     required this.lightBorder,
+    required this.cardRadius,
+    required this.controlRadius,
+    required this.tableRadius,
+    required this.shadowBlur,
+    required this.shadowOpacity,
+    required this.headerAccentOpacity,
   });
 }
 
@@ -80,6 +92,12 @@ const Map<AppThemePreset, AppThemePalette> appThemePalettes = {
     lightText: Color(0xFF17252B),
     lightMutedText: Color(0xFF60747B),
     lightBorder: Color(0xFFD8E3E6),
+    cardRadius: 14,
+    controlRadius: 9,
+    tableRadius: 14,
+    shadowBlur: 24,
+    shadowOpacity: .20,
+    headerAccentOpacity: .30,
   ),
   AppThemePreset.arctic: AppThemePalette(
     name: 'Arctic',
@@ -95,6 +113,12 @@ const Map<AppThemePreset, AppThemePalette> appThemePalettes = {
     lightText: Color(0xFF17263D),
     lightMutedText: Color(0xFF62748E),
     lightBorder: Color(0xFFD8E2F0),
+    cardRadius: 9,
+    controlRadius: 6,
+    tableRadius: 10,
+    shadowBlur: 12,
+    shadowOpacity: .06,
+    headerAccentOpacity: .16,
   ),
   AppThemePreset.emerald: AppThemePalette(
     name: 'Emerald',
@@ -110,6 +134,12 @@ const Map<AppThemePreset, AppThemePalette> appThemePalettes = {
     lightText: Color(0xFF193329),
     lightMutedText: Color(0xFF637C70),
     lightBorder: Color(0xFFD8E7DE),
+    cardRadius: 17,
+    controlRadius: 10,
+    tableRadius: 16,
+    shadowBlur: 20,
+    shadowOpacity: .12,
+    headerAccentOpacity: .22,
   ),
   AppThemePreset.amethyst: AppThemePalette(
     name: 'Amethyst',
@@ -125,6 +155,12 @@ const Map<AppThemePreset, AppThemePalette> appThemePalettes = {
     lightText: Color(0xFF2C2140),
     lightMutedText: Color(0xFF77668F),
     lightBorder: Color(0xFFE4DCEF),
+    cardRadius: 21,
+    controlRadius: 12,
+    tableRadius: 18,
+    shadowBlur: 26,
+    shadowOpacity: .17,
+    headerAccentOpacity: .25,
   ),
   AppThemePreset.sunset: AppThemePalette(
     name: 'Sunset',
@@ -140,6 +176,12 @@ const Map<AppThemePreset, AppThemePalette> appThemePalettes = {
     lightText: Color(0xFF33271D),
     lightMutedText: Color(0xFF806D5A),
     lightBorder: Color(0xFFEADFD1),
+    cardRadius: 9,
+    controlRadius: 6,
+    tableRadius: 10,
+    shadowBlur: 16,
+    shadowOpacity: .14,
+    headerAccentOpacity: .30,
   ),
 };
 
@@ -219,6 +261,83 @@ class AppTheme extends ChangeNotifier {
   late Color mutedTextColor;
   late Color borderColor;
   late m.InputDecoration inputDecoration;
+
+  Color get textColor => writingStyle.color ?? Colors.black;
+  double get cardRadius => palette.cardRadius;
+  double get controlRadius => palette.controlRadius;
+  double get tableRadius => palette.tableRadius;
+
+  BoxShadow get surfaceShadow => BoxShadow(
+    color: Colors.black.withValues(
+      alpha: palette.shadowOpacity * (mode == ThemeMode.dark ? 1.25 : 1),
+    ),
+    blurRadius: palette.shadowBlur,
+    offset: Offset(0, palette.shadowBlur / 3),
+  );
+
+  FluentThemeData fluentTheme(Brightness brightness) {
+    final foreground = brightness == Brightness.dark
+        ? palette.darkText
+        : palette.lightText;
+    return FluentThemeData(
+      brightness: brightness,
+      accentColor: color,
+      visualDensity: VisualDensity.standard,
+      focusTheme: const FocusThemeData(glowFactor: 0),
+      typography: Typography.fromBrightness(
+        brightness: brightness,
+        color: foreground,
+      ),
+    );
+  }
+
+  m.ThemeData get materialTheme {
+    final isDark = mode == ThemeMode.dark;
+    final brightness = isDark ? Brightness.dark : Brightness.light;
+    final scheme = m.ColorScheme.fromSeed(
+      seedColor: color,
+      brightness: brightness,
+      surface: surfaceColor,
+    ).copyWith(
+      primary: color,
+      onPrimary: isDark ? Colors.black : Colors.white,
+      onSurface: textColor,
+      outline: borderColor,
+      outlineVariant: borderColor,
+      surfaceContainer: fillColor,
+      surfaceContainerHighest: fillColor,
+    );
+    final baseTextTheme = m.ThemeData(
+      brightness: brightness,
+      useMaterial3: true,
+    ).textTheme.apply(bodyColor: textColor, displayColor: textColor);
+    return m.ThemeData.from(
+      colorScheme: scheme,
+      textTheme: baseTextTheme,
+      useMaterial3: true,
+    ).copyWith(
+      scaffoldBackgroundColor: backGroundColor,
+      canvasColor: surfaceColor,
+      cardColor: surfaceColor,
+      dividerColor: borderColor,
+      iconTheme: m.IconThemeData(color: mutedTextColor),
+      visualDensity: m.VisualDensity.standard,
+      inputDecorationTheme: m.InputDecorationTheme(
+        filled: true,
+        fillColor: fillColor,
+        hintStyle: TextStyle(color: mutedTextColor),
+        labelStyle: TextStyle(color: mutedTextColor),
+        enabledBorder: m.OutlineInputBorder(
+          borderSide: m.BorderSide(color: borderColor),
+          borderRadius: BorderRadius.circular(controlRadius),
+        ),
+        focusedBorder: m.OutlineInputBorder(
+          borderSide: m.BorderSide(color: color, width: 1.5),
+          borderRadius: BorderRadius.circular(controlRadius),
+        ),
+      ),
+    );
+  }
 
   set mode(ThemeMode value) {
     if (_mode == value) return;
