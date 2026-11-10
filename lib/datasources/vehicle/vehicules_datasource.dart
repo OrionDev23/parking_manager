@@ -47,7 +47,9 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
 
       if (yearMin != null && (vehicle.usageYear ?? 0) < yearMin) return false;
       if (yearMax != null && (vehicle.usageYear ?? 9999) > yearMax) return false;
-      if (genre != null && vehicle.genre != genre) return false;
+      if (genre != null && vehicle.genre != genre) {
+        return false;
+      }
       if (marque != null && vehicle.brand != marque) return false;
       return true;
     }).toList();
