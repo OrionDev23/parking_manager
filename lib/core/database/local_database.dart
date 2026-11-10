@@ -142,6 +142,50 @@ class LocalDatabase {
         "INSERT INTO schema_migrations(version, applied_at) VALUES (7, datetime('now'))",
       );
     }
+
+    if (version < 8) {
+      db.execute('''CREATE TABLE IF NOT EXISTS sync_cursors (
+        company_id TEXT NOT NULL,
+        entity TEXT NOT NULL,
+        cursor TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        PRIMARY KEY (company_id, entity)
+      )''');
+      db.execute(
+        "INSERT INTO schema_migrations(version, applied_at) VALUES (8, datetime('now'))",
+      );
+    }
+  }
+
+  DateTime? readSyncCursor({
+    required String companyId,
+    required String entity,
+  }) {
+    final rows = database.select(
+      'SELECT cursor FROM sync_cursors WHERE company_id=? AND entity=?',
+      [companyId, entity],
+    );
+    if (rows.isEmpty) return null;
+    return DateTime.tryParse(rows.first['cursor'] as String);
+  }
+
+  void saveSyncCursor({
+    required String companyId,
+    required String entity,
+    required DateTime cursor,
+  }) {
+    database.execute(
+      '''INSERT INTO sync_cursors(company_id, entity, cursor, updated_at)
+         VALUES (?, ?, ?, ?)
+         ON CONFLICT(company_id, entity) DO UPDATE SET
+           cursor=excluded.cursor, updated_at=excluded.updated_at''',
+      [
+        companyId,
+        entity,
+        cursor.toUtc().toIso8601String(),
+        DateTime.now().toUtc().toIso8601String(),
+      ],
+    );
   }
 
   List<Map<String, dynamic>> readLegacyCache({
