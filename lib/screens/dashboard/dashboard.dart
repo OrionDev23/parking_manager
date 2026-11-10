@@ -272,19 +272,14 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         maxCounter: DatabaseGetter.gotLimit && DatabaseGetter.limits
             .containsKey('vehicles')?DatabaseGetter.limits['vehicles']:null,
         action: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-              .indexOf(PaneItemsAndFooters.vehicles);
+          PaneItemsAndFooters.selectPane('vehicles');
         },
         actionList: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.vehicles) +
-              1;
+          PaneItemsAndFooters.selectPane('vehicle-manager');
         },
         actionNouveau: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.vehicles) +
-              1;
-          Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
+          PaneItemsAndFooters.selectPane('vehicle-manager');
+          WidgetsBinding.instance.addPostFrameCallback((_) {
             late Tab tab;
             tab = Tab(
               key: UniqueKey(),
@@ -314,19 +309,13 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         counter: VehicleProvider.downloadedDocuments?VehicleProvider
         .documentsVehicules.length:null,
         action: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.vehicles) +
-              4;
+          PaneItemsAndFooters.selectPane('vehicle-documents');
         },
         actionList: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.vehicles) +
-              4;
+          PaneItemsAndFooters.selectPane('vehicle-documents');
         },
         actionNouveau: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.vehicles) +
-              4;
+          PaneItemsAndFooters.selectPane('vehicle-documents');
           Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
             late Tab tab;
             tab = Tab(
@@ -359,21 +348,13 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         counter: RepairProvider.downloadedReparations?RepairProvider
             .reparations.length:null,
         action: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.reparations) +
-
-              PaneItemsAndFooters.vehicles.items.length;
+          PaneItemsAndFooters.selectPane('vehicle-manager');
         },
         actionList: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.reparations) +
-
-              PaneItemsAndFooters.vehicles.items.length+1;
+          PaneItemsAndFooters.selectPane('vehicle-manager');
         },
         actionNouveau: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.reparations) +
-              PaneItemsAndFooters.vehicles.items.length+1;
+          PaneItemsAndFooters.selectPane('vehicle-manager');
           Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
             late Tab tab;
             tab = Tab(
@@ -406,19 +387,13 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         counter: RepairProvider.downloadedPrestataires?RepairProvider
             .prestataires.length:null,
         action: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.reparations) +
-              PaneItemsAndFooters.vehicles.items.length+3;
+          PaneItemsAndFooters.selectPane('vehicle-manager');
         },
         actionList: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.reparations) +
-              PaneItemsAndFooters.vehicles.items.length+3;
+          PaneItemsAndFooters.selectPane('vehicle-manager');
         },
         actionNouveau: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-              .indexOf(PaneItemsAndFooters.reparations) +
-              PaneItemsAndFooters.vehicles.items.length+3;
+          PaneItemsAndFooters.selectPane('vehicle-manager');
           Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
             late Tab tab;
             tab = Tab(
@@ -449,26 +424,13 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         counter:DriverProvider.downloadedConducteurs?DriverProvider
         .conducteurs.length:null,
         action: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.chauffeurs) +
-              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-              .reparations.items.length+(showAtelier?PaneItemsAndFooters
-              .atelier.items.length:0)-2;
+          PaneItemsAndFooters.selectPane('vehicle-manager');
         },
         actionList: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.chauffeurs) +
-              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-              .reparations.items.length+(showAtelier?PaneItemsAndFooters
-              .atelier.items.length:0)-1;
+          PaneItemsAndFooters.selectPane('vehicle-manager');
         },
         actionNouveau: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.chauffeurs) +
-
-              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-              .reparations.items.length+(showAtelier?PaneItemsAndFooters
-              .atelier.items.length:0)-1;
+          PaneItemsAndFooters.selectPane('vehicle-manager');
           Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
             late Tab tab;
             tab = Tab(
@@ -499,25 +461,13 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         counter:DriverProvider.downloadedDocuments?DriverProvider
             .documentConducteurs.length:null,
         action: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.chauffeurs) +
-              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-              .reparations.items.length+(showAtelier?PaneItemsAndFooters
-              .atelier.items.length:0)+1;
+          PaneItemsAndFooters.selectPane('vehicle-manager');
         },
         actionList: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.chauffeurs) +
-              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-              .reparations.items.length+(showAtelier?PaneItemsAndFooters
-              .atelier.items.length:0)+1;
+          PaneItemsAndFooters.selectPane('vehicle-manager');
         },
         actionNouveau: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.chauffeurs) +
-              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-              .reparations.items.length+(showAtelier?PaneItemsAndFooters
-              .atelier.items.length:0)+1;
+          PaneItemsAndFooters.selectPane('vehicle-manager');
           Future.delayed(const Duration(milliseconds: 300)).whenComplete(() {
             late Tab tab;
             tab = Tab(
@@ -550,22 +500,11 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         counter:PlanningProvider.downloadedPlanning?PlanningProvider
             .plannings.length:null,
         action: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.planner) +
-              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-              .reparations.items.length+(showAtelier?PaneItemsAndFooters
-              .atelier.items.length:0)+PaneItemsAndFooters.chauffeurs.items
-              .length-2;
+          PaneItemsAndFooters.selectPane('vehicle-manager');
         },
         showBothLN: false,
         actionList: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.planner) +
-
-              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-              .reparations.items.length+(showAtelier?PaneItemsAndFooters
-              .atelier.items.length:0)+PaneItemsAndFooters.chauffeurs.items
-              .length-2;
+          PaneItemsAndFooters.selectPane('vehicle-manager');
         },
       ),
       ButtonContainer(
@@ -576,19 +515,11 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
         counter:LogProvider.downloadedActivities?LogProvider
             .activities.length:null,
         action: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.evenements) +
-
-              PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-              .reparations.items.length+(showAtelier?PaneItemsAndFooters
-              .atelier.items.length:0)+PaneItemsAndFooters.chauffeurs.items
-              .length-2;
+          PaneItemsAndFooters.selectPane('vehicle-manager');
         },
         showBothLN: false,
         actionList: () {
-          PanesListState.index.value = PaneItemsAndFooters.originalItems
-                  .indexOf(PaneItemsAndFooters.evenements) +
-              10;
+          PaneItemsAndFooters.selectPane('events');
         },
       ),
     ];
@@ -625,9 +556,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
             ],
           ),
           onTap: () {
-            PanesListState.index.value = PaneItemsAndFooters.originalItems
-                    .indexOf(PaneItemsAndFooters.vehicles) +
-                1;
+            PaneItemsAndFooters.selectPane('vehicle-manager');
           },
         ),
       ),
@@ -651,9 +580,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                 ]))),
           ),
           onTap: () {
-            PanesListState.index.value = PaneItemsAndFooters.originalItems
-                .indexOf(PaneItemsAndFooters.vehicles) +
-                1;
+            PaneItemsAndFooters.selectPane('vehicle-manager');
           },
         ),
       ),
@@ -709,9 +636,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
             ],)),
           ),
           onTap: () {
-            PanesListState.index.value = PaneItemsAndFooters.originalItems
-                .indexOf(PaneItemsAndFooters.vehicles) +
-                1;
+            PaneItemsAndFooters.selectPane('vehicle-manager');
           },
         ),
       ),
@@ -737,9 +662,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                 ]))),
           ),
           onTap: () {
-            PanesListState.index.value = PaneItemsAndFooters.originalItems
-                .indexOf(PaneItemsAndFooters.vehicles) +
-                1;
+            PaneItemsAndFooters.selectPane('vehicle-manager');
           },
         ),
       ),
@@ -765,9 +688,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                 ]))),
           ),
           onTap: () {
-            PanesListState.index.value = PaneItemsAndFooters.originalItems
-                .indexOf(PaneItemsAndFooters.vehicles) +
-                1;
+            PaneItemsAndFooters.selectPane('vehicle-manager');
           },
         ),
       ),
@@ -791,9 +712,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
                 ]))),
           ),
           onTap: () {
-            PanesListState.index.value = PaneItemsAndFooters.originalItems
-                .indexOf(PaneItemsAndFooters.vehicles) +
-                1;
+            PaneItemsAndFooters.selectPane('vehicle-manager');
           },
         ),
       ),
@@ -818,9 +737,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
             numberOfRows: 5,
           ),
           onTap: () {
-            PanesListState.index.value = PaneItemsAndFooters.originalItems
-                    .indexOf(PaneItemsAndFooters.vehicles) +
-                1;
+            PaneItemsAndFooters.selectPane('vehicle-manager');
           },
         ),
       ),
@@ -839,10 +756,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
             appTheme: appTheme,
           ),
           onTap: () {
-            PanesListState.index.value = PaneItemsAndFooters.originalItems
-                    .indexOf(PaneItemsAndFooters.reparations) +
-
-                PaneItemsAndFooters.vehicles.items.length+1;
+            PaneItemsAndFooters.selectPane('vehicle-manager');
           },
         ),
       ),
@@ -867,10 +781,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
             numberOfRows: 5,
           ),
           onTap: () {
-            PanesListState.index.value = PaneItemsAndFooters.originalItems
-                    .indexOf(PaneItemsAndFooters.reparations) +
-
-                PaneItemsAndFooters.vehicles.items.length+1;
+            PaneItemsAndFooters.selectPane('vehicle-manager');
           },
         ),
       ),
@@ -895,12 +806,7 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
             numberOfRows: 5,
           ),
           onTap: () {
-            PanesListState.index.value = PaneItemsAndFooters.originalItems
-                    .indexOf(PaneItemsAndFooters.chauffeurs) +
-
-                PaneItemsAndFooters.vehicles.items.length+PaneItemsAndFooters
-                .reparations.items.length+(showAtelier?PaneItemsAndFooters
-                .atelier.items.length:0)-1;
+            PaneItemsAndFooters.selectPane('vehicle-manager');
           },
         ),
       ),
