@@ -116,6 +116,7 @@ class PaneItemsAndFooters {
         ).tr(),
         items: [
           PaneItem(
+              key: const Key('vehicle-manager'),
               icon: Icon(
                 FluentIcons.list,
                 color: appTheme.color.lightest,
@@ -126,6 +127,7 @@ class PaneItemsAndFooters {
               ).tr(),
               body: const VehicleTabs()),
           PaneItem(
+            key: const Key('vehicle-brands'),
             icon: Icon(
               FluentIcons.verified_brand,
               color: appTheme.color.lightest,
@@ -137,6 +139,7 @@ class PaneItemsAndFooters {
             body: const BrandList(),
           ),
           PaneItem(
+            key: const Key('vehicle-states'),
             icon: Icon(
               FluentIcons.health,
               color: appTheme.color.lightest,
@@ -148,6 +151,7 @@ class PaneItemsAndFooters {
             body: const StateTabs(),
           ),
           PaneItem(
+            key: const Key('vehicle-documents'),
             icon: Icon(
               FluentIcons.document_set,
               color: appTheme.color.lightest,
@@ -546,6 +550,39 @@ class PaneItemsAndFooters {
     ];
   }
 
+
+
+  /// Resolves a destination from the current, permission-filtered navigation
+  /// tree. The flattened index is derived from the actual menu structure.
+  static int? indexForPaneKey(String value) {
+    var flatIndex = 0;
+    for (final item in originalItems) {
+      if (item.key is ValueKey && (item.key as ValueKey).value == value) {
+        return flatIndex;
+      }
+      flatIndex++;
+      if (item is PaneItemExpander) {
+        for (final child in item.items) {
+          if (child.key is ValueKey &&
+              (child.key as ValueKey).value == value) {
+            return flatIndex;
+          }
+          flatIndex++;
+        }
+      }
+    }
+    return null;
+  }
+
+  static bool selectPane(String value) {
+    final targetIndex = indexForPaneKey(value);
+    if (targetIndex == null) {
+      debugPrint('[ParcOto Navigation] Pane not found: $value');
+      return false;
+    }
+    PanesListState.index.value = targetIndex;
+    return true;
+  }
 
   static List<NavigationPaneItem> originalItems = List.empty(growable: true);
   static List<NavigationPaneItem> footerItems = List.empty(growable: true);
