@@ -11,7 +11,6 @@ import '../logs/logging/log_table.dart';
 import '../prestataire/prestataire_form.dart';
 import '../prestataire/prestataire_tabs.dart';
 import '../sidemenu/pane_items.dart';
-import '../sidemenu/sidemenu.dart';
 import 'reparation/manager/reparation_tabs.dart';
 import 'reparation/reparation_order_form/reparation_form.dart';
 
@@ -54,12 +53,7 @@ class ReparationDashboard extends StatelessWidget {
             detail: 'Suivi des interventions',
             icon: FluentIcons.list,
             onPressed: () {
-                  PanesListState.index.value =
-                      PaneItemsAndFooters.originalItems.indexOf(
-                        PaneItemsAndFooters.reparations,
-                      ) +
-                      PaneItemsAndFooters.vehicles.items.length +
-                      1;
+                  PaneItemsAndFooters.selectPane('repair-orders');
                 },
           ),
               ModuleDashboardAction(
@@ -67,12 +61,7 @@ class ReparationDashboard extends StatelessWidget {
             detail: 'Créer un nouvel élément',
             icon: FluentIcons.repair,
             onPressed: () {
-                  PanesListState.index.value =
-                      PaneItemsAndFooters.originalItems.indexOf(
-                        PaneItemsAndFooters.reparations,
-                      ) +
-                      PaneItemsAndFooters.vehicles.items.length +
-                      1;
+                  PaneItemsAndFooters.selectPane('repair-orders');
                   Future.delayed(const Duration(milliseconds: 300))
                       .whenComplete(() {
                         late Tab tab;
@@ -101,12 +90,7 @@ class ReparationDashboard extends StatelessWidget {
             detail: 'Gestion des prestataires',
             icon: FluentIcons.list,
             onPressed: () {
-                  PanesListState.index.value =
-                      PaneItemsAndFooters.originalItems.indexOf(
-                        PaneItemsAndFooters.reparations,
-                      ) +
-                      PaneItemsAndFooters.vehicles.items.length +
-                      2;
+                  PaneItemsAndFooters.selectPane('repair-providers');
                 },
           ),
               ModuleDashboardAction(
@@ -114,12 +98,7 @@ class ReparationDashboard extends StatelessWidget {
             detail: 'Créer un nouvel élément',
             icon: FluentIcons.service_activity,
             onPressed: () {
-                  PanesListState.index.value =
-                      PaneItemsAndFooters.originalItems.indexOf(
-                        PaneItemsAndFooters.reparations,
-                      ) +
-                      PaneItemsAndFooters.vehicles.items.length +
-                      2;
+                  PaneItemsAndFooters.selectPane('repair-providers');
                   Future.delayed(const Duration(milliseconds: 300))
                       .whenComplete(() {
                         late Tab tab;
