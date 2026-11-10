@@ -26,7 +26,6 @@ import 'charts/pie_chart.dart';
 import '../../providers/counters.dart';
 import '../../theme.dart';
 import '../../widgets/button_container.dart';
-import '../../widgets/page_header.dart';
 import '../chauffeur/document/chauf_document_form.dart';
 import '../chauffeur/document/chauf_document_tabs.dart';
 import '../prestataire/prestataire_form.dart';
@@ -52,7 +51,6 @@ class _DashboardState extends State<Dashboard> with AutomaticKeepAliveClientMixi
   Widget build(BuildContext context) {
     super.build(context);
     var appTheme = context.watch<AppTheme>();
-    bool portrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<VehicleProvider>(create:(c)=> VehicleProvider()),
