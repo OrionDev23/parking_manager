@@ -118,7 +118,15 @@ class _DataTableParcState extends State<DataTableParc> {
           rowsPerPage: widget.numberOfRows ?? rowPerPage,
           onRowsPerPageChanged: widget.pages
               ? (count) {
-                  setState(() => rowPerPage = count ?? 12);
+                  // data_table_2 may normalize rowsPerPage while building.
+                  // Defer our state update to avoid setState during build.
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (!mounted) return;
+                    final nextCount = count ?? 12;
+                    if (rowPerPage != nextCount) {
+                      setState(() => rowPerPage = nextCount);
+                    }
+                  });
                 }
               : null,
           availableRowsPerPage: widget.numberOfRows == null
