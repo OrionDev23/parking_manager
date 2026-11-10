@@ -106,6 +106,7 @@ class DatabaseGetter {
       MyEntrepriseState.p = null;
       MyEntrepriseState.logo = null;
       MyEntrepriseState.imageFile = null;
+      MyEntrepriseState.logoExists = false;
       MyEntrepriseState.downloading = false;
 
       client = Client()
