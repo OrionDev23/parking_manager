@@ -158,32 +158,22 @@ class VehicleDashboard extends StatelessWidget {
                     'Accédez aux véhicules, aux états et aux documents administratifs.',
                 icon: FluentIcons.car,
               ),
-              const SizedBox(height: 28),
-          ModuleDashboardSectionHeader(
-            title: 'Actions courantes',
-            subtitle: 'Ouvrez directement la gestion des véhicules, documents et référentiels.',
-          ),
-              const SizedBox(height: 26),
-              Text(
-                'Accès rapides',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  color: appTheme.writingStyle.color,
-                ),
+              ModuleDashboardSectionHeader(
+                title: 'Actions courantes',
+                subtitle:
+                    'Ouvrez directement la gestion des véhicules, documents et référentiels.',
               ),
-              const SizedBox(height: 12),
               Wrap(
                 spacing: 12,
                 runSpacing: 12,
                 children: moduleActions,
-
-          const SizedBox(height: 28),
-          ModuleDashboardSectionHeader(
-            title: 'État et activité du parc',
-            subtitle: 'Suivez la répartition des véhicules et les dernières opérations enregistrées.',
-          ),
-
+              ),
+              const SizedBox(height: 28),
+              ModuleDashboardSectionHeader(
+                title: 'État et activité du parc',
+                subtitle:
+                    'Suivez la répartition des véhicules et les dernières opérations enregistrées.',
+              ),
               StaggeredGrid.count(
                 crossAxisCount: compact ? 1 : 2,
                 mainAxisSpacing: 14,
@@ -200,34 +190,18 @@ class VehicleDashboard extends StatelessWidget {
                     ),
                   ),
                   ModuleDashboardPanel(
-                    title: 'vstates'.tr(),
+                    title: 'Répartition des véhicules',
                     child: ParcOtoPie(
                       labels: [
-                        MapEntry(
-                          'gstate',
-                          DatabaseCounters().countVehicles(etat: 0),
-                        ),
-                        MapEntry(
-                          'bstate',
-                          DatabaseCounters().countVehicles(etat: 1),
-                        ),
-                        MapEntry(
-                          'rstate',
-                          DatabaseCounters().countVehicles(etat: 2),
-                        ),
-                        MapEntry(
-                          'ostate',
-                          DatabaseCounters().countVehicles(etat: 3),
-                        ),
-                        MapEntry(
-                          'restate',
-                          DatabaseCounters().countVehicles(etat: 4),
-                        ),
+                        MapEntry('gstate', DatabaseCounters().countVehicles(etat: 0)),
+                        MapEntry('bstate', DatabaseCounters().countVehicles(etat: 1)),
+                        MapEntry('rstate', DatabaseCounters().countVehicles(etat: 2)),
+                        MapEntry('ostate', DatabaseCounters().countVehicles(etat: 3)),
+                        MapEntry('restate', DatabaseCounters().countVehicles(etat: 4)),
                       ],
                     ),
                   ),
                 ],
-              ),
               ),
             ],
           );
