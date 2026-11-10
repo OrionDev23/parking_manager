@@ -282,7 +282,6 @@ class AppTheme extends ChangeNotifier {
     final background = isDark ? palette.darkBackground : palette.lightBackground;
     final surface = isDark ? palette.darkSurface : palette.lightSurface;
     final muted = isDark ? palette.darkMutedText : palette.lightMutedText;
-    final border = isDark ? palette.darkBorder : palette.lightBorder;
     final fill = isDark
         ? Color.lerp(surface, Colors.white, .055)!
         : Color.lerp(surface, background, .55)!;
