@@ -4,6 +4,7 @@ import '../../core/permissions/permission.dart';
 import '../../core/permissions/permission_catalog.dart';
 import '../../domain/entities/access_team.dart';
 import '../../main.dart';
+import '../../widgets/module_dashboard_header.dart';
 
 class AccessManagement extends StatefulWidget {
   const AccessManagement({super.key});
@@ -98,101 +99,145 @@ class _AccessManagementState extends State<AccessManagement> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const Center(child: ProgressRing());
     return ScaffoldPage(
-      header: PageHeader(
-        title: const Text('Équipes et accès'),
-        commandBar: CommandBar(
-          primaryItems: [
-            CommandBarButton(
-              icon: const Icon(FluentIcons.add),
-              label: const Text('Nouvelle équipe'),
-              onPressed: _createTeam,
+      padding: EdgeInsets.zero,
+      content: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 760;
+          return ListView(
+            padding: EdgeInsets.symmetric(
+              horizontal: compact ? 16 : 28,
+              vertical: 22,
             ),
-            CommandBarButton(
-              icon: const Icon(FluentIcons.refresh),
-              label: const Text('Actualiser'),
-              onPressed: _load,
-            ),
-          ],
-        ),
-      ),
-      content: _error != null
-          ? Center(child: Text(_error!))
-          : _teams.isEmpty
-          ? _EmptyState(onCreate: _createTeam)
-          : ListView.separated(
-              padding: const EdgeInsets.all(24),
-              itemCount: _teams.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 12),
-              itemBuilder: (_, index) {
-                final team = _teams[index];
-                return Card(
-                  padding: const EdgeInsets.all(18),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: FluentTheme.of(context).accentColor
-                              .withValues(alpha: .12),
-                        ),
-                        child: Icon(
-                          team.isSystem
-                              ? FluentIcons.shield
-                              : FluentIcons.people,
-                          color: FluentTheme.of(context).accentColor,
-                        ),
+            children: [
+              ModuleDashboardHeader(
+                title: 'Équipes et accès',
+                subtitle:
+                    'Définissez les rôles et contrôlez les permissions de chaque équipe.',
+                eyebrow: 'ParcOto / Security',
+                heroTitle: 'Gestion des accès',
+                heroDescription:
+                    'Organisez les utilisateurs par équipe et attribuez uniquement les permissions nécessaires.',
+                icon: FluentIcons.security_group,
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Tooltip(
+                      message: 'Actualiser',
+                      child: IconButton(
+                        icon: const Icon(FluentIcons.refresh),
+                        onPressed: _loading ? null : _load,
                       ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
+                    ),
+                    const SizedBox(width: 6),
+                    Tooltip(
+                      message: 'Nouvelle équipe',
+                      child: IconButton(
+                        icon: const Icon(FluentIcons.add),
+                        onPressed: _createTeam,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 26),
+              Text(
+                'Équipes configurées',
+                style: FluentTheme.of(context).typography.subtitle,
+              ),
+              const SizedBox(height: 12),
+              if (_loading)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 48),
+                  child: Center(child: ProgressRing()),
+                )
+              else if (_error != null)
+                InfoBar(
+                  title: const Text('Impossible de charger les équipes'),
+                  content: Text(_error!),
+                  severity: InfoBarSeverity.error,
+                )
+              else if (_teams.isEmpty)
+                _EmptyState(onCreate: _createTeam)
+              else
+                ..._teams.map(
+                  (team) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Card(
+                      padding: const EdgeInsets.all(18),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: FluentTheme.of(context).accentColor
+                                  .withValues(alpha: .12),
+                            ),
+                            child: Icon(
+                              team.isSystem
+                                  ? FluentIcons.shield
+                                  : FluentIcons.people,
+                              color: FluentTheme.of(context).accentColor,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  team.name,
-                                  style: FluentTheme.of(context)
-                                      .typography
-                                      .subtitle,
+                                Row(
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        team.name,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: FluentTheme.of(context)
+                                            .typography
+                                            .subtitle,
+                                      ),
+                                    ),
+                                    if (team.isSystem) ...[
+                                      const SizedBox(width: 8),
+                                      const InfoBadge(source: Text('Système')),
+                                    ],
+                                  ],
                                 ),
-                                if (team.isSystem) ...[
-                                  const SizedBox(width: 8),
-                                  const InfoBadge(source: Text('Système')),
-                                ],
+                                const SizedBox(height: 5),
+                                Text(
+                                  team.description?.isNotEmpty == true
+                                      ? team.description!
+                                      : '${team.permissions.length} permission(s)',
+                                  style:
+                                      FluentTheme.of(context).typography.caption,
+                                ),
                               ],
                             ),
-                            const SizedBox(height: 5),
-                            Text(
-                              team.description?.isNotEmpty == true
-                                  ? team.description!
-                                  : '${team.permissions.length} permission(s)',
-                              style: FluentTheme.of(context).typography.caption,
+                          ),
+                          Button(
+                            onPressed: () => _editTeam(team),
+                            child: const Text('Modifier'),
+                          ),
+                          if (!team.isSystem) ...[
+                            const SizedBox(width: 8),
+                            IconButton(
+                              icon: const Icon(FluentIcons.delete),
+                              onPressed: () => _deleteTeam(team),
                             ),
                           ],
-                        ),
+                        ],
                       ),
-                      Button(
-                        onPressed: () => _editTeam(team),
-                        child: const Text('Modifier'),
-                      ),
-                      if (!team.isSystem) ...[
-                        const SizedBox(width: 8),
-                        IconButton(
-                          icon: const Icon(FluentIcons.delete),
-                          onPressed: () => _deleteTeam(team),
-                        ),
-                      ],
-                    ],
+                    ),
                   ),
-                );
-              },
-            ),
+                ),
+            ],
+          );
+        },
+      ),
     );
   }
+
 }
 
 class _EmptyState extends StatelessWidget {
