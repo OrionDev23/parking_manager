@@ -49,15 +49,11 @@ class _DataTableParcState extends State<DataTableParc> {
   @override
   Widget build(BuildContext context) {
     final appTheme = context.watch<AppTheme>();
-    // GTS has two explicit palettes (gtsDark / gtsLight), represented by
-    // AppTheme.mode. Use AppTheme's resolved colors instead of guessing from
-    // Fluent's inherited brightness or introducing a separate table palette.
+    // Resolve all table foreground and surface colors from the active theme.
     final isDark = appTheme.mode == ThemeMode.dark;
     final accent = appTheme.color;
     final surfaceColor = appTheme.surfaceColor;
-    final primaryText = appTheme.writingStyle.color ??
-        (isDark ? Colors.white : Colors.black);
-    final secondaryText = appTheme.mutedTextColor;
+    final primaryText = appTheme.textColor;
     final borderColor = appTheme.borderColor;
 
     // DataTable2 inherits the application-wide Material theme. Explicit row
