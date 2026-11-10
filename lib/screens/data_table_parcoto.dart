@@ -6,8 +6,12 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../theme.dart';
 import '../widgets/empty_table_widget.dart';
 
+/// Shared data-grid surface used by every Parcoto module.
+///
+/// Module screens keep ownership of their columns, data sources, filtering and
+/// business actions. This widget centralizes the table's visual language and
+/// common pagination behaviour so a visual change is applied everywhere.
 class DataTableParc extends StatefulWidget {
-
   final Widget? header;
   final AsyncDataTableSource source;
   final bool sortAscending;
@@ -18,14 +22,22 @@ class DataTableParc extends StatefulWidget {
   final int? numberOfRows;
   final bool pages;
   final double? rowHeight;
-
   final bool horizontalScroll;
-  const DataTableParc({super.key,this.rowHeight, this.header, required this
-      .source, required
-  this.sortAscending, required this.sortColumnIndex, required this.columns,
-    this.numberOfRows,this.horizontalScroll=false,
-    this.pages=true,
-    this.hidePaginator=false,this.autoRowHeight=true});
+
+  const DataTableParc({
+    super.key,
+    this.rowHeight,
+    this.header,
+    required this.source,
+    required this.sortAscending,
+    required this.sortColumnIndex,
+    required this.columns,
+    this.numberOfRows,
+    this.horizontalScroll = false,
+    this.pages = true,
+    this.hidePaginator = false,
+    this.autoRowHeight = true,
+  });
 
   @override
   State<DataTableParc> createState() => _DataTableParcState();
@@ -34,52 +46,104 @@ class DataTableParc extends StatefulWidget {
 class _DataTableParcState extends State<DataTableParc> {
   int rowPerPage = 12;
 
-
-
   @override
   Widget build(BuildContext context) {
-    var appTheme=context.watch<AppTheme>();
-    return AsyncPaginatedDataTable2(
+    final appTheme = context.watch<AppTheme>();
+    final accent = appTheme.color;
+    final isDark = appTheme.mode == ThemeMode.dark;
+    final borderColor = appTheme.writingStyle.color!.withValues(alpha: .10);
 
-      header: widget.header,
-      sortAscending: widget.sortAscending,
-      headingRowHeight: 25,
-      minWidth: widget.horizontalScroll?2000.px:null,
-      isHorizontalScrollBarVisible: widget.horizontalScroll,
-      headingRowDecoration: BoxDecoration(
-          color: appTheme.color,
-          borderRadius:
-          const BorderRadius.vertical(top: Radius.circular(5))),
-      dividerThickness: 0.5,
-      autoRowsToHeight: widget.autoRowHeight,
-      empty: NoDataWidget(
-        datasource: widget.source,
+    return Container(
+      decoration: BoxDecoration(
+        color: appTheme.backGroundColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? .12 : .035),
+            blurRadius: 18,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
-      pageSyncApproach: PageSyncApproach.goToLast,
-      horizontalMargin: 8,
-      columnSpacing: 5,
-      dataRowHeight: widget.autoRowHeight?kMinInteractiveDimension:widget
-          .rowHeight==null?widget
-          .numberOfRows==null?rowHeight:rowHeight*2:widget.rowHeight!,
-      onPageChanged: (s) {},
-      rowsPerPage: widget.numberOfRows ?? rowPerPage,
-      onRowsPerPageChanged: widget.pages
-          ? (nbr) {
-          rowPerPage = nbr ?? 12;
-      }
-          : null,
-      availableRowsPerPage: widget.numberOfRows == null
-          ? const [12, 24, 50, 100, 200]
-          : [widget.numberOfRows!],
-      showCheckboxColumn: false,
-      sortColumnIndex: widget.sortColumnIndex,
-      showFirstLastButtons: false,
-      renderEmptyRowsInTheEnd: false,
-      fit: FlexFit.loose,
-      columns: widget.columns,
-      source: widget.source,
-      sortArrowAlwaysVisible: true,
-      hidePaginator: widget.hidePaginator,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(11),
+        child: AsyncPaginatedDataTable2(
+          header: widget.header,
+          sortAscending: widget.sortAscending,
+          headingRowHeight: 44,
+          minWidth: widget.horizontalScroll ? 2000.px : null,
+          isHorizontalScrollBarVisible: widget.horizontalScroll,
+          headingRowDecoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                accent.withValues(alpha: isDark ? .24 : .13),
+                accent.withValues(alpha: isDark ? .12 : .07),
+              ],
+              begin: AlignmentDirectional.centerStart,
+              end: AlignmentDirectional.centerEnd,
+            ),
+            border: Border(
+              bottom: BorderSide(
+                color: accent.withValues(alpha: .24),
+                width: 1,
+              ),
+            ),
+          ),
+          headingTextStyle: TextStyle(
+            color: appTheme.writingStyle.color,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            letterSpacing: .25,
+          ),
+          dataTextStyle: TextStyle(
+            color: appTheme.writingStyle.color,
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
+          dataRowColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.hovered)) {
+              return accent.withValues(alpha: .07);
+            }
+            return null;
+          }),
+          border: TableBorder(
+            horizontalInside: BorderSide(
+              color: borderColor,
+              width: .6,
+            ),
+          ),
+          dividerThickness: .4,
+          autoRowsToHeight: widget.autoRowHeight,
+          empty: NoDataWidget(datasource: widget.source),
+          pageSyncApproach: PageSyncApproach.goToLast,
+          horizontalMargin: 16,
+          columnSpacing: 14,
+          dataRowHeight: widget.autoRowHeight
+              ? kMinInteractiveDimension
+              : widget.rowHeight ??
+                  (widget.numberOfRows == null ? rowHeight : rowHeight * 2),
+          onPageChanged: (_) {},
+          rowsPerPage: widget.numberOfRows ?? rowPerPage,
+          onRowsPerPageChanged: widget.pages
+              ? (count) {
+                  setState(() => rowPerPage = count ?? 12);
+                }
+              : null,
+          availableRowsPerPage: widget.numberOfRows == null
+              ? const [12, 24, 50, 100, 200]
+              : [widget.numberOfRows!],
+          showCheckboxColumn: false,
+          sortColumnIndex: widget.sortColumnIndex,
+          showFirstLastButtons: true,
+          renderEmptyRowsInTheEnd: false,
+          fit: FlexFit.loose,
+          columns: widget.columns,
+          source: widget.source,
+          sortArrowAlwaysVisible: true,
+          hidePaginator: widget.hidePaginator,
+        ),
+      ),
     );
   }
 }

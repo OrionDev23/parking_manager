@@ -243,6 +243,7 @@ PaneItem(
             header: Text('inventaire',style: paneTextStyle,).tr()
         ),
         PaneItem(
+          key: const ValueKey('workshop-stock'),
           icon: Icon(
             Icons.inventory_2_outlined,
             color: appTheme.color.lightest,
@@ -254,6 +255,7 @@ PaneItem(
           body: const StorageTabs(),
         ),
         PaneItem(
+          key: const ValueKey('workshop-suppliers'),
           icon: Icon(
             FluentIcons.service_activity,
             color: appTheme.color.lightest,
@@ -268,6 +270,7 @@ PaneItem(
             header: Text('pieces',style: paneTextStyle,).tr()
         ),
         PaneItem(
+          key: const ValueKey('workshop-parts'),
           icon: Icon(
             Icons.plumbing,
             color: appTheme.color.lightest,
@@ -279,6 +282,7 @@ PaneItem(
           ).tr(),
         ),
         PaneItem(
+          key: const ValueKey('workshop-brands'),
           icon: Icon(
             FluentIcons.verified_brand,
             color: appTheme.color.lightest,
@@ -290,6 +294,7 @@ PaneItem(
           ).tr(),
         ),
         PaneItem(
+          key: const ValueKey('workshop-categories'),
           icon: Icon(
             FluentIcons.category_classification,
             color: appTheme.color.lightest,
@@ -301,6 +306,7 @@ PaneItem(
           ).tr(),
         ),
         PaneItem(
+          key: const ValueKey('workshop-options'),
           icon: Icon(
             FluentIcons.text_paragraph_option,
             color: appTheme.color.lightest,
