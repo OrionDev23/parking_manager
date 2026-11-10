@@ -31,7 +31,7 @@ class ConducteurDashboard extends StatelessWidget {
     return ScaffoldPage(
       padding: EdgeInsets.zero,
       content: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 22),
         children: [
           ModuleDashboardHeader(
             title: 'chauffeurs'.tr(),
@@ -44,6 +44,15 @@ class ConducteurDashboard extends StatelessWidget {
             icon: FluentIcons.people,
           ),
           const SizedBox(height: 26),
+          Text(
+            'Accès rapides',
+            style: TextStyle(
+              color: appTheme.writingStyle.color,
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 12),
           Wrap(
             spacing: 12,
             runSpacing: 12,
