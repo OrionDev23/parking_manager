@@ -72,6 +72,14 @@ class DatabaseGetter {
   static bool isCurrentTenant(String projectId) =>
       _isCurrentProject(_projectGeneration, projectId);
 
+  /// Invalidates asynchronous work even when the next session uses the same
+  /// Appwrite project. This is required for logout/login in one tenant.
+  static void invalidatePendingRequests() {
+    _projectGeneration++;
+    gettingUser = false;
+    MyEntrepriseState.downloading = false;
+  }
+
   DatabaseGetter() {
     final requestedProject = project ?? prefs.getString('project');
     if (requestedProject == null || requestedProject.isEmpty) return;
@@ -207,14 +215,17 @@ class DatabaseGetter {
         if (trialDate == null ||
             trialDate!.difference(DateTime.now()).inMilliseconds <= 0) {
           await onSessionExpired?.call();
-          if (!_isCurrentProject(generation, projectId)) return;
+          // The callback invalidates pending requests, so use the captured
+          // account to revoke this expired session even after generation changes.
+          if (_configuredProjectId != projectId) return;
           await activeAccount.deleteSession(sessionId: 'current');
-          if (!_isCurrentProject(generation, projectId)) return;
-          user = null;
-          me.value = null;
-          myTeams = List.empty(growable: true);
-          PanesListState.signedIn.value = false;
-          PanesListState.index.value = 0;
+          if (_configuredProjectId == projectId) {
+            user = null;
+            me.value = null;
+            myTeams = List.empty(growable: true);
+            PanesListState.signedIn.value = false;
+            PanesListState.index.value = 0;
+          }
           return;
         }
 
