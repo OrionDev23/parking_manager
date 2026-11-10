@@ -12,6 +12,8 @@ class SyncOperation {
   final DateTime createdAt;
   final SyncOperationStatus status;
   final int attempts;
+  final String? conflictReason;
+  final DateTime? conflictedAt;
 
   const SyncOperation({
     required this.id,
@@ -24,5 +26,7 @@ class SyncOperation {
     required this.createdAt,
     this.status = SyncOperationStatus.pending,
     this.attempts = 0,
+    this.conflictReason,
+    this.conflictedAt,
   });
 }
