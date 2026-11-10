@@ -57,20 +57,41 @@ class DatabaseGetter {
   static TablesDB? database;
 
   static ValueNotifier<ParcUser?> me = ValueNotifier(null);
+  static String? _configuredProjectId;
 
   DatabaseGetter() {
-    project ??= prefs.getString('project');
-    if (project != null) {
+    final requestedProject = project ?? prefs.getString('project');
+    if (requestedProject == null || requestedProject.isEmpty) return;
+
+    // Rebuild the legacy Appwrite clients only when the project actually
+    // changes. Never carry profile, licensing, team or encryption state
+    // from one project into another.
+    if (_configuredProjectId != requestedProject) {
+      _configuredProjectId = requestedProject;
+      project = requestedProject;
+      user = null;
+      me.value = null;
+      myTeams = List.empty(growable: true);
+      trialDate = null;
+      limits = {};
+      gotLimit = false;
+      gettingUser = false;
+      secretKey = null;
+      secretKeySet = false;
+      settingSecretKey = false;
+      encrypter = null;
+      iv = null;
+
       client = Client()
         ..setEndpoint(endpoint)
-        ..setProject(project!);
+        ..setProject(requestedProject);
       account = Account(client!);
       database = TablesDB(client!);
       storage = Storage(client!);
-      getLimits();
-
-      getEntreprise();
     }
+
+    getLimits();
+    getEntreprise();
   }
 
   bool isManager({List<Team>? teams}) {
