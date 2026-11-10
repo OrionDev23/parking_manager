@@ -158,6 +158,13 @@ class AppwriteSyncEngine implements SyncEngine {
         try {
           await queue.markProcessing(operation.id);
           await handler(operation);
+          // If the lease expired while the remote request was in flight, do
+          // not acknowledge the operation. The next lease owner will recover
+          // and retry it; handlers are designed to be idempotent.
+          if (_leaseLost) {
+            debugPrint('[ParcOto Sync] lease lost during remote write; leaving operation for recovery');
+            break;
+          }
           await queue.markCompleted(operation.id);
           debugPrint('[ParcOto Sync] SUCCESS ${operation.entity} ${operation.type.name} id=${operation.entityId}');
         } on AppwriteException catch (error, stackTrace) {
