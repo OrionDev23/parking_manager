@@ -12,6 +12,7 @@ import '../../widgets/module_dashboard_header.dart';
 import '../dashboard/charts/pie_chart.dart';
 import '../logs/logging/log_table.dart';
 import '../sidemenu/pane_items.dart';
+import '../sidemenu/sidemenu.dart';
 import 'document/chauf_document_form.dart';
 import 'document/chauf_document_tabs.dart';
 import 'manager/chauffeur_form.dart';
@@ -43,7 +44,15 @@ class ConducteurDashboard extends StatelessWidget {
             icon: FluentIcons.people,
           ),
           const SizedBox(height: 26),
-          bigSpace,
+          Text(
+            'Suivi des conducteurs',
+            style: TextStyle(
+              color: appTheme.writingStyle.color,
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 12),
           StaggeredGrid.count(
             crossAxisCount: portrait ? 1 : 2,
             mainAxisSpacing: 5,
@@ -108,6 +117,7 @@ class ConducteurDashboard extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 28),
           Text(
             'Accès rapides',
             style: TextStyle(
