@@ -200,7 +200,12 @@ class VehicleServices {
         entity: 'vehicle',
         entityId: vehicleId,
       );
-      if (hasLocalMutation) continue;
+      if (hasLocalMutation) {
+        // Keep the missing ID in the baseline so deletion is retried after
+        // the local outbox mutation is resolved.
+        secondScan.add(vehicleId);
+        continue;
+      }
       await localSource.deleteVehicle(vehicleId);
       deleted++;
     }
