@@ -58,7 +58,6 @@ class _DataTableParcState extends State<DataTableParc> {
     final surfaceColor = isDark
         ? const Color(0xFF202126)
         : const Color(0xFFFFFFFF);
-    final rowHoverColor = accent.withValues(alpha: isDark ? .13 : .07);
     final borderColor = isDark
         ? const Color(0xFF383A42)
         : const Color(0xFFE5E7EB);
