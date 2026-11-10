@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/parts_provider.dart';
 import '../../theme.dart';
+import '../../widgets/module_dashboard_header.dart';
 import '../sidemenu/pane_items.dart';
 
 class WorkshopDashboard extends StatefulWidget {
@@ -75,97 +76,20 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                   vertical: 24,
                 ),
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Atelier',
-                              style: TextStyle(
-                                color: theme.writingStyle.color,
-                                fontSize: compact ? 25 : 30,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              'Vue opérationnelle du catalogue et de l’inventaire',
-                              style: TextStyle(
-                                color: Colors.grey[100],
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
+                  ModuleDashboardHeader(
+                    title: 'Atelier',
+                    subtitle: 'Vue opérationnelle du catalogue et de l’inventaire',
+                    eyebrow: 'ParcOto / Workshop',
+                    heroTitle: 'Centre de contrôle de l’atelier',
+                    heroDescription:
+                        'Accédez aux pièces, aux références et aux partenaires de votre chaîne d’approvisionnement.',
+                    icon: FluentIcons.repair,
+                    trailing: Tooltip(
+                      message: 'Actualiser les données',
+                      child: IconButton(
+                        icon: const Icon(FluentIcons.refresh),
+                        onPressed: isLoading ? null : _refreshCatalog,
                       ),
-                      Tooltip(
-                        message: 'Actualiser les données',
-                        child: IconButton(
-                          icon: const Icon(FluentIcons.refresh),
-                          onPressed: isLoading ? null : _refreshCatalog,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 22),
-                  Container(
-                    padding: EdgeInsets.all(compact ? 18 : 24),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          theme.color.dark,
-                          theme.color,
-                          theme.color.light,
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'PARCOTO  /  WORKSHOP',
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: .78),
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 1.5,
-                                ),
-                              ),
-                              const SizedBox(height: 9),
-                              Text(
-                                'Centre de contrôle de l’atelier',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: compact ? 18 : 23,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                'Accédez aux pièces, aux références et aux partenaires de votre chaîne d’approvisionnement.',
-                                style: TextStyle(
-                                  color: Colors.white.withValues(alpha: .88),
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (!compact) ...[
-                          const SizedBox(width: 20),
-                          Icon(
-                            FluentIcons.repair,
-                            size: 54,
-                            color: Colors.white.withValues(alpha: .9),
-                          ),
-                        ],
-                      ],
                     ),
                   ),
                   const SizedBox(height: 22),
