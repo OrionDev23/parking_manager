@@ -78,12 +78,15 @@ class MyEntrepriseState extends State<MyEntreprise> {
   }
 
   void downloadData() async {
+    final projectId = DatabaseGetter.activeProjectId;
+    if (projectId == null) return;
+
     downloading = true;
-    if (mounted) {
-      setState(() {});
-    }
+    if (mounted) setState(() {});
     try {
       final company = await companyService.getCurrent();
+      if (!DatabaseGetter.isCurrentTenant(projectId)) return;
+
       if (company != null) {
         p = Entreprise(
           id: company.id,
@@ -101,16 +104,16 @@ class MyEntrepriseState extends State<MyEntreprise> {
           directions: List<String>.from(company.directions),
           departments: List<String>.from(company.departments),
         );
-        downloadLogo();
         initValues();
+        await downloadLogo();
       }
-      setState(() {
-        downloading = false;
-      });
     } catch (e) {
-      setState(() {
+      debugPrint('[ParcOto Company] load failed: $e');
+    } finally {
+      if (DatabaseGetter.isCurrentTenant(projectId)) {
         downloading = false;
-      });
+        if (mounted) setState(() {});
+      }
     }
   }
 
@@ -201,57 +204,48 @@ class MyEntrepriseState extends State<MyEntreprise> {
   List<String> filliales = [];
 
   Future<void> downloadLogo() async {
+    final projectId = DatabaseGetter.activeProjectId;
+    final activeStorage = DatabaseGetter.storage;
+    if (projectId == null || activeStorage == null) return;
+
     downloadingLogo = true;
-    if (mounted) {
-      setState(() {});
-    }
-    String link = "";
+    if (mounted) setState(() {});
+    final link = !kIsWeb && p?.logo != null && p!.logo!.isNotEmpty
+        ? p!.logo!
+        : logoid;
 
-    if (kIsWeb) {
-    } else {
-      if (p != null && p!.logo != null && p!.logo!.isNotEmpty) {
-        link = p!.logo!;
-      } else {
-        link = logoid;
+    try {
+      if (!kIsWeb) {
+        try {
+          await FileImage(io.File(logoid)).evict();
+        } catch (_) {
+          // Cache eviction is best-effort.
+        }
       }
-      try {
-        await FileImage(io.File('mylogo.png')).evict();
-      } catch (e) {
-        //
+
+      final bytes = await activeStorage.getFileDownload(
+        bucketId: buckedId,
+        fileId: link,
+      );
+      if (!DatabaseGetter.isCurrentTenant(projectId)) return;
+
+      if (!kIsWeb) {
+        await io.File(logoid).writeAsBytes(bytes);
+        if (!DatabaseGetter.isCurrentTenant(projectId)) return;
+      }
+      logo = bytes;
+      MyEntrepriseState.logo = bytes;
+    } catch (error) {
+      if (DatabaseGetter.isCurrentTenant(projectId)) {
+        debugPrint('[ParcOto Company] logo download failed: $error');
+        logo = null;
+      }
+    } finally {
+      if (DatabaseGetter.isCurrentTenant(projectId)) {
+        downloadingLogo = false;
+        if (mounted) setState(() {});
       }
     }
-
-    await DatabaseGetter.storage!
-        .getFileDownload(bucketId: buckedId, fileId: link)
-        .then((value) async {
-          logo = value;
-          if (!kIsWeb) {
-            io.File file = io.File(logoid);
-
-            await file
-                .writeAsBytes(value)
-                .then((value) {
-                  downloadingLogo = false;
-                  if (mounted) {
-                    setState(() {});
-                  }
-                })
-                .onError((error, stackTrace) {});
-          } else {
-            MyEntrepriseState.logo = value;
-          }
-          downloadingLogo = false;
-          if (mounted) {
-            setState(() {});
-          }
-        })
-        .onError((error, stackTrace) {
-          logo = null;
-          downloadingLogo = false;
-          if (mounted) {
-            setState(() {});
-          }
-        });
   }
 
   static bool checkingFile = false;
@@ -1126,6 +1120,10 @@ class MyEntrepriseState extends State<MyEntreprise> {
           '${nom.text} ${nif.text} ${nis.text} ${rc.text} ${email.text} '
           '${telephone.text} ${adresse.text} ${descr.text} 1 $logoid ${art.text}',
     );
+    final projectId = DatabaseGetter.activeProjectId;
+    if (projectId == null) {
+      throw StateError('No active Appwrite tenant.');
+    }
     final updated = await companyService.update(
       Company(
         id: prest.id,
@@ -1144,6 +1142,9 @@ class MyEntrepriseState extends State<MyEntreprise> {
         departments: List<String>.from(prest.departments ?? const []),
       ),
     );
+    if (!DatabaseGetter.isCurrentTenant(projectId)) {
+      throw StateError('Tenant changed while saving company information.');
+    }
 
     p = Entreprise(
       id: updated.id,
@@ -1213,7 +1214,15 @@ class MyEntrepriseState extends State<MyEntreprise> {
 
   @override
   void dispose() {
-    downloading = false;
+    nom.dispose();
+    email.dispose();
+    telephone.dispose();
+    adresse.dispose();
+    nif.dispose();
+    nis.dispose();
+    descr.dispose();
+    art.dispose();
+    rc.dispose();
     imageFile = null;
     super.dispose();
   }
