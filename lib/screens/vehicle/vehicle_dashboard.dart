@@ -159,7 +159,7 @@ class VehicleDashboard extends StatelessWidget {
                 icon: FluentIcons.car,
               ),
               ModuleDashboardSectionHeader(
-                title: 'Actions courantes',
+                title: 'Gérer le parc automobile',
                 subtitle:
                     'Ouvrez directement la gestion des véhicules, documents et référentiels.',
               ),
