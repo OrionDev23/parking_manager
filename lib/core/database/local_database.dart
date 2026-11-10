@@ -155,6 +155,44 @@ class LocalDatabase {
         "INSERT INTO schema_migrations(version, applied_at) VALUES (8, datetime('now'))",
       );
     }
+
+    if (version < 9) {
+      db.execute('''CREATE TABLE IF NOT EXISTS sync_reconciliation (
+        company_id TEXT NOT NULL,
+        entity TEXT NOT NULL,
+        reconciled_at TEXT NOT NULL,
+        PRIMARY KEY (company_id, entity)
+      )''');
+      db.execute(
+        "INSERT INTO schema_migrations(version, applied_at) VALUES (9, datetime('now'))",
+      );
+    }
+  }
+
+  DateTime? readReconciliationTime({
+    required String companyId,
+    required String entity,
+  }) {
+    final rows = database.select(
+      'SELECT reconciled_at FROM sync_reconciliation WHERE company_id=? AND entity=?',
+      [companyId, entity],
+    );
+    if (rows.isEmpty) return null;
+    return DateTime.tryParse(rows.first['reconciled_at'] as String);
+  }
+
+  void saveReconciliationTime({
+    required String companyId,
+    required String entity,
+    required DateTime reconciledAt,
+  }) {
+    database.execute(
+      '''INSERT INTO sync_reconciliation(company_id, entity, reconciled_at)
+         VALUES (?, ?, ?)
+         ON CONFLICT(company_id, entity) DO UPDATE SET
+           reconciled_at=excluded.reconciled_at''',
+      [companyId, entity, reconciledAt.toUtc().toIso8601String()],
+    );
   }
 
   DateTime? readSyncCursor({
