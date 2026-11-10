@@ -494,165 +494,162 @@ class VehicleTableState extends State<VehicleTable> {
                 }
                 return DataTableParc(
                   horizontalScroll: true,
-                  header: Padding(
+                  header: Container(
+                    width: double.infinity,
                     padding: const EdgeInsets.symmetric(
-                        vertical: 5.0, horizontal: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: appTheme.backGroundColor,
+                      border: Border(
+                        bottom: BorderSide(color: Colors.grey[30]),
+                      ),
+                    ),
+                    child: Wrap(
+                      alignment: WrapAlignment.end,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 10,
+                      runSpacing: 8,
                       children: [
-                        SizedBox(
-                          width: 80.px,
-                          child: Stack(
-                            children: [
-                              Positioned.fill(
-                                child: FlyoutTarget(
-                                  controller: filterFlyout,
-                                  child: IconButton(
-                                      icon: Row(
-                                        children: [
-                                          Text(
-                                            'filter',
-                                            style: TextStyle(fontSize: 12.sp),
-                                          ).tr(),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          filtered
-                                              ? Icon(
-                                                  FluentIcons.filter_solid,
-                                                  color: appTheme.color,
-                                                )
-                                              : const Icon(FluentIcons.filter),
-                                        ],
-                                      ),
-                                      onPressed: () {
-                                        showFilters(appTheme);
-                                      }),
-                                ),
-                              ),
-                              if (filtered)
-                                Positioned(
-                                    bottom: 10,
-                                    right: 0,
-                                    child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 2, horizontal: 4),
-                                        decoration: BoxDecoration(
-                                          color: appTheme.color,
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          boxShadow: kElevationToShadow[2],
-                                        ),
-                                        child: Text(
-                                          '${filters.length}',
-                                          style: TextStyle(fontSize: 10.sp),
-                                        ))),
-                            ],
-                          ),
-                        ),
-                        smallSpace,
                         FlyoutTarget(
-                          controller: export,
-                          child: SizedBox(
-                            height: 45.px,
-                            width: 80.px,
-                            child: Button(onPressed: (){
-                              export.showFlyout(
-                                  builder: (context){
-                                return MenuFlyout(
-                                  items: [
-                                    MenuFlyoutSubItem(
-                                        text: const Text('listcomplete').tr(),
-                                    items: (BuildContext context) {
-                                        return [
-                                        MenuFlyoutItem(
-                                        text: const Text('PDF'), onPressed: showPdf),
-                                    MenuFlyoutItem(
-                                    text: const Text('EXCEL'), onPressed:
-                                    saveExcell),
-                                        ];
-                                    }),
-                                    MenuFlyoutSubItem(
-                                        text: const Text('costpervehic').tr(),
-                                        items: (BuildContext context) {
-                                          return [
-                                            MenuFlyoutItem(
-                                                text: const Text('PDF'),
-                                                onPressed: showCostPdf),
-                                            MenuFlyoutItem(
-                                                text: const Text('EXCEL'), onPressed:
-                                            saveExcelCost),
-                                          ];
-                                        }),
-
-                                  ],
-                                );
-                              });
-                            }, child: const Text
-                              ('export').tr
-                              ()),
-                          ),
-                        ),
-                        smallSpace,
-                        Flexible(
-                          child: SizedBox(
-                            width: 350.px,
-                            height: 45.px,
-                            child: TextBox(
-                              controller: searchController,
-                              placeholder: 'search'.tr(),
-                              style: appTheme.writingStyle,
-                              cursorColor: appTheme.color.darker,
-                              placeholderStyle: placeStyle,
-                              decoration: WidgetStatePropertyAll(BoxDecoration(color: appTheme.fillColor)),
-
-                              onSubmitted: (s) {
-                                if (s.isNotEmpty) {
-                                  vehicleDataSource.search(s);
-                                  if (!notEmpty) {
-                                    setState(() {
-                                      notEmpty = true;
-                                    });
-                                  }
-                                } else {
-                                  if (notEmpty) {
-                                    setState(() {
-                                      notEmpty = false;
-                                    });
-                                    vehicleDataSource.search('');
-                                  }
-                                }
-                              },
-                              onChanged: (s){
-                                if(s.isEmpty){
-                                  notEmpty=false;
-                                  vehicleDataSource.search('');
-                                }
-                                else{
-                                    notEmpty=true;
-                                }
-                                setState(() {
-                                });
-                              },
-                              suffix: notEmpty
-                                  ? IconButton(
-                                      icon: const Icon(FluentIcons.cancel),
-                                      onPressed: () {
-                                        searchController.text = "";
-                                        notEmpty = false;
-                                        setState(() {});
-                                        vehicleDataSource.search('');
-                                      })
-                                  : null,
+                          controller: filterFlyout,
+                          child: Button(
+                            onPressed: () => showFilters(appTheme),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  filtered
+                                      ? FluentIcons.filter_solid
+                                      : FluentIcons.filter,
+                                  size: 14,
+                                  color: filtered ? appTheme.color : null,
+                                ),
+                                const SizedBox(width: 7),
+                                const Text('filter').tr(),
+                                if (filtered) ...[
+                                  const SizedBox(width: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: appTheme.color,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      '${filters.length}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                           ),
                         ),
-                        bigSpace,
-                        IconButton(
-                            icon: const Icon(FluentIcons.refresh),
+                        FlyoutTarget(
+                          controller: export,
+                          child: Button(
                             onPressed: () {
-                              vehicleDataSource.refreshDatasource();
-                            }),
+                              export.showFlyout(builder: (context) {
+                                return MenuFlyout(
+                                  items: [
+                                    MenuFlyoutSubItem(
+                                      text: const Text('listcomplete').tr(),
+                                      items: (context) => [
+                                        MenuFlyoutItem(
+                                          text: const Text('PDF'),
+                                          onPressed: showPdf,
+                                        ),
+                                        MenuFlyoutItem(
+                                          text: const Text('EXCEL'),
+                                          onPressed: saveExcell,
+                                        ),
+                                      ],
+                                    ),
+                                    MenuFlyoutSubItem(
+                                      text: const Text('costpervehic').tr(),
+                                      items: (context) => [
+                                        MenuFlyoutItem(
+                                          text: const Text('PDF'),
+                                          onPressed: showCostPdf,
+                                        ),
+                                        MenuFlyoutItem(
+                                          text: const Text('EXCEL'),
+                                          onPressed: saveExcelCost,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                );
+                              });
+                            },
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(FluentIcons.download, size: 14),
+                                const SizedBox(width: 7),
+                                const Text('export').tr(),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 300,
+                          height: 38,
+                          child: TextBox(
+                            controller: searchController,
+                            placeholder: 'search'.tr(),
+                            style: appTheme.writingStyle,
+                            cursorColor: appTheme.color.darker,
+                            placeholderStyle: placeStyle,
+                            decoration: WidgetStatePropertyAll(
+                              BoxDecoration(
+                                color: appTheme.fillColor,
+                                borderRadius: BorderRadius.circular(7),
+                              ),
+                            ),
+                            onSubmitted: (s) {
+                              final query = s.trim();
+                              vehicleDataSource.search(query);
+                              setState(() {
+                                notEmpty = query.isNotEmpty;
+                              });
+                            },
+                            onChanged: (s) {
+                              if (s.isEmpty) {
+                                notEmpty = false;
+                                vehicleDataSource.search('');
+                              } else {
+                                notEmpty = true;
+                              }
+                              setState(() {});
+                            },
+                            suffix: notEmpty
+                                ? IconButton(
+                                    icon: const Icon(FluentIcons.cancel),
+                                    onPressed: () {
+                                      searchController.clear();
+                                      notEmpty = false;
+                                      vehicleDataSource.search('');
+                                      setState(() {});
+                                    },
+                                  )
+                                : const Icon(FluentIcons.search),
+                          ),
+                        ),
+                        Tooltip(
+                          message: 'Actualiser',
+                          child: IconButton(
+                            icon: const Icon(FluentIcons.refresh),
+                            onPressed: vehicleDataSource.refreshDatasource,
+                          ),
+                        ),
                       ],
                     ),
                   ),
