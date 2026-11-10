@@ -21,6 +21,7 @@ class LegacyAppwriteAuthService implements AuthService {
 
   AuthState _state = AuthState.unknown;
   AuthSession? _session;
+  Future<AuthSession?>? _restoreInFlight;
   final StreamController<AuthState> _stateController =
       StreamController<AuthState>.broadcast();
 
@@ -48,8 +49,20 @@ class LegacyAppwriteAuthService implements AuthService {
   }
 
   @override
-  Future<AuthSession?> restoreSession() async {
-    if (_state == AuthState.restoring) return _session;
+  Future<AuthSession?> restoreSession() {
+    final inFlight = _restoreInFlight;
+    if (inFlight != null) return inFlight;
+
+    final restoration = _restoreSession();
+    _restoreInFlight = restoration;
+    return restoration.whenComplete(() {
+      if (identical(_restoreInFlight, restoration)) {
+        _restoreInFlight = null;
+      }
+    });
+  }
+
+  Future<AuthSession?> _restoreSession() async {
     _setState(AuthState.restoring);
 
     final configuredProject = preferences.getString('project');
