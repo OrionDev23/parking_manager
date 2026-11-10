@@ -237,6 +237,22 @@ class SqliteSyncQueue implements SyncQueue {
   }
 
   @override
+  Future<bool> hasUnresolvedMutation({
+    required String companyId,
+    required String entity,
+    required String entityId,
+  }) async {
+    final rows = _db.select(
+      """SELECT 1 FROM sync_operations
+         WHERE company_id=? AND entity=? AND entity_id=?
+           AND status IN ('pending','processing','failed','conflict')
+         LIMIT 1""",
+      [companyId, entity, entityId],
+    );
+    return rows.isNotEmpty;
+  }
+
+  @override
   Future<void> retryConflict(String operationId) async {
     _db.execute('BEGIN IMMEDIATE');
     try {
