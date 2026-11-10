@@ -9,6 +9,7 @@ import 'sync_operation.dart';
 import 'sync_queue.dart';
 
 typedef SyncOperationHandler = Future<void> Function(SyncOperation operation);
+typedef SyncPullHandler = Future<void> Function();
 
 /// Drains the local SQLite outbox while an internet connection is available.
 /// A SQLite lease prevents independent engine instances from draining the same
@@ -20,6 +21,7 @@ class AppwriteSyncEngine implements SyncEngine {
   final SyncQueue queue;
   final String companyId;
   final Map<String, SyncOperationHandler> handlers;
+  final Map<String, SyncPullHandler> pullHandlers;
   final InternetConnection _connection;
   late final String _ownerId =
       '${DateTime.now().microsecondsSinceEpoch}-${identityHashCode(this)}';
@@ -36,6 +38,7 @@ class AppwriteSyncEngine implements SyncEngine {
     required this.queue,
     required this.companyId,
     required this.handlers,
+    this.pullHandlers = const {},
     InternetConnection? connection,
   }) : _connection = connection ?? InternetConnection();
 
@@ -182,6 +185,19 @@ class AppwriteSyncEngine implements SyncEngine {
           debugPrint('[ParcOto Sync] ERROR entity=${operation.entity} op=${operation.type.name} id=${operation.entityId}: $error\n$stackTrace');
           await queue.markFailed(operation.id);
           blockedRecords.add(recordKey);
+        }
+      }
+
+      // Pull only after the outbound queue has been drained. This ordering
+      // prevents a remote snapshot from overwriting an acknowledged local edit.
+      if (_running && !_leaseLost && blockedRecords.isEmpty) {
+        for (final entry in pullHandlers.entries) {
+          if (!_running || _leaseLost) break;
+          try {
+            await entry.value();
+          } catch (error, stackTrace) {
+            debugPrint('[ParcOto Sync] pull failed for ${entry.key}: $error\n$stackTrace');
+          }
         }
       }
     } catch (error, stackTrace) {
