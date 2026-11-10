@@ -223,13 +223,13 @@ class _DashboardState extends State<Dashboard>
         label: 'reparations'.tr(),
         detail: countDetail(repairCount, 'intervention', 'interventions'),
         icon: FluentIcons.repair,
-        onPressed: () => PaneItemsAndFooters.selectPane('reparations'),
+        onPressed: () => PaneItemsAndFooters.selectPane('repairs'),
       ),
       ModuleDashboardAction(
         label: 'prestataires'.tr(),
         detail: countDetail(providerCount, 'prestataire', 'prestataires'),
         icon: FluentIcons.service_activity,
-        onPressed: () => PaneItemsAndFooters.selectPane('prestataires'),
+        onPressed: () => PaneItemsAndFooters.selectPane('repair-providers'),
       ),
       ModuleDashboardAction(
         label: 'chauffeurs'.tr(),
