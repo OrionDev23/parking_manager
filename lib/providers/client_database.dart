@@ -68,15 +68,20 @@ class DatabaseGetter {
       generation == _projectGeneration && _configuredProjectId == projectId;
 
   static String? get activeProjectId => _configuredProjectId;
+  static int get tenantRevision => _projectGeneration;
 
   static bool isCurrentTenant(String projectId) =>
       _isCurrentProject(_projectGeneration, projectId);
+
+  static bool isCurrentTenantRevision(String projectId, int revision) =>
+      _isCurrentProject(revision, projectId);
 
   /// Invalidates asynchronous work even when the next session uses the same
   /// Appwrite project. This is required for logout/login in one tenant.
   static void invalidatePendingRequests() {
     _projectGeneration++;
     gettingUser = false;
+    settingSecretKey = false;
     MyEntrepriseState.downloading = false;
   }
 
@@ -159,36 +164,53 @@ class DatabaseGetter {
   static en.Encrypter? encrypter;
   static en.IV? iv;
   Future<void> setSecretKey() async {
-    if (!settingSecretKey && !secretKeySet) {
-      settingSecretKey = true;
-      await database!
-          .getRow(databaseId: databaseId, tableId: adminID, rowId: 'admin')
-          .then((value) async {
-            secretKey = value.data['key'];
-            secretKeySet = true;
+    final projectId = _configuredProjectId;
+    final activeDatabase = database;
+    if (projectId == null ||
+        activeDatabase == null ||
+        settingSecretKey ||
+        secretKeySet) {
+      return;
+    }
 
-            await database!
-                .getRow(
-                  databaseId: databaseId,
-                  tableId: adminID,
-                  rowId: 'cryptkey',
-                )
-                .then((value) {
-                  String s = value.data['key'];
+    final generation = _projectGeneration;
+    settingSecretKey = true;
+    try {
+      final adminRow = await activeDatabase.getRow(
+        databaseId: databaseId,
+        tableId: adminID,
+        rowId: 'admin',
+      );
+      if (!_isCurrentProject(generation, projectId)) return;
+      final loadedSecret = adminRow.data['key'] as String?;
+      if (loadedSecret == null) return;
 
-                  if (s.length < 32) {
-                    for (int i = 0; i < (32 - value.data['key'].length); i++) {
-                      s = '${s}p';
-                    }
-                  } else {
-                    s = s.substring(0, 32);
-                  }
-                  final key = en.Key.fromUtf8(s);
-                  iv = en.IV.fromUtf8(s.substring(0, 16));
-                  encrypter = en.Encrypter(en.AES(key));
-                });
-          })
-          .onError((error, stackTrace) {});
+      final cryptoRow = await activeDatabase.getRow(
+        databaseId: databaseId,
+        tableId: adminID,
+        rowId: 'cryptkey',
+      );
+      if (!_isCurrentProject(generation, projectId)) return;
+
+      String value = cryptoRow.data['key'] as String;
+      if (value.length < 32) {
+        value = value.padRight(32, 'p');
+      } else {
+        value = value.substring(0, 32);
+      }
+      secretKey = loadedSecret;
+      secretKeySet = true;
+      final key = en.Key.fromUtf8(value);
+      iv = en.IV.fromUtf8(value.substring(0, 16));
+      encrypter = en.Encrypter(en.AES(key));
+    } catch (error) {
+      if (_isCurrentProject(generation, projectId) && kDebugMode) {
+        debugPrint('Unable to load Appwrite encryption keys: $error');
+      }
+    } finally {
+      if (_isCurrentProject(generation, projectId)) {
+        settingSecretKey = false;
+      }
     }
   }
 
