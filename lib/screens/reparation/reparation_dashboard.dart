@@ -6,7 +6,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../theme.dart';
 import '../../widgets/button_container.dart';
-import '../../widgets/page_header.dart';
+import '../../widgets/module_dashboard_header.dart';
 import '../logs/logging/log_table.dart';
 import '../prestataire/prestataire_form.dart';
 import '../prestataire/prestataire_tabs.dart';
@@ -22,11 +22,21 @@ class ReparationDashboard extends StatelessWidget {
     var appTheme = context.watch<AppTheme>();
     bool portrait = Device.orientation == Orientation.portrait;
     return ScaffoldPage(
-      padding: const EdgeInsets.all(10),
-      header: PageTitle(text: 'reparations'.tr()),
+      padding: EdgeInsets.zero,
       content: ListView(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
         children: [
+          ModuleDashboardHeader(
+            title: 'reparations'.tr(),
+            subtitle:
+                'Suivez les interventions, les réceptions et les prestataires.',
+            eyebrow: 'Maintenance / Operations',
+            heroTitle: 'Pilotage des réparations',
+            heroDescription:
+                'Centralisez les ordres de réparation, les fiches de réception et le suivi des intervenants.',
+            icon: FluentIcons.repair,
+          ),
+          const SizedBox(height: 26),
           StaggeredGrid.count(
             crossAxisCount: portrait ? 2 : 4,
             mainAxisSpacing: 5,
