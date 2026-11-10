@@ -108,16 +108,16 @@ class LegacyStockSyncService {
           ) ??
           DateTime.fromMillisecondsSinceEpoch(0, isUtc: true);
       final since = cursor.subtract(const Duration(seconds: 5));
-      var offset = 0;
+      String? lastId;
       while (true) {
         final page = await database.listRows(
           databaseId: legacy.databaseId,
           tableId: tableId,
           queries: [
             Query.greaterThan(r'$updatedAt', since.toIso8601String()),
-            Query.orderAsc(r'$updatedAt'),
+            Query.orderAsc(r'$id'),
+            if (lastId != null) Query.cursorAfter(lastId),
             Query.limit(100),
-            Query.offset(offset),
           ],
         );
         if (page.rows.isEmpty) break;
@@ -141,7 +141,7 @@ class LegacyStockSyncService {
           );
           imported++;
         }
-        offset += page.rows.length;
+        lastId = page.rows.last.$id;
         if (page.rows.length < 100) break;
       }
       localDatabase.saveSyncCursor(
@@ -179,20 +179,20 @@ class LegacyStockSyncService {
       final result = <String, Set<String>>{};
       for (final entry in tableByEntity.entries) {
         final ids = <String>{};
-        var offset = 0;
+        String? lastId;
         while (true) {
           final page = await database.listRows(
             databaseId: legacy.databaseId,
             tableId: entry.value,
             queries: [
               Query.orderAsc(r'$id'),
+              if (lastId != null) Query.cursorAfter(lastId),
               Query.limit(100),
-              Query.offset(offset),
             ],
           );
           ids.addAll(page.rows.map((row) => row.$id));
-          if (page.rows.length < 100) break;
-          offset += page.rows.length;
+          if (page.rows.isEmpty || page.rows.length < 100) break;
+          lastId = page.rows.last.$id;
         }
         result[entry.key] = ids;
       }
