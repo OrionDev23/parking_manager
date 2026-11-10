@@ -63,7 +63,7 @@ class LogTableState extends State<LogTable> {
       sortColumn: sortColumn,
       selectC: widget.selectD,
       fieldsToShow: widget.fieldsToShow,
-      filters: widget.filters,
+      filters: filters,
     );
     initColumns();
     super.initState();
@@ -309,7 +309,7 @@ class LogTableState extends State<LogTable> {
       sortAscending: assending,
       sortColumnIndex: sortColumn,
       columns: columns,
-      source: logDatasource..filter(filters),
+      source: logDatasource,
       hidePaginator: !widget.pages,
     );
   }
