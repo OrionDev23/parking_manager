@@ -54,15 +54,11 @@ class _DataTableParcState extends State<DataTableParc> {
     // Fluent's inherited brightness or introducing a separate table palette.
     final isDark = appTheme.mode == ThemeMode.dark;
     final accent = appTheme.color;
-    final surfaceColor = appTheme.backGroundColor;
+    final surfaceColor = appTheme.surfaceColor;
     final primaryText = appTheme.writingStyle.color ??
         (isDark ? Colors.white : Colors.black);
-    final secondaryText = isDark
-        ? const Color(0xFFBFC3CC)
-        : const Color(0xFF555D6B);
-    final borderColor = isDark
-        ? const Color(0xFF383A42)
-        : const Color(0xFFE5E7EB);
+    final secondaryText = appTheme.mutedTextColor;
+    final borderColor = appTheme.borderColor;
 
     // data_table_2 is a Material widget inside a Fluent application. Without
     // an explicit Material theme it falls back to Flutter's default light
