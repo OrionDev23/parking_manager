@@ -22,6 +22,7 @@ import '../../providers/counters.dart';
 import '../../theme.dart';
 import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
+import '../../widgets/module_dashboard_section_header.dart';
 import '../sidemenu/pane_items.dart';
 import 'charts/state_bars.dart';
 import 'charts/costs_graph.dart';
@@ -91,9 +92,31 @@ class _DashboardState extends State<Dashboard>
                       ),
                     ),
                   ),
-                  const SizedBox(height: 26),
-                  Text(
-                    'Statistiques et activité',
+                  ModuleDashboardSectionHeader(
+                    title: 'Actions courantes',
+                    subtitle: 'Accédez directement aux fonctions les plus utilisées.',
+                  ),
+                                    Text(
+                                      'Accès rapides',
+                                      style: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w700,
+                                        color: appTheme.writingStyle.color,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Wrap(
+                                      spacing: 12,
+                                      runSpacing: 12,
+                                      children: buttonList(),
+                                    ),
+                  const SizedBox(height: 24),
+                  ModuleDashboardSectionHeader(
+                    title: 'Indicateurs de votre activité',
+                    subtitle: 'Une vue synthétique de la flotte, des opérations et des mouvements récents.',
+                  ),
+                  const SizedBox(height: 8),
+
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w700,
@@ -108,20 +131,7 @@ class _DashboardState extends State<Dashboard>
                     children: widgetList(appTheme),
                   ),
                   const SizedBox(height: 28),
-                  Text(
-                    'Accès rapides',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                      color: appTheme.writingStyle.color,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: buttonList(),
-                  ),
+
                 ],
               );
             },
