@@ -10,13 +10,9 @@ import 'package:parc_oto/providers/log_provider.dart';
 import 'package:parc_oto/providers/planning_provider.dart';
 import 'package:parc_oto/providers/repair_provider.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
-import 'package:parc_oto/screens/chauffeur/manager/chauffeur_form.dart';
-import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
 import 'package:parc_oto/screens/dashboard/charts/state_category_bar.dart';
 import 'package:parc_oto/screens/entreprise/entreprise.dart';
 import 'package:parc_oto/screens/logs/logging/log_table.dart';
-import 'package:parc_oto/screens/reparation/fiche_reception/form/fiche_reception_form.dart';
-import 'package:parc_oto/screens/reparation/fiche_reception/manager/fiche_reception_tabs.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -27,15 +23,7 @@ import '../../providers/counters.dart';
 import '../../theme.dart';
 import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
-import '../chauffeur/document/chauf_document_form.dart';
-import '../chauffeur/document/chauf_document_tabs.dart';
-import '../prestataire/prestataire_form.dart';
-import '../prestataire/prestataire_tabs.dart';
 import '../sidemenu/pane_items.dart';
-import '../vehicle/documents/document_form.dart';
-import '../vehicle/documents/document_tabs.dart';
-import '../vehicle/manager/vehicle_form.dart';
-import '../vehicle/manager/vehicle_tabs.dart';
 import 'charts/state_bars.dart';
 import 'charts/costs_graph.dart';
 import 'table_stats.dart';
@@ -133,14 +121,7 @@ class _DashboardState extends State<Dashboard>
                   Wrap(
                     spacing: 12,
                     runSpacing: 12,
-                    children: buttonList(
-                      appTheme,
-                      vehicles,
-                      drivers,
-                      logs,
-                      plannings,
-                      repairs,
-                    ),
+                    children: buttonList(),
                   ),
                 ],
               );
@@ -170,14 +151,7 @@ class _DashboardState extends State<Dashboard>
     setState(() {});
   }
 
-  List<Widget> buttonList(
-    AppTheme appTheme,
-    VehicleProvider vehicles,
-    DriverProvider drivers,
-    LogProvider logs,
-    PlanningProvider plannings,
-    RepairProvider repairs,
-  ) {
+  List<Widget> buttonList() {
     final vehicleCount = VehicleProvider.downloadedVehicles
         ? VehicleProvider.vehicles.length
         : null;
