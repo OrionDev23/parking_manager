@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 import '../../providers/parts_provider.dart';
 import '../../theme.dart';
@@ -15,6 +16,7 @@ class WorkshopDashboard extends StatefulWidget {
 
 class _WorkshopDashboardState extends State<WorkshopDashboard> {
   late final PartsProvider _partsProvider;
+  bool? _hasInternet;
 
   @override
   void initState() {
@@ -24,6 +26,12 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
   }
 
   Future<void> _refreshCatalog() async {
+    try {
+      final hasInternet = await InternetConnection().hasInternetAccess;
+      if (mounted) setState(() => _hasInternet = hasInternet);
+    } catch (_) {
+      if (mounted) setState(() => _hasInternet = null);
+    }
     await Future.wait([
       _partsProvider.downloadAllParts(),
       _partsProvider.downloadAllCategories(),
@@ -51,12 +59,7 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
             PartsProvider.downloadingBrands ||
             PartsProvider.downloadingOptions ||
             PartsProvider.downloadingFournisseurs;
-        final hasError =
-            PartsProvider.errorParts ||
-            PartsProvider.errorCategories ||
-            PartsProvider.errorBrands ||
-            PartsProvider.errorOptions ||
-            PartsProvider.errorFournisseurs;
+        final hasError = PartsProvider.refreshErrors.isNotEmpty;
 
         return ScaffoldPage(
           padding: EdgeInsets.zero,
@@ -147,9 +150,30 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                   ] else if (hasError) ...[
                     const SizedBox(height: 14),
                     InfoBar(
-                      title: const Text('Certaines données sont indisponibles'),
-                      content: const Text(
-                        'Les éléments déjà présents localement restent affichés. Vérifiez la connexion puis actualisez.',
+                      title: Text(
+                        _hasInternet == false
+                            ? 'Connexion Internet indisponible'
+                            : 'Échec de synchronisation avec Appwrite',
+                      ),
+                      content: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Les données locales sont conservées. Le détail des chargements en échec :',
+                          ),
+                          const SizedBox(height: 6),
+                          ...PartsProvider.refreshErrors.entries.map(
+                            (entry) => Padding(
+                              padding: const EdgeInsets.only(bottom: 3),
+                              child: Text(
+                                '${entry.key} : ${entry.value}',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       severity: InfoBarSeverity.warning,
                     ),
