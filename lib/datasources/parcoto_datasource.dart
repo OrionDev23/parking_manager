@@ -37,6 +37,31 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
   late final ParcOtoWebService repo;
   bool _localCacheLoaded = false;
 
+  // AsyncPaginatedDataTable2 notifies its source after getRows completes.
+  // Keep the ChangeNotifier alive until that final notification has run.
+  int _activeRowsRequests = 0;
+  bool _disposeRequested = false;
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    if (_disposeRequested || _disposed) return;
+    _disposeRequested = true;
+    _disposeWhenIdle();
+  }
+
+  void _disposeWhenIdle() {
+    if (!_disposeRequested || _activeRowsRequests > 0 || _disposed) return;
+
+    // A zero-duration future runs after pending microtasks, including the
+    // table package's continuation that calls notifyListeners().
+    Future<void>.delayed(Duration.zero, () {
+      if (!_disposeRequested || _activeRowsRequests > 0 || _disposed) return;
+      _disposed = true;
+      super.dispose();
+    });
+  }
+
   String? get _cacheEntity {
     switch (collectionID) {
       case clientsID:
@@ -185,102 +210,109 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
 
   @override
   Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
-    bool portrait = MediaQuery.of(current).orientation == Orientation.portrait;
-    if (portrait != lastPortrait) {
-      rowTextStyle = TextStyle(fontSize: portrait ? 13.sp : 10.sp);
-      lastPortrait = portrait;
-    }
-    if (errorCounter != null) {
-      errorCounter = errorCounter! + 1;
-
-      if (errorCounter! % 2 == 1) {
-        await Future.delayed(const Duration(milliseconds: 500));
-        throw 'Error #${((errorCounter! - 1) / 2).round() + 1} has occured';
+    _activeRowsRequests++;
+    try {
+      bool portrait = MediaQuery.of(current).orientation == Orientation.portrait;
+      if (portrait != lastPortrait) {
+        rowTextStyle = TextStyle(fontSize: portrait ? 13.sp : 10.sp);
+        lastPortrait = portrait;
       }
-    }
+      if (errorCounter != null) {
+        errorCounter = errorCounter! + 1;
 
-    assert(startIndex >= 0);
-
-    // Populate from SQLite before attempting the remote page.
-    _loadLocalCache();
-
-    // List returned will be empty is there're fewer items than startingAt
-    var x = empty
-        ? await Future.delayed(
-            const Duration(milliseconds: 1000),
-            () => ParcOtoWebServiceResponse<T>(0, []),
-          )
-        : await repo.getData(
-            startIndex,
-            count,
-            sortColumn,
-            sortAscending,
-            searchKey: searchKey,
-            filters: filters,
-          );
-    var visibleData = List<MapEntry<String, T>>.from(x.data);
-    var totalRecords = x.totalRecords;
-
-    final entity = _cacheEntity;
-    if (entity != null &&
-        LegacyStockSyncService.tableByEntity.containsKey(entity)) {
-      final pendingOperations = await vehicleServices.syncQueue.pending(
-        limit: 5000,
-        companyId: vehicleServices.companyId,
-      );
-      for (final operation in pendingOperations) {
-        if (operation.entity != entity) continue;
-        final existingIndex = visibleData.indexWhere(
-          (entry) => entry.key == operation.entityId,
-        );
-        switch (operation.type) {
-          case SyncOperationType.delete:
-            if (existingIndex >= 0) {
-              visibleData.removeAt(existingIndex);
-              totalRecords = totalRecords > 0 ? totalRecords - 1 : 0;
-            }
-            break;
-          case SyncOperationType.create:
-          case SyncOperationType.update:
-            try {
-              final payload = <String, dynamic>{
-                ...operation.payload,
-                r'$id': operation.entityId,
-              };
-              final localValue = repo.fromJsonFunction(payload);
-              if (existingIndex >= 0) {
-                visibleData[existingIndex] = MapEntry(
-                  operation.entityId,
-                  localValue,
-                );
-              } else if (operation.type == SyncOperationType.create &&
-                  startIndex == 0 &&
-                  (searchKey == null || searchKey!.isEmpty) &&
-                  (filters == null || filters!.isEmpty)) {
-                visibleData.add(MapEntry(operation.entityId, localValue));
-                totalRecords++;
-              }
-            } catch (error) {
-              debugPrint('[ParcOto] pending $entity row ignored: $error');
-            }
-            break;
+        if (errorCounter! % 2 == 1) {
+          await Future.delayed(const Duration(milliseconds: 500));
+          throw 'Error #${((errorCounter! - 1) / 2).round() + 1} has occured';
         }
       }
-      if (visibleData.length > count) {
-        visibleData = visibleData.take(count).toList();
+
+      assert(startIndex >= 0);
+
+      // Populate from SQLite before attempting the remote page.
+      _loadLocalCache();
+
+      // List returned will be empty is there're fewer items than startingAt
+      var x = empty
+          ? await Future.delayed(
+              const Duration(milliseconds: 1000),
+              () => ParcOtoWebServiceResponse<T>(0, []),
+            )
+          : await repo.getData(
+              startIndex,
+              count,
+              sortColumn,
+              sortAscending,
+              searchKey: searchKey,
+              filters: filters,
+            );
+      var visibleData = List<MapEntry<String, T>>.from(x.data);
+      var totalRecords = x.totalRecords;
+
+      final entity = _cacheEntity;
+      if (entity != null &&
+          LegacyStockSyncService.tableByEntity.containsKey(entity)) {
+        final pendingOperations = await vehicleServices.syncQueue.pending(
+          limit: 5000,
+          companyId: vehicleServices.companyId,
+        );
+        for (final operation in pendingOperations) {
+          if (operation.entity != entity) continue;
+          final existingIndex = visibleData.indexWhere(
+            (entry) => entry.key == operation.entityId,
+          );
+          switch (operation.type) {
+            case SyncOperationType.delete:
+              if (existingIndex >= 0) {
+                visibleData.removeAt(existingIndex);
+                totalRecords = totalRecords > 0 ? totalRecords - 1 : 0;
+              }
+              break;
+            case SyncOperationType.create:
+            case SyncOperationType.update:
+              try {
+                final payload = <String, dynamic>{
+                  ...operation.payload,
+                  r'$id': operation.entityId,
+                };
+                final localValue = repo.fromJsonFunction(payload);
+                if (existingIndex >= 0) {
+                  visibleData[existingIndex] = MapEntry(
+                    operation.entityId,
+                    localValue,
+                  );
+                } else if (operation.type == SyncOperationType.create &&
+                    startIndex == 0 &&
+                    (searchKey == null || searchKey!.isEmpty) &&
+                    (filters == null || filters!.isEmpty)) {
+                  visibleData.add(MapEntry(operation.entityId, localValue));
+                  totalRecords++;
+                }
+              } catch (error) {
+                debugPrint('[ParcOto] pending $entity row ignored: $error');
+              }
+              break;
+          }
+        }
+        if (visibleData.length > count) {
+          visibleData = visibleData.take(count).toList();
+        }
       }
+
+      _persistRows(visibleData.cast<MapEntry<String, dynamic>>());
+
+      final r = AsyncRowsResponse(
+        totalRecords,
+        visibleData.map((element) {
+          return rowDisplay(startIndex, count, element);
+        }).toList(),
+      );
+
+      return r;
+    
+    } finally {
+      _activeRowsRequests--;
+      _disposeWhenIdle();
     }
-
-    _persistRows(visibleData.cast<MapEntry<String, dynamic>>());
-
-    final r = AsyncRowsResponse(
-      totalRecords,
-      visibleData.map((element) {
-        return rowDisplay(startIndex, count, element);
-      }).toList(),
-    );
-
-    return r;
   }
 
   void longPressing(MapEntry<String, T> element) {}
