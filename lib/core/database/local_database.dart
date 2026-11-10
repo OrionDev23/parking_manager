@@ -124,6 +124,24 @@ class LocalDatabase {
         "INSERT INTO schema_migrations(version, applied_at) VALUES (6, datetime('now'))",
       );
     }
+
+    if (version < 7) {
+      db.execute('''CREATE TABLE IF NOT EXISTS sync_conflict_resolutions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        operation_id TEXT NOT NULL,
+        company_id TEXT NOT NULL,
+        entity TEXT NOT NULL,
+        entity_id TEXT NOT NULL,
+        resolution TEXT NOT NULL,
+        resolved_at TEXT NOT NULL
+      )''');
+      db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_sync_conflict_resolutions_company ON sync_conflict_resolutions(company_id, resolved_at)',
+      );
+      db.execute(
+        "INSERT INTO schema_migrations(version, applied_at) VALUES (7, datetime('now'))",
+      );
+    }
   }
 
   List<Map<String, dynamic>> readLegacyCache({
