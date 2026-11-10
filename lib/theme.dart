@@ -502,7 +502,7 @@ class AppTheme extends ChangeNotifier {
 
   void changeDecorations() {
     if (gts) {
-      final p = palette;
+      final p = definition;
       final isDark = mode == ThemeMode.dark;
       _color = _accentFromColor(p.accent);
       backGroundColor = isDark ? p.darkBackground : p.lightBackground;
