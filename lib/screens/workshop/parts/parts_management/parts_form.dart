@@ -310,14 +310,6 @@ class _PartsFormState extends State<PartsForm>
                         selectedFournisseur = pickedSupplier;
                         _supplierTouched = true;
                       }
-                      if (pickedBrand != null) {
-                        selectedBrand = pickedBrand;
-                        _brandTouched = true;
-                      }
-                      if (pickedCategory != null) {
-                        selectedCategory = pickedCategory;
-                        _categoryTouched = true;
-                      }
                       setState(() {});
                     }),
               ),
@@ -470,6 +462,10 @@ class _PartsFormState extends State<PartsForm>
                               ],
                             );
                           });
+                      if (pickedBrand != null) {
+                        selectedBrand = pickedBrand;
+                        _brandTouched = true;
+                      }
                       setState(() {});
                     }),
               ),
@@ -515,6 +511,10 @@ class _PartsFormState extends State<PartsForm>
                               ],
                             );
                           });
+                      if (pickedCategory != null) {
+                        selectedCategory = pickedCategory;
+                        _categoryTouched = true;
+                      }
                       setState(() {});
                     }),
               ),
