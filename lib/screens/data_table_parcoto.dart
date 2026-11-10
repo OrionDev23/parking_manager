@@ -83,7 +83,6 @@ class _DataTableParcState extends State<DataTableParc> {
             headingRowHeight: 48,
             minWidth: widget.horizontalScroll ? 2000.px : null,
             isHorizontalScrollBarVisible: widget.horizontalScroll,
-            dataRowColor: WidgetStatePropertyAll(surfaceColor),
             headingRowDecoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
