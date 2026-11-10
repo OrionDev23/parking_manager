@@ -9,10 +9,10 @@ import '../../providers/counters.dart';
 import '../../theme.dart';
 import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
+import '../../widgets/module_dashboard_panel.dart';
 import '../dashboard/charts/pie_chart.dart';
 import '../logs/logging/log_table.dart';
 import '../sidemenu/pane_items.dart';
-import '../sidemenu/sidemenu.dart';
 import 'document/chauf_document_form.dart';
 import 'document/chauf_document_tabs.dart';
 import 'manager/chauffeur_form.dart';
@@ -20,8 +20,6 @@ import 'manager/chauffeur_tabs.dart';
 
 class ConducteurDashboard extends StatelessWidget {
   const ConducteurDashboard({super.key});
-
-  final int indexAdition = 6;
 
   @override
   Widget build(BuildContext context) {
@@ -55,45 +53,29 @@ class ConducteurDashboard extends StatelessWidget {
           const SizedBox(height: 12),
           StaggeredGrid.count(
             crossAxisCount: portrait ? 1 : 2,
-            mainAxisSpacing: 5,
-            crossAxisSpacing: 5,
+            mainAxisSpacing: 14,
+            crossAxisSpacing: 14,
             children: [
               StaggeredGridTile.fit(
                 crossAxisCellCount: 1,
-                child: SizedBox(
+                child: ModuleDashboardPanel(
+                  title: 'Activité récente',
                   height: height,
-                  child: Column(
-                    children: [
-                      Text(
-                        'lactivities',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: appTheme.writingStyle.color,
-                        ),
-                      ).tr(),
-                      smallSpace,
-                      const Flexible(
-                        child: LogTable(
-                          statTable: true,
-                          pages: false,
-                          numberOfRows: 3,
-                          filters: {'typemin': '16', 'typemax': '25'},
-                          fieldsToShow: ['act', 'date'],
-                        ),
-                      ),
-                    ],
+                  child: const LogTable(
+                    statTable: true,
+                    pages: false,
+                    numberOfRows: 3,
+                    filters: {'typemin': '16', 'typemax': '25'},
+                    fieldsToShow: ['act', 'date'],
                   ),
                 ),
               ),
-              smallSpace,
               StaggeredGridTile.fit(
                 crossAxisCellCount: 1,
-                child: Container(
-                  padding: const EdgeInsets.all(10),
+                child: ModuleDashboardPanel(
+                  title: 'Disponibilité',
                   height: height,
                   child: ParcOtoPie(
-                    title: 'disponibilite'.tr(),
                     labels: [
                       MapEntry(
                         'disponible',
