@@ -33,7 +33,8 @@ class ZoneBox extends StatelessWidget {
             top: 15,
             child: Container(
               decoration: BoxDecoration(
-                border: Border.all(color: appTheme.fillColor),
+                border: Border.all(color: appTheme.borderColor),
+                borderRadius: BorderRadius.circular(appTheme.controlRadius),
               ),
               child: child,
             ),
@@ -44,7 +45,7 @@ class ZoneBox extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(2),
               color: backGroundColor ?? appTheme.backGroundColor,
-              child: Text(label, style: placeStyle),
+              child: Text(label, style: appTheme.writingStyle.copyWith(fontSize: 12, fontWeight: FontWeight.w600)),
             ),
           ),
           if (trailing != null)
