@@ -19,11 +19,17 @@ class RepairProvider extends ChangeNotifier {
   static bool downloadingReparations = false;
   static bool downloadedPrestataires = false;
   static bool downloadingPrestataires = false;
+  static int _cacheGeneration = 0;
+
+  static bool _isCurrentCompany(String companyId, int generation) =>
+      vehicleServices.companyId == companyId && _cacheGeneration == generation;
+
   static String? _cacheCompanyId;
 
   static void _ensureCompanyCache() {
     final companyId = vehicleServices.companyId;
     if (_cacheCompanyId == companyId) return;
+    _cacheGeneration++;
     reparations.clear();
     prestataires.clear();
     repPerVeh.clear();
@@ -62,107 +68,81 @@ class RepairProvider extends ChangeNotifier {
 
   Future<void> refreshReparations() async {
     if (downloadingReparations) return;
+    final companyId = vehicleServices.companyId;
+    final generation = _cacheGeneration;
     downloadingReparations = true;
     try {
       final cached = _readCached('repair');
+      if (!_isCurrentCompany(companyId, generation)) return;
+      final cachedItems = <String, Reparation>{};
       for (final payload in cached) {
-        try {
-          final item = Reparation.fromJson(payload);
-          reparations[item.id] = item;
-        } catch (error) {
-          debugPrint('[ParcOto Repairs] invalid cached repair ignored: $error');
-        }
+        try { final item = Reparation.fromJson(payload); cachedItems[item.id] = item; }
+        catch (error) { debugPrint('[ParcOto Repairs] invalid cached repair ignored: $error'); }
       }
-      if (reparations.isNotEmpty) {
-        downloadedReparations = true;
-        notifyListeners();
-      }
-
+      reparations..clear()..addAll(cachedItems);
+      if (reparations.isNotEmpty) notifyListeners();
       final database = DatabaseGetter.database;
       if (database == null) throw StateError('Appwrite database unavailable');
-      final value = await database.listRows(
-        databaseId: databaseId,
-        tableId: reparationId,
-        queries: [Query.limit(5000)],
-      );
+      final value = await database.listRows(databaseId: databaseId, tableId: reparationId, queries: [Query.limit(5000)]);
+      if (!_isCurrentCompany(companyId, generation)) return;
       final refreshed = <String, Reparation>{};
       for (final row in value.rows) {
         final payload = _rowPayload(row);
         try {
-          final item = Reparation.fromJson(payload);
-          refreshed[item.id] = item;
-          vehicleServices.localDatabase.cacheLegacyRow(
-            companyId: vehicleServices.companyId,
-            entity: 'repair',
-            entityId: row.$id,
-            payload: payload,
-          );
-        } catch (error) {
-          debugPrint('[ParcOto Repairs] remote row ignored: $error');
-        }
+          final item = Reparation.fromJson(payload); refreshed[item.id] = item;
+          vehicleServices.localDatabase.cacheLegacyRow(companyId: companyId, entity: 'repair', entityId: row.$id, payload: payload);
+        } catch (error) { debugPrint('[ParcOto Repairs] remote row ignored: $error'); }
       }
-      reparations = refreshed;
+      if (!_isCurrentCompany(companyId, generation)) return;
+      reparations..clear()..addAll(refreshed);
       downloadedReparations = true;
     } catch (error) {
-      downloadedReparations = reparations.isNotEmpty;
-      debugPrint('[ParcOto Repairs] refresh failed: $error');
+      if (_isCurrentCompany(companyId, generation)) {
+        downloadedReparations = reparations.isNotEmpty;
+        debugPrint('[ParcOto Repairs] refresh failed: $error');
+      }
     } finally {
-      downloadingReparations = false;
-      notifyListeners();
+      if (_isCurrentCompany(companyId, generation)) { downloadingReparations = false; notifyListeners(); }
     }
   }
 
   Future<void> refreshPrestataires() async {
     if (downloadingPrestataires) return;
+    final companyId = vehicleServices.companyId;
+    final generation = _cacheGeneration;
     downloadingPrestataires = true;
     try {
-      for (final payload in _readCached('provider')) {
-        try {
-          final item = Client.fromJson(payload);
-          prestataires[item.id] = item;
-        } catch (error) {
-          debugPrint(
-            '[ParcOto Providers] invalid cached provider ignored: $error',
-          );
-        }
+      final cached = _readCached('provider');
+      if (!_isCurrentCompany(companyId, generation)) return;
+      final cachedItems = <String, Client>{};
+      for (final payload in cached) {
+        try { final item = Client.fromJson(payload); cachedItems[item.id] = item; }
+        catch (error) { debugPrint('[ParcOto Providers] invalid cached provider ignored: $error'); }
       }
-      if (prestataires.isNotEmpty) {
-        downloadedPrestataires = true;
-        notifyListeners();
-      }
-
+      prestataires..clear()..addAll(cachedItems);
+      if (prestataires.isNotEmpty) notifyListeners();
       final database = DatabaseGetter.database;
       if (database == null) throw StateError('Appwrite database unavailable');
-      // Providers live in prestataire, not in the reparation table.
-      final value = await database.listRows(
-        databaseId: databaseId,
-        tableId: prestataireId,
-        queries: [Query.limit(5000)],
-      );
+      final value = await database.listRows(databaseId: databaseId, tableId: prestataireId, queries: [Query.limit(5000)]);
+      if (!_isCurrentCompany(companyId, generation)) return;
       final refreshed = <String, Client>{};
       for (final row in value.rows) {
         final payload = _rowPayload(row);
         try {
-          final item = Client.fromJson(payload);
-          refreshed[item.id] = item;
-          vehicleServices.localDatabase.cacheLegacyRow(
-            companyId: vehicleServices.companyId,
-            entity: 'provider',
-            entityId: row.$id,
-            payload: payload,
-          );
-        } catch (error) {
-          debugPrint('[ParcOto Providers] remote row ignored: $error');
-        }
+          final item = Client.fromJson(payload); refreshed[item.id] = item;
+          vehicleServices.localDatabase.cacheLegacyRow(companyId: companyId, entity: 'provider', entityId: row.$id, payload: payload);
+        } catch (error) { debugPrint('[ParcOto Providers] remote row ignored: $error'); }
       }
-      prestataires = refreshed;
+      if (!_isCurrentCompany(companyId, generation)) return;
+      prestataires..clear()..addAll(refreshed);
       downloadedPrestataires = true;
     } catch (error) {
-      downloadedPrestataires = prestataires.isNotEmpty;
-      debugPrint('[ParcOto Providers] refresh failed: $error');
+      if (_isCurrentCompany(companyId, generation)) {
+        downloadedPrestataires = prestataires.isNotEmpty;
+        debugPrint('[ParcOto Providers] refresh failed: $error');
+      }
     } finally {
-      downloadingPrestataires = false;
-      notifyListeners();
+      if (_isCurrentCompany(companyId, generation)) { downloadingPrestataires = false; notifyListeners(); }
     }
   }
 
