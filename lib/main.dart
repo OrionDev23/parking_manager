@@ -6,7 +6,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:material_ui/material_ui.dart' as mui;
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart' as m;
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -343,7 +342,7 @@ class MyApp extends StatelessWidget {
       // Country names in this picker remain English; app UI localization is unchanged.
       CountryLocalizations.getDelegate(enableLocalization: false),
       FluentLocalizations.delegate,
-      ...GlobalMaterialLocalizations.delegates,
+      ...mui.GlobalMaterialLocalizations.delegates,
       SfGlobalLocalizations.delegate,
     ]);
     return results;
