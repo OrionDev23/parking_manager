@@ -88,6 +88,8 @@ void displayMessage(
 
 Future<bool>? _initialSessionRestore;
 Future<void>? _backgroundInitialization;
+Timer? _backgroundInitializationRetryTimer;
+int _backgroundInitializationRetryCount = 0;
 String? _runtimeCompanyId;
 bool _runtimeReady = false;
 Future<void>? _runtimeConfiguration;
@@ -96,6 +98,9 @@ Future<void> stopSessionRuntime() async {
   // Invalidate callbacks from the previous session even when the next login
   // reuses the same project ID.
   DatabaseGetter.invalidatePendingRequests();
+  _backgroundInitializationRetryTimer?.cancel();
+  _backgroundInitializationRetryTimer = null;
+  _backgroundInitializationRetryCount = 0;
   if (!_runtimeReady) return;
   await syncEngine.stop();
   // A later login, including one in the same project, must start the engine
@@ -183,15 +188,39 @@ Future<bool> _restoreInitialSession() async {
 /// Configures services for the authenticated tenant, then starts remote
 /// backfills after the first frame. The Future is scoped to the active company.
 Future<void> startBackgroundInitialization(String companyId) async {
+  _backgroundInitializationRetryTimer?.cancel();
+  _backgroundInitializationRetryTimer = null;
+
   try {
     await _configureSessionRuntime(companyId);
     _backgroundInitialization ??= _initializeBackgroundData(companyId);
     await _backgroundInitialization;
+    _backgroundInitializationRetryCount = 0;
   } catch (error, stackTrace) {
-    // Authentication remains valid even if an optional cache backfill fails.
-    // Keep the failure visible in logs and allow a later retry.
+    // Authentication remains valid when an optional cache backfill fails.
+    // Keep the failure visible and retry transient failures without requiring
+    // the user to restart the application or sign in again.
     _backgroundInitialization = null;
     debugPrint('[ParcOto Runtime] initialization failed: $error\\n$stackTrace');
+
+    if (_runtimeCompanyId == companyId &&
+        _backgroundInitializationRetryCount < 3) {
+      final delaySeconds = 5 * (1 << _backgroundInitializationRetryCount);
+      _backgroundInitializationRetryCount++;
+      debugPrint(
+        '[ParcOto Runtime] retry scheduled in $delaySeconds seconds '
+        '($_backgroundInitializationRetryCount/3)',
+      );
+      _backgroundInitializationRetryTimer = Timer(
+        Duration(seconds: delaySeconds),
+        () {
+          _backgroundInitializationRetryTimer = null;
+          if (_runtimeCompanyId == companyId) {
+            unawaited(startBackgroundInitialization(companyId));
+          }
+        },
+      );
+    }
   }
 }
 
@@ -224,6 +253,7 @@ Future<void> _initializeBackgroundData(String companyId) async {
       debugPrint(
         '[ParcOto Startup] $key failed after ${stopwatch.elapsedMilliseconds} ms: $error\\n$stackTrace',
       );
+      rethrow;
     }
   }
 
