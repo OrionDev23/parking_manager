@@ -32,6 +32,11 @@ class PartsProvider extends ChangeNotifier {
   static bool downloadingOptions = false;
   static bool downloadingParts = false;
   static bool downloadingFournisseurs = false;
+  static int _cacheGeneration = 0;
+
+  static bool _isCurrentCompany(String companyId, int generation) =>
+      vehicleServices.companyId == companyId && _cacheGeneration == generation;
+
   static String? _cacheCompanyId;
 
   PartsProvider() {
@@ -41,6 +46,7 @@ class PartsProvider extends ChangeNotifier {
   static void _ensureCompanyCache() {
     final companyId = vehicleServices.companyId;
     if (_cacheCompanyId == companyId) return;
+    _cacheGeneration++;
     categories.clear();
     brands.clear();
     options.clear();
@@ -103,40 +109,36 @@ class PartsProvider extends ChangeNotifier {
     required void Function(bool) setError,
     required void Function(bool) setDownloading,
   }) async {
+    final companyId = vehicleServices.companyId;
+    final generation = _cacheGeneration;
+    bool isCurrent() => _isCurrentCompany(companyId, generation);
     try {
-      for (final payload in _readCache(entity)) {
+      final cachedRows = _readCache(entity);
+      if (!isCurrent()) return;
+      for (final payload in cachedRows) {
         try {
           final item = decode(payload);
           final id = payload[r'$id']?.toString();
           if (id != null && id.isNotEmpty) target[id] = item;
         } catch (error) {
-          debugPrint(
-            '[ParcOto Stock] invalid $entity cache row ignored: $error',
-          );
+          debugPrint('[ParcOto Stock] invalid $entity cache row ignored: $error');
         }
       }
-      // Reapply unsynced mutations even when the app is offline. The
-      // cache may contain the last remote snapshot, while the outbox is the
-      // source of truth for newer local changes and deletion tombstones.
       final cachedPendingOperations = await vehicleServices.syncQueue.pending(
-        limit: 5000,
-        companyId: vehicleServices.companyId,
+        limit: 5000, companyId: companyId,
       );
+      if (!isCurrent()) return;
       for (final operation in cachedPendingOperations) {
         if (operation.entity != entity) continue;
         switch (operation.type) {
           case SyncOperationType.create:
           case SyncOperationType.update:
             try {
-              final payload = <String, dynamic>{
-                ...operation.payload,
-                r'$id': operation.entityId,
-              };
-              target[operation.entityId] = decode(payload);
+              target[operation.entityId] = decode(<String, dynamic>{
+                ...operation.payload, r'$id': operation.entityId,
+              });
             } catch (error) {
-              debugPrint(
-                '[ParcOto Stock] cached pending $entity row ignored: $error',
-              );
+              debugPrint('[ParcOto Stock] cached pending $entity row ignored: $error');
             }
             break;
           case SyncOperationType.delete:
@@ -144,80 +146,66 @@ class PartsProvider extends ChangeNotifier {
             break;
         }
       }
-
-      if (target.isNotEmpty) {
-        setError(false);
-        notifyListeners();
-      }
-
+      if (!isCurrent()) return;
+      if (target.isNotEmpty) { setError(false); notifyListeners(); }
       if (!PanesListState.signedIn.value) {
         setError(target.isEmpty);
         return;
       }
-
       final database = DatabaseGetter.database;
       if (database == null) throw StateError('Appwrite database unavailable');
       final rows = await DatabaseGetter().listDocuments(tableId);
+      if (!isCurrent()) return;
       final refreshed = <String, T>{};
       for (final row in rows) {
         final payload = _payload(row);
         try {
           refreshed[row.$id] = decode(payload);
           vehicleServices.localDatabase.cacheLegacyRow(
-            companyId: vehicleServices.companyId,
-            entity: entity,
-            entityId: row.$id,
-            payload: payload,
+            companyId: companyId, entity: entity, entityId: row.$id, payload: payload,
           );
         } catch (error) {
           debugPrint('[ParcOto Stock] remote $entity row ignored: $error');
         }
       }
-      // A remote refresh must never overwrite local changes that have not
-      // reached Appwrite yet. Replay this company's pending/failed outbox
-      // operations over the freshly downloaded snapshot.
       final pendingOperations = await vehicleServices.syncQueue.pending(
-        limit: 5000,
-        companyId: vehicleServices.companyId,
+        limit: 5000, companyId: companyId,
       );
+      if (!isCurrent()) return;
       for (final operation in pendingOperations) {
         if (operation.entity != entity) continue;
-        switch (operation.type.name) {
-          case 'create':
-          case 'update':
+        switch (operation.type) {
+          case SyncOperationType.create:
+          case SyncOperationType.update:
             try {
-              final payload = <String, dynamic>{
-                ...operation.payload,
-                r'$id': operation.entityId,
-              };
-              refreshed[operation.entityId] = decode(payload);
+              refreshed[operation.entityId] = decode(<String, dynamic>{
+                ...operation.payload, r'$id': operation.entityId,
+              });
             } catch (error) {
-              debugPrint(
-                '[ParcOto Stock] pending $entity operation ignored: $error',
-              );
+              debugPrint('[ParcOto Stock] pending $entity operation ignored: $error');
             }
             break;
-          case 'delete':
+          case SyncOperationType.delete:
             refreshed.remove(operation.entityId);
             break;
         }
       }
-
-      target
-        ..clear()
-        ..addAll(refreshed);
+      if (!isCurrent()) return;
+      target..clear()..addAll(refreshed);
       setError(false);
       refreshErrors.remove(entity);
     } catch (error, stackTrace) {
-      // A populated local cache must not hide a failed remote refresh.
-      // Keep the cached values, but expose the synchronization failure.
-      setError(true);
-      refreshErrors[entity] = error.toString();
-      debugPrint('[ParcOto Stock] $entity refresh failed: $error');
-      if (kDebugMode) debugPrintStack(stackTrace: stackTrace);
+      if (isCurrent()) {
+        setError(true);
+        refreshErrors[entity] = error.toString();
+        debugPrint('[ParcOto Stock] $entity refresh failed: $error');
+        if (kDebugMode) debugPrintStack(stackTrace: stackTrace);
+      }
     } finally {
-      setDownloading(false);
-      notifyListeners();
+      if (isCurrent()) {
+        setDownloading(false);
+        notifyListeners();
+      }
     }
   }
 
@@ -309,12 +297,15 @@ class PartsProvider extends ChangeNotifier {
     required String id,
     required T Function(Map<String, dynamic>) decode,
   }) async {
+    final companyId = vehicleServices.companyId;
+    final generation = _cacheGeneration;
     // A queued deletion is a local tombstone: do not resurrect the remote
     // record through a detail lookup before the delete reaches Appwrite.
     final pendingOperations = await vehicleServices.syncQueue.pending(
       limit: 5000,
-      companyId: vehicleServices.companyId,
+      companyId: companyId,
     );
+    if (!_isCurrentCompany(companyId, generation)) return null;
     SyncOperation? latestPending;
     for (final operation in pendingOperations) {
       if (operation.entity == entity && operation.entityId == id) {
@@ -340,11 +331,11 @@ class PartsProvider extends ChangeNotifier {
 
     try {
       final row = await DatabaseGetter().getDocument(tableId, id);
-      if (row == null) return null;
+      if (!_isCurrentCompany(companyId, generation) || row == null) return null;
       final payload = _payload(row);
       final item = decode(payload);
       vehicleServices.localDatabase.cacheLegacyRow(
-        companyId: vehicleServices.companyId,
+        companyId: companyId,
         entity: entity,
         entityId: id,
         payload: payload,
