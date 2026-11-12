@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart' show Icons;
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
