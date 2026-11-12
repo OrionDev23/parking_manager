@@ -19,11 +19,17 @@ class DriverProvider extends ChangeNotifier {
   static bool downloadingDocuments = false;
   static bool downloadedDisp = false;
   static bool downloadingDisp = false;
+  static int _cacheGeneration = 0;
+
+  static bool _isCurrentCompany(String companyId, int generation) =>
+      vehicleServices.companyId == companyId && _cacheGeneration == generation;
+
   static String? _cacheCompanyId;
 
   static void _ensureCompanyCache() {
     final companyId = vehicleServices.companyId;
     if (_cacheCompanyId == companyId) return;
+    _cacheGeneration++;
     conducteurs.clear();
     disponibiliteConducteurs.clear();
     documentConducteurs.clear();
@@ -46,25 +52,20 @@ class DriverProvider extends ChangeNotifier {
     }
   }
   Future<void> refreshConducteurs() async {
-    if (downloadingConducteurs) {
-      return;
-    }
+    if (downloadingConducteurs) return;
+    final companyId = vehicleServices.companyId;
+    final generation = _cacheGeneration;
     downloadingConducteurs = true;
     try {
       final drivers = await driverServices.repository.getDrivers();
-      conducteurs
-        ..clear()
-        ..addEntries(
-          drivers.map(
-            (driver) => MapEntry(driver.id, _toLegacyConducteur(driver)),
-          ),
-        );
+      if (!_isCurrentCompany(companyId, generation)) return;
+      conducteurs..clear()..addEntries(drivers.map((driver) => MapEntry(driver.id, _toLegacyConducteur(driver))));
       downloadedConducteurs = true;
-    } catch (_) {
-      downloadedConducteurs = false;
+    } catch (error) {
+      if (_isCurrentCompany(companyId, generation)) { downloadedConducteurs = false; debugPrint('[ParcOto Drivers] refresh failed: $error'); }
+    } finally {
+      if (_isCurrentCompany(companyId, generation)) { downloadingConducteurs = false; notifyListeners(); }
     }
-    downloadingConducteurs = false;
-    notifyListeners();
   }
 
   static Conducteur _toLegacyConducteur(Driver driver) {
@@ -92,56 +93,63 @@ class DriverProvider extends ChangeNotifier {
   }
 
   Future<void> refreshDocuments() async {
-    if (downloadingDocuments) {
-      return;
-    }
+    if (downloadingDocuments) return;
+    final companyId = vehicleServices.companyId;
+    final generation = _cacheGeneration;
     downloadingDocuments = true;
     documentConducteurs.clear();
-    await DatabaseGetter.database!
-        .listRows(
-          databaseId: databaseId,
-          tableId: chaufDoc,
-          queries: [Query.limit(5000)],
-        )
-        .then((value) {
-          for (int i = 0; i < value.rows.length; i++) {
-            documentConducteurs[value.rows[i].$id] = value.rows[i].convertTo(
-              (p0) => DocumentChauffeur.fromJson(p0),
-            );
-          }
-          downloadedDocuments = true;
-        })
-        .onError((error, stackTrace) {
-          downloadedDocuments = false;
-        });
-    downloadingDocuments = false;
-    notifyListeners();
+    try {
+      final value = await DatabaseGetter.database!.listRows(
+        databaseId: databaseId, tableId: chaufDoc, queries: [Query.limit(5000)],
+      );
+      if (!_isCurrentCompany(companyId, generation)) return;
+      final refreshed = <String, DocumentChauffeur>{};
+      for (final row in value.rows) {
+        refreshed[row.$id] = row.convertTo((data) => DocumentChauffeur.fromJson(data));
+      }
+      documentConducteurs..clear()..addAll(refreshed);
+      downloadedDocuments = true;
+    } catch (error) {
+      if (_isCurrentCompany(companyId, generation)) {
+        downloadedDocuments = false;
+        debugPrint('[ParcOto Driver documents] refresh failed: $error');
+      }
+    } finally {
+      if (_isCurrentCompany(companyId, generation)) {
+        downloadingDocuments = false;
+        notifyListeners();
+      }
+    }
   }
 
   Future<void> refreshDisp() async {
-    if (downloadingDisp) {
-      return;
-    }
+    if (downloadingDisp) return;
+    final companyId = vehicleServices.companyId;
+    final generation = _cacheGeneration;
     downloadingDisp = true;
     disponibiliteConducteurs.clear();
-    await DatabaseGetter.database!
-        .listRows(
-          databaseId: databaseId,
-          tableId: chaufDispID,
-          queries: [Query.limit(5000)],
-        )
-        .then((value) {
-          for (int i = 0; i < value.rows.length; i++) {
-            disponibiliteConducteurs[value.rows[i].$id] = value.rows[i]
-                .convertTo((p0) => DisponibiliteChauffeur.fromJson(p0));
-          }
-          downloadedDisp = true;
-        })
-        .onError((error, stackTrace) {
-          downloadedDisp = false;
-        });
-    downloadingDisp = false;
-    notifyListeners();
+    try {
+      final value = await DatabaseGetter.database!.listRows(
+        databaseId: databaseId, tableId: chaufDispID, queries: [Query.limit(5000)],
+      );
+      if (!_isCurrentCompany(companyId, generation)) return;
+      final refreshed = <String, DisponibiliteChauffeur>{};
+      for (final row in value.rows) {
+        refreshed[row.$id] = row.convertTo((data) => DisponibiliteChauffeur.fromJson(data));
+      }
+      disponibiliteConducteurs..clear()..addAll(refreshed);
+      downloadedDisp = true;
+    } catch (error) {
+      if (_isCurrentCompany(companyId, generation)) {
+        downloadedDisp = false;
+        debugPrint('[ParcOto Driver availability] refresh failed: $error');
+      }
+    } finally {
+      if (_isCurrentCompany(companyId, generation)) {
+        downloadingDisp = false;
+        notifyListeners();
+      }
+    }
   }
 
   Future<int> getDriversCount() async {
