@@ -176,7 +176,7 @@ class DriverProvider extends ChangeNotifier {
 
   Future<int> getDriversStatesCount() async {
     if (!downloadedDisp && !downloadingDisp) {
-      await refreshDocuments();
+      await refreshDisp();
     } else {
       while (downloadingDisp) {
         await Future.delayed(const Duration(milliseconds: 30));
