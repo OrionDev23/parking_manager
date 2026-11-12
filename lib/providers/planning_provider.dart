@@ -11,11 +11,17 @@ class PlanningProvider extends ChangeNotifier {
   static bool downloadingPlanning = false;
   static const String _cacheEntity = 'planning';
 
+  static int _cacheGeneration = 0;
+
+  static bool _isCurrentCompany(String companyId, int generation) =>
+      vehicleServices.companyId == companyId && _cacheGeneration == generation;
+
   static String? _cacheCompanyId;
 
   static void _ensureCompanyCache() {
     final companyId = vehicleServices.companyId;
     if (_cacheCompanyId == companyId) return;
+    _cacheGeneration++;
     plannings.clear();
     downloadedPlanning = false;
     downloadingPlanning = false;
@@ -47,61 +53,39 @@ class PlanningProvider extends ChangeNotifier {
 
   Future<void> refreshPlannings() async {
     if (downloadingPlanning) return;
+    final companyId = vehicleServices.companyId;
+    final generation = _cacheGeneration;
     downloadingPlanning = true;
-
-    // Show cached data immediately; the network refresh below is best-effort.
     try {
       final cached = _readLocalPlannings();
-      if (cached.isNotEmpty) {
-        plannings = {for (final item in cached) item.id: item};
-        downloadedPlanning = true;
-        notifyListeners();
-      }
+      if (!_isCurrentCompany(companyId, generation)) return;
+      if (cached.isNotEmpty) { plannings = {for (final item in cached) item.id: item}; downloadedPlanning = true; notifyListeners(); }
     } catch (error) {
-      debugPrint('[ParcOto Planning] local cache read failed: $error');
+      if (_isCurrentCompany(companyId, generation)) debugPrint('[ParcOto Planning] local cache read failed: $error');
     }
-
     try {
       final database = DatabaseGetter.database;
-      if (database == null) {
-        throw StateError('Appwrite database unavailable');
-      }
-      final value = await database.listRows(
-        databaseId: databaseId,
-        tableId: planningID,
-        queries: [Query.limit(5000)],
-      );
+      if (database == null) throw StateError('Appwrite database unavailable');
+      final value = await database.listRows(databaseId: databaseId, tableId: planningID, queries: [Query.limit(5000)]);
+      if (!_isCurrentCompany(companyId, generation)) return;
       final refreshed = <String, Planning>{};
       for (final row in value.rows) {
-        final payload = <String, dynamic>{
-          ...row.data,
-          r'$id': row.$id,
-          r'$createdAt': row.$createdAt,
-          r'$updatedAt': row.$updatedAt,
-        };
+        final payload = <String, dynamic>{...row.data, r'$id': row.$id, r'$createdAt': row.$createdAt, r'$updatedAt': row.$updatedAt};
         try {
-          final planning = Planning.fromJson(payload);
-          refreshed[planning.id] = planning;
-          vehicleServices.localDatabase.cacheLegacyRow(
-            companyId: vehicleServices.companyId,
-            entity: _cacheEntity,
-            entityId: row.$id,
-            payload: payload,
-          );
-        } catch (error) {
-          debugPrint('[ParcOto Planning] remote row ignored: $error');
-        }
+          final item = Planning.fromJson(payload); refreshed[item.id] = item;
+          vehicleServices.localDatabase.cacheLegacyRow(companyId: companyId, entity: _cacheEntity, entityId: row.$id, payload: payload);
+        } catch (error) { debugPrint('[ParcOto Planning] remote row ignored: $error'); }
       }
-      plannings = refreshed;
-      downloadedPlanning = true;
+      if (!_isCurrentCompany(companyId, generation)) return;
+      plannings = refreshed; downloadedPlanning = true;
     } catch (error, stackTrace) {
-      // Offline startup remains usable when a local snapshot exists.
-      downloadedPlanning = plannings.isNotEmpty;
-      debugPrint('[ParcOto Planning] remote refresh failed: $error');
-      if (kDebugMode) debugPrintStack(stackTrace: stackTrace);
+      if (_isCurrentCompany(companyId, generation)) {
+        downloadedPlanning = plannings.isNotEmpty;
+        debugPrint('[ParcOto Planning] remote refresh failed: $error');
+        if (kDebugMode) debugPrintStack(stackTrace: stackTrace);
+      }
     } finally {
-      downloadingPlanning = false;
-      notifyListeners();
+      if (_isCurrentCompany(companyId, generation)) { downloadingPlanning = false; notifyListeners(); }
     }
   }
 
