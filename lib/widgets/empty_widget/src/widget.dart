@@ -6,7 +6,7 @@ import '../../../theme.dart';
 import 'helper.dart';
 import 'utility.dart';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 part 'images.dart';
 
 /// {@tool snippet}
