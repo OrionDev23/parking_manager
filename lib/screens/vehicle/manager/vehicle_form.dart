@@ -3,7 +3,7 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:dzair_data_usage/langs.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' as m;
+import 'package:material_ui/material_ui.dart' as m;
 import 'package:flutter/services.dart';
 import 'package:flutter_chip_tags/flutter_chip_tags.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
