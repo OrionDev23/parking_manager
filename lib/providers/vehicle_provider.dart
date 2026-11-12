@@ -21,11 +21,17 @@ class VehicleProvider extends ChangeNotifier {
   static bool downloadedStates = false;
   static bool downloadingStates = false;
 
+  static int _cacheGeneration = 0;
+
+  static bool _isCurrentCompany(String companyId, int generation) =>
+      vehicleServices.companyId == companyId && _cacheGeneration == generation;
+
   static String? _cacheCompanyId;
 
   static void _ensureCompanyCache() {
     final companyId = vehicleServices.companyId;
     if (_cacheCompanyId == companyId) return;
+    _cacheGeneration++;
     vehicles.clear();
     etats.clear();
     documentsVehicules.clear();
@@ -50,99 +56,115 @@ class VehicleProvider extends ChangeNotifier {
 
   Future<void> refreshVehicles() async {
     if (downloadingVehicles) return;
-
+    final companyId = vehicleServices.companyId;
+    final generation = _cacheGeneration;
     downloadingVehicles = true;
     vehicles.clear();
-
     try {
       var localVehicles = await vehicleServices.repository.getVehicles();
-
+      if (!_isCurrentCompany(companyId, generation)) return;
       if (localVehicles.isEmpty) {
-        await _bootstrapLegacyVehicles();
+        await _bootstrapLegacyVehicles(companyId: companyId, generation: generation);
+        if (!_isCurrentCompany(companyId, generation)) return;
         localVehicles = await vehicleServices.repository.getVehicles();
+        if (!_isCurrentCompany(companyId, generation)) return;
       }
-
-      for (final vehicle in localVehicles) {
-        final legacy = VehicleMapper.toLegacy(vehicle);
-        vehicles[legacy.id] = legacy;
-      }
+      vehicles
+        ..clear()
+        ..addEntries(localVehicles.map((vehicle) {
+          final legacy = VehicleMapper.toLegacy(vehicle);
+          return MapEntry(legacy.id, legacy);
+        }));
       downloadedVehicles = true;
-    } catch (_) {
-      downloadedVehicles = false;
+    } catch (error) {
+      if (_isCurrentCompany(companyId, generation)) {
+        downloadedVehicles = false;
+        debugPrint('[ParcOto Vehicles] refresh failed: $error');
+      }
     } finally {
-      downloadingVehicles = false;
-      notifyListeners();
+      if (_isCurrentCompany(companyId, generation)) {
+        downloadingVehicles = false;
+        notifyListeners();
+      }
     }
   }
 
-  Future<void> _bootstrapLegacyVehicles() async {
+  Future<void> _bootstrapLegacyVehicles({
+    required String companyId,
+    required int generation,
+  }) async {
     final result = await DatabaseGetter.database!.listRows(
       databaseId: databaseId,
       tableId: vehiculeid,
       queries: [Query.limit(DatabaseGetter.limits['vehicles'] ?? 500)],
     );
-
-    final companyId = project ?? 'local';
+    if (!_isCurrentCompany(companyId, generation)) return;
     for (final row in result.rows) {
+      if (!_isCurrentCompany(companyId, generation)) return;
       final legacy = row.convertTo((data) => Vehicle.fromJson(data));
-      final domainVehicle = VehicleMapper.toDomain(
-        legacy,
-        companyId: companyId,
-      );
+      final domainVehicle = VehicleMapper.toDomain(legacy, companyId: companyId);
       await vehicleServices.seedLocal(domainVehicle);
     }
   }
 
   Future<void> refreshDocuments() async {
     if (downloadingDocuments) return;
+    final companyId = vehicleServices.companyId;
+    final generation = _cacheGeneration;
     downloadingDocuments = true;
     documentsVehicules.clear();
-
-    await DatabaseGetter.database!
-        .listRows(
-          databaseId: databaseId,
-          tableId: vehicDoc,
-          queries: [Query.limit(5000)],
-        )
-        .then((value) {
-          for (final row in value.rows) {
-            documentsVehicules[row.$id] = row.convertTo(
-              (data) => DocumentVehicle.fromJson(data),
-            );
-          }
-          downloadedDocuments = true;
-        })
-        .onError((error, stackTrace) {
-          downloadedDocuments = false;
-        });
-
-    downloadingDocuments = false;
-    notifyListeners();
+    try {
+      final value = await DatabaseGetter.database!.listRows(
+        databaseId: databaseId, tableId: vehicDoc, queries: [Query.limit(5000)],
+      );
+      if (!_isCurrentCompany(companyId, generation)) return;
+      final refreshed = <String, DocumentVehicle>{};
+      for (final row in value.rows) {
+        refreshed[row.$id] = row.convertTo((data) => DocumentVehicle.fromJson(data));
+      }
+      documentsVehicules..clear()..addAll(refreshed);
+      downloadedDocuments = true;
+    } catch (error) {
+      if (_isCurrentCompany(companyId, generation)) {
+        downloadedDocuments = false;
+        debugPrint('[ParcOto Vehicle documents] refresh failed: $error');
+      }
+    } finally {
+      if (_isCurrentCompany(companyId, generation)) {
+        downloadingDocuments = false;
+        notifyListeners();
+      }
+    }
   }
 
   Future<void> refreshStates() async {
     if (downloadingStates) return;
+    final companyId = vehicleServices.companyId;
+    final generation = _cacheGeneration;
     downloadingStates = true;
     etats.clear();
-
-    await DatabaseGetter.database!
-        .listRows(
-          databaseId: databaseId,
-          tableId: etatId,
-          queries: [Query.limit(5000)],
-        )
-        .then((value) {
-          for (final row in value.rows) {
-            etats[row.$id] = row.convertTo((data) => Etat.fromJson(data));
-          }
-          downloadedStates = true;
-        })
-        .onError((error, stackTrace) {
-          downloadedStates = false;
-        });
-
-    downloadingStates = false;
-    notifyListeners();
+    try {
+      final value = await DatabaseGetter.database!.listRows(
+        databaseId: databaseId, tableId: etatId, queries: [Query.limit(5000)],
+      );
+      if (!_isCurrentCompany(companyId, generation)) return;
+      final refreshed = <String, Etat>{};
+      for (final row in value.rows) {
+        refreshed[row.$id] = row.convertTo((data) => Etat.fromJson(data));
+      }
+      etats..clear()..addAll(refreshed);
+      downloadedStates = true;
+    } catch (error) {
+      if (_isCurrentCompany(companyId, generation)) {
+        downloadedStates = false;
+        debugPrint('[ParcOto Vehicle states] refresh failed: $error');
+      }
+    } finally {
+      if (_isCurrentCompany(companyId, generation)) {
+        downloadingStates = false;
+        notifyListeners();
+      }
+    }
   }
 
   Future<int> getVehicleCount() async {
