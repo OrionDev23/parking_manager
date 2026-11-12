@@ -138,6 +138,7 @@ class _DashboardState extends State<Dashboard>
       logs.refreshLogs(),
       plannings.refreshPlannings(),
       repairs.refreshReparations(),
+      repairs.refreshPrestataires(),
     ]);
     setState(() {});
   }
