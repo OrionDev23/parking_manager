@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' show Badge, LinearProgressIndicator;
+import 'package:material_ui/material_ui.dart' show Badge, LinearProgressIndicator;
 import 'package:parc_oto/providers/driver_provider.dart';
 import 'package:parc_oto/providers/planning_provider.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
