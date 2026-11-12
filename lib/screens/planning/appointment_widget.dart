@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:parc_oto/serializables/planning.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
