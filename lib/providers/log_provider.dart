@@ -10,11 +10,17 @@ class LogProvider extends ChangeNotifier {
   static bool downloadedActivities = false;
   static bool downloadingActivities = false;
 
+  static int _cacheGeneration = 0;
+
+  static bool _isCurrentCompany(String companyId, int generation) =>
+      vehicleServices.companyId == companyId && _cacheGeneration == generation;
+
   static String? _cacheCompanyId;
 
   static void _ensureCompanyCache() {
     final companyId = vehicleServices.companyId;
     if (_cacheCompanyId == companyId) return;
+    _cacheGeneration++;
     activities.clear();
     downloadedActivities = false;
     downloadingActivities = false;
@@ -30,62 +36,40 @@ class LogProvider extends ChangeNotifier {
 
   Future<void> refreshLogs() async {
     if (downloadingActivities) return;
+    final companyId = vehicleServices.companyId;
+    final generation = _cacheGeneration;
     downloadingActivities = true;
-
     try {
-      final cached = vehicleServices.localDatabase.readLegacyCache(
-        companyId: vehicleServices.companyId,
-        entity: 'activity',
-      );
+      final cached = vehicleServices.localDatabase.readLegacyCache(companyId: companyId, entity: 'activity');
+      if (!_isCurrentCompany(companyId, generation)) return;
+      final cachedItems = <String, Activity>{};
       for (final payload in cached) {
-        try {
-          final item = Activity.fromJson(payload);
-          activities[item.id] = item;
-        } catch (error) {
-          debugPrint('[ParcOto Activity] invalid cached row ignored: $error');
-        }
+        try { final item = Activity.fromJson(payload); cachedItems[item.id] = item; }
+        catch (error) { debugPrint('[ParcOto Activity] invalid cached row ignored: $error'); }
       }
-      if (activities.isNotEmpty) {
-        downloadedActivities = true;
-        notifyListeners();
-      }
-
+      activities..clear()..addAll(cachedItems);
+      if (activities.isNotEmpty) notifyListeners();
       final database = DatabaseGetter.database;
       if (database == null) throw StateError('Appwrite database unavailable');
-      final result = await database.listRows(
-        databaseId: databaseId,
-        tableId: activityId,
-        queries: [Query.limit(5000)],
-      );
+      final result = await database.listRows(databaseId: databaseId, tableId: activityId, queries: [Query.limit(5000)]);
+      if (!_isCurrentCompany(companyId, generation)) return;
       final refreshed = <String, Activity>{};
       for (final row in result.rows) {
-        final payload = <String, dynamic>{
-          ...row.data,
-          r'$id': row.$id,
-          r'$createdAt': row.$createdAt,
-          r'$updatedAt': row.$updatedAt,
-        };
+        final payload = <String, dynamic>{...row.data, r'$id': row.$id, r'$createdAt': row.$createdAt, r'$updatedAt': row.$updatedAt};
         try {
-          final activity = Activity.fromJson(payload);
-          refreshed[activity.id] = activity;
-          vehicleServices.localDatabase.cacheLegacyRow(
-            companyId: vehicleServices.companyId,
-            entity: 'activity',
-            entityId: row.$id,
-            payload: payload,
-          );
-        } catch (error) {
-          debugPrint('[ParcOto Activity] remote row ignored: $error');
-        }
+          final item = Activity.fromJson(payload); refreshed[item.id] = item;
+          vehicleServices.localDatabase.cacheLegacyRow(companyId: companyId, entity: 'activity', entityId: row.$id, payload: payload);
+        } catch (error) { debugPrint('[ParcOto Activity] remote row ignored: $error'); }
       }
-      activities = refreshed;
-      downloadedActivities = true;
+      if (!_isCurrentCompany(companyId, generation)) return;
+      activities..clear()..addAll(refreshed); downloadedActivities = true;
     } catch (error) {
-      downloadedActivities = activities.isNotEmpty;
-      debugPrint('[ParcOto Activity] refresh failed: $error');
+      if (_isCurrentCompany(companyId, generation)) {
+        downloadedActivities = activities.isNotEmpty;
+        debugPrint('[ParcOto Activity] refresh failed: $error');
+      }
     } finally {
-      downloadingActivities = false;
-      notifyListeners();
+      if (_isCurrentCompany(companyId, generation)) { downloadingActivities = false; notifyListeners(); }
     }
   }
 
