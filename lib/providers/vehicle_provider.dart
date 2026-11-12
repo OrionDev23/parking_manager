@@ -1,6 +1,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:flutter/foundation.dart';
 
+import '../core/services/vehicle_services.dart';
 import '../data/mappers/vehicle_mapper.dart';
 import '../main.dart';
 import '../serializables/vehicle/document_vehicle.dart';
