@@ -1,4 +1,5 @@
 import 'package:data_table_2/data_table_2.dart';
+import 'package:fluent_ui/fluent_ui.dart' as f;
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -51,7 +52,7 @@ class _DataTableParcState extends State<DataTableParc> {
   Widget build(BuildContext context) {
     final appTheme = context.watch<AppTheme>();
     // Resolve all table foreground and surface colors from the active theme.
-    final isDark = appTheme.mode == ThemeMode.dark;
+    final isDark = appTheme.mode == f.ThemeMode.dark;
     final accent = appTheme.color;
     final surfaceColor = appTheme.surfaceColor;
     final primaryText = appTheme.textColor;
