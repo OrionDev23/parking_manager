@@ -4,7 +4,7 @@ library;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' show Button;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'multiple_items_bloc.dart';
 import 'select_bloc.dart';
