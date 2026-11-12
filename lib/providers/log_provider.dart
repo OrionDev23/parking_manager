@@ -10,7 +10,19 @@ class LogProvider extends ChangeNotifier {
   static bool downloadedActivities = false;
   static bool downloadingActivities = false;
 
+  static String? _cacheCompanyId;
+
+  static void _ensureCompanyCache() {
+    final companyId = vehicleServices.companyId;
+    if (_cacheCompanyId == companyId) return;
+    activities.clear();
+    downloadedActivities = false;
+    downloadingActivities = false;
+    _cacheCompanyId = companyId;
+  }
+
   LogProvider() {
+    _ensureCompanyCache();
     if (!downloadedActivities && !downloadingActivities) {
       refreshLogs();
     }
