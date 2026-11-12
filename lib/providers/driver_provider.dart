@@ -19,7 +19,25 @@ class DriverProvider extends ChangeNotifier {
   static bool downloadingDocuments = false;
   static bool downloadedDisp = false;
   static bool downloadingDisp = false;
+  static String? _cacheCompanyId;
+
+  static void _ensureCompanyCache() {
+    final companyId = vehicleServices.companyId;
+    if (_cacheCompanyId == companyId) return;
+    conducteurs.clear();
+    disponibiliteConducteurs.clear();
+    documentConducteurs.clear();
+    downloadedConducteurs = false;
+    downloadingConducteurs = false;
+    downloadedDocuments = false;
+    downloadingDocuments = false;
+    downloadedDisp = false;
+    downloadingDisp = false;
+    _cacheCompanyId = companyId;
+  }
+
   DriverProvider() {
+    _ensureCompanyCache();
     if (!downloadedConducteurs && !downloadingConducteurs) {
       refreshConducteurs();
     }
