@@ -89,6 +89,8 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
         return 'part_option';
       case fournsID:
         return 'supplier';
+      case storageId:
+        return 'storage';
       default:
         return null;
     }
