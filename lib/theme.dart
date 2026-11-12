@@ -263,6 +263,20 @@ class AppTheme extends ChangeNotifier {
   late Color mutedTextColor;
   late Color borderColor;
   late m.InputDecoration inputDecoration;
+  mui.InputDecoration get materialUiInputDecoration => mui.InputDecoration(
+    filled: true,
+    fillColor: fillColor,
+    hintStyle: TextStyle(color: mutedTextColor),
+    labelStyle: TextStyle(color: mutedTextColor),
+    enabledBorder: mui.OutlineInputBorder(
+      borderSide: mui.BorderSide(color: borderColor),
+      borderRadius: BorderRadius.circular(controlRadius),
+    ),
+    focusedBorder: mui.OutlineInputBorder(
+      borderSide: mui.BorderSide(color: color, width: 1.5),
+      borderRadius: BorderRadius.circular(controlRadius),
+    ),
+  );
 
   Color get textColor => writingStyle.color ?? Colors.black;
   double get cardRadius => definition.cardRadius;
