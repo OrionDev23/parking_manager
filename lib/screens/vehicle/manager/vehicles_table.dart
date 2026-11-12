@@ -894,7 +894,7 @@ class VehicleTableState extends State<VehicleTable> {
                                         );
                                       },
                                       searchBoxDecoration: appTheme
-                                          .inputDecoration
+                                          .materialUiInputDecoration
                                           .copyWith(
                                             labelText: 'search'.tr(),
                                             labelStyle: placeStyle,
@@ -996,7 +996,7 @@ class VehicleTableState extends State<VehicleTable> {
                                         );
                                       },
                                       searchBoxDecoration: appTheme
-                                          .inputDecoration
+                                          .materialUiInputDecoration
                                           .copyWith(
                                             labelText: 'search'.tr(),
                                             labelStyle: placeStyle,
