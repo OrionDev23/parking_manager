@@ -1,7 +1,7 @@
 import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' hide ColorPicker;
-import 'package:flutter/material.dart' as m;
+import 'package:material_ui/material_ui.dart' as m;
 import 'package:parc_oto/datasources/planning/planning_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/serializables/planning.dart';
