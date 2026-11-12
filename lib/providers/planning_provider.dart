@@ -11,7 +11,19 @@ class PlanningProvider extends ChangeNotifier {
   static bool downloadingPlanning = false;
   static const String _cacheEntity = 'planning';
 
+  static String? _cacheCompanyId;
+
+  static void _ensureCompanyCache() {
+    final companyId = vehicleServices.companyId;
+    if (_cacheCompanyId == companyId) return;
+    plannings.clear();
+    downloadedPlanning = false;
+    downloadingPlanning = false;
+    _cacheCompanyId = companyId;
+  }
+
   PlanningProvider() {
+    _ensureCompanyCache();
     if (!downloadedPlanning && !downloadingPlanning) {
       refreshPlannings();
     }
