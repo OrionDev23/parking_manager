@@ -25,6 +25,9 @@ class VehicleProvider extends ChangeNotifier {
     if (!downloadedVehicles && !downloadingVehicles) {
       refreshVehicles();
     }
+    if (!downloadedDocuments && !downloadingDocuments) {
+      refreshDocuments();
+    }
   }
 
   Future<void> refreshVehicles() async {
