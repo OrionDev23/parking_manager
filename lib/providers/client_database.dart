@@ -505,21 +505,36 @@ class DatabaseGetter {
   }
 
   Future<List<Row>> listDocuments(String path) async {
-    List<Row> result = List.empty(growable: true);
-    int nextPageToken = 0;
-    bool hasNextPage = true;
-    while (hasNextPage) {
-      await database
-          ?.listRows(
-            databaseId: databaseId,
-            tableId: path,
-            queries: [Query.limit(5000), Query.offset(nextPageToken)],
-          )
-          .then((value) {
-            hasNextPage = value.total >= 5000;
-            nextPageToken += 5000;
-            result.addAll(value.rows);
-          });
+    const pageSize = 5000;
+    final activeDatabase = database;
+    if (activeDatabase == null) {
+      throw StateError(
+        'Cannot list Appwrite table "$path": database client is not initialized.',
+      );
+    }
+
+    final result = <Row>[];
+    var offset = 0;
+
+    while (true) {
+      final page = await activeDatabase.listRows(
+        databaseId: databaseId,
+        tableId: path,
+        queries: [
+          Query.limit(pageSize),
+          Query.offset(offset),
+        ],
+      );
+
+      if (page.rows.isEmpty) break;
+
+      result.addAll(page.rows);
+
+      // Appwrite's total is the total matching row count, not the number of
+      // rows in this page. Use the actual page length to decide whether to
+      // continue; an exact multiple of pageSize ends with one empty request.
+      if (page.rows.length < pageSize) break;
+      offset += page.rows.length;
     }
 
     return result;
