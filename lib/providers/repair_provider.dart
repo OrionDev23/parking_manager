@@ -20,8 +20,11 @@ class RepairProvider extends ChangeNotifier {
   static bool downloadedPrestataires = false;
   static bool downloadingPrestataires = false;
   RepairProvider() {
-    if (!downloadedReparations && !downloadingPrestataires) {
+    if (!downloadedReparations && !downloadingReparations) {
       refreshReparations();
+    }
+    if (!downloadedPrestataires && !downloadingPrestataires) {
+      refreshPrestataires();
     }
   }
 
