@@ -32,6 +32,33 @@ class PartsProvider extends ChangeNotifier {
   static bool downloadingOptions = false;
   static bool downloadingParts = false;
   static bool downloadingFournisseurs = false;
+  static String? _cacheCompanyId;
+
+  PartsProvider() {
+    _ensureCompanyCache();
+  }
+
+  static void _ensureCompanyCache() {
+    final companyId = vehicleServices.companyId;
+    if (_cacheCompanyId == companyId) return;
+    categories.clear();
+    brands.clear();
+    options.clear();
+    parts.clear();
+    fournisseurs.clear();
+    refreshErrors.clear();
+    errorCategories = true;
+    errorBrands = true;
+    errorOptions = true;
+    errorParts = true;
+    errorFournisseurs = true;
+    downloadingCategories = false;
+    downloadingBrands = false;
+    downloadingOptions = false;
+    downloadingParts = false;
+    downloadingFournisseurs = false;
+    _cacheCompanyId = companyId;
+  }
 
   static String getUniqueCodeCategory() {
     var i = 0;
