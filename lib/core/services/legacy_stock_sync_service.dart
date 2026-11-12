@@ -19,6 +19,7 @@ class LegacyStockSyncService {
     'part_brand': legacy.brandsID,
     'part_option': legacy.optionsID,
     'supplier': legacy.fournsID,
+    'storage': legacy.storageId,
   };
 
   final LocalDatabase localDatabase;
