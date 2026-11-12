@@ -1296,7 +1296,7 @@ class _VehicleFormState extends State<VehicleForm>
                                   ).tr(),
                                 );
                               },
-                              searchBoxDecoration: appTheme.inputDecoration
+                              searchBoxDecoration: appTheme.materialUiInputDecoration
                                   .copyWith(
                                     labelText: 'search'.tr(),
                                     labelStyle: placeStyle,
@@ -1383,7 +1383,7 @@ class _VehicleFormState extends State<VehicleForm>
                                   ).tr(),
                                 );
                               },
-                              searchBoxDecoration: appTheme.inputDecoration
+                              searchBoxDecoration: appTheme.materialUiInputDecoration
                                   .copyWith(
                                     labelText: 'search'.tr(),
                                     labelStyle: placeStyle,
