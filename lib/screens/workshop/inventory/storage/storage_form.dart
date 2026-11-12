@@ -78,6 +78,9 @@ class _StorageFormState extends State<StorageForm> {
         variations.addAll(widget.storage!.variations!);
       }
       await Future.wait([loadPart(), loadFourn()]);
+      if (!mounted) return;
+      updateQteRestant();
+      setState(() => loading = false);
     }
   }
 
