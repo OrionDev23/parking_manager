@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:parc_oto/providers/repair_provider.dart';
 import 'package:parc_oto/screens/dashboard/charts/common.dart';
 import 'package:parc_oto/theme.dart';
