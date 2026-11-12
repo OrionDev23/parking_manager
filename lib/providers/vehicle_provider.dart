@@ -21,7 +21,25 @@ class VehicleProvider extends ChangeNotifier {
   static bool downloadedStates = false;
   static bool downloadingStates = false;
 
+  static String? _cacheCompanyId;
+
+  static void _ensureCompanyCache() {
+    final companyId = vehicleServices.companyId;
+    if (_cacheCompanyId == companyId) return;
+    vehicles.clear();
+    etats.clear();
+    documentsVehicules.clear();
+    downloadedVehicles = false;
+    downloadingVehicles = false;
+    downloadedDocuments = false;
+    downloadingDocuments = false;
+    downloadedStates = false;
+    downloadingStates = false;
+    _cacheCompanyId = companyId;
+  }
+
   VehicleProvider() {
+    _ensureCompanyCache();
     if (!downloadedVehicles && !downloadingVehicles) {
       refreshVehicles();
     }
