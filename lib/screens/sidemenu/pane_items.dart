@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../clients/client_tabs.dart';
 import '../reparation/fiche_reception/manager/fiche_reception_tabs.dart';
