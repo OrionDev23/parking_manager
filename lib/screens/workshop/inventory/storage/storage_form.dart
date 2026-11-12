@@ -11,6 +11,8 @@ import '../../../../serializables/pieces/storage_variations.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../../providers/parts_provider.dart';
+import '../../../../providers/client_database.dart' show DatabaseGetter;
+import '../../../../main.dart' show legacyStockSyncService;
 import '../../../../serializables/pieces/part.dart';
 
 import 'package:provider/provider.dart';
@@ -379,8 +381,10 @@ class _StorageFormState extends State<StorageForm> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               FilledButton(
-                onPressed: confirmUpload,
-                child: const Text('confirmer').tr(),
+                onPressed: saving ? null : confirmUpload,
+                child: saving
+                    ? const ProgressRing()
+                    : const Text('confirmer').tr(),
               ),
             ],
           ),
@@ -625,18 +629,90 @@ class _StorageFormState extends State<StorageForm> {
     setState(() {});
   }
 
-  void confirmUpload() async {
-    if (selectedPart == null) {
-      return;
-    }
-    if (qte <= 0) {
-      return;
-    }
+  bool saving = false;
 
-    for (int i = 0; i < variations.length; i++) {
-      if (variations[i].qte <= 0) {
+  void confirmUpload() async {
+    if (saving) return;
+
+    if (selectedPart == null) {
+      _showSaveError('Veuillez sélectionner une pièce.');
+      return;
+    }
+    if (!qte.isFinite || qte <= 0) {
+      _showSaveError('La quantité doit être supérieure à zéro.');
+      return;
+    }
+    if (qteRestant < 0) {
+      _showSaveError('La somme des quantités des variantes dépasse le stock saisi.');
+      return;
+    }
+    for (final variation in variations) {
+      if (!variation.qte.isFinite || variation.qte <= 0) {
+        _showSaveError('Chaque variante doit avoir une quantité positive.');
         return;
       }
     }
+
+    setState(() => saving = true);
+    final isNew = storageID == null;
+    final id = storageID ?? DateTime.now().microsecondsSinceEpoch.toString();
+    final storage = Storage(
+      id: id,
+      qte: qte,
+      partID: selectedPart!.id,
+      pieceName: selectedPart!.name,
+      fournisseurID: selectedF?.id,
+      fournisseurName: selectedF?.nom,
+      expirationDate: expire ? expirationDate : null,
+      variations: variations.isEmpty ? null : List<StorageVariation>.from(variations),
+    );
+
+    try {
+      // Queue-first local persistence: the stock lot remains available offline
+      // and is synchronized through the existing Appwrite outbox.
+      await legacyStockSyncService.save(
+        entity: 'storage',
+        id: id,
+        data: storage.toJson(),
+        isNew: isNew,
+      );
+      storageID = id;
+
+      // Activity history is secondary; it must not turn a successful local
+      // stock save into a reported failure when the device is offline.
+      try {
+        await DatabaseGetter().ajoutActivity(
+          65,
+          id,
+          docName: storage.pieceName,
+        );
+      } catch (_) {
+        // The stock operation is already safely queued for synchronization.
+      }
+
+      if (!mounted) return;
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: Text(isNew ? 'Entrée en stock enregistrée.' : 'Entrée en stock mise à jour.'),
+          severity: InfoBarSeverity.success,
+        ),
+      );
+    } catch (error) {
+      if (mounted) _showSaveError('Échec de l’enregistrement : $error');
+    } finally {
+      if (mounted) setState(() => saving = false);
+    }
+  }
+
+  void _showSaveError(String message) {
+    if (!mounted) return;
+    displayInfoBar(
+      context,
+      builder: (context, close) => InfoBar(
+        title: Text(message),
+        severity: InfoBarSeverity.error,
+      ),
+    );
   }
 }
