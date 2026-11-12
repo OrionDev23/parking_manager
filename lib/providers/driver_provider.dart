@@ -23,6 +23,9 @@ class DriverProvider extends ChangeNotifier {
     if (!downloadedConducteurs && !downloadingConducteurs) {
       refreshConducteurs();
     }
+    if (!downloadedDocuments && !downloadingDocuments) {
+      refreshDocuments();
+    }
   }
   Future<void> refreshConducteurs() async {
     if (downloadingConducteurs) {
