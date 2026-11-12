@@ -64,7 +64,11 @@ class VehicleProvider extends ChangeNotifier {
       var localVehicles = await vehicleServices.repository.getVehicles();
       if (!_isCurrentCompany(companyId, generation)) return;
       if (localVehicles.isEmpty) {
-        await _bootstrapLegacyVehicles(companyId: companyId, generation: generation);
+        await _bootstrapLegacyVehicles(
+          services: vehicleServices,
+          companyId: companyId,
+          generation: generation,
+        );
         if (!_isCurrentCompany(companyId, generation)) return;
         localVehicles = await vehicleServices.repository.getVehicles();
         if (!_isCurrentCompany(companyId, generation)) return;
@@ -90,6 +94,7 @@ class VehicleProvider extends ChangeNotifier {
   }
 
   Future<void> _bootstrapLegacyVehicles({
+    required VehicleServices services,
     required String companyId,
     required int generation,
   }) async {
@@ -103,7 +108,7 @@ class VehicleProvider extends ChangeNotifier {
       if (!_isCurrentCompany(companyId, generation)) return;
       final legacy = row.convertTo((data) => Vehicle.fromJson(data));
       final domainVehicle = VehicleMapper.toDomain(legacy, companyId: companyId);
-      await vehicleServices.seedLocal(domainVehicle);
+      await services.seedLocal(domainVehicle);
     }
   }
 
