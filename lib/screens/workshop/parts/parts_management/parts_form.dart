@@ -6,7 +6,7 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:chip_list/chip_list.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' show Icons, Material;
+import 'package:material_ui/material_ui.dart' show Icons, Material;
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart' hide Trans;
