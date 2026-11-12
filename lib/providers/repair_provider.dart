@@ -19,7 +19,23 @@ class RepairProvider extends ChangeNotifier {
   static bool downloadingReparations = false;
   static bool downloadedPrestataires = false;
   static bool downloadingPrestataires = false;
+  static String? _cacheCompanyId;
+
+  static void _ensureCompanyCache() {
+    final companyId = vehicleServices.companyId;
+    if (_cacheCompanyId == companyId) return;
+    reparations.clear();
+    prestataires.clear();
+    repPerVeh.clear();
+    downloadedReparations = false;
+    downloadingReparations = false;
+    downloadedPrestataires = false;
+    downloadingPrestataires = false;
+    _cacheCompanyId = companyId;
+  }
+
   RepairProvider() {
+    _ensureCompanyCache();
     if (!downloadedReparations && !downloadingReparations) {
       refreshReparations();
     }
