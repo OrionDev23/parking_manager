@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:material_ui/material_ui.dart' as m;
+// ignore: deprecated_member_use
+import 'package:flutter/material.dart' as m;
 import 'package:flutter_chip_tags/flutter_chip_tags.dart';
 import 'package:parc_oto/datasources/workshop/option/option_datasource.dart';
 import 'package:parc_oto/widgets/zone_box.dart';
