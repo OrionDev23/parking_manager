@@ -335,42 +335,42 @@ class _DashboardState extends State<Dashboard>
                   if (conducteurEmploye)
                     MapEntry(
                       VehiclesUtilities.getPerimetre(0),
-                      DatabaseCounters().countVehiclesWithCondition([
-                        Query.equal('etatactuel', index),
-                        Query.equal('perimetre', 0),
-                      ]),
+                      DatabaseCounters().countVehiclesInStateAndPerimeter(
+                        state: index,
+                        perimeter: 0,
+                      ),
                     ),
                   if (conducteurEmploye)
                     MapEntry(
                       VehiclesUtilities.getPerimetre(1),
-                      DatabaseCounters().countVehiclesWithCondition([
-                        Query.equal('etatactuel', index),
-                        Query.equal('perimetre', 1),
-                      ]),
+                      DatabaseCounters().countVehiclesInStateAndPerimeter(
+                        state: index,
+                        perimeter: 1,
+                      ),
                     ),
                   if (conducteurEmploye)
                     MapEntry(
                       VehiclesUtilities.getPerimetre(2),
-                      DatabaseCounters().countVehiclesWithCondition([
-                        Query.equal('etatactuel', index),
-                        Query.equal('perimetre', 2),
-                      ]),
+                      DatabaseCounters().countVehiclesInStateAndPerimeter(
+                        state: index,
+                        perimeter: 2,
+                      ),
                     ),
                   if (!conducteurEmploye)
                     MapEntry(
                       VehiclesUtilities.getPerimetre(3),
-                      DatabaseCounters().countVehiclesWithCondition([
-                        Query.equal('etatactuel', index),
-                        Query.equal('perimetre', 3),
-                      ]),
+                      DatabaseCounters().countVehiclesInStateAndPerimeter(
+                        state: index,
+                        perimeter: 3,
+                      ),
                     ),
                   if (!conducteurEmploye)
                     MapEntry(
                       VehiclesUtilities.getPerimetre(4),
-                      DatabaseCounters().countVehiclesWithCondition([
-                        Query.equal('etatactuel', index),
-                        Query.equal('perimetre', 4),
-                      ]),
+                      DatabaseCounters().countVehiclesInStateAndPerimeter(
+                        state: index,
+                        perimeter: 4,
+                      ),
                     ),
                 ],
               ),
