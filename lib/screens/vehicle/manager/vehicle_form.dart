@@ -688,10 +688,12 @@ class _VehicleFormState extends State<VehicleForm>
   Widget _buildProfessionalDetailsSection(AppTheme appTheme) {
     final screenWidth = MediaQuery.of(context).size.width;
     final columns = screenWidth >= 1200 ? 4 : screenWidth >= 700 ? 2 : 1;
-    final fieldWidth =
-        ((screenWidth - 100 - (columns - 1) * 12) / columns)
-            .clamp(150.0, 420.0)
-            .toDouble();
+    final availableWidth = (screenWidth - 100)
+        .clamp(240.0, 1008.0)
+        .toDouble();
+    final fieldWidth = ((availableWidth - (columns - 1) * 12) / columns)
+        .clamp(150.0, 420.0)
+        .toDouble();
 
     Widget field(String label, TextEditingController controller,
         {String? hint, bool numeric = false}) {
