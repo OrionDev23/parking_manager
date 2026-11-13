@@ -297,7 +297,7 @@ class _VehicleFormState extends State<VehicleForm>
         margin: const EdgeInsets.only(top: 14, bottom: 6),
         padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
         decoration: BoxDecoration(
-          color: appTheme.color.withOpacity(0.08),
+          color: appTheme.color.withValues(alpha: 0.08),
           border: Border(
             left: BorderSide(color: appTheme.color, width: 3),
           ),
@@ -318,7 +318,7 @@ class _VehicleFormState extends State<VehicleForm>
               description,
               style: appTheme.writingStyle.copyWith(
                 fontSize: 11,
-                color: appTheme.writingStyle.color?.withOpacity(0.7),
+                color: appTheme.writingStyle.color?.withValues(alpha: 0.7),
               ),
             ),
           ],
