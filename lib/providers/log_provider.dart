@@ -6,6 +6,15 @@ import '../serializables/activity.dart';
 import 'client_database.dart';
 
 class LogProvider extends ChangeNotifier {
+  static void invalidateSessionCache() {
+    _cacheGeneration++;
+    _cacheCompanyId = null;
+    activities.clear();
+    downloadedActivities = false;
+    downloadingActivities = false;
+  }
+
+
   static Map<String, Activity> activities = {};
   static bool downloadedActivities = false;
   static bool downloadingActivities = false;
