@@ -13,12 +13,14 @@ class CostGraph extends StatefulWidget {
   final DateTime start;
   final DateTime end;
   final AppTheme appTheme;
+  final int refreshVersion;
 
   const CostGraph({
     super.key,
     required this.start,
     required this.end,
     required this.appTheme,
+    this.refreshVersion = 0,
   });
 
   @override
@@ -42,7 +44,7 @@ class _CostGraphState extends State<CostGraph> {
   @override
   void didUpdateWidget(covariant CostGraph oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.start != widget.start || oldWidget.end != widget.end) {
+    if (oldWidget.refreshVersion != widget.refreshVersion || oldWidget.start != widget.start || oldWidget.end != widget.end) {
       initValues();
     }
   }
@@ -63,7 +65,7 @@ class _CostGraphState extends State<CostGraph> {
       final loaded = await context.read<RepairProvider>().getReparationInMarge(
         start,
         end,
-      );
+      ).timeout(const Duration(seconds: 30));
       if (!mounted || generation != _loadGeneration) return;
 
       final inRange = loaded
