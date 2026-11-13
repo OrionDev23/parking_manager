@@ -35,7 +35,7 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
   int valueOfBiggest = 0;
   List<Color> colors = [];
   String? error;
-  bool _reloadPending = false;
+  int _loadGeneration = 0;
   bool _sameInputs(ParcOtoPie other) {
     if (widget.labels.length != other.labels.length) return false;
     for (var i = 0; i < widget.labels.length; i++) {
@@ -50,17 +50,12 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
   @override
   void didUpdateWidget(covariant ParcOtoPie oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!_sameInputs(oldWidget)) {
-      if (loading) {
-        _reloadPending = true;
-      } else {
-        initValues();
-      }
-    }
+    if (!_sameInputs(oldWidget)) initValues();
   }
 
   Future<void> initValues() async {
-    if (loading) return;
+    final generation = ++_loadGeneration;
+    final labels = widget.labels;
     setState(() {
       loading = true;
       error = null;
@@ -70,31 +65,28 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
       gotenColors = false;
       colors.clear();
     });
+
     try {
-      await Future.wait([
-        for (int i = 0; i < widget.labels.length; i++) getValue(i),
+      final loaded = await Future.wait([
+        for (final label in labels)
+          label.value.then((value) => MapEntry(label.key, value)),
       ]);
+      if (!mounted || generation != _loadGeneration) return;
+      values.addAll(loaded);
       sortAsIntended();
       totalNumber = values.fold<int>(0, (sum, item) => sum + item.value);
     } catch (exception) {
-      error = exception.toString();
+      if (generation == _loadGeneration) error = exception.toString();
     } finally {
-      loading = false;
-      if (mounted) {
-        setState(() {});
-        if (_reloadPending) {
-          _reloadPending = false;
-          initValues();
-        }
+      if (mounted && generation == _loadGeneration) {
+        setState(() {
+          loading = false;
+        });
       }
     }
   }
 
-  Future<void> getValue(int index) async {
-    values.add(
-      MapEntry(widget.labels[index].key, await widget.labels[index].value),
-    );
-  }
+
 
   bool notOnlyOne = false;
   void sortAsIntended() {
