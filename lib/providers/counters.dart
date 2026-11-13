@@ -70,6 +70,25 @@ class DatabaseCounters {
     return _countRows(tableId: vehiculeid, filters: queries);
   }
 
+  Future<int> countVehiclesInStateAndPerimeter({
+    required int state,
+    required int perimeter,
+  }) {
+    return _countRows(
+      tableId: vehiculeid,
+      filters: [
+        if (state == 0)
+          Query.or([
+            Query.isNull('etatactuel'),
+            Query.equal('etatactuel', 0),
+          ])
+        else
+          Query.equal('etatactuel', state),
+        Query.equal('perimetre', perimeter),
+      ],
+    );
+  }
+
   Future<int> countChauffeurWithCondition(List<String> queries) {
     return _countRows(tableId: chauffeurid, filters: queries);
   }
