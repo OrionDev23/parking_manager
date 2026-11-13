@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:appwrite/appwrite.dart';
 import 'package:flutter/foundation.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -506,6 +507,7 @@ class _DashboardState extends State<Dashboard>
             title: 'appartenanceconducteur'.tr(),
             icon: Icon(Icons.home_work_outlined, color: appTheme.color.darker),
             content: ParcOtoPie(
+              refreshVersion: _refreshVersion,
               labels: List.generate(
                 MyEntrepriseState.p!.filiales?.length ?? 0,
                 (index) => MapEntry(
