@@ -2488,6 +2488,26 @@ class _VehicleFormState extends State<VehicleForm>
               matr2.text.trim().length >= 3 &&
               matr3.text.trim().length >= 2;
     final chassisIsValid = !chassisKey || numSer.text.trim().isNotEmpty;
+    final acquisitionDate = acquisitionDateController.text.trim();
+    final warrantyEndDate = warrantyEndDateController.text.trim();
+    final hasInvalidDate =
+        (acquisitionDate.isNotEmpty &&
+            DateTime.tryParse(acquisitionDate) == null) ||
+        (warrantyEndDate.isNotEmpty &&
+            DateTime.tryParse(warrantyEndDate) == null);
+
+    if (hasInvalidDate) {
+      if (!mounted) return;
+      displayInfoBar(
+        context,
+        builder: (context, close) => const InfoBar(
+          title: Text('Date invalide. Utilisez le format AAAA-MM-JJ.'),
+          severity: InfoBarSeverity.error,
+        ),
+        duration: snackbarShortDuration,
+      );
+      return;
+    }
 
     if (!mounted) return;
     setState(() {
