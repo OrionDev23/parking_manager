@@ -44,18 +44,26 @@ class DatabaseCounters {
       }
     });
   }
-  Future<int> countVehicles({int etat = -1}) async {
+  Future<int> countVehicles({int etat = -1}) {
     if (VehicleProvider.downloadedVehicles) {
-      if (etat == -1) return VehicleProvider.vehicles.length;
-
-      var result = 0;
-      for (final vehicle in VehicleProvider.vehicles.values) {
-        if ((etat == 0 && vehicle.etatactuel == null) ||
-            vehicle.etatactuel == etat) {
-          result++;
-        }
+      final tenantRevision = DatabaseGetter.tenantRevision;
+      if (_cacheTenantRevision != tenantRevision) {
+        _countCache.clear();
+        _cacheTenantRevision = tenantRevision;
       }
-      return result;
+      final cacheKey = '$tenantRevision|localVehicles|$etat';
+      return _countCache.putIfAbsent(cacheKey, () async {
+        if (etat == -1) return VehicleProvider.vehicles.length;
+
+        var result = 0;
+        for (final vehicle in VehicleProvider.vehicles.values) {
+          if ((etat == 0 && vehicle.etatactuel == null) ||
+              vehicle.etatactuel == etat) {
+            result++;
+          }
+        }
+        return result;
+      });
     }
 
     return _countRows(
