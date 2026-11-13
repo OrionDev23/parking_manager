@@ -114,7 +114,7 @@ class _CostGraphState extends State<CostGraph> {
         debugPrint(
           '[ParcOto Dashboard] repair cost chart: '
           '${reparations.length} repairs, '
-          'source=$sourceTotal DA, chart=$chartTotal DA',
+          'source=$calculatedSourceTotal DA, chart=$chartTotal DA',
         );
       }
     } catch (exception) {
@@ -150,7 +150,7 @@ class _CostGraphState extends State<CostGraph> {
             const SizedBox(height: 8),
             const Text('Impossible de vérifier les dépenses.'),
             Text(error!, maxLines: 2, overflow: TextOverflow.ellipsis),
-            Button(
+            TextButton(
               onPressed: initValues,
               child: const Text('Réessayer'),
             ),
