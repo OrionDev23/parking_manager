@@ -62,7 +62,7 @@ class _CostGraphState extends State<CostGraph> {
     });
 
     try {
-      final loaded = await RepairProvider().getReparationInMarge(
+      final loaded = await context.read<RepairProvider>().getReparationInMarge(
         start,
         end,
       );
