@@ -47,8 +47,7 @@ class _StateBarsState extends State<StateBars> {
       return false;
     }
     for (var i = 0; i < widget.labels.length; i++) {
-      if (widget.labels[i].key != other.labels[i].key ||
-          false) {
+      if (widget.labels[i].key != other.labels[i].key) {
         return false;
       }
     }
