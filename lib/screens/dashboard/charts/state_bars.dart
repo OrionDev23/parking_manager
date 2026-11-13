@@ -71,12 +71,12 @@ class _StateBarsState extends State<StateBars> {
     });
 
     try {
-      final loaded = await Future.wait([
+      final loaded = await Future.wait<ChartData>([
         for (var i = 0; i < labels.length; i++)
           labels[i].value.then(
             (value) => ChartData(i, value, labels[i].key),
           ),
-      ]);
+      ]).timeout(const Duration(seconds: 25));
       if (!mounted || generation != _loadGeneration) return;
       values = _sortAsIntended(loaded, labels);
       gotenColors = false;
