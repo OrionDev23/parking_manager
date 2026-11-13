@@ -30,6 +30,7 @@ class _StateBarsState extends State<StateBars> {
   List<ChartData> values = [];
   List<Color> colors = [];
   String? error;
+  bool _reloadPending = false;
   @override
   void initState() {
     super.initState();
@@ -54,7 +55,13 @@ class _StateBarsState extends State<StateBars> {
   @override
   void didUpdateWidget(covariant StateBars oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!_sameInputs(oldWidget)) initValues();
+    if (!_sameInputs(oldWidget)) {
+      if (loading) {
+        _reloadPending = true;
+      } else {
+        initValues();
+      }
+    }
   }
 
   Future<void> initValues() async {
@@ -75,7 +82,13 @@ class _StateBarsState extends State<StateBars> {
       error = exception.toString();
     } finally {
       loading = false;
-      if (mounted) setState(() {});
+      if (mounted) {
+        setState(() {});
+        if (_reloadPending) {
+          _reloadPending = false;
+          initValues();
+        }
+      }
     }
   }
 
