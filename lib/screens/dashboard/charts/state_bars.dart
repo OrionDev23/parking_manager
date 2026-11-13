@@ -97,12 +97,17 @@ class _StateBarsState extends State<StateBars> {
     List<MapEntry<String, Future<int>>> labels,
   ) {
     final byLabel = {for (final item in source) item.label: item};
-    return [
-      for (var i = 0; i < labels.length; i++)
-        if (byLabel[labels[i].key] case final item)
-          if (item.y != 0 || !widget.hideEmpty)
-            ChartData(i, item.y, item.label),
-    ];
+    final sorted = <ChartData>[];
+    for (var i = 0; i < labels.length; i++) {
+      final item = byLabel[labels[i].key];
+
+      // Map lookup is nullable: skip missing entries instead of force-unwrapping.
+      if (item == null) continue;
+      if (item.y == 0 && widget.hideEmpty) continue;
+
+      sorted.add(ChartData(i, item.y, item.label));
+    }
+    return sorted;
   }
 
 
