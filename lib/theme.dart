@@ -253,10 +253,6 @@ class AppTheme extends ChangeNotifier {
             Colors.red,
             Colors.teal,
             Colors.yellow,
-            Colors.purple,
-            Colors.cyan,
-            Colors.pink,
-            Colors.indigo,
           ]
         : colors;
 
