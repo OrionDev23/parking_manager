@@ -23,8 +23,8 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
 
   @override
   void initState() {
-    initValues();
     super.initState();
+    initValues();
   }
 
   bool loading = false;
