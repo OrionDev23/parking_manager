@@ -140,7 +140,8 @@ class _DashboardState extends State<Dashboard>
       repairs.refreshReparations(),
       repairs.refreshPrestataires(),
     ]);
-    setState(() {});
+    DatabaseCounters.invalidateCache();
+    if (mounted) setState(() {});
   }
 
   List<Widget> buttonList() {
