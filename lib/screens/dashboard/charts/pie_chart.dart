@@ -40,8 +40,7 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
   bool _sameInputs(ParcOtoPie other) {
     if (widget.refreshVersion != other.refreshVersion || widget.labels.length != other.labels.length) return false;
     for (var i = 0; i < widget.labels.length; i++) {
-      if (widget.labels[i].key != other.labels[i].key ||
-          false) {
+      if (widget.labels[i].key != other.labels[i].key) {
         return false;
       }
     }
