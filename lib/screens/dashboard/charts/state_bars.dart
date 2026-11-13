@@ -32,8 +32,8 @@ class _StateBarsState extends State<StateBars> {
   String? error;
   @override
   void initState() {
-    initValues();
     super.initState();
+    initValues();
   }
 
   Future<void> initValues() async {
