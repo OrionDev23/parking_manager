@@ -71,7 +71,8 @@ class _StateBarsState extends State<StateCategoryBars> {
     setState(() {
       loading = true;
       error = null;
-      values.clear();
+      // Keep the previous chart data immutable while a refresh is pending.
+      values = [];
       gotenColors = false;
       colors.clear();
     });
@@ -90,7 +91,7 @@ class _StateBarsState extends State<StateCategoryBars> {
           }(),
       ]);
       if (!mounted || generation != _loadGeneration) return;
-      values.addAll(loaded);
+      values = loaded;
     } catch (exception) {
       if (generation == _loadGeneration) error = exception.toString();
     } finally {
