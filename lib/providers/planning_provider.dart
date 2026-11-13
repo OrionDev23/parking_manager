@@ -6,6 +6,15 @@ import '../main.dart';
 import 'client_database.dart';
 
 class PlanningProvider extends ChangeNotifier {
+  static void invalidateSessionCache() {
+    _cacheGeneration++;
+    _cacheCompanyId = null;
+    plannings.clear();
+    downloadedPlanning = false;
+    downloadingPlanning = false;
+  }
+
+
   static Map<String, Planning> plannings = {};
   static bool downloadedPlanning = false;
   static bool downloadingPlanning = false;
