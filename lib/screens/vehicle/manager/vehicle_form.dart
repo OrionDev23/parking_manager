@@ -185,7 +185,8 @@ class _VehicleFormState extends State<VehicleForm>
                 boxShadow: kElevationToShadow[3],
               ),
               padding: const EdgeInsets.all(10),
-              width: 1080.px,
+              width: double.infinity,
+              constraints: BoxConstraints(maxWidth: 1080.px),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -242,13 +243,7 @@ class _VehicleFormState extends State<VehicleForm>
 
   List<Widget> gridChildren(AppTheme appTheme) {
     return [
-      _sectionHeader(
-        appTheme,
-        'Identification du véhicule',
-        'Immatriculation, marque, modèle et numéro de châssis',
-      ),
-      ...firstLine(appTheme),
-      ...sixthLine(appTheme),
+      _buildVehicleIdentitySection(appTheme),
       _sectionHeader(
         appTheme,
         'Localisation et documents administratifs',
@@ -284,6 +279,416 @@ class _VehicleFormState extends State<VehicleForm>
       ),
       ...eightLine(appTheme),
     ];
+  }
+
+  Widget _buildVehicleIdentitySection(AppTheme appTheme) {
+    return StaggeredGridTile.fit(
+      crossAxisCellCount: 12,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: appTheme.backGroundColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: appTheme.color.withValues(alpha: 0.28)),
+        ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final availableWidth = constraints.maxWidth;
+            final columns = availableWidth >= 900
+                ? 4
+                : availableWidth >= 560
+                    ? 2
+                    : 1;
+            final spacing = 12.0;
+            final fieldWidth =
+                (availableWidth - (spacing * (columns - 1))) / columns;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: appTheme.color.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(FluentIcons.car, color: appTheme.color),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Identification du véhicule',
+                            style: appTheme.writingStyle.copyWith(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            'Identité administrative et commerciale du véhicule',
+                            style: appTheme.writingStyle.copyWith(
+                              fontSize: 12,
+                              color: appTheme.writingStyle.color
+                                  ?.withValues(alpha: 0.68),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (widget.readOnly)
+                      const Tooltip(
+                        message: 'Mode consultation',
+                        child: Icon(FluentIcons.lock, size: 16),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Wrap(
+                  spacing: spacing,
+                  runSpacing: 14,
+                  children: [
+                    _identityField(
+                      appTheme,
+                      width: fieldWidth,
+                      label: 'Immatriculation',
+                      requiredField: true,
+                      child: autreMat
+                          ? TextBox(
+                              enabled: !widget.readOnly,
+                              controller: matriculeEtr,
+                              maxLength: 30,
+                              placeholder: 'XXXXXXXXXXXXXX',
+                              style: appTheme.writingStyle,
+                              placeholderStyle: placeStyle,
+                              cursorColor: appTheme.color,
+                              decoration: _identityInputDecoration(appTheme),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                  RegExp('[0-9a-zA-Z.-]'),
+                                ),
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                Expanded(
+                                  flex: 6,
+                                  child: TextBox(
+                                    enabled: !widget.readOnly,
+                                    controller: matr1,
+                                    maxLength: 6,
+                                    placeholder: '123456',
+                                    textAlign: TextAlign.center,
+                                    style: appTheme.writingStyle,
+                                    placeholderStyle: placeStyle,
+                                    decoration: _identityInputDecoration(appTheme),
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                    ],
+                                  ),
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 5),
+                                  child: Text('-'),
+                                ),
+                                Expanded(
+                                  flex: 3,
+                                  child: TextBox(
+                                    enabled: !widget.readOnly,
+                                    controller: matr2,
+                                    maxLength: 3,
+                                    placeholder: '123',
+                                    textAlign: TextAlign.center,
+                                    style: appTheme.writingStyle,
+                                    placeholderStyle: placeStyle,
+                                    decoration: _identityInputDecoration(appTheme),
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                    ],
+                                    onChanged: (_) => updateOverMatricule(appTheme),
+                                  ),
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 5),
+                                  child: Text('-'),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: TextBox(
+                                    enabled: !widget.readOnly,
+                                    controller: matr3,
+                                    maxLength: 2,
+                                    placeholder: '16',
+                                    textAlign: TextAlign.center,
+                                    style: appTheme.writingStyle,
+                                    placeholderStyle: placeStyle,
+                                    decoration: _identityInputDecoration(appTheme),
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                    ],
+                                    onChanged: (_) => updateOverMatricule(appTheme),
+                                  ),
+                                ),
+                              ],
+                            ),
+                    ),
+                    _identityField(
+                      appTheme,
+                      width: fieldWidth,
+                      label: 'Marque',
+                      child: Button(
+                        onPressed: widget.readOnly
+                            ? null
+                            : () {
+                                SelectDialog.showModal<int?>(
+                                  context,
+                                  selectedValue: marque,
+                                  backgroundColor: appTheme.backGroundColor,
+                                  gridView: true,
+                                  numberOfGridCross: 3,
+                                  constraints: BoxConstraints.loose(
+                                    Size(600.px, 650.px),
+                                  ),
+                                  items: VehiclesUtilities.marques!.keys.toList(),
+                                  itemBuilder: (c, v, e) => Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8),
+                                      child: Image.asset(
+                                        'assets/images/marques/${v ?? 'default'}.webp',
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
+                                  onChange: (value) => setState(() => marque = value),
+                                  onFind: VehiclesUtilities.findMarque,
+                                  emptyBuilder: (_) => const Center(
+                                    child: Text('Aucune marque trouvée'),
+                                  ),
+                                  loadingBuilder: (_) => const Center(
+                                    child: ProgressRing(),
+                                  ),
+                                  searchBoxDecoration:
+                                      appTheme.materialUiInputDecoration.copyWith(
+                                    labelText: 'search'.tr(),
+                                    labelStyle: placeStyle,
+                                  ),
+                                  searchTextStyle: appTheme.writingStyle,
+                                  searchCursorColor: appTheme.color,
+                                );
+                              },
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              'assets/images/marques/${marque == null || marque! <= 0 ? 'default' : marque!}.webp',
+                              width: 28,
+                              height: 28,
+                              errorBuilder: (_, __, ___) =>
+                                  const Icon(FluentIcons.car),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                VehiclesUtilities.marques?[
+                                      marque == null || marque! <= 0 ? 0 : marque!
+                                    ] ??
+                                    'nonind'.tr(),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const Icon(FluentIcons.chevron_down, size: 12),
+                          ],
+                        ),
+                      ),
+                    ),
+                    _identityField(
+                      appTheme,
+                      width: fieldWidth,
+                      label: 'Modèle',
+                      child: TextBox(
+                        enabled: !widget.readOnly,
+                        controller: type,
+                        maxLength: 60,
+                        placeholder: 'Ex. : Clio, Corolla, Hilux',
+                        style: appTheme.writingStyle,
+                        placeholderStyle: placeStyle,
+                        cursorColor: appTheme.color,
+                        decoration: _identityInputDecoration(appTheme),
+                      ),
+                    ),
+                    _identityField(
+                      appTheme,
+                      width: fieldWidth,
+                      label: 'Genre',
+                      child: Button(
+                        onPressed: widget.readOnly
+                            ? null
+                            : () {
+                                SelectDialog.showModal<int>(
+                                  context,
+                                  selectedValue: genre,
+                                  backgroundColor: appTheme.backGroundColor,
+                                  items: VehiclesUtilities.genres!.keys.toList(),
+                                  itemBuilder: (c, value, e) => Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Text(
+                                      '$value  •  ${(VehiclesUtilities.genres?[value] ?? 'nonind').tr()}',
+                                    ),
+                                  ),
+                                  onChange: (value) => setState(() => genre = value),
+                                  onFind: VehiclesUtilities.findGenres,
+                                  emptyBuilder: (_) => const Center(
+                                    child: Text('Aucun genre trouvé'),
+                                  ),
+                                  loadingBuilder: (_) => const Center(
+                                    child: ProgressRing(),
+                                  ),
+                                  searchBoxDecoration:
+                                      appTheme.materialUiInputDecoration.copyWith(
+                                    labelText: 'search'.tr(),
+                                    labelStyle: placeStyle,
+                                  ),
+                                  searchTextStyle: appTheme.writingStyle,
+                                  searchCursorColor: appTheme.color,
+                                  constraints: BoxConstraints.loose(
+                                    Size(400.px, 450.px),
+                                  ),
+                                );
+                              },
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                (VehiclesUtilities.genres?[genre ?? -1] ??
+                                        'nonind')
+                                    .tr(),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const Icon(FluentIcons.chevron_down, size: 12),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (chassisKey)
+                      _identityField(
+                        appTheme,
+                        width: fieldWidth,
+                        label: 'Numéro de châssis (VIN)',
+                        requiredField: true,
+                        child: TextBox(
+                          enabled: !widget.readOnly,
+                          controller: numSer,
+                          maxLength: 30,
+                          placeholder: '17 caractères généralement',
+                          style: appTheme.writingStyle,
+                          placeholderStyle: placeStyle,
+                          cursorColor: appTheme.color,
+                          decoration: _identityInputDecoration(appTheme),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Checkbox(
+                      checked: autreMat,
+                      onChanged: widget.readOnly
+                          ? null
+                          : (value) => setState(() {
+                                autreMat = value ?? false;
+                                erreurMatricule = false;
+                              }),
+                      content: const Text('Immatriculation étrangère'),
+                    ),
+                    if (erreurMatricule) ...[
+                      const SizedBox(width: 12),
+                      const Icon(FluentIcons.warning, color: Colors.red, size: 14),
+                      const SizedBox(width: 5),
+                      const Flexible(
+                        child: Text(
+                          'Veuillez saisir une immatriculation valide.',
+                          style: TextStyle(color: Colors.red, fontSize: 12),
+                        ),
+                      ),
+                    ],
+                    if (errorChassis) ...[
+                      const SizedBox(width: 12),
+                      const Icon(FluentIcons.warning, color: Colors.red, size: 14),
+                      const SizedBox(width: 5),
+                      const Flexible(
+                        child: Text(
+                          'Le numéro de châssis est obligatoire.',
+                          style: TextStyle(color: Colors.red, fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _identityField(
+    AppTheme appTheme, {
+    required double width,
+    required String label,
+    required Widget child,
+    bool requiredField = false,
+  }) {
+    return SizedBox(
+      width: width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Row(
+              children: [
+                Text(
+                  label,
+                  style: appTheme.writingStyle.copyWith(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (requiredField)
+                  const Text(
+                    ' *',
+                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                  ),
+              ],
+            ),
+          ),
+          SizedBox(height: 42, child: child),
+        ],
+      ),
+    );
+  }
+
+  WidgetStateProperty<BoxDecoration> _identityInputDecoration(
+    AppTheme appTheme,
+  ) {
+    return WidgetStatePropertyAll(
+      BoxDecoration(
+        color: appTheme.fillColor,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: appTheme.color.withValues(alpha: 0.32),
+        ),
+      ),
+    );
   }
 
   Widget _sectionHeader(
