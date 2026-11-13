@@ -37,28 +37,54 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard>
     with AutomaticKeepAliveClientMixin {
+  late final VehicleProvider _vehicles;
+  late final DriverProvider _drivers;
+  late final LogProvider _logs;
+  late final PlanningProvider _plannings;
+  late final RepairProvider _repairs;
+
+  @override
+  void initState() {
+    super.initState();
+    // Keep provider instances stable across dashboard rebuilds. Recreating
+    // them during refresh caused chart inputs to be replaced repeatedly.
+    _vehicles = VehicleProvider();
+    _drivers = DriverProvider();
+    _logs = LogProvider();
+    _plannings = PlanningProvider();
+    _repairs = RepairProvider();
+  }
+
+  @override
+  void dispose() {
+    _vehicles.dispose();
+    _drivers.dispose();
+    _logs.dispose();
+    _plannings.dispose();
+    _repairs.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     var appTheme = context.watch<AppTheme>();
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<VehicleProvider>(
-          create: (c) => VehicleProvider(),
-        ),
-        ChangeNotifierProvider<DriverProvider>(create: (c) => DriverProvider()),
-        ChangeNotifierProvider<LogProvider>(create: (c) => LogProvider()),
-        ChangeNotifierProvider<PlanningProvider>(
-          create: (c) => PlanningProvider(),
-        ),
-        ChangeNotifierProvider<RepairProvider>(create: (c) => RepairProvider()),
+        ChangeNotifierProvider<VehicleProvider>.value(value: _vehicles),
+        ChangeNotifierProvider<DriverProvider>.value(value: _drivers),
+        ChangeNotifierProvider<LogProvider>.value(value: _logs),
+        ChangeNotifierProvider<PlanningProvider>.value(value: _plannings),
+        ChangeNotifierProvider<RepairProvider>.value(value: _repairs),
       ],
       builder: (con, w) {
-        var vehicles = Provider.of<VehicleProvider>(con);
-        var drivers = Provider.of<DriverProvider>(con);
-        var logs = Provider.of<LogProvider>(con);
-        var plannings = Provider.of<PlanningProvider>(con);
-        var repairs = Provider.of<RepairProvider>(con);
+        // Refresh is coordinated by the button; avoid rebuilding the entire
+        // dashboard for every individual provider notification.
+        final vehicles = Provider.of<VehicleProvider>(con, listen: false);
+        final drivers = Provider.of<DriverProvider>(con, listen: false);
+        final logs = Provider.of<LogProvider>(con, listen: false);
+        final plannings = Provider.of<PlanningProvider>(con, listen: false);
+        final repairs = Provider.of<RepairProvider>(con, listen: false);
         return ScaffoldPage(
           padding: EdgeInsets.zero,
           content: LayoutBuilder(
