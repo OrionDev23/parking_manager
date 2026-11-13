@@ -6,12 +6,12 @@ list(APPEND FLUTTER_PLUGIN_LIST
   desktop_webview_window
   file_selector_windows
   media_kit_libs_windows_video
-  media_kit_video
   printing
   screen_retriever_windows
-  share_plus
   system_theme
   url_launcher_windows
+  share_plus
+  media_kit_video
   window_manager
   window_to_front
 )

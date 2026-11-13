@@ -6,11 +6,11 @@ list(APPEND FLUTTER_PLUGIN_LIST
   desktop_webview_window
   file_selector_linux
   media_kit_libs_linux
-  media_kit_video
   printing
   screen_retriever_linux
   system_theme
   url_launcher_linux
+  media_kit_video
   window_manager
   window_to_front
 )
