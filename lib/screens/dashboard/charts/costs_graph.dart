@@ -30,7 +30,6 @@ class _CostGraphState extends State<CostGraph> {
   List<ChartDataTimeSpan> values = [];
   bool loading = true;
   String? error;
-  double sourceTotal = 0;
   double chartTotal = 0;
   int _loadGeneration = 0;
 
@@ -57,7 +56,6 @@ class _CostGraphState extends State<CostGraph> {
       error = null;
       reparations = [];
       values = [];
-      sourceTotal = 0;
       chartTotal = 0;
     });
 
@@ -110,7 +108,6 @@ class _CostGraphState extends State<CostGraph> {
 
       reparations = inRange;
       values = chartValues;
-      sourceTotal = calculatedSourceTotal;
       chartTotal = calculatedChartTotal;
 
       if (kDebugMode) {
