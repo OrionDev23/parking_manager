@@ -10,11 +10,13 @@ class StateBars extends StatefulWidget {
   final String? title;
   final bool vertical;
   final bool hideEmpty;
+  final int refreshVersion;
 
   final List<MapEntry<String, Future<int>>> labels;
   const StateBars({
     super.key,
     this.hideEmpty = false,
+    this.refreshVersion = 0,
     required this.labels,
     this.vertical = false,
     this.title,
@@ -40,12 +42,13 @@ class _StateBarsState extends State<StateBars> {
   bool _sameInputs(StateBars other) {
     if (widget.labels.length != other.labels.length ||
         widget.hideEmpty != other.hideEmpty ||
+        widget.refreshVersion != other.refreshVersion ||
         widget.vertical != other.vertical) {
       return false;
     }
     for (var i = 0; i < widget.labels.length; i++) {
       if (widget.labels[i].key != other.labels[i].key ||
-          !identical(widget.labels[i].value, other.labels[i].value)) {
+          false) {
         return false;
       }
     }
