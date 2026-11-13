@@ -12,7 +12,6 @@ import '../../../serializables/reparation/reparation.dart';
 class CostGraph extends StatefulWidget {
   final DateTime start;
   final DateTime end;
-
   final AppTheme appTheme;
 
   const CostGraph({
@@ -28,71 +27,110 @@ class CostGraph extends StatefulWidget {
 
 class _CostGraphState extends State<CostGraph> {
   List<Reparation> reparations = [];
-
   List<ChartDataTimeSpan> values = [];
-
   bool loading = true;
+  String? error;
+  double sourceTotal = 0;
+  double chartTotal = 0;
 
   @override
   void initState() {
-    initValues();
     super.initState();
+    initValues();
   }
 
-  void initValues() async {
-    reparations = await RepairProvider().getReparationInMarge(
-      widget.start,
-      widget.end,
-    );
-    if (kDebugMode) {
-      print('got them lenght :${reparations.length}');
-    }
-    fillValues();
-
-    loading = false;
-    if (mounted) {
-      setState(() {});
+  @override
+  void didUpdateWidget(covariant CostGraph oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.start != widget.start || oldWidget.end != widget.end) {
+      initValues();
     }
   }
 
-  void fillValues() {
-    for (var r in reparations) {
-      if (datePresent(r.date)) {
-        addToValue(DateTime(r.date.year, r.date.month), r.getPrixTTC());
-      } else {
-        values.add(
-          ChartDataTimeSpan(
-            DateTime(r.date.year, r.date.month),
-            r.getPrixTTC(),
-          ),
+  Future<void> initValues() async {
+    if (loading && reparations.isNotEmpty) return;
+    setState(() {
+      loading = true;
+      error = null;
+      reparations = [];
+      values = [];
+      sourceTotal = 0;
+      chartTotal = 0;
+    });
+
+    try {
+      final loaded = await RepairProvider().getReparationInMarge(
+        widget.start,
+        widget.end,
+      );
+      if (!mounted) return;
+
+      final inRange = loaded
+          .where(
+            (repair) =>
+                !repair.date.isBefore(widget.start) &&
+                !repair.date.isAfter(widget.end),
+          )
+          .toList();
+
+      final monthlyTotals = <DateTime, double>{};
+      for (final repair in inRange) {
+        final month = DateTime(repair.date.year, repair.date.month);
+        monthlyTotals.update(
+          month,
+          (total) => total + repair.getPrixTTC(),
+          ifAbsent: () => repair.getPrixTTC(),
         );
       }
-    }
 
-    values.sort((a, b) => a.x.compareTo(b.x));
-  }
+      final chartValues = monthlyTotals.entries
+          .map((entry) => ChartDataTimeSpan(entry.key, entry.value))
+          .toList()
+        ..sort((a, b) => a.x.compareTo(b.x));
 
-  void addToValue(DateTime date, double value) {
-    for (int j = 0; j < values.length; j++) {
-      if (values[j].x == date) {
-        values[j] = ChartDataTimeSpan(values[j].x, values[j].y + value);
-        return;
+      final calculatedSourceTotal = inRange.fold<double>(
+        0,
+        (total, repair) => total + repair.getPrixTTC(),
+      );
+      final calculatedChartTotal = chartValues.fold<double>(
+        0,
+        (total, point) => total + point.y,
+      );
+
+      // The chart must reconcile exactly (within floating-point tolerance)
+      // with the sum of the repair records returned by the provider.
+      if ((calculatedSourceTotal - calculatedChartTotal).abs() > 0.01) {
+        throw StateError(
+          'Le total du graphique ne correspond pas au total des réparations.',
+        );
+      }
+
+      reparations = inRange;
+      values = chartValues;
+      sourceTotal = calculatedSourceTotal;
+      chartTotal = calculatedChartTotal;
+
+      if (kDebugMode) {
+        debugPrint(
+          '[ParcOto Dashboard] repair cost chart: '
+          '${reparations.length} repairs, '
+          'source=$sourceTotal DA, chart=$chartTotal DA',
+        );
+      }
+    } catch (exception) {
+      error = exception.toString();
+    } finally {
+      if (mounted) {
+        setState(() {
+          loading = false;
+        });
       }
     }
-  }
-
-  bool datePresent(DateTime date) {
-    for (int j = 0; j < values.length; j++) {
-      if (values[j].x.month == date.month && values[j].x.year == date.year) {
-        return true;
-      }
-    }
-    return false;
   }
 
   @override
   Widget build(BuildContext context) {
-    var appTheme = context.watch<AppTheme>();
+    final appTheme = context.watch<AppTheme>();
     if (loading) {
       return const Center(
         child: SizedBox(
@@ -102,8 +140,41 @@ class _CostGraphState extends State<CostGraph> {
         ),
       );
     }
+
+    if (error != null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.warning_amber_rounded, size: 24),
+            const SizedBox(height: 8),
+            const Text('Impossible de vérifier les dépenses.'),
+            Text(error!, maxLines: 2, overflow: TextOverflow.ellipsis),
+            Button(
+              onPressed: initValues,
+              child: const Text('Réessayer'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (values.isEmpty) {
+      return const Center(child: Text('Aucune réparation sur cette période.'));
+    }
+
     return Column(
       children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Total vérifié : ${chartTotal.toStringAsFixed(2)} DA'),
+              Text('${reparations.length} réparations'),
+            ],
+          ),
+        ),
         Expanded(
           child: SfCartesianChart(
             plotAreaBorderWidth: 0,
@@ -120,7 +191,6 @@ class _CostGraphState extends State<CostGraph> {
               intervalType: DateTimeIntervalType.months,
               dateFormat: DateFormat.MMM(),
               majorGridLines: const MajorGridLines(width: 0),
-
               title: AxisTitle(text: 'months'.tr()),
             ),
             primaryYAxis: NumericAxis(
@@ -135,12 +205,8 @@ class _CostGraphState extends State<CostGraph> {
                 markerSettings: const MarkerSettings(isVisible: true),
                 color: appTheme.color.lightest,
                 dataSource: values,
-                xValueMapper: (data, t) {
-                  return data.x;
-                },
-                yValueMapper: (data, t) {
-                  return data.y;
-                },
+                xValueMapper: (data, _) => data.x,
+                yValueMapper: (data, _) => data.y,
               ),
             ],
           ),
