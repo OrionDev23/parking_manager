@@ -15,6 +15,30 @@ class Vehicle {
   final String? ownerFirstName;
   final String? ownerProfession;
   final String? serialNumber;
+  final String? trim;
+  final int? modelYear;
+  final String? imageFileId;
+  final String? imageUrl;
+  final String? imageSource;
+  final String? color;
+  final int? engineDisplacement;
+  final String? engineCode;
+  final String? transmission;
+  final String? gearbox;
+  final String? driveType;
+  final int? doors;
+  final int? lengthMm;
+  final int? widthMm;
+  final int? heightMm;
+  final String? acquisitionType;
+  final DateTime? acquisitionDate;
+  final double? purchasePrice;
+  final String? supplier;
+  final DateTime? warrantyEndDate;
+  final String? fleetNumber;
+  final int? currentMileage;
+  final int? nextServiceMileage;
+  final Map<String, dynamic> customFields;
   final String? type;
   final String? brand;
   final String? genre;
@@ -61,6 +85,30 @@ class Vehicle {
     this.ownerFirstName,
     this.ownerProfession,
     this.serialNumber,
+    this.trim,
+    this.modelYear,
+    this.imageFileId,
+    this.imageUrl,
+    this.imageSource,
+    this.color,
+    this.engineDisplacement,
+    this.engineCode,
+    this.transmission,
+    this.gearbox,
+    this.driveType,
+    this.doors,
+    this.lengthMm,
+    this.widthMm,
+    this.heightMm,
+    this.acquisitionType,
+    this.acquisitionDate,
+    this.purchasePrice,
+    this.supplier,
+    this.warrantyEndDate,
+    this.fleetNumber,
+    this.currentMileage,
+    this.nextServiceMileage,
+    this.customFields = const {},
     this.type,
     this.brand,
     this.genre,
@@ -128,6 +176,30 @@ class Vehicle {
     'ownerFirstName': ownerFirstName,
     'ownerProfession': ownerProfession,
     'serialNumber': serialNumber,
+    'trim': trim,
+    'modelYear': modelYear,
+    'imageFileId': imageFileId,
+    'imageUrl': imageUrl,
+    'imageSource': imageSource,
+    'color': color,
+    'engineDisplacement': engineDisplacement,
+    'engineCode': engineCode,
+    'transmission': transmission,
+    'gearbox': gearbox,
+    'driveType': driveType,
+    'doors': doors,
+    'lengthMm': lengthMm,
+    'widthMm': widthMm,
+    'heightMm': heightMm,
+    'acquisitionType': acquisitionType,
+    'acquisitionDate': acquisitionDate?.toIso8601String(),
+    'purchasePrice': purchasePrice,
+    'supplier': supplier,
+    'warrantyEndDate': warrantyEndDate?.toIso8601String(),
+    'fleetNumber': fleetNumber,
+    'currentMileage': currentMileage,
+    'nextServiceMileage': nextServiceMileage,
+    'customFields': customFields,
     'type': type,
     'brand': brand,
     'genre': genre,
@@ -175,6 +247,32 @@ class Vehicle {
     ownerFirstName: map['ownerFirstName'] as String?,
     ownerProfession: map['ownerProfession'] as String?,
     serialNumber: map['serialNumber'] as String?,
+    trim: map['trim'] as String?,
+    modelYear: (map['modelYear'] as num?)?.toInt(),
+    imageFileId: map['imageFileId'] as String?,
+    imageUrl: map['imageUrl'] as String?,
+    imageSource: map['imageSource'] as String?,
+    color: map['color'] as String?,
+    engineDisplacement: (map['engineDisplacement'] as num?)?.toInt(),
+    engineCode: map['engineCode'] as String?,
+    transmission: map['transmission'] as String?,
+    gearbox: map['gearbox'] as String?,
+    driveType: map['driveType'] as String?,
+    doors: (map['doors'] as num?)?.toInt(),
+    lengthMm: (map['lengthMm'] as num?)?.toInt(),
+    widthMm: (map['widthMm'] as num?)?.toInt(),
+    heightMm: (map['heightMm'] as num?)?.toInt(),
+    acquisitionType: map['acquisitionType'] as String?,
+    acquisitionDate: _date(map['acquisitionDate']),
+    purchasePrice: (map['purchasePrice'] as num?)?.toDouble(),
+    supplier: map['supplier'] as String?,
+    warrantyEndDate: _date(map['warrantyEndDate']),
+    fleetNumber: map['fleetNumber'] as String?,
+    currentMileage: (map['currentMileage'] as num?)?.toInt(),
+    nextServiceMileage: (map['nextServiceMileage'] as num?)?.toInt(),
+    customFields: Map<String, dynamic>.from(
+      map['customFields'] as Map? ?? const {},
+    ),
     type: map['type'] as String?,
     brand: map['brand'] as String?,
     genre: map['genre'] as String?,
