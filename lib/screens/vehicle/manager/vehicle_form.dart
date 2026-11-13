@@ -489,7 +489,7 @@ class _VehicleFormState extends State<VehicleForm>
                               'assets/images/marques/${marque == null || marque! <= 0 ? 'default' : marque!}.webp',
                               width: 28,
                               height: 28,
-                              errorBuilder: (_, __, ___) =>
+                              errorBuilder: (_, _, _) =>
                                   const Icon(FluentIcons.car),
                             ),
                             const SizedBox(width: 10),
@@ -610,9 +610,9 @@ class _VehicleFormState extends State<VehicleForm>
                     ),
                     if (erreurMatricule) ...[
                       const SizedBox(width: 12),
-                      const Icon(FluentIcons.warning, color: Colors.red, size: 14),
+                      Icon(FluentIcons.warning, color: Colors.red, size: 14),
                       const SizedBox(width: 5),
-                      const Flexible(
+                      Flexible(
                         child: Text(
                           'Veuillez saisir une immatriculation valide.',
                           style: TextStyle(color: Colors.red, fontSize: 12),
@@ -623,7 +623,7 @@ class _VehicleFormState extends State<VehicleForm>
                       const SizedBox(width: 12),
                       const Icon(FluentIcons.warning, color: Colors.red, size: 14),
                       const SizedBox(width: 5),
-                      const Flexible(
+                      Flexible(
                         child: Text(
                           'Le numéro de châssis est obligatoire.',
                           style: TextStyle(color: Colors.red, fontSize: 12),
@@ -664,7 +664,7 @@ class _VehicleFormState extends State<VehicleForm>
                   ),
                 ),
                 if (requiredField)
-                  const Text(
+                  Text(
                     ' *',
                     style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                   ),
