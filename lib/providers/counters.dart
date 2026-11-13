@@ -39,11 +39,13 @@ class DatabaseCounters {
             'Appwrite database unavailable while loading dashboard statistics',
           );
         }
-        final result = await database.listRows(
-          databaseId: databaseId,
-          tableId: tableId,
-          queries: [...filters, Query.limit(1)],
-        );
+        final result = await database
+            .listRows(
+              databaseId: databaseId,
+              tableId: tableId,
+              queries: [...filters, Query.limit(1)],
+            )
+            .timeout(const Duration(seconds: 20));
         return result.total;
       } catch (_) {
         // Do not cache failures: a later retry must be able to reach Appwrite.
