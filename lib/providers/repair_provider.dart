@@ -13,6 +13,19 @@ import '../utilities/profil_beautifier.dart';
 import 'client_database.dart';
 
 class RepairProvider extends ChangeNotifier {
+  static void invalidateSessionCache() {
+    _cacheGeneration++;
+    _cacheCompanyId = null;
+    reparations.clear();
+    prestataires.clear();
+    repPerVeh.clear();
+    downloadedReparations = false;
+    downloadingReparations = false;
+    downloadedPrestataires = false;
+    downloadingPrestataires = false;
+  }
+
+
   static Map<String, Reparation> reparations = {};
   static Map<String, Client> prestataires = {};
   static bool downloadedReparations = false;
