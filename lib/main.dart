@@ -23,6 +23,12 @@ import 'package:video_player_media_kit/video_player_media_kit.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'providers/client_database.dart';
+import 'providers/parts_provider.dart';
+import 'providers/log_provider.dart';
+import 'providers/planning_provider.dart';
+import 'providers/repair_provider.dart';
+import 'providers/driver_provider.dart';
+import 'providers/vehicle_provider.dart';
 import 'core/auth/auth_service.dart';
 import 'core/auth/legacy_appwrite_auth_service.dart';
 import 'core/services/company_service.dart';
@@ -98,6 +104,12 @@ Future<void> stopSessionRuntime() async {
   // Invalidate callbacks from the previous session even when the next login
   // reuses the same project ID.
   DatabaseGetter.invalidatePendingRequests();
+  VehicleProvider.invalidateSessionCache();
+  DriverProvider.invalidateSessionCache();
+  RepairProvider.invalidateSessionCache();
+  PlanningProvider.invalidateSessionCache();
+  LogProvider.invalidateSessionCache();
+  PartsProvider.invalidateSessionCache();
   _backgroundInitializationRetryTimer?.cancel();
   _backgroundInitializationRetryTimer = null;
   _backgroundInitializationRetryCount = 0;
