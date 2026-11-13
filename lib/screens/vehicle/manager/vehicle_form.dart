@@ -621,7 +621,7 @@ class _VehicleFormState extends State<VehicleForm>
                     ],
                     if (errorChassis) ...[
                       const SizedBox(width: 12),
-                      const Icon(FluentIcons.warning, color: Colors.red, size: 14),
+                      Icon(FluentIcons.warning, color: Colors.red, size: 14),
                       const SizedBox(width: 5),
                       Flexible(
                         child: Text(
