@@ -11,6 +11,21 @@ import '../utilities/profil_beautifier.dart';
 import 'client_database.dart';
 
 class VehicleProvider extends ChangeNotifier {
+  static void invalidateSessionCache() {
+    _cacheGeneration++;
+    _cacheCompanyId = null;
+    vehicles.clear();
+    etats.clear();
+    documentsVehicules.clear();
+    downloadedVehicles = false;
+    downloadingVehicles = false;
+    downloadedDocuments = false;
+    downloadingDocuments = false;
+    downloadedStates = false;
+    downloadingStates = false;
+  }
+
+
   static Map<String, Vehicle> vehicles = {};
   static Map<String, Etat> etats = {};
   static Map<String, DocumentVehicle> documentsVehicules = {};
