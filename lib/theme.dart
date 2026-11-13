@@ -240,11 +240,31 @@ class AppTheme extends ChangeNotifier {
   ];
 
   List<Color> getRandomColors(int nbr) {
-    if (nbr <= colors.length) return colors;
-    return [
-      ...colors,
-      ...List.generate(nbr - colors.length, (_) => colors.last),
-    ];
+    if (nbr <= 0) return const <Color>[];
+
+    // A chart can request more colors than the current palette contains.
+    // Never rely on List.last: the palette may be empty after a theme update
+    // or external mutation. Use a non-empty fallback and cycle deterministically.
+    final palette = colors.isEmpty
+        ? <Color>[
+            Colors.blue,
+            Colors.orange,
+            Colors.green,
+            Colors.red,
+            Colors.teal,
+            Colors.yellow,
+            Colors.purple,
+            Colors.cyan,
+            Colors.pink,
+            Colors.indigo,
+          ]
+        : colors;
+
+    return List<Color>.generate(
+      nbr,
+      (index) => palette[index % palette.length],
+      growable: false,
+    );
   }
 
   set color(AccentColor value) {
