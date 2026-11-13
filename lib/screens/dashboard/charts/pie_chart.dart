@@ -9,10 +9,11 @@ import '../../../widgets/empty_widget/src/widget.dart';
 
 class ParcOtoPie extends StatefulWidget {
   final String? title;
+  final int refreshVersion;
 
   final List<MapEntry<String, Future<int>>> labels;
 
-  const ParcOtoPie({super.key, required this.labels, this.title});
+  const ParcOtoPie({super.key, required this.labels, this.title, this.refreshVersion = 0});
 
   @override
   State<ParcOtoPie> createState() => _ParcOtoPieState();
@@ -37,10 +38,10 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
   String? error;
   int _loadGeneration = 0;
   bool _sameInputs(ParcOtoPie other) {
-    if (widget.labels.length != other.labels.length) return false;
+    if (widget.refreshVersion != other.refreshVersion || widget.labels.length != other.labels.length) return false;
     for (var i = 0; i < widget.labels.length; i++) {
       if (widget.labels[i].key != other.labels[i].key ||
-          !identical(widget.labels[i].value, other.labels[i].value)) {
+          false) {
         return false;
       }
     }
@@ -70,7 +71,7 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
       final loaded = await Future.wait([
         for (final label in labels)
           label.value.then((value) => MapEntry(label.key, value)),
-      ]);
+      ]).timeout(const Duration(seconds: 25));
       if (!mounted || generation != _loadGeneration) return;
       values.addAll(loaded);
       sortAsIntended();
