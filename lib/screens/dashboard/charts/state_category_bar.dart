@@ -74,7 +74,7 @@ class _StateBarsState extends State<StateCategoryBars> {
       // Keep the previous chart data immutable while a refresh is pending.
       values = [];
       gotenColors = false;
-      colors.clear();
+      colors = <Color>[];
     });
 
     try {
@@ -194,7 +194,7 @@ class _StateBarsState extends State<StateCategoryBars> {
 
   @override
   void dispose() {
-    values.clear();
+    _loadGeneration++;
     super.dispose();
   }
 }
