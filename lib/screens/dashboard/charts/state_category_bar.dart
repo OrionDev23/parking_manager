@@ -78,18 +78,18 @@ class _StateBarsState extends State<StateCategoryBars> {
     });
 
     try {
-      final loaded = await Future.wait([
+      final loaded = await Future.wait<ChartDataCategory>([
         for (final category in labels)
           () async {
-            final categoryValues = await Future.wait([
+            final categoryValues = await Future.wait<ChartData>([
               for (var i = 0; i < category.value.length; i++)
                 category.value[i].value.then(
                   (value) => ChartData(i, value, category.value[i].key),
                 ),
-            ]);
+            ]).timeout(const Duration(seconds: 25));
             return ChartDataCategory(category.key, categoryValues);
           }(),
-      ]);
+      ]).timeout(const Duration(seconds: 25));
       if (!mounted || generation != _loadGeneration) return;
       values = loaded;
     } catch (exception) {
