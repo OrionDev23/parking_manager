@@ -69,7 +69,7 @@ class _StateBarsState extends State<StateBars> {
       // Do not mutate the list currently held by Syncfusion's chart.
       values = [];
       gotenColors = false;
-      colors.clear();
+      colors = <Color>[];
     });
 
     try {
@@ -219,7 +219,7 @@ class _StateBarsState extends State<StateBars> {
 
   @override
   void dispose() {
-    values.clear();
+    _loadGeneration++;
     super.dispose();
   }
 }
