@@ -9,10 +9,11 @@ import 'common.dart';
 
 class StateCategoryBars extends StatefulWidget {
   final String? title;
+  final int refreshVersion;
 
   final List<MapEntry<String, List<MapEntry<String, Future<int>>>>> labels;
 
-  const StateCategoryBars({super.key, required this.labels, this.title});
+  const StateCategoryBars({super.key, required this.labels, this.title, this.refreshVersion = 0});
 
   @override
   State<StateCategoryBars> createState() => _StateBarsState();
@@ -41,7 +42,7 @@ class _StateBarsState extends State<StateCategoryBars> {
   }
 
   bool _sameInputs(StateCategoryBars other) {
-    if (widget.labels.length != other.labels.length) return false;
+    if (widget.refreshVersion != other.refreshVersion || widget.labels.length != other.labels.length) return false;
     for (var i = 0; i < widget.labels.length; i++) {
       final current = widget.labels[i];
       final previous = other.labels[i];
@@ -51,7 +52,7 @@ class _StateBarsState extends State<StateCategoryBars> {
       }
       for (var j = 0; j < current.value.length; j++) {
         if (current.value[j].key != previous.value[j].key ||
-            !identical(current.value[j].value, previous.value[j].value)) {
+            false) {
           return false;
         }
       }
