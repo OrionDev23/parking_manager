@@ -242,16 +242,89 @@ class _VehicleFormState extends State<VehicleForm>
 
   List<Widget> gridChildren(AppTheme appTheme) {
     return [
+      _sectionHeader(
+        appTheme,
+        'Identification du véhicule',
+        'Immatriculation, marque, modèle et numéro de châssis',
+      ),
       ...firstLine(appTheme),
+      ...sixthLine(appTheme),
+      _sectionHeader(
+        appTheme,
+        'Localisation et documents administratifs',
+        'Pays, wilaya, commune et informations de la carte grise',
+      ),
       ...getWilayaCommuneWidget(appTheme),
       ...secondLine(appTheme),
-      if (conducteurEmploye) ...thirdLine(appTheme),
-      if (conducteurEmploye) ...forthLine(appTheme),
+      if (conducteurEmploye) ...[
+        _sectionHeader(
+          appTheme,
+          'Propriétaire et conducteur',
+          'Informations sur le propriétaire et le conducteur associé',
+        ),
+        ...thirdLine(appTheme),
+        ...forthLine(appTheme),
+      ],
+      _sectionHeader(
+        appTheme,
+        'Organisation et rattachement',
+        'Appartenance, filiale, direction et département',
+      ),
       ...fifthLine(appTheme),
-      ...sixthLine(appTheme),
+      _sectionHeader(
+        appTheme,
+        'Caractéristiques techniques',
+        'Configuration, motorisation, capacité et caractéristiques du véhicule',
+      ),
       ...seventhLine(appTheme),
+      _sectionHeader(
+        appTheme,
+        'Historique des immatriculations',
+        'Anciennes immatriculations connues pour ce véhicule',
+      ),
       ...eightLine(appTheme),
     ];
+  }
+
+  Widget _sectionHeader(
+    AppTheme appTheme,
+    String title,
+    String description,
+  ) {
+    return StaggeredGridTile.fit(
+      crossAxisCellCount: 12,
+      child: Container(
+        margin: const EdgeInsets.only(top: 14, bottom: 6),
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+        decoration: BoxDecoration(
+          color: appTheme.color.withOpacity(0.08),
+          border: Border(
+            left: BorderSide(color: appTheme.color, width: 3),
+          ),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: appTheme.writingStyle.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              description,
+              style: appTheme.writingStyle.copyWith(
+                fontSize: 11,
+                color: appTheme.writingStyle.color?.withOpacity(0.7),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   List<Widget> firstLine(AppTheme appTheme) {
