@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:flutter/foundation.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:material_ui/material_ui.dart' show Icons;
@@ -42,10 +43,16 @@ class _DashboardState extends State<Dashboard>
   late final LogProvider _logs;
   late final PlanningProvider _plannings;
   late final RepairProvider _repairs;
+  late final DateTime _periodStart;
+  late final DateTime _periodEnd;
+  int _refreshVersion = 0;
+  bool _refreshing = false;
 
   @override
   void initState() {
     super.initState();
+    _periodEnd = DateTime.now();
+    _periodStart = _periodEnd.subtract(const Duration(days: 30 * 6));
     // Keep provider instances stable across dashboard rebuilds. Recreating
     // them during refresh caused chart inputs to be replaced repeatedly.
     _vehicles = VehicleProvider();
@@ -108,7 +115,7 @@ class _DashboardState extends State<Dashboard>
                       message: 'Actualiser les données',
                       child: IconButton(
                         icon: const Icon(FluentIcons.refresh),
-                        onPressed: () => onRefresh(
+                        onPressed: _refreshing ? null : () => onRefresh(
                           vehicles,
                           drivers,
                           logs,
@@ -156,18 +163,37 @@ class _DashboardState extends State<Dashboard>
     PlanningProvider plannings,
     RepairProvider repairs,
   ) async {
-    await Future.wait([
-      vehicles.refreshVehicles(),
-      vehicles.refreshDocuments(),
-      drivers.refreshConducteurs(),
-      drivers.refreshDocuments(),
-      logs.refreshLogs(),
-      plannings.refreshPlannings(),
-      repairs.refreshReparations(),
-      repairs.refreshPrestataires(),
-    ]);
-    DatabaseCounters.invalidateCache();
-    if (mounted) setState(() {});
+    if (_refreshing) return;
+    setState(() => _refreshing = true);
+
+    try {
+      // Some providers may already be synchronizing from their constructors.
+      // Bound the dashboard refresh so one stalled endpoint cannot prevent
+      // chart refresh and UI recovery forever.
+      await Future.wait<void>([
+        vehicles.refreshVehicles(),
+        vehicles.refreshDocuments(),
+        drivers.refreshConducteurs(),
+        drivers.refreshDocuments(),
+        logs.refreshLogs(),
+        plannings.refreshPlannings(),
+        repairs.refreshReparations(),
+        repairs.refreshPrestataires(),
+      ]).timeout(const Duration(seconds: 30));
+    } on TimeoutException {
+      debugPrint('[ParcOto Dashboard] refresh timed out after 30 seconds');
+    } catch (error, stackTrace) {
+      debugPrint('[ParcOto Dashboard] refresh failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    } finally {
+      DatabaseCounters.invalidateCache();
+      if (mounted) {
+        setState(() {
+          _refreshVersion++;
+          _refreshing = false;
+        });
+      }
+    }
   }
 
   List<Widget> buttonList() {
@@ -252,8 +278,8 @@ class _DashboardState extends State<Dashboard>
   }
 
   List<Widget> widgetList(AppTheme appTheme) {
-    DateTime start = DateTime.now().subtract(const Duration(days: 30 * 6));
-    DateTime end = DateTime.now();
+    final start = _periodStart;
+    final end = _periodEnd;
 
     double height = 400.px;
 
@@ -265,6 +291,7 @@ class _DashboardState extends State<Dashboard>
           title: 'vstates'.tr(),
           icon: Icon(FluentIcons.health, color: appTheme.color.darker),
           content: StateBars(
+            refreshVersion: _refreshVersion,
             labels: conducteurEmploye
                 ? [
                     MapEntry(
@@ -323,6 +350,7 @@ class _DashboardState extends State<Dashboard>
               color: appTheme.color.darker,
             ),
             content: ParcOtoPie(
+              refreshVersion: _refreshVersion,
               labels: List.generate(
                 MyEntrepriseState.p?.filiales?.length ?? 0,
                 (index) => MapEntry(
@@ -351,6 +379,7 @@ class _DashboardState extends State<Dashboard>
           title: 'perimetre'.tr(),
           icon: Icon(FluentIcons.map_directions, color: appTheme.color.darker),
           content: StateCategoryBars(
+            refreshVersion: _refreshVersion,
             labels: List.generate(
               conducteurEmploye ? 5 : 4,
               (index) => MapEntry(
@@ -522,7 +551,7 @@ class _DashboardState extends State<Dashboard>
           height: height,
           title: 'depenses'.tr(),
           icon: Icon(FluentIcons.cost_control, color: appTheme.color.darker),
-          content: CostGraph(start: start, end: end, appTheme: appTheme),
+          content: CostGraph(start: start, end: end, appTheme: appTheme, refreshVersion: _refreshVersion),
           onTap: () {
             PaneItemsAndFooters.selectPane('vehicle-manager');
           },
