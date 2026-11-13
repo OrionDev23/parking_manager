@@ -12,18 +12,16 @@ class DatabaseCounters {
     List<String> filters = const [],
   }) async {
     final database = DatabaseGetter.database;
-    if (database == null) return 0;
-
-    try {
-      final result = await database.listRows(
-        databaseId: databaseId,
-        tableId: tableId,
-        queries: [...filters, Query.limit(1)],
-      );
-      return result.total;
-    } on AppwriteException {
-      return 0;
+    if (database == null) {
+      throw StateError('Appwrite database unavailable while loading dashboard statistics');
     }
+
+    final result = await database.listRows(
+      databaseId: databaseId,
+      tableId: tableId,
+      queries: [...filters, Query.limit(1)],
+    );
+    return result.total;
   }
 
   Future<int> countVehicles({int etat = -1}) async {
