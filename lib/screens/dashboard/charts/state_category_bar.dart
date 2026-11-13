@@ -51,8 +51,7 @@ class _StateBarsState extends State<StateCategoryBars> {
         return false;
       }
       for (var j = 0; j < current.value.length; j++) {
-        if (current.value[j].key != previous.value[j].key ||
-            false) {
+        if (current.value[j].key != previous.value[j].key) {
           return false;
         }
       }
