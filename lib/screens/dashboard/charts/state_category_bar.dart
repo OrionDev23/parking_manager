@@ -26,8 +26,8 @@ class _StateBarsState extends State<StateCategoryBars> {
   String? error;
   @override
   void initState() {
-    initValues();
     super.initState();
+    initValues();
   }
 
   bool gotenColors = false;
