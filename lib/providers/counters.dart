@@ -3,27 +3,47 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
 
 class DatabaseCounters {
-  /// Appwrite returns the total number of matching rows independently from
-  /// the page size. A one-row page is therefore enough to retrieve a count.
-  /// The previous offset loops repeated the same count request and could loop
-  /// indefinitely for tables with at least 5,000 rows.
+  static final Map<String, Future<int>> _countCache = {};
+  static int _cacheTenantRevision = -1;
+
+  /// Clears memoized counts after an explicit dashboard refresh.
+  static void invalidateCache() {
+    _countCache.clear();
+  }
+
   Future<int> _countRows({
     required String tableId,
     List<String> filters = const [],
-  }) async {
-    final database = DatabaseGetter.database;
-    if (database == null) {
-      throw StateError('Appwrite database unavailable while loading dashboard statistics');
+  }) {
+    final tenantRevision = DatabaseGetter.tenantRevision;
+    if (_cacheTenantRevision != tenantRevision) {
+      _countCache.clear();
+      _cacheTenantRevision = tenantRevision;
     }
 
-    final result = await database.listRows(
-      databaseId: databaseId,
-      tableId: tableId,
-      queries: [...filters, Query.limit(1)],
-    );
-    return result.total;
-  }
+    final cacheKey = '$tenantRevision|$tableId|${filters.join('|')}';
+    return _countCache.putIfAbsent(cacheKey, () async {
+      final database = DatabaseGetter.database;
+      if (database == null) {
+        throw StateError(
+          'Appwrite database unavailable while loading dashboard statistics',
+        );
+      }
 
+      try {
+        final result = await database.listRows(
+          databaseId: databaseId,
+          tableId: tableId,
+          queries: [...filters, Query.limit(1)],
+        );
+        return result.total;
+      } catch (_) {
+        // Do not cache failures: a later retry must be able to reach Appwrite.
+        _countCache.remove(cacheKey);
+        rethrow;
+      }
+    });
+  }
   Future<int> countVehicles({int etat = -1}) async {
     if (VehicleProvider.downloadedVehicles) {
       if (etat == -1) return VehicleProvider.vehicles.length;
