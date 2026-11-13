@@ -64,7 +64,8 @@ class _StateBarsState extends State<StateBars> {
     setState(() {
       loading = true;
       error = null;
-      values.clear();
+      // Do not mutate the list currently held by Syncfusion's chart.
+      values = [];
       gotenColors = false;
       colors.clear();
     });
@@ -77,8 +78,9 @@ class _StateBarsState extends State<StateBars> {
           ),
       ]);
       if (!mounted || generation != _loadGeneration) return;
-      values.addAll(loaded);
-      sortAsIntended();
+      values = _sortAsIntended(loaded, labels);
+      gotenColors = false;
+      colors = [];
     } catch (exception) {
       if (generation == _loadGeneration) error = exception.toString();
     } finally {
@@ -90,24 +92,18 @@ class _StateBarsState extends State<StateBars> {
     }
   }
 
-  void sortAsIntended() {
-    loading = true;
-    List<ChartData> result = [];
-    for (int i = 0; i < widget.labels.length; i++) {
-      for (int j = 0; j < values.length; j++) {
-        if (widget.labels[i].key == values[j].label) {
-          if (values[j].y != 0 || !widget.hideEmpty) {
-            result.add(ChartData(values[j].x, values[j].y, values[j].label));
-          }
-          values.removeAt(j);
-          break;
-        }
-      }
-    }
-    values.clear();
-    values.addAll(result);
+  List<ChartData> _sortAsIntended(
+    List<ChartData> source,
+    List<MapEntry<String, Future<int>>> labels,
+  ) {
+    final byLabel = {for (final item in source) item.label: item};
+    return [
+      for (var i = 0; i < labels.length; i++)
+        if (byLabel[labels[i].key] case final item)
+          if (item.y != 0 || !widget.hideEmpty)
+            ChartData(i, item.y, item.label),
+    ];
   }
-
 
 
   bool hideEmptyFil = true;
