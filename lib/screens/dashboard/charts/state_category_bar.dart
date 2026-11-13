@@ -39,6 +39,31 @@ class _StateBarsState extends State<StateCategoryBars> {
     }
   }
 
+  bool _sameInputs(StateCategoryBars other) {
+    if (widget.labels.length != other.labels.length) return false;
+    for (var i = 0; i < widget.labels.length; i++) {
+      final current = widget.labels[i];
+      final previous = other.labels[i];
+      if (current.key != previous.key ||
+          current.value.length != previous.value.length) {
+        return false;
+      }
+      for (var j = 0; j < current.value.length; j++) {
+        if (current.value[j].key != previous.value[j].key ||
+            !identical(current.value[j].value, previous.value[j].value)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  @override
+  void didUpdateWidget(covariant StateCategoryBars oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_sameInputs(oldWidget)) initValues();
+  }
+
   Future<void> initValues() async {
     if (loading) return;
     setState(() {
