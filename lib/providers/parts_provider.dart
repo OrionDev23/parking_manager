@@ -12,6 +12,28 @@ import '../serializables/pieces/option.dart';
 import '../serializables/pieces/part.dart';
 
 class PartsProvider extends ChangeNotifier {
+  static void invalidateSessionCache() {
+    _cacheGeneration++;
+    _cacheCompanyId = null;
+    categories.clear();
+    brands.clear();
+    options.clear();
+    parts.clear();
+    fournisseurs.clear();
+    refreshErrors.clear();
+    errorCategories = true;
+    errorBrands = true;
+    errorOptions = true;
+    errorParts = true;
+    errorFournisseurs = true;
+    downloadingCategories = false;
+    downloadingBrands = false;
+    downloadingOptions = false;
+    downloadingParts = false;
+    downloadingFournisseurs = false;
+  }
+
+
   static Map<String, Category> categories = {};
   static Map<String, Brand> brands = {};
   static Map<String, Option> options = {};
