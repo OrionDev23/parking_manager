@@ -32,6 +32,7 @@ class _CostGraphState extends State<CostGraph> {
   String? error;
   double sourceTotal = 0;
   double chartTotal = 0;
+  int _loadGeneration = 0;
 
   @override
   void initState() {
@@ -48,7 +49,9 @@ class _CostGraphState extends State<CostGraph> {
   }
 
   Future<void> initValues() async {
-    if (loading && reparations.isNotEmpty) return;
+    final generation = ++_loadGeneration;
+    final start = widget.start;
+    final end = widget.end;
     setState(() {
       loading = true;
       error = null;
@@ -60,16 +63,16 @@ class _CostGraphState extends State<CostGraph> {
 
     try {
       final loaded = await RepairProvider().getReparationInMarge(
-        widget.start,
-        widget.end,
+        start,
+        end,
       );
-      if (!mounted) return;
+      if (!mounted || generation != _loadGeneration) return;
 
       final inRange = loaded
           .where(
             (repair) =>
-                !repair.date.isBefore(widget.start) &&
-                !repair.date.isAfter(widget.end),
+                !repair.date.isBefore(start) &&
+                !repair.date.isAfter(end),
           )
           .toList();
 
@@ -118,9 +121,9 @@ class _CostGraphState extends State<CostGraph> {
         );
       }
     } catch (exception) {
-      error = exception.toString();
+      if (generation == _loadGeneration) error = exception.toString();
     } finally {
-      if (mounted) {
+      if (mounted && generation == _loadGeneration) {
         setState(() {
           loading = false;
         });
