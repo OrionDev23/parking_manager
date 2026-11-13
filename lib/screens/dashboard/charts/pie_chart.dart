@@ -35,6 +35,23 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
   int valueOfBiggest = 0;
   List<Color> colors = [];
   String? error;
+  bool _sameInputs(ParcOtoPie other) {
+    if (widget.labels.length != other.labels.length) return false;
+    for (var i = 0; i < widget.labels.length; i++) {
+      if (widget.labels[i].key != other.labels[i].key ||
+          !identical(widget.labels[i].value, other.labels[i].value)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @override
+  void didUpdateWidget(covariant ParcOtoPie oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_sameInputs(oldWidget)) initValues();
+  }
+
   Future<void> initValues() async {
     if (loading) return;
     setState(() {
