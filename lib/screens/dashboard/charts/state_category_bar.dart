@@ -24,7 +24,7 @@ class _StateBarsState extends State<StateCategoryBars> {
 
   List<Color> colors = [];
   String? error;
-  bool _reloadPending = false;
+  int _loadGeneration = 0;
   @override
   void initState() {
     super.initState();
@@ -62,17 +62,12 @@ class _StateBarsState extends State<StateCategoryBars> {
   @override
   void didUpdateWidget(covariant StateCategoryBars oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!_sameInputs(oldWidget)) {
-      if (loading) {
-        _reloadPending = true;
-      } else {
-        initValues();
-      }
-    }
+    if (!_sameInputs(oldWidget)) initValues();
   }
 
   Future<void> initValues() async {
-    if (loading) return;
+    final generation = ++_loadGeneration;
+    final labels = widget.labels;
     setState(() {
       loading = true;
       error = null;
@@ -80,52 +75,34 @@ class _StateBarsState extends State<StateCategoryBars> {
       gotenColors = false;
       colors.clear();
     });
+
     try {
-      await Future.wait([
-        for (int i = 0; i < widget.labels.length; i++) getValue(i),
+      final loaded = await Future.wait([
+        for (final category in labels)
+          () async {
+            final categoryValues = await Future.wait([
+              for (var i = 0; i < category.value.length; i++)
+                category.value[i].value.then(
+                  (value) => ChartData(i, value, category.value[i].key),
+                ),
+            ]);
+            return ChartDataCategory(category.key, categoryValues);
+          }(),
       ]);
-      sortAsIntended();
+      if (!mounted || generation != _loadGeneration) return;
+      values.addAll(loaded);
     } catch (exception) {
-      error = exception.toString();
+      if (generation == _loadGeneration) error = exception.toString();
     } finally {
-      loading = false;
-      if (mounted) {
-        setState(() {});
-        if (_reloadPending) {
-          _reloadPending = false;
-          initValues();
-        }
+      if (mounted && generation == _loadGeneration) {
+        setState(() {
+          loading = false;
+        });
       }
     }
   }
 
-  void sortAsIntended() {
-    List<ChartDataCategory> result = [];
-    for (int i = 0; i < widget.labels.length; i++) {
-      for (int j = 0; j < values.length; j++) {
-        if (widget.labels[i].key == values[j].category) {
-          result.add(ChartDataCategory(widget.labels[i].key, values[j].values));
-          values.removeAt(j);
-          break;
-        }
-      }
-    }
-    values.addAll(result);
-  }
 
-  Future<void> getValue(int index) async {
-    List<ChartData> s = [];
-    for (int j = 0; j < widget.labels[index].value.length; j++) {
-      s.add(
-        ChartData(
-          j,
-          await widget.labels[index].value[j].value,
-          widget.labels[index].value[j].key,
-        ),
-      );
-    }
-    values.add(ChartDataCategory(widget.labels[index].key, s));
-  }
 
   @override
   Widget build(BuildContext context) {
