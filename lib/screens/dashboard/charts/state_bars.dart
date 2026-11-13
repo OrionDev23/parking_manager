@@ -30,7 +30,7 @@ class _StateBarsState extends State<StateBars> {
   List<ChartData> values = [];
   List<Color> colors = [];
   String? error;
-  bool _reloadPending = false;
+  int _loadGeneration = 0;
   @override
   void initState() {
     super.initState();
@@ -55,17 +55,12 @@ class _StateBarsState extends State<StateBars> {
   @override
   void didUpdateWidget(covariant StateBars oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!_sameInputs(oldWidget)) {
-      if (loading) {
-        _reloadPending = true;
-      } else {
-        initValues();
-      }
-    }
+    if (!_sameInputs(oldWidget)) initValues();
   }
 
   Future<void> initValues() async {
-    if (loading) return;
+    final generation = ++_loadGeneration;
+    final labels = widget.labels;
     setState(() {
       loading = true;
       error = null;
@@ -73,21 +68,24 @@ class _StateBarsState extends State<StateBars> {
       gotenColors = false;
       colors.clear();
     });
+
     try {
-      await Future.wait([
-        for (int i = 0; i < widget.labels.length; i++) getValue(i),
+      final loaded = await Future.wait([
+        for (var i = 0; i < labels.length; i++)
+          labels[i].value.then(
+            (value) => ChartData(i, value, labels[i].key),
+          ),
       ]);
+      if (!mounted || generation != _loadGeneration) return;
+      values.addAll(loaded);
       sortAsIntended();
     } catch (exception) {
-      error = exception.toString();
+      if (generation == _loadGeneration) error = exception.toString();
     } finally {
-      loading = false;
-      if (mounted) {
-        setState(() {});
-        if (_reloadPending) {
-          _reloadPending = false;
-          initValues();
-        }
+      if (mounted && generation == _loadGeneration) {
+        setState(() {
+          loading = false;
+        });
       }
     }
   }
@@ -110,15 +108,7 @@ class _StateBarsState extends State<StateBars> {
     values.addAll(result);
   }
 
-  Future<void> getValue(int index) async {
-    values.add(
-      ChartData(
-        index,
-        await widget.labels[index].value,
-        widget.labels[index].key,
-      ),
-    );
-  }
+
 
   bool hideEmptyFil = true;
 
