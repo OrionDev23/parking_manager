@@ -61,6 +61,28 @@ class _VehicleFormState extends State<VehicleForm>
   TextEditingController places = TextEditingController();
   TextEditingController poidsT = TextEditingController();
   TextEditingController charg = TextEditingController();
+
+  // Professional vehicle data, independent from the legacy registration fields.
+  final trimController = TextEditingController();
+  final modelYearController = TextEditingController();
+  final colorController = TextEditingController();
+  final engineDisplacementController = TextEditingController();
+  final engineCodeController = TextEditingController();
+  final transmissionController = TextEditingController();
+  final gearboxController = TextEditingController();
+  final driveTypeController = TextEditingController();
+  final doorsController = TextEditingController();
+  final lengthController = TextEditingController();
+  final widthController = TextEditingController();
+  final heightController = TextEditingController();
+  final acquisitionTypeController = TextEditingController();
+  final acquisitionDateController = TextEditingController();
+  final purchasePriceController = TextEditingController();
+  final supplierController = TextEditingController();
+  final warrantyEndDateController = TextEditingController();
+  final fleetNumberController = TextEditingController();
+  final mileageController = TextEditingController();
+  final nextServiceMileageController = TextEditingController();
   DateTime? selectedAnnee = DateTime(2023);
   bool autreMat = false;
   int? marque;
@@ -160,6 +182,28 @@ class _VehicleFormState extends State<VehicleForm>
       selectedAnnee = DateTime(
         widget.vehicle!.anneeUtil ?? DateTime.now().year,
       );
+      trimController.text = widget.vehicle!.trim ?? '';
+      modelYearController.text = widget.vehicle!.modelYear?.toString() ?? '';
+      colorController.text = widget.vehicle!.color ?? '';
+      engineDisplacementController.text =
+          widget.vehicle!.engineDisplacement?.toString() ?? '';
+      engineCodeController.text = widget.vehicle!.engineCode ?? '';
+      transmissionController.text = widget.vehicle!.transmission ?? '';
+      gearboxController.text = widget.vehicle!.gearbox ?? '';
+      driveTypeController.text = widget.vehicle!.driveType ?? '';
+      doorsController.text = widget.vehicle!.doors?.toString() ?? '';
+      lengthController.text = widget.vehicle!.lengthMm?.toString() ?? '';
+      widthController.text = widget.vehicle!.widthMm?.toString() ?? '';
+      heightController.text = widget.vehicle!.heightMm?.toString() ?? '';
+      acquisitionTypeController.text = widget.vehicle!.acquisitionType ?? '';
+      acquisitionDateController.text = widget.vehicle!.acquisitionDate ?? '';
+      purchasePriceController.text = widget.vehicle!.purchasePrice?.toString() ?? '';
+      supplierController.text = widget.vehicle!.supplier ?? '';
+      warrantyEndDateController.text = widget.vehicle!.warrantyEndDate ?? '';
+      fleetNumberController.text = widget.vehicle!.fleetNumber ?? '';
+      mileageController.text = widget.vehicle!.currentMileage?.toString() ?? '';
+      nextServiceMileageController.text =
+          widget.vehicle!.nextServiceMileage?.toString() ?? '';
     }
     documentID ??= DatabaseGetter.ref
         .difference(DateTime.now())
@@ -272,6 +316,7 @@ class _VehicleFormState extends State<VehicleForm>
         'Configuration, motorisation, capacité et caractéristiques du véhicule',
       ),
       ...seventhLine(appTheme),
+      _buildProfessionalDetailsSection(appTheme),
       _sectionHeader(
         appTheme,
         'Historique des immatriculations',
@@ -638,6 +683,118 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
     );
+  }
+
+  Widget _buildProfessionalDetailsSection(AppTheme appTheme) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final columns = screenWidth >= 1200 ? 4 : screenWidth >= 700 ? 2 : 1;
+    final fieldWidth =
+        ((screenWidth - 100 - (columns - 1) * 12) / columns).clamp(150.0, 420.0);
+
+    Widget field(String label, TextEditingController controller,
+        {String? hint, bool numeric = false}) {
+      return _identityField(
+        appTheme,
+        width: fieldWidth,
+        label: label,
+        child: TextBox(
+          enabled: !widget.readOnly,
+          controller: controller,
+          placeholder: hint ?? label,
+          style: appTheme.writingStyle,
+          placeholderStyle: placeStyle,
+          cursorColor: appTheme.color,
+          decoration: _identityInputDecoration(appTheme),
+          inputFormatters: numeric
+              ? [FilteringTextInputFormatter.digitsOnly]
+              : const [],
+        ),
+      );
+    }
+
+    return StaggeredGridTile.fit(
+      crossAxisCellCount: 12,
+      child: Container(
+        margin: const EdgeInsets.only(top: 14, bottom: 8),
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: appTheme.backGroundColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: appTheme.color.withValues(alpha: 0.22)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(FluentIcons.toolbox, color: appTheme.color, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Données professionnelles et exploitation',
+                    style: appTheme.writingStyle.copyWith(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 5),
+            Text(
+              'Informations complémentaires, facultatives et modifiables.',
+              style: appTheme.writingStyle.copyWith(
+                fontSize: 12,
+                color: appTheme.writingStyle.color?.withValues(alpha: 0.68),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Wrap(
+              spacing: 12,
+              runSpacing: 14,
+              children: [
+                field('Version / finition', trimController),
+                field('Année modèle', modelYearController,
+                    hint: 'Ex. 2022', numeric: true),
+                field('Couleur', colorController),
+                field('Cylindrée (cm³)', engineDisplacementController,
+                    numeric: true),
+                field('Code moteur', engineCodeController),
+                field('Transmission', transmissionController,
+                    hint: 'Ex. traction, propulsion, 4x4'),
+                field('Boîte de vitesses', gearboxController,
+                    hint: 'Ex. manuelle, automatique'),
+                field('Nombre de portes', doorsController, numeric: true),
+                field('Longueur (mm)', lengthController, numeric: true),
+                field('Largeur (mm)', widthController, numeric: true),
+                field('Hauteur (mm)', heightController, numeric: true),
+                field('Type d’acquisition', acquisitionTypeController,
+                    hint: 'Achat, leasing, location…'),
+                field('Date d’acquisition', acquisitionDateController,
+                    hint: 'AAAA-MM-JJ'),
+                field('Prix d’acquisition (DA)', purchasePriceController,
+                    hint: 'Montant en DA'),
+                field('Fournisseur / vendeur', supplierController),
+                field('Fin de garantie', warrantyEndDateController,
+                    hint: 'AAAA-MM-JJ'),
+                field('Numéro de parc', fleetNumberController),
+                field('Kilométrage actuel (km)', mileageController,
+                    numeric: true),
+                field('Prochaine révision (km)', nextServiceMileageController,
+                    numeric: true),
+                field('Type de motricité', driveTypeController,
+                    hint: 'Ex. 4x2, 4x4'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String? _nullableText(String value) {
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
   }
 
   Widget _identityField(
@@ -2358,7 +2515,28 @@ class _VehicleFormState extends State<VehicleForm>
         numero: numero.text,
         numeroSerie: numSer.text,
         // Preserve extended data while editing a vehicle in the legacy form.
-        trim: widget.vehicle?.trim,
+        trim: _nullableText(trimController.text),
+        modelYear: int.tryParse(modelYearController.text.trim()),
+        color: _nullableText(colorController.text),
+        engineDisplacement: int.tryParse(engineDisplacementController.text.trim()),
+        engineCode: _nullableText(engineCodeController.text),
+        transmission: _nullableText(transmissionController.text),
+        gearbox: _nullableText(gearboxController.text),
+        driveType: _nullableText(driveTypeController.text),
+        doors: int.tryParse(doorsController.text.trim()),
+        lengthMm: int.tryParse(lengthController.text.trim()),
+        widthMm: int.tryParse(widthController.text.trim()),
+        heightMm: int.tryParse(heightController.text.trim()),
+        acquisitionType: _nullableText(acquisitionTypeController.text),
+        acquisitionDate: _nullableText(acquisitionDateController.text),
+        purchasePrice: double.tryParse(
+          purchasePriceController.text.trim().replaceAll(',', '.'),
+        ),
+        supplier: _nullableText(supplierController.text),
+        warrantyEndDate: _nullableText(warrantyEndDateController.text),
+        fleetNumber: _nullableText(fleetNumberController.text),
+        currentMileage: int.tryParse(mileageController.text.trim()),
+        nextServiceMileage: int.tryParse(nextServiceMileageController.text.trim()),
         modelYear: widget.vehicle?.modelYear,
         imageFileId: widget.vehicle?.imageFileId,
         imageUrl: widget.vehicle?.imageUrl,
