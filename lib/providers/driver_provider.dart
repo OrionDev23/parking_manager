@@ -10,6 +10,21 @@ import '../utilities/profil_beautifier.dart';
 import 'client_database.dart';
 
 class DriverProvider extends ChangeNotifier {
+  static void invalidateSessionCache() {
+    _cacheGeneration++;
+    _cacheCompanyId = null;
+    conducteurs.clear();
+    disponibiliteConducteurs.clear();
+    documentConducteurs.clear();
+    downloadedConducteurs = false;
+    downloadingConducteurs = false;
+    downloadedDocuments = false;
+    downloadingDocuments = false;
+    downloadedDisp = false;
+    downloadingDisp = false;
+  }
+
+
   static Map<String, Conducteur> conducteurs = {};
   static Map<String, DisponibiliteChauffeur> disponibiliteConducteurs = {};
   static Map<String, DocumentChauffeur> documentConducteurs = {};
