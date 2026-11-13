@@ -173,6 +173,15 @@ Future<void> _configureSessionRuntime(String companyId) async {
     vehicleServices = nextVehicles;
     driverServices = nextDrivers;
     legacyStockSyncService = nextStock;
+
+    // Runtime swaps can happen without a logout (for example, switching
+    // companies). Invalidate all legacy provider caches at the swap boundary.
+    VehicleProvider.invalidateSessionCache();
+    DriverProvider.invalidateSessionCache();
+    RepairProvider.invalidateSessionCache();
+    PlanningProvider.invalidateSessionCache();
+    LogProvider.invalidateSessionCache();
+    PartsProvider.invalidateSessionCache();
     syncEngine = nextEngine;
     _runtimeCompanyId = companyId;
     _runtimeReady = true;
