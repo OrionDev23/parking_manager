@@ -1844,52 +1844,24 @@ class _VehicleFormState extends State<VehicleForm>
   bool uploading = false;
   bool errorUploading = false;
   bool errorChassis = false;
-  void confirmAndUpload() async {
-    if (autreMat) {
-      if (matriculeEtr.text.isEmpty || matriculeEtr.text.length < 4) {
-        if (!erreurMatricule) {
-          setState(() {
-            erreurMatricule = true;
-          });
-        }
-      } else {
-        if (erreurMatricule) {
-          setState(() {
-            erreurMatricule = false;
-          });
-        }
-      }
-    } else {
-      if (matr1.text.isEmpty ||
-          matr2.text.length < 3 ||
-          matr3.text.length < 2) {
-        if (!erreurMatricule) {
-          setState(() {
-            erreurMatricule = true;
-          });
-        }
-      } else {
-        if (erreurMatricule) {
-          setState(() {
-            erreurMatricule = false;
-          });
-        }
-      }
-    }
-    if (numSer.text.trim().isEmpty) {
-      errorChassis = true;
-      if (!errorChassis) {
-        setState(() {});
-      }
-    } else {
-      if (errorChassis) {
-        setState(() {
-          errorChassis = false;
-        });
-      }
-    }
+  Future<void> confirmAndUpload() async {
+    final matriculeIsValid = autreMat
+        ? matriculeEtr.text.trim().length >= 4
+        : matr1.text.trim().isNotEmpty &&
+              matr2.text.trim().length >= 3 &&
+              matr3.text.trim().length >= 2;
+    final chassisIsValid = !chassisKey || numSer.text.trim().isNotEmpty;
 
-    if (!erreurMatricule) {
+    if (!mounted) return;
+    setState(() {
+      erreurMatricule = !matriculeIsValid;
+      errorChassis = !chassisIsValid;
+    });
+
+    // Do not persist an incomplete vehicle record.
+    if (!matriculeIsValid || !chassisIsValid) return;
+
+    if (mounted) {
       setState(() {
         uploading = true;
         errorUploading = false;
@@ -1918,8 +1890,8 @@ class _VehicleFormState extends State<VehicleForm>
         profession: profession.text,
         puissance: int.tryParse(puissance.text),
         daira: dairaCont.text,
-        genre: genre.toString(),
-        marque: marque.toString(),
+        genre: genre?.toString(),
+        marque: marque?.toString(),
         matriculePrec: matriculesPrec,
         carrosserie: caross.text,
         charegeUtile: int.tryParse(charg.text),
