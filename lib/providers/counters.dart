@@ -3,279 +3,90 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
 
 class DatabaseCounters {
-  Future<int> countVehicles({int etat = -1}) async {
-    int result = 0;
+  /// Appwrite returns the total number of matching rows independently from
+  /// the page size. A one-row page is therefore enough to retrieve a count.
+  /// The previous offset loops repeated the same count request and could loop
+  /// indefinitely for tables with at least 5,000 rows.
+  Future<int> _countRows({
+    required String tableId,
+    List<String> filters = const [],
+  }) async {
+    final database = DatabaseGetter.database;
+    if (database == null) return 0;
 
+    try {
+      final result = await database.listRows(
+        databaseId: databaseId,
+        tableId: tableId,
+        queries: [...filters, Query.limit(1)],
+      );
+      return result.total;
+    } on AppwriteException {
+      return 0;
+    }
+  }
+
+  Future<int> countVehicles({int etat = -1}) async {
     if (VehicleProvider.downloadedVehicles) {
-      if (etat == -1) {
-        return VehicleProvider.vehicles.length;
-      }
-      var v = VehicleProvider.vehicles.entries.toList();
-      for (int i = 0; i < v.length; i++) {
-        if ((etat == 0 && v[i].value.etatactuel == null) ||
-            v[i].value.etatactuel == etat) {
+      if (etat == -1) return VehicleProvider.vehicles.length;
+
+      var result = 0;
+      for (final vehicle in VehicleProvider.vehicles.values) {
+        if ((etat == 0 && vehicle.etatactuel == null) ||
+            vehicle.etatactuel == etat) {
           result++;
         }
       }
-    } else {
-      bool cont = true;
-
-      while (cont) {
-        await DatabaseGetter.database!
-            .listRows(
-              databaseId: databaseId,
-              tableId: vehiculeid,
-              queries: [
-                if (etat != -1) Query.equal('etatactuel', etat),
-                Query.limit(1),
-                Query.offset(result),
-              ],
-            )
-            .then((value) {
-              result += value.total;
-              if (value.total < 5000) {
-                cont = false;
-              }
-            })
-            .onError((AppwriteException error, stackTrace) {
-              cont = false;
-            });
-      }
+      return result;
     }
-    return result;
+
+    return _countRows(
+      tableId: vehiculeid,
+      filters: [
+        if (etat != -1) Query.equal('etatactuel', etat),
+      ],
+    );
   }
 
-  Future<int> countVehiclesWithCondition(List<String> queries) async {
-    int result = 0;
-
-    bool cont = true;
-
-    while (cont) {
-      await DatabaseGetter.database!
-          .listRows(
-            databaseId: databaseId,
-            tableId: vehiculeid,
-            queries: [...queries, Query.limit(1), Query.offset(result)],
-          )
-          .then((value) {
-            result += value.total;
-            if (value.total < 5000) {
-              cont = false;
-            }
-          })
-          .onError((AppwriteException error, stackTrace) {
-            cont = false;
-          });
-    }
-    return result;
+  Future<int> countVehiclesWithCondition(List<String> queries) {
+    return _countRows(tableId: vehiculeid, filters: queries);
   }
 
-  Future<int> countChauffeurWithCondition(List<String> queries) async {
-    int result = 0;
-
-    bool cont = true;
-
-    while (cont) {
-      await DatabaseGetter.database!
-          .listRows(
-            databaseId: databaseId,
-            tableId: chauffeurid,
-            queries: [...queries, Query.limit(1), Query.offset(result)],
-          )
-          .then((value) {
-            result += value.total;
-            if (value.total < 5000) {
-              cont = false;
-            }
-          })
-          .onError((AppwriteException error, stackTrace) {
-            cont = false;
-          });
-    }
-    return result;
+  Future<int> countChauffeurWithCondition(List<String> queries) {
+    return _countRows(tableId: chauffeurid, filters: queries);
   }
 
-  Future<int> countChauffeur({int etat = -1}) async {
-    int result = 0;
-    bool cont = true;
-
-    while (cont) {
-      await DatabaseGetter.database!
-          .listRows(
-            databaseId: databaseId,
-            tableId: chauffeurid,
-            queries: [
-              if (etat != -1) Query.equal('etat', etat),
-              if (etat == -1) Query.notEqual('etat', 3),
-              Query.limit(1),
-            ],
-          )
-          .then((value) {
-            result += value.total;
-            if (value.total < 5000) {
-              cont = false;
-            }
-          })
-          .onError((AppwriteException error, stackTrace) {
-            cont = false;
-          });
-    }
-    return result;
+  Future<int> countChauffeur({int etat = -1}) {
+    return _countRows(
+      tableId: chauffeurid,
+      filters: [
+        if (etat != -1) Query.equal('etat', etat),
+        if (etat == -1) Query.notEqual('etat', 3),
+      ],
+    );
   }
 
-  Future<int> countVdocs() async {
-    int result = 0;
-
-    bool cont = true;
-
-    while (cont) {
-      await DatabaseGetter.database!
-          .listRows(
-            databaseId: databaseId,
-            tableId: vehicDoc,
-            queries: [Query.limit(1), Query.offset(result)],
-          )
-          .then((value) {
-            result += value.total;
-            if (value.total < 5000) {
-              cont = false;
-            }
-          })
-          .onError((AppwriteException error, stackTrace) {
-            cont = false;
-          });
-    }
-
-    return result;
+  Future<int> countVdocs() {
+    return _countRows(tableId: vehicDoc);
   }
 
-  Future<int> countCDocs() async {
-    int result = 0;
-
-    bool cont = true;
-
-    while (cont) {
-      await DatabaseGetter.database!
-          .listRows(
-            databaseId: databaseId,
-            tableId: chaufDoc,
-            queries: [Query.limit(1), Query.offset(result)],
-          )
-          .then((value) {
-            result += value.total;
-            if (value.total < 5000) {
-              cont = false;
-            }
-          })
-          .onError((AppwriteException error, stackTrace) {
-            cont = false;
-          });
-    }
-
-    return result;
+  Future<int> countCDocs() {
+    return _countRows(tableId: chaufDoc);
   }
 
-  Future<int> countReservation() async {
-    int result = 0;
-
-    bool cont = true;
-
-    while (cont) {
-      await DatabaseGetter.database!
-          .listRows(
-            databaseId: databaseId,
-            tableId: planningID,
-            queries: [Query.limit(1), Query.offset(result)],
-          )
-          .then((value) {
-            result += value.total;
-            if (value.total < 5000) {
-              cont = false;
-            }
-          })
-          .onError((AppwriteException error, stackTrace) {
-            cont = false;
-          });
-    }
-
-    return result;
+  Future<int> countReservation() {
+    return _countRows(tableId: planningID);
   }
 
-  Future<int> countLog() async {
-    int result = 0;
-
-    bool cont = true;
-
-    while (cont) {
-      await DatabaseGetter.database!
-          .listRows(
-            databaseId: databaseId,
-            tableId: activityId,
-            queries: [Query.limit(1), Query.offset(result)],
-          )
-          .then((value) {
-            result += value.total;
-            if (value.total < 5000) {
-              cont = false;
-            }
-          })
-          .onError((AppwriteException error, stackTrace) {
-            cont = false;
-          });
-    }
-
-    return result;
+  Future<int> countLog() {
+    return _countRows(tableId: activityId);
   }
 
-  Future<int> countReparation() async {
-    int result = 0;
-
-    bool cont = true;
-
-    while (cont) {
-      await DatabaseGetter.database!
-          .listRows(
-            databaseId: databaseId,
-            tableId: reparationId,
-            queries: [Query.limit(1), Query.offset(result)],
-          )
-          .then((value) {
-            result += value.total;
-            if (value.total < 5000) {
-              cont = false;
-            }
-          })
-          .onError((AppwriteException error, stackTrace) {
-            cont = false;
-          });
-    }
-
-    return result;
+  Future<int> countReparation() {
+    return _countRows(tableId: reparationId);
   }
 
-  Future<int> countPrestataire() async {
-    int result = 0;
-
-    bool cont = true;
-
-    while (cont) {
-      await DatabaseGetter.database!
-          .listRows(
-            databaseId: databaseId,
-            tableId: prestataireId,
-            queries: [Query.limit(1), Query.offset(result)],
-          )
-          .then((value) {
-            result += value.total;
-            if (value.total < 5000) {
-              cont = false;
-            }
-          })
-          .onError((AppwriteException error, stackTrace) {
-            cont = false;
-          });
-    }
-
-    return result;
+  Future<int> countPrestataire() {
+    return _countRows(tableId: prestataireId);
   }
 }
