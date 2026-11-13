@@ -696,7 +696,7 @@ class _VehicleFormState extends State<VehicleForm>
         .toDouble();
 
     Widget field(String label, TextEditingController controller,
-        {String? hint, bool numeric = false}) {
+        {String? hint, bool numeric = false, bool decimal = false}) {
       return _identityField(
         appTheme,
         width: fieldWidth,
@@ -711,7 +711,9 @@ class _VehicleFormState extends State<VehicleForm>
           decoration: _identityInputDecoration(appTheme),
           inputFormatters: numeric
               ? [FilteringTextInputFormatter.digitsOnly]
-              : const [],
+              : decimal
+                  ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))]
+                  : const [],
         ),
       );
     }
@@ -777,7 +779,7 @@ class _VehicleFormState extends State<VehicleForm>
                 field('Date d’acquisition', acquisitionDateController,
                     hint: 'AAAA-MM-JJ'),
                 field('Prix d’acquisition (DA)', purchasePriceController,
-                    hint: 'Montant en DA'),
+                    hint: 'Montant en DA', decimal: true),
                 field('Fournisseur / vendeur', supplierController),
                 field('Fin de garantie', warrantyEndDateController,
                     hint: 'AAAA-MM-JJ'),
