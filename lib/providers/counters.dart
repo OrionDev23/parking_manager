@@ -3,7 +3,8 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
 
 class DatabaseCounters {
-  static final Map<String, Future<int>> _countCache = {};
+  static const Duration _cacheTtl = Duration(seconds: 15);
+  static final Map<String, _CachedCount> _countCache = {};
   static int _cacheTenantRevision = -1;
 
   /// Clears memoized counts after an explicit dashboard refresh.
@@ -22,7 +23,15 @@ class DatabaseCounters {
     }
 
     final cacheKey = '$tenantRevision|$tableId|${filters.join('|')}';
-    return _countCache.putIfAbsent(cacheKey, () async {
+    final now = DateTime.now();
+    final cached = _countCache[cacheKey];
+    if (cached != null && now.difference(cached.createdAt) < _cacheTtl) {
+      return cached.future;
+    }
+    _countCache.remove(cacheKey);
+
+    late final Future<int> future;
+    future = () async {
       try {
         final database = DatabaseGetter.database;
         if (database == null) {
@@ -38,10 +47,14 @@ class DatabaseCounters {
         return result.total;
       } catch (_) {
         // Do not cache failures: a later retry must be able to reach Appwrite.
-        _countCache.remove(cacheKey);
+        if (identical(_countCache[cacheKey]?.future, future)) {
+          _countCache.remove(cacheKey);
+        }
         rethrow;
       }
-    });
+    }();
+    _countCache[cacheKey] = _CachedCount(now, future);
+    return future;
   }
   Future<int> countVehicles({int etat = -1}) {
     if (VehicleProvider.downloadedVehicles) {
@@ -51,7 +64,12 @@ class DatabaseCounters {
         _cacheTenantRevision = tenantRevision;
       }
       final cacheKey = '$tenantRevision|localVehicles|$etat';
-      return _countCache.putIfAbsent(cacheKey, () async {
+      final now = DateTime.now();
+      final cached = _countCache[cacheKey];
+      if (cached != null && now.difference(cached.createdAt) < _cacheTtl) {
+        return cached.future;
+      }
+      final future = Future<int>(() {
         if (etat == -1) return VehicleProvider.vehicles.length;
 
         var result = 0;
@@ -63,6 +81,8 @@ class DatabaseCounters {
         }
         return result;
       });
+      _countCache[cacheKey] = _CachedCount(now, future);
+      return future;
     }
 
     return _countRows(
@@ -139,4 +159,11 @@ class DatabaseCounters {
   Future<int> countPrestataire() {
     return _countRows(tableId: prestataireId);
   }
+}
+
+class _CachedCount {
+  final DateTime createdAt;
+  final Future<int> future;
+
+  const _CachedCount(this.createdAt, this.future);
 }
