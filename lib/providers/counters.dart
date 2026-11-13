@@ -23,14 +23,13 @@ class DatabaseCounters {
 
     final cacheKey = '$tenantRevision|$tableId|${filters.join('|')}';
     return _countCache.putIfAbsent(cacheKey, () async {
-      final database = DatabaseGetter.database;
-      if (database == null) {
-        throw StateError(
-          'Appwrite database unavailable while loading dashboard statistics',
-        );
-      }
-
       try {
+        final database = DatabaseGetter.database;
+        if (database == null) {
+          throw StateError(
+            'Appwrite database unavailable while loading dashboard statistics',
+          );
+        }
         final result = await database.listRows(
           databaseId: databaseId,
           tableId: tableId,
