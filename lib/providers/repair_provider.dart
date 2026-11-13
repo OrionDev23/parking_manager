@@ -375,43 +375,68 @@ class RepairProvider extends ChangeNotifier {
     DateTime start,
     DateTime end,
   ) async {
-    List<Reparation> result = [];
+    final companyId = vehicleServices.companyId;
+    final generation = _cacheGeneration;
+    final database = DatabaseGetter.database;
+
+    // Wait for an in-flight initial refresh so the method never reads a
+    // half-populated cache.
     while (downloadingReparations) {
       await Future.delayed(const Duration(milliseconds: 100));
-    }
-    if (downloadedReparations) {
-      for (var element in reparations.values) {
-        if ((element.date.isAtSameMomentAs(start) ||
-                element.date.isAfter(start)) &&
-            (element.date.isAtSameMomentAs(end) ||
-                element.date.isBefore(end))) {
-          result.add(element);
-        }
+      if (!_isCurrentCompany(companyId, generation)) {
+        throw StateError('Company changed while loading repair costs');
       }
-    } else {
-      await DatabaseGetter.database!
-          .listRows(
-            databaseId: databaseId,
-            tableId: reparationId,
-            queries: [
-              Query.greaterThanEqual('date', dateToIntJson(start)),
-              Query.lessThanEqual('date', dateToIntJson(end)),
-            ],
-          )
-          .then((value) {
-            for (int i = 0; i < value.rows.length; i++) {
-              result.add(
-                value.rows[i].convertTo((p0) => Reparation.fromJson(p0)),
-              );
-            }
-          })
-          .onError((error, stackTrace) {
-            if (kDebugMode) {
-              print(stackTrace);
-            }
-          });
     }
-    return result;
+
+    bool isInRange(Reparation item) =>
+        !item.date.isBefore(start) && !item.date.isAfter(end);
+
+    // Prefer a complete remote result when online. The provider cache is
+    // intentionally not used as the primary source here: its normal refresh
+    // is capped at 5,000 rows and would silently truncate historical totals.
+    if (database != null) {
+      final result = <Reparation>[];
+      var offset = 0;
+      var total = 0;
+      const pageSize = 5000;
+
+      do {
+        final page = await database.listRows(
+          databaseId: databaseId,
+          tableId: reparationId,
+          queries: [
+            Query.greaterThanEqual('date', dateToIntJson(start)),
+            Query.lessThanEqual('date', dateToIntJson(end)),
+            Query.limit(pageSize),
+            Query.offset(offset),
+          ],
+        );
+
+        if (!_isCurrentCompany(companyId, generation)) {
+          throw StateError('Company changed while loading repair costs');
+        }
+
+        total = page.total;
+        for (final row in page.rows) {
+          try {
+            final item = row.convertTo((json) => Reparation.fromJson(json));
+            if (isInRange(item)) result.add(item);
+          } catch (error) {
+            debugPrint('[ParcOto Dashboard] Invalid repair row ignored: $error');
+          }
+        }
+
+        if (page.rows.isEmpty) break;
+        offset += page.rows.length;
+      } while (offset < total);
+
+      return result;
+    }
+
+    // Offline fallback. This can be partial if the local repair cache itself
+    // has not yet been fully populated, so callers must not label it as a
+    // verified remote total.
+    return reparations.values.where(isInRange).toList();
   }
 
   Future<Client?> getPrestataire(String? docID) async {
