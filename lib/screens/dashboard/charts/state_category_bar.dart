@@ -23,6 +23,7 @@ class _StateBarsState extends State<StateCategoryBars> {
   List<ChartDataCategory> values = [];
 
   List<Color> colors = [];
+  String? error;
   @override
   void initState() {
     initValues();
@@ -38,18 +39,25 @@ class _StateBarsState extends State<StateCategoryBars> {
     }
   }
 
-  void initValues() async {
-    loading = true;
-    List<Future> tasks = [];
-    for (int i = 0; i < widget.labels.length; i++) {
-      tasks.add(getValue(i));
-    }
-    await Future.wait(tasks);
-    sortAsIntended();
-    loading = false;
-
-    if (mounted) {
-      setState(() {});
+  Future<void> initValues() async {
+    if (loading) return;
+    setState(() {
+      loading = true;
+      error = null;
+      values.clear();
+      gotenColors = false;
+      colors.clear();
+    });
+    try {
+      await Future.wait([
+        for (int i = 0; i < widget.labels.length; i++) getValue(i),
+      ]);
+      sortAsIntended();
+    } catch (exception) {
+      error = exception.toString();
+    } finally {
+      loading = false;
+      if (mounted) setState(() {});
     }
   }
 
@@ -86,6 +94,20 @@ class _StateBarsState extends State<StateCategoryBars> {
     var appTheme = context.watch<AppTheme>();
     if (loading) {
       return const Center(child: ProgressRing());
+    }
+    if (error != null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(FluentIcons.warning, size: 24),
+            const SizedBox(height: 8),
+            const Text('Impossible de vérifier ces statistiques.'),
+            Text(error!, maxLines: 2, overflow: TextOverflow.ellipsis),
+            Button(onPressed: initValues, child: const Text('Réessayer')),
+          ],
+        ),
+      );
     }
     getColors(appTheme);
     return Column(
