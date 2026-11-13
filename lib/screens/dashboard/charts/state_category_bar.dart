@@ -124,6 +124,9 @@ class _StateBarsState extends State<StateCategoryBars> {
         ),
       );
     }
+    if (values.isEmpty) {
+      return const Center(child: Text('Aucune donnée à afficher.'));
+    }
     getColors(appTheme);
     return Column(
       mainAxisSize: MainAxisSize.min,
