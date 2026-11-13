@@ -59,11 +59,11 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
     setState(() {
       loading = true;
       error = null;
-      values.clear();
+      values = <MapEntry<String, int>>[];
       valueOfBiggest = 0;
       indexOfBiggest = 0;
       gotenColors = false;
-      colors.clear();
+      colors = <Color>[];
     });
 
     try {
@@ -72,8 +72,7 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
           label.value.then((value) => MapEntry(label.key, value)),
       ]).timeout(const Duration(seconds: 25));
       if (!mounted || generation != _loadGeneration) return;
-      values.addAll(loaded);
-      sortAsIntended();
+      values = _sortAsIntended(loaded);
     } catch (exception) {
       if (generation == _loadGeneration) error = exception.toString();
     } finally {
@@ -88,32 +87,31 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
 
 
   bool notOnlyOne = false;
-  void sortAsIntended() {
-    int noo = 0;
-    List<MapEntry<String, int>> result = [];
-    for (int i = 0; i < widget.labels.length; i++) {
-      for (int j = 0; j < values.length; j++) {
-        if (widget.labels[i].key == values[j].key) {
-          if (values[j].value > valueOfBiggest) {
-            valueOfBiggest = values[j].value;
-            indexOfBiggest = i;
-          }
-          if (values[j].value > 0) {
-            noo++;
-          }
-          result.add(MapEntry(values[j].key, values[j].value));
+  List<MapEntry<String, int>> _sortAsIntended(
+    List<MapEntry<String, int>> source,
+  ) {
+    final byKey = {for (final item in source) item.key: item};
+    final sorted = <MapEntry<String, int>>[];
+    var biggestValue = 0;
+    var biggestIndex = 0;
+    var positiveCount = 0;
 
-          values.removeAt(j);
-          break;
-        }
+    for (var i = 0; i < widget.labels.length; i++) {
+      final item = byKey[widget.labels[i].key];
+      if (item == null) continue;
+
+      if (item.value > biggestValue) {
+        biggestValue = item.value;
+        biggestIndex = i;
       }
+      if (item.value > 0) positiveCount++;
+      sorted.add(MapEntry(item.key, item.value));
     }
-    if (noo > 1) {
-      notOnlyOne = true;
-    } else {
-      notOnlyOne = false;
-    }
-    values.addAll(result);
+
+    valueOfBiggest = biggestValue;
+    indexOfBiggest = biggestIndex;
+    notOnlyOne = positiveCount > 1;
+    return sorted;
   }
 
   int minValue = 10;
@@ -262,7 +260,7 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
 
   @override
   void dispose() {
-    values.clear();
+    _loadGeneration++;
     super.dispose();
   }
 }
