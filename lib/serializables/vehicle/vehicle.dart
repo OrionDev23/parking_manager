@@ -27,6 +27,30 @@ class Vehicle extends ParcOtoDefault {
 
   @JsonKey(name: 'numero_serie')
   String? numeroSerie;
+  String? trim;
+  int? modelYear;
+  String? imageFileId;
+  String? imageUrl;
+  String? imageSource;
+  String? color;
+  int? engineDisplacement;
+  String? engineCode;
+  String? transmission;
+  String? gearbox;
+  String? driveType;
+  int? doors;
+  int? lengthMm;
+  int? widthMm;
+  int? heightMm;
+  String? acquisitionType;
+  String? acquisitionDate;
+  double? purchasePrice;
+  String? supplier;
+  String? warrantyEndDate;
+  String? fleetNumber;
+  int? currentMileage;
+  int? nextServiceMileage;
+  Map<String, dynamic>? customFields;
   String? type;
   String? marque;
 
@@ -89,6 +113,30 @@ class Vehicle extends ParcOtoDefault {
     this.prenom,
     this.profession,
     this.numeroSerie,
+    this.trim,
+    this.modelYear,
+    this.imageFileId,
+    this.imageUrl,
+    this.imageSource,
+    this.color,
+    this.engineDisplacement,
+    this.engineCode,
+    this.transmission,
+    this.gearbox,
+    this.driveType,
+    this.doors,
+    this.lengthMm,
+    this.widthMm,
+    this.heightMm,
+    this.acquisitionType,
+    this.acquisitionDate,
+    this.purchasePrice,
+    this.supplier,
+    this.warrantyEndDate,
+    this.fleetNumber,
+    this.currentMileage,
+    this.nextServiceMileage,
+    this.customFields,
     this.type,
     this.anneeUtil,
     this.carrosserie,
