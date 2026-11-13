@@ -689,7 +689,9 @@ class _VehicleFormState extends State<VehicleForm>
     final screenWidth = MediaQuery.of(context).size.width;
     final columns = screenWidth >= 1200 ? 4 : screenWidth >= 700 ? 2 : 1;
     final fieldWidth =
-        ((screenWidth - 100 - (columns - 1) * 12) / columns).clamp(150.0, 420.0);
+        ((screenWidth - 100 - (columns - 1) * 12) / columns)
+            .clamp(150.0, 420.0)
+            .toDouble();
 
     Widget field(String label, TextEditingController controller,
         {String? hint, bool numeric = false}) {
@@ -727,7 +729,7 @@ class _VehicleFormState extends State<VehicleForm>
           children: [
             Row(
               children: [
-                Icon(FluentIcons.toolbox, color: appTheme.color, size: 20),
+                Icon(FluentIcons.car, color: appTheme.color, size: 20),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
