@@ -61,7 +61,13 @@ class DatabaseCounters {
     return _countRows(
       tableId: vehiculeid,
       filters: [
-        if (etat != -1) Query.equal('etatactuel', etat),
+        if (etat == 0)
+          Query.or([
+            Query.isNull('etatactuel'),
+            Query.equal('etatactuel', 0),
+          ])
+        else if (etat != -1)
+          Query.equal('etatactuel', etat),
       ],
     );
   }
