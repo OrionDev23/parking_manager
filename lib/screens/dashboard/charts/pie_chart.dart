@@ -74,7 +74,6 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
       if (!mounted || generation != _loadGeneration) return;
       values.addAll(loaded);
       sortAsIntended();
-      totalNumber = values.fold<int>(0, (sum, item) => sum + item.value);
     } catch (exception) {
       if (generation == _loadGeneration) error = exception.toString();
     } finally {
@@ -116,8 +115,6 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
     }
     values.addAll(result);
   }
-
-  late final int totalNumber;
 
   int minValue = 10;
 
