@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart' hide Client;
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
@@ -307,18 +308,13 @@ class ReparationFormState extends State<ReparationForm>
                                       Text('num', style: boldStyle).tr(),
                                       smallSpace,
                                       Flexible(
-                                        child: TextBox(
+                                        child: ParcotoTextBox(
                                           controller: numOrdre,
                                           enabled: widget.reparation == null,
                                           placeholder: 'num'.tr(),
                                           placeholderStyle: placeStyle,
                                           style: appTheme.writingStyle,
                                           cursorColor: appTheme.color.darker,
-                                          decoration: WidgetStatePropertyAll(
-                                            BoxDecoration(
-                                              color: appTheme.fillColor,
-                                            ),
-                                          ),
                                           inputFormatters: [
                                             FilteringTextInputFormatter
                                                 .digitsOnly,
@@ -505,16 +501,13 @@ class ReparationFormState extends State<ReparationForm>
                               label: 'remarqueplus'.tr(),
                               child: Padding(
                                 padding: const EdgeInsets.all(10.0),
-                                child: TextBox(
+                                child: ParcotoTextBox(
                                   controller: remarqueEntretien,
                                   placeholder: 'remarqueplus'.tr(),
                                   maxLines: 4,
                                   placeholderStyle: placeStyle,
                                   style: appTheme.writingStyle,
                                   cursorColor: appTheme.color.darker,
-                                  decoration: WidgetStatePropertyAll(
-                                    BoxDecoration(color: appTheme.fillColor),
-                                  ),
                                 ),
                               ),
                             ),
