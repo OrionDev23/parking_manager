@@ -81,9 +81,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         final active = selected == i;
         return Button(
           style: ButtonStyle(
-            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
-            backgroundColor: WidgetStateProperty.all(active ? accent.withValues(alpha: .12) : Colors.transparent),
-            foregroundColor: WidgetStateProperty.all(active ? accent : null)),
+            padding: ButtonState.all(const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
+            backgroundColor: ButtonState.all(active ? accent.withValues(alpha: .12) : Colors.transparent),
+            foregroundColor: ButtonState.all(active ? accent : null)),
           onPressed: () => setState(() => selected = i),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             Icon(sections[i].$2, size: 14), const SizedBox(width: 7),
