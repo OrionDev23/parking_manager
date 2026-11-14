@@ -380,7 +380,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       SizedBox(
                         width: 200.px,
                         height: 30.px,
-                        child: DatePicker(
+                        child: ParcotoFieldSurface(child: DatePicker(
                           selected: DateTime(
                             dateEntre.year,
                             dateEntre.month,
@@ -401,7 +401,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                               );
                             });
                           },
-                        ),
+                        )),
                       ),
                       smallSpace,
                       Text('at', style: boldStyle).tr(),
@@ -444,7 +444,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       SizedBox(
                         width: 200.px,
                         height: 30.px,
-                        child: DatePicker(
+                        child: ParcotoFieldSurface(child: DatePicker(
                           selected: dateSortie == null
                               ? dateSortie
                               : DateTime(
@@ -470,7 +470,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                                     );
                             });
                           },
-                        ),
+                        )),
                       ),
                       smallSpace,
                       Text('at', style: boldStyle).tr(),
@@ -1189,11 +1189,11 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                         const Spacer(),
                         SizedBox(
                           width: 80.px,
-                          child: DatePicker(
+                          child: ParcotoFieldSurface(child: DatePicker(
                             selected: anneeUtil,
                             showDay: false,
                             showMonth: false,
-                          ),
+                          )),
                         ),
                       ],
                     ),
