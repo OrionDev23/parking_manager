@@ -85,6 +85,7 @@ class _VehicleFormState extends State<VehicleForm>
   final nextServiceMileageController = TextEditingController();
   DateTime? selectedAnnee = DateTime(2023);
   bool autreMat = false;
+  int selectedFormSection = 0;
   int? marque;
 
   bool erreurMatricule = false;
@@ -234,21 +235,20 @@ class _VehicleFormState extends State<VehicleForm>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Flexible(
-                    child: Container(
-                      decoration: BoxDecoration(border: Border.all()),
-                      child: Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: StaggeredGrid.count(
-                          crossAxisCount:
-                              MediaQuery.of(context).orientation ==
-                                  Orientation.portrait
-                              ? 1
-                              : 12,
-                          mainAxisSpacing: 0,
-                          crossAxisSpacing: 0,
-                          children: gridChildren(appTheme),
-                        ),
+                  _buildFormSectionNavigation(appTheme),
+                  Container(
+                    decoration: BoxDecoration(border: Border.all()),
+                    child: Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: StaggeredGrid.count(
+                        crossAxisCount:
+                            MediaQuery.of(context).orientation ==
+                                Orientation.portrait
+                            ? 1
+                            : 12,
+                        mainAxisSpacing: 0,
+                        crossAxisSpacing: 0,
+                        children: gridChildren(appTheme),
                       ),
                     ),
                   ),
@@ -285,45 +285,99 @@ class _VehicleFormState extends State<VehicleForm>
     );
   }
 
-  List<Widget> gridChildren(AppTheme appTheme) {
-    return [
-      _buildVehicleIdentitySection(appTheme),
-      _sectionHeader(
-        appTheme,
-        'Localisation et documents administratifs',
-        'Pays, wilaya, commune et informations de la carte grise',
+  static const _formSections = [
+    ('Identification', FluentIcons.car),
+    ('Administratif', FluentIcons.document),
+    ('Affectation', FluentIcons.people),
+    ('Technique', FluentIcons.repair),
+    ('Exploitation & finances', FluentIcons.money),
+    ('Immatriculations', FluentIcons.document),
+  ];
+
+  Widget _buildFormSectionNavigation(AppTheme appTheme) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(
+          color: appTheme.color.withValues(alpha: .18),
+        )),
       ),
-      ...getWilayaCommuneWidget(appTheme),
-      ...secondLine(appTheme),
-      if (conducteurEmploye) ...[
-        _sectionHeader(
-          appTheme,
-          'Propriétaire et conducteur',
-          'Informations sur le propriétaire et le conducteur associé',
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: List.generate(_formSections.length, (index) {
+            final active = selectedFormSection == index;
+            return Padding(
+              padding: const EdgeInsets.only(right: 6),
+              child: Button(
+                style: ButtonStyle(
+                  padding: WidgetStateProperty.all(
+                    const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
+                  ),
+                  backgroundColor: WidgetStateProperty.all(
+                    active ? appTheme.color.withValues(alpha: .13) : Colors.transparent,
+                  ),
+                  foregroundColor: WidgetStateProperty.all(active ? appTheme.color : null),
+                ),
+                onPressed: () => setState(() => selectedFormSection = index),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(_formSections[index].$2, size: 14),
+                    const SizedBox(width: 7),
+                    Text(_formSections[index].$1, style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                    )),
+                  ],
+                ),
+              ),
+            );
+          }),
         ),
-        ...thirdLine(appTheme),
-        ...forthLine(appTheme),
-      ],
-      _sectionHeader(
-        appTheme,
-        'Organisation et rattachement',
-        'Appartenance, filiale, direction et département',
       ),
-      ...fifthLine(appTheme),
-      _sectionHeader(
-        appTheme,
-        'Caractéristiques techniques',
-        'Configuration, motorisation, capacité et caractéristiques du véhicule',
-      ),
-      ...seventhLine(appTheme),
-      _buildProfessionalDetailsSection(appTheme),
-      _sectionHeader(
-        appTheme,
-        'Historique des immatriculations',
-        'Anciennes immatriculations connues pour ce véhicule',
-      ),
-      ...eightLine(appTheme),
-    ];
+    );
+  }
+
+  List<Widget> gridChildren(AppTheme appTheme) {
+    switch (selectedFormSection) {
+      case 0:
+        return [_buildVehicleIdentitySection(appTheme)];
+      case 1:
+        return [
+          _sectionHeader(appTheme, 'Localisation et documents administratifs',
+            'Pays, wilaya, commune et informations de la carte grise'),
+          ...getWilayaCommuneWidget(appTheme),
+          ...secondLine(appTheme),
+        ];
+      case 2:
+        return [
+          if (conducteurEmploye) ...[
+            _sectionHeader(appTheme, 'Propriétaire et conducteur',
+              'Informations sur le propriétaire et le conducteur associé'),
+            ...thirdLine(appTheme),
+            ...forthLine(appTheme),
+          ],
+          _sectionHeader(appTheme, 'Organisation et rattachement',
+            'Appartenance, filiale, direction et département'),
+          ...fifthLine(appTheme),
+        ];
+      case 3:
+        return [
+          _sectionHeader(appTheme, 'Caractéristiques techniques',
+            'Configuration, motorisation, capacité et caractéristiques du véhicule'),
+          ...seventhLine(appTheme),
+        ];
+      case 4:
+        return [_buildProfessionalDetailsSection(appTheme)];
+      default:
+        return [
+          _sectionHeader(appTheme, 'Historique des immatriculations',
+            'Anciennes immatriculations connues pour ce véhicule'),
+          ...eightLine(appTheme),
+        ];
+    }
   }
 
   Widget _buildVehicleIdentitySection(AppTheme appTheme) {
