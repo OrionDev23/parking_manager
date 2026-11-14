@@ -409,7 +409,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       SizedBox(
                         width: 200.px,
                         height: 30.px,
-                        child: TimePicker(
+                        child: ParcotoFieldSurface(child: TimePicker(
                           selected: DateTime(
                             dateEntre.year,
                             dateEntre.month,
@@ -431,7 +431,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                             });
                           },
                           hourFormat: HourFormat.HH,
-                        ),
+                        )),
                       ),
                     ],
                   ),
@@ -478,7 +478,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       SizedBox(
                         width: 200.px,
                         height: 30.px,
-                        child: TimePicker(
+                        child: ParcotoFieldSurface(child: TimePicker(
                           selected: dateSortie == null
                               ? dateSortie
                               : DateTime(
@@ -504,7 +504,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                             });
                           },
                           hourFormat: HourFormat.HH,
-                        ),
+                        )),
                       ),
                     ],
                   ),
