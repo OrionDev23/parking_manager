@@ -626,7 +626,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(FluentIcons.chevronRight, color: accent, size: 16),
+                  Icon(FluentIcons.chevron_right, color: accent, size: 16),
                   const SizedBox(width: 10),
                   Expanded(child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
