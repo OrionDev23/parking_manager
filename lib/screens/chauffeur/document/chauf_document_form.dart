@@ -182,7 +182,7 @@ class CDocumentFormState extends State<CDocumentForm>
                     label: 'dateexp'.tr(),
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
-                      child: DatePicker(
+                      child: ParcotoFieldSurface(child: DatePicker(
                         selected: selectedDate,
                         onChanged: (d) {
                           setState(() {
@@ -190,7 +190,7 @@ class CDocumentFormState extends State<CDocumentForm>
                           });
                           checkForChanges();
                         },
-                      ),
+                      )),
                     ),
                   ),
                 ),
