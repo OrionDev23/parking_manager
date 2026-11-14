@@ -618,7 +618,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       children: [
         _heading('Historique du véhicule',
             'Événements de statut enregistrés dans le registre des états Parcoto'),
-        _panel('Changements d’état', FluentIcons.history, accent, [
+        _panel('Changements d’état', FluentIcons.document, accent, [
           if (_vehicleStates.isEmpty)
             _emptyInline('Aucun changement d’état enregistré pour ce véhicule')
           else
@@ -627,7 +627,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(FluentIcons.circle_ring, color: accent, size: 16),
+                  Icon(FluentIcons.circle, color: accent, size: 16),
                   const SizedBox(width: 10),
                   Expanded(child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
