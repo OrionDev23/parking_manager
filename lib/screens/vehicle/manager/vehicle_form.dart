@@ -1227,19 +1227,6 @@ class _VehicleFormState extends State<VehicleForm>
     );
   }
 
-  WidgetStateProperty<BoxDecoration> _identityInputDecoration(
-    AppTheme appTheme,
-  ) {
-    return WidgetStatePropertyAll(
-      BoxDecoration(
-        color: appTheme.fillColor,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: appTheme.color.withValues(alpha: 0.32),
-        ),
-      ),
-    );
-  }
 
   Widget _sectionHeader(
     AppTheme appTheme,
