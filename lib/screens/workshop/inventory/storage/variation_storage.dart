@@ -88,7 +88,7 @@ class VariationStorageWidgetState extends State<VariationStorageWidget> {
     return [
       VerticalDivider(color: placeStyle.color),
       Flexible(
-        child: ComboBox(
+        child: ParcotoFieldSurface(child: ComboBox(
           items: List.generate(widget.part.variations?.length ?? 0, (index) {
             return ComboBoxItem(
               onTap: () {
@@ -109,7 +109,7 @@ class VariationStorageWidgetState extends State<VariationStorageWidget> {
               widget.onOptionsChanged!(selectedVariation!.optionValues!);
             }
           },
-        ),
+        )),
       ),
       smallSpace,
       VerticalDivider(color: placeStyle.color),
