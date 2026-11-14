@@ -1,5 +1,4 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/foundation.dart';
 import 'package:parc_oto/serializables/vehicle/vehicle.dart';
 import 'package:parc_oto/serializables/vehicle/document_vehicle.dart';
 import 'package:parc_oto/serializables/vehicle/state.dart';
@@ -627,7 +626,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(FluentIcons.radioBtnOff, color: accent, size: 16),
+                  Icon(FluentIcons.chevronRight, color: accent, size: 16),
                   const SizedBox(width: 10),
                   Expanded(child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
