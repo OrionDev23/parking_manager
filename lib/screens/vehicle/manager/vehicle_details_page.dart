@@ -46,9 +46,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     padding: const EdgeInsets.fromLTRB(22, 20, 22, 18),
     decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey[30]))),
     child: Row(children: [
-      Container(width: 66, height: 66,
-        decoration: BoxDecoration(color: accent.withValues(alpha: .10), borderRadius: BorderRadius.circular(16)),
-        child: Icon(FluentIcons.car, size: 32, color: accent)),
+      _vehicleAvatar(accent),
       const SizedBox(width: 16),
       Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(v.matricule, style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w700)),
@@ -65,6 +63,32 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       ])),
     ]),
   );
+
+  Widget _vehicleAvatar(Color accent) {
+    final imageUrl = v.imageUrl?.trim();
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: 76,
+        height: 76,
+        color: accent.withValues(alpha: .10),
+        child: imageUrl != null && imageUrl.isNotEmpty
+            ? Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => Icon(FluentIcons.car, size: 34, color: accent),
+              )
+            : Icon(FluentIcons.car, size: 34, color: accent),
+      ),
+    );
+  }
+
+  String _date(DateTime? value) {
+    if (value == null) return 'Non renseigné';
+    final day = value.day.toString().padLeft(2, '0');
+    final month = value.month.toString().padLeft(2, '0');
+    return day + '/' + month + '/' + value.year.toString();
+  }
 
   Widget _chip(String text, Color accent) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
@@ -96,7 +120,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       case 1: return _section('Identification', 'Identité administrative et informations principales', [
         _group('Immatriculation', [
           _field('Immatriculation', v.matricule), _field('Anciennes immatriculations', v.matriculePrec?.join(', ')),
-          _field('Pays', v.pays), _field('Date carte grise', v.date?.toString()),
+          _field('Pays', v.pays), _field('Date carte grise', _date(v.date)),
           _field('Numéro carte grise', v.numero), _field('Numéro de série / VIN', v.numeroSerie)]),
         _group('Identité du véhicule', [
           _field('Marque', v.marque), _field('Modèle / type', v.type), _field('Finition', v.trim),
@@ -146,9 +170,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         'Historique véhicule à structurer');
       default: return _section('Finances & cycle de vie', 'Acquisition, garantie et suivi kilométrique', [
         _group('Acquisition', [
-          _field('Mode', v.acquisitionType), _field('Date', v.acquisitionDate),
+          _field('Mode', v.acquisitionType), _field('Date', _date(v.acquisitionDate)),
           _field('Prix d’achat', v.purchasePrice == null ? null : '${v.purchasePrice} DA'),
-          _field('Fournisseur', v.supplier), _field('Fin de garantie', v.warrantyEndDate)]),
+          _field('Fournisseur', v.supplier), _field('Fin de garantie', _date(v.warrantyEndDate))]),
         _group('Kilométrage', [
           _field('Kilométrage actuel', v.currentMileage == null ? null : '${v.currentMileage} km'),
           _field('Prochaine révision', v.nextServiceMileage == null ? null : '${v.nextServiceMileage} km')]),
@@ -178,8 +202,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       _field('Département', v.departement),
       _field('Conducteur', [v.prenom, v.nom].where((e) => e?.isNotEmpty == true).join(' '))]),
     _group('Informations complémentaires', [
-      _field('Date de création', v.createdAt?.toString()),
-      _field('Dernière modification', v.updatedAt?.toString()),
+      _field('Date de création', _date(v.createdAt)),
+      _field('Dernière modification', _date(v.updatedAt)),
       _field('Numéro de flotte', v.fleetNumber), _field('État administratif', v.etat)]),
   ]);
 
