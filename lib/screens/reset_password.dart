@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -108,7 +109,7 @@ class _ResetScreenState extends State<ResetScreen> {
                 children: [
                   SizedBox(
                     width: pwidth,
-                    child: TextBox(
+                    child: ParcotoTextBox(
                       controller: password,
                       placeholder: 'motdepasse'.tr(),
                       suffix: IconButton(
@@ -145,7 +146,7 @@ class _ResetScreenState extends State<ResetScreen> {
                   SizedBox(height: 2.h),
                   SizedBox(
                     width: pwidth,
-                    child: TextBox(
+                    child: ParcotoTextBox(
                       controller: passwordConfirmation,
                       placeholder: 'confirmation'.tr(),
                       suffix: IconButton(
