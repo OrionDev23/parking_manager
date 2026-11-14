@@ -549,13 +549,7 @@ class VehicleTableState extends State<VehicleTable> {
                         style: appTheme.writingStyle,
                         cursorColor: appTheme.color.darker,
                         placeholderStyle: placeStyle,
-                        decoration: WidgetStatePropertyAll(
-                          BoxDecoration(
-                            color: appTheme.fillColor,
-                            borderRadius: BorderRadius.circular(7),
-                          ),
-                        ),
-                        onSubmitted: (s) {
+                onSubmitted: (s) {
                           final query = s.trim();
                           vehicleDataSource.search(query);
                           setState(() {
