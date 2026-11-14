@@ -139,7 +139,6 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                 onChanged: (s) {
                                   checkChanges();
                                 },
-                                ),
                               ),
                             ),
                           ),
@@ -440,6 +439,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                 onClose: () {
                                   checkChanges();
                                 },
+                                ),
                               ),
                             ),
                           ),
