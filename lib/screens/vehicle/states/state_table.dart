@@ -304,21 +304,23 @@ class StateTableState extends State<StateTable> {
                     ).tr(),
                   ],
                 ),
-                title: ComboBox<int>(
-                  items: List.generate(
-                    5,
-                    (index) => ComboBoxItem<int>(
-                      value: index,
-                      child: Text(VehiclesUtilities.getEtatName(index)).tr(),
+                title: ParcotoFieldSurface(
+                  child: ComboBox<int>(
+                    items: List.generate(
+                      5,
+                      (index) => ComboBoxItem<int>(
+                        value: index,
+                        child: Text(VehiclesUtilities.getEtatName(index)).tr(),
+                      ),
                     ),
+                    value: type,
+                    onChanged: (s) {
+                      setState(() {
+                        type = s ?? 0;
+                      });
+                      setS(() {});
+                    },
                   ),
-                  value: type,
-                  onChanged: (s) {
-                    setState(() {
-                      type = s ?? 0;
-                    });
-                    setS(() {});
-                  },
                 ),
                 trailing: type != null
                     ? IconButton(
