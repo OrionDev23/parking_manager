@@ -232,6 +232,7 @@ class _VehicleFormState extends State<VehicleForm>
                 child: Center(child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 1120),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                    if (!wide) _buildFormSectionNavigation(appTheme),
                     _buildActiveSectionHeading(appTheme),
                     Container(
                       padding: const EdgeInsets.all(18),
@@ -241,7 +242,7 @@ class _VehicleFormState extends State<VehicleForm>
                         border: Border.all(color: Colors.grey[30]),
                       ),
                       child: StaggeredGrid.count(
-                        crossAxisCount: constraints.maxWidth < 700 ? 1 : 12,
+                        crossAxisCount: 12,
                         mainAxisSpacing: 8,
                         crossAxisSpacing: 8,
                         children: gridChildren(appTheme),
