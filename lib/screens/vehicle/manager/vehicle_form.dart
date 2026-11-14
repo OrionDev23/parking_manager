@@ -23,6 +23,7 @@ import '../../../main.dart';
 import '../../../theme.dart';
 import '../../../utilities/algeria_lists.dart';
 import '../../../widgets/select_dialog/select_dialog.dart';
+import '../../../widgets/forms/parcoto_form_field.dart';
 
 class VehicleForm extends StatefulWidget {
   final Vehicle? vehicle;
@@ -1116,14 +1117,13 @@ class _VehicleFormState extends State<VehicleForm>
         appTheme,
         width: fieldWidth,
         label: label,
-        child: TextBox(
+        child: ParcotoTextBox(
           enabled: !widget.readOnly,
           controller: controller,
           placeholder: hint ?? label,
           style: appTheme.writingStyle,
           placeholderStyle: placeStyle,
           cursorColor: appTheme.color,
-          decoration: _identityInputDecoration(appTheme),
           inputFormatters: numeric
               ? [FilteringTextInputFormatter.digitsOnly]
               : decimal
@@ -1225,33 +1225,11 @@ class _VehicleFormState extends State<VehicleForm>
     required Widget child,
     bool requiredField = false,
   }) {
-    return SizedBox(
+    return ParcotoFormField(
       width: width,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Row(
-              children: [
-                Text(
-                  label,
-                  style: appTheme.writingStyle.copyWith(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                if (requiredField)
-                  Text(
-                    ' *',
-                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-                  ),
-              ],
-            ),
-          ),
-          SizedBox(height: 42, child: child),
-        ],
-      ),
+      label: label,
+      requiredField: requiredField,
+      child: child,
     );
   }
 
