@@ -58,19 +58,21 @@ class DesignationReparationState extends State<DesignationReparation> {
         VerticalDivider(color: placeStyle.color),
         smallSpace,
         Expanded(
-          child: NumberBox<int>(
-            value: qte,
-            min: 1,
-            onChanged: (s) => setState(() {
-              qte = s ?? 1;
-              widget.designation.qte = s ?? 1;
-              setState(() {});
-            }),
-            max: 99,
-            placeholderStyle: placeStyle,
-            placeholder: 'qte'.tr(),
-            style: appTheme.writingStyle,
-            cursorColor: appTheme.color.darker,
+          child: ParcotoFieldSurface(
+            child: NumberBox<int>(
+              value: qte,
+              min: 1,
+              onChanged: (s) => setState(() {
+                qte = s ?? 1;
+                widget.designation.qte = s ?? 1;
+                setState(() {});
+              }),
+              max: 99,
+              placeholderStyle: placeStyle,
+              placeholder: 'qte'.tr(),
+              style: appTheme.writingStyle,
+              cursorColor: appTheme.color.darker,
+            ),
           ),
         ),
         smallSpace,
