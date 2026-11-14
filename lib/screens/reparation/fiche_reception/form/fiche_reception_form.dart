@@ -1082,7 +1082,6 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                 padding: const EdgeInsets.all(5),
                 child: SizedBox(
                   height: 120.px,
-                  width: 180.px,
                   child: SfRadialGauge(
                     animationDuration: 500,
                     title: GaugeTitle(
