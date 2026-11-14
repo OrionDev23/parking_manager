@@ -379,7 +379,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       bigSpace,
                       SizedBox(
                         width: 200.px,
-                        height: 30.px,
+                        height: 44.px,
                         child: ParcotoFieldSurface(child: DatePicker(
                           selected: DateTime(
                             dateEntre.year,
@@ -408,7 +408,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       smallSpace,
                       SizedBox(
                         width: 200.px,
-                        height: 30.px,
+                        height: 44.px,
                         child: ParcotoFieldSurface(child: TimePicker(
                           selected: DateTime(
                             dateEntre.year,
@@ -443,7 +443,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       bigSpace,
                       SizedBox(
                         width: 200.px,
-                        height: 30.px,
+                        height: 44.px,
                         child: ParcotoFieldSurface(child: DatePicker(
                           selected: dateSortie == null
                               ? dateSortie
@@ -477,7 +477,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       smallSpace,
                       SizedBox(
                         width: 200.px,
-                        height: 30.px,
+                        height: 44.px,
                         child: ParcotoFieldSurface(child: TimePicker(
                           selected: dateSortie == null
                               ? dateSortie
