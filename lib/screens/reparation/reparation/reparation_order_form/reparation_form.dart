@@ -347,7 +347,7 @@ class ReparationFormState extends State<ReparationForm>
                       smallSpace,
                       SizedBox(
                         width: 200.px,
-                        height: 30.px,
+                        height: 44.px,
                         child: ParcotoFieldSurface(child: DatePicker(
                           selected: selectedDate,
                           onChanged: (s) {
