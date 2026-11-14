@@ -16,14 +16,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   int selected = 0;
   Vehicle get v => widget.vehicle;
   static const sections = [
-    ('Vue d’ensemble', FluentIcons.view_dashboard),
-    ('Identification', FluentIcons.contact),
+    ('Vue d’ensemble', FluentIcons.car),
+    ('Identification', FluentIcons.people),
     ('Caractéristiques', FluentIcons.car),
-    ('Affectation', FluentIcons.org),
-    ('GPS & localisation', FluentIcons.map_pin),
+    ('Affectation', FluentIcons.people),
+    ('GPS & localisation', FluentIcons.car),
     ('Maintenance', FluentIcons.repair),
-    ('Documents', FluentIcons.documentation),
-    ('Historique', FluentIcons.history),
+    ('Documents', FluentIcons.document),
+    ('Historique', FluentIcons.document),
     ('Finances', FluentIcons.money),
   ];
   String val(String? s) => s == null || s.trim().isEmpty ? 'Non renseigné' : s.trim();
@@ -133,16 +133,16 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           _field('Matricule conducteur', v.matriculeConducteur),
           _field('Appartenance conducteur', v.appartenanceconducteur)]),
       ]);
-      case 4: return _empty(FluentIcons.map_pin, 'Aucune position GPS disponible',
+      case 4: return _empty(FluentIcons.car, 'Aucune position GPS disponible',
         'La dernière position apparaîtra ici lorsqu’un conducteur autorisé aura transmis sa position depuis Parcoto Mobile.',
         'Suivi GPS non encore activé');
       case 5: return _empty(FluentIcons.repair, 'Aucune donnée de maintenance structurée',
         'Les entretiens, interventions, ordres de réparation et prochaines échéances seront regroupés ici.',
         'Module maintenance à connecter');
-      case 6: return _empty(FluentIcons.documentation, 'Aucun document affiché',
+      case 6: return _empty(FluentIcons.document, 'Aucun document affiché',
         'Les cartes grises, assurances, contrôles techniques, factures et autres pièces seront accessibles ici.',
         'Gestion documentaire à connecter');
-      case 7: return _empty(FluentIcons.history, 'Historique détaillé indisponible',
+      case 7: return _empty(FluentIcons.document, 'Historique détaillé indisponible',
         'Les changements d’affectation, de statut, relevés kilométriques et événements seront présentés chronologiquement.',
         'Historique véhicule à structurer');
       default: return _section('Finances & cycle de vie', 'Acquisition, garantie et suivi kilométrique', [
@@ -163,9 +163,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       final cols = c.maxWidth > 900 ? 4 : c.maxWidth > 560 ? 2 : 1;
       final w = (c.maxWidth - (cols - 1) * 12) / cols;
       return Wrap(spacing: 12, runSpacing: 12, children: [
-        _metric(w, FluentIcons.speed_high, 'Kilométrage', n(v.currentMileage, ' km'), accent),
-        _metric(w, FluentIcons.contact, 'Conducteur', val(v.matriculeConducteur), accent),
-        _metric(w, FluentIcons.map_pin, 'Localisation', val(v.commune), accent),
+        _metric(w, FluentIcons.car, 'Kilométrage', n(v.currentMileage, ' km'), accent),
+        _metric(w, FluentIcons.people, 'Conducteur', val(v.matriculeConducteur), accent),
+        _metric(w, FluentIcons.car, 'Localisation', val(v.commune), accent),
         _metric(w, FluentIcons.repair, 'Prochaine révision', n(v.nextServiceMileage, ' km'), accent),
       ]);
     }),
@@ -179,8 +179,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       _field('Département', v.departement),
       _field('Conducteur', [v.prenom, v.nom].where((e) => e?.isNotEmpty == true).join(' '))]),
     _group('Informations complémentaires', [
-      _field('Date de création', v.dateCreation?.toString()),
-      _field('Dernière modification', v.dateModification?.toString()),
+      _field('Date de création', v.createdAt?.toString()),
+      _field('Dernière modification', v.updatedAt?.toString()),
       _field('Numéro de flotte', v.fleetNumber), _field('État administratif', v.etat)]),
   ]);
 
