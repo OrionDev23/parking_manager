@@ -120,7 +120,7 @@ class ParcotoTextBox extends StatelessWidget {
     final theme = FluentTheme.of(context);
     final border = theme.inactiveColor.withValues(alpha: .30);
     return SizedBox(
-      height: maxLines == 1 ? 42 : null,
+      height: maxLines == 1 ? 44 : null,
       child: TextBox(
         controller: controller,
         placeholder: placeholder,
@@ -167,7 +167,7 @@ class ParcotoFieldSurface extends StatelessWidget {
     super.key,
     required this.child,
     this.padding = const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    this.minHeight = 42,
+    this.minHeight = 44,
   });
 
   @override
