@@ -210,7 +210,6 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                       ],
                                                     ),
                                                   ],
-                                                  ),
                                                 ),
                                               ),
                                             ),
