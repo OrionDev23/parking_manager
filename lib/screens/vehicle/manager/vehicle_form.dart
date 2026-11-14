@@ -400,6 +400,10 @@ class _VehicleFormState extends State<VehicleForm>
       'Configurez les caractéristiques mécaniques et physiques.',
       'Centralisez les informations d’acquisition, de garantie et de kilométrage.',
       'Conservez la traçabilité des anciennes immatriculations.',
+      'Consultez la dernière position et les relevés GPS disponibles.',
+      'Suivez les entretiens, réparations et prochaines échéances.',
+      'Centralisez les pièces administratives et leurs dates de validité.',
+      'Retrouvez les événements qui composent la vie du véhicule.',
     ];
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
