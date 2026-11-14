@@ -391,11 +391,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             'La dernière position apparaîtra ici lorsqu’un conducteur autorisé aura transmis sa position depuis Parcoto Mobile.',
             'Suivi GPS non encore activé');
       case 5:
-        return _empty(
-            FluentIcons.repair,
-            'Aucune donnée de maintenance structurée',
-            'Les entretiens, interventions, ordres de réparation et prochaines échéances seront regroupés ici.',
-            'Module maintenance à connecter');
+        return _maintenanceSection(accent);
       case 6:
         return _documentsSection(accent);
       case 7:
@@ -627,7 +623,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(FluentIcons.circle, color: accent, size: 16),
+                  Icon(FluentIcons.radioBtnOff, color: accent, size: 16),
                   const SizedBox(width: 10),
                   Expanded(child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1004,6 +1000,30 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   _VehicleField _field(String label, String? raw) =>
       _VehicleField(label, val(raw));
   
+  Widget _metric(double width, IconData icon, String label, String data, Color accent) =>
+      Container(
+        width: width,
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: FluentTheme.of(context).micaBackgroundColor,
+          border: Border.all(color: Colors.grey[30]),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(children: [
+          Icon(icon, color: accent, size: 20),
+          const SizedBox(width: 12),
+          Expanded(child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: TextStyle(color: Colors.grey[100], fontSize: 11)),
+              const SizedBox(height: 5),
+              Text(data, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+            ],
+          )),
+        ]),
+      );
+
   Widget _empty(IconData icon, String title, String desc, String status) =>
       Center(
         child: Container(
