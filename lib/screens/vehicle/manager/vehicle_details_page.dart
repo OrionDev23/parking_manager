@@ -1,7 +1,10 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/serializables/vehicle/vehicle.dart';
 import 'package:parc_oto/serializables/vehicle/document_vehicle.dart';
+import 'package:parc_oto/serializables/reparation/reparation.dart';
+import 'package:parc_oto/serializables/reparation/fiche_reception.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
+import 'package:parc_oto/providers/repair_provider.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
 
@@ -16,6 +19,9 @@ class VehicleDetailsPage extends StatefulWidget {
 class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   int selected = 0;
   bool _requestedDocuments = false;
+  bool _requestedMaintenance = false;
+  bool _loadingMaintenance = false;
+  List<FicheReception> _receptionSheets = [];
   Vehicle get v => widget.vehicle;
 
   @override
@@ -205,7 +211,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 foregroundColor:
                     WidgetStateProperty.all(active ? accent : null),
               ),
-              onPressed: () => setState(() => selected = i),
+              onPressed: () {\n                setState(() => selected = i);\n                if (i == 5) _loadMaintenance();\n              },
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -222,6 +228,34 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           },
         ),
       );
+
+  Future<void> _loadMaintenance() async {
+    if (_requestedMaintenance || _loadingMaintenance) return;
+    _requestedMaintenance = true;
+    _loadingMaintenance = true;
+    if (mounted) setState(() {});
+    try {
+      final repairProvider = RepairProvider();
+      await Future.wait([
+        repairProvider.refreshReparations(),
+        RepairProvider.downloadFicheReparations(),
+      ]);
+      final key = v.matricule.trim();
+      final sheets = RepairProvider.repPerVeh.entries
+          .where((entry) => entry.key == key)
+          .expand((entry) => entry.value)
+          .toList()
+        ..sort((a, b) => b.dateEntre.compareTo(a.dateEntre));
+      if (!mounted) return;
+      setState(() {
+        _receptionSheets = sheets;
+        _loadingMaintenance = false;
+      });
+    } catch (error) {
+      debugPrint('[Vehicle details] maintenance load failed: $error');
+      if (mounted) setState(() => _loadingMaintenance = false);
+    }
+  }
 
   Widget _content(Color accent) {
     switch (selected) {
@@ -532,6 +566,107 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                   const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
         ],
       );
+
+  Widget _maintenanceSection(Color accent) {
+    final repairs = RepairProvider.reparations.values.where((repair) =>
+        repair.vehiculemat == v.matricule || repair.vehicule == v.id).toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
+    final sheets = _receptionSheets;
+    final totalCost = sheets.fold<double>(
+        0, (sum, sheet) => sum + (sheet.reparationCost ?? 0));
+
+    if (_loadingMaintenance && repairs.isEmpty && sheets.isEmpty) {
+      return const Center(child: Padding(
+        padding: EdgeInsets.all(36), child: ProgressRing()));
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _heading('Maintenance & interventions',
+            'Interventions et fiches de réception réellement enregistrées pour ce véhicule'),
+        LayoutBuilder(builder: (context, constraints) {
+          final width = (constraints.maxWidth - 24) / 3;
+          return Wrap(spacing: 12, runSpacing: 12, children: [
+            _metric(width, FluentIcons.repair, 'Ordres de réparation',
+                repairs.length.toString(), accent),
+            _metric(width, FluentIcons.document, 'Fiches de réception',
+                sheets.length.toString(), accent),
+            _metric(width, FluentIcons.money, 'Coût enregistré',
+                '${totalCost.toStringAsFixed(2)} DA', accent),
+          ]);
+        }),
+        const SizedBox(height: 20),
+        _panel('Ordres de réparation', FluentIcons.repair, accent, [
+          if (repairs.isEmpty)
+            _emptyInline('Aucun ordre de réparation associé à ce véhicule')
+          else
+            ...repairs.map((repair) => _repairRow(repair, accent)),
+        ]),
+        _panel('Fiches de réception', FluentIcons.document, accent, [
+          if (sheets.isEmpty)
+            _emptyInline('Aucune fiche de réception trouvée pour cette immatriculation')
+          else
+            ...sheets.map((sheet) => _receptionRow(sheet, accent)),
+        ]),
+        if (_loadingMaintenance)
+          const Padding(
+            padding: EdgeInsets.all(8),
+            child: Center(child: ProgressRing()),
+          ),
+      ],
+    );
+  }
+
+  Widget _repairRow(Reparation repair, Color accent) => Padding(
+    padding: const EdgeInsets.only(bottom: 13),
+    child: Row(children: [
+      Icon(FluentIcons.repair, color: accent, size: 17),
+      const SizedBox(width: 10),
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Ordre #${repair.numero}',
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 3),
+        Text('${_date(repair.date)} • ${repair.prestatairenom ?? 'Prestataire non renseigné'}',
+            style: TextStyle(color: Colors.grey[100], fontSize: 11)),
+        if (repair.remarque?.trim().isNotEmpty == true)
+          Text(repair.remarque!, maxLines: 2, overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: Colors.grey[100], fontSize: 11)),
+      ])),
+      _chip(repair.etat == 2 ? 'Terminé' : repair.etat == 1 ? 'En cours' : 'En attente', accent),
+    ]),
+  );
+
+  Widget _receptionRow(FicheReception sheet, Color accent) => Padding(
+    padding: const EdgeInsets.only(bottom: 13),
+    child: Row(children: [
+      Icon(FluentIcons.document, color: accent, size: 17),
+      const SizedBox(width: 10),
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Fiche de réception #${sheet.numero}',
+            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 3),
+        Text('Entrée : ${_date(sheet.dateEntre)}'
+            '${sheet.dateSortie == null ? ' • Toujours ouverte' : ' • Sortie : ${_date(sheet.dateSortie)}'}',
+            style: TextStyle(color: Colors.grey[100], fontSize: 11)),
+        if (sheet.kilometrage != null)
+          Text('Kilométrage : ${sheet.kilometrage} km',
+              style: TextStyle(color: Colors.grey[100], fontSize: 11)),
+        if (sheet.remarque?.trim().isNotEmpty == true)
+          Text(sheet.remarque!, maxLines: 2, overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: Colors.grey[100], fontSize: 11)),
+      ])),
+      if (sheet.reparationCost != null)
+        Text('${sheet.reparationCost!.toStringAsFixed(2)} DA',
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+    ]),
+  );
+
+  Widget _emptyInline(String message) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 10),
+    child: Text(message,
+        style: TextStyle(color: Colors.grey[100], fontSize: 12)),
+  );
 
   Widget _documentsSection(Color accent) {
     final provider = context.watch<VehicleProvider>();
