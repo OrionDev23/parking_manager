@@ -604,10 +604,17 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
         context: current,
         barrierDismissible: true,
         builder: (context) => f.ContentDialog(
-          constraints: BoxConstraints.loose(f.Size(1240, 900)),
+          constraints: BoxConstraints.loose(
+            f.Size(
+              MediaQuery.sizeOf(context).width * .96,
+              MediaQuery.sizeOf(context).height * .94,
+            ),
+          ),
           content: SizedBox(
-            width: 1180,
-            height: 780,
+            width: MediaQuery.sizeOf(context).width < 900
+                ? MediaQuery.sizeOf(context).width * .88
+                : 1180,
+            height: MediaQuery.sizeOf(context).height * .78,
             child: VehicleDetailsPage(vehicle: element.value),
           ),
           actions: [
