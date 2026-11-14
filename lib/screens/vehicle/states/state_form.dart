@@ -189,7 +189,7 @@ class StateFormState extends State<StateForm> {
                       ).tr(),
                     ],
                   ),
-                  title: ParcotoFieldSurface(child: ComboBox<int>(
+                  title: ParcotoFieldSurface(child: ParcotoFieldSurface(child: ComboBox<int>(
                     items: List.generate(
                       5,
                       (index) => ComboBoxItem<int>(
@@ -203,7 +203,7 @@ class StateFormState extends State<StateForm> {
                         type = s ?? 0;
                       });
                     },
-                  )),
+                  ))),
                 ),
                 const Divider(),
                 ListTile(
