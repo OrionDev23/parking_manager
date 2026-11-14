@@ -82,6 +82,7 @@ class ParcotoTextBox extends StatelessWidget {
   final Color? cursorColor;
   final List<TextInputFormatter>? inputFormatters;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
   final VoidCallback? onTap;
   final Widget? prefix;
   final Widget? suffix;
@@ -103,6 +104,7 @@ class ParcotoTextBox extends StatelessWidget {
     this.cursorColor,
     this.inputFormatters,
     this.onChanged,
+    this.onSubmitted,
     this.onTap,
     this.prefix,
     this.suffix,
@@ -133,6 +135,7 @@ class ParcotoTextBox extends StatelessWidget {
         cursorColor: cursorColor ?? theme.accentColor,
         inputFormatters: inputFormatters,
         onChanged: onChanged,
+        onSubmitted: onSubmitted,
         onTap: onTap,
         prefix: prefix,
         suffix: suffix,
