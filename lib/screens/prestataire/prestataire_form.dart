@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -92,15 +93,12 @@ class PrestataireFormState extends State<PrestataireForm> {
                           label: 'fullname'.tr(),
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
-                            child: TextBox(
+                            child: ParcotoTextBox(
                               controller: nom,
                               placeholder: 'fullname'.tr(),
                               style: appTheme.writingStyle,
                               placeholderStyle: placeStyle,
                               cursorColor: appTheme.color.darker,
-                              decoration: WidgetStatePropertyAll(
-                                BoxDecoration(color: appTheme.fillColor),
-                              ),
 
                               onChanged: (s) {
                                 checkChanges();
@@ -116,15 +114,12 @@ class PrestataireFormState extends State<PrestataireForm> {
                           label: 'descr'.tr(),
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
-                            child: TextBox(
+                            child: ParcotoTextBox(
                               controller: descr,
                               placeholder: 'descr'.tr(),
                               style: appTheme.writingStyle,
                               placeholderStyle: placeStyle,
                               cursorColor: appTheme.color.darker,
-                              decoration: WidgetStatePropertyAll(
-                                BoxDecoration(color: appTheme.fillColor),
-                              ),
 
                               onChanged: (s) {
                                 checkChanges();
@@ -146,17 +141,12 @@ class PrestataireFormState extends State<PrestataireForm> {
                                   children: [
                                     SizedBox(
                                       width: 250,
-                                      child: TextBox(
+                                      child: ParcotoTextBox(
                                         controller: email,
                                         placeholder: 'email'.tr(),
                                         style: appTheme.writingStyle,
                                         placeholderStyle: placeStyle,
                                         cursorColor: appTheme.color.darker,
-                                        decoration: WidgetStatePropertyAll(
-                                          BoxDecoration(
-                                            color: appTheme.fillColor,
-                                          ),
-                                        ),
 
                                         onChanged: (s) {
                                           checkChanges();
@@ -166,17 +156,12 @@ class PrestataireFormState extends State<PrestataireForm> {
                                     smallSpace,
                                     SizedBox(
                                       width: 187,
-                                      child: TextBox(
+                                      child: ParcotoTextBox(
                                         controller: telephone,
                                         placeholder: 'telephone'.tr(),
                                         style: appTheme.writingStyle,
                                         placeholderStyle: placeStyle,
                                         cursorColor: appTheme.color.darker,
-                                        decoration: WidgetStatePropertyAll(
-                                          BoxDecoration(
-                                            color: appTheme.fillColor,
-                                          ),
-                                        ),
 
                                         onChanged: (s) {
                                           checkChanges();
@@ -187,16 +172,13 @@ class PrestataireFormState extends State<PrestataireForm> {
                                 ),
                                 smallSpace,
                                 Flexible(
-                                  child: TextBox(
+                                  child: ParcotoTextBox(
                                     controller: adresse,
                                     placeholder: 'adresse'.tr(),
                                     maxLines: 3,
                                     style: appTheme.writingStyle,
                                     placeholderStyle: placeStyle,
                                     cursorColor: appTheme.color.darker,
-                                    decoration: WidgetStatePropertyAll(
-                                      BoxDecoration(color: appTheme.fillColor),
-                                    ),
 
                                     onChanged: (s) {
                                       checkChanges();
@@ -222,17 +204,12 @@ class PrestataireFormState extends State<PrestataireForm> {
                                   child: Row(
                                     children: [
                                       Flexible(
-                                        child: TextBox(
+                                        child: ParcotoTextBox(
                                           controller: nif,
                                           placeholder: 'NIF',
                                           style: appTheme.writingStyle,
                                           placeholderStyle: placeStyle,
                                           cursorColor: appTheme.color.darker,
-                                          decoration: WidgetStatePropertyAll(
-                                            BoxDecoration(
-                                              color: appTheme.fillColor,
-                                            ),
-                                          ),
 
                                           onChanged: (s) {
                                             checkChanges();
@@ -241,17 +218,12 @@ class PrestataireFormState extends State<PrestataireForm> {
                                       ),
                                       smallSpace,
                                       Flexible(
-                                        child: TextBox(
+                                        child: ParcotoTextBox(
                                           controller: nis,
                                           placeholder: 'NIS',
                                           style: appTheme.writingStyle,
                                           placeholderStyle: placeStyle,
                                           cursorColor: appTheme.color.darker,
-                                          decoration: WidgetStatePropertyAll(
-                                            BoxDecoration(
-                                              color: appTheme.fillColor,
-                                            ),
-                                          ),
 
                                           onChanged: (s) {
                                             checkChanges();
@@ -266,17 +238,12 @@ class PrestataireFormState extends State<PrestataireForm> {
                                   child: Row(
                                     children: [
                                       Flexible(
-                                        child: TextBox(
+                                        child: ParcotoTextBox(
                                           controller: rc,
                                           placeholder: 'RC',
                                           style: appTheme.writingStyle,
                                           placeholderStyle: placeStyle,
                                           cursorColor: appTheme.color.darker,
-                                          decoration: WidgetStatePropertyAll(
-                                            BoxDecoration(
-                                              color: appTheme.fillColor,
-                                            ),
-                                          ),
 
                                           onChanged: (s) {
                                             checkChanges();
@@ -285,17 +252,12 @@ class PrestataireFormState extends State<PrestataireForm> {
                                       ),
                                       smallSpace,
                                       Flexible(
-                                        child: TextBox(
+                                        child: ParcotoTextBox(
                                           controller: art,
                                           placeholder: 'ART',
                                           style: appTheme.writingStyle,
                                           placeholderStyle: placeStyle,
                                           cursorColor: appTheme.color.darker,
-                                          decoration: WidgetStatePropertyAll(
-                                            BoxDecoration(
-                                              color: appTheme.fillColor,
-                                            ),
-                                          ),
 
                                           onChanged: (s) {
                                             checkChanges();
