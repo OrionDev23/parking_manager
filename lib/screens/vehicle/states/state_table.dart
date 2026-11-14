@@ -346,7 +346,7 @@ class StateTableState extends State<StateTable> {
                             smallSpace,
                             smallSpace,
                             Flexible(
-                              child: DatePicker(
+                              child: ParcotoFieldSurface(child: DatePicker(
                                 selected: dateMin,
                                 endDate: dateMax,
                                 onChanged: (d) {
@@ -354,7 +354,7 @@ class StateTableState extends State<StateTable> {
                                   setState(() {});
                                   setS(() {});
                                 },
-                              ),
+                              )),
                             ),
                           ],
                         ),
@@ -365,7 +365,7 @@ class StateTableState extends State<StateTable> {
                             smallSpace,
                             smallSpace,
                             Flexible(
-                              child: DatePicker(
+                              child: ParcotoFieldSurface(child: DatePicker(
                                 selected: dateMax,
                                 startDate: dateMin,
                                 onChanged: (d) {
@@ -373,7 +373,7 @@ class StateTableState extends State<StateTable> {
                                   setState(() {});
                                   setS(() {});
                                 },
-                              ),
+                              )),
                             ),
                           ],
                         ),
