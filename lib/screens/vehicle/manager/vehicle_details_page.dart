@@ -27,7 +27,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     ('Finances', FluentIcons.money),
   ];
   String val(String? s) => s == null || s.trim().isEmpty ? 'Non renseigné' : s.trim();
-  String n(num? x, [String suffix = '']) => x == null ? 'Non renseigné' : x.toString() + suffix;
+  String n(num? x, [String suffix = '']) => x == null ? 'Non renseigné' : '$x$suffix';
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +57,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         const SizedBox(height: 8),
         Wrap(spacing: 8, children: [
           _chip(val(v.etat), accent),
-          if (v.fleetNumber?.isNotEmpty == true) _chip('Flotte ' + v.fleetNumber!, accent),
+          if (v.fleetNumber?.isNotEmpty == true) _chip('Flotte ${v.fleetNumber!}', accent),
           if (v.service) _chip('Véhicule de service', accent),
         ]),
       ])),
@@ -76,14 +76,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     height: 58, padding: const EdgeInsets.symmetric(horizontal: 14),
     decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey[30]))),
     child: ListView.separated(scrollDirection: Axis.horizontal, itemCount: sections.length,
-      separatorBuilder: (_, __) => const SizedBox(width: 5),
+      separatorBuilder: (_, _) => const SizedBox(width: 5),
       itemBuilder: (context, i) {
         final active = selected == i;
         return Button(
           style: ButtonStyle(
-            padding: ButtonState.all(const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
-            backgroundColor: ButtonState.all(active ? accent.withValues(alpha: .12) : Colors.transparent),
-            foregroundColor: ButtonState.all(active ? accent : null)),
+            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
+            backgroundColor: WidgetStateProperty.all(active ? accent.withValues(alpha: .12) : Colors.transparent),
+            foregroundColor: WidgetStateProperty.all(active ? accent : null)),
           onPressed: () => setState(() => selected = i),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             Icon(sections[i].$2, size: 14), const SizedBox(width: 7),
@@ -109,18 +109,18 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       ]);
       case 2: return _section('Caractéristiques techniques', 'Motorisation, transmission, dimensions et capacités', [
         _group('Motorisation', [
-          _field('Énergie', v.energie), _field('Puissance', v.puissance == null ? null : v.puissance.toString() + ' ch'),
-          _field('Cylindrée', v.engineDisplacement == null ? null : v.engineDisplacement.toString() + ' cm³'),
+          _field('Énergie', v.energie), _field('Puissance', v.puissance == null ? null : '${v.puissance} ch'),
+          _field('Cylindrée', v.engineDisplacement == null ? null : '${v.engineDisplacement} cm³'),
           _field('Code moteur', v.engineCode)]),
         _group('Transmission', [
           _field('Transmission', v.transmission), _field('Boîte', v.gearbox), _field('Roues motrices', v.driveType)]),
         _group('Dimensions & capacité', [
           _field('Portes', v.doors?.toString()), _field('Places', v.placesAssises?.toString()),
-          _field('Poids total', v.poidsTotal == null ? null : v.poidsTotal.toString() + ' kg'),
-          _field('Charge utile', v.charegeUtile == null ? null : v.charegeUtile.toString() + ' kg'),
-          _field('Longueur', v.lengthMm == null ? null : v.lengthMm.toString() + ' mm'),
-          _field('Largeur', v.widthMm == null ? null : v.widthMm.toString() + ' mm'),
-          _field('Hauteur', v.heightMm == null ? null : v.heightMm.toString() + ' mm')]),
+          _field('Poids total', v.poidsTotal == null ? null : '${v.poidsTotal} kg'),
+          _field('Charge utile', v.charegeUtile == null ? null : '${v.charegeUtile} kg'),
+          _field('Longueur', v.lengthMm == null ? null : '${v.lengthMm} mm'),
+          _field('Largeur', v.widthMm == null ? null : '${v.widthMm} mm'),
+          _field('Hauteur', v.heightMm == null ? null : '${v.heightMm} mm')]),
       ]);
       case 3: return _section('Affectation & organisation', 'Rattachement administratif et conducteur associé', [
         _group('Organisation', [
@@ -148,11 +148,11 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       default: return _section('Finances & cycle de vie', 'Acquisition, garantie et suivi kilométrique', [
         _group('Acquisition', [
           _field('Mode', v.acquisitionType), _field('Date', v.acquisitionDate),
-          _field('Prix d’achat', v.purchasePrice == null ? null : v.purchasePrice.toString() + ' DA'),
+          _field('Prix d’achat', v.purchasePrice == null ? null : '${v.purchasePrice} DA'),
           _field('Fournisseur', v.supplier), _field('Fin de garantie', v.warrantyEndDate)]),
         _group('Kilométrage', [
-          _field('Kilométrage actuel', v.currentMileage == null ? null : v.currentMileage.toString() + ' km'),
-          _field('Prochaine révision', v.nextServiceMileage == null ? null : v.nextServiceMileage.toString() + ' km')]),
+          _field('Kilométrage actuel', v.currentMileage == null ? null : '${v.currentMileage} km'),
+          _field('Prochaine révision', v.nextServiceMileage == null ? null : '${v.nextServiceMileage} km')]),
       ]);
     }
   }
