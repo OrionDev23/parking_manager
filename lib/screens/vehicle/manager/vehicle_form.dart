@@ -348,6 +348,8 @@ class _VehicleFormState extends State<VehicleForm>
           'Identité et immatriculation', 'Carte grise et localisation',
           'Conducteur et organisation', 'Motorisation et dimensions',
           'Acquisition et exploitation', 'Anciens numéros connus',
+          'Positions et trajets', 'Entretiens et réparations',
+          'Pièces et justificatifs', 'Événements du véhicule',
         ];
         return Padding(
           padding: const EdgeInsets.only(bottom: 5),
@@ -519,6 +521,10 @@ class _VehicleFormState extends State<VehicleForm>
     ('Technique', FluentIcons.repair),
     ('Exploitation & finances', FluentIcons.money),
     ('Immatriculations', FluentIcons.document),
+    ('GPS & localisation', FluentIcons.car),
+    ('Maintenance', FluentIcons.repair),
+    ('Documents', FluentIcons.document),
+    ('Historique', FluentIcons.info),
   ];
 
   Widget _buildFormSectionNavigation(AppTheme appTheme) {
@@ -598,12 +604,48 @@ class _VehicleFormState extends State<VehicleForm>
         ];
       case 4:
         return [_buildProfessionalDetailsSection(appTheme)];
-      default:
+      case 5:
         return [
           _sectionHeader(appTheme, 'Historique des immatriculations',
             'Anciennes immatriculations connues pour ce véhicule'),
           ...eightLine(appTheme),
         ];
+      case 6:
+        return [_buildModulePlaceholder(
+          FluentIcons.car,
+          'GPS & localisation',
+          'Visualisez la dernière position connue du véhicule et consultez ses déplacements lorsque le suivi sera activé.',
+          ['Dernière position connue', 'Date et précision du relevé', 'Carte et historique des positions', 'Source du relevé et conducteur associé'],
+          'Collecte GPS non connectée',
+          appTheme,
+        )];
+      case 7:
+        return [_buildModulePlaceholder(
+          FluentIcons.repair,
+          'Maintenance & interventions',
+          'Centralisez le cycle de maintenance, les entretiens préventifs et les réparations effectuées sur ce véhicule.',
+          ['Prochaine échéance kilométrique ou temporelle', 'Planning des entretiens', 'Ordres de réparation', 'Coûts et prestataires'],
+          'Module maintenance à connecter',
+          appTheme,
+        )];
+      case 8:
+        return [_buildModulePlaceholder(
+          FluentIcons.document,
+          'Documents du véhicule',
+          'Retrouvez les documents administratifs et opérationnels dans un espace unique, avec leurs dates de validité.',
+          ['Carte grise et assurance', 'Contrôle technique', 'Factures et justificatifs', 'Alertes avant expiration'],
+          'Stockage documentaire à connecter',
+          appTheme,
+        )];
+      default:
+        return [_buildModulePlaceholder(
+          FluentIcons.info,
+          'Historique & journal de vie',
+          'Consultez les événements importants qui modifient la vie du véhicule et son utilisation.',
+          ['Changements d’affectation', 'Relevés kilométriques', 'Changements de statut', 'Interventions et modifications de la fiche'],
+          'Journal d’événements à structurer',
+          appTheme,
+        )];
     }
   }
 
@@ -961,6 +1003,93 @@ class _VehicleFormState extends State<VehicleForm>
               ],
             );
           },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModulePlaceholder(
+    IconData icon,
+    String title,
+    String description,
+    List<String> features,
+    String status,
+    AppTheme appTheme,
+  ) {
+    return StaggeredGridTile.fit(
+      crossAxisCellCount: 12,
+      child: Container(
+        padding: const EdgeInsets.all(22),
+        decoration: BoxDecoration(
+          color: FluentTheme.of(context).micaBackgroundColor,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: Colors.grey[30]),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: appTheme.color.withValues(alpha: .11),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: appTheme.color, size: 21),
+              ),
+              const SizedBox(width: 13),
+              Expanded(child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 4),
+                  Text(description, style: TextStyle(fontSize: 11, color: Colors.grey[100], height: 1.4)),
+                ],
+              )),
+            ]),
+            const SizedBox(height: 22),
+            Text('CE QUE CONTIENDRA CE MODULE',
+              style: TextStyle(fontSize: 10, letterSpacing: .8, color: Colors.grey[100], fontWeight: FontWeight.w700)),
+            const SizedBox(height: 12),
+            LayoutBuilder(builder: (context, constraints) {
+              final columns = constraints.maxWidth >= 720 ? 2 : 1;
+              final width = (constraints.maxWidth - (columns - 1) * 10) / columns;
+              return Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: features.map((feature) => SizedBox(
+                  width: width,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: appTheme.backGroundColor,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.grey[30]),
+                    ),
+                    child: Row(children: [
+                      Icon(FluentIcons.check_mark, size: 13, color: appTheme.color),
+                      const SizedBox(width: 9),
+                      Expanded(child: Text(feature, style: const TextStyle(fontSize: 11))),
+                    ]),
+                  ),
+                )).toList(),
+              );
+            }),
+            const SizedBox(height: 18),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.grey[20],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(FluentIcons.info, size: 12, color: Colors.grey[100]),
+                const SizedBox(width: 7),
+                Text(status, style: TextStyle(fontSize: 10, color: Colors.grey[100], fontWeight: FontWeight.w600)),
+              ]),
+            ),
+          ],
         ),
       ),
     );
