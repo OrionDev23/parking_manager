@@ -186,7 +186,7 @@ class CDocumentTableState extends State<CDocumentTable> {
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
-                                                          child: DatePicker(
+                                                          child: ParcotoFieldSurface(child: DatePicker(
                                                             selected: dateMin,
                                                             endDate: dateMax,
                                                             onChanged: (d) {
@@ -194,7 +194,7 @@ class CDocumentTableState extends State<CDocumentTable> {
                                                               setState(() {});
                                                               setS(() {});
                                                             },
-                                                          ),
+                                                          )),
                                                         ),
                                                       ],
                                                     ),
@@ -210,7 +210,7 @@ class CDocumentTableState extends State<CDocumentTable> {
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
-                                                          child: DatePicker(
+                                                          child: ParcotoFieldSurface(child: DatePicker(
                                                             selected: dateMax,
                                                             startDate: dateMin,
                                                             onChanged: (d) {
@@ -218,7 +218,7 @@ class CDocumentTableState extends State<CDocumentTable> {
                                                               setState(() {});
                                                               setS(() {});
                                                             },
-                                                          ),
+                                                          )),
                                                         ),
                                                       ],
                                                     ),
