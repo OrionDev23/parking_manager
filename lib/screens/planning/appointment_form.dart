@@ -203,7 +203,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                     children: <Widget>[
                       Expanded(
                         flex: 7,
-                        child: DatePicker(
+                        child: ParcotoFieldSurface(child: DatePicker(
                           locale: appTheme.locale,
                           selected: _startDate,
                           startDate: DateTime(1900),
@@ -227,7 +227,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                               setState(() {});
                             }
                           },
-                        ),
+                        )),
                       ),
                       const m.VerticalDivider(),
                       Expanded(
@@ -276,7 +276,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                     children: <Widget>[
                       Expanded(
                         flex: 7,
-                        child: DatePicker(
+                        child: ParcotoFieldSurface(child: DatePicker(
                           selected: _endDate,
                           locale: appTheme.locale,
                           startDate: DateTime(1900),
@@ -302,7 +302,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                               setState(() {});
                             }
                           },
-                        ),
+                        )),
                       ),
                       const m.VerticalDivider(),
                       Expanded(
