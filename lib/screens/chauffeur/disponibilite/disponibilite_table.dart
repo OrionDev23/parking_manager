@@ -289,6 +289,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                               ),
                                             ),
                                           ),
+                                          ),
                                           smallSpace,
                                           Padding(
                                             padding: const EdgeInsets.all(8.0),
