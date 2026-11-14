@@ -22,6 +22,8 @@ class Vehicle {
   final String? imageSource;
   final String? color;
   final int? engineDisplacement;
+  final double? enginePowerHp;
+  final double? enginePowerKw;
   final String? engineCode;
   final String? transmission;
   final String? gearbox;
@@ -45,7 +47,7 @@ class Vehicle {
   final int? usefulLoad;
   final int? totalWeight;
   final int? seats;
-  final int? power;
+  final int? fiscalPower;
   final String? energy;
   final String? body;
   final int? usageYear;
@@ -92,6 +94,8 @@ class Vehicle {
     this.imageSource,
     this.color,
     this.engineDisplacement,
+    this.enginePowerHp,
+    this.enginePowerKw,
     this.engineCode,
     this.transmission,
     this.gearbox,
@@ -115,7 +119,7 @@ class Vehicle {
     this.usefulLoad,
     this.totalWeight,
     this.seats,
-    this.power,
+    this.fiscalPower,
     this.energy,
     this.body,
     this.usageYear,
@@ -183,6 +187,8 @@ class Vehicle {
     'imageSource': imageSource,
     'color': color,
     'engineDisplacement': engineDisplacement,
+    'enginePowerHp': enginePowerHp,
+    'enginePowerKw': enginePowerKw,
     'engineCode': engineCode,
     'transmission': transmission,
     'gearbox': gearbox,
@@ -206,7 +212,7 @@ class Vehicle {
     'usefulLoad': usefulLoad,
     'totalWeight': totalWeight,
     'seats': seats,
-    'power': power,
+    'fiscalPower': fiscalPower,
     'energy': energy,
     'body': body,
     'usageYear': usageYear,
@@ -254,6 +260,8 @@ class Vehicle {
     imageSource: map['imageSource'] as String?,
     color: map['color'] as String?,
     engineDisplacement: (map['engineDisplacement'] as num?)?.toInt(),
+    enginePowerHp: (map['enginePowerHp'] as num?)?.toDouble(),
+    enginePowerKw: (map['enginePowerKw'] as num?)?.toDouble(),
     engineCode: map['engineCode'] as String?,
     transmission: map['transmission'] as String?,
     gearbox: map['gearbox'] as String?,
@@ -279,7 +287,7 @@ class Vehicle {
     usefulLoad: (map['usefulLoad'] as num?)?.toInt(),
     totalWeight: (map['totalWeight'] as num?)?.toInt(),
     seats: (map['seats'] as num?)?.toInt(),
-    power: (map['power'] as num?)?.toInt(),
+    fiscalPower: ((map['fiscalPower'] ?? map['power']) as num?)?.toInt(),
     energy: map['energy'] as String?,
     body: map['body'] as String?,
     usageYear: (map['usageYear'] as num?)?.toInt(),
