@@ -2,6 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:parc_oto/serializables/vehicle/vehicle.dart';
 import 'package:parc_oto/serializables/vehicle/document_vehicle.dart';
+import 'package:parc_oto/serializables/vehicle/state.dart';
 import 'package:parc_oto/serializables/reparation/reparation.dart';
 import 'package:parc_oto/serializables/reparation/fiche_reception.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
@@ -22,6 +23,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   bool _requestedDocuments = false;
   bool _requestedMaintenance = false;
   bool _loadingMaintenance = false;
+  bool _requestedHistory = false;
+  bool _loadingHistory = false;
+  List<Etat> _vehicleStates = [];
   List<FicheReception> _receptionSheets = [];
   Vehicle get v => widget.vehicle;
 
@@ -212,7 +216,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 foregroundColor:
                     WidgetStateProperty.all(active ? accent : null),
               ),
-              onPressed: () {\n                setState(() => selected = i);\n                if (i == 5) _loadMaintenance();\n              },
+              onPressed: () {\n                setState(() => selected = i);\n                if (i == 5) _loadMaintenance();\n                if (i == 7) _loadHistory();\n              },
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -229,6 +233,42 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           },
         ),
       );
+
+  Future<void> _loadHistory() async {
+    if (_requestedHistory || _loadingHistory) return;
+    _requestedHistory = true;
+    _loadingHistory = true;
+    if (mounted) setState(() {});
+    try {
+      final provider = context.read<VehicleProvider>();
+      if (!VehicleProvider.downloadedStates &&
+          !VehicleProvider.downloadingStates) {
+        await provider.refreshStates();
+      } else {
+        while (VehicleProvider.downloadingStates) {
+          await Future.delayed(const Duration(milliseconds: 50));
+        }
+      }
+      final states = VehicleProvider.etats.values.where((state) =>
+          state.vehicle == v.id || state.vehicleMat == v.matricule).toList()
+        ..sort((a, b) {
+          final aDate = a.date ?? a.updatedAt ?? a.createdAt;
+          final bDate = b.date ?? b.updatedAt ?? b.createdAt;
+          if (aDate == null && bDate == null) return 0;
+          if (aDate == null) return 1;
+          if (bDate == null) return -1;
+          return bDate.compareTo(aDate);
+        });
+      if (!mounted) return;
+      setState(() {
+        _vehicleStates = states;
+        _loadingHistory = false;
+      });
+    } catch (error) {
+      debugPrint('[Vehicle details] history load failed: $error');
+      if (mounted) setState(() => _loadingHistory = false);
+    }
+  }
 
   Future<void> _loadMaintenance() async {
     if (_requestedMaintenance || _loadingMaintenance) return;
@@ -359,11 +399,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       case 6:
         return _documentsSection(accent);
       case 7:
-        return _empty(
-            FluentIcons.document,
-            'Historique détaillé indisponible',
-            'Les changements d’affectation, de statut, relevés kilométriques et événements seront présentés chronologiquement.',
-            'Historique véhicule à structurer');
+        return _historySection(accent);
       default:
         return _section(
             'Finances & cycle de vie',
@@ -571,6 +607,59 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                   const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
         ],
       );
+
+  Widget _historySection(Color accent) {
+    if (_loadingHistory && _vehicleStates.isEmpty) {
+      return const Center(child: Padding(
+        padding: EdgeInsets.all(36), child: ProgressRing()));
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _heading('Historique du véhicule',
+            'Événements de statut enregistrés dans le registre des états Parcoto'),
+        _panel('Changements d’état', FluentIcons.history, accent, [
+          if (_vehicleStates.isEmpty)
+            _emptyInline('Aucun changement d’état enregistré pour ce véhicule')
+          else
+            ..._vehicleStates.map((state) => Padding(
+              padding: const EdgeInsets.only(bottom: 13),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(FluentIcons.circle_ring, color: accent, size: 16),
+                  const SizedBox(width: 10),
+                  Expanded(child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('État ${state.type}',
+                          style: const TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 3),
+                      Text(
+                        '${_date(state.date ?? state.updatedAt ?? state.createdAt)}'
+                        '${state.ordreNum == null ? '' : ' • Ordre #${state.ordreNum}'}',
+                        style: TextStyle(color: Colors.grey[100], fontSize: 11)),
+                      if (state.remarque?.trim().isNotEmpty == true)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(state.remarque!,
+                              style: const TextStyle(fontSize: 12)),
+                        ),
+                    ],
+                  )),
+                ],
+              ),
+            )),
+        ]),
+        if (_loadingHistory)
+          const Padding(
+            padding: EdgeInsets.all(8),
+            child: Center(child: ProgressRing()),
+          ),
+      ],
+    );
+  }
 
   Widget _maintenanceSection(Color accent) {
     final repairs = RepairProvider.reparations.values.where((repair) =>
