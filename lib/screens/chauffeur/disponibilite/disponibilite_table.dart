@@ -173,7 +173,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
-                                                          child: DatePicker(
+                                                          child: ParcotoFieldSurface(child: DatePicker(
                                                             selected: dateMin,
                                                             onChanged: (s) {
                                                               setState(() {
@@ -181,7 +181,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                               });
                                                               setS(() {});
                                                             },
-                                                          ),
+                                                          )),
                                                         ),
                                                       ],
                                                     ),
@@ -197,7 +197,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
-                                                          child: DatePicker(
+                                                          child: ParcotoFieldSurface(child: DatePicker(
                                                             selected: dateMax,
                                                             onChanged: (s) {
                                                               setState(() {
@@ -205,7 +205,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                               });
                                                               setS(() {});
                                                             },
-                                                          ),
+                                                          )),
                                                         ),
                                                       ],
                                                     ),
