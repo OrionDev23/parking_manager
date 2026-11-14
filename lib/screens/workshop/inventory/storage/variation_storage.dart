@@ -143,33 +143,35 @@ class VariationStorageWidgetState extends State<VariationStorageWidget> {
       smallSpace,
       SizedBox(
         width: 150.px,
-        child: widget.part.unitType == 0
-            ? NumberBox<int>(
-                value: qte.toInt(),
-                onChanged: (int? value) {
-                  setState(() {
-                    qte = value?.toDouble() ?? 0;
-                  });
-                  if (widget.onQteChanged != null) {
-                    widget.onQteChanged!(value?.toDouble() ?? 0);
-                  }
-                },
-                min: 0,
-                max: widget.maxQte.toInt() + qte.toInt(),
-              )
-            : NumberBox<double>(
-                value: qte,
-                onChanged: (s) {
-                  setState(() {
-                    qte = s ?? 0;
-                  });
-                  if (widget.onQteChanged != null) {
-                    widget.onQteChanged!(s ?? 0);
-                  }
-                },
-                min: 0,
-                max: widget.maxQte + qte,
-              ),
+        child: ParcotoFieldSurface(
+          child: widget.part.unitType == 0
+              ? NumberBox<int>(
+                  value: qte.toInt(),
+                  onChanged: (int? value) {
+                    setState(() {
+                      qte = value?.toDouble() ?? 0;
+                    });
+                    if (widget.onQteChanged != null) {
+                      widget.onQteChanged!(value?.toDouble() ?? 0);
+                    }
+                  },
+                  min: 0,
+                  max: widget.maxQte.toInt() + qte.toInt(),
+                )
+              : NumberBox<double>(
+                  value: qte,
+                  onChanged: (s) {
+                    setState(() {
+                      qte = s ?? 0;
+                    });
+                    if (widget.onQteChanged != null) {
+                      widget.onQteChanged!(s ?? 0);
+                    }
+                  },
+                  min: 0,
+                  max: widget.maxQte + qte,
+                ),
+        ),
       ),
     ];
   }
