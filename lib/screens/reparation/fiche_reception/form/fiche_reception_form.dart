@@ -928,11 +928,11 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
     return Table(
       defaultVerticalAlignment: TableCellVerticalAlignment.top,
       border: TableBorder.all(),
-      columnWidths: {
-        0: FixedColumnWidth(80.px),
-        1: FixedColumnWidth(80.px),
-        2: FixedColumnWidth(80.px),
-        3: FixedColumnWidth(80.px),
+      columnWidths: const {
+        0: FlexColumnWidth(1),
+        1: FlexColumnWidth(1),
+        2: FlexColumnWidth(1),
+        3: FlexColumnWidth(1),
       },
       children: [
         TableRow(
@@ -944,8 +944,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                   children: [
                     Text('marque', style: littleStyle).tr(),
                     const Spacer(),
-                    SizedBox(
-                      width: 160.px,
+                    Flexible(
                       child: ParcotoTextBox(
                         controller: marque,
                         placeholder: 'marque'.tr(),
@@ -965,8 +964,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                   children: [
                     Text('type', style: littleStyle).tr(),
                     const Spacer(),
-                    SizedBox(
-                      width: 160.px,
+                    Flexible(
                       child: ParcotoTextBox(
                         controller: type,
                         placeholder: 'type'.tr(),
@@ -1037,9 +1035,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       children: [
                         Text('nmoteur', style: littleStyle).tr(),
                         const Spacer(),
-                        SizedBox(
-                          width: 160.px,
-                          child: ParcotoTextBox(
+                        Flexible(
+                      child: ParcotoTextBox(
                             controller: nmoteur,
                             placeholder: 'nmoteur'.tr(),
                             style: appTheme.writingStyle,
@@ -1062,9 +1059,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       children: [
                         Text('kilometrage', style: littleStyle).tr(),
                         const Spacer(),
-                        SizedBox(
-                          width: 160.px,
-                          child: ParcotoTextBox(
+                        Flexible(
+                      child: ParcotoTextBox(
                             controller: km,
                             placeholder: 'KM',
                             style: appTheme.writingStyle,
@@ -1162,9 +1158,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       children: [
                         Text('color', style: littleStyle).tr(),
                         const Spacer(),
-                        SizedBox(
-                          width: 160.px,
-                          child: ParcotoTextBox(
+                        Flexible(
+                      child: ParcotoTextBox(
                             controller: couleur,
                             placeholder: 'color'.tr(),
                             style: appTheme.writingStyle,
@@ -1212,9 +1207,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       children: [
                         Text('matriculeemploye', style: littleStyle).tr(),
                         const Spacer(),
-                        SizedBox(
-                          width: 160.px,
-                          child: ParcotoTextBox(
+                        Flexible(
+                      child: ParcotoTextBox(
                             controller: matriculeConducteur,
                             placeholder: 'matriculeemploye'.tr(),
                             style: appTheme.writingStyle,
@@ -1237,9 +1231,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       children: [
                         Text('nom', style: littleStyle).tr(),
                         const Spacer(),
-                        SizedBox(
-                          width: 160.px,
-                          child: ParcotoTextBox(
+                        Flexible(
+                      child: ParcotoTextBox(
                             controller: nom,
                             placeholder: 'nom'.tr(),
                             style: appTheme.writingStyle,
@@ -1262,9 +1255,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       children: [
                         Text('prenom', style: littleStyle).tr(),
                         const Spacer(),
-                        SizedBox(
-                          width: 160.px,
-                          child: ParcotoTextBox(
+                        Flexible(
+                      child: ParcotoTextBox(
                             controller: prenom,
                             placeholder: 'prenom'.tr(),
                             style: appTheme.writingStyle,
