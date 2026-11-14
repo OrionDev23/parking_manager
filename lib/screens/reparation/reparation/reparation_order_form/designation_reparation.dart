@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
@@ -38,16 +39,13 @@ class DesignationReparationState extends State<DesignationReparation> {
         bigSpace,
         Flexible(
           flex: 3,
-          child: TextBox(
+          child: ParcotoTextBox(
             controller: designation,
             placeholderStyle: placeStyle,
             placeholder: 'desi'.tr(),
             style: appTheme.writingStyle,
             cursorColor: appTheme.color.darker,
             maxLength: 60,
-            decoration: WidgetStatePropertyAll(
-              BoxDecoration(color: appTheme.fillColor),
-            ),
 
             onChanged: (s) {
               setState(() {
@@ -79,7 +77,7 @@ class DesignationReparationState extends State<DesignationReparation> {
         VerticalDivider(color: placeStyle.color),
         smallSpace,
         Expanded(
-          child: TextBox(
+          child: ParcotoTextBox(
             controller: tva,
             suffix: Text('%', style: placeStyle),
             onChanged: (s) => setState(() {
@@ -101,9 +99,6 @@ class DesignationReparationState extends State<DesignationReparation> {
             placeholder: 'TVA'.tr(),
             style: appTheme.writingStyle,
             cursorColor: appTheme.color.darker,
-            decoration: WidgetStatePropertyAll(
-              BoxDecoration(color: appTheme.fillColor),
-            ),
           ),
         ),
         smallSpace,
@@ -111,7 +106,7 @@ class DesignationReparationState extends State<DesignationReparation> {
         smallSpace,
         Expanded(
           flex: 1,
-          child: TextBox(
+          child: ParcotoTextBox(
             controller: prix,
             placeholderStyle: placeStyle,
             suffix: Text('DA', style: placeStyle),
@@ -121,9 +116,6 @@ class DesignationReparationState extends State<DesignationReparation> {
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'^(\d+)?\.?\d{0,2}')),
             ],
-            decoration: WidgetStatePropertyAll(
-              BoxDecoration(color: appTheme.fillColor),
-            ),
 
             onChanged: (s) {
               setState(() {
