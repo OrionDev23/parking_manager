@@ -6,6 +6,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../../../widgets/empty_widget/src/widget.dart';
+import '../../../widgets/forms/parcoto_form_field.dart';
 
 class ParcOtoPie extends StatefulWidget {
   final String? title;
@@ -29,20 +30,17 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
   }
 
   bool loading = false;
-
   bool group = true;
-
   int indexOfBiggest = 0;
   int valueOfBiggest = 0;
   List<Color> colors = [];
   String? error;
   int _loadGeneration = 0;
+
   bool _sameInputs(ParcOtoPie other) {
     if (widget.refreshVersion != other.refreshVersion || widget.labels.length != other.labels.length) return false;
     for (var i = 0; i < widget.labels.length; i++) {
-      if (widget.labels[i].key != other.labels[i].key) {
-        return false;
-      }
+      if (widget.labels[i].key != other.labels[i].key) return false;
     }
     return true;
   }
@@ -84,12 +82,8 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
     }
   }
 
-
-
   bool notOnlyOne = false;
-  List<MapEntry<String, int>> _sortAsIntended(
-    List<MapEntry<String, int>> source,
-  ) {
+  List<MapEntry<String, int>> _sortAsIntended(List<MapEntry<String, int>> source) {
     final byKey = {for (final item in source) item.key: item};
     final sorted = <MapEntry<String, int>>[];
     var biggestValue = 0;
@@ -99,7 +93,6 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
     for (var i = 0; i < widget.labels.length; i++) {
       final item = byKey[widget.labels[i].key];
       if (item == null) continue;
-
       if (item.value > biggestValue) {
         biggestValue = item.value;
         biggestIndex = i;
@@ -115,8 +108,8 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
   }
 
   int minValue = 10;
-
   bool gotenColors = false;
+
   void getColors(AppTheme appTheme) {
     if (!gotenColors) {
       colors = appTheme.getRandomColors(values.length);
@@ -128,9 +121,7 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
 
-    if (loading) {
-      return const Center(child: ProgressRing());
-    }
+    if (loading) return const Center(child: ProgressRing());
     if (error != null) {
       return Center(
         child: Column(
@@ -167,10 +158,7 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                     width: 250.px,
                     child: EmptyWidget(
                       title: 'nodatayet'.tr(),
-                      titleTextStyle: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      titleTextStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                       image: PackageImage.Image_3.encode(),
                     ),
                   ),
@@ -190,33 +178,18 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                         legendIconType: LegendIconType.circle,
                         explode: true,
                         explodeIndex: indexOfBiggest,
-                        groupMode: notOnlyOne && group
-                            ? CircularChartGroupMode.value
-                            : null,
+                        groupMode: notOnlyOne && group ? CircularChartGroupMode.value : null,
                         groupTo: minValue.toDouble(),
                         dataSource: values,
-                        xValueMapper: (s, t) {
-                          return s.key.tr();
-                        },
-                        yValueMapper: (s, t) {
-                          return s.value;
-                        },
-                        dataLabelMapper: (s, t) {
-                          return s.key.tr();
-                        },
-                        pointColorMapper: (s, i) {
-                          return colors[i];
-                        },
+                        xValueMapper: (s, t) => s.key.tr(),
+                        yValueMapper: (s, t) => s.value,
+                        dataLabelMapper: (s, t) => s.key.tr(),
+                        pointColorMapper: (s, i) => colors[i],
                         dataLabelSettings: DataLabelSettings(
                           isVisible: true,
-                          textStyle: TextStyle(
-                            fontSize: 10,
-                            color: appTheme.writingStyle.color,
-                          ),
+                          textStyle: TextStyle(fontSize: 10, color: appTheme.writingStyle.color),
                           showZeroValue: false,
-                          connectorLineSettings: const ConnectorLineSettings(
-                            type: ConnectorType.line,
-                          ),
+                          connectorLineSettings: const ConnectorLineSettings(type: ConnectorType.line),
                         ),
                       ),
                     ],
@@ -232,15 +205,19 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                   smallSpace,
                   SizedBox(
                     width: 70.px,
-                    child: NumberBox(
-                      clearButton: false,
-                      mode: SpinButtonPlacementMode.none,
-                      value: minValue,
-                      onChanged: (s) {
-                        setState(() {
-                          minValue = s ?? 0;
-                        });
-                      },
+                    child: ParcotoFieldSurface(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      minHeight: 30,
+                      child: NumberBox(
+                        clearButton: false,
+                        mode: SpinButtonPlacementMode.none,
+                        value: minValue,
+                        onChanged: (s) {
+                          setState(() {
+                            minValue = s ?? 0;
+                          });
+                        },
+                      ),
                     ),
                   ),
                   smallSpace,
