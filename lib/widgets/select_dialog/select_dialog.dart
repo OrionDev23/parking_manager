@@ -255,7 +255,7 @@ class SelectDialogState<T> extends State<SelectDialog<T>> {
           if (widget.showSearchBox)
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: TextField(
+              child: ParcotoTextBox(
                 controller: bloc.findController,
                 focusNode: bloc.focusNode,
                 style: widget.searchTextStyle,
