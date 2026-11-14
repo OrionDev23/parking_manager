@@ -68,6 +68,8 @@ class _VehicleFormState extends State<VehicleForm>
   final modelYearController = TextEditingController();
   final colorController = TextEditingController();
   final engineDisplacementController = TextEditingController();
+  final enginePowerHpController = TextEditingController();
+  final enginePowerKwController = TextEditingController();
   final engineCodeController = TextEditingController();
   final transmissionController = TextEditingController();
   final gearboxController = TextEditingController();
@@ -164,7 +166,7 @@ class _VehicleFormState extends State<VehicleForm>
       selectedDate = widget.vehicle!.date ?? DateTime.now();
       lourd = widget.vehicle!.lourd;
       matempl.text = widget.vehicle!.matriculeConducteur ?? '';
-      service = widget.vehicle!.decision;
+      service = widget.vehicle!.service;
 
       selectedDepartment.text = VehiclesUtilities.getDepartment(
         widget.vehicle!.departement,
@@ -189,6 +191,8 @@ class _VehicleFormState extends State<VehicleForm>
       colorController.text = widget.vehicle!.color ?? '';
       engineDisplacementController.text =
           widget.vehicle!.engineDisplacement?.toString() ?? '';
+      enginePowerHpController.text = widget.vehicle!.enginePowerHp?.toString() ?? '';
+      enginePowerKwController.text = widget.vehicle!.enginePowerKw?.toString() ?? '';
       engineCodeController.text = widget.vehicle!.engineCode ?? '';
       transmissionController.text = widget.vehicle!.transmission ?? '';
       gearboxController.text = widget.vehicle!.gearbox ?? '';
@@ -2540,7 +2544,7 @@ class _VehicleFormState extends State<VehicleForm>
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Column(
               children: [
-                Text('puissance', style: formHintStyle).tr(),
+                const Text('Puissance fiscale (CV)', style: TextStyle(fontSize: 12)),
                 ParcotoTextBox(
                   enabled: !widget.readOnly,
                   placeholder: '0000',
@@ -2554,6 +2558,48 @@ class _VehicleFormState extends State<VehicleForm>
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(children: [
+              const Text('Puissance moteur (ch)', style: TextStyle(fontSize: 12)),
+              ParcotoTextBox(
+                enabled: !widget.readOnly, placeholder: 'Ex. 110',
+                controller: enginePowerHpController, maxLength: 7,
+                placeholderStyle: placeStyle, cursorColor: appTheme.color.darker,
+                style: appTheme.writingStyle,
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}'))],
+              ),
+            ]),
+          ),
+        ),
+      ),
+      StaggeredGridTile.fit(
+        crossAxisCellCount: 2,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.zero,
+          decoration: BoxDecoration(border: Border.all(color: appTheme.color)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(children: [
+              const Text('Puissance moteur (kW)', style: TextStyle(fontSize: 12)),
+              ParcotoTextBox(
+                enabled: !widget.readOnly, placeholder: 'Ex. 81',
+                controller: enginePowerKwController, maxLength: 7,
+                placeholderStyle: placeStyle, cursorColor: appTheme.color.darker,
+                style: appTheme.writingStyle,
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}'))],
+              ),
+            ]),
           ),
         ),
       ),
@@ -2878,6 +2924,8 @@ class _VehicleFormState extends State<VehicleForm>
         modelYear: int.tryParse(modelYearController.text.trim()),
         color: _nullableText(colorController.text),
         engineDisplacement: int.tryParse(engineDisplacementController.text.trim()),
+        enginePowerHp: double.tryParse(enginePowerHpController.text.trim().replaceAll(',', '.')),
+        enginePowerKw: double.tryParse(enginePowerKwController.text.trim().replaceAll(',', '.')),
         engineCode: _nullableText(engineCodeController.text),
         transmission: _nullableText(transmissionController.text),
         gearbox: _nullableText(gearboxController.text),
@@ -2917,7 +2965,7 @@ class _VehicleFormState extends State<VehicleForm>
         matriculePrec: matriculesPrec,
         carrosserie: caross.text,
         charegeUtile: int.tryParse(charg.text),
-        createdBy: DatabaseGetter.me.value?.id,
+        createdBy: widget.vehicle?.createdBy ?? DatabaseGetter.me.value?.id,
         lourd: lourd,
         direction: selectedDirection.text
             .toUpperCase()
@@ -2937,6 +2985,11 @@ class _VehicleFormState extends State<VehicleForm>
             .replaceAll(' ', '')
             .trim(),
         service: service,
+        decision: widget.vehicle?.decision ?? false,
+        emplacement: widget.vehicle?.emplacement,
+        etat: widget.vehicle?.etat,
+        etatactuel: widget.vehicle?.etatactuel ?? 0,
+        perimetre: widget.vehicle?.perimetre ?? 0,
         matriculeConducteur: matempl.text,
       );
       final isUpdate = widget.vehicle != null;
