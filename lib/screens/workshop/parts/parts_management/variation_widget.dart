@@ -175,7 +175,9 @@ class VariationWidgetState extends State<VariationWidget> {
       return List.generate(widget.options!.length, (index) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5),
-          child: DropDownButton(
+          child: ParcotoFieldSurface(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            child: DropDownButton(
             title: Text(
               selectedItems[index] == null
                   ? widget.options![index].name
@@ -193,6 +195,7 @@ class VariationWidgetState extends State<VariationWidget> {
                 selected: selectedItems[index] == ind,
               );
             }),
+            ),
           ),
         );
       });
