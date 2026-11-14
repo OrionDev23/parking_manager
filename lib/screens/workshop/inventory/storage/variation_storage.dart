@@ -117,6 +117,7 @@ class VariationStorageWidgetState extends State<VariationStorageWidget> {
       smallSpace,
       if (widget.differentDate)
         Flexible(
+          child: ParcotoFieldSurface(
           child: DatePicker(
             selected: selectedDate,
             onChanged: (d) {
@@ -128,6 +129,7 @@ class VariationStorageWidgetState extends State<VariationStorageWidget> {
               }
             },
           ),
+        ),
         ),
       if (widget.differentDate) smallSpace,
       if (widget.differentDate) VerticalDivider(color: placeStyle.color),
