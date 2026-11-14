@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/parts_provider.dart';
 import 'package:provider/provider.dart';
@@ -123,7 +124,7 @@ class _BrandFormState extends State<BrandForm>
                       child: Row(
                         children: [
                           Flexible(
-                            child: TextBox(
+                            child: ParcotoTextBox(
                               controller: brandCode,
                               placeholder: 'code'.tr(),
                               onChanged: (s) {
@@ -140,9 +141,6 @@ class _BrandFormState extends State<BrandForm>
                               style: appTheme.writingStyle,
                               placeholderStyle: placeStyle,
                               cursorColor: appTheme.color.darker,
-                              decoration: WidgetStatePropertyAll(
-                                BoxDecoration(color: appTheme.fillColor),
-                              ),
                             ),
                           ),
                           const SizedBox(width: 5),
@@ -170,7 +168,7 @@ class _BrandFormState extends State<BrandForm>
                     label: 'nom'.tr(),
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
-                      child: TextBox(
+                      child: ParcotoTextBox(
                         controller: brandName,
                         placeholder: 'nom'.tr(),
                         onChanged: (s) {
@@ -179,9 +177,6 @@ class _BrandFormState extends State<BrandForm>
                         style: appTheme.writingStyle,
                         placeholderStyle: placeStyle,
                         cursorColor: appTheme.color.darker,
-                        decoration: WidgetStatePropertyAll(
-                          BoxDecoration(color: appTheme.fillColor),
-                        ),
                       ),
                     ),
                   ),
