@@ -189,7 +189,7 @@ class StateFormState extends State<StateForm> {
                       ).tr(),
                     ],
                   ),
-                  title: ParcotoFieldSurface(child: ParcotoFieldSurface(child: ComboBox<int>(
+                  title: ParcotoFieldSurface(child: ComboBox<int>(
                     items: List.generate(
                       5,
                       (index) => ComboBoxItem<int>(
@@ -203,7 +203,7 @@ class StateFormState extends State<StateForm> {
                         type = s ?? 0;
                       });
                     },
-                  ))),
+                  )),
                 ),
                 const Divider(),
                 ListTile(
@@ -220,7 +220,7 @@ class StateFormState extends State<StateForm> {
                     children: <Widget>[
                       Expanded(
                         flex: 7,
-                        child: DatePicker(
+                        child: ParcotoFieldSurface(child: DatePicker(
                           locale: appTheme.locale,
                           selected: date,
                           startDate: DateTime(1900),
@@ -239,7 +239,7 @@ class StateFormState extends State<StateForm> {
                               setState(() {});
                             }
                           },
-                        ),
+                        )),
                       ),
                       const m.VerticalDivider(),
                       Expanded(
