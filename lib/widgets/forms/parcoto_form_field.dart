@@ -77,6 +77,8 @@ class ParcotoTextBox extends StatelessWidget {
   final int? minLines;
   final TextInputType? keyboardType;
   final TextAlign textAlign;
+  final TextAlignVertical? textAlignVertical;
+  final CrossAxisAlignment? crossAxisAlignment;
   final TextStyle? style;
   final TextStyle? placeholderStyle;
   final Color? cursorColor;
@@ -99,6 +101,8 @@ class ParcotoTextBox extends StatelessWidget {
     this.minLines,
     this.keyboardType,
     this.textAlign = TextAlign.start,
+    this.textAlignVertical,
+    this.crossAxisAlignment,
     this.style,
     this.placeholderStyle,
     this.cursorColor,
@@ -127,6 +131,8 @@ class ParcotoTextBox extends StatelessWidget {
         minLines: minLines,
         keyboardType: keyboardType,
         textAlign: textAlign,
+        textAlignVertical: textAlignVertical,
+        crossAxisAlignment: crossAxisAlignment,
         style: style ?? theme.typography.body,
         placeholderStyle: placeholderStyle ?? TextStyle(
           color: theme.inactiveColor,
