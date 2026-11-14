@@ -30,60 +30,124 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       }
     }
   }
+
   static const sections = [
-    ('Vue d’ensemble', FluentIcons.car),
-    ('Identification', FluentIcons.people),
-    ('Caractéristiques', FluentIcons.car),
+    ('Vue générale', FluentIcons.view_dashboard),
+    ('Identification', FluentIcons.contact),
+    ('Spécifications', FluentIcons.settings),
     ('Affectation', FluentIcons.people),
-    ('GPS & localisation', FluentIcons.car),
+    ('GPS', FluentIcons.map_pin),
     ('Maintenance', FluentIcons.repair),
     ('Documents', FluentIcons.document),
-    ('Historique', FluentIcons.document),
+    ('Historique', FluentIcons.history),
     ('Finances', FluentIcons.money),
   ];
-  String val(String? s) => s == null || s.trim().isEmpty ? 'Non renseigné' : s.trim();
-  String n(num? x, [String suffix = '']) => x == null ? 'Non renseigné' : '$x$suffix';
+
+  String val(String? s) =>
+      s == null || s.trim().isEmpty ? 'Non renseigné' : s.trim();
+  String n(num? x, [String suffix = '']) =>
+      x == null ? 'Non renseigné' : '$x$suffix';
 
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppTheme>();
     final accent = FluentTheme.of(context).accentColor;
     final model = [val(v.marque), val(v.type), v.modelYear?.toString() ?? '']
-        .where((e) => e != 'Non renseigné' && e.isNotEmpty).join(' ');
-    return Container(color: app.backGroundColor, child: Column(children: [
-      _header(accent, model.isEmpty ? 'Fiche véhicule' : model),
-      _navigation(accent),
-      Expanded(child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(22, 20, 22, 28), child: _content(accent))),
-    ]));
+        .where((e) => e != 'Non renseigné' && e.isNotEmpty)
+        .join(' ');
+    return Container(
+      color: app.backGroundColor,
+      child: Column(
+        children: [
+          _header(accent, model.isEmpty ? 'Fiche véhicule' : model),
+          _navigation(accent),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(22, 20, 22, 28),
+              child: _content(accent),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _header(Color accent, String model) => Container(
-    padding: const EdgeInsets.fromLTRB(22, 20, 22, 18),
-    decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey[30]))),
-    child: Row(children: [
-      _vehicleAvatar(accent),
-      const SizedBox(width: 16),
-      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(v.matricule, style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 4), Text(model, style: TextStyle(color: Colors.grey[100], fontSize: 13)),
-        const SizedBox(height: 8),
-        Wrap(spacing: 8, children: [
-          _chip(val(v.etat), accent),
-          if (v.fleetNumber?.isNotEmpty == true) _chip('Flotte ${v.fleetNumber!}', accent),
-          if (v.service) _chip('Véhicule de service', accent),
-        ]),
-      ])),
-      if (widget.onEdit != null) Button(onPressed: widget.onEdit, child: const Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(FluentIcons.edit, size: 14), SizedBox(width: 7), Text('Modifier'),
-      ])),
-    ]),
-  );
+        padding: const EdgeInsets.fromLTRB(22, 18, 22, 16),
+        decoration: BoxDecoration(
+          color: FluentTheme.of(context).micaBackgroundColor,
+          border: Border(bottom: BorderSide(color: Colors.grey[30])),
+        ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compact = constraints.maxWidth < 650;
+            final identity = Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    v.matricule,
+                    style: const TextStyle(
+                        fontSize: 23, fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(model,
+                      style:
+                          TextStyle(color: Colors.grey[100], fontSize: 13)),
+                  const SizedBox(height: 9),
+                  Wrap(
+                    spacing: 7,
+                    runSpacing: 6,
+                    children: [
+                      _chip(val(v.etat), accent),
+                      if (v.fleetNumber?.isNotEmpty == true)
+                        _chip('Flotte ${v.fleetNumber!}', accent),
+                      if (v.service) _chip('Véhicule de service', accent),
+                    ],
+                  ),
+                ],
+              ),
+            );
+            final actions = widget.onEdit == null
+                ? const SizedBox.shrink()
+                : Button(
+                    onPressed: widget.onEdit,
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(FluentIcons.edit, size: 14),
+                        SizedBox(width: 7),
+                        Text('Modifier'),
+                      ],
+                    ),
+                  );
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _vehicleAvatar(accent),
+                const SizedBox(width: 16),
+                if (compact)
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [identity, const SizedBox(height: 10), actions],
+                    ),
+                  )
+                else ...[
+                  identity,
+                  const SizedBox(width: 14),
+                  actions,
+                ],
+              ],
+            );
+          },
+        ),
+      );
 
   Widget _vehicleAvatar(Color accent) {
     final imageUrl = v.imageUrl?.trim();
     return ClipRRect(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(13),
       child: Container(
         width: 76,
         height: 76,
@@ -92,7 +156,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             ? Image.network(
                 imageUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => Icon(FluentIcons.car, size: 34, color: accent),
+                errorBuilder: (_, _, _) =>
+                    Icon(FluentIcons.car, size: 34, color: accent),
               )
             : Icon(FluentIcons.car, size: 34, color: accent),
       ),
@@ -101,7 +166,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
 
   String _date(Object? value) {
     if (value == null) return 'Non renseigné';
-    final date = value is DateTime ? value : DateTime.tryParse(value.toString());
+    final date =
+        value is DateTime ? value : DateTime.tryParse(value.toString());
     if (date == null) return value.toString();
     final day = date.day.toString().padLeft(2, '0');
     final month = date.month.toString().padLeft(2, '0');
@@ -109,93 +175,363 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   }
 
   Widget _chip(String text, Color accent) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-    decoration: BoxDecoration(color: accent.withValues(alpha: .10), borderRadius: BorderRadius.circular(20)),
-    child: Text(text, style: TextStyle(color: accent, fontSize: 11, fontWeight: FontWeight.w600)));
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+        decoration: BoxDecoration(
+          color: accent.withValues(alpha: .10),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(text,
+            style: TextStyle(
+                color: accent, fontSize: 11, fontWeight: FontWeight.w600)),
+      );
 
   Widget _navigation(Color accent) => Container(
-    height: 58, padding: const EdgeInsets.symmetric(horizontal: 14),
-    decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey[30]))),
-    child: ListView.separated(scrollDirection: Axis.horizontal, itemCount: sections.length,
-      separatorBuilder: (_, _) => const SizedBox(width: 5),
-      itemBuilder: (context, i) {
-        final active = selected == i;
-        return Button(
-          style: ButtonStyle(
-            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
-            backgroundColor: WidgetStateProperty.all(active ? accent.withValues(alpha: .12) : Colors.transparent),
-            foregroundColor: WidgetStateProperty.all(active ? accent : null)),
-          onPressed: () => setState(() => selected = i),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(sections[i].$2, size: 14), const SizedBox(width: 7),
-            Text(sections[i].$1, style: TextStyle(fontSize: 12, fontWeight: active ? FontWeight.w700 : FontWeight.w500)),
-          ]));
-      }));
+        height: 58,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration:
+            BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey[30]))),
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemCount: sections.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 5),
+          itemBuilder: (context, i) {
+            final active = selected == i;
+            return Button(
+              style: ButtonStyle(
+                padding: WidgetStateProperty.all(
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
+                backgroundColor: WidgetStateProperty.all(
+                    active ? accent.withValues(alpha: .12) : Colors.transparent),
+                foregroundColor:
+                    WidgetStateProperty.all(active ? accent : null),
+              ),
+              onPressed: () => setState(() => selected = i),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(sections[i].$2, size: 14),
+                  const SizedBox(width: 7),
+                  Text(sections[i].$1,
+                      style: TextStyle(
+                          fontSize: 12,
+                          fontWeight:
+                              active ? FontWeight.w700 : FontWeight.w500)),
+                ],
+              ),
+            );
+          },
+        ),
+      );
 
   Widget _content(Color accent) {
     switch (selected) {
-      case 0: return _overview(accent);
-      case 1: return _section('Identification', 'Identité administrative et informations principales', [
-        _group('Immatriculation', [
-          _field('Immatriculation', v.matricule), _field('Anciennes immatriculations', v.matriculePrec?.join(', ')),
-          _field('Pays', v.pays), _field('Date carte grise', _date(v.date)),
-          _field('Numéro carte grise', v.numero), _field('Numéro de série / VIN', v.numeroSerie)]),
-        _group('Identité du véhicule', [
-          _field('Marque', v.marque), _field('Modèle / type', v.type), _field('Finition', v.trim),
-          _field('Année modèle', v.modelYear?.toString()), _field('Mise en circulation', v.anneeUtil?.toString()),
-          _field('Couleur', v.color), _field('Carrosserie', v.carrosserie)]),
-        _group('Adresse administrative', [
-          _field('Wilaya', v.wilaya?.toString()), _field('Daïra', v.daira),
-          _field('Commune', v.commune), _field('Adresse', v.adresse)]),
-      ]);
-      case 2: return _section('Caractéristiques techniques', 'Motorisation, transmission, dimensions et capacités', [
-        _group('Motorisation', [
-          _field('Énergie', v.energie), _field('Puissance', v.puissance == null ? null : '${v.puissance} ch'),
-          _field('Cylindrée', v.engineDisplacement == null ? null : '${v.engineDisplacement} cm³'),
-          _field('Code moteur', v.engineCode)]),
-        _group('Transmission', [
-          _field('Transmission', v.transmission), _field('Boîte', v.gearbox), _field('Roues motrices', v.driveType)]),
-        _group('Dimensions & capacité', [
-          _field('Portes', v.doors?.toString()), _field('Places', v.placesAssises?.toString()),
-          _field('Poids total', v.poidsTotal == null ? null : '${v.poidsTotal} kg'),
-          _field('Charge utile', v.charegeUtile == null ? null : '${v.charegeUtile} kg'),
-          _field('Longueur', v.lengthMm == null ? null : '${v.lengthMm} mm'),
-          _field('Largeur', v.widthMm == null ? null : '${v.widthMm} mm'),
-          _field('Hauteur', v.heightMm == null ? null : '${v.heightMm} mm')]),
-      ]);
-      case 3: return _section('Affectation & organisation', 'Rattachement administratif et conducteur associé', [
-        _group('Organisation', [
-          _field('Appartenance', v.appartenance), _field('Filiale', v.filliale),
-          _field('Direction', v.direction), _field('Département', v.departement),
-          _field('Périmètre', v.perimetre.toString()), _field('Emplacement', v.emplacement)]),
-        _group('Propriétaire', [
-          _field('Nom', v.nom), _field('Prénom', v.prenom), _field('Profession', v.profession)]),
-        _group('Conducteur', [
-          _field('Matricule conducteur', v.matriculeConducteur),
-          _field('Appartenance conducteur', v.appartenanceconducteur)]),
-      ]);
-      case 4: return _empty(FluentIcons.car, 'Aucune position GPS disponible',
-        'La dernière position apparaîtra ici lorsqu’un conducteur autorisé aura transmis sa position depuis Parcoto Mobile.',
-        'Suivi GPS non encore activé');
-      case 5: return _empty(FluentIcons.repair, 'Aucune donnée de maintenance structurée',
-        'Les entretiens, interventions, ordres de réparation et prochaines échéances seront regroupés ici.',
-        'Module maintenance à connecter');
-      case 6: return _documentsSection(accent);
-      case 7: return _empty(FluentIcons.document, 'Historique détaillé indisponible',
-        'Les changements d’affectation, de statut, relevés kilométriques et événements seront présentés chronologiquement.',
-        'Historique véhicule à structurer');
-      default: return _section('Finances & cycle de vie', 'Acquisition, garantie et suivi kilométrique', [
-        _group('Acquisition', [
-          _field('Mode', v.acquisitionType), _field('Date', _date(v.acquisitionDate)),
-          _field('Prix d’achat', v.purchasePrice == null ? null : '${v.purchasePrice} DA'),
-          _field('Fournisseur', v.supplier), _field('Fin de garantie', _date(v.warrantyEndDate))]),
-        _group('Kilométrage', [
-          _field('Kilométrage actuel', v.currentMileage == null ? null : '${v.currentMileage} km'),
-          _field('Prochaine révision', v.nextServiceMileage == null ? null : '${v.nextServiceMileage} km')]),
-      ]);
+      case 0:
+        return _overview(accent);
+      case 1:
+        return _section('Identification',
+            'Identité administrative et informations principales', [
+          _group('Immatriculation', [
+            _field('Immatriculation', v.matricule),
+            _field('Anciennes immatriculations', v.matriculePrec?.join(', ')),
+            _field('Pays', v.pays),
+            _field('Date carte grise', _date(v.date)),
+            _field('Numéro carte grise', v.numero),
+            _field('Numéro de série / VIN', v.numeroSerie)
+          ]),
+          _group('Identité du véhicule', [
+            _field('Marque', v.marque),
+            _field('Modèle / type', v.type),
+            _field('Finition', v.trim),
+            _field('Année modèle', v.modelYear?.toString()),
+            _field('Mise en circulation', v.anneeUtil?.toString()),
+            _field('Couleur', v.color),
+            _field('Carrosserie', v.carrosserie)
+          ]),
+          _group('Adresse administrative', [
+            _field('Wilaya', v.wilaya?.toString()),
+            _field('Daïra', v.daira),
+            _field('Commune', v.commune),
+            _field('Adresse', v.adresse)
+          ]),
+        ]);
+      case 2:
+        return _section(
+            'Spécifications techniques',
+            'Motorisation, transmission, dimensions et capacités', [
+          _group('Motorisation', [
+            _field('Énergie', v.energie),
+            _field('Puissance', v.puissance == null ? null : '${v.puissance} ch'),
+            _field('Cylindrée',
+                v.engineDisplacement == null ? null : '${v.engineDisplacement} cm³'),
+            _field('Code moteur', v.engineCode)
+          ]),
+          _group('Transmission', [
+            _field('Transmission', v.transmission),
+            _field('Boîte', v.gearbox),
+            _field('Roues motrices', v.driveType)
+          ]),
+          _group('Dimensions & capacité', [
+            _field('Portes', v.doors?.toString()),
+            _field('Places', v.placesAssises?.toString()),
+            _field('Poids total',
+                v.poidsTotal == null ? null : '${v.poidsTotal} kg'),
+            _field('Charge utile',
+                v.charegeUtile == null ? null : '${v.charegeUtile} kg'),
+            _field('Longueur',
+                v.lengthMm == null ? null : '${v.lengthMm} mm'),
+            _field('Largeur', v.widthMm == null ? null : '${v.widthMm} mm'),
+            _field('Hauteur', v.heightMm == null ? null : '${v.heightMm} mm')
+          ]),
+        ]);
+      case 3:
+        return _section(
+            'Affectation & organisation',
+            'Rattachement administratif et conducteur associé', [
+          _group('Organisation', [
+            _field('Appartenance', v.appartenance),
+            _field('Filiale', v.filliale),
+            _field('Direction', v.direction),
+            _field('Département', v.departement),
+            _field('Périmètre', v.perimetre.toString()),
+            _field('Emplacement', v.emplacement)
+          ]),
+          _group('Propriétaire', [
+            _field('Nom', v.nom),
+            _field('Prénom', v.prenom),
+            _field('Profession', v.profession)
+          ]),
+          _group('Conducteur', [
+            _field('Matricule conducteur', v.matriculeConducteur),
+            _field('Appartenance conducteur', v.appartenanceconducteur)
+          ]),
+        ]);
+      case 4:
+        return _empty(
+            FluentIcons.map_pin,
+            'Aucune position GPS disponible',
+            'La dernière position apparaîtra ici lorsqu’un conducteur autorisé aura transmis sa position depuis Parcoto Mobile.',
+            'Suivi GPS non encore activé');
+      case 5:
+        return _empty(
+            FluentIcons.repair,
+            'Aucune donnée de maintenance structurée',
+            'Les entretiens, interventions, ordres de réparation et prochaines échéances seront regroupés ici.',
+            'Module maintenance à connecter');
+      case 6:
+        return _documentsSection(accent);
+      case 7:
+        return _empty(
+            FluentIcons.history,
+            'Historique détaillé indisponible',
+            'Les changements d’affectation, de statut, relevés kilométriques et événements seront présentés chronologiquement.',
+            'Historique véhicule à structurer');
+      default:
+        return _section(
+            'Finances & cycle de vie',
+            'Acquisition, garantie et suivi kilométrique', [
+          _group('Acquisition', [
+            _field('Mode', v.acquisitionType),
+            _field('Date', _date(v.acquisitionDate)),
+            _field('Prix d’achat',
+                v.purchasePrice == null ? null : '${v.purchasePrice} DA'),
+            _field('Fournisseur', v.supplier),
+            _field('Fin de garantie', _date(v.warrantyEndDate))
+          ]),
+          _group('Kilométrage', [
+            _field('Kilométrage actuel',
+                v.currentMileage == null ? null : '${v.currentMileage} km'),
+            _field('Prochaine révision',
+                v.nextServiceMileage == null ? null : '${v.nextServiceMileage} km')
+          ]),
+        ]);
     }
   }
 
+  Widget _overview(Color accent) {
+    final documents = VehicleProvider.documentsVehicules.values.where((doc) =>
+        doc.vehicle == v.id || doc.vehiclemat == v.matricule).toList();
+    final expiring = documents.where((doc) {
+      final date = doc.dateExpiration;
+      if (date == null) return false;
+      final today = DateTime.now();
+      return !date.isBefore(DateTime(today.year, today.month, today.day));
+    }).length;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _heading('Vue générale',
+            'Synthèse du véhicule, de son affectation et des informations de suivi'),
+        LayoutBuilder(builder: (context, constraints) {
+          final wide = constraints.maxWidth >= 850;
+          final left = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _group('Informations du véhicule', [
+                _field('Immatriculation', v.matricule),
+                _field('Marque', v.marque),
+                _field('Modèle', v.type),
+                _field('Année modèle',
+                    v.modelYear?.toString() ?? v.anneeUtil?.toString()),
+                _field('VIN / numéro de série', v.numeroSerie),
+                _field('Énergie', v.energie),
+                _field('Couleur', v.color),
+                _field('Catégorie', v.carrosserie),
+              ]),
+              _group('Affectation', [
+                _field('Filiale', v.filliale),
+                _field('Direction', v.direction),
+                _field('Département', v.departement),
+                _field('Conducteur', [
+                  v.prenom,
+                  v.nom
+                ].where((e) => e?.trim().isNotEmpty == true).join(' ')),
+                _field('Matricule conducteur', v.matriculeConducteur),
+                _field('Emplacement', v.emplacement),
+              ]),
+              _group('Informations administratives', [
+                _field('Date carte grise', _date(v.date)),
+                _field('Pays', v.pays),
+                _field('Wilaya', v.wilaya?.toString()),
+                _field('Commune', v.commune),
+                _field('Adresse', v.adresse),
+              ]),
+            ],
+          );
+          final right = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _panel(
+                'État du véhicule',
+                FluentIcons.info,
+                accent,
+                [
+                  Row(
+                    children: [
+                      Expanded(
+                          child: _statusValue('Statut', val(v.etat), accent)),
+                      Expanded(
+                          child: _statusValue(
+                              'Type', v.service ? 'Service' : 'Flotte', accent)),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _statusValue('Numéro de flotte', val(v.fleetNumber), accent),
+                ],
+              ),
+              _panel(
+                'Kilométrage & entretien',
+                FluentIcons.speed_high,
+                accent,
+                [
+                  _statusValue('Kilométrage actuel',
+                      n(v.currentMileage, ' km'), accent),
+                  const SizedBox(height: 13),
+                  _statusValue('Prochaine révision',
+                      n(v.nextServiceMileage, ' km'), accent),
+                  const SizedBox(height: 9),
+                  Text(
+                    'Les échéances de maintenance seront calculées à partir des relevés et interventions réellement enregistrés.',
+                    style: TextStyle(
+                        color: Colors.grey[100], fontSize: 11, height: 1.4),
+                  ),
+                ],
+              ),
+              _panel(
+                'Documents',
+                FluentIcons.documentation,
+                accent,
+                [
+                  Row(
+                    children: [
+                      Expanded(
+                          child: _statusValue(
+                              'Enregistrés', documents.length.toString(), accent)),
+                      Expanded(
+                          child: _statusValue(
+                              'Avec échéance', expiring.toString(), accent)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: HyperlinkButton(
+                      onPressed: () => setState(() => selected = 6),
+                      child: const Text('Consulter les documents'),
+                    ),
+                  ),
+                ],
+              ),
+              _panel(
+                'Localisation',
+                FluentIcons.map_pin,
+                accent,
+                [
+                  _statusValue('Dernière position', 'Non disponible', accent),
+                  const SizedBox(height: 7),
+                  Text(
+                    'Aucune donnée GPS réelle n’est actuellement associée à ce véhicule.',
+                    style: TextStyle(
+                        color: Colors.grey[100], fontSize: 11, height: 1.4),
+                  ),
+                ],
+              ),
+            ],
+          );
+          if (!wide) return Column(children: [left, right]);
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(flex: 7, child: left),
+              const SizedBox(width: 16),
+              Expanded(flex: 4, child: right),
+            ],
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _panel(
+          String title, IconData icon, Color accent, List<Widget> children) =>
+      Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(bottom: 14),
+        padding: const EdgeInsets.all(17),
+        decoration: BoxDecoration(
+          color: FluentTheme.of(context).micaBackgroundColor,
+          border: Border.all(color: Colors.grey[30]),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              Icon(icon, color: accent, size: 16),
+              const SizedBox(width: 9),
+              Text(title,
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.w700)),
+            ]),
+            const SizedBox(height: 16),
+            ...children,
+          ],
+        ),
+      );
+
+  Widget _statusValue(String label, String value, Color accent) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+              style: TextStyle(color: Colors.grey[100], fontSize: 11)),
+          const SizedBox(height: 5),
+          Text(value,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style:
+                  const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+        ],
+      );
 
   Widget _documentsSection(Color accent) {
     final provider = context.watch<VehicleProvider>();
@@ -229,19 +565,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         ),
         Row(
           children: [
-            _documentSummary(
-              'Documents enregistrés',
-              documents.length.toString(),
-              FluentIcons.document,
-              accent,
-            ),
+            _documentSummary('Documents enregistrés', documents.length.toString(),
+                FluentIcons.document, accent),
             const SizedBox(width: 12),
             _documentSummary(
-              'Avec expiration',
-              documents.where((d) => d.dateExpiration != null).length.toString(),
-              FluentIcons.calendar,
-              accent,
-            ),
+                'Avec expiration',
+                documents.where((d) => d.dateExpiration != null).length.toString(),
+                FluentIcons.calendar,
+                accent),
           ],
         ),
         const SizedBox(height: 16),
@@ -283,11 +614,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   }
 
   Widget _documentSummary(
-    String label,
-    String value,
-    IconData icon,
-    Color accent,
-  ) =>
+          String label, String value, IconData icon, Color accent) =>
       Expanded(
         child: Container(
           padding: const EdgeInsets.all(14),
@@ -303,9 +630,13 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(label, style: TextStyle(color: Colors.grey[100], fontSize: 11)),
+                    Text(label,
+                        style:
+                            TextStyle(color: Colors.grey[100], fontSize: 11)),
                     const SizedBox(height: 4),
-                    Text(value, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+                    Text(value,
+                        style: const TextStyle(
+                            fontSize: 17, fontWeight: FontWeight.w700)),
                   ],
                 ),
               ),
@@ -332,9 +663,10 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 : daysRemaining != null && daysRemaining <= 30
                     ? 'Expire bientôt'
                     : 'Valide';
-    final statusColor = expired || (daysRemaining != null && daysRemaining <= 30)
-        ? Colors.orange
-        : accent;
+    final statusColor =
+        expired || (daysRemaining != null && daysRemaining <= 30)
+            ? Colors.orange
+            : accent;
 
     return Container(
       width: double.infinity,
@@ -361,7 +693,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(document.nom, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                Text(document.nom,
+                    style: const TextStyle(
+                        fontSize: 13, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 5),
                 Text(
                   expiration == null
@@ -379,85 +713,94 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     );
   }
 
-  Widget _overview(Color accent) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    _heading('Vue d’ensemble', 'Les informations essentielles de ce véhicule'),
-    LayoutBuilder(builder: (context, c) {
-      final cols = c.maxWidth > 900 ? 4 : c.maxWidth > 560 ? 2 : 1;
-      final w = (c.maxWidth - (cols - 1) * 12) / cols;
-      return Wrap(spacing: 12, runSpacing: 12, children: [
-        _metric(w, FluentIcons.car, 'Kilométrage', n(v.currentMileage, ' km'), accent),
-        _metric(w, FluentIcons.people, 'Conducteur', val(v.matriculeConducteur), accent),
-        _metric(w, FluentIcons.car, 'Localisation', val(v.commune), accent),
-        _metric(w, FluentIcons.repair, 'Prochaine révision', n(v.nextServiceMileage, ' km'), accent),
-      ]);
-    }),
-    const SizedBox(height: 18),
-    _group('Profil du véhicule', [
-      _field('Marque', v.marque), _field('Modèle', v.type),
-      _field('Année', v.modelYear?.toString() ?? v.anneeUtil?.toString()),
-      _field('Énergie', v.energie), _field('Numéro de série', v.numeroSerie), _field('Couleur', v.color)]),
-    _group('Affectation actuelle', [
-      _field('Filiale', v.filliale), _field('Direction', v.direction),
-      _field('Département', v.departement),
-      _field('Conducteur', [v.prenom, v.nom].where((e) => e?.isNotEmpty == true).join(' '))]),
-    _group('Informations complémentaires', [
-      _field('Date de création', _date(v.createdAt)),
-      _field('Dernière modification', _date(v.updatedAt)),
-      _field('Numéro de flotte', v.fleetNumber), _field('État administratif', v.etat)]),
-  ]);
-
-  Widget _section(String title, String desc, List<Widget> groups) =>
-    Column(crossAxisAlignment: CrossAxisAlignment.start, children: [_heading(title, desc), ...groups]);
+  Widget _section(String title, String desc, List<Widget> groups) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [_heading(title, desc), ...groups],
+      );
 
   Widget _heading(String title, String desc) => Padding(
-    padding: const EdgeInsets.only(bottom: 18),
-    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-      const SizedBox(height: 4), Text(desc, style: TextStyle(color: Colors.grey[100], fontSize: 12))]));
+        padding: const EdgeInsets.only(bottom: 18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title,
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 4),
+            Text(desc,
+                style: TextStyle(color: Colors.grey[100], fontSize: 12)),
+          ],
+        ),
+      );
 
   Widget _group(String title, List<_VehicleField> fields) {
     final visible = fields.where((f) => f.hasValue).toList();
     if (visible.isEmpty) return const SizedBox.shrink();
-    return Container(width: double.infinity, margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(17),
-      decoration: BoxDecoration(color: FluentTheme.of(context).micaBackgroundColor,
-        border: Border.all(color: Colors.grey[30]), borderRadius: BorderRadius.circular(12)),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 14),
-        LayoutBuilder(builder: (context, c) {
-          final cols = c.maxWidth > 720 ? 3 : c.maxWidth > 430 ? 2 : 1;
-          final w = (c.maxWidth - (cols - 1) * 18) / cols;
-          return Wrap(spacing: 18, runSpacing: 16,
-            children: visible.map((f) => SizedBox(width: w, child: f)).toList());
-        }),
-      ]));
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(17),
+      decoration: BoxDecoration(
+        color: FluentTheme.of(context).micaBackgroundColor,
+        border: Border.all(color: Colors.grey[30]),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title,
+              style:
+                  const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 14),
+          LayoutBuilder(builder: (context, c) {
+            final cols = c.maxWidth > 720 ? 3 : c.maxWidth > 430 ? 2 : 1;
+            final w = (c.maxWidth - (cols - 1) * 18) / cols;
+            return Wrap(
+              spacing: 18,
+              runSpacing: 16,
+              children: visible.map((f) => SizedBox(width: w, child: f)).toList(),
+            );
+          }),
+        ],
+      ),
+    );
   }
 
-  _VehicleField _field(String label, String? raw) => _VehicleField(label, val(raw));
-
-  Widget _metric(double width, IconData icon, String label, String data, Color accent) => Container(
-    width: width, padding: const EdgeInsets.all(15),
-    decoration: BoxDecoration(border: Border.all(color: Colors.grey[30]), borderRadius: BorderRadius.circular(12)),
-    child: Row(children: [
-      Icon(icon, color: accent, size: 20), const SizedBox(width: 12),
-      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(label, style: TextStyle(color: Colors.grey[100], fontSize: 11)),
-        const SizedBox(height: 5), Text(data, maxLines: 1, overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700))]))]));
-
-  Widget _empty(IconData icon, String title, String desc, String status) => Center(
-    child: Container(constraints: const BoxConstraints(maxWidth: 560),
-      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
-      child: Column(children: [
-        Icon(icon, size: 38, color: Colors.grey[100]), const SizedBox(height: 18),
-        Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 8), Text(desc, textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.grey[100], height: 1.5)),
-        const SizedBox(height: 18),
-        Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-          decoration: BoxDecoration(color: Colors.grey[20], borderRadius: BorderRadius.circular(20)),
-          child: Text(status, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600))),
-      ])));
+  _VehicleField _field(String label, String? raw) =>
+      _VehicleField(label, val(raw));
+  
+  Widget _empty(IconData icon, String title, String desc, String status) =>
+      Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 560),
+          padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
+          child: Column(
+            children: [
+              Icon(icon, size: 38, color: Colors.grey[100]),
+              const SizedBox(height: 18),
+              Text(title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 8),
+              Text(desc,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.grey[100], height: 1.5)),
+              const SizedBox(height: 18),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                decoration: BoxDecoration(
+                    color: Colors.grey[20],
+                    borderRadius: BorderRadius.circular(20)),
+                child: Text(status,
+                    style: const TextStyle(
+                        fontSize: 11, fontWeight: FontWeight.w600)),
+              ),
+            ],
+          ),
+        ),
+      );
 }
 
 class _VehicleField extends StatelessWidget {
@@ -466,8 +809,15 @@ class _VehicleField extends StatelessWidget {
   const _VehicleField(this.label, this.value);
   bool get hasValue => value != 'Non renseigné';
   @override
-  Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-    Text(label, style: TextStyle(color: Colors.grey[100], fontSize: 11)),
-    const SizedBox(height: 5), Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-  ]);
+  Widget build(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+              style: TextStyle(color: Colors.grey[100], fontSize: 11)),
+          const SizedBox(height: 5),
+          Text(value,
+              style:
+                  const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+        ],
+      );
 }
