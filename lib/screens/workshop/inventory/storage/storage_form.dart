@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart' hide Trans;
 
@@ -338,13 +339,13 @@ class _StorageFormState extends State<StorageForm> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         if (differentDate == false)
-                                          DatePicker(
+                                          ParcotoFieldSurface(child: DatePicker(
                                             selected: expirationDate,
                                             onChanged: (d) {
                                               expirationDate = d;
                                               setState(() {});
                                             },
-                                          ),
+                                          )),
                                         if (qte > 1)
                                           Checkbox(
                                             checked: differentDate,
