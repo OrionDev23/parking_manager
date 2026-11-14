@@ -343,8 +343,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           _group('Motorisation', [
             _field('Énergie', v.energie),
             _field('Puissance fiscale', v.puissance == null ? null : '${v.puissance} CV fiscaux'),
-            _field('Puissance moteur', v.enginePowerHp == null ? null : '${v.enginePowerHp} ch'),
-            _field('Puissance moteur', v.enginePowerKw == null ? null : '${v.enginePowerKw} kW'),
+            _field('Puissance moteur (ch)', v.enginePowerHp == null ? null : '${v.enginePowerHp} ch'),
+            _field('Puissance moteur (kW)', v.enginePowerKw == null ? null : '${v.enginePowerKw} kW'),
             _field('Cylindrée',
                 v.engineDisplacement == null ? null : '${v.engineDisplacement} cm³'),
             _field('Code moteur', v.engineCode)
