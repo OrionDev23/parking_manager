@@ -216,7 +216,11 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 foregroundColor:
                     WidgetStateProperty.all(active ? accent : null),
               ),
-              onPressed: () {\n                setState(() => selected = i);\n                if (i == 5) _loadMaintenance();\n                if (i == 7) _loadHistory();\n              },
+              onPressed: () {
+                setState(() => selected = i);
+                if (i == 5) _loadMaintenance();
+                if (i == 7) _loadHistory();
+              },
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
