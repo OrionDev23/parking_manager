@@ -190,7 +190,6 @@ class _PartsFormState extends State<PartsForm>
     return StaggeredGridTile.fit(
       crossAxisCellCount: 2,
       child: Container(
-        width: 400.px,
         height: 280.px,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -253,7 +252,6 @@ class _PartsFormState extends State<PartsForm>
     return StaggeredGridTile.fit(
       crossAxisCellCount: 1,
       child: Container(
-        width: 200.px,
         height: 160.px,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -328,7 +326,6 @@ class _PartsFormState extends State<PartsForm>
     return StaggeredGridTile.fit(
       crossAxisCellCount: 2,
       child: Container(
-        width: 400.px,
         height: portrait ? 215.px : 140.px,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -419,7 +416,6 @@ class _PartsFormState extends State<PartsForm>
     return StaggeredGridTile.fit(
       crossAxisCellCount: 1,
       child: Container(
-        width: 200.px,
         height: 425.px,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -795,7 +791,6 @@ class _PartsFormState extends State<PartsForm>
     return StaggeredGridTile.fit(
       crossAxisCellCount: 2,
       child: Container(
-        width: 400.px,
         height: portrait ? 355.px : 160.5.px,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -942,7 +937,6 @@ class _PartsFormState extends State<PartsForm>
     return StaggeredGridTile.fit(
       crossAxisCellCount: 3,
       child: Container(
-        width: 400.px,
         height: variations.isEmpty
             ? 480.px
             : 50.px * variations.length + 165.px,
