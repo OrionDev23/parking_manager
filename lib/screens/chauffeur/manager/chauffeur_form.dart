@@ -322,7 +322,8 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                               child: Column(
                                 children: [
                                   Flexible(
-                                    child: AutoSuggestBox<String>(
+                                    child: ParcotoFieldSurface(
+                                      child: AutoSuggestBox<String>(
                                       placeholder: 'filiale'.tr(),
                                       placeholderStyle: placeStyle,
                                       controller: selectedAppartenance,
@@ -339,10 +340,12 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                         ),
                                       ),
                                     ),
+                                    ),
                                   ),
                                   smallSpace,
                                   Flexible(
-                                    child: AutoSuggestBox<String>(
+                                    child: ParcotoFieldSurface(
+                                      child: AutoSuggestBox<String>(
                                       placeholder: 'direction'.tr(),
                                       placeholderStyle: placeStyle,
                                       controller: selectedDirection,
@@ -359,10 +362,12 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                         ),
                                       ),
                                     ),
+                                    ),
                                   ),
                                   smallSpace,
                                   Flexible(
-                                    child: AutoSuggestBox<String>(
+                                    child: ParcotoFieldSurface(
+                                      child: AutoSuggestBox<String>(
                                       placeholder: 'departement'.tr(),
                                       placeholderStyle: placeStyle,
                                       controller: selectedDepartment,
@@ -381,6 +386,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                               .toUpperCase(),
                                         ),
                                       ),
+                                    ),
                                     ),
                                   ),
                                 ],
