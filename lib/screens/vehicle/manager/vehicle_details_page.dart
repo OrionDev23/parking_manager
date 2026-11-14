@@ -1,5 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/serializables/vehicle/vehicle.dart';
+import 'package:parc_oto/serializables/vehicle/document_vehicle.dart';
+import 'package:parc_oto/providers/vehicle_provider.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +15,21 @@ class VehicleDetailsPage extends StatefulWidget {
 
 class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   int selected = 0;
+  bool _requestedDocuments = false;
   Vehicle get v => widget.vehicle;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_requestedDocuments) {
+      _requestedDocuments = true;
+      final provider = context.read<VehicleProvider>();
+      if (!VehicleProvider.downloadedDocuments &&
+          !VehicleProvider.downloadingDocuments) {
+        provider.refreshDocuments();
+      }
+    }
+  }
   static const sections = [
     ('Vue d’ensemble', FluentIcons.car),
     ('Identification', FluentIcons.people),
@@ -164,9 +180,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       case 5: return _empty(FluentIcons.repair, 'Aucune donnée de maintenance structurée',
         'Les entretiens, interventions, ordres de réparation et prochaines échéances seront regroupés ici.',
         'Module maintenance à connecter');
-      case 6: return _empty(FluentIcons.document, 'Aucun document affiché',
-        'Les cartes grises, assurances, contrôles techniques, factures et autres pièces seront accessibles ici.',
-        'Gestion documentaire à connecter');
+      case 6: return _documentsSection(accent);
       case 7: return _empty(FluentIcons.document, 'Historique détaillé indisponible',
         'Les changements d’affectation, de statut, relevés kilométriques et événements seront présentés chronologiquement.',
         'Historique véhicule à structurer');
@@ -180,6 +194,187 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           _field('Prochaine révision', v.nextServiceMileage == null ? null : '${v.nextServiceMileage} km')]),
       ]);
     }
+  }
+
+
+  Widget _documentsSection(Color accent) {
+    final provider = context.watch<VehicleProvider>();
+    final documents = VehicleProvider.documentsVehicules.values.where((doc) {
+      return doc.vehicle == v.id || doc.vehiclemat == v.matricule;
+    }).toList()
+      ..sort((a, b) {
+        final aDate = a.dateExpiration;
+        final bDate = b.dateExpiration;
+        if (aDate == null && bDate == null) return a.nom.compareTo(b.nom);
+        if (aDate == null) return 1;
+        if (bDate == null) return -1;
+        return aDate.compareTo(bDate);
+      });
+
+    if (VehicleProvider.downloadingDocuments && documents.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(40),
+          child: ProgressRing(),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _heading(
+          'Documents du véhicule',
+          'Documents administratifs et dates d’expiration enregistrés dans Parcoto',
+        ),
+        Row(
+          children: [
+            _documentSummary(
+              'Documents enregistrés',
+              documents.length.toString(),
+              FluentIcons.document,
+              accent,
+            ),
+            const SizedBox(width: 12),
+            _documentSummary(
+              'Avec expiration',
+              documents.where((d) => d.dateExpiration != null).length.toString(),
+              FluentIcons.calendar,
+              accent,
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        if (documents.isEmpty)
+          _empty(
+            FluentIcons.document,
+            'Aucun document enregistré pour ce véhicule',
+            'Les documents associés à cette immatriculation apparaîtront ici dès leur création dans la gestion documentaire.',
+            'Aucun document trouvé',
+          )
+        else
+          ...documents.map((document) => _documentTile(document, accent)),
+        if (!VehicleProvider.downloadedDocuments &&
+            !VehicleProvider.downloadingDocuments)
+          Align(
+            alignment: Alignment.centerRight,
+            child: Button(
+              onPressed: () => provider.refreshDocuments(),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(FluentIcons.refresh, size: 13),
+                  SizedBox(width: 7),
+                  Text('Actualiser'),
+                ],
+              ),
+            ),
+          ),
+        const SizedBox(height: 8),
+        Text(
+          'Note : la version actuelle conserve les métadonnées du document. '
+          'Aucun fichier joint n’est encore référencé dans ce modèle.',
+          style: TextStyle(color: Colors.grey[100], fontSize: 11),
+        ),
+      ],
+    );
+  }
+
+  Widget _documentSummary(
+    String label,
+    String value,
+    IconData icon,
+    Color accent,
+  ) =>
+      Expanded(
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey[30]),
+            borderRadius: BorderRadius.circular(11),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: accent, size: 18),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(label, style: TextStyle(color: Colors.grey[100], fontSize: 11)),
+                    const SizedBox(height: 4),
+                    Text(value, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+
+  Widget _documentTile(DocumentVehicle document, Color accent) {
+    final expiration = document.dateExpiration;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final expiryDay = expiration == null
+        ? null
+        : DateTime(expiration.year, expiration.month, expiration.day);
+    final expired = expiryDay != null && expiryDay.isBefore(today);
+    final daysRemaining = expiryDay?.difference(today).inDays;
+    final status = expiration == null
+        ? 'Aucune échéance'
+        : expired
+            ? 'Expiré'
+            : daysRemaining == 0
+                ? 'Expire aujourd’hui'
+                : daysRemaining! <= 30
+                    ? 'Expire bientôt'
+                    : 'Valide';
+    final statusColor = expired || (daysRemaining != null && daysRemaining <= 30)
+        ? Colors.orange
+        : accent;
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: FluentTheme.of(context).micaBackgroundColor,
+        border: Border.all(color: Colors.grey[30]),
+        borderRadius: BorderRadius.circular(11),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: .10),
+              borderRadius: BorderRadius.circular(9),
+            ),
+            child: Icon(FluentIcons.document, color: accent, size: 19),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(document.nom, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 5),
+                Text(
+                  expiration == null
+                      ? 'Date d’expiration non renseignée'
+                      : 'Expiration : ${_date(expiration)}',
+                  style: TextStyle(color: Colors.grey[100], fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          _chip(status, statusColor),
+        ],
+      ),
+    );
   }
 
   Widget _overview(Color accent) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
