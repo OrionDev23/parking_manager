@@ -254,22 +254,24 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           )
         else
           ...documents.map((document) => _documentTile(document, accent)),
-        if (!VehicleProvider.downloadedDocuments &&
-            !VehicleProvider.downloadingDocuments)
-          Align(
-            alignment: Alignment.centerRight,
-            child: Button(
-              onPressed: () => provider.refreshDocuments(),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(FluentIcons.refresh, size: 13),
-                  SizedBox(width: 7),
-                  Text('Actualiser'),
-                ],
-              ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: Button(
+            onPressed: VehicleProvider.downloadingDocuments
+                ? null
+                : () => provider.refreshDocuments(),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(FluentIcons.refresh, size: 13),
+                const SizedBox(width: 7),
+                Text(VehicleProvider.downloadingDocuments
+                    ? 'Actualisation…'
+                    : 'Actualiser'),
+              ],
             ),
           ),
+        ),
         const SizedBox(height: 8),
         Text(
           'Note : la version actuelle conserve les métadonnées du document. '
