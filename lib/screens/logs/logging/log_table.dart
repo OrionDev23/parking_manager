@@ -398,7 +398,8 @@ class LogTableState extends State<LogTable> {
                       label: 'activity'.tr(),
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
-                        child: DropDownButton(
+                        child: ParcotoFieldSurface(
+                          child: DropDownButton(
                           closeAfterClick: true,
                           title: SizedBox(
                             width: 250.px,
@@ -438,6 +439,7 @@ class LogTableState extends State<LogTable> {
                               },
                             );
                           }),
+                          ),
                         ),
                       ),
                     ),
