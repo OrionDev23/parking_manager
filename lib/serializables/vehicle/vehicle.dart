@@ -34,6 +34,8 @@ class Vehicle extends ParcOtoDefault {
   String? imageSource;
   String? color;
   int? engineDisplacement;
+  double? enginePowerHp;
+  double? enginePowerKw;
   String? engineCode;
   String? transmission;
   String? gearbox;
@@ -120,6 +122,8 @@ class Vehicle extends ParcOtoDefault {
     this.imageSource,
     this.color,
     this.engineDisplacement,
+    this.enginePowerHp,
+    this.enginePowerKw,
     this.engineCode,
     this.transmission,
     this.gearbox,
