@@ -48,6 +48,10 @@ class Vehicle {
   final int? totalWeight;
   final int? seats;
   final int? fiscalPower;
+
+  /// Backward-compatible alias for callers using the former ambiguous field.
+  @Deprecated('Use fiscalPower instead.')
+  int? get power => fiscalPower;
   final String? energy;
   final String? body;
   final int? usageYear;
