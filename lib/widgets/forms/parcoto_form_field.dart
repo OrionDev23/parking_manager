@@ -39,7 +39,7 @@ class ParcotoFormField extends StatelessWidget {
                 )),
               ),
               if (requiredField)
-                const Text('*', style: TextStyle(
+                Text('*', style: TextStyle(
                   color: Colors.red,
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
@@ -49,7 +49,7 @@ class ParcotoFormField extends StatelessWidget {
           child,
           if (errorText != null && errorText!.isNotEmpty) ...[
             const SizedBox(height: 5),
-            Text(errorText!, style: const TextStyle(
+            Text(errorText!, style: TextStyle(
               color: Colors.red,
               fontSize: 10,
             )),
@@ -132,7 +132,7 @@ class ParcotoTextBox extends StatelessWidget {
         keyboardType: keyboardType,
         textAlign: textAlign,
         textAlignVertical: textAlignVertical,
-        crossAxisAlignment: crossAxisAlignment,
+        crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.center,
         style: style ?? theme.typography.body,
         placeholderStyle: placeholderStyle ?? TextStyle(
           color: theme.inactiveColor,
