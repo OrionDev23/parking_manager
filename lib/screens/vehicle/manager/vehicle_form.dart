@@ -797,8 +797,7 @@ class _VehicleFormState extends State<VehicleForm>
                                     controller: matr3,
                                     maxLength: 2,
                                     placeholder: '16',
-                                    textAlign: TextAlign.center,
-                                    style: appTheme.writingStyle,
+                                    textAlign: TextAlign.center,                                    style: appTheme.writingStyle,
                                     placeholderStyle: placeStyle,
                                     inputFormatters: [
                                       FilteringTextInputFormatter.digitsOnly,
@@ -1144,14 +1143,10 @@ class _VehicleFormState extends State<VehicleForm>
                 startDate: DateTime(1900),
                 endDate: DateTime(2100),
                 onChanged: (date) {
-                  if (date == null) {
-                    controller.clear();
-                  } else {
-                    final year = date.year.toString().padLeft(4, '0');
-                    final month = date.month.toString().padLeft(2, '0');
-                    final day = date.day.toString().padLeft(2, '0');
-                    controller.text = '$year-$month-$day';
-                  }
+                  final year = date.year.toString().padLeft(4, '0');
+                  final month = date.month.toString().padLeft(2, '0');
+                  final day = date.day.toString().padLeft(2, '0');
+                  controller.text = '$year-$month-$day';
                   setState(() {});
                 },
               ),
@@ -1597,8 +1592,7 @@ class _VehicleFormState extends State<VehicleForm>
                           daira?.getDairaName(
                             appTheme.locale?.languageCode.toUpperCase() == "AR"
                                 ? Language.AR
-                                : Language.FR,
-                          ) ??
+                                : Language.FR,                          ) ??
                           '',
                     );
                   }).toList(),
@@ -2397,8 +2391,7 @@ class _VehicleFormState extends State<VehicleForm>
                               searchCursorColor: appTheme.color,
                             );
                           },
-                  ),
-                ),
+                  ),                ),
               ],
             ),
           ),
