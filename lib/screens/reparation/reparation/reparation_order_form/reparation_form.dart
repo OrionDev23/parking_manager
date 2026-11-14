@@ -348,14 +348,14 @@ class ReparationFormState extends State<ReparationForm>
                       SizedBox(
                         width: 200.px,
                         height: 30.px,
-                        child: DatePicker(
+                        child: ParcotoFieldSurface(child: DatePicker(
                           selected: selectedDate,
                           onChanged: (s) {
                             setState(() {
                               selectedDate = s;
                             });
                           },
-                        ),
+                        )),
                       ),
                     ],
                   ),
