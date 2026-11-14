@@ -1,4 +1,5 @@
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:dart_appwrite/dart_appwrite.dart';
 import 'package:dart_appwrite/models.dart' hide Row;
 import 'package:easy_localization/easy_localization.dart';
@@ -157,7 +158,7 @@ class _UserFormState extends State<UserForm> {
                 Icon(FluentIcons.mail, color: Colors.grey[100]),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: TextBox(
+                  child: ParcotoTextBox(
                     controller: email,
                     placeholder: 'email'.tr(),
                     enabled: widget.user == null,
@@ -175,9 +176,6 @@ class _UserFormState extends State<UserForm> {
                     placeholderStyle: placeStyle,
                     cursorColor: appTheme.color.darker,
                     style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(
-                      BoxDecoration(color: appTheme.fillColor),
-                    ),
                   ),
                 ),
               ],
@@ -189,7 +187,7 @@ class _UserFormState extends State<UserForm> {
               Icon(FluentIcons.i_d_badge, color: Colors.grey[100]),
               const SizedBox(width: 10),
               Expanded(
-                child: TextBox(
+                child: ParcotoTextBox(
                   controller: name,
                   placeholder: 'nom'.tr(),
                   onChanged: (s) {
@@ -198,9 +196,6 @@ class _UserFormState extends State<UserForm> {
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
                 ),
               ),
             ],
@@ -211,7 +206,7 @@ class _UserFormState extends State<UserForm> {
               Icon(FluentIcons.password_field, color: Colors.grey[100]),
               const SizedBox(width: 10),
               Expanded(
-                child: TextBox(
+                child: ParcotoTextBox(
                   controller: password,
                   placeholder: 'motdepasse'.tr(),
                   enabled: widget.user == null,
@@ -231,9 +226,6 @@ class _UserFormState extends State<UserForm> {
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
 
                   onChanged: (s) {
                     testIfSomethingChanged();
@@ -248,7 +240,7 @@ class _UserFormState extends State<UserForm> {
               Icon(FluentIcons.password_field, color: Colors.grey[100]),
               const SizedBox(width: 10),
               Expanded(
-                child: TextBox(
+                child: ParcotoTextBox(
                   controller: passwordConfirm,
                   placeholder: 'confirmation'.tr(),
                   enabled: widget.user == null,
@@ -272,9 +264,6 @@ class _UserFormState extends State<UserForm> {
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
 
                   onChanged: (s) {
                     testIfSomethingChanged();
@@ -305,7 +294,7 @@ class _UserFormState extends State<UserForm> {
               ),
               const SizedBox(width: 5),
               Expanded(
-                child: TextBox(
+                child: ParcotoTextBox(
                   controller: phone,
                   placeholder: 'telephone'.tr(),
                   maxLength: 9,
@@ -316,9 +305,6 @@ class _UserFormState extends State<UserForm> {
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
                 ),
               ),
             ],
