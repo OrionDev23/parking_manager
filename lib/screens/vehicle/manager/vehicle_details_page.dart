@@ -1,4 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/foundation.dart';
 import 'package:parc_oto/serializables/vehicle/vehicle.dart';
 import 'package:parc_oto/serializables/vehicle/document_vehicle.dart';
 import 'package:parc_oto/serializables/reparation/reparation.dart';
@@ -236,10 +237,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     if (mounted) setState(() {});
     try {
       final repairProvider = RepairProvider();
-      await Future.wait([
-        repairProvider.refreshReparations(),
-        RepairProvider.downloadFicheReparations(),
-      ]);
+      while (RepairProvider.downloadingReparations) {
+        await Future.delayed(const Duration(milliseconds: 50));
+      }
+      if (!RepairProvider.downloadedReparations &&
+          RepairProvider.reparations.isEmpty) {
+        await repairProvider.refreshReparations();
+      }
+      await RepairProvider.downloadFicheReparations();
       final key = v.matricule.trim();
       final sheets = RepairProvider.repPerVeh.entries
           .where((entry) => entry.key == key)
@@ -586,7 +591,13 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         _heading('Maintenance & interventions',
             'Interventions et fiches de réception réellement enregistrées pour ce véhicule'),
         LayoutBuilder(builder: (context, constraints) {
-          final width = (constraints.maxWidth - 24) / 3;
+          final columns = constraints.maxWidth >= 760
+              ? 3
+              : constraints.maxWidth >= 480
+                  ? 2
+                  : 1;
+          final width =
+              (constraints.maxWidth - (columns - 1) * 12) / columns;
           return Wrap(spacing: 12, runSpacing: 12, children: [
             _metric(width, FluentIcons.repair, 'Ordres de réparation',
                 repairs.length.toString(), accent),
