@@ -83,11 +83,13 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     );
   }
 
-  String _date(DateTime? value) {
+  String _date(Object? value) {
     if (value == null) return 'Non renseigné';
-    final day = value.day.toString().padLeft(2, '0');
-    final month = value.month.toString().padLeft(2, '0');
-    return day + '/' + month + '/' + value.year.toString();
+    final date = value is DateTime ? value : DateTime.tryParse(value.toString());
+    if (date == null) return value.toString();
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    return day + '/' + month + '/' + date.year.toString();
   }
 
   Widget _chip(String text, Color accent) => Container(
