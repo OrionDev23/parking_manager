@@ -126,7 +126,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                       ).tr(),
                     ],
                   ),
-                  title: ComboBox<int>(
+                  title: ParcotoFieldSurface(child: ComboBox<int>(
                     items: categories
                         .map(
                           (e) => ComboBoxItem<int>(
@@ -141,7 +141,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                         _selectedCategorie = s ?? 0;
                       });
                     },
-                  ),
+                  )),
                   onPressed: () {
                     showDialog<Widget>(
                       context: context,
@@ -234,7 +234,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                         flex: 3,
                         child: _isAllDay
                             ? const Text('')
-                            : TimePicker(
+                            : ParcotoFieldSurface(child: TimePicker(
                                 hourFormat: HourFormat.HH,
                                 locale: appTheme.locale,
                                 selected: _startDate,
@@ -257,7 +257,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                                     setState(() {});
                                   }
                                 },
-                              ),
+                              )),
                       ),
                     ],
                   ),
@@ -309,7 +309,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                         flex: 3,
                         child: _isAllDay
                             ? const Text('')
-                            : TimePicker(
+                            : ParcotoFieldSurface(child: TimePicker(
                                 locale: appTheme.locale,
                                 selected: _endDate,
                                 hourFormat: HourFormat.HH,
@@ -334,7 +334,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                                     setState(() {});
                                   }
                                 },
-                              ),
+                              )),
                       ),
                     ],
                   ),
