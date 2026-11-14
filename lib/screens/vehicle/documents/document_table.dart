@@ -1,6 +1,7 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -436,7 +437,7 @@ class DocumentTableState extends State<DocumentTable> {
             SizedBox(
               width: 350.px,
               height: 45.px,
-              child: TextBox(
+              child: ParcotoTextBox(
                 onChanged: (s) {
                   if (s.isEmpty) {
                     notEmpty = false;
@@ -451,9 +452,6 @@ class DocumentTableState extends State<DocumentTable> {
                 style: appTheme.writingStyle,
                 cursorColor: appTheme.color.darker,
                 placeholderStyle: placeStyle,
-                decoration: WidgetStatePropertyAll(
-                  BoxDecoration(color: appTheme.fillColor),
-                ),
                 onSubmitted: (s) {
                   if (s.isNotEmpty) {
                     documentsDataSource.search(s);
