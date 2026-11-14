@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 
 import 'package:flutter/foundation.dart' hide Category;
 
@@ -208,7 +209,7 @@ class _PartsFormState extends State<PartsForm>
                 label: 'name'.tr(),
                 child: Padding(
                   padding: const EdgeInsets.all(10),
-                  child: TextBox(
+                  child: ParcotoTextBox(
                     controller: name,
                     placeholder: 'nom'.tr(),
                     onChanged: (s) {
@@ -217,9 +218,6 @@ class _PartsFormState extends State<PartsForm>
                     style: appTheme.writingStyle,
                     placeholderStyle: placeStyle,
                     cursorColor: appTheme.color.darker,
-                    decoration: WidgetStatePropertyAll(
-                      BoxDecoration(color: appTheme.fillColor),
-                    ),
                   ),
                 ),
               ),
@@ -231,7 +229,7 @@ class _PartsFormState extends State<PartsForm>
                 label: 'descr'.tr(),
                 child: Padding(
                   padding: const EdgeInsets.all(10),
-                  child: TextBox(
+                  child: ParcotoTextBox(
                     controller: description,
                     placeholder: 'descr'.tr(),
                     onChanged: (s) {
@@ -241,9 +239,6 @@ class _PartsFormState extends State<PartsForm>
                     placeholderStyle: placeStyle,
                     cursorColor: appTheme.color.darker,
                     textAlignVertical: TextAlignVertical.top,
-                    decoration: WidgetStatePropertyAll(
-                      BoxDecoration(color: appTheme.fillColor),
-                    ),
                   ),
                 ),
               ),
@@ -842,7 +837,7 @@ class _PartsFormState extends State<PartsForm>
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(20),
-                          child: TextBox(
+                          child: ParcotoTextBox(
                             controller: sku,
                             placeholder: 'SKU',
                             onChanged: (s) {
@@ -852,9 +847,6 @@ class _PartsFormState extends State<PartsForm>
                             placeholderStyle: placeStyle,
                             inputFormatters: [maskFormatter],
                             cursorColor: appTheme.color.darker,
-                            decoration: WidgetStatePropertyAll(
-                              BoxDecoration(color: appTheme.fillColor),
-                            ),
                           ),
                         ),
                       ),
@@ -885,7 +877,7 @@ class _PartsFormState extends State<PartsForm>
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(20),
-                          child: TextBox(
+                          child: ParcotoTextBox(
                             controller: barcode,
                             placeholder: 'barcode'.tr(),
                             onChanged: (s) {
@@ -898,9 +890,6 @@ class _PartsFormState extends State<PartsForm>
                             style: appTheme.writingStyle,
                             placeholderStyle: placeStyle,
                             cursorColor: appTheme.color.darker,
-                            decoration: WidgetStatePropertyAll(
-                              BoxDecoration(color: appTheme.fillColor),
-                            ),
                           ),
                         ),
                       ),
