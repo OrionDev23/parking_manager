@@ -1646,7 +1646,7 @@ class _VehicleFormState extends State<VehicleForm>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text('datecartegrise', style: formHintStyle).tr(),
-              DatePicker(
+              ParcotoFieldSurface(child: DatePicker(
                 selected: selectedDate,
                 onChanged: widget.readOnly
                     ? null
@@ -1655,7 +1655,7 @@ class _VehicleFormState extends State<VehicleForm>
                           selectedDate = s;
                         });
                       },
-              ),
+              )),
             ],
           ),
         ),
@@ -2655,7 +2655,7 @@ class _VehicleFormState extends State<VehicleForm>
               children: [
                 Text('anneeutil', style: formHintStyle).tr(),
                 Flexible(
-                  child: DatePicker(
+                  child: ParcotoFieldSurface(child: DatePicker(
                     showDay: false,
                     showMonth: false,
                     selected: selectedAnnee,
@@ -2666,7 +2666,7 @@ class _VehicleFormState extends State<VehicleForm>
                               selectedAnnee = s;
                             });
                           },
-                  ),
+                  )),
                 ),
               ],
             ),
