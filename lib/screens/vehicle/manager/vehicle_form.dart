@@ -1482,7 +1482,7 @@ class _VehicleFormState extends State<VehicleForm>
               Text('wilaya', style: formHintStyle).tr(),
               SizedBox(
                 height: 5.h,
-                child: AutoSuggestBox<String>(
+                child: ParcotoFieldSurface(child: AutoSuggestBox<String>(
                   enabled: !widget.readOnly,
                   controller: wilayaCont,
                   placeholder: 'wilaya'.tr(),
@@ -1522,7 +1522,7 @@ class _VehicleFormState extends State<VehicleForm>
                       setState(() => wilayaCont.text = s);
                     }
                   },
-                ),
+                )),
               ),
             ],
           ),
@@ -1550,7 +1550,7 @@ class _VehicleFormState extends State<VehicleForm>
               Text('daira', style: formHintStyle).tr(),
               SizedBox(
                 height: 5.h,
-                child: AutoSuggestBox<String>(
+                child: ParcotoFieldSurface(child: AutoSuggestBox<String>(
                   enabled: !widget.readOnly,
                   controller: dairaCont,
                   placeholder: 'daira'.tr(),
@@ -1578,12 +1578,12 @@ class _VehicleFormState extends State<VehicleForm>
                       setState(() => dairaCont.text = s);
                     }
                   },
-                ),
+                )),
               ),
               Text('commune', style: formHintStyle).tr(),
               SizedBox(
                 height: 5.h,
-                child: AutoSuggestBox<String>(
+                child: ParcotoFieldSurface(child: AutoSuggestBox<String>(
                   enabled: !widget.readOnly,
                   controller: communeCont,
                   placeholder: 'commune'.tr(),
@@ -1617,7 +1617,7 @@ class _VehicleFormState extends State<VehicleForm>
                       setState(() => communeCont.text = s);
                     }
                   },
-                ),
+                )),
               ),
             ],
           ),
@@ -2019,7 +2019,7 @@ class _VehicleFormState extends State<VehicleForm>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('appartenanceconducteursingle', style: formHintStyle).tr(),
-                AutoSuggestBox<String>(
+                ParcotoFieldSurface(child: AutoSuggestBox<String>(
                   enabled: !widget.readOnly,
                   placeholder: 'appartenanceconducteursingle'.tr(),
                   placeholderStyle: placeStyle,
@@ -2032,7 +2032,7 @@ class _VehicleFormState extends State<VehicleForm>
                           .toUpperCase(),
                     ),
                   ),
-                ),
+                )),
               ],
             ),
           ),
@@ -2062,7 +2062,7 @@ class _VehicleFormState extends State<VehicleForm>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('appartenancevehiculesingle', style: formHintStyle).tr(),
-                AutoSuggestBox<String>(
+                ParcotoFieldSurface(child: AutoSuggestBox<String>(
                   enabled: !widget.readOnly,
                   placeholder: 'appartenancevehiculesingle'.tr(),
                   placeholderStyle: placeStyle,
@@ -2075,7 +2075,7 @@ class _VehicleFormState extends State<VehicleForm>
                           .toUpperCase(),
                     ),
                   ),
-                ),
+                )),
               ],
             ),
           ),
@@ -2100,7 +2100,7 @@ class _VehicleFormState extends State<VehicleForm>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('filialeexploit', style: formHintStyle).tr(),
-                AutoSuggestBox<String>(
+                ParcotoFieldSurface(child: AutoSuggestBox<String>(
                   enabled: !widget.readOnly,
                   placeholder: 'filialeexploit'.tr(),
                   placeholderStyle: placeStyle,
@@ -2113,7 +2113,7 @@ class _VehicleFormState extends State<VehicleForm>
                           .toUpperCase(),
                     ),
                   ),
-                ),
+                )),
               ],
             ),
           ),
@@ -2138,7 +2138,7 @@ class _VehicleFormState extends State<VehicleForm>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('direction', style: formHintStyle).tr(),
-                AutoSuggestBox<String>(
+                ParcotoFieldSurface(child: AutoSuggestBox<String>(
                   enabled: !widget.readOnly,
                   placeholder: 'direction'.tr(),
                   placeholderStyle: placeStyle,
@@ -2151,7 +2151,7 @@ class _VehicleFormState extends State<VehicleForm>
                           .toUpperCase(),
                     ),
                   ),
-                ),
+                )),
               ],
             ),
           ),
@@ -2176,7 +2176,7 @@ class _VehicleFormState extends State<VehicleForm>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('departement', style: formHintStyle).tr(),
-                AutoSuggestBox<String>(
+                ParcotoFieldSurface(child: AutoSuggestBox<String>(
                   enabled: !widget.readOnly,
                   placeholder: 'departement'.tr(),
                   placeholderStyle: placeStyle,
@@ -2189,7 +2189,7 @@ class _VehicleFormState extends State<VehicleForm>
                           .toUpperCase(),
                     ),
                   ),
-                ),
+                )),
               ],
             ),
           ),
