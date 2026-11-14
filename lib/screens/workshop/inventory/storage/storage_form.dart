@@ -105,7 +105,6 @@ class _StorageFormState extends State<StorageForm> {
                   StaggeredGridTile.fit(
                     crossAxisCellCount: 3,
                     child: Container(
-                      width: 200.px,
                       height: 170.px,
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
@@ -174,7 +173,6 @@ class _StorageFormState extends State<StorageForm> {
                   StaggeredGridTile.fit(
                     crossAxisCellCount: 3,
                     child: Container(
-                      width: 200.px,
                       height: 170.px,
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
@@ -248,7 +246,6 @@ class _StorageFormState extends State<StorageForm> {
                     StaggeredGridTile.fit(
                       crossAxisCellCount: 2,
                       child: Container(
-                        width: 200.px,
                         height: 170.px,
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -299,7 +296,6 @@ class _StorageFormState extends State<StorageForm> {
                     StaggeredGridTile.fit(
                       crossAxisCellCount: 4,
                       child: Container(
-                        width: 200.px,
                         height: expire ? 170.px : 70.px,
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -403,7 +399,6 @@ class _StorageFormState extends State<StorageForm> {
     return StaggeredGridTile.fit(
       crossAxisCellCount: 6,
       child: Container(
-        width: 400.px,
         height: variations.isEmpty
             ? 480.px
             : 50.px * variations.length + 165.px,
