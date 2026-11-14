@@ -1,4 +1,5 @@
 import 'dart:io' as io;
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -384,15 +385,12 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                 label: 'fullname'.tr(),
                                 child: Padding(
                                   padding: const EdgeInsets.all(10.0),
-                                  child: TextBox(
+                                  child: ParcotoTextBox(
                                     controller: nom,
                                     placeholder: 'fullname'.tr(),
                                     style: appTheme.writingStyle,
                                     placeholderStyle: placeStyle,
                                     cursorColor: appTheme.color.darker,
-                                    decoration: WidgetStatePropertyAll(
-                                      BoxDecoration(color: appTheme.fillColor),
-                                    ),
 
                                     onChanged: (s) {
                                       checkChanges();
@@ -408,15 +406,12 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                 label: 'descr'.tr(),
                                 child: Padding(
                                   padding: const EdgeInsets.all(10.0),
-                                  child: TextBox(
+                                  child: ParcotoTextBox(
                                     controller: descr,
                                     placeholder: 'descr'.tr(),
                                     style: appTheme.writingStyle,
                                     placeholderStyle: placeStyle,
                                     cursorColor: appTheme.color.darker,
-                                    decoration: WidgetStatePropertyAll(
-                                      BoxDecoration(color: appTheme.fillColor),
-                                    ),
 
                                     onChanged: (s) {
                                       checkChanges();
@@ -438,19 +433,13 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                         children: [
                                           SizedBox(
                                             width: 250,
-                                            child: TextBox(
+                                            child: ParcotoTextBox(
                                               controller: email,
                                               placeholder: 'email'.tr(),
                                               style: appTheme.writingStyle,
                                               placeholderStyle: placeStyle,
                                               cursorColor:
                                                   appTheme.color.darker,
-                                              decoration:
-                                                  WidgetStatePropertyAll(
-                                                    BoxDecoration(
-                                                      color: appTheme.fillColor,
-                                                    ),
-                                                  ),
 
                                               onChanged: (s) {
                                                 checkChanges();
@@ -460,19 +449,13 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                           smallSpace,
                                           SizedBox(
                                             width: 187,
-                                            child: TextBox(
+                                            child: ParcotoTextBox(
                                               controller: telephone,
                                               placeholder: 'telephone'.tr(),
                                               style: appTheme.writingStyle,
                                               placeholderStyle: placeStyle,
                                               cursorColor:
                                                   appTheme.color.darker,
-                                              decoration:
-                                                  WidgetStatePropertyAll(
-                                                    BoxDecoration(
-                                                      color: appTheme.fillColor,
-                                                    ),
-                                                  ),
 
                                               onChanged: (s) {
                                                 checkChanges();
@@ -483,18 +466,13 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                       ),
                                       smallSpace,
                                       Flexible(
-                                        child: TextBox(
+                                        child: ParcotoTextBox(
                                           controller: adresse,
                                           placeholder: 'adresse'.tr(),
                                           maxLines: 3,
                                           style: appTheme.writingStyle,
                                           placeholderStyle: placeStyle,
                                           cursorColor: appTheme.color.darker,
-                                          decoration: WidgetStatePropertyAll(
-                                            BoxDecoration(
-                                              color: appTheme.fillColor,
-                                            ),
-                                          ),
 
                                           onChanged: (s) {
                                             checkChanges();
@@ -520,20 +498,13 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                         child: Row(
                                           children: [
                                             Flexible(
-                                              child: TextBox(
+                                              child: ParcotoTextBox(
                                                 controller: nif,
                                                 placeholder: 'NIF',
                                                 style: appTheme.writingStyle,
                                                 placeholderStyle: placeStyle,
                                                 cursorColor:
                                                     appTheme.color.darker,
-                                                decoration:
-                                                    WidgetStatePropertyAll(
-                                                      BoxDecoration(
-                                                        color:
-                                                            appTheme.fillColor,
-                                                      ),
-                                                    ),
 
                                                 onChanged: (s) {
                                                   checkChanges();
@@ -542,20 +513,13 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                             ),
                                             smallSpace,
                                             Flexible(
-                                              child: TextBox(
+                                              child: ParcotoTextBox(
                                                 controller: nis,
                                                 placeholder: 'NIS',
                                                 style: appTheme.writingStyle,
                                                 placeholderStyle: placeStyle,
                                                 cursorColor:
                                                     appTheme.color.darker,
-                                                decoration:
-                                                    WidgetStatePropertyAll(
-                                                      BoxDecoration(
-                                                        color:
-                                                            appTheme.fillColor,
-                                                      ),
-                                                    ),
 
                                                 onChanged: (s) {
                                                   checkChanges();
@@ -570,20 +534,13 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                         child: Row(
                                           children: [
                                             Flexible(
-                                              child: TextBox(
+                                              child: ParcotoTextBox(
                                                 controller: rc,
                                                 placeholder: 'RC',
                                                 style: appTheme.writingStyle,
                                                 placeholderStyle: placeStyle,
                                                 cursorColor:
                                                     appTheme.color.darker,
-                                                decoration:
-                                                    WidgetStatePropertyAll(
-                                                      BoxDecoration(
-                                                        color:
-                                                            appTheme.fillColor,
-                                                      ),
-                                                    ),
 
                                                 onChanged: (s) {
                                                   checkChanges();
@@ -592,20 +549,13 @@ class MyEntrepriseState extends State<MyEntreprise> {
                                             ),
                                             smallSpace,
                                             Flexible(
-                                              child: TextBox(
+                                              child: ParcotoTextBox(
                                                 controller: art,
                                                 placeholder: 'ART',
                                                 style: appTheme.writingStyle,
                                                 placeholderStyle: placeStyle,
                                                 cursorColor:
                                                     appTheme.color.darker,
-                                                decoration:
-                                                    WidgetStatePropertyAll(
-                                                      BoxDecoration(
-                                                        color:
-                                                            appTheme.fillColor,
-                                                      ),
-                                                    ),
 
                                                 onChanged: (s) {
                                                   checkChanges();
@@ -692,15 +642,12 @@ class MyEntrepriseState extends State<MyEntreprise> {
                   children: [
                     Expanded(
                       flex: 4,
-                      child: TextBox(
+                      child: ParcotoTextBox(
                         controller: fillialeToAdd,
                         placeholder: 'writefiliale'.tr(),
                         style: appTheme.writingStyle,
                         placeholderStyle: placeStyle,
                         cursorColor: appTheme.color.darker,
-                        decoration: WidgetStatePropertyAll(
-                          BoxDecoration(color: appTheme.fillColor),
-                        ),
 
                         onChanged: (s) {
                           setState(() {});
@@ -806,15 +753,12 @@ class MyEntrepriseState extends State<MyEntreprise> {
                   children: [
                     Expanded(
                       flex: 4,
-                      child: TextBox(
+                      child: ParcotoTextBox(
                         controller: directionToAdd,
                         placeholder: 'writedirection'.tr(),
                         style: appTheme.writingStyle,
                         placeholderStyle: placeStyle,
                         cursorColor: appTheme.color.darker,
-                        decoration: WidgetStatePropertyAll(
-                          BoxDecoration(color: appTheme.fillColor),
-                        ),
 
                         onChanged: (s) {
                           setState(() {});
@@ -920,15 +864,12 @@ class MyEntrepriseState extends State<MyEntreprise> {
                   children: [
                     Expanded(
                       flex: 4,
-                      child: TextBox(
+                      child: ParcotoTextBox(
                         controller: departmentToAdd,
                         placeholder: 'writedepartment'.tr(),
                         style: appTheme.writingStyle,
                         placeholderStyle: placeStyle,
                         cursorColor: appTheme.color.darker,
-                        decoration: WidgetStatePropertyAll(
-                          BoxDecoration(color: appTheme.fillColor),
-                        ),
 
                         onChanged: (s) {
                           setState(() {});
