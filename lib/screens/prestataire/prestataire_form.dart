@@ -139,8 +139,8 @@ class PrestataireFormState extends State<PrestataireForm> {
                               children: [
                                 Row(
                                   children: [
-                                    SizedBox(
-                                      width: 250,
+                                    Expanded(
+                                      flex: 4,
                                       child: ParcotoTextBox(
                                         controller: email,
                                         placeholder: 'email'.tr(),
@@ -154,8 +154,8 @@ class PrestataireFormState extends State<PrestataireForm> {
                                       ),
                                     ),
                                     smallSpace,
-                                    SizedBox(
-                                      width: 187,
+                                    Expanded(
+                                      flex: 3,
                                       child: ParcotoTextBox(
                                         controller: telephone,
                                         placeholder: 'telephone'.tr(),
