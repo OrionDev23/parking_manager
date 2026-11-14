@@ -266,26 +266,28 @@ class _StorageFormState extends State<StorageForm> {
                                 label: 'quantity'.tr(),
                                 child: Padding(
                                   padding: const EdgeInsets.all(20.0),
-                                  child: selectedPart!.unitType == 0
-                                      ? NumberBox<int>(
-                                          value: qte.toInt(),
-                                          onChanged: (int? value) {
-                                            setState(() {
-                                              qte = value?.toDouble() ?? 0;
-                                            });
-                                            updateQteRestant();
-                                          },
-                                          min: 0,
-                                        )
-                                      : NumberBox<double>(
-                                          value: qte,
-                                          onChanged: (s) {
-                                            setState(() {
-                                              qte = s ?? 0;
-                                            });
-                                            updateQteRestant();
-                                          },
-                                        ),
+                                  child: ParcotoFieldSurface(
+                                    child: selectedPart!.unitType == 0
+                                        ? NumberBox<int>(
+                                            value: qte.toInt(),
+                                            onChanged: (int? value) {
+                                              setState(() {
+                                                qte = value?.toDouble() ?? 0;
+                                              });
+                                              updateQteRestant();
+                                            },
+                                            min: 0,
+                                          )
+                                        : NumberBox<double>(
+                                            value: qte,
+                                            onChanged: (s) {
+                                              setState(() {
+                                                qte = s ?? 0;
+                                              });
+                                              updateQteRestant();
+                                            },
+                                          ),
+                                  ),
                                 ),
                               ),
                             ),
