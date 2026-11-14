@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' hide ColorPicker;
 import 'package:material_ui/material_ui.dart' as m;
@@ -93,7 +94,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                     FluentIcons.title,
                     color: appTheme.color.lightest,
                   ),
-                  title: TextBox(
+                  title: ParcotoTextBox(
                     controller: TextEditingController(text: _subject),
                     onChanged: (String value) {
                       _subject = value;
@@ -106,9 +107,6 @@ class _AppointmentFormState extends State<AppointmentForm> {
                       fontSize: 25,
                       color: appTheme.writingStyle.color,
                       fontWeight: FontWeight.w400,
-                    ),
-                    decoration: WidgetStatePropertyAll(
-                      BoxDecoration(color: appTheme.fillColor),
                     ),
                   ),
                 ),
@@ -386,7 +384,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                     FluentIcons.add_notes,
                     color: appTheme.color.lightest,
                   ),
-                  title: TextBox(
+                  title: ParcotoTextBox(
                     controller: TextEditingController(text: _notes),
                     onChanged: (String value) {
                       _notes = value;
@@ -399,9 +397,6 @@ class _AppointmentFormState extends State<AppointmentForm> {
                       fontSize: 18,
                       color: appTheme.writingStyle.color,
                       fontWeight: FontWeight.w400,
-                    ),
-                    decoration: WidgetStatePropertyAll(
-                      BoxDecoration(color: appTheme.fillColor),
                     ),
                   ),
                 ),
