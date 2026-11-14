@@ -89,7 +89,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     if (date == null) return value.toString();
     final day = date.day.toString().padLeft(2, '0');
     final month = date.month.toString().padLeft(2, '0');
-    return day + '/' + month + '/' + date.year.toString();
+    return '$day/$month/${date.year}';
   }
 
   Widget _chip(String text, Color accent) => Container(
