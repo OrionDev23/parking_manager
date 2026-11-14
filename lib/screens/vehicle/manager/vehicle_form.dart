@@ -97,7 +97,7 @@ class _VehicleFormState extends State<VehicleForm>
 
   String pays = 'DZ';
 
-  final double height = 55.px;
+  final double height = 72.px;
   final double heightFirst = 118.px;
 
   String wilaya = "16";
@@ -1789,7 +1789,7 @@ class _VehicleFormState extends State<VehicleForm>
             children: [
               Text('existingdriver', style: formHintStyle).tr(),
               SizedBox(
-                width: 500.px,
+                width: double.infinity,
                 child: Button(
                   onPressed: () => selectConducteur(appTheme),
                   child: const Text('select').tr(),
