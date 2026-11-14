@@ -327,7 +327,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             ? 'Expiré'
             : daysRemaining == 0
                 ? 'Expire aujourd’hui'
-                : daysRemaining! <= 30
+                : daysRemaining != null && daysRemaining <= 30
                     ? 'Expire bientôt'
                     : 'Valide';
     final statusColor = expired || (daysRemaining != null && daysRemaining <= 30)
