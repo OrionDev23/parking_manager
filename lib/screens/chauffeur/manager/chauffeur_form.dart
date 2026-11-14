@@ -139,6 +139,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                 onChanged: (s) {
                                   checkChanges();
                                 },
+                                ),
                               ),
                             ),
                           ),
@@ -395,7 +396,8 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                             label: 'disponibilite'.tr(),
                             child: Padding(
                               padding: const EdgeInsets.all(10.0),
-                              child: DropDownButton(
+                              child: ParcotoFieldSurface(
+                                child: DropDownButton(
                                 title: Text(DriverProvider.getEtat(etat)).tr(),
                                 placement: FlyoutPlacementMode.bottomCenter,
                                 closeAfterClick: false,
