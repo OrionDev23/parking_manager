@@ -735,7 +735,7 @@ class _VehicleFormState extends State<VehicleForm>
                       label: 'Immatriculation',
                       requiredField: true,
                       child: autreMat
-                          ? TextBox(
+                          ? ParcotoTextBox(
                               enabled: !widget.readOnly,
                               controller: matriculeEtr,
                               maxLength: 30,
@@ -743,7 +743,6 @@ class _VehicleFormState extends State<VehicleForm>
                               style: appTheme.writingStyle,
                               placeholderStyle: placeStyle,
                               cursorColor: appTheme.color,
-                              decoration: _identityInputDecoration(appTheme),
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
                                   RegExp('[0-9a-zA-Z.-]'),
@@ -754,7 +753,7 @@ class _VehicleFormState extends State<VehicleForm>
                               children: [
                                 Expanded(
                                   flex: 6,
-                                  child: TextBox(
+                                  child: ParcotoTextBox(
                                     enabled: !widget.readOnly,
                                     controller: matr1,
                                     maxLength: 6,
@@ -762,7 +761,6 @@ class _VehicleFormState extends State<VehicleForm>
                                     textAlign: TextAlign.center,
                                     style: appTheme.writingStyle,
                                     placeholderStyle: placeStyle,
-                                    decoration: _identityInputDecoration(appTheme),
                                     inputFormatters: [
                                       FilteringTextInputFormatter.digitsOnly,
                                     ],
@@ -774,7 +772,7 @@ class _VehicleFormState extends State<VehicleForm>
                                 ),
                                 Expanded(
                                   flex: 3,
-                                  child: TextBox(
+                                  child: ParcotoTextBox(
                                     enabled: !widget.readOnly,
                                     controller: matr2,
                                     maxLength: 3,
@@ -782,7 +780,6 @@ class _VehicleFormState extends State<VehicleForm>
                                     textAlign: TextAlign.center,
                                     style: appTheme.writingStyle,
                                     placeholderStyle: placeStyle,
-                                    decoration: _identityInputDecoration(appTheme),
                                     inputFormatters: [
                                       FilteringTextInputFormatter.digitsOnly,
                                     ],
@@ -795,7 +792,7 @@ class _VehicleFormState extends State<VehicleForm>
                                 ),
                                 Expanded(
                                   flex: 2,
-                                  child: TextBox(
+                                  child: ParcotoTextBox(
                                     enabled: !widget.readOnly,
                                     controller: matr3,
                                     maxLength: 2,
@@ -803,7 +800,6 @@ class _VehicleFormState extends State<VehicleForm>
                                     textAlign: TextAlign.center,
                                     style: appTheme.writingStyle,
                                     placeholderStyle: placeStyle,
-                                    decoration: _identityInputDecoration(appTheme),
                                     inputFormatters: [
                                       FilteringTextInputFormatter.digitsOnly,
                                     ],
@@ -885,7 +881,7 @@ class _VehicleFormState extends State<VehicleForm>
                       appTheme,
                       width: fieldWidth,
                       label: 'Modèle',
-                      child: TextBox(
+                      child: ParcotoTextBox(
                         enabled: !widget.readOnly,
                         controller: type,
                         maxLength: 60,
@@ -893,7 +889,6 @@ class _VehicleFormState extends State<VehicleForm>
                         style: appTheme.writingStyle,
                         placeholderStyle: placeStyle,
                         cursorColor: appTheme.color,
-                        decoration: _identityInputDecoration(appTheme),
                       ),
                     ),
                     _identityField(
@@ -956,7 +951,7 @@ class _VehicleFormState extends State<VehicleForm>
                         width: fieldWidth,
                         label: 'Numéro de châssis (VIN)',
                         requiredField: true,
-                        child: TextBox(
+                        child: ParcotoTextBox(
                           enabled: !widget.readOnly,
                           controller: numSer,
                           maxLength: 30,
@@ -964,7 +959,6 @@ class _VehicleFormState extends State<VehicleForm>
                           style: appTheme.writingStyle,
                           placeholderStyle: placeStyle,
                           cursorColor: appTheme.color,
-                          decoration: _identityInputDecoration(appTheme),
                         ),
                       ),
                   ],
@@ -1331,7 +1325,7 @@ class _VehicleFormState extends State<VehicleForm>
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 5.0),
                   child: autreMat
-                      ? TextBox(
+                      ? ParcotoTextBox(
                           enabled: !widget.readOnly,
                           controller: matriculeEtr,
                           maxLength: 30,
@@ -1340,9 +1334,6 @@ class _VehicleFormState extends State<VehicleForm>
                           placeholder: 'XXXXXXXXXXXXXX',
                           textAlign: TextAlign.center,
                           placeholderStyle: placeStyle,
-                          decoration: WidgetStatePropertyAll(
-                            BoxDecoration(color: appTheme.fillColor),
-                          ),
 
                           inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.allow(
@@ -1355,16 +1346,13 @@ class _VehicleFormState extends State<VehicleForm>
                           children: [
                             Flexible(
                               flex: 6,
-                              child: TextBox(
+                              child: ParcotoTextBox(
                                 enabled: !widget.readOnly,
                                 controller: matr1,
                                 cursorColor: appTheme.color.darker,
                                 style: appTheme.writingStyle,
                                 placeholder: '123456',
                                 placeholderStyle: placeStyle,
-                                decoration: WidgetStatePropertyAll(
-                                  BoxDecoration(color: appTheme.fillColor),
-                                ),
 
                                 maxLength: 6,
                                 textAlign: TextAlign.center,
@@ -1378,7 +1366,7 @@ class _VehicleFormState extends State<VehicleForm>
                             smallSpace,
                             Flexible(
                               flex: 3,
-                              child: TextBox(
+                              child: ParcotoTextBox(
                                 enabled: !widget.readOnly,
                                 controller: matr2,
                                 cursorColor: appTheme.color.darker,
@@ -1386,9 +1374,6 @@ class _VehicleFormState extends State<VehicleForm>
                                 placeholder: '123',
                                 maxLength: 3,
                                 placeholderStyle: placeStyle,
-                                decoration: WidgetStatePropertyAll(
-                                  BoxDecoration(color: appTheme.fillColor),
-                                ),
 
                                 textAlign: TextAlign.center,
                                 inputFormatters: [
@@ -1404,7 +1389,7 @@ class _VehicleFormState extends State<VehicleForm>
                             smallSpace,
                             Flexible(
                               flex: 2,
-                              child: TextBox(
+                              child: ParcotoTextBox(
                                 enabled: !widget.readOnly,
                                 controller: matr3,
                                 cursorColor: appTheme.color.darker,
@@ -1412,9 +1397,6 @@ class _VehicleFormState extends State<VehicleForm>
                                 placeholder: '12',
                                 maxLength: 2,
                                 placeholderStyle: placeStyle,
-                                decoration: WidgetStatePropertyAll(
-                                  BoxDecoration(color: appTheme.fillColor),
-                                ),
 
                                 textAlign: TextAlign.center,
                                 inputFormatters: [
@@ -1520,9 +1502,6 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
 
                   items: AlgeriaList.dzair!.getWilayat()!.map((wilaya) {
                     return AutoSuggestBoxItem<String>(
@@ -1591,9 +1570,6 @@ class _VehicleFormState extends State<VehicleForm>
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
                   placeholderStyle: placeStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
 
                   items: AlgeriaList().getDairas(wilayaCont.text).map((daira) {
                     return AutoSuggestBoxItem<String>(
@@ -1627,9 +1603,6 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
 
                   items: AlgeriaList().getCommune(wilayaCont.text).map((
                     commune,
@@ -1719,7 +1692,7 @@ class _VehicleFormState extends State<VehicleForm>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text('numcartegrise', style: formHintStyle).tr(),
-              TextBox(
+              ParcotoTextBox(
                 enabled: !widget.readOnly,
                 controller: numero,
                 placeholder: 'numcartegrise'.tr(),
@@ -1727,9 +1700,6 @@ class _VehicleFormState extends State<VehicleForm>
                 placeholderStyle: placeStyle,
                 cursorColor: appTheme.color.darker,
                 style: appTheme.writingStyle,
-                decoration: WidgetStatePropertyAll(
-                  BoxDecoration(color: appTheme.fillColor),
-                ),
               ),
             ],
           ),
@@ -1758,16 +1728,13 @@ class _VehicleFormState extends State<VehicleForm>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text('quittance', style: formHintStyle).tr(),
-              TextBox(
+              ParcotoTextBox(
                 enabled: !widget.readOnly,
                 controller: quittance,
                 placeholder: 'quittance'.tr(),
                 cursorColor: appTheme.color.darker,
                 style: appTheme.writingStyle,
                 placeholderStyle: placeStyle,
-                decoration: WidgetStatePropertyAll(
-                  BoxDecoration(color: appTheme.fillColor),
-                ),
 
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(
@@ -1836,7 +1803,7 @@ class _VehicleFormState extends State<VehicleForm>
               Text('matriculeemploye', style: formHintStyle).tr(),
               SizedBox(
                 height: 5.h,
-                child: TextBox(
+                child: ParcotoTextBox(
                   enabled: !widget.readOnly,
                   controller: matempl,
                   maxLength: 30,
@@ -1844,9 +1811,6 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
                 ),
               ),
             ],
@@ -1873,7 +1837,7 @@ class _VehicleFormState extends State<VehicleForm>
               Text('nomf', style: formHintStyle).tr(),
               SizedBox(
                 height: 5.h,
-                child: TextBox(
+                child: ParcotoTextBox(
                   enabled: !widget.readOnly,
                   controller: lname,
                   maxLength: 30,
@@ -1881,9 +1845,6 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
                 ),
               ),
             ],
@@ -1911,7 +1872,7 @@ class _VehicleFormState extends State<VehicleForm>
               Text('prenom', style: formHintStyle).tr(),
               SizedBox(
                 height: 5.h,
-                child: TextBox(
+                child: ParcotoTextBox(
                   enabled: !widget.readOnly,
                   controller: fname,
                   maxLength: 30,
@@ -1919,9 +1880,6 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
                 ),
               ),
             ],
@@ -1952,7 +1910,7 @@ class _VehicleFormState extends State<VehicleForm>
               Text('poste', style: formHintStyle).tr(),
               SizedBox(
                 height: 5.h,
-                child: TextBox(
+                child: ParcotoTextBox(
                   enabled: !widget.readOnly,
                   controller: profession,
                   maxLength: 40,
@@ -1960,9 +1918,6 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
                 ),
               ),
             ],
@@ -2043,7 +1998,7 @@ class _VehicleFormState extends State<VehicleForm>
               Text('adresse', style: formHintStyle).tr(),
               SizedBox(
                 height: 5.h,
-                child: TextBox(
+                child: ParcotoTextBox(
                   enabled: !widget.readOnly,
                   controller: adresse,
                   placeholder: 'adresse'.tr(),
@@ -2051,9 +2006,6 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
                 ),
               ),
             ],
@@ -2444,7 +2396,7 @@ class _VehicleFormState extends State<VehicleForm>
             child: Column(
               children: [
                 Text('type', style: formHintStyle).tr(),
-                TextBox(
+                ParcotoTextBox(
                   enabled: !widget.readOnly,
                   controller: type,
                   placeholder: 'type'.tr(),
@@ -2452,9 +2404,6 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
                 ),
               ],
             ),
@@ -2487,7 +2436,7 @@ class _VehicleFormState extends State<VehicleForm>
                 ),
               ).tr(),
               if (chassisKey) const Spacer(),
-              TextBox(
+              ParcotoTextBox(
                 enabled: !widget.readOnly,
                 controller: numSer,
                 maxLength: 30,
@@ -2495,9 +2444,6 @@ class _VehicleFormState extends State<VehicleForm>
                 placeholderStyle: placeStyle,
                 cursorColor: appTheme.color.darker,
                 style: appTheme.writingStyle,
-                decoration: WidgetStatePropertyAll(
-                  BoxDecoration(color: appTheme.fillColor),
-                ),
               ),
               if (chassisKey) const Spacer(),
               if (chassisKey)
@@ -2533,7 +2479,7 @@ class _VehicleFormState extends State<VehicleForm>
             child: Column(
               children: [
                 Text('caross', style: formHintStyle).tr(),
-                TextBox(
+                ParcotoTextBox(
                   enabled: !widget.readOnly,
                   controller: caross,
                   maxLength: 30,
@@ -2541,9 +2487,6 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
                 ),
               ],
             ),
@@ -2561,7 +2504,7 @@ class _VehicleFormState extends State<VehicleForm>
             child: Column(
               children: [
                 Text('energie', style: formHintStyle).tr(),
-                TextBox(
+                ParcotoTextBox(
                   enabled: !widget.readOnly,
                   controller: energie,
                   maxLength: 20,
@@ -2569,9 +2512,6 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
                 ),
               ],
             ),
@@ -2589,7 +2529,7 @@ class _VehicleFormState extends State<VehicleForm>
             child: Column(
               children: [
                 Text('puissance', style: formHintStyle).tr(),
-                TextBox(
+                ParcotoTextBox(
                   enabled: !widget.readOnly,
                   placeholder: '0000',
                   controller: puissance,
@@ -2597,9 +2537,6 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
 
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 ),
@@ -2619,7 +2556,7 @@ class _VehicleFormState extends State<VehicleForm>
             child: Column(
               children: [
                 Text('placeassise', style: formHintStyle).tr(),
-                TextBox(
+                ParcotoTextBox(
                   enabled: !widget.readOnly,
                   placeholder: '000',
                   controller: places,
@@ -2627,9 +2564,6 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
 
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 ),
@@ -2649,7 +2583,7 @@ class _VehicleFormState extends State<VehicleForm>
             child: Column(
               children: [
                 Text('poidstotal', style: formHintStyle).tr(),
-                TextBox(
+                ParcotoTextBox(
                   enabled: !widget.readOnly,
                   placeholder: '000000',
                   controller: poidsT,
@@ -2658,9 +2592,6 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
                 ),
               ],
             ),
@@ -2710,7 +2641,7 @@ class _VehicleFormState extends State<VehicleForm>
             child: Column(
               children: [
                 Text('chargeutil', style: formHintStyle).tr(),
-                TextBox(
+                ParcotoTextBox(
                   enabled: !widget.readOnly,
                   placeholder: '000000',
                   controller: charg,
@@ -2719,9 +2650,6 @@ class _VehicleFormState extends State<VehicleForm>
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
                 ),
               ],
             ),
