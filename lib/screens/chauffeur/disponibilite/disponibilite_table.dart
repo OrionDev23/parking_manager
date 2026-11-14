@@ -210,6 +210,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                       ],
                                                     ),
                                                   ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -222,7 +223,8 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                 padding: const EdgeInsets.all(
                                                   10.0,
                                                 ),
-                                                child: DropDownButton(
+                                                child: ParcotoFieldSurface(
+                                                  child: DropDownButton(
                                                   title: Text(
                                                     type == null
                                                         ? ''
