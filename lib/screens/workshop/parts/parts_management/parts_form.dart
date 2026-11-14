@@ -355,7 +355,8 @@ class _PartsFormState extends State<PartsForm>
                         label: 'unit'.tr(),
                         child: Padding(
                           padding: const EdgeInsets.all(10),
-                          child: DropDownButton(
+                          child: ParcotoFieldSurface(
+                            child: DropDownButton(
                             items: List.generate(units.length, (index) {
                               return MenuFlyoutItem(
                                 text: Text(units[index]).tr(),
@@ -372,6 +373,7 @@ class _PartsFormState extends State<PartsForm>
                               style: placeStyle,
                             ).tr(),
                             title: Text(units[selectedUnit]).tr(),
+                            ),
                           ),
                         ),
                       ),
