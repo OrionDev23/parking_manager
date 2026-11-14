@@ -1127,6 +1127,40 @@ class _VehicleFormState extends State<VehicleForm>
       );
     }
 
+    Widget dateField(String label, TextEditingController controller) {
+      final selected = DateTime.tryParse(controller.text.trim());
+      return _identityField(
+        appTheme,
+        width: fieldWidth,
+        label: label,
+        child: ParcotoFieldSurface(
+          child: IgnorePointer(
+            ignoring: widget.readOnly,
+            child: Opacity(
+              opacity: widget.readOnly ? 0.65 : 1,
+              child: DatePicker(
+                selected: selected,
+                locale: appTheme.locale,
+                startDate: DateTime(1900),
+                endDate: DateTime(2100),
+                onChanged: (date) {
+                  if (date == null) {
+                    controller.clear();
+                  } else {
+                    final year = date.year.toString().padLeft(4, '0');
+                    final month = date.month.toString().padLeft(2, '0');
+                    final day = date.day.toString().padLeft(2, '0');
+                    controller.text = '$year-$month-$day';
+                  }
+                  setState(() {});
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return StaggeredGridTile.fit(
       crossAxisCellCount: 12,
       child: Container(
@@ -1185,13 +1219,11 @@ class _VehicleFormState extends State<VehicleForm>
                 field('Hauteur (mm)', heightController, numeric: true),
                 field('Type d’acquisition', acquisitionTypeController,
                     hint: 'Achat, leasing, location…'),
-                field('Date d’acquisition', acquisitionDateController,
-                    hint: 'AAAA-MM-JJ'),
+                dateField('Date d’acquisition', acquisitionDateController),
                 field('Prix d’acquisition (DA)', purchasePriceController,
                     hint: 'Montant en DA', decimal: true),
                 field('Fournisseur / vendeur', supplierController),
-                field('Fin de garantie', warrantyEndDateController,
-                    hint: 'AAAA-MM-JJ'),
+                dateField('Fin de garantie', warrantyEndDateController),
                 field('Numéro de parc', fleetNumberController),
                 field('Kilométrage actuel (km)', mileageController,
                     numeric: true),
