@@ -387,18 +387,20 @@ class _PartsFormState extends State<PartsForm>
                             .uppercaseFirst(),
                         child: Padding(
                           padding: const EdgeInsets.all(10),
-                          child: NumberBox<double>(
-                            value: prix,
-                            placeholder: 'prix${units[selectedUnit]}'
-                                .tr()
-                                .uppercaseFirst(),
-                            onChanged: (s) {
-                              setState(() {});
-                            },
-                            min: 0,
-                            style: appTheme.writingStyle,
-                            placeholderStyle: placeStyle,
-                            cursorColor: appTheme.color.darker,
+                          child: ParcotoFieldSurface(
+                            child: NumberBox<double>(
+                              value: prix,
+                              placeholder: 'prix${units[selectedUnit]}'
+                                  .tr()
+                                  .uppercaseFirst(),
+                              onChanged: (s) {
+                                setState(() {});
+                              },
+                              min: 0,
+                              style: appTheme.writingStyle,
+                              placeholderStyle: placeStyle,
+                              cursorColor: appTheme.color.darker,
+                            ),
                           ),
                         ),
                       ),
