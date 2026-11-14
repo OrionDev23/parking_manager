@@ -12,6 +12,7 @@ import '../../data/mappers/vehicle_mapper.dart';
 import '../../main.dart';
 import '../../screens/vehicle/documents/document_form.dart';
 import '../../screens/vehicle/manager/vehicle_form.dart';
+import '../../screens/vehicle/manager/vehicle_details_page.dart';
 import '../../screens/vehicle/manager/vehicle_tabs.dart';
 import '../../screens/vehicle/states/state_form.dart';
 import '../../serializables/vehicle/vehicle.dart';
@@ -596,25 +597,28 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
     }
   }
 
-  void viewVehicule(MapEntry<String,Vehicle> element){
-    Future.delayed(const Duration(milliseconds: 50))
-        .then((value) {
-          if(current.mounted){
-          return f.showDialog(
+  void viewVehicule(MapEntry<String, Vehicle> element) {
+    Future.delayed(const Duration(milliseconds: 50)).then((_) {
+      if (!current.mounted) return;
+      f.showDialog(
         context: current,
         barrierDismissible: true,
-        builder: (c) {
-          return f.ContentDialog(
-            constraints: BoxConstraints.loose(f.Size(900.px, 800.px)),
-            content: VehicleForm(readOnly: true,vehicle: element.value,),
-            actions: [
-              f.Button(child:const Text('fermer').tr(),onPressed:(){
-                Navigator.of(current).pop();
-              })
-            ],
-          );
-        });}
-        });
+        builder: (context) => f.ContentDialog(
+          constraints: BoxConstraints.loose(f.Size(1240, 900)),
+          content: SizedBox(
+            width: 1180,
+            height: 780,
+            child: VehicleDetailsPage(vehicle: element.value),
+          ),
+          actions: [
+            f.Button(
+              child: const Text('fermer').tr(),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   @override
