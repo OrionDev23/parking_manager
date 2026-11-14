@@ -339,7 +339,7 @@ class LogTableState extends State<LogTable> {
                               smallSpace,
                               smallSpace,
                               Flexible(
-                                child: DatePicker(
+                                child: ParcotoFieldSurface(child: DatePicker(
                                   selected: dateMin,
                                   onChanged: (s) {
                                     dateMin = DateTime(
@@ -353,7 +353,7 @@ class LogTableState extends State<LogTable> {
                                     setState(() {});
                                     setS(() {});
                                   },
-                                ),
+                                )),
                               ),
                             ],
                           ),
@@ -367,7 +367,7 @@ class LogTableState extends State<LogTable> {
                               smallSpace,
                               smallSpace,
                               Flexible(
-                                child: DatePicker(
+                                child: ParcotoFieldSurface(child: DatePicker(
                                   selected: dateMax,
                                   onChanged: (s) {
                                     dateMax = DateTime(
@@ -381,7 +381,7 @@ class LogTableState extends State<LogTable> {
                                     setState(() {});
                                     setS(() {});
                                   },
-                                ),
+                                )),
                               ),
                             ],
                           ),
