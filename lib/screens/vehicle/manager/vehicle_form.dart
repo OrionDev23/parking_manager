@@ -216,74 +216,301 @@ class _VehicleFormState extends State<VehicleForm>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var appTheme = context.watch<AppTheme>();
-
+    final appTheme = context.watch<AppTheme>();
     return ScaffoldPage(
-      content: Center(
-        child: ListView(
-          shrinkWrap: true,
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: appTheme.backGroundColor,
-                boxShadow: kElevationToShadow[3],
-              ),
-              padding: const EdgeInsets.all(10),
-              width: double.infinity,
-              constraints: BoxConstraints(maxWidth: 1080.px),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildFormSectionNavigation(appTheme),
-                  Container(
-                    decoration: BoxDecoration(border: Border.all()),
-                    child: Padding(
-                      padding: const EdgeInsets.all(5.0),
+      content: LayoutBuilder(builder: (context, constraints) {
+        final wide = constraints.maxWidth >= 1180;
+        final showSummary = constraints.maxWidth >= 1540;
+        return Container(
+          color: appTheme.backGroundColor,
+          child: Column(children: [
+            _buildEditorHeader(appTheme),
+            Expanded(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              if (wide) _buildEditorSidebar(appTheme),
+              Expanded(child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: wide ? 26 : 14, vertical: 22),
+                child: Center(child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1120),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                    _buildActiveSectionHeading(appTheme),
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: FluentTheme.of(context).micaBackgroundColor,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.grey[30]),
+                      ),
                       child: StaggeredGrid.count(
-                        crossAxisCount:
-                            MediaQuery.of(context).orientation ==
-                                Orientation.portrait
-                            ? 1
-                            : 12,
-                        mainAxisSpacing: 0,
-                        crossAxisSpacing: 0,
+                        crossAxisCount: constraints.maxWidth < 700 ? 1 : 12,
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
                         children: gridChildren(appTheme),
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 28),
+                    _buildComingNextPanel(appTheme),
+                  ]),
+                )),
+              )),
+              if (showSummary) SizedBox(
+                width: 278,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(0, 22, 20, 22),
+                  child: _buildEditorSummary(appTheme),
+                ),
               ),
+            ])),
+          ]),
+        );
+      }),
+      bottomBar: widget.readOnly ? null : Padding(
+        padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 18),
+        child: Row(children: [
+          if (errorUploading)
+            Expanded(child: Text('errupld', style: TextStyle(color: Colors.red)).tr())
+          else
+            const Expanded(child: Text(
+              'Les modifications ne sont enregistrées qu’après confirmation.',
+              style: TextStyle(fontSize: 11),
+            )),
+          Button(
+            onPressed: uploading ? null : () => setState(() => selectedFormSection = 0),
+            child: const Text('Retour à l’identification'),
+          ),
+          const SizedBox(width: 10),
+          FilledButton(
+            onPressed: uploading ? null : confirmAndUpload,
+            child: uploading ? const ProgressRing() : const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [Icon(FluentIcons.save, size: 14), SizedBox(width: 8), Text('Enregistrer le véhicule')],
             ),
-          ],
-        ),
+          ),
+        ]),
       ),
-      bottomBar: widget.readOnly
-          ? null
-          : Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  if (errorUploading)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Text(
-                        'errupld',
-                        style: TextStyle(color: Colors.red),
-                      ).tr(),
-                    ),
-                  FilledButton(
-                    onPressed: uploading ? null : confirmAndUpload,
-                    child: uploading
-                        ? const ProgressRing()
-                        : const Text('confirmer').tr(),
-                  ),
-                ],
-              ),
-            ),
     );
   }
+
+  Widget _buildEditorHeader(AppTheme appTheme) {
+    final isEditing = widget.vehicle != null;
+    final registration = widget.vehicle?.matricule ??
+        (autreMat ? matriculeEtr.text : [matr1.text, matr2.text, matr3.text]
+            .where((part) => part.trim().isNotEmpty).join('-'));
+    return Container(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 18),
+      decoration: BoxDecoration(
+        color: FluentTheme.of(context).micaBackgroundColor,
+        border: Border(bottom: BorderSide(color: Colors.grey[30])),
+      ),
+      child: Row(children: [
+        Container(width: 54, height: 54,
+          decoration: BoxDecoration(color: appTheme.color.withValues(alpha: .12), borderRadius: BorderRadius.circular(15)),
+          child: Icon(FluentIcons.car, size: 26, color: appTheme.color)),
+        const SizedBox(width: 16),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(isEditing ? 'Modifier un véhicule' : 'Nouveau véhicule',
+            style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 4),
+          Text(registration.isEmpty ? 'Fiche véhicule · Parcoto' : registration + ' · Fiche véhicule',
+            style: TextStyle(color: Colors.grey[100], fontSize: 12)),
+        ])),
+        _headerPill(isEditing ? FluentIcons.edit : FluentIcons.add,
+          isEditing ? 'Modification' : 'Création', appTheme.color),
+        const SizedBox(width: 10),
+        _headerPill(widget.readOnly ? FluentIcons.lock : FluentIcons.edit,
+          widget.readOnly ? 'Consultation' : 'Brouillon',
+          widget.readOnly ? Colors.grey : appTheme.color),
+      ]),
+    );
+  }
+
+  Widget _headerPill(IconData icon, String label, Color color) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+    decoration: BoxDecoration(color: color.withValues(alpha: .10), borderRadius: BorderRadius.circular(20)),
+    child: Row(mainAxisSize: MainAxisSize.min, children: [
+      Icon(icon, size: 12, color: color), const SizedBox(width: 6),
+      Text(label, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600)),
+    ]),
+  );
+
+  Widget _buildEditorSidebar(AppTheme appTheme) => Container(
+    width: 236,
+    padding: const EdgeInsets.fromLTRB(14, 22, 12, 18),
+    decoration: BoxDecoration(border: Border(right: BorderSide(color: Colors.grey[30]))),
+    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(8, 0, 8, 14),
+        child: Text('CONFIGURATION DU VÉHICULE',
+          style: TextStyle(fontSize: 10, letterSpacing: 1.1, color: Colors.grey[100], fontWeight: FontWeight.w700)),
+      ),
+      Expanded(child: ListView(children: List.generate(_formSections.length, (index) {
+        final active = selectedFormSection == index;
+        const descriptions = [
+          'Identité et immatriculation', 'Carte grise et localisation',
+          'Conducteur et organisation', 'Motorisation et dimensions',
+          'Acquisition et exploitation', 'Anciens numéros connus',
+        ];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 5),
+          child: Button(
+            style: ButtonStyle(
+              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 10, vertical: 12)),
+              backgroundColor: WidgetStateProperty.all(active ? appTheme.color.withValues(alpha: .12) : Colors.transparent),
+              foregroundColor: WidgetStateProperty.all(active ? appTheme.color : null),
+            ),
+            onPressed: () => setState(() => selectedFormSection = index),
+            child: Row(children: [
+              Container(width: 30, height: 30, alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: active ? appTheme.color.withValues(alpha: .16) : Colors.grey[20],
+                  borderRadius: BorderRadius.circular(9)),
+                child: Icon(_formSections[index].$2, size: 14, color: active ? appTheme.color : Colors.grey[100])),
+              const SizedBox(width: 10),
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(_formSections[index].$1, style: TextStyle(fontSize: 12, fontWeight: active ? FontWeight.w700 : FontWeight.w600)),
+                const SizedBox(height: 3),
+                Text(descriptions[index], maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 10, color: Colors.grey[100])),
+              ])),
+              if (active) Icon(FluentIcons.chevron_right, size: 12, color: appTheme.color),
+            ]),
+          ),
+        );
+      }))),
+      Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(color: appTheme.color.withValues(alpha: .07), borderRadius: BorderRadius.circular(12)),
+        child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Icon(FluentIcons.info, size: 16), SizedBox(height: 8),
+          Text('Conseil', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+          SizedBox(height: 4),
+          Text('Renseignez les informations disponibles. Les données facultatives pourront être complétées plus tard.',
+            style: TextStyle(fontSize: 10, height: 1.4)),
+        ]),
+      ),
+    ]),
+  );
+
+  Widget _buildActiveSectionHeading(AppTheme appTheme) {
+    const subtitles = [
+      'Définissez l’identité visuelle et administrative du véhicule.',
+      'Renseignez les informations de carte grise et son adresse administrative.',
+      'Décrivez le rattachement organisationnel et le conducteur associé.',
+      'Configurez les caractéristiques mécaniques et physiques.',
+      'Centralisez les informations d’acquisition, de garantie et de kilométrage.',
+      'Conservez la traçabilité des anciennes immatriculations.',
+    ];
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(children: [
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(_formSections[selectedFormSection].$1, style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 5),
+          Text(subtitles[selectedFormSection], style: TextStyle(fontSize: 12, color: Colors.grey[100])),
+        ])),
+        Text((selectedFormSection + 1).toString() + ' / ' + _formSections.length.toString(),
+          style: TextStyle(fontSize: 12, color: appTheme.color, fontWeight: FontWeight.w700)),
+      ]),
+    );
+  }
+
+  Widget _buildEditorSummary(AppTheme appTheme) {
+    final registration = widget.vehicle?.matricule ?? 'À définir';
+    final vehicleName = [
+      widget.vehicle?.marque ?? marque?.toString(),
+      widget.vehicle?.type ?? type.text,
+    ].where((value) => value != null && value.trim().isNotEmpty).join(' ');
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Container(
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: FluentTheme.of(context).micaBackgroundColor,
+          border: Border.all(color: Colors.grey[30]), borderRadius: BorderRadius.circular(15)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            const Expanded(child: Text('APERÇU DU VÉHICULE',
+              style: TextStyle(fontSize: 10, letterSpacing: .8, fontWeight: FontWeight.w700))),
+            Icon(FluentIcons.preview, size: 14, color: Colors.grey[100]),
+          ]),
+          const SizedBox(height: 14),
+          Container(
+            height: 118, width: double.infinity,
+            decoration: BoxDecoration(color: appTheme.color.withValues(alpha: .08), borderRadius: BorderRadius.circular(11)),
+            child: widget.vehicle?.imageUrl?.isNotEmpty == true
+                ? ClipRRect(borderRadius: BorderRadius.circular(11),
+                    child: Image.network(widget.vehicle!.imageUrl!, fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => Icon(FluentIcons.car, size: 42, color: appTheme.color)))
+                : Icon(FluentIcons.car, size: 42, color: appTheme.color),
+          ),
+          const SizedBox(height: 13),
+          Text(vehicleName.isEmpty ? 'Marque et modèle à renseigner' : vehicleName,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 5),
+          Text(registration, style: TextStyle(fontSize: 12, color: Colors.grey[100])),
+          const SizedBox(height: 12),
+          _summaryLine(FluentIcons.number, 'N° de parc',
+            fleetNumberController.text.isEmpty ? 'Non défini' : fleetNumberController.text),
+          _summaryLine(FluentIcons.speedometer, 'Kilométrage',
+            mileageController.text.isEmpty ? 'Non renseigné' : mileageController.text + ' km'),
+        ]),
+      ),
+      const SizedBox(height: 12),
+      _summaryCard('AFFECTATION', [
+        ('Conducteur', widget.vehicle?.matriculeConducteur ?? 'À associer'),
+        ('Filiale', widget.vehicle?.filliale ?? 'À renseigner'),
+        ('Direction', widget.vehicle?.direction ?? 'À renseigner'),
+      ]),
+      const SizedBox(height: 12),
+      _summaryCard('À CONNECTER ENSUITE', [
+        ('GPS', 'Position en attente'),
+        ('Documents', 'Espace documentaire'),
+        ('Maintenance', 'Échéances et interventions'),
+        ('Historique', 'Journal des événements'),
+      ]),
+    ]);
+  }
+
+  Widget _summaryCard(String title, List<(String, String)> rows) => Container(
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: FluentTheme.of(context).micaBackgroundColor,
+      border: Border.all(color: Colors.grey[30]), borderRadius: BorderRadius.circular(14)),
+    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(title, style: const TextStyle(fontSize: 10, letterSpacing: .8, fontWeight: FontWeight.w700)),
+      const SizedBox(height: 12),
+      ...rows.map((row) => _summaryLine(FluentIcons.circle_info, row.$1, row.$2)),
+    ]),
+  );
+
+  Widget _summaryLine(IconData icon, String label, String value) => Padding(
+    padding: const EdgeInsets.only(bottom: 10),
+    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Icon(icon, size: 13, color: Colors.grey[100]), const SizedBox(width: 8),
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[100])),
+        const SizedBox(height: 2),
+        Text(value, maxLines: 2, overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+      ])),
+    ]),
+  );
+
+  Widget _buildComingNextPanel(AppTheme appTheme) => Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: appTheme.color.withValues(alpha: .06),
+      borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: appTheme.color.withValues(alpha: .16))),
+    child: Row(children: [
+      Icon(FluentIcons.layers, color: appTheme.color, size: 20), const SizedBox(width: 12),
+      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Évolution de la fiche véhicule', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+        SizedBox(height: 4),
+        Text('Les prochains lots intégreront les documents, la galerie photo, les alertes de conformité, le suivi GPS et le journal de vie du véhicule.',
+          style: TextStyle(fontSize: 11, height: 1.4)),
+      ])),
+      const SizedBox(width: 8), const Icon(FluentIcons.chevron_right, size: 14),
+    ]),
+  );
 
   static const _formSections = [
     ('Identification', FluentIcons.car),
