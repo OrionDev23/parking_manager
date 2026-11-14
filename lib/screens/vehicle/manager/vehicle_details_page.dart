@@ -32,14 +32,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   }
 
   static const sections = [
-    ('Vue générale', FluentIcons.view_dashboard),
-    ('Identification', FluentIcons.contact),
-    ('Spécifications', FluentIcons.settings),
+    ('Vue générale', FluentIcons.car),
+    ('Identification', FluentIcons.people),
+    ('Spécifications', FluentIcons.car),
     ('Affectation', FluentIcons.people),
-    ('GPS', FluentIcons.map_pin),
+    ('GPS', FluentIcons.car),
     ('Maintenance', FluentIcons.repair),
     ('Documents', FluentIcons.document),
-    ('Historique', FluentIcons.history),
+    ('Historique', FluentIcons.document),
     ('Finances', FluentIcons.money),
   ];
 
@@ -307,7 +307,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         ]);
       case 4:
         return _empty(
-            FluentIcons.map_pin,
+            FluentIcons.car,
             'Aucune position GPS disponible',
             'La dernière position apparaîtra ici lorsqu’un conducteur autorisé aura transmis sa position depuis Parcoto Mobile.',
             'Suivi GPS non encore activé');
@@ -321,7 +321,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         return _documentsSection(accent);
       case 7:
         return _empty(
-            FluentIcons.history,
+            FluentIcons.document,
             'Historique détaillé indisponible',
             'Les changements d’affectation, de statut, relevés kilométriques et événements seront présentés chronologiquement.',
             'Historique véhicule à structurer');
@@ -421,7 +421,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               ),
               _panel(
                 'Kilométrage & entretien',
-                FluentIcons.speed_high,
+                FluentIcons.car,
                 accent,
                 [
                   _statusValue('Kilométrage actuel',
@@ -439,7 +439,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               ),
               _panel(
                 'Documents',
-                FluentIcons.documentation,
+                FluentIcons.document,
                 accent,
                 [
                   Row(
@@ -464,7 +464,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               ),
               _panel(
                 'Localisation',
-                FluentIcons.map_pin,
+                FluentIcons.car,
                 accent,
                 [
                   _statusValue('Dernière position', 'Non disponible', accent),
