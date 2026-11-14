@@ -155,3 +155,39 @@ class ParcotoTextBox extends StatelessWidget {
     );
   }
 }
+
+/// Shared visual surface for non-text controls (date pickers, combo boxes,
+/// time pickers and custom selectors).
+class ParcotoFieldSurface extends StatelessWidget {
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final double? minHeight;
+
+  const ParcotoFieldSurface({
+    super.key,
+    required this.child,
+    this.padding = const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    this.minHeight = 42,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = FluentTheme.of(context);
+    return ConstrainedBox(
+      constraints: BoxConstraints(minHeight: minHeight ?? 0),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: theme.inactiveBackgroundColor,
+          borderRadius: BorderRadius.circular(9),
+          border: Border.all(
+            color: theme.inactiveColor.withValues(alpha: .30),
+          ),
+        ),
+        child: Padding(
+          padding: padding,
+          child: child,
+        ),
+      ),
+    );
+  }
+}
