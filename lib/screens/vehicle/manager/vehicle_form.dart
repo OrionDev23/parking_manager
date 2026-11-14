@@ -429,7 +429,7 @@ class _VehicleFormState extends State<VehicleForm>
           Row(children: [
             const Expanded(child: Text('APERÇU DU VÉHICULE',
               style: TextStyle(fontSize: 10, letterSpacing: .8, fontWeight: FontWeight.w700))),
-            Icon(FluentIcons.preview, size: 14, color: Colors.grey[100]),
+            Icon(FluentIcons.car, size: 14, color: Colors.grey[100]),
           ]),
           const SizedBox(height: 14),
           Container(
@@ -447,9 +447,9 @@ class _VehicleFormState extends State<VehicleForm>
           const SizedBox(height: 5),
           Text(registration, style: TextStyle(fontSize: 12, color: Colors.grey[100])),
           const SizedBox(height: 12),
-          _summaryLine(FluentIcons.number, 'N° de parc',
+          _summaryLine(FluentIcons.document, 'N° de parc',
             fleetNumberController.text.isEmpty ? 'Non défini' : fleetNumberController.text),
-          _summaryLine(FluentIcons.speedometer, 'Kilométrage',
+          _summaryLine(FluentIcons.car, 'Kilométrage',
             mileageController.text.isEmpty ? 'Non renseigné' : mileageController.text + ' km'),
         ]),
       ),
@@ -477,7 +477,7 @@ class _VehicleFormState extends State<VehicleForm>
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(title, style: const TextStyle(fontSize: 10, letterSpacing: .8, fontWeight: FontWeight.w700)),
       const SizedBox(height: 12),
-      ...rows.map((row) => _summaryLine(FluentIcons.circle_info, row.$1, row.$2)),
+      ...rows.map((row) => _summaryLine(FluentIcons.info, row.$1, row.$2)),
     ]),
   );
 
@@ -501,7 +501,7 @@ class _VehicleFormState extends State<VehicleForm>
       borderRadius: BorderRadius.circular(14),
       border: Border.all(color: appTheme.color.withValues(alpha: .16))),
     child: Row(children: [
-      Icon(FluentIcons.layers, color: appTheme.color, size: 20), const SizedBox(width: 12),
+      Icon(FluentIcons.document, color: appTheme.color, size: 20), const SizedBox(width: 12),
       const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('Évolution de la fiche véhicule', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
         SizedBox(height: 4),
