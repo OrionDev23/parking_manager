@@ -249,7 +249,7 @@ Future<void> startBackgroundInitialization(String companyId) async {
 Future<void> _initializeBackgroundData(String companyId) async {
   // Web uses Appwrite directly and has no SQLite cache or startup migrations.
   if (kIsWeb) {
-    await syncEngine.start();
+    // Web repositories write directly to Appwrite; no background outbox sync.
     return;
   }
   final localDatabase = vehicleServices.localDatabase;

@@ -68,13 +68,15 @@ class DriverServices {
       remoteSource: remoteSource,
       syncQueue: syncQueue,
       companyId: companyId,
-      repository: DriverRepositoryImpl(
-        local: localSource,
-        syncQueue: syncQueue,
-        deviceIdentity: deviceIdentity,
-        companyContext: CompanyContext(companyId: companyId),
-        remote: remoteSource,
-      ),
+      repository: kIsWeb
+          ? _OnlineDriverRepository(remoteSource)
+          : DriverRepositoryImpl(
+              local: localSource,
+              syncQueue: syncQueue,
+              deviceIdentity: deviceIdentity,
+              companyContext: CompanyContext(companyId: companyId),
+              remote: remoteSource,
+            ),
     );
   }
 
@@ -262,4 +264,38 @@ class DriverServices {
   }
 
   Future<void> dispose() => localDatabase.close();
+}
+
+
+/// Web repository: every operation is performed against Appwrite immediately.
+class _OnlineDriverRepository implements DriverRepository {
+  final AppwriteDriverSource remote;
+  _OnlineDriverRepository(this.remote);
+
+  @override
+  Future<List<domain.Driver>> getDrivers({
+    String? search,
+    int? limit,
+    int offset = 0,
+    bool includeArchived = false,
+  }) => remote.getDrivers(
+    search: search,
+    limit: limit,
+    offset: offset,
+    includeArchived: includeArchived,
+  );
+
+  @override
+  Future<domain.Driver?> getDriver(String id) => remote.getDriver(id);
+
+  @override
+  Future<domain.Driver> createDriver(domain.Driver driver) =>
+      remote.createDriver(driver);
+
+  @override
+  Future<domain.Driver> updateDriver(domain.Driver driver) =>
+      remote.updateDriver(driver);
+
+  @override
+  Future<void> deleteDriver(String id) => remote.deleteDriver(id);
 }

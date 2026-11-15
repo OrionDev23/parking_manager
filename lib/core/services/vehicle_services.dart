@@ -75,13 +75,15 @@ class VehicleServices {
       remoteSource: remoteSource,
       syncQueue: syncQueue,
       companyId: companyId,
-      repository: VehicleRepositoryImpl(
-        local: localSource,
-        syncQueue: syncQueue,
-        deviceIdentity: deviceIdentity,
-        companyContext: CompanyContext(companyId: companyId),
-        remote: remoteSource,
-      ),
+      repository: kIsWeb
+          ? _OnlineVehicleRepository(remoteSource)
+          : VehicleRepositoryImpl(
+              local: localSource,
+              syncQueue: syncQueue,
+              deviceIdentity: deviceIdentity,
+              companyContext: CompanyContext(companyId: companyId),
+              remote: remoteSource,
+            ),
     );
   }
 
@@ -259,4 +261,33 @@ class VehicleServices {
   }
 
   Future<void> dispose() => localDatabase.close();
+}
+
+
+/// Web repository: reads and writes go directly to Appwrite. No local cache
+/// and no deferred outbox are involved.
+class _OnlineVehicleRepository implements VehicleRepository {
+  final AppwriteVehicleSource remote;
+  _OnlineVehicleRepository(this.remote);
+
+  @override
+  Future<List<domain.Vehicle>> getVehicles({
+    String? search,
+    int? limit,
+    int offset = 0,
+  }) => remote.getVehicles(search: search, limit: limit, offset: offset);
+
+  @override
+  Future<domain.Vehicle?> getVehicle(String id) => remote.getVehicle(id);
+
+  @override
+  Future<domain.Vehicle> createVehicle(domain.Vehicle vehicle) =>
+      remote.createVehicle(vehicle);
+
+  @override
+  Future<domain.Vehicle> updateVehicle(domain.Vehicle vehicle) =>
+      remote.updateVehicle(vehicle);
+
+  @override
+  Future<void> deleteVehicle(String id) => remote.deleteVehicle(id);
 }
