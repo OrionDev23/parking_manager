@@ -1,6 +1,7 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:parc_oto/datasources/vehicle_states/vehicle_states_datasrouce.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
@@ -225,7 +226,7 @@ class StateTableState extends State<StateTable> {
             SizedBox(
               width: 350.px,
               height: 45.px,
-              child: TextBox(
+              child: ParcotoTextBox(
                 onChanged: (s) {
                   if (s.isEmpty) {
                     notEmpty = false;
@@ -240,9 +241,6 @@ class StateTableState extends State<StateTable> {
                 style: appTheme.writingStyle,
                 cursorColor: appTheme.color.darker,
                 placeholderStyle: placeStyle,
-                decoration: WidgetStatePropertyAll(
-                  BoxDecoration(color: appTheme.fillColor),
-                ),
                 onSubmitted: (s) {
                   if (s.isNotEmpty) {
                     vehicleStateDatasource.search(s);
@@ -306,21 +304,23 @@ class StateTableState extends State<StateTable> {
                     ).tr(),
                   ],
                 ),
-                title: ComboBox<int>(
-                  items: List.generate(
-                    5,
-                    (index) => ComboBoxItem<int>(
-                      value: index,
-                      child: Text(VehiclesUtilities.getEtatName(index)).tr(),
+                title: ParcotoFieldSurface(
+                  child: ComboBox<int>(
+                    items: List.generate(
+                      5,
+                      (index) => ComboBoxItem<int>(
+                        value: index,
+                        child: Text(VehiclesUtilities.getEtatName(index)).tr(),
+                      ),
                     ),
+                    value: type,
+                    onChanged: (s) {
+                      setState(() {
+                        type = s ?? 0;
+                      });
+                      setS(() {});
+                    },
                   ),
-                  value: type,
-                  onChanged: (s) {
-                    setState(() {
-                      type = s ?? 0;
-                    });
-                    setS(() {});
-                  },
                 ),
                 trailing: type != null
                     ? IconButton(
@@ -348,7 +348,7 @@ class StateTableState extends State<StateTable> {
                             smallSpace,
                             smallSpace,
                             Flexible(
-                              child: DatePicker(
+                              child: ParcotoFieldSurface(child: DatePicker(
                                 selected: dateMin,
                                 endDate: dateMax,
                                 onChanged: (d) {
@@ -356,7 +356,7 @@ class StateTableState extends State<StateTable> {
                                   setState(() {});
                                   setS(() {});
                                 },
-                              ),
+                              )),
                             ),
                           ],
                         ),
@@ -367,7 +367,7 @@ class StateTableState extends State<StateTable> {
                             smallSpace,
                             smallSpace,
                             Flexible(
-                              child: DatePicker(
+                              child: ParcotoFieldSurface(child: DatePicker(
                                 selected: dateMax,
                                 startDate: dateMin,
                                 onChanged: (d) {
@@ -375,7 +375,7 @@ class StateTableState extends State<StateTable> {
                                   setState(() {});
                                   setS(() {});
                                 },
-                              ),
+                              )),
                             ),
                           ],
                         ),

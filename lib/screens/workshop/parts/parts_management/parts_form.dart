@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 
 import 'package:flutter/foundation.dart' hide Category;
 
@@ -189,7 +190,6 @@ class _PartsFormState extends State<PartsForm>
     return StaggeredGridTile.fit(
       crossAxisCellCount: 2,
       child: Container(
-        width: 400.px,
         height: 280.px,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -208,7 +208,7 @@ class _PartsFormState extends State<PartsForm>
                 label: 'name'.tr(),
                 child: Padding(
                   padding: const EdgeInsets.all(10),
-                  child: TextBox(
+                  child: ParcotoTextBox(
                     controller: name,
                     placeholder: 'nom'.tr(),
                     onChanged: (s) {
@@ -217,9 +217,6 @@ class _PartsFormState extends State<PartsForm>
                     style: appTheme.writingStyle,
                     placeholderStyle: placeStyle,
                     cursorColor: appTheme.color.darker,
-                    decoration: WidgetStatePropertyAll(
-                      BoxDecoration(color: appTheme.fillColor),
-                    ),
                   ),
                 ),
               ),
@@ -231,7 +228,7 @@ class _PartsFormState extends State<PartsForm>
                 label: 'descr'.tr(),
                 child: Padding(
                   padding: const EdgeInsets.all(10),
-                  child: TextBox(
+                  child: ParcotoTextBox(
                     controller: description,
                     placeholder: 'descr'.tr(),
                     onChanged: (s) {
@@ -241,9 +238,6 @@ class _PartsFormState extends State<PartsForm>
                     placeholderStyle: placeStyle,
                     cursorColor: appTheme.color.darker,
                     textAlignVertical: TextAlignVertical.top,
-                    decoration: WidgetStatePropertyAll(
-                      BoxDecoration(color: appTheme.fillColor),
-                    ),
                   ),
                 ),
               ),
@@ -258,7 +252,6 @@ class _PartsFormState extends State<PartsForm>
     return StaggeredGridTile.fit(
       crossAxisCellCount: 1,
       child: Container(
-        width: 200.px,
         height: 160.px,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -333,7 +326,6 @@ class _PartsFormState extends State<PartsForm>
     return StaggeredGridTile.fit(
       crossAxisCellCount: 2,
       child: Container(
-        width: 400.px,
         height: portrait ? 215.px : 140.px,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -360,7 +352,8 @@ class _PartsFormState extends State<PartsForm>
                         label: 'unit'.tr(),
                         child: Padding(
                           padding: const EdgeInsets.all(10),
-                          child: DropDownButton(
+                          child: ParcotoFieldSurface(
+                            child: DropDownButton(
                             items: List.generate(units.length, (index) {
                               return MenuFlyoutItem(
                                 text: Text(units[index]).tr(),
@@ -377,6 +370,7 @@ class _PartsFormState extends State<PartsForm>
                               style: placeStyle,
                             ).tr(),
                             title: Text(units[selectedUnit]).tr(),
+                            ),
                           ),
                         ),
                       ),
@@ -390,18 +384,20 @@ class _PartsFormState extends State<PartsForm>
                             .uppercaseFirst(),
                         child: Padding(
                           padding: const EdgeInsets.all(10),
-                          child: NumberBox<double>(
-                            value: prix,
-                            placeholder: 'prix${units[selectedUnit]}'
-                                .tr()
-                                .uppercaseFirst(),
-                            onChanged: (s) {
-                              setState(() {});
-                            },
-                            min: 0,
-                            style: appTheme.writingStyle,
-                            placeholderStyle: placeStyle,
-                            cursorColor: appTheme.color.darker,
+                          child: ParcotoFieldSurface(
+                            child: NumberBox<double>(
+                              value: prix,
+                              placeholder: 'prix${units[selectedUnit]}'
+                                  .tr()
+                                  .uppercaseFirst(),
+                              onChanged: (s) {
+                                setState(() {});
+                              },
+                              min: 0,
+                              style: appTheme.writingStyle,
+                              placeholderStyle: placeStyle,
+                              cursorColor: appTheme.color.darker,
+                            ),
                           ),
                         ),
                       ),
@@ -420,7 +416,6 @@ class _PartsFormState extends State<PartsForm>
     return StaggeredGridTile.fit(
       crossAxisCellCount: 1,
       child: Container(
-        width: 200.px,
         height: 425.px,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -796,7 +791,6 @@ class _PartsFormState extends State<PartsForm>
     return StaggeredGridTile.fit(
       crossAxisCellCount: 2,
       child: Container(
-        width: 400.px,
         height: portrait ? 355.px : 160.5.px,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -842,7 +836,7 @@ class _PartsFormState extends State<PartsForm>
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(20),
-                          child: TextBox(
+                          child: ParcotoTextBox(
                             controller: sku,
                             placeholder: 'SKU',
                             onChanged: (s) {
@@ -852,9 +846,6 @@ class _PartsFormState extends State<PartsForm>
                             placeholderStyle: placeStyle,
                             inputFormatters: [maskFormatter],
                             cursorColor: appTheme.color.darker,
-                            decoration: WidgetStatePropertyAll(
-                              BoxDecoration(color: appTheme.fillColor),
-                            ),
                           ),
                         ),
                       ),
@@ -885,7 +876,7 @@ class _PartsFormState extends State<PartsForm>
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(20),
-                          child: TextBox(
+                          child: ParcotoTextBox(
                             controller: barcode,
                             placeholder: 'barcode'.tr(),
                             onChanged: (s) {
@@ -898,9 +889,6 @@ class _PartsFormState extends State<PartsForm>
                             style: appTheme.writingStyle,
                             placeholderStyle: placeStyle,
                             cursorColor: appTheme.color.darker,
-                            decoration: WidgetStatePropertyAll(
-                              BoxDecoration(color: appTheme.fillColor),
-                            ),
                           ),
                         ),
                       ),
@@ -949,7 +937,6 @@ class _PartsFormState extends State<PartsForm>
     return StaggeredGridTile.fit(
       crossAxisCellCount: 3,
       child: Container(
-        width: 400.px,
         height: variations.isEmpty
             ? 480.px
             : 50.px * variations.length + 165.px,

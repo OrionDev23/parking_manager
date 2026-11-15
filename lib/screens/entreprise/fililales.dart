@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:material_ui/material_ui.dart' show Icons;
@@ -62,15 +63,12 @@ class MesFillialesState extends State<MesFilliales> {
                 SizedBox(
                   width: 300.px,
                   height: 40.px,
-                  child: TextBox(
+                  child: ParcotoTextBox(
                     controller: searchController,
                     placeholder: 'search'.tr(),
                     style: appTheme.writingStyle,
                     cursorColor: appTheme.color.darker,
                     placeholderStyle: placeStyle,
-                    decoration: WidgetStatePropertyAll(
-                      BoxDecoration(color: appTheme.fillColor),
-                    ),
                     onChanged: (s) {
                       if (s.isNotEmpty) {
                         notEmpty = true;
@@ -420,15 +418,12 @@ class MesFillialesState extends State<MesFilliales> {
             style: TextStyle(fontSize: 16.px),
           ).tr(),
           constraints: BoxConstraints.loose(Size(300.px, 190.px)),
-          content: TextBox(
+          content: ParcotoTextBox(
             controller: textToEdit,
             placeholderStyle: placeStyle,
             style: appTheme.writingStyle,
             cursorColor: appTheme.color.dark,
             placeholder: 'nom'.tr(),
-            decoration: WidgetStatePropertyAll(
-              BoxDecoration(color: appTheme.fillColor),
-            ),
           ),
           actions: [
             Button(

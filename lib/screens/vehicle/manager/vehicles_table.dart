@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:parc_oto/admin_parameters.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/repair_provider.dart';
@@ -542,19 +543,13 @@ class VehicleTableState extends State<VehicleTable> {
                     SizedBox(
                       width: 300,
                       height: 38,
-                      child: TextBox(
+                      child: ParcotoTextBox(
                         controller: searchController,
                         placeholder: 'search'.tr(),
                         style: appTheme.writingStyle,
                         cursorColor: appTheme.color.darker,
                         placeholderStyle: placeStyle,
-                        decoration: WidgetStatePropertyAll(
-                          BoxDecoration(
-                            color: appTheme.fillColor,
-                            borderRadius: BorderRadius.circular(7),
-                          ),
-                        ),
-                        onSubmitted: (s) {
+                onSubmitted: (s) {
                           final query = s.trim();
                           vehicleDataSource.search(query);
                           setState(() {
@@ -799,10 +794,6 @@ class VehicleTableState extends State<VehicleTable> {
                                   placeholder: 'min'.tr(),
                                   placeholderStyle: placeStyle,
                                   style: appTheme.writingStyle,
-                                  decoration: WidgetStatePropertyAll(
-                                    BoxDecoration(color: appTheme.fillColor),
-                                  ),
-
                                   cursorColor: appTheme.color.darker,
                                 ),
                               ),

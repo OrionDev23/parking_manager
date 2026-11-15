@@ -1,6 +1,7 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 
 import '../../../../datasources/fiche_reception/fiche_reception_datasource.dart';
 import '../../../../providers/client_database.dart';
@@ -207,7 +208,7 @@ class FicheReceptionTableState extends State<FicheReceptionTable> {
                 SizedBox(
                   width: 350.px,
                   height: 45.px,
-                  child: TextBox(
+                  child: ParcotoTextBox(
                     onChanged: (s) {
                       if (s.isEmpty) {
                         notEmpty = false;
@@ -223,9 +224,6 @@ class FicheReceptionTableState extends State<FicheReceptionTable> {
                     style: appTheme.writingStyle,
                     cursorColor: appTheme.color.darker,
                     placeholderStyle: placeStyle,
-                    decoration: WidgetStatePropertyAll(
-                      BoxDecoration(color: appTheme.fillColor),
-                    ),
                     onSubmitted: (s) {
                       if (s.isNotEmpty) {
                         ficheReceptionDatasource.search(s);

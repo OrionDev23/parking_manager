@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart' hide Trans;
 
@@ -104,7 +105,6 @@ class _StorageFormState extends State<StorageForm> {
                   StaggeredGridTile.fit(
                     crossAxisCellCount: 3,
                     child: Container(
-                      width: 200.px,
                       height: 170.px,
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
@@ -173,7 +173,6 @@ class _StorageFormState extends State<StorageForm> {
                   StaggeredGridTile.fit(
                     crossAxisCellCount: 3,
                     child: Container(
-                      width: 200.px,
                       height: 170.px,
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
@@ -247,7 +246,6 @@ class _StorageFormState extends State<StorageForm> {
                     StaggeredGridTile.fit(
                       crossAxisCellCount: 2,
                       child: Container(
-                        width: 200.px,
                         height: 170.px,
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -265,26 +263,28 @@ class _StorageFormState extends State<StorageForm> {
                                 label: 'quantity'.tr(),
                                 child: Padding(
                                   padding: const EdgeInsets.all(20.0),
-                                  child: selectedPart!.unitType == 0
-                                      ? NumberBox<int>(
-                                          value: qte.toInt(),
-                                          onChanged: (int? value) {
-                                            setState(() {
-                                              qte = value?.toDouble() ?? 0;
-                                            });
-                                            updateQteRestant();
-                                          },
-                                          min: 0,
-                                        )
-                                      : NumberBox<double>(
-                                          value: qte,
-                                          onChanged: (s) {
-                                            setState(() {
-                                              qte = s ?? 0;
-                                            });
-                                            updateQteRestant();
-                                          },
-                                        ),
+                                  child: ParcotoFieldSurface(
+                                    child: selectedPart!.unitType == 0
+                                        ? NumberBox<int>(
+                                            value: qte.toInt(),
+                                            onChanged: (int? value) {
+                                              setState(() {
+                                                qte = value?.toDouble() ?? 0;
+                                              });
+                                              updateQteRestant();
+                                            },
+                                            min: 0,
+                                          )
+                                        : NumberBox<double>(
+                                            value: qte,
+                                            onChanged: (s) {
+                                              setState(() {
+                                                qte = s ?? 0;
+                                              });
+                                              updateQteRestant();
+                                            },
+                                          ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -296,7 +296,6 @@ class _StorageFormState extends State<StorageForm> {
                     StaggeredGridTile.fit(
                       crossAxisCellCount: 4,
                       child: Container(
-                        width: 200.px,
                         height: expire ? 170.px : 70.px,
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -338,13 +337,13 @@ class _StorageFormState extends State<StorageForm> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         if (differentDate == false)
-                                          DatePicker(
+                                          ParcotoFieldSurface(child: DatePicker(
                                             selected: expirationDate,
                                             onChanged: (d) {
                                               expirationDate = d;
                                               setState(() {});
                                             },
-                                          ),
+                                          )),
                                         if (qte > 1)
                                           Checkbox(
                                             checked: differentDate,
@@ -400,7 +399,6 @@ class _StorageFormState extends State<StorageForm> {
     return StaggeredGridTile.fit(
       crossAxisCellCount: 6,
       child: Container(
-        width: 400.px,
         height: variations.isEmpty
             ? 480.px
             : 50.px * variations.length + 165.px,

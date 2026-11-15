@@ -8,6 +8,7 @@ import '../../../../serializables/pieces/storage_variations.dart';
 import '../../../../serializables/pieces/part.dart';
 import '../../../../serializables/pieces/variation.dart';
 import '../../../../theme.dart';
+import '../../../../widgets/forms/parcoto_form_field.dart';
 
 class VariationStorageWidget extends StatefulWidget {
   final VehiclePart part;
@@ -88,7 +89,7 @@ class VariationStorageWidgetState extends State<VariationStorageWidget> {
     return [
       VerticalDivider(color: placeStyle.color),
       Flexible(
-        child: ComboBox(
+        child: ParcotoFieldSurface(child: ComboBox(
           items: List.generate(widget.part.variations?.length ?? 0, (index) {
             return ComboBoxItem(
               onTap: () {
@@ -109,13 +110,14 @@ class VariationStorageWidgetState extends State<VariationStorageWidget> {
               widget.onOptionsChanged!(selectedVariation!.optionValues!);
             }
           },
-        ),
+        )),
       ),
       smallSpace,
       VerticalDivider(color: placeStyle.color),
       smallSpace,
       if (widget.differentDate)
         Flexible(
+          child: ParcotoFieldSurface(
           child: DatePicker(
             selected: selectedDate,
             onChanged: (d) {
@@ -127,6 +129,7 @@ class VariationStorageWidgetState extends State<VariationStorageWidget> {
               }
             },
           ),
+        ),
         ),
       if (widget.differentDate) smallSpace,
       if (widget.differentDate) VerticalDivider(color: placeStyle.color),
@@ -140,33 +143,35 @@ class VariationStorageWidgetState extends State<VariationStorageWidget> {
       smallSpace,
       SizedBox(
         width: 150.px,
-        child: widget.part.unitType == 0
-            ? NumberBox<int>(
-                value: qte.toInt(),
-                onChanged: (int? value) {
-                  setState(() {
-                    qte = value?.toDouble() ?? 0;
-                  });
-                  if (widget.onQteChanged != null) {
-                    widget.onQteChanged!(value?.toDouble() ?? 0);
-                  }
-                },
-                min: 0,
-                max: widget.maxQte.toInt() + qte.toInt(),
-              )
-            : NumberBox<double>(
-                value: qte,
-                onChanged: (s) {
-                  setState(() {
-                    qte = s ?? 0;
-                  });
-                  if (widget.onQteChanged != null) {
-                    widget.onQteChanged!(s ?? 0);
-                  }
-                },
-                min: 0,
-                max: widget.maxQte + qte,
-              ),
+        child: ParcotoFieldSurface(
+          child: widget.part.unitType == 0
+              ? NumberBox<int>(
+                  value: qte.toInt(),
+                  onChanged: (int? value) {
+                    setState(() {
+                      qte = value?.toDouble() ?? 0;
+                    });
+                    if (widget.onQteChanged != null) {
+                      widget.onQteChanged!(value?.toDouble() ?? 0);
+                    }
+                  },
+                  min: 0,
+                  max: widget.maxQte.toInt() + qte.toInt(),
+                )
+              : NumberBox<double>(
+                  value: qte,
+                  onChanged: (s) {
+                    setState(() {
+                      qte = s ?? 0;
+                    });
+                    if (widget.onQteChanged != null) {
+                      widget.onQteChanged!(s ?? 0);
+                    }
+                  },
+                  min: 0,
+                  max: widget.maxQte + qte,
+                ),
+        ),
       ),
     ];
   }

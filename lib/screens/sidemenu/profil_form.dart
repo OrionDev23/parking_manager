@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -131,7 +132,7 @@ class _ProfilFormState extends State<ProfilForm> {
                 Icon(FluentIcons.mail, color: Colors.grey[100]),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: TextBox(
+                  child: ParcotoTextBox(
                     controller: email,
                     placeholder: 'email'.tr(),
                     onChanged: (s) {
@@ -148,9 +149,6 @@ class _ProfilFormState extends State<ProfilForm> {
                     placeholderStyle: placeStyle,
                     cursorColor: appTheme.color.darker,
                     style: appTheme.writingStyle,
-                    decoration: WidgetStatePropertyAll(
-                      BoxDecoration(color: appTheme.fillColor),
-                    ),
                   ),
                 ),
               ],
@@ -162,7 +160,7 @@ class _ProfilFormState extends State<ProfilForm> {
               Icon(FluentIcons.i_d_badge, color: Colors.grey[100]),
               const SizedBox(width: 10),
               Expanded(
-                child: TextBox(
+                child: ParcotoTextBox(
                   controller: name,
                   placeholder: 'nom'.tr(),
                   onChanged: (s) {
@@ -171,9 +169,6 @@ class _ProfilFormState extends State<ProfilForm> {
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
                 ),
               ),
             ],
@@ -200,7 +195,7 @@ class _ProfilFormState extends State<ProfilForm> {
               ),
               const SizedBox(width: 5),
               Expanded(
-                child: TextBox(
+                child: ParcotoTextBox(
                   controller: phone,
                   placeholder: 'telephone'.tr(),
                   maxLength: 9,
@@ -211,9 +206,6 @@ class _ProfilFormState extends State<ProfilForm> {
                   placeholderStyle: placeStyle,
                   cursorColor: appTheme.color.darker,
                   style: appTheme.writingStyle,
-                  decoration: WidgetStatePropertyAll(
-                    BoxDecoration(color: appTheme.fillColor),
-                  ),
                 ),
               ),
             ],
