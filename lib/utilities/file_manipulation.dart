@@ -1,51 +1,24 @@
 import 'dart:convert';
 
-import 'package:document_file_save_plus/document_file_save_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:universal_html/html.dart' as html;
 
 class FileManipulation {}
 
-void saveThisFile(
+Future<void> saveThisFile(
   Uint8List file,
   String title,
   String extension,
   String mime,
 ) async {
-  if (DeviceType.android == Device.deviceType ||
-      Device.deviceType == DeviceType.ios) {
-    await DocumentFileSave.saveFile(file, '$title.$extension', mime);
-  } else if (kIsWeb) {
-    saveFileWeb(file, '$title.$extension');
-  } else {
-    await FilePicker.saveFile(
-      dialogTitle: "save".tr(),
-      fileName: '$title.$extension',
-      bytes: file,
-      type: FileType.custom,
-      allowedExtensions: [extension],
-    );
-  }
-}
-
-void saveFileWeb(Uint8List bytes, String name) {
-  final blob = html.Blob([bytes]);
-  final url = html.Url.createObjectUrlFromBlob(blob);
-  final anchor = html.document.createElement('a') as html.AnchorElement
-    ..href = url
-    ..style.display = 'none'
-    ..download = name;
-  html.document.body?.children.add(anchor);
-
-  // download
-  anchor.click();
-
-  // cleanup
-  html.document.body?.children.remove(anchor);
-  html.Url.revokeObjectUrl(url);
+  final normalizedExtension =
+      extension.startsWith('.') ? extension.substring(1) : extension;
+  await FilePicker.saveFile(
+    dialogTitle: "save".tr(),
+    fileName: '$title.$normalizedExtension',
+    bytes: file,
+    mimeType: mime,
+  );
 }
 
 String jsonify(Map<String, dynamic> map) {

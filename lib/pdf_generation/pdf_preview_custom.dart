@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:universal_html/html.dart' as html;
-import 'package:document_file_save_plus/document_file_save_plus.dart';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
@@ -15,6 +13,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../serializables/reparation/fiche_reception.dart';
+import '../utilities/file_manipulation.dart' as file_utils;
 import '../serializables/reparation/reparation.dart';
 import 'fiche_reception_pdf.dart';
 
@@ -93,49 +92,14 @@ class PdfPreviewPO extends StatelessWidget {
     FutureOr<Uint8List> Function(PdfPageFormat) futureFile,
     PdfPageFormat pageFormat,
   ) async {
-    if (DeviceType.android == Device.deviceType ||
-        Device.deviceType == DeviceType.ios) {
-      await DocumentFileSave.saveFile(
-        await futureFile(pageFormat),
-        reparation != null
-            ? 'ordre${numberFormat.format(reparation!.numero)}.pdf'
-            : 'fiche${numberFormat.format(fiche!.numero)}.pdf',
-        "application/pdf",
-      );
-    } else if (kIsWeb) {
-      saveFileWeb(
-        await futureFile(pageFormat),
-        reparation != null
-            ? 'ordre${numberFormat.format(reparation!.numero)}.pdf'
-            : 'fiche${numberFormat.format(fiche!.numero)}.pdf',
-      );
-    } else {
-      await FilePicker.saveFile(
-        dialogTitle: "save".tr(),
-        fileName: reparation != null
-            ? 'ordre${numberFormat.format(reparation!.numero)}.pdf'
-            : 'fiche${numberFormat.format(fiche!.numero)}.pdf',
-        bytes: await futureFile(pageFormat),
-        type: FileType.custom,
-        allowedExtensions: ['pdf'],
-      );
-    }
-  }
-
-  void saveFileWeb(Uint8List bytes, String name) {
-    final blob = html.Blob([bytes]);
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.document.createElement('a') as html.AnchorElement
-      ..href = url
-      ..style.display = 'none'
-      ..download = name;
-    html.document.body?.children.add(anchor);
-
-    // download
-    anchor.click();
-
-    // cleanup
-    html.document.body?.children.remove(anchor);
-    html.Url.revokeObjectUrl(url);
+    final fileName = reparation != null
+        ? 'ordre${numberFormat.format(reparation!.numero)}'
+        : 'fiche${numberFormat.format(fiche!.numero)}';
+    await file_utils.saveThisFile(
+      await futureFile(pageFormat),
+      fileName,
+      'pdf',
+      'application/pdf',
+    );
   }
 }

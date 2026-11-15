@@ -1,8 +1,6 @@
 import 'dart:async';
 
 import 'package:pdf/widgets.dart' show PageOrientation;
-import 'package:universal_html/html.dart' as html;
-import 'package:document_file_save_plus/document_file_save_plus.dart';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
@@ -14,6 +12,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'generate_list.dart';
+import '../utilities/file_manipulation.dart' as file_utils;
 
 class PdfPreviewListing extends StatelessWidget {
   final List<Map<String, dynamic>> list;
@@ -101,40 +100,11 @@ class PdfPreviewListing extends StatelessWidget {
     FutureOr<Uint8List> Function(PdfPageFormat) futureFile,
     PdfPageFormat pageFormat,
   ) async {
-    if (DeviceType.android == Device.deviceType ||
-        Device.deviceType == DeviceType.ios) {
-      await DocumentFileSave.saveFile(
-        await futureFile(pageFormat),
-        '$name.pdf',
-        "application/pdf",
-      );
-    } else if (kIsWeb) {
-      saveFileWeb(await futureFile(pageFormat), '$name.pdf');
-    } else {
-      await FilePicker.saveFile(
-        dialogTitle: "save".tr(),
-        fileName: '$name.pdf',
-        bytes: await futureFile(pageFormat),
-        type: FileType.custom,
-        allowedExtensions: ['pdf'],
-      );
-    }
-  }
-
-  void saveFileWeb(Uint8List bytes, String name) {
-    final blob = html.Blob([bytes]);
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.document.createElement('a') as html.AnchorElement
-      ..href = url
-      ..style.display = 'none'
-      ..download = name;
-    html.document.body?.children.add(anchor);
-
-    // download
-    anchor.click();
-
-    // cleanup
-    html.document.body?.children.remove(anchor);
-    html.Url.revokeObjectUrl(url);
+    await file_utils.saveThisFile(
+      await futureFile(pageFormat),
+      name,
+      'pdf',
+      'application/pdf',
+    );
   }
 }
