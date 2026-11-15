@@ -356,17 +356,19 @@ class ReparationFormState extends State<ReparationForm>
                             });
                           },
                         )),
-                      ),
+                          ),
+                        ),
                     ],
                   ),
                   smallSpace,
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      SizedBox(
-                        width: 350.px,
-                        height: 50.px,
-                        child: ListTile(
+                      Expanded(
+                        flex: 7,
+                        child: SizedBox(
+                          height: 50.px,
+                          child: ListTile(
                           leading: Text(
                             'fichereception',
                             style: boldStyle,
@@ -413,7 +415,8 @@ class ReparationFormState extends State<ReparationForm>
                             getVehicleThenSetValues();
                           },
                         ),
-                      ),
+                          ),
+                        ),
                       smallSpace,
                       if (selectedVehicle != null)
                         IconButton(
@@ -423,11 +426,11 @@ class ReparationFormState extends State<ReparationForm>
                             setVehicleValues();
                           },
                         ),
-                      const Spacer(),
-                      SizedBox(
-                        width: 250.px,
-                        height: 50.px,
-                        child: ListTile(
+                      Expanded(
+                        flex: 5,
+                        child: SizedBox(
+                          height: 50.px,
+                          child: ListTile(
                           leading: Text('prestataire', style: boldStyle).tr(),
                           title: Text(selectedPrest?.nom ?? 'nonind'.tr()),
                           onPressed: () async {
