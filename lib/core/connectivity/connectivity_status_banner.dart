@@ -60,7 +60,7 @@ class _ConnectivityStatusBannerState extends State<ConnectivityStatusBanner> {
           child: Row(
             children: [
               Icon(
-                checking ? FluentIcons.sync : online ? FluentIcons.cloud : FluentIcons.cloud_offline,
+                checking ? FluentIcons.sync : FluentIcons.cloud,
                 size: 14,
                 color: Colors.white,
               ),
