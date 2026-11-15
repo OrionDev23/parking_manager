@@ -30,6 +30,7 @@ import 'providers/repair_provider.dart';
 import 'providers/driver_provider.dart';
 import 'providers/vehicle_provider.dart';
 import 'core/auth/auth_service.dart';
+import 'core/connectivity/connectivity_status_banner.dart';
 import 'core/auth/legacy_appwrite_auth_service.dart';
 import 'core/services/company_service.dart';
 import 'core/services/access_control_service.dart';
@@ -246,6 +247,11 @@ Future<void> startBackgroundInitialization(String companyId) async {
 }
 
 Future<void> _initializeBackgroundData(String companyId) async {
+  // Web uses Appwrite directly and has no SQLite cache or startup migrations.
+  if (kIsWeb) {
+    await syncEngine.start();
+    return;
+  }
   final localDatabase = vehicleServices.localDatabase;
 
   Future<void> runMigration(
@@ -451,7 +457,7 @@ class MyApp extends StatelessWidget {
                       data: NavigationPaneThemeData(
                         backgroundColor: appTheme.backGroundColor,
                       ),
-                      child: child!,
+                      child: ConnectivityStatusBanner(child: child!),
                     ),
                   ),
                 );
