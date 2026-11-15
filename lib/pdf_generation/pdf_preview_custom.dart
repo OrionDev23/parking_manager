@@ -95,26 +95,26 @@ class PdfPreviewPO extends StatelessWidget {
   ) async {
     if (DeviceType.android == Device.deviceType ||
         Device.deviceType == DeviceType.ios) {
-      DocumentFileSavePlus().saveFile(
+      await DocumentFileSave.saveFile(
         await futureFile(pageFormat),
         reparation != null
             ? 'ordre${numberFormat.format(reparation!.numero)}.pdf'
-            : 'fiche${numberFormat.format(fiche!.numero)}}.pdf',
-        "appliation/pdf",
+            : 'fiche${numberFormat.format(fiche!.numero)}.pdf',
+        "application/pdf",
       );
     } else if (kIsWeb) {
       saveFileWeb(
         await futureFile(pageFormat),
         reparation != null
             ? 'ordre${numberFormat.format(reparation!.numero)}.pdf'
-            : 'fiche${numberFormat.format(fiche!.numero)}}.pdf',
+            : 'fiche${numberFormat.format(fiche!.numero)}.pdf',
       );
     } else {
       await FilePicker.saveFile(
         dialogTitle: "save".tr(),
         fileName: reparation != null
             ? 'ordre${numberFormat.format(reparation!.numero)}.pdf'
-            : 'fiche${numberFormat.format(fiche!.numero)}}.pdf',
+            : 'fiche${numberFormat.format(fiche!.numero)}.pdf',
         bytes: await futureFile(pageFormat),
         type: FileType.custom,
         allowedExtensions: ['pdf'],

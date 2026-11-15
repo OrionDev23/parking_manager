@@ -7,7 +7,6 @@ import '../../../../serializables/pieces/option.dart';
 import '../../../../serializables/pieces/variation.dart';
 import '../../../../theme.dart';
 import '../../../../utilities/form_validators.dart';
-import '../../../../widgets/forms/parcoto_form_field.dart';
 
 class VariationWidget extends StatefulWidget {
   final Variation variation;
@@ -51,7 +50,8 @@ class VariationWidgetState extends State<VariationWidget> {
         if (values.containsKey(widget.options![i].id)) {
           if (widget.options![i].values != null) {
             for (int j = 0; j < widget.options![i].values!.length; j++) {
-              if (widget.options![i].values![j] == values[widget.options![i].id]) {
+              if (widget.options![i].values![j] ==
+                  values[widget.options![i].id]) {
                 selectedItems[i] = j;
               }
             }
@@ -69,19 +69,29 @@ class VariationWidgetState extends State<VariationWidget> {
     String o1 = "XX", o2 = "XX", o3 = "XX", o4 = 'XX';
     if (widget.options != null && widget.options!.isNotEmpty) {
       for (int i = 0; i < widget.options!.length; i++) {
-        if (selectedItems.containsKey(i) && widget.options![i].values != null && widget.options![i].values!.isNotEmpty) {
+        if (selectedItems.containsKey(i) &&
+            widget.options![i].values != null &&
+            widget.options![i].values!.isNotEmpty) {
           switch (i) {
             case 0:
-              o1 = getFirstTwoLetters(widget.options![i].values![selectedItems[i]!]);
+              o1 = getFirstTwoLetters(
+                widget.options![i].values![selectedItems[i]!],
+              );
               break;
             case 1:
-              o2 = getFirstTwoLetters(widget.options![i].values![selectedItems[i]!]);
+              o2 = getFirstTwoLetters(
+                widget.options![i].values![selectedItems[i]!],
+              );
               break;
             case 2:
-              o3 = getFirstTwoLetters(widget.options![i].values![selectedItems[i]!]);
+              o3 = getFirstTwoLetters(
+                widget.options![i].values![selectedItems[i]!],
+              );
               break;
             case 3:
-              o4 = getFirstTwoLetters(widget.options![i].values![selectedItems[i]!]);
+              o4 = getFirstTwoLetters(
+                widget.options![i].values![selectedItems[i]!],
+              );
               break;
           }
         }
@@ -115,7 +125,7 @@ class VariationWidgetState extends State<VariationWidget> {
       VerticalDivider(color: placeStyle.color),
       Flexible(
         flex: 3,
-        child: ParcotoTextBox(
+        child: TextBox(
           controller: name,
           enabled: widget.mod,
           placeholderStyle: placeStyle,
@@ -123,8 +133,12 @@ class VariationWidgetState extends State<VariationWidget> {
           style: appTheme.writingStyle,
           cursorColor: appTheme.color.darker,
           maxLength: 60,
+          decoration: WidgetStatePropertyAll(
+            BoxDecoration(color: appTheme.fillColor),
+          ),
           onChanged: (s) {
             widget.variation.name = s;
+
             setSku();
             setState(() {});
           },
@@ -147,7 +161,7 @@ class VariationWidgetState extends State<VariationWidget> {
             Flexible(flex: 2, child: Text('${widget.sku}-')),
             Flexible(
               flex: 1,
-              child: ParcotoTextBox(
+              child: TextBox(
                 controller: sku,
                 enabled: widget.mod,
                 placeholderStyle: placeStyle,
@@ -155,6 +169,9 @@ class VariationWidgetState extends State<VariationWidget> {
                 style: appTheme.writingStyle,
                 cursorColor: appTheme.color.darker,
                 maxLength: 6,
+                decoration: WidgetStatePropertyAll(
+                  BoxDecoration(color: appTheme.fillColor),
+                ),
                 onChanged: (s) {
                   setState(() {
                     widget.variation.sku = sku.text;
@@ -175,15 +192,15 @@ class VariationWidgetState extends State<VariationWidget> {
       return List.generate(widget.options!.length, (index) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5),
-          child: ParcotoFieldSurface(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            child: DropDownButton(
+          child: DropDownButton(
             title: Text(
               selectedItems[index] == null
                   ? widget.options![index].name
                   : widget.options![index].values![selectedItems[index]!],
             ),
-            items: List.generate(widget.options![index].values?.length ?? 0, (ind) {
+            items: List.generate(widget.options![index].values?.length ?? 0, (
+              ind,
+            ) {
               return MenuFlyoutItem(
                 text: Text(widget.options![index].values![ind]),
                 onPressed: () {
@@ -195,7 +212,6 @@ class VariationWidgetState extends State<VariationWidget> {
                 selected: selectedItems[index] == ind,
               );
             }),
-            ),
           ),
         );
       });
@@ -208,7 +224,8 @@ class VariationWidgetState extends State<VariationWidget> {
     if (widget.options != null) {
       for (int i = 0; i < widget.options!.length; i++) {
         if (selectedItems.containsKey(i)) {
-          values[widget.options![i].id] = widget.options![i].values![selectedItems[i]!];
+          values[widget.options![i].id] =
+              widget.options![i].values![selectedItems[i]!];
         }
       }
     }

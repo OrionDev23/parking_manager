@@ -1,5 +1,4 @@
 import 'package:appwrite/appwrite.dart' hide Client;
-import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
@@ -308,13 +307,18 @@ class ReparationFormState extends State<ReparationForm>
                                       Text('num', style: boldStyle).tr(),
                                       smallSpace,
                                       Flexible(
-                                        child: ParcotoTextBox(
+                                        child: TextBox(
                                           controller: numOrdre,
                                           enabled: widget.reparation == null,
                                           placeholder: 'num'.tr(),
                                           placeholderStyle: placeStyle,
                                           style: appTheme.writingStyle,
                                           cursorColor: appTheme.color.darker,
+                                          decoration: WidgetStatePropertyAll(
+                                            BoxDecoration(
+                                              color: appTheme.fillColor,
+                                            ),
+                                          ),
                                           inputFormatters: [
                                             FilteringTextInputFormatter
                                                 .digitsOnly,
@@ -347,74 +351,71 @@ class ReparationFormState extends State<ReparationForm>
                       smallSpace,
                       SizedBox(
                         width: 200.px,
-                        height: 44.px,
-                        child: ParcotoFieldSurface(
-                          child: DatePicker(
-                            selected: selectedDate,
-                            onChanged: (s) {
-                              setState(() {
-                                selectedDate = s;
-                              });
-                            },
-                          ),
+                        height: 30.px,
+                        child: DatePicker(
+                          selected: selectedDate,
+                          onChanged: (s) {
+                            setState(() {
+                              selectedDate = s;
+                            });
+                          },
                         ),
                       ),
                     ],
                   ),
                   smallSpace,
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Expanded(
-                        flex: 7,
-                        child: SizedBox(
-                          height: 50.px,
-                          child: ListTile(
-                            leading: Text(
-                              'fichereception',
-                              style: boldStyle,
-                            ).tr(),
-                            title: Text(
-                              selectedFicheReception != null
-                                  ? NumberFormat(
-                                      '00000000',
-                                      'fr',
-                                    ).format(selectedFicheReception?.numero)
-                                  : 'nonind'.tr(),
-                            ),
-                            onPressed: () async {
-                              selectedFicheReception =
-                                  await showDialog<FicheReception>(
-                                    context: context,
-                                    barrierDismissible: true,
-                                    builder: (context) {
-                                      return ContentDialog(
-                                        constraints: BoxConstraints.tight(
-                                          Size(700.px, 550.px),
-                                        ),
-                                        title: const Text('selectedfiche').tr(),
-                                        style: ContentDialogThemeData(
-                                          titleStyle: appTheme.writingStyle
-                                              .copyWith(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                        ),
-                                        content: const FicheReceptionTable(
-                                          selectD: true,
-                                        ),
-                                        actions: [
-                                          Button(
-                                            child: const Text('fermer').tr(),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                              getVehicleThenSetValues();
-                            },
+                      SizedBox(
+                        width: 350.px,
+                        height: 50.px,
+                        child: ListTile(
+                          leading: Text(
+                            'fichereception',
+                            style: boldStyle,
+                          ).tr(),
+                          title: Text(
+                            selectedFicheReception != null
+                                ? NumberFormat(
+                                    '00000000',
+                                    'fr',
+                                  ).format(selectedFicheReception?.numero)
+                                : 'nonind'.tr(),
                           ),
+                          onPressed: () async {
+                            selectedFicheReception =
+                                await showDialog<FicheReception>(
+                                  context: context,
+                                  barrierDismissible: true,
+                                  builder: (context) {
+                                    return ContentDialog(
+                                      constraints: BoxConstraints.tight(
+                                        Size(700.px, 550.px),
+                                      ),
+                                      title: const Text('selectedfiche').tr(),
+                                      style: ContentDialogThemeData(
+                                        titleStyle: appTheme.writingStyle
+                                            .copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
+                                      content: const FicheReceptionTable(
+                                        selectD: true,
+                                      ),
+                                      actions: [
+                                        Button(
+                                          child: const Text('fermer').tr(),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                            getVehicleThenSetValues();
+                          },
                         ),
                       ),
                       smallSpace,
@@ -426,48 +427,44 @@ class ReparationFormState extends State<ReparationForm>
                             setVehicleValues();
                           },
                         ),
-                      Expanded(
-                        flex: 5,
-                        child: SizedBox(
-                          height: 50.px,
-                          child: ListTile(
-                            leading: Text(
-                              'prestataire',
-                              style: boldStyle,
-                            ).tr(),
-                            title: Text(selectedPrest?.nom ?? 'nonind'.tr()),
-                            onPressed: () async {
-                              selectedPrest = await showDialog<Client>(
-                                context: context,
-                                barrierDismissible: true,
-                                builder: (context) {
-                                  return ContentDialog(
-                                    constraints: BoxConstraints.tight(
-                                      Size(700.px, 550.px),
+                      const Spacer(),
+                      SizedBox(
+                        width: 250.px,
+                        height: 50.px,
+                        child: ListTile(
+                          leading: Text('prestataire', style: boldStyle).tr(),
+                          title: Text(selectedPrest?.nom ?? 'nonind'.tr()),
+                          onPressed: () async {
+                            selectedPrest = await showDialog<Client>(
+                              context: context,
+                              barrierDismissible: true,
+                              builder: (context) {
+                                return ContentDialog(
+                                  constraints: BoxConstraints.tight(
+                                    Size(700.px, 550.px),
+                                  ),
+                                  title: const Text('selectprestataire').tr(),
+                                  style: ContentDialogThemeData(
+                                    titleStyle: appTheme.writingStyle.copyWith(
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    title: const Text('selectprestataire').tr(),
-                                    style: ContentDialogThemeData(
-                                      titleStyle: appTheme.writingStyle.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                  ),
+                                  content: const PrestataireTable(
+                                    selectD: true,
+                                  ),
+                                  actions: [
+                                    Button(
+                                      child: const Text('fermer').tr(),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
                                     ),
-                                    content: const PrestataireTable(
-                                      selectD: true,
-                                    ),
-                                    actions: [
-                                      Button(
-                                        child: const Text('fermer').tr(),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                              setState(() {});
-                            },
-                          ),
+                                  ],
+                                );
+                              },
+                            );
+                            setState(() {});
+                          },
                         ),
                       ),
                     ],
@@ -508,13 +505,16 @@ class ReparationFormState extends State<ReparationForm>
                               label: 'remarqueplus'.tr(),
                               child: Padding(
                                 padding: const EdgeInsets.all(10.0),
-                                child: ParcotoTextBox(
+                                child: TextBox(
                                   controller: remarqueEntretien,
                                   placeholder: 'remarqueplus'.tr(),
                                   maxLines: 4,
                                   placeholderStyle: placeStyle,
                                   style: appTheme.writingStyle,
                                   cursorColor: appTheme.color.darker,
+                                  decoration: WidgetStatePropertyAll(
+                                    BoxDecoration(color: appTheme.fillColor),
+                                  ),
                                 ),
                               ),
                             ),

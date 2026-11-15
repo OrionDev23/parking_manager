@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/driver_provider.dart';
@@ -129,12 +128,15 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                             label: 'matricule'.tr(),
                             child: Padding(
                               padding: const EdgeInsets.all(10.0),
-                              child: ParcotoTextBox(
+                              child: TextBox(
                                 controller: matricule,
                                 placeholder: 'matricule'.tr(),
                                 style: appTheme.writingStyle,
                                 placeholderStyle: placeStyle,
                                 cursorColor: appTheme.color.darker,
+                                decoration: WidgetStatePropertyAll(
+                                  BoxDecoration(color: appTheme.fillColor),
+                                ),
 
                                 onChanged: (s) {
                                   checkChanges();
@@ -153,12 +155,17 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                               child: Row(
                                 children: [
                                   Flexible(
-                                    child: ParcotoTextBox(
+                                    child: TextBox(
                                       controller: nom,
                                       placeholder: 'Nom',
                                       style: appTheme.writingStyle,
                                       placeholderStyle: placeStyle,
                                       cursorColor: appTheme.color.darker,
+                                      decoration: WidgetStatePropertyAll(
+                                        BoxDecoration(
+                                          color: appTheme.fillColor,
+                                        ),
+                                      ),
 
                                       onChanged: (s) {
                                         checkChanges();
@@ -167,12 +174,17 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                   ),
                                   smallSpace,
                                   Flexible(
-                                    child: ParcotoTextBox(
+                                    child: TextBox(
                                       controller: prenom,
                                       placeholder: 'Prénom',
                                       style: appTheme.writingStyle,
                                       placeholderStyle: placeStyle,
                                       cursorColor: appTheme.color.darker,
+                                      decoration: WidgetStatePropertyAll(
+                                        BoxDecoration(
+                                          color: appTheme.fillColor,
+                                        ),
+                                      ),
 
                                       onChanged: (s) {
                                         checkChanges();
@@ -194,12 +206,17 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                               child: Row(
                                 children: [
                                   Flexible(
-                                    child: ParcotoTextBox(
+                                    child: TextBox(
                                       controller: profession,
                                       placeholder: 'poste'.tr(),
                                       style: appTheme.writingStyle,
                                       placeholderStyle: placeStyle,
                                       cursorColor: appTheme.color.darker,
+                                      decoration: WidgetStatePropertyAll(
+                                        BoxDecoration(
+                                          color: appTheme.fillColor,
+                                        ),
+                                      ),
 
                                       onChanged: (s) {
                                         checkChanges();
@@ -238,7 +255,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                             child: Container(
                               height: 5.h,
                               padding: const EdgeInsets.all(10),
-                              child: ParcotoFieldSurface(child: DatePicker(
+                              child: DatePicker(
                                 selected: birthDay,
                                 onChanged: (d) {
                                   setState(() {
@@ -246,7 +263,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                   });
                                   checkChanges();
                                 },
-                              )),
+                              ),
                             ),
                           ),
                         ),
@@ -261,14 +278,19 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                 children: [
                                   Row(
                                     children: [
-                                      Expanded(
-                                        flex: 4,
-                                        child: ParcotoTextBox(
+                                      SizedBox(
+                                        width: 250,
+                                        child: TextBox(
                                           controller: email,
                                           placeholder: 'email'.tr(),
                                           style: appTheme.writingStyle,
                                           placeholderStyle: placeStyle,
                                           cursorColor: appTheme.color.darker,
+                                          decoration: WidgetStatePropertyAll(
+                                            BoxDecoration(
+                                              color: appTheme.fillColor,
+                                            ),
+                                          ),
 
                                           onChanged: (s) {
                                             checkChanges();
@@ -276,14 +298,19 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                         ),
                                       ),
                                       smallSpace,
-                                      Expanded(
-                                        flex: 3,
-                                        child: ParcotoTextBox(
+                                      SizedBox(
+                                        width: 187,
+                                        child: TextBox(
                                           controller: telephone,
                                           placeholder: 'telephone'.tr(),
                                           style: appTheme.writingStyle,
                                           placeholderStyle: placeStyle,
                                           cursorColor: appTheme.color.darker,
+                                          decoration: WidgetStatePropertyAll(
+                                            BoxDecoration(
+                                              color: appTheme.fillColor,
+                                            ),
+                                          ),
 
                                           onChanged: (s) {
                                             checkChanges();
@@ -294,13 +321,18 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                   ),
                                   smallSpace,
                                   Flexible(
-                                    child: ParcotoTextBox(
+                                    child: TextBox(
                                       controller: adresse,
                                       placeholder: 'adresse'.tr(),
                                       maxLines: 3,
                                       style: appTheme.writingStyle,
                                       placeholderStyle: placeStyle,
                                       cursorColor: appTheme.color.darker,
+                                      decoration: WidgetStatePropertyAll(
+                                        BoxDecoration(
+                                          color: appTheme.fillColor,
+                                        ),
+                                      ),
 
                                       onChanged: (s) {
                                         checkChanges();
@@ -322,8 +354,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                               child: Column(
                                 children: [
                                   Flexible(
-                                    child: ParcotoFieldSurface(
-                                      child: AutoSuggestBox<String>(
+                                    child: AutoSuggestBox<String>(
                                       placeholder: 'filiale'.tr(),
                                       placeholderStyle: placeStyle,
                                       controller: selectedAppartenance,
@@ -340,12 +371,10 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                         ),
                                       ),
                                     ),
-                                    ),
                                   ),
                                   smallSpace,
                                   Flexible(
-                                    child: ParcotoFieldSurface(
-                                      child: AutoSuggestBox<String>(
+                                    child: AutoSuggestBox<String>(
                                       placeholder: 'direction'.tr(),
                                       placeholderStyle: placeStyle,
                                       controller: selectedDirection,
@@ -362,12 +391,10 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                         ),
                                       ),
                                     ),
-                                    ),
                                   ),
                                   smallSpace,
                                   Flexible(
-                                    child: ParcotoFieldSurface(
-                                      child: AutoSuggestBox<String>(
+                                    child: AutoSuggestBox<String>(
                                       placeholder: 'departement'.tr(),
                                       placeholderStyle: placeStyle,
                                       controller: selectedDepartment,
@@ -387,7 +414,6 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                         ),
                                       ),
                                     ),
-                                    ),
                                   ),
                                 ],
                               ),
@@ -401,8 +427,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                             label: 'disponibilite'.tr(),
                             child: Padding(
                               padding: const EdgeInsets.all(10.0),
-                              child: ParcotoFieldSurface(
-                                child: DropDownButton(
+                              child: DropDownButton(
                                 title: Text(DriverProvider.getEtat(etat)).tr(),
                                 placement: FlyoutPlacementMode.bottomCenter,
                                 closeAfterClick: false,
@@ -445,7 +470,6 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                                 onClose: () {
                                   checkChanges();
                                 },
-                                ),
                               ),
                             ),
                           ),

@@ -1,5 +1,4 @@
 import 'package:appwrite/appwrite.dart' hide Client;
-import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
@@ -340,13 +339,18 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                                       Text('num', style: boldStyle).tr(),
                                       smallSpace,
                                       Flexible(
-                                        child: ParcotoTextBox(
+                                        child: TextBox(
                                           controller: numOrdre,
                                           enabled: widget.fiche == null,
                                           placeholder: 'num'.tr(),
                                           placeholderStyle: placeStyle,
                                           style: appTheme.writingStyle,
                                           cursorColor: appTheme.color.darker,
+                                          decoration: WidgetStatePropertyAll(
+                                            BoxDecoration(
+                                              color: appTheme.fillColor,
+                                            ),
+                                          ),
                                           inputFormatters: [
                                             FilteringTextInputFormatter
                                                 .digitsOnly,
@@ -379,8 +383,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       bigSpace,
                       SizedBox(
                         width: 200.px,
-                        height: 44.px,
-                        child: ParcotoFieldSurface(child: DatePicker(
+                        height: 30.px,
+                        child: DatePicker(
                           selected: DateTime(
                             dateEntre.year,
                             dateEntre.month,
@@ -401,15 +405,15 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                               );
                             });
                           },
-                        )),
+                        ),
                       ),
                       smallSpace,
                       Text('at', style: boldStyle).tr(),
                       smallSpace,
                       SizedBox(
                         width: 200.px,
-                        height: 44.px,
-                        child: ParcotoFieldSurface(child: TimePicker(
+                        height: 30.px,
+                        child: TimePicker(
                           selected: DateTime(
                             dateEntre.year,
                             dateEntre.month,
@@ -431,7 +435,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                             });
                           },
                           hourFormat: HourFormat.HH,
-                        )),
+                        ),
                       ),
                     ],
                   ),
@@ -443,8 +447,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       bigSpace,
                       SizedBox(
                         width: 200.px,
-                        height: 44.px,
-                        child: ParcotoFieldSurface(child: DatePicker(
+                        height: 30.px,
+                        child: DatePicker(
                           selected: dateSortie == null
                               ? dateSortie
                               : DateTime(
@@ -470,15 +474,15 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                                     );
                             });
                           },
-                        )),
+                        ),
                       ),
                       smallSpace,
                       Text('at', style: boldStyle).tr(),
                       smallSpace,
                       SizedBox(
                         width: 200.px,
-                        height: 44.px,
-                        child: ParcotoFieldSurface(child: TimePicker(
+                        height: 30.px,
+                        child: TimePicker(
                           selected: dateSortie == null
                               ? dateSortie
                               : DateTime(
@@ -504,7 +508,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                             });
                           },
                           hourFormat: HourFormat.HH,
-                        )),
+                        ),
                       ),
                     ],
                   ),
@@ -686,7 +690,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                         Text('descriptiondegats', style: littleStyle).tr(),
                         smallSpace,
                         Flexible(
-                          child: ParcotoTextBox(
+                          child: TextBox(
                             controller: remarqueEntretien,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             placeholder: 'descriptiondegats'.tr(),
@@ -928,11 +932,11 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
     return Table(
       defaultVerticalAlignment: TableCellVerticalAlignment.top,
       border: TableBorder.all(),
-      columnWidths: const {
-        0: FlexColumnWidth(1),
-        1: FlexColumnWidth(1),
-        2: FlexColumnWidth(1),
-        3: FlexColumnWidth(1),
+      columnWidths: {
+        0: FixedColumnWidth(80.px),
+        1: FixedColumnWidth(80.px),
+        2: FixedColumnWidth(80.px),
+        3: FixedColumnWidth(80.px),
       },
       children: [
         TableRow(
@@ -944,11 +948,15 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                   children: [
                     Text('marque', style: littleStyle).tr(),
                     const Spacer(),
-                    Flexible(
-                      child: ParcotoTextBox(
+                    SizedBox(
+                      width: 160.px,
+                      child: TextBox(
                         controller: marque,
                         placeholder: 'marque'.tr(),
                         style: appTheme.writingStyle,
+                        decoration: WidgetStatePropertyAll(
+                          BoxDecoration(color: appTheme.fillColor),
+                        ),
                         cursorColor: appTheme.color.darker,
                         placeholderStyle: placeStyle,
                       ),
@@ -964,11 +972,15 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                   children: [
                     Text('type', style: littleStyle).tr(),
                     const Spacer(),
-                    Flexible(
-                      child: ParcotoTextBox(
+                    SizedBox(
+                      width: 160.px,
+                      child: TextBox(
                         controller: type,
                         placeholder: 'type'.tr(),
                         style: appTheme.writingStyle,
+                        decoration: WidgetStatePropertyAll(
+                          BoxDecoration(color: appTheme.fillColor),
+                        ),
                         cursorColor: appTheme.color.darker,
                         placeholderStyle: placeStyle,
                       ),
@@ -985,10 +997,13 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                     Text('nchassi', style: littleStyle).tr(),
                     smallSpace,
                     Flexible(
-                      child: ParcotoTextBox(
+                      child: TextBox(
                         controller: nchassi,
                         placeholder: 'nchassi'.tr(),
                         style: appTheme.writingStyle,
+                        decoration: WidgetStatePropertyAll(
+                          BoxDecoration(color: appTheme.fillColor),
+                        ),
                         cursorColor: appTheme.color.darker,
                         placeholderStyle: placeStyle,
                       ),
@@ -1005,12 +1020,15 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                     Text('matricule', style: littleStyle).tr(),
                     smallSpace,
                     Flexible(
-                      child: ParcotoTextBox(
+                      child: TextBox(
                         controller: matricule,
                         enabled: selectedVehicle == null,
                         //readOnly: selectedVehicle!=null,
                         placeholder: 'matricule'.tr(),
                         style: appTheme.writingStyle,
+                        decoration: WidgetStatePropertyAll(
+                          BoxDecoration(color: appTheme.fillColor),
+                        ),
 
                         cursorColor: appTheme.color.darker,
                         placeholderStyle: placeStyle,
@@ -1035,11 +1053,15 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       children: [
                         Text('nmoteur', style: littleStyle).tr(),
                         const Spacer(),
-                        Flexible(
-                      child: ParcotoTextBox(
+                        SizedBox(
+                          width: 160.px,
+                          child: TextBox(
                             controller: nmoteur,
                             placeholder: 'nmoteur'.tr(),
                             style: appTheme.writingStyle,
+                            decoration: WidgetStatePropertyAll(
+                              BoxDecoration(color: appTheme.fillColor),
+                            ),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -1059,14 +1081,18 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       children: [
                         Text('kilometrage', style: littleStyle).tr(),
                         const Spacer(),
-                        Flexible(
-                      child: ParcotoTextBox(
+                        SizedBox(
+                          width: 160.px,
+                          child: TextBox(
                             controller: km,
                             placeholder: 'KM',
                             style: appTheme.writingStyle,
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
                             ],
+                            decoration: WidgetStatePropertyAll(
+                              BoxDecoration(color: appTheme.fillColor),
+                            ),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -1082,6 +1108,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                 padding: const EdgeInsets.all(5),
                 child: SizedBox(
                   height: 120.px,
+                  width: 180.px,
                   child: SfRadialGauge(
                     animationDuration: 500,
                     title: GaugeTitle(
@@ -1157,11 +1184,15 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       children: [
                         Text('color', style: littleStyle).tr(),
                         const Spacer(),
-                        Flexible(
-                      child: ParcotoTextBox(
+                        SizedBox(
+                          width: 160.px,
+                          child: TextBox(
                             controller: couleur,
                             placeholder: 'color'.tr(),
                             style: appTheme.writingStyle,
+                            decoration: WidgetStatePropertyAll(
+                              BoxDecoration(color: appTheme.fillColor),
+                            ),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -1183,11 +1214,11 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                         const Spacer(),
                         SizedBox(
                           width: 80.px,
-                          child: ParcotoFieldSurface(child: DatePicker(
+                          child: DatePicker(
                             selected: anneeUtil,
                             showDay: false,
                             showMonth: false,
-                          )),
+                          ),
                         ),
                       ],
                     ),
@@ -1206,11 +1237,15 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       children: [
                         Text('matriculeemploye', style: littleStyle).tr(),
                         const Spacer(),
-                        Flexible(
-                      child: ParcotoTextBox(
+                        SizedBox(
+                          width: 160.px,
+                          child: TextBox(
                             controller: matriculeConducteur,
                             placeholder: 'matriculeemploye'.tr(),
                             style: appTheme.writingStyle,
+                            decoration: WidgetStatePropertyAll(
+                              BoxDecoration(color: appTheme.fillColor),
+                            ),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -1230,11 +1265,15 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       children: [
                         Text('nom', style: littleStyle).tr(),
                         const Spacer(),
-                        Flexible(
-                      child: ParcotoTextBox(
+                        SizedBox(
+                          width: 160.px,
+                          child: TextBox(
                             controller: nom,
                             placeholder: 'nom'.tr(),
                             style: appTheme.writingStyle,
+                            decoration: WidgetStatePropertyAll(
+                              BoxDecoration(color: appTheme.fillColor),
+                            ),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),
@@ -1254,11 +1293,15 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       children: [
                         Text('prenom', style: littleStyle).tr(),
                         const Spacer(),
-                        Flexible(
-                      child: ParcotoTextBox(
+                        SizedBox(
+                          width: 160.px,
+                          child: TextBox(
                             controller: prenom,
                             placeholder: 'prenom'.tr(),
                             style: appTheme.writingStyle,
+                            decoration: WidgetStatePropertyAll(
+                              BoxDecoration(color: appTheme.fillColor),
+                            ),
                             cursorColor: appTheme.color.darker,
                             placeholderStyle: placeStyle,
                           ),

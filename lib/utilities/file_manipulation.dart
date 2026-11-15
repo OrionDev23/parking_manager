@@ -17,7 +17,7 @@ void saveThisFile(
 ) async {
   if (DeviceType.android == Device.deviceType ||
       Device.deviceType == DeviceType.ios) {
-    DocumentFileSavePlus().saveFile(file, '$title.$extension', mime);
+    await DocumentFileSave.saveFile(file, '$title.$extension', mime);
   } else if (kIsWeb) {
     saveFileWeb(file, '$title.$extension');
   } else {

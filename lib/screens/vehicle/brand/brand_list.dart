@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/screens/vehicle/brand/brand_container.dart';
 import 'package:parc_oto/theme.dart';
@@ -35,12 +34,15 @@ class _BrandListState extends State<BrandList> {
                 SizedBox(
                   width: 350.px,
                   height: 45.px,
-                  child: ParcotoTextBox(
+                  child: TextBox(
                     controller: searchController,
                     placeholder: 'search'.tr(),
                     style: appTheme.writingStyle,
                     cursorColor: appTheme.color.darker,
                     placeholderStyle: placeStyle,
+                    decoration: WidgetStatePropertyAll(
+                      BoxDecoration(color: appTheme.fillColor),
+                    ),
                     onChanged: (s) {
                       if (s.isNotEmpty) {
                         notEmpty = true;

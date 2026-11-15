@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -153,9 +152,12 @@ class DocumentFormState extends State<DocumentForm>
                     label: 'nom'.tr(),
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
-                      child: ParcotoTextBox(
+                      child: TextBox(
                         controller: nom,
                         style: appTheme.writingStyle,
+                        decoration: WidgetStatePropertyAll(
+                          BoxDecoration(color: appTheme.fillColor),
+                        ),
                         cursorColor: appTheme.color.darker,
                         placeholderStyle: placeStyle,
                         placeholder: 'nom'.tr(),
@@ -172,7 +174,7 @@ class DocumentFormState extends State<DocumentForm>
                     label: 'dateexp'.tr(),
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
-                      child: ParcotoFieldSurface(child: DatePicker(
+                      child: DatePicker(
                         selected: selectedDate,
                         onChanged: (d) {
                           setState(() {
@@ -180,7 +182,7 @@ class DocumentFormState extends State<DocumentForm>
                           });
                           checkForChanges();
                         },
-                      )),
+                      ),
                     ),
                   ),
                 ),

@@ -1,7 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 
 import '../../../../datasources/workshop/brand/brand_datasrouce.dart';
 
@@ -156,7 +155,7 @@ class BrandTableState extends State<BrandTable> {
                 SizedBox(
                   width: 350.px,
                   height: 45.px,
-                  child: ParcotoTextBox(
+                  child: TextBox(
                     onChanged: (s) {
                       if (s.isEmpty) {
                         notEmpty = false;
@@ -171,9 +170,8 @@ class BrandTableState extends State<BrandTable> {
                     style: appTheme.writingStyle,
                     cursorColor: appTheme.color.darker,
                     placeholderStyle: placeStyle,
-                    prefix: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      child: Icon(FluentIcons.search, size: 14),
+                    decoration: WidgetStatePropertyAll(
+                      BoxDecoration(color: appTheme.fillColor),
                     ),
                     onSubmitted: (s) {
                       if (s.isNotEmpty) {

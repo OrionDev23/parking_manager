@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:material_ui/material_ui.dart' as m;
 import 'package:flutter/services.dart';
@@ -189,7 +188,7 @@ class StateFormState extends State<StateForm> {
                       ).tr(),
                     ],
                   ),
-                  title: ParcotoFieldSurface(child: ComboBox<int>(
+                  title: ComboBox<int>(
                     items: List.generate(
                       5,
                       (index) => ComboBoxItem<int>(
@@ -203,7 +202,7 @@ class StateFormState extends State<StateForm> {
                         type = s ?? 0;
                       });
                     },
-                  )),
+                  ),
                 ),
                 const Divider(),
                 ListTile(
@@ -220,7 +219,7 @@ class StateFormState extends State<StateForm> {
                     children: <Widget>[
                       Expanded(
                         flex: 7,
-                        child: ParcotoFieldSurface(child: DatePicker(
+                        child: DatePicker(
                           locale: appTheme.locale,
                           selected: date,
                           startDate: DateTime(1900),
@@ -239,12 +238,12 @@ class StateFormState extends State<StateForm> {
                               setState(() {});
                             }
                           },
-                        )),
+                        ),
                       ),
                       const m.VerticalDivider(),
                       Expanded(
                         flex: 3,
-                        child: ParcotoFieldSurface(child: TimePicker(
+                        child: TimePicker(
                           hourFormat: HourFormat.HH,
                           locale: appTheme.locale,
                           selected: date,
@@ -261,7 +260,7 @@ class StateFormState extends State<StateForm> {
                               setState(() {});
                             }
                           },
-                        )),
+                        ),
                       ),
                     ],
                   ),
@@ -273,7 +272,7 @@ class StateFormState extends State<StateForm> {
                     FluentIcons.add_notes,
                     color: appTheme.color.lightest,
                   ),
-                  title: ParcotoTextBox(
+                  title: TextBox(
                     controller: TextEditingController(text: remarque),
                     onChanged: (String value) {
                       remarque = value;
@@ -286,6 +285,9 @@ class StateFormState extends State<StateForm> {
                       fontSize: 18,
                       color: appTheme.writingStyle.color,
                       fontWeight: FontWeight.w400,
+                    ),
+                    decoration: WidgetStatePropertyAll(
+                      BoxDecoration(color: appTheme.fillColor),
                     ),
                   ),
                 ),
@@ -347,7 +349,7 @@ class StateFormState extends State<StateForm> {
                       FluentIcons.money,
                       color: appTheme.color.lightest,
                     ),
-                    title: ParcotoTextBox(
+                    title: TextBox(
                       controller: TextEditingController(
                         text: valeur.toStringAsFixed(2),
                       ),
@@ -370,6 +372,9 @@ class StateFormState extends State<StateForm> {
                           RegExp(r'^(\d+)?\.?\d{0,2}'),
                         ),
                       ],
+                      decoration: WidgetStatePropertyAll(
+                        BoxDecoration(color: appTheme.fillColor),
+                      ),
                     ),
                   ),
                 if (type == 2) const Divider(),

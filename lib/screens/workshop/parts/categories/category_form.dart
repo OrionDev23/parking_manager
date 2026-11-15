@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/datasources/workshop/category/category_datasource.dart';
 import 'package:parc_oto/screens/workshop/parts/categories/category_table.dart';
@@ -175,7 +174,7 @@ class _CategoryFormState extends State<CategoryForm>
                       child: Row(
                         children: [
                           Flexible(
-                            child: ParcotoTextBox(
+                            child: TextBox(
                               controller: catCode,
                               placeholder: 'code'.tr(),
                               onChanged: (s) {
@@ -192,6 +191,9 @@ class _CategoryFormState extends State<CategoryForm>
                               style: appTheme.writingStyle,
                               placeholderStyle: placeStyle,
                               cursorColor: appTheme.color.darker,
+                              decoration: WidgetStatePropertyAll(
+                                BoxDecoration(color: appTheme.fillColor),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 5),
@@ -219,7 +221,7 @@ class _CategoryFormState extends State<CategoryForm>
                     label: 'nom'.tr(),
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
-                      child: ParcotoTextBox(
+                      child: TextBox(
                         controller: catName,
                         placeholder: 'nom'.tr(),
                         onChanged: (s) {
@@ -228,6 +230,9 @@ class _CategoryFormState extends State<CategoryForm>
                         style: appTheme.writingStyle,
                         placeholderStyle: placeStyle,
                         cursorColor: appTheme.color.darker,
+                        decoration: WidgetStatePropertyAll(
+                          BoxDecoration(color: appTheme.fillColor),
+                        ),
                       ),
                     ),
                   ),

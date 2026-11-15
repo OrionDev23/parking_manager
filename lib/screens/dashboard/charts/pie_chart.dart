@@ -6,7 +6,6 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../../../widgets/empty_widget/src/widget.dart';
-import '../../../widgets/forms/parcoto_form_field.dart';
 
 class ParcOtoPie extends StatefulWidget {
   final String? title;
@@ -30,17 +29,20 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
   }
 
   bool loading = false;
+
   bool group = true;
+
   int indexOfBiggest = 0;
   int valueOfBiggest = 0;
   List<Color> colors = [];
   String? error;
   int _loadGeneration = 0;
-
   bool _sameInputs(ParcOtoPie other) {
     if (widget.refreshVersion != other.refreshVersion || widget.labels.length != other.labels.length) return false;
     for (var i = 0; i < widget.labels.length; i++) {
-      if (widget.labels[i].key != other.labels[i].key) return false;
+      if (widget.labels[i].key != other.labels[i].key) {
+        return false;
+      }
     }
     return true;
   }
@@ -57,11 +59,11 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
     setState(() {
       loading = true;
       error = null;
-      values = <MapEntry<String, int>>[];
+      values.clear();
       valueOfBiggest = 0;
       indexOfBiggest = 0;
       gotenColors = false;
-      colors = <Color>[];
+      colors.clear();
     });
 
     try {
@@ -70,7 +72,8 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
           label.value.then((value) => MapEntry(label.key, value)),
       ]).timeout(const Duration(seconds: 25));
       if (!mounted || generation != _loadGeneration) return;
-      values = _sortAsIntended(loaded);
+      values.addAll(loaded);
+      sortAsIntended();
     } catch (exception) {
       if (generation == _loadGeneration) error = exception.toString();
     } finally {
@@ -82,34 +85,40 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
     }
   }
 
+
+
   bool notOnlyOne = false;
-  List<MapEntry<String, int>> _sortAsIntended(List<MapEntry<String, int>> source) {
-    final byKey = {for (final item in source) item.key: item};
-    final sorted = <MapEntry<String, int>>[];
-    var biggestValue = 0;
-    var biggestIndex = 0;
-    var positiveCount = 0;
+  void sortAsIntended() {
+    int noo = 0;
+    List<MapEntry<String, int>> result = [];
+    for (int i = 0; i < widget.labels.length; i++) {
+      for (int j = 0; j < values.length; j++) {
+        if (widget.labels[i].key == values[j].key) {
+          if (values[j].value > valueOfBiggest) {
+            valueOfBiggest = values[j].value;
+            indexOfBiggest = i;
+          }
+          if (values[j].value > 0) {
+            noo++;
+          }
+          result.add(MapEntry(values[j].key, values[j].value));
 
-    for (var i = 0; i < widget.labels.length; i++) {
-      final item = byKey[widget.labels[i].key];
-      if (item == null) continue;
-      if (item.value > biggestValue) {
-        biggestValue = item.value;
-        biggestIndex = i;
+          values.removeAt(j);
+          break;
+        }
       }
-      if (item.value > 0) positiveCount++;
-      sorted.add(MapEntry(item.key, item.value));
     }
-
-    valueOfBiggest = biggestValue;
-    indexOfBiggest = biggestIndex;
-    notOnlyOne = positiveCount > 1;
-    return sorted;
+    if (noo > 1) {
+      notOnlyOne = true;
+    } else {
+      notOnlyOne = false;
+    }
+    values.addAll(result);
   }
 
   int minValue = 10;
-  bool gotenColors = false;
 
+  bool gotenColors = false;
   void getColors(AppTheme appTheme) {
     if (!gotenColors) {
       colors = appTheme.getRandomColors(values.length);
@@ -121,7 +130,9 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
 
-    if (loading) return const Center(child: ProgressRing());
+    if (loading) {
+      return const Center(child: ProgressRing());
+    }
     if (error != null) {
       return Center(
         child: Column(
@@ -158,7 +169,10 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                     width: 250.px,
                     child: EmptyWidget(
                       title: 'nodatayet'.tr(),
-                      titleTextStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                      titleTextStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
                       image: PackageImage.Image_3.encode(),
                     ),
                   ),
@@ -178,18 +192,33 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                         legendIconType: LegendIconType.circle,
                         explode: true,
                         explodeIndex: indexOfBiggest,
-                        groupMode: notOnlyOne && group ? CircularChartGroupMode.value : null,
+                        groupMode: notOnlyOne && group
+                            ? CircularChartGroupMode.value
+                            : null,
                         groupTo: minValue.toDouble(),
                         dataSource: values,
-                        xValueMapper: (s, t) => s.key.tr(),
-                        yValueMapper: (s, t) => s.value,
-                        dataLabelMapper: (s, t) => s.key.tr(),
-                        pointColorMapper: (s, i) => colors[i],
+                        xValueMapper: (s, t) {
+                          return s.key.tr();
+                        },
+                        yValueMapper: (s, t) {
+                          return s.value;
+                        },
+                        dataLabelMapper: (s, t) {
+                          return s.key.tr();
+                        },
+                        pointColorMapper: (s, i) {
+                          return colors[i];
+                        },
                         dataLabelSettings: DataLabelSettings(
                           isVisible: true,
-                          textStyle: TextStyle(fontSize: 10, color: appTheme.writingStyle.color),
+                          textStyle: TextStyle(
+                            fontSize: 10,
+                            color: appTheme.writingStyle.color,
+                          ),
                           showZeroValue: false,
-                          connectorLineSettings: const ConnectorLineSettings(type: ConnectorType.line),
+                          connectorLineSettings: const ConnectorLineSettings(
+                            type: ConnectorType.line,
+                          ),
                         ),
                       ),
                     ],
@@ -205,19 +234,15 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
                   smallSpace,
                   SizedBox(
                     width: 70.px,
-                    child: ParcotoFieldSurface(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      minHeight: 30,
-                      child: NumberBox(
-                        clearButton: false,
-                        mode: SpinButtonPlacementMode.none,
-                        value: minValue,
-                        onChanged: (s) {
-                          setState(() {
-                            minValue = s ?? 0;
-                          });
-                        },
-                      ),
+                    child: NumberBox(
+                      clearButton: false,
+                      mode: SpinButtonPlacementMode.none,
+                      value: minValue,
+                      onChanged: (s) {
+                        setState(() {
+                          minValue = s ?? 0;
+                        });
+                      },
                     ),
                   ),
                   smallSpace,
@@ -237,7 +262,7 @@ class _ParcOtoPieState extends State<ParcOtoPie> {
 
   @override
   void dispose() {
-    _loadGeneration++;
+    values.clear();
     super.dispose();
   }
 }

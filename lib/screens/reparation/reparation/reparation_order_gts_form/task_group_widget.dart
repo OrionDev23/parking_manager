@@ -37,7 +37,7 @@ class _TaskGroupWidgetState extends State<TaskGroupWidget> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 10),
               width: 200.px,
-              height: 44.px,
+              height: 35.px,
               child: FilledButton(
                 child: Text('addtask').tr(),
                 onPressed: () {

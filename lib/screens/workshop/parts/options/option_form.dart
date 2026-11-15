@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 // ignore: deprecated_member_use
 import 'package:flutter/material.dart' as m;
@@ -87,7 +86,7 @@ class _OptionFormState extends State<OptionForm>
                         child: Row(
                           children: [
                             Flexible(
-                              child: ParcotoTextBox(
+                              child: TextBox(
                                 controller: optionCode,
                                 placeholder: 'code'.tr(),
                                 onChanged: (s) {
@@ -104,6 +103,9 @@ class _OptionFormState extends State<OptionForm>
                                 style: appTheme.writingStyle,
                                 placeholderStyle: placeStyle,
                                 cursorColor: appTheme.color.darker,
+                                decoration: WidgetStatePropertyAll(
+                                  BoxDecoration(color: appTheme.fillColor),
+                                ),
                               ),
                             ),
                             smallSpace,
@@ -135,7 +137,7 @@ class _OptionFormState extends State<OptionForm>
                       label: 'nom'.tr(),
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
-                        child: ParcotoTextBox(
+                        child: TextBox(
                           controller: optionName,
                           placeholder: 'nom'.tr(),
                           onChanged: (s) {
@@ -144,6 +146,9 @@ class _OptionFormState extends State<OptionForm>
                           style: appTheme.writingStyle,
                           placeholderStyle: placeStyle,
                           cursorColor: appTheme.color.darker,
+                          decoration: WidgetStatePropertyAll(
+                            BoxDecoration(color: appTheme.fillColor),
+                          ),
                         ),
                       ),
                     ),

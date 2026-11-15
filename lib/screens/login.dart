@@ -1,5 +1,4 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:appwrite/models.dart' hide Row;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -116,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen>
                             children: [
                               SizedBox(
                                 width: pwidth,
-                                child: ParcotoTextBox(
+                                child: TextBox(
                                   prefix: Padding(
                                     padding: const EdgeInsets.fromLTRB(
                                       8,
@@ -143,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen>
                                       ? ''
                                       : 'entervalidemail'.tr(),
                                   labelStyle: TextStyle(color: Colors.red),
-                                  child: ParcotoTextBox(
+                                  child: TextBox(
                                     prefix: Padding(
                                       padding: const EdgeInsets.fromLTRB(
                                         8,
@@ -177,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen>
                               bigSpace,
                               SizedBox(
                                 width: pwidth,
-                                child: ParcotoTextBox(
+                                child: TextBox(
                                   prefix: Padding(
                                     padding: const EdgeInsets.fromLTRB(
                                       8,

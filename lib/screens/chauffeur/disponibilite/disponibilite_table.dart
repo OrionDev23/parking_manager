@@ -1,7 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:parc_oto/datasources/conducteurs/disponibilite_datasource.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/driver_provider.dart';
@@ -173,7 +172,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
-                                                          child: ParcotoFieldSurface(child: DatePicker(
+                                                          child: DatePicker(
                                                             selected: dateMin,
                                                             onChanged: (s) {
                                                               setState(() {
@@ -181,7 +180,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                               });
                                                               setS(() {});
                                                             },
-                                                          )),
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
@@ -197,7 +196,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                         smallSpace,
                                                         smallSpace,
                                                         Flexible(
-                                                          child: ParcotoFieldSurface(child: DatePicker(
+                                                          child: DatePicker(
                                                             selected: dateMax,
                                                             onChanged: (s) {
                                                               setState(() {
@@ -205,7 +204,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                               });
                                                               setS(() {});
                                                             },
-                                                          )),
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
@@ -222,8 +221,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                 padding: const EdgeInsets.all(
                                                   10.0,
                                                 ),
-                                                child: ParcotoFieldSurface(
-                                                  child: DropDownButton(
+                                                child: DropDownButton(
                                                   title: Text(
                                                     type == null
                                                         ? ''
@@ -288,7 +286,6 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                 ),
                                               ),
                                             ),
-                                          ),
                                           ),
                                           smallSpace,
                                           Padding(
@@ -421,7 +418,7 @@ class DisponibliteTableState extends State<DisponibliteTable> {
             SizedBox(
               width: 350.px,
               height: 45.px,
-              child: ParcotoTextBox(
+              child: TextBox(
                 onChanged: (s) {
                   if (s.isEmpty) {
                     notEmpty = false;
@@ -436,6 +433,9 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                 style: appTheme.writingStyle,
                 cursorColor: appTheme.color.darker,
                 placeholderStyle: placeStyle,
+                decoration: WidgetStatePropertyAll(
+                  BoxDecoration(color: appTheme.fillColor),
+                ),
                 onSubmitted: (s) {
                   if (s.isNotEmpty) {
                     disponibiliteDataSource.search(s);

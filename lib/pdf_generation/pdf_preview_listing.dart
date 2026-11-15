@@ -103,10 +103,10 @@ class PdfPreviewListing extends StatelessWidget {
   ) async {
     if (DeviceType.android == Device.deviceType ||
         Device.deviceType == DeviceType.ios) {
-      DocumentFileSavePlus().saveFile(
+      await DocumentFileSave.saveFile(
         await futureFile(pageFormat),
         '$name.pdf',
-        "appliation/pdf",
+        "application/pdf",
       );
     } else if (kIsWeb) {
       saveFileWeb(await futureFile(pageFormat), '$name.pdf');

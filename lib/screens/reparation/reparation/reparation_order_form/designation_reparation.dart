@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
@@ -39,13 +38,16 @@ class DesignationReparationState extends State<DesignationReparation> {
         bigSpace,
         Flexible(
           flex: 3,
-          child: ParcotoTextBox(
+          child: TextBox(
             controller: designation,
             placeholderStyle: placeStyle,
             placeholder: 'desi'.tr(),
             style: appTheme.writingStyle,
             cursorColor: appTheme.color.darker,
             maxLength: 60,
+            decoration: WidgetStatePropertyAll(
+              BoxDecoration(color: appTheme.fillColor),
+            ),
 
             onChanged: (s) {
               setState(() {
@@ -58,28 +60,26 @@ class DesignationReparationState extends State<DesignationReparation> {
         VerticalDivider(color: placeStyle.color),
         smallSpace,
         Expanded(
-          child: ParcotoFieldSurface(
-            child: NumberBox<int>(
-              value: qte,
-              min: 1,
-              onChanged: (s) => setState(() {
-                qte = s ?? 1;
-                widget.designation.qte = s ?? 1;
-                setState(() {});
-              }),
-              max: 99,
-              placeholderStyle: placeStyle,
-              placeholder: 'qte'.tr(),
-              style: appTheme.writingStyle,
-              cursorColor: appTheme.color.darker,
-            ),
+          child: NumberBox<int>(
+            value: qte,
+            min: 1,
+            onChanged: (s) => setState(() {
+              qte = s ?? 1;
+              widget.designation.qte = s ?? 1;
+              setState(() {});
+            }),
+            max: 99,
+            placeholderStyle: placeStyle,
+            placeholder: 'qte'.tr(),
+            style: appTheme.writingStyle,
+            cursorColor: appTheme.color.darker,
           ),
         ),
         smallSpace,
         VerticalDivider(color: placeStyle.color),
         smallSpace,
         Expanded(
-          child: ParcotoTextBox(
+          child: TextBox(
             controller: tva,
             suffix: Text('%', style: placeStyle),
             onChanged: (s) => setState(() {
@@ -101,6 +101,9 @@ class DesignationReparationState extends State<DesignationReparation> {
             placeholder: 'TVA'.tr(),
             style: appTheme.writingStyle,
             cursorColor: appTheme.color.darker,
+            decoration: WidgetStatePropertyAll(
+              BoxDecoration(color: appTheme.fillColor),
+            ),
           ),
         ),
         smallSpace,
@@ -108,7 +111,7 @@ class DesignationReparationState extends State<DesignationReparation> {
         smallSpace,
         Expanded(
           flex: 1,
-          child: ParcotoTextBox(
+          child: TextBox(
             controller: prix,
             placeholderStyle: placeStyle,
             suffix: Text('DA', style: placeStyle),
@@ -118,6 +121,9 @@ class DesignationReparationState extends State<DesignationReparation> {
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'^(\d+)?\.?\d{0,2}')),
             ],
+            decoration: WidgetStatePropertyAll(
+              BoxDecoration(color: appTheme.fillColor),
+            ),
 
             onChanged: (s) {
               setState(() {

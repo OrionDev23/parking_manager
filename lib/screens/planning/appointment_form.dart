@@ -1,5 +1,4 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' hide ColorPicker;
 import 'package:material_ui/material_ui.dart' as m;
@@ -94,7 +93,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                     FluentIcons.title,
                     color: appTheme.color.lightest,
                   ),
-                  title: ParcotoTextBox(
+                  title: TextBox(
                     controller: TextEditingController(text: _subject),
                     onChanged: (String value) {
                       _subject = value;
@@ -107,6 +106,9 @@ class _AppointmentFormState extends State<AppointmentForm> {
                       fontSize: 25,
                       color: appTheme.writingStyle.color,
                       fontWeight: FontWeight.w400,
+                    ),
+                    decoration: WidgetStatePropertyAll(
+                      BoxDecoration(color: appTheme.fillColor),
                     ),
                   ),
                 ),
@@ -126,7 +128,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                       ).tr(),
                     ],
                   ),
-                  title: ParcotoFieldSurface(child: ComboBox<int>(
+                  title: ComboBox<int>(
                     items: categories
                         .map(
                           (e) => ComboBoxItem<int>(
@@ -141,7 +143,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                         _selectedCategorie = s ?? 0;
                       });
                     },
-                  )),
+                  ),
                   onPressed: () {
                     showDialog<Widget>(
                       context: context,
@@ -203,7 +205,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                     children: <Widget>[
                       Expanded(
                         flex: 7,
-                        child: ParcotoFieldSurface(child: DatePicker(
+                        child: DatePicker(
                           locale: appTheme.locale,
                           selected: _startDate,
                           startDate: DateTime(1900),
@@ -227,14 +229,14 @@ class _AppointmentFormState extends State<AppointmentForm> {
                               setState(() {});
                             }
                           },
-                        )),
+                        ),
                       ),
                       const m.VerticalDivider(),
                       Expanded(
                         flex: 3,
                         child: _isAllDay
                             ? const Text('')
-                            : ParcotoFieldSurface(child: TimePicker(
+                            : TimePicker(
                                 hourFormat: HourFormat.HH,
                                 locale: appTheme.locale,
                                 selected: _startDate,
@@ -257,7 +259,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                                     setState(() {});
                                   }
                                 },
-                              )),
+                              ),
                       ),
                     ],
                   ),
@@ -276,7 +278,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                     children: <Widget>[
                       Expanded(
                         flex: 7,
-                        child: ParcotoFieldSurface(child: DatePicker(
+                        child: DatePicker(
                           selected: _endDate,
                           locale: appTheme.locale,
                           startDate: DateTime(1900),
@@ -302,14 +304,14 @@ class _AppointmentFormState extends State<AppointmentForm> {
                               setState(() {});
                             }
                           },
-                        )),
+                        ),
                       ),
                       const m.VerticalDivider(),
                       Expanded(
                         flex: 3,
                         child: _isAllDay
                             ? const Text('')
-                            : ParcotoFieldSurface(child: TimePicker(
+                            : TimePicker(
                                 locale: appTheme.locale,
                                 selected: _endDate,
                                 hourFormat: HourFormat.HH,
@@ -334,7 +336,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                                     setState(() {});
                                   }
                                 },
-                              )),
+                              ),
                       ),
                     ],
                   ),
@@ -384,7 +386,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                     FluentIcons.add_notes,
                     color: appTheme.color.lightest,
                   ),
-                  title: ParcotoTextBox(
+                  title: TextBox(
                     controller: TextEditingController(text: _notes),
                     onChanged: (String value) {
                       _notes = value;
@@ -397,6 +399,9 @@ class _AppointmentFormState extends State<AppointmentForm> {
                       fontSize: 18,
                       color: appTheme.writingStyle.color,
                       fontWeight: FontWeight.w400,
+                    ),
+                    decoration: WidgetStatePropertyAll(
+                      BoxDecoration(color: appTheme.fillColor),
                     ),
                   ),
                 ),
