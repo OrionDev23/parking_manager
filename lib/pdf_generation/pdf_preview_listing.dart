@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:pdf/widgets.dart' show PageOrientation;
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pdf/pdf.dart';
