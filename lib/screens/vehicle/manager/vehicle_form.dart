@@ -1472,7 +1472,7 @@ class _VehicleFormState extends State<VehicleForm>
   List<Widget> getWilayaCommuneWidget(AppTheme appTheme) {
     return [
       StaggeredGridTile.fit(
-        crossAxisCellCount: chassisKey ? 6 : 4,
+        crossAxisCellCount: 6,
         child: Container(
           height: heightFirst,
 
@@ -1560,7 +1560,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: chassisKey ? 6 : 4,
+        crossAxisCellCount: 6,
         child: Container(
           decoration: BoxDecoration(
             border: Border(
