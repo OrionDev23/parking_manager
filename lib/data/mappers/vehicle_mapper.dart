@@ -34,8 +34,6 @@ class VehicleMapper {
       engineDisplacement: vehicle.engineDisplacement,
       enginePowerHp: vehicle.enginePowerHp,
       enginePowerKw: vehicle.enginePowerKw,
-      enginePowerHp: vehicle.enginePowerHp,
-      enginePowerKw: vehicle.enginePowerKw,
       engineCode: vehicle.engineCode,
       transmission: vehicle.transmission,
       gearbox: vehicle.gearbox,
