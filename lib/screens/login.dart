@@ -102,8 +102,15 @@ class _LoginScreenState extends State<LoginScreen>
     );
 
     final loginPanel = Container(
-      width: 430,
-      padding: const EdgeInsets.fromLTRB(34, 36, 34, 28),
+      width: MediaQuery.sizeOf(context).width < 560
+          ? MediaQuery.sizeOf(context).width - 36
+          : 460,
+      padding: EdgeInsets.fromLTRB(
+        MediaQuery.sizeOf(context).width < 560 ? 24 : 38,
+        MediaQuery.sizeOf(context).width < 560 ? 26 : 38,
+        MediaQuery.sizeOf(context).width < 560 ? 24 : 38,
+        MediaQuery.sizeOf(context).width < 560 ? 22 : 30,
+      ),
       decoration: BoxDecoration(
         color: surface,
         borderRadius: BorderRadius.circular(26),
@@ -247,10 +254,10 @@ class _LoginScreenState extends State<LoginScreen>
                     ),
                   ),
                   Center(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 500),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 570),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 34),
                         child: brand,
                       ),
                     ),
@@ -260,12 +267,7 @@ class _LoginScreenState extends State<LoginScreen>
             ),
             Expanded(
               flex: 9,
-              child: Center(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: loginPanel,
-                ),
-              ),
+              child: Center(child: loginPanel),
             ),
           ]);
 
@@ -282,54 +284,28 @@ class _LoginScreenState extends State<LoginScreen>
           children: [
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Container(
-                width: 42,
-                height: 42,
-                padding: const EdgeInsets.all(6),
+                width: 38,
+                height: 38,
+                padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(13),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Image.asset('assets/images/favIcon.webp', fit: BoxFit.contain),
               ),
-              const SizedBox(width: 11),
+              const SizedBox(width: 10),
               const Text(
                 'PARCOTO',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: 17,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 2,
                 ),
               ),
             ]),
-            const SizedBox(height: 27),
-            const Text(
-              'Votre activité.\nSous contrôle.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 32,
-                height: 1.05,
-                fontWeight: FontWeight.w900,
-                letterSpacing: -1,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Connectez-vous à votre espace professionnel.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: .65),
-                fontSize: 11,
-              ),
-            ),
-            const SizedBox(height: 30),
-            loginPanel,
             const SizedBox(height: 20),
-            Text(
-              'PARCOTO  •  © 2026',
-              style: TextStyle(color: muted, fontSize: 9, letterSpacing: 1.2),
-            ),
+            loginPanel,
           ],
         );
 
@@ -345,17 +321,14 @@ class _LoginScreenState extends State<LoginScreen>
             ),
           ),
           child: Center(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: SizedBox(
-                width: constraints.maxWidth,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: compact ? 18 : 30,
-                    vertical: 10,
-                  ),
-                  child: mobileContent,
-                ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: 500,
+                maxHeight: availableHeight,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                child: mobileContent,
               ),
             ),
           ),
