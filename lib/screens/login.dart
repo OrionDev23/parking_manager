@@ -15,6 +15,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../main.dart';
 import '../core/tenancy/company_membership_resolver.dart';
+import '../core/auth/auth_session.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -47,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen>
     while (PanesListState.firstLoading) {
       await Future.delayed(const Duration(milliseconds: 100));
     }
-    if (DatabaseGetter.user == null) {
+    if (authService.session == null) {
       checkUser();
     }
   }
