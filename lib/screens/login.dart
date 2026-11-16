@@ -196,39 +196,191 @@ class _LoginScreenState extends State<LoginScreen>
       content: LayoutBuilder(builder: (context, constraints) {
         final wide = constraints.maxWidth >= 1000;
         final compact = constraints.maxWidth < 560;
+        final availableHeight = constraints.maxHeight;
+        final canFitWithoutScroll = availableHeight >= 740;
+        final desktop = constraints.maxWidth >= 1000;
+
+        if (desktop) {
+          final content = Row(children: [
+            Expanded(
+              flex: 11,
+              child: Container(
+                height: availableHeight,
+                clipBehavior: Clip.antiAlias,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [navy, Color(0xFF102D3C), Color(0xFF0B1B2B)],
+                  ),
+                ),
+                child: Stack(children: [
+                  Positioned(
+                    right: -150,
+                    top: -160,
+                    child: Container(
+                      width: 570,
+                      height: 570,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: mint.withValues(alpha: .10)),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: -85,
+                    top: -95,
+                    child: Container(
+                      width: 440,
+                      height: 440,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: mint.withValues(alpha: .07)),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 30,
+                    bottom: -190,
+                    child: Icon(
+                      FluentIcons.car,
+                      size: 390,
+                      color: Colors.white.withValues(alpha: .025),
+                    ),
+                  ),
+                  Center(
+                    child: canFitWithoutScroll
+                        ? FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 500),
+                              child: brand,
+                            ),
+                          )
+                        : SingleChildScrollView(
+                            padding: const EdgeInsets.symmetric(horizontal: 58, vertical: 35),
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 500),
+                              child: brand,
+                            ),
+                          ),
+                  ),
+                ]),
+              ),
+            ),
+            Expanded(
+              flex: 9,
+              child: Center(
+                child: canFitWithoutScroll
+                    ? FittedBox(fit: BoxFit.scaleDown, child: loginPanel)
+                    : SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 30),
+                        child: loginPanel,
+                      ),
+              ),
+            ),
+          ]);
+
+          return Container(
+            width: double.infinity,
+            height: availableHeight,
+            color: page,
+            child: content,
+          );
+        }
+
+        final compact = constraints.maxWidth < 560;
+        final mobileContent = Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Container(
+                width: 42,
+                height: 42,
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: Image.asset('assets/images/logo.webp', fit: BoxFit.contain),
+              ),
+              const SizedBox(width: 11),
+              const Text(
+                'PARCOTO',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2,
+                ),
+              ),
+            ]),
+            const SizedBox(height: 27),
+            const Text(
+              'Votre activité.\\nSous contrôle.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 32,
+                height: 1.05,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -1,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Connectez-vous à votre espace professionnel.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: .65),
+                fontSize: 11,
+              ),
+            ),
+            const SizedBox(height: 30),
+            loginPanel,
+            const SizedBox(height: 20),
+            Text(
+              'PARCOTO  •  © 2026',
+              style: TextStyle(color: muted, fontSize: 9, letterSpacing: 1.2),
+            ),
+          ],
+        );
+
         return Container(
-          width: double.infinity, height: double.infinity, color: page,
-          child: wide
-              ? Row(children: [
-                  Expanded(flex: 11, child: Container(
-                    height: double.infinity, clipBehavior: Clip.antiAlias,
-                    decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [navy, Color(0xFF102D3C), Color(0xFF0B1B2B)])),
-                    child: Stack(children: [
-                      Positioned(right: -150, top: -160, child: Container(width: 570, height: 570, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: mint.withValues(alpha: .10))))),
-                      Positioned(right: -85, top: -95, child: Container(width: 440, height: 440, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: mint.withValues(alpha: .07))))),
-                      Positioned(right: 30, bottom: -190, child: Icon(FluentIcons.car, size: 390, color: Colors.white.withValues(alpha: .025))),
-                      Center(child: SingleChildScrollView(padding: const EdgeInsets.symmetric(horizontal: 58, vertical: 55), child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 500), child: brand))),
-                    ]),
-                  )),
-                  Expanded(flex: 9, child: Center(child: SingleChildScrollView(padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 45), child: loginPanel))),
-                ])
-              : Container(
-                  decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [navy, navy2, page], stops: const [0, .38, .38])),
-                  child: SingleChildScrollView(padding: EdgeInsets.fromLTRB(compact ? 18 : 30, 25, compact ? 18 : 30, 24), child: Column(children: [
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      Container(width: 42, height: 42, padding: const EdgeInsets.all(6), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(13)), child: Image.asset('assets/images/logo.webp', fit: BoxFit.contain)),
-                      const SizedBox(width: 11),
-                      const Text('PARCOTO', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2)),
-                    ]),
-                    const SizedBox(height: 27),
-                    const Text('Votre activité.\nSous contrôle.', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 32, height: 1.05, fontWeight: FontWeight.w900, letterSpacing: -1)),
-                    const SizedBox(height: 10),
-                    Text('Connectez-vous à votre espace professionnel.', textAlign: TextAlign.center, style: TextStyle(color: Colors.white.withValues(alpha: .65), fontSize: 11)),
-                    const SizedBox(height: 30),
-                    loginPanel,
-                    const SizedBox(height: 20),
-                    Text('PARCOTO  •  © 2026', style: TextStyle(color: muted, fontSize: 9, letterSpacing: 1.2)),
-                  ])),
+          width: double.infinity,
+          height: availableHeight,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [navy, navy2, page],
+              stops: const [0, .38, .38],
+            ),
+          ),
+          child: canFitWithoutScroll
+              ? Center(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: SizedBox(
+                      width: constraints.maxWidth,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: compact ? 18 : 30,
+                          vertical: 18,
+                        ),
+                        child: mobileContent,
+                      ),
+                    ),
+                  ),
+                )
+              : SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(
+                    compact ? 18 : 30,
+                    25,
+                    compact ? 18 : 30,
+                    24,
+                  ),
+                  child: mobileContent,
                 ),
         );
       }),
