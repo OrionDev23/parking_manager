@@ -40,7 +40,8 @@ const partsID = "parts";
 const backupId = "backup";
 const storageId = "storage";
 const endpoint = "https://fra.cloud.appwrite.io/v1";
-String? project;
+const appwriteProjectId = 'essais';
+String? project = appwriteProjectId;
 
 String? secretKey;
 
@@ -86,7 +87,7 @@ class DatabaseGetter {
   }
 
   DatabaseGetter() {
-    final requestedProject = project ?? prefs.getString('project');
+    const requestedProject = appwriteProjectId;
     if (requestedProject == null || requestedProject.isEmpty) return;
 
     // Rebuild the legacy Appwrite clients only when the project actually

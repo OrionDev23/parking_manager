@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import '../tenancy/company_membership_resolver.dart';
+
 import 'package:appwrite/appwrite.dart' hide Role;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,6 +20,8 @@ class LegacyAppwriteAuthService implements AuthService {
   final ParcotoEdition edition;
   final AccessControlRepository accessControlRepository;
   final Future<void> Function()? onSessionEnding;
+  final CompanyMembershipResolver membershipResolver =
+      CompanyMembershipResolver();
 
   AuthState _state = AuthState.unknown;
   AuthSession? _session;
@@ -65,16 +69,9 @@ class LegacyAppwriteAuthService implements AuthService {
   Future<AuthSession?> _restoreSession() async {
     _setState(AuthState.restoring);
 
-    final configuredProject = preferences.getString('project');
-    if (configuredProject == null || configuredProject.isEmpty) {
-      _session = null;
-      _setState(AuthState.signedOut);
-      return null;
-    }
-
     try {
       await onSessionEnding?.call();
-      project = configuredProject;
+      project = appwriteProjectId;
       final databaseGetter = DatabaseGetter();
       await databaseGetter.getUser();
 
@@ -84,11 +81,18 @@ class LegacyAppwriteAuthService implements AuthService {
         return null;
       }
 
+      // "project" is retained only as a legacy company selector. Appwrite's
+      // project is fixed and never comes from user input or preferences.
+      final selector = preferences.getString('active_company_id') ??
+          preferences.getString('project');
+      final membership = await membershipResolver.select(selector: selector);
+      await preferences.setString('active_company_id', membership.companyId);
+
       final permissions = await accessControlRepository.getEffectivePermissions(
-        configuredProject,
+        membership.companyId,
         DatabaseGetter.user!.$id,
       );
-      _session = _buildSession(configuredProject, permissions);
+      _session = _buildSession(membership.companyId, permissions);
       _setState(AuthState.signedIn);
       return _session;
     } catch (_) {
@@ -102,30 +106,20 @@ class LegacyAppwriteAuthService implements AuthService {
   Future<AuthSession> signIn({
     required String email,
     required String password,
-    String? projectId,
+    String? companyId,
   }) async {
     _setState(AuthState.signingIn);
 
-    final resolvedProject =
-        (projectId ?? preferences.getString('project') ?? '').trim();
-    if (resolvedProject.isEmpty) {
-      _setState(AuthState.error);
-      throw StateError('A Parcoto project ID is required.');
-    }
-
     try {
-      // Stop the previous tenant's sync before changing the global legacy
-      // Appwrite client. An in-flight stock sync must not use the new project.
+      // Stop the previous tenant's sync before replacing its session state.
       await onSessionEnding?.call();
-      project = resolvedProject;
+      project = appwriteProjectId;
       final databaseGetter = DatabaseGetter();
       final account = DatabaseGetter.account;
       if (account == null) {
         throw StateError('Appwrite account is not initialized.');
       }
 
-      // There may be no active session yet. Appwrite returns
-      // general_unauthorized_scope in that case, so this cleanup is best-effort.
       try {
         await account.deleteSessions();
       } on AppwriteException {
@@ -136,7 +130,6 @@ class LegacyAppwriteAuthService implements AuthService {
         email: email.trim(),
         password: password,
       );
-      await preferences.setString('project', resolvedProject);
 
       DatabaseGetter.user = null;
       DatabaseGetter.me.value = null;
@@ -148,11 +141,18 @@ class LegacyAppwriteAuthService implements AuthService {
         );
       }
 
+      final membership = await membershipResolver.select(
+        selector: companyId,
+      );
+      await preferences.setString('active_company_id', membership.companyId);
+      // Keep the old key as a company selector for older UI code only.
+      await preferences.setString('project', membership.companyId);
+
       final permissions = await accessControlRepository.getEffectivePermissions(
-        resolvedProject,
+        membership.companyId,
         DatabaseGetter.user!.$id,
       );
-      _session = _buildSession(resolvedProject, permissions);
+      _session = _buildSession(membership.companyId, permissions);
       _setState(AuthState.signedIn);
       return _session!;
     } on AppwriteException {

@@ -39,7 +39,9 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   void initState() {
-    projectName.text = prefs.getString('project') ?? '';
+    projectName.text = prefs.getString('active_company_id') ??
+        prefs.getString('project') ??
+        '';
     waitForFirstLoading();
     super.initState();
   }
@@ -268,7 +270,7 @@ class _LoginScreenState extends State<LoginScreen>
         await authService.signIn(
           email: email.text,
           password: password.text,
-          projectId: projectName.text.trim(),
+          companyId: projectName.text.trim(),
         );
 
         PanesListState.signedIn.value = true;

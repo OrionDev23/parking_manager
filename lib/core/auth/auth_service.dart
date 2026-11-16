@@ -10,7 +10,7 @@ abstract class AuthService {
   Future<AuthSession> signIn({
     required String email,
     required String password,
-    String? projectId,
+    String? companyId,
   });
   Future<void> signOut();
 }

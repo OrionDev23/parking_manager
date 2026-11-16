@@ -141,7 +141,7 @@ Future<void> _configureSessionRuntime(String companyId) async {
     final nextDrivers = await DriverServices.create(
       preferences: prefs,
       companyId: companyId,
-      appwriteProjectId: companyId,
+      appwriteProjectId: appwriteProjectId,
     );
     final nextStock = LegacyStockSyncService(
       localDatabase: nextVehicles.localDatabase,
@@ -329,7 +329,7 @@ Future<void> launchApp() async {
   // Keep a local runtime available to widgets before authentication. Once
   // a session is restored or created, it is replaced with the authenticated
   // company's runtime before any backfill or sync is started.
-  final activeCompanyId = project ?? 'local';
+  const activeCompanyId = 'local';
   await _configureSessionRuntime(activeCompanyId);
 
   VehiclesUtilities();
