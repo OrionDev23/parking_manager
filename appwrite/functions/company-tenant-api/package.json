@@ -1,1 +1,6 @@
-{"name":"parcoto-company-tenant-api","version":"1.0.0","private":true,"type":"module"}
+{
+  "name": "parcoto-company-tenant-api",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module"
+}

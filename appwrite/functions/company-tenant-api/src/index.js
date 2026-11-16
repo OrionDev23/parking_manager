@@ -87,6 +87,18 @@ async function requireCompanyAdmin(userId, companyId) {
   return membership;
 }
 
+async function createRow(tableId, rowId, data) {
+  return appwrite(`/tablesdb/${DATABASE_ID}/tables/${tableId}/rows`, {
+    method: 'POST',
+    body: { rowId, data, permissions: [] },
+  });
+}
+
+function slugify(value) {
+  return value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 64);
+}
+
 export default async ({ req, res, log, error }) => {
   try {
     if (!projectId || !apiKey) {
@@ -95,6 +107,7 @@ export default async ({ req, res, log, error }) => {
     const { userId } = await authenticate(req);
     const input = req.bodyJson || {};
     const action = input.action;
+    const now = new Date().toISOString();
 
     if (action === 'resolve') {
       const rows = await listRows(MEMBERSHIPS, {
@@ -102,8 +115,7 @@ export default async ({ req, res, log, error }) => {
       });
       const memberships = [];
       for (const row of rows.filter(item => item.data?.status === 'active')) {
-        const companyId = row.data.companyId;
-        const company = await getCompany(companyId);
+        const company = await getCompany(row.data.companyId);
         if (company && company.data?.status === 'active') {
           memberships.push({
             companyId: company.$id,
@@ -115,6 +127,39 @@ export default async ({ req, res, log, error }) => {
         }
       }
       return json(res, 200, { ok: true, userId, memberships });
+    }
+
+    if (action === 'create_company') {
+      const name = String(input.name || '').trim();
+      const slug = slugify(input.slug || name);
+      if (name.length < 2 || name.length > 160 || slug.length < 2) {
+        return json(res, 400, { ok: false, message: 'A valid company name is required.' });
+      }
+      const existing = await listRows(COMPANIES, {
+        method: 'equal', attribute: 'slug', values: [slug],
+      });
+      if (existing.length) return json(res, 409, { ok: false, message: 'This company identifier is already used.' });
+
+      const companyId = crypto.randomUUID();
+      const membershipId = crypto.randomUUID();
+      await createRow(COMPANIES, companyId, {
+        name, slug, status: 'active', ownerUserId: userId, createdAt: now, updatedAt: now,
+      });
+      try {
+        await createRow(MEMBERSHIPS, membershipId, {
+          companyId, userId, role: 'owner', status: 'active',
+          invitedBy: userId, createdAt: now, updatedAt: now,
+        });
+      } catch (failure) {
+        try {
+          await appwrite(`/tablesdb/${DATABASE_ID}/tables/${COMPANIES}/rows/${companyId}`, { method: 'DELETE' });
+        } catch (_) {}
+        throw failure;
+      }
+      return json(res, 201, {
+        ok: true,
+        membership: { companyId, companyName: name, companySlug: slug, role: 'owner', membershipId },
+      });
     }
 
     if (action === 'list_members') {
@@ -146,6 +191,44 @@ export default async ({ req, res, log, error }) => {
       return json(res, 200, { ok: true, companyId, members });
     }
 
+    if (action === 'add_member') {
+      const companyId = String(input.companyId || '');
+      const email = String(input.email || '').trim().toLowerCase();
+      const role = String(input.role || 'employee');
+      if (!companyId || !email || !['admin', 'manager', 'employee', 'viewer'].includes(role)) {
+        return json(res, 400, { ok: false, message: 'Invalid companyId, email or role.' });
+      }
+      const caller = await requireCompanyAdmin(userId, companyId);
+      if (role === 'admin' && caller.data.role !== 'owner') {
+        return json(res, 403, { ok: false, message: 'Only the owner can add an administrator.' });
+      }
+      const search = new URLSearchParams({ search: email, limit: '25' });
+      const users = await appwrite(`/users?${search.toString()}`);
+      const target = (users.users || []).find(item => item.email?.toLowerCase() === email);
+      if (!target) return json(res, 404, { ok: false, message: 'No Parcoto account exists for this email yet.' });
+
+      const existing = await listRows(MEMBERSHIPS, {
+        method: 'equal', attribute: 'userId', values: [target.$id],
+      });
+      const current = existing.find(row => row.data?.companyId === companyId);
+      if (current && current.data?.status !== 'revoked') {
+        return json(res, 409, { ok: false, message: 'This user is already a member of the company.' });
+      }
+      const membershipId = current?.$id || crypto.randomUUID();
+      const data = {
+        companyId, userId: target.$id, role, status: 'active',
+        invitedBy: userId, createdAt: current?.data?.createdAt || now, updatedAt: now,
+      };
+      if (current) {
+        await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
+          method: 'PATCH', body: { data },
+        });
+      } else {
+        await createRow(MEMBERSHIPS, membershipId, data);
+      }
+      return json(res, 201, { ok: true, membershipId, userId: target.$id, email, role });
+    }
+
     if (action === 'change_role') {
       const companyId = String(input.companyId || '');
       const membershipId = String(input.membershipId || '');
@@ -155,15 +238,14 @@ export default async ({ req, res, log, error }) => {
       }
       const caller = await requireCompanyAdmin(userId, companyId);
       const target = await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`);
-      if (target.data?.companyId !== companyId || target.data?.role === 'owner') {
+      if (target.data?.companyId !== companyId || target.data?.role === 'owner' || target.data?.status === 'revoked') {
         return json(res, 403, { ok: false, message: 'The target membership cannot be changed.' });
       }
-      if (caller.data.role !== 'owner' && role === 'admin') {
-        return json(res, 403, { ok: false, message: 'Only the owner can promote an administrator.' });
+      if (caller.data.role !== 'owner' && (target.data?.role === 'admin' || role === 'admin')) {
+        return json(res, 403, { ok: false, message: 'Only the owner can manage administrator roles.' });
       }
       await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
-        method: 'PATCH',
-        body: { data: { role, updatedAt: new Date().toISOString() } },
+        method: 'PATCH', body: { data: { role, updatedAt: now } },
       });
       return json(res, 200, { ok: true });
     }
@@ -176,15 +258,14 @@ export default async ({ req, res, log, error }) => {
       }
       const caller = await requireCompanyAdmin(userId, companyId);
       const target = await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`);
-      if (target.data?.companyId !== companyId || target.data?.role === 'owner' || target.data?.userId === userId) {
+      if (target.data?.companyId !== companyId || target.data?.role === 'owner' || target.data?.userId === userId || target.data?.status === 'revoked') {
         return json(res, 403, { ok: false, message: 'The target membership cannot be revoked.' });
       }
       if (caller.data.role !== 'owner' && target.data?.role === 'admin') {
         return json(res, 403, { ok: false, message: 'Only the owner can revoke an administrator.' });
       }
       await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
-        method: 'PATCH',
-        body: { data: { status: 'revoked', updatedAt: new Date().toISOString() } },
+        method: 'PATCH', body: { data: { status: 'revoked', updatedAt: now } },
       });
       return json(res, 200, { ok: true });
     }
