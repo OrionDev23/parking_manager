@@ -159,6 +159,18 @@ class AppwriteSyncEngine implements SyncEngine {
       final blockedRecords = <String>{};
       for (final operation in operations) {
         if (!_running || _leaseLost) break;
+        if (operation.companyId != companyId) {
+          await queue.markConflict(
+            operation.id,
+            reason:
+                'Tenant mismatch: queued for ${operation.companyId}, engine is scoped to $companyId.',
+          );
+          debugPrint(
+            '[ParcOto Sync] SECURITY BLOCK tenant mismatch operation=${operation.id} '
+            'operationCompany=${operation.companyId} engineCompany=$companyId',
+          );
+          continue;
+        }
         final recordKey =
             '${operation.companyId}:${operation.entity}:${operation.entityId}';
         if (blockedRecords.contains(recordKey)) continue;
