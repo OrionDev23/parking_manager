@@ -144,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen>
             controller: password, placeholder: 'Votre mot de passe', obscureText: !showPassword,
             onSubmitted: (_) => signIn(),
             onChanged: (_) { if (error.isNotEmpty) setState(() => error = ''); },
-            prefix: Padding(padding: const EdgeInsets.symmetric(horizontal: 13), child: Icon(FluentIcons.password_field, size: 15, color: muted)),
+            prefix: Padding(padding: const EdgeInsets.symmetric(horizontal: 13), child: Icon(FluentIcons.lock, size: 15, color: muted)),
             suffix: IconButton(icon: Icon(showPassword ? FluentIcons.hide : FluentIcons.red_eye, size: 15, color: muted), onPressed: () => setState(() => showPassword = !showPassword)),
             style: TextStyle(color: foreground, fontSize: 13),
           ),
@@ -157,9 +157,10 @@ class _LoginScreenState extends State<LoginScreen>
         ],
         const SizedBox(height: 20),
         SizedBox(height: 52, child: FilledButton(
-          style: ButtonStyle(backgroundColor: WidgetStateProperty.all(teal), shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
           onPressed: checking ? null : signIn,
-          child: checking ? const SizedBox(width: 19, height: 19, child: ProgressRing(strokeWidth: 2)) : const Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text('Accéder à mon espace', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)), SizedBox(width: 10), Icon(FluentIcons.arrow_up_right, size: 14)]),
+          child: checking
+              ? const SizedBox(width: 19, height: 19, child: ProgressRing(strokeWidth: 2))
+              : const Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text('Accéder à mon espace', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)), SizedBox(width: 10), Icon(FluentIcons.arrow_right, size: 14)]),
         )),
         const SizedBox(height: 22),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(FluentIcons.shield, size: 12, color: muted), const SizedBox(width: 7), Text('Vos accès sont protégés', style: TextStyle(color: muted, fontSize: 10))]),
@@ -177,7 +178,7 @@ class _LoginScreenState extends State<LoginScreen>
         ]),
       ]),
       const SizedBox(height: 62),
-      Container(padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7), decoration: BoxDecoration(color: mint.withValues(alpha: .12), borderRadius: BorderRadius.circular(30), border: Border.all(color: mint.withValues(alpha: .25))), child: const Row(mainAxisSize: MainAxisSize.min, children: [Icon(FluentIcons.circle_ring, color: mint, size: 9), SizedBox(width: 8), Text('VOTRE ACTIVITÉ, EN TEMPS RÉEL', style: TextStyle(color: mint, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.1))])),
+      Container(padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7), decoration: BoxDecoration(color: mint.withValues(alpha: .12), borderRadius: BorderRadius.circular(30), border: Border.all(color: mint.withValues(alpha: .25))), child: const Row(mainAxisSize: MainAxisSize.min, children: [Icon(FluentIcons.sync, color: mint, size: 9), SizedBox(width: 8), Text('VOTRE ACTIVITÉ, EN TEMPS RÉEL', style: TextStyle(color: mint, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.1))])),
       const SizedBox(height: 23),
       const Text('Prenez une\nlongueur\nd’avance.', style: TextStyle(color: Colors.white, fontSize: 57, height: 1.02, fontWeight: FontWeight.w900, letterSpacing: -2.8)),
       const SizedBox(height: 20),
@@ -185,9 +186,9 @@ class _LoginScreenState extends State<LoginScreen>
       const SizedBox(height: 42),
       feature(FluentIcons.car, 'Flotte & conducteurs', 'Chaque véhicule, chaque mouvement, maîtrisé.'),
       const SizedBox(height: 19),
-      feature(FluentIcons.analytics, 'Pilotage & rentabilité', 'Les indicateurs utiles, sans perdre de temps.'),
+      feature(FluentIcons.chart, 'Pilotage & rentabilité', 'Les indicateurs utiles, sans perdre de temps.'),
       const SizedBox(height: 19),
-      feature(FluentIcons.cloud_sync, 'Continuité de service', 'Travaillez même lorsque le réseau vous lâche.'),
+      feature(FluentIcons.sync, 'Continuité de service', 'Travaillez même lorsque le réseau vous lâche.'),
       const SizedBox(height: 48),
       Row(children: [Container(width: 28, height: 2, color: const Color(0xFFFFB36B)), const SizedBox(width: 10), Text('LA GESTION QUI AVANCE AVEC VOUS', style: TextStyle(color: Colors.white.withValues(alpha: .48), fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.4))]),
     ]);
