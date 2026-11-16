@@ -32,6 +32,7 @@ import '../reparation/reparation_dashboard.dart';
 import '../settings.dart';
 import '../../tutorials/tutorial.dart';
 import '../user_management/user_management.dart';
+import '../platform/platform_companies_screen.dart';
 import '../access/access_management.dart';
 import '../vehicle/brand/brand_list.dart';
 import '../vehicle/documents/document_tabs.dart';
@@ -53,6 +54,7 @@ class PaneItemsAndFooters {
 
   static late PaneItem dashboard;
   static late PaneItem usermanagement;
+  static late PaneItem platformCompanies;
   static late PaneItem accessManagement;
   static late PaneItemExpander userAccessManagement;
   static late PaneItemExpander vehicles;
@@ -85,6 +87,12 @@ class PaneItemsAndFooters {
       title: const Text('Équipes et accès'),
       icon: Icon(FluentIcons.security_group, color: appTheme.color.lightest),
       body: const AccessManagement(),
+    );
+    platformCompanies = PaneItem(
+      key: const Key('platform-companies'),
+      title: const Text('Entreprises clientes'),
+      icon: Icon(FluentIcons.cloud, color: appTheme.color.lightest),
+      body: const PlatformCompaniesScreen(),
     );
     usermanagement = PaneItem(
       key: Key("usermngmt"),
@@ -371,6 +379,7 @@ class PaneItemsAndFooters {
     if (PanesListState.signedIn.value) {
       originalItems = [
         if (PanesListState.signedIn.value) dashboard,
+        if (authService.session?.userId == '999') platformCompanies,
         if (canManageUsers || canManageAccess) userAccessManagement,
         if (PanesListState.signedIn.value) vehicles,
         if (PanesListState.signedIn.value) reparations,
