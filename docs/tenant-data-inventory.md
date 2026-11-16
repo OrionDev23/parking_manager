@@ -166,3 +166,58 @@ The three vehicle rows successfully resolved during this pass (`39911741672`, `3
 - The `entreprise` singleton and inventory/catalogue tables require a deliberate scope decision before backfill.
 
 No records, schemas, permissions, row-security flags, memberships or Function deployments were modified by this pass.
+
+## Platform super-admin model (clarified 2026-11-16)
+
+The intended platform operator is the Appwrite Auth account `contact@parcoto.com`. This identity is a platform-level principal, not an ordinary company administrator and must not need a membership in every company.
+
+Required authorization model:
+
+- **Platform super admin**: `contact@parcoto.com`, authenticated by Appwrite. May list/access all companies, provision companies, create company administrator accounts, create ordinary user accounts, manage tenant limits, and perform platform-wide support operations.
+- **Company admin**: scoped to one company by an active membership. May administer that company's operational data and members, but cannot create companies, create/promote other company admins, or grant platform privileges.
+- **Company manager / employee / viewer**: scoped to one company and governed by the company's role/permission policy.
+- **Ordinary user account provisioning**: controlled by the platform super admin. Company admins must not have an open-ended account-creation flow. If self-registration is ever added, it must be separately designed and gated.
+- **User quota**: enforced server-side per company when the platform super admin provisions or activates users. A client-side count or disabled UI button is not an enforcement boundary.
+
+The platform super-admin check must be based on the authenticated Appwrite account ID (or another server-controlled immutable principal mapping), never an email or role supplied in the request body. Email is useful for identifying the intended account during provisioning, but the authorization decision should bind to the stable Auth user ID. Keep the super-admin allowlist/configuration server-side; do not store a client-editable role or expose a platform-wide API key to Flutter.
+
+The tenant API must support platform-scoped operations distinct from company-scoped operations. Company admins must continue to be checked against their active membership and requested company. The super admin's platform scope must not be simulated by creating memberships for every company.
+
+### Current code mismatch with this model
+
+- `create_company` currently creates a company and gives the authenticated caller an `owner` membership. This is not the desired platform provisioning flow.
+- `add_member` is company-admin scoped and currently allows a company `owner` to add an `admin`. This conflicts with the requirement that only the platform super admin creates company administrators.
+- There is no dedicated action to create an Appwrite Auth user and provision their company membership with a controlled role.
+- There is no platform-scoped list/inspect/manage-companies API.
+- There is no server-enforced per-company user quota in the current tenant Function.
+- The current Flutter auth path requires an active company membership for every successful sign-in; a platform super admin with no company membership would be rejected. A separate platform session / company selection context is needed.
+- The account `contact@parcoto.com` has not yet been verified against the live Appwrite Auth users in this audit. Do not assume it exists or infer its Auth user ID.
+
+## Flutter legacy data-access audit (read-only, 2026-11-16)
+
+The new strict tenant repositories currently cover the migrated `chauffeur` and `vehicle` data sources. Several legacy Appwrite-backed services remain on the generic `ParcOtoWebService`, whose query builder does not add an active-company filter. That generic service performs direct TablesDB list calls and therefore cannot be considered tenant-isolated.
+
+| Feature / table | Current access path | Finding |
+|---|---|---|
+| Vehicles | `VehicleRepository` / `AppwriteVehicleSource` for the main vehicle table | Active-company filter and row/payload checks are present in the new path. Check all secondary vehicle operations and import/export separately. |
+| Drivers | `DriverRepository` / `AppwriteDriverSource` | Active-company filter and row/payload checks are present in the new path. |
+| Vehicle states (`etat`) | `VStatesDatasource` → `VehicleStateWebservice` → generic `ParcOtoWebService` | No tenant filter in the service; records are currently queried across the whole table subject only to Appwrite permissions. Must scope through the parent vehicle or add a tenant key. |
+| Vehicle documents (`doc_vehic`) | Legacy generic datasource/service | No tenant filter; relation to vehicle is inconsistent/unresolved for the single live record. |
+| Activity (`activity`) | `LogWebService` → generic `ParcOtoWebService` | Queries filter by date, creator and activity type, but not by company. `docID`/activity type must be resolved to the parent tenant record. |
+| Planning (`planning`) | `PlanningDatasource.handleLoadMore` direct TablesDB query | No company filter or tenant field. This is a cross-company exposure risk if Appwrite permissions allow access. |
+| Backups (`backup`) | `BackupWebService` and backup datasource flow | Generic query path has no company filter; backup payloads can aggregate many tenant tables, so this is a high-impact isolation boundary. |
+| Workshop inventory (`parts`, `categories`, `partsbrands`, `options`) | `PartsWebService` / legacy datasource | No tenant key/filter in the legacy generic path. Need decide whether catalogs are tenant-specific or platform-shared, then enforce it consistently. |
+| Company profile (`entreprise`) | `DatabaseGetter.getEntreprise()` direct row lookup at ID `1` | One project-global singleton is loaded, not a company-scoped profile. Must become company-scoped or explicitly platform-global. |
+| Licensing (`trialdate`, `limits`) | `DatabaseGetter.getTrialDate()`, `getLimits()` direct row lookups | Legacy project-global semantics; cannot represent per-company subscription/user limits correctly. Must move to server-managed tenant entitlements. |
+| Admin secrets (`admin_keys`) | `DatabaseGetter.setSecretKey()` direct row lookups | Client reads system encryption secrets from a table historically exposed to a global Team. Must be moved behind a server-controlled design; never exposed to ordinary company clients. |
+
+### Cross-cutting technical findings
+
+- `ParcOtoWebService.getQueries()` composes only feature filters, limit, offset and sort. It has no `CompanyContext` and no mandatory `companyId` predicate.
+- `getSearchResult()` calls TablesDB directly. Its search branch also omits the generic paging/sort queries and has no tenant predicate.
+- The base `getData()` retains a local cache on remote failure. Once tenant scoping is added, cached rows must also be keyed by company ID and cleared/rejected on company switch; otherwise a previous company's local snapshot can be rendered after a tenant change.
+- `PlanningDatasource.handleLoadMore()` directly calls `DatabaseGetter.database.listRows` and does not use a tenant-aware repository.
+- The offline sync engine correctly carries a `companyId` in its queue and engine lease, but that alone does not secure the remote read/write handlers. Every handler and pull path must verify that the operation company matches the active session and the remote row.
+- Main vehicle/driver CRUD has stricter client-side checks, but client-side filters are not server-side security. Legacy table permissions and row security still need a server-enforced boundary.
+
+No application code, Appwrite data, permissions, row-security flags, user accounts, memberships, Function deployment or quotas were changed by this audit.
