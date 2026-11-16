@@ -88,11 +88,7 @@ class LegacyAppwriteAuthService implements AuthService {
       final membership = await membershipResolver.select(selector: selector);
       await preferences.setString('active_company_id', membership.companyId);
 
-      final permissions = await accessControlRepository.getEffectivePermissions(
-        membership.companyId,
-        DatabaseGetter.user!.$id,
-      );
-      _session = _buildSession(membership.companyId, permissions);
+      _session = _buildSession(membership.companyId, membership.permissions);
       _setState(AuthState.signedIn);
       return _session;
     } catch (_) {
@@ -148,11 +144,7 @@ class LegacyAppwriteAuthService implements AuthService {
       // Keep the old key as a company selector for older UI code only.
       await preferences.setString('project', membership.companyId);
 
-      final permissions = await accessControlRepository.getEffectivePermissions(
-        membership.companyId,
-        DatabaseGetter.user!.$id,
-      );
-      _session = _buildSession(membership.companyId, permissions);
+      _session = _buildSession(membership.companyId, membership.permissions);
       _setState(AuthState.signedIn);
       return _session!;
     } on AppwriteException {

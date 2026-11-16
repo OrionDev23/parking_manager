@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:appwrite/appwrite.dart';
 
 import '../../providers/client_database.dart';
+import '../permissions/permission_catalog.dart';
 
 class CompanyMembership {
   final String companyId;
@@ -27,6 +28,16 @@ class CompanyMembership {
       role: json['role']?.toString() ?? 'viewer',
       membershipId: json['membershipId']?.toString() ?? '',
     );
+  }
+
+  Set<String> get permissions {
+    if (role == 'owner' || role == 'admin') {
+      return PermissionCatalog.all.map((permission) => permission.id).toSet();
+    }
+    if (role == 'manager') return PermissionCatalog.preset('Gestionnaire');
+    // employee and viewer deliberately receive the least-privilege preset
+    // until company-specific custom permission profiles are migrated.
+    return PermissionCatalog.preset('Lecture seule');
   }
 
   bool matches(String selector) {
