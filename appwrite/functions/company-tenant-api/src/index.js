@@ -1,6 +1,7 @@
 const DATABASE_ID = '6531ad112080ae3b14a7';
 const MEMBERSHIPS = 'company_memberships';
 const COMPANIES = 'companies';
+const ENTITLEMENTS = 'company_entitlements';
 
 const endpoint = (process.env.APPWRITE_FUNCTION_API_ENDPOINT || 'https://fra.cloud.appwrite.io/v1').replace(/\/$/, '');
 const projectId = process.env.APPWRITE_FUNCTION_PROJECT_ID;
@@ -62,6 +63,46 @@ async function listRows(tableId, query) {
     offset += page.length;
   }
   return rows;
+}
+
+async function listAllRows(tableId) {
+  const rows = [];
+  let offset = 0;
+  while (true) {
+    const params = new URLSearchParams();
+    params.append('queries[]', JSON.stringify({ method: 'limit', values: [100] }));
+    params.append('queries[]', JSON.stringify({ method: 'offset', values: [offset] }));
+    const result = await appwrite(`/tablesdb/${DATABASE_ID}/tables/${tableId}/rows?${params.toString()}`);
+    const page = result.rows || [];
+    rows.push(...page);
+    if (page.length < 100) break;
+    offset += page.length;
+  }
+  return rows;
+}
+
+function isPlatformSuperAdmin(userId) {
+  const allowed = String(process.env.PLATFORM_SUPER_ADMIN_IDS || '')
+    .split(',').map(value => value.trim()).filter(Boolean);
+  return allowed.includes(userId);
+}
+
+function requirePlatformSuperAdmin(userId) {
+  if (!isPlatformSuperAdmin(userId)) {
+    const failure = new Error('Platform super-administrator access required.');
+    failure.status = 403;
+    throw failure;
+  }
+}
+
+async function getEntitlement(companyId) {
+  try {
+    const row = await appwrite(`/tablesdb/${DATABASE_ID}/tables/${ENTITLEMENTS}/rows/${encodeURIComponent(companyId)}`);
+    return row.data || {};
+  } catch (failure) {
+    if (failure.status === 404) return null;
+    throw failure;
+  }
 }
 
 async function getCompany(companyId) {
@@ -140,39 +181,111 @@ export default async ({ req, res, log, error }) => {
       return json(res, 200, { ok: true, userId, memberships });
     }
 
+    if (action === 'platform_list_companies') {
+      requirePlatformSuperAdmin(userId);
+      const companies = await listAllRows(COMPANIES);
+      const result = [];
+      for (const company of companies) {
+        const entitlement = await getEntitlement(company.$id);
+        const memberships = await listRows(MEMBERSHIPS, {
+          method: 'equal', attribute: 'companyId', values: [company.$id],
+        });
+        result.push({
+          companyId: company.$id,
+          name: company.data?.name || '',
+          slug: company.data?.slug || '',
+          status: company.data?.status || 'active',
+          createdAt: company.data?.createdAt || '',
+          entitlement,
+          activeUsers: memberships.filter(item => item.data?.status === 'active').length,
+        });
+      }
+      return json(res, 200, { ok: true, companies: result });
+    }
+
     if (action === 'create_company') {
+      requirePlatformSuperAdmin(userId);
       if (process.env.TENANT_COMPANY_CREATION_ENABLED !== 'true') {
-        return json(res, 403, { ok: false, message: 'Company onboarding is disabled until tenant data provisioning is complete.' });
+        return json(res, 403, { ok: false, message: 'Company provisioning is disabled until tenant data provisioning and isolation are verified.' });
       }
       const name = String(input.name || '').trim();
       const slug = slugify(input.slug || name);
-      if (name.length < 2 || name.length > 160 || slug.length < 2) {
-        return json(res, 400, { ok: false, message: 'A valid company name is required.' });
+      const adminName = String(input.adminName || '').trim();
+      const adminEmail = String(input.adminEmail || '').trim().toLowerCase();
+      const adminPassword = String(input.adminPassword || '');
+      const startsAt = new Date(input.startsAt || now);
+      const expiresAt = new Date(input.expiresAt || '');
+      const maxUsers = Number(input.maxUsers);
+      const maxVehicles = Number(input.maxVehicles);
+      const maxEmployees = Number(input.maxEmployees);
+      const maxDrivers = Number(input.maxDrivers);
+      const maxSites = Number(input.maxSites);
+      const monthlyPrice = Number(input.monthlyPrice || 0);
+      const billingCycle = String(input.billingCycle || 'monthly');
+      const currency = String(input.currency || 'DZD').toUpperCase();
+      if (name.length < 2 || name.length > 160 || slug.length < 2 ||
+          adminName.length < 2 || !adminEmail || adminPassword.length < 8 ||
+          !Number.isFinite(startsAt.getTime()) || !Number.isFinite(expiresAt.getTime()) ||
+          expiresAt <= startsAt ||
+          ![maxUsers, maxVehicles, maxEmployees, maxDrivers, maxSites, monthlyPrice].every(Number.isSafeInteger) ||
+          [maxUsers, maxVehicles, maxEmployees, maxDrivers, maxSites, monthlyPrice].some(value => value < 0) ||
+          maxUsers < 1 || !['monthly', 'quarterly', 'yearly', 'custom'].includes(billingCycle) ||
+          !/^[A-Z]{3}$/.test(currency)) {
+        return json(res, 400, { ok: false, message: 'Invalid company, administrator, license or quota values.' });
       }
-      const existing = await listRows(COMPANIES, {
-        method: 'equal', attribute: 'slug', values: [slug],
-      });
+      const existing = await listRows(COMPANIES, { method: 'equal', attribute: 'slug', values: [slug] });
       if (existing.length) return json(res, 409, { ok: false, message: 'This company identifier is already used.' });
+      const userSearch = new URLSearchParams({ search: adminEmail, limit: '25' });
+      const matchingUsers = await appwrite(`/users?${userSearch.toString()}`);
+      if ((matchingUsers.users || []).some(item => item.email?.toLowerCase() === adminEmail)) {
+        return json(res, 409, { ok: false, message: 'An Appwrite account already exists for this administrator email.' });
+      }
 
       const companyId = crypto.randomUUID();
+      const adminUserId = crypto.randomUUID();
       const membershipId = crypto.randomUUID();
-      await createRow(COMPANIES, companyId, {
-        name, slug, status: 'active', ownerUserId: userId, createdAt: now, updatedAt: now,
-      });
+      const entitlement = {
+        companyId, startsAt: startsAt.toISOString(), expiresAt: expiresAt.toISOString(),
+        maxUsers, maxVehicles, maxEmployees, maxDrivers, maxSites,
+        monthlyPrice, currency, billingCycle,
+        notes: String(input.notes || '').trim().slice(0, 2000),
+        createdAt: now, updatedAt: now,
+      };
+      let accountCreated = false;
+      let companyCreated = false;
+      let entitlementCreated = false;
       try {
+        await appwrite('/users', {
+          method: 'POST',
+          body: { userId: adminUserId, email: adminEmail, password: adminPassword, name: adminName },
+        });
+        accountCreated = true;
+        await createRow(COMPANIES, companyId, {
+          name, slug, status: 'active', ownerUserId: adminUserId, createdAt: now, updatedAt: now,
+        });
+        companyCreated = true;
+        await createRow(ENTITLEMENTS, companyId, entitlement);
+        entitlementCreated = true;
         await createRow(MEMBERSHIPS, membershipId, {
-          companyId, userId, role: 'owner', status: 'active',
+          companyId, userId: adminUserId, role: 'admin', status: 'active',
           invitedBy: userId, createdAt: now, updatedAt: now,
         });
       } catch (failure) {
-        try {
-          await appwrite(`/tablesdb/${DATABASE_ID}/tables/${COMPANIES}/rows/${companyId}`, { method: 'DELETE' });
-        } catch (_) {}
+        if (entitlementCreated) {
+          try { await appwrite(`/tablesdb/${DATABASE_ID}/tables/${ENTITLEMENTS}/rows/${companyId}`, { method: 'DELETE' }); } catch (_) {}
+        }
+        if (companyCreated) {
+          try { await appwrite(`/tablesdb/${DATABASE_ID}/tables/${COMPANIES}/rows/${companyId}`, { method: 'DELETE' }); } catch (_) {}
+        }
+        if (accountCreated) {
+          try { await appwrite(`/users/${adminUserId}`, { method: 'DELETE' }); } catch (_) {}
+        }
         throw failure;
       }
       return json(res, 201, {
         ok: true,
-        membership: { companyId, companyName: name, companySlug: slug, role: 'owner', membershipId },
+        company: { companyId, name, slug, status: 'active', entitlement },
+        administrator: { userId: adminUserId, email: adminEmail, role: 'admin' },
       });
     }
 
