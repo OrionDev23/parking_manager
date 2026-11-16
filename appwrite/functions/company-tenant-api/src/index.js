@@ -228,8 +228,11 @@ export default async ({ req, res, log, error }) => {
       const priceAmount = Number(input.priceAmount || 0);
       const billingCycle = String(input.billingCycle || 'monthly');
       const currency = String(input.currency || 'DZD').toUpperCase();
+      const userSearch = new URLSearchParams({ search: adminEmail, limit: '25' });
+      const matchingUsers = await appwrite(`/users?${userSearch.toString()}`);
+      const existingAdmin = (matchingUsers.users || []).find(item => item.email?.toLowerCase() === adminEmail) || null;
       if (name.length < 2 || name.length > 160 || slug.length < 2 ||
-          adminName.length < 2 || !adminEmail || adminPassword.length < 8 ||
+          adminName.length < 2 || !adminEmail || (!existingAdmin && adminPassword.length < 8) ||
           !Number.isFinite(startsAt.getTime()) || !Number.isFinite(expiresAt.getTime()) ||
           expiresAt <= startsAt ||
           ![maxUsers, maxVehicles, maxEmployees, maxDrivers, maxSites, priceAmount].every(Number.isSafeInteger) ||
@@ -240,14 +243,9 @@ export default async ({ req, res, log, error }) => {
       }
       const existing = await listRows(COMPANIES, { method: 'equal', attribute: 'slug', values: [slug] });
       if (existing.length) return json(res, 409, { ok: false, message: 'This company identifier is already used.' });
-      const userSearch = new URLSearchParams({ search: adminEmail, limit: '25' });
-      const matchingUsers = await appwrite(`/users?${userSearch.toString()}`);
-      if ((matchingUsers.users || []).some(item => item.email?.toLowerCase() === adminEmail)) {
-        return json(res, 409, { ok: false, message: 'An Appwrite account already exists for this administrator email.' });
-      }
 
       const companyId = crypto.randomUUID();
-      const adminUserId = crypto.randomUUID();
+      const adminUserId = existingAdmin?.$id || crypto.randomUUID();
       const membershipId = crypto.randomUUID();
       const entitlement = {
         companyId, startsAt: startsAt.toISOString(), expiresAt: expiresAt.toISOString(),
@@ -260,11 +258,13 @@ export default async ({ req, res, log, error }) => {
       let companyCreated = false;
       let entitlementCreated = false;
       try {
-        await appwrite('/users', {
-          method: 'POST',
-          body: { userId: adminUserId, email: adminEmail, password: adminPassword, name: adminName },
-        });
-        accountCreated = true;
+        if (!existingAdmin) {
+          await appwrite('/users', {
+            method: 'POST',
+            body: { userId: adminUserId, email: adminEmail, password: adminPassword, name: adminName },
+          });
+          accountCreated = true;
+        }
         await createRow(COMPANIES, companyId, {
           name, slug, status: 'active', ownerUserId: adminUserId, createdAt: now, updatedAt: now,
         });
@@ -290,7 +290,7 @@ export default async ({ req, res, log, error }) => {
       return json(res, 201, {
         ok: true,
         company: { companyId, name, slug, status: 'active', entitlement },
-        administrator: { userId: adminUserId, email: adminEmail, role: 'admin' },
+        administrator: { userId: adminUserId, email: adminEmail, role: 'admin', reusedExistingAccount: Boolean(existingAdmin) },
       });
     }
 
