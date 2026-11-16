@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../main.dart';
+import '../core/tenancy/company_membership_resolver.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,7 +25,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen>
     with AutomaticKeepAliveClientMixin {
-  TextEditingController projectName = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
@@ -39,9 +39,6 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   void initState() {
-    projectName.text = prefs.getString('active_company_id') ??
-        prefs.getString('project') ??
-        '';
     waitForFirstLoading();
     super.initState();
   }
@@ -63,10 +60,11 @@ class _LoginScreenState extends State<LoginScreen>
     try {
       final session = await authService.restoreSession();
       if (session != null) {
-        PanesListState.signedIn.value = true;
-        signedIn = true;
-        startBackgroundInitialization(session.company.companyId);
+        _activateSession(session);
       }
+    } on CompanySelectionRequired catch (selection) {
+      final selected = await _promptCompanySelection(selection.memberships);
+      if (selected != null) _activateSession(selected);
     } catch (_) {
       PanesListState.signedIn.value = false;
       signedIn = false;
@@ -116,27 +114,6 @@ class _LoginScreenState extends State<LoginScreen>
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              SizedBox(
-                                width: pwidth,
-                                child: ParcotoTextBox(
-                                  prefix: Padding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                      8,
-                                      5,
-                                      5,
-                                      5,
-                                    ),
-                                    child: Icon(
-                                      FluentIcons.external_build,
-                                      size: 14.px,
-                                      color: Colors.grey[100],
-                                    ),
-                                  ),
-                                  controller: projectName,
-                                  placeholder: 'entreprise'.tr(),
-                                ),
-                              ),
-                              bigSpace,
                               const Divider(),
                               SizedBox(
                                 width: pwidth,
@@ -265,19 +242,14 @@ class _LoginScreenState extends State<LoginScreen>
       });
 
       try {
-        await authService.signIn(
+        final session = await authService.signIn(
           email: email.text,
           password: password.text,
-          companyId: projectName.text.trim().isEmpty
-              ? null
-              : projectName.text.trim(),
         );
-
-        PanesListState.signedIn.value = true;
-        signedIn = true;
-        startBackgroundInitialization(
-          authService.session!.company.companyId,
-        );
+        _activateSession(session);
+      } on CompanySelectionRequired catch (selection) {
+        final selected = await _promptCompanySelection(selection.memberships);
+        if (selected != null) _activateSession(selected);
       } on AppwriteException catch (e) {
         error = e.type?.tr() ?? e.message ?? 'connexionerror'.tr();
         signedIn = false;
@@ -295,6 +267,63 @@ class _LoginScreenState extends State<LoginScreen>
         checking = false;
       });
     }
+  }
+
+
+  void _activateSession(AuthSession session) {
+    PanesListState.signedIn.value = true;
+    signedIn = true;
+    if (!session.isPlatformSuperAdmin) {
+      startBackgroundInitialization(session.company.companyId);
+    }
+    if (mounted) setState(() {});
+  }
+
+  Future<AuthSession?> _promptCompanySelection(
+    List<CompanyMembership> memberships,
+  ) async {
+    if (!mounted || memberships.isEmpty) return null;
+    final selected = await showDialog<CompanyMembership>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => ContentDialog(
+        title: const Text('Choisir une entreprise'),
+        content: SizedBox(
+          width: 420,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text('Ce compte a accès à plusieurs entreprises. Sélectionnez celle à ouvrir.'),
+              const SizedBox(height: 12),
+              ...memberships.map((membership) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Button(
+                  onPressed: () => Navigator.of(dialogContext).pop(membership),
+                  child: Row(children: [
+                    const Icon(FluentIcons.company_directory),
+                    const SizedBox(width: 10),
+                    Expanded(child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(membership.companyName),
+                        Text(
+                          '${membership.companySlug} • ${membership.role}',
+                          style: FluentTheme.of(dialogContext).typography.caption,
+                        ),
+                      ],
+                    )),
+                    const Icon(FluentIcons.chevron_right),
+                  ]),
+                ),
+              )),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (selected == null) return null;
+    return authService.selectCompany(selected.companyId);
   }
 
   void forgotPassword() async {
