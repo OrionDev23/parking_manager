@@ -220,15 +220,15 @@ export default async ({ req, res, log, error }) => {
       const maxEmployees = Number(input.maxEmployees);
       const maxDrivers = Number(input.maxDrivers);
       const maxSites = Number(input.maxSites);
-      const monthlyPrice = Number(input.monthlyPrice || 0);
+      const priceAmount = Number(input.priceAmount || 0);
       const billingCycle = String(input.billingCycle || 'monthly');
       const currency = String(input.currency || 'DZD').toUpperCase();
       if (name.length < 2 || name.length > 160 || slug.length < 2 ||
           adminName.length < 2 || !adminEmail || adminPassword.length < 8 ||
           !Number.isFinite(startsAt.getTime()) || !Number.isFinite(expiresAt.getTime()) ||
           expiresAt <= startsAt ||
-          ![maxUsers, maxVehicles, maxEmployees, maxDrivers, maxSites, monthlyPrice].every(Number.isSafeInteger) ||
-          [maxUsers, maxVehicles, maxEmployees, maxDrivers, maxSites, monthlyPrice].some(value => value < 0) ||
+          ![maxUsers, maxVehicles, maxEmployees, maxDrivers, maxSites, priceAmount].every(Number.isSafeInteger) ||
+          [maxUsers, maxVehicles, maxEmployees, maxDrivers, maxSites, priceAmount].some(value => value < 0) ||
           maxUsers < 1 || !['monthly', 'quarterly', 'yearly', 'custom'].includes(billingCycle) ||
           !/^[A-Z]{3}$/.test(currency)) {
         return json(res, 400, { ok: false, message: 'Invalid company, administrator, license or quota values.' });
@@ -247,7 +247,7 @@ export default async ({ req, res, log, error }) => {
       const entitlement = {
         companyId, startsAt: startsAt.toISOString(), expiresAt: expiresAt.toISOString(),
         maxUsers, maxVehicles, maxEmployees, maxDrivers, maxSites,
-        monthlyPrice, currency, billingCycle,
+        priceAmount, currency, billingCycle,
         notes: String(input.notes || '').trim().slice(0, 2000),
         createdAt: now, updatedAt: now,
       };
