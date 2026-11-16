@@ -325,9 +325,19 @@ export default async ({ req, res, log, error }) => {
       if (!companyId || !email || !['admin', 'manager', 'employee', 'viewer'].includes(role)) {
         return json(res, 400, { ok: false, message: 'Invalid companyId, email or role.' });
       }
-      const caller = await requireCompanyAdmin(userId, companyId);
+      await requireCompanyAdmin(userId, companyId);
       if (role === 'admin') {
         return json(res, 403, { ok: false, message: 'Company administrators cannot create or promote other administrators.' });
+      }
+      const entitlement = await getEntitlement(companyId);
+      if (entitlement) {
+        const existingMembers = await listRows(MEMBERSHIPS, {
+          method: 'equal', attribute: 'companyId', values: [companyId],
+        });
+        const activeCount = existingMembers.filter(item => item.data?.status === 'active').length;
+        if (activeCount >= Number(entitlement.maxUsers || 0)) {
+          return json(res, 409, { ok: false, message: 'The company has reached its licensed user limit.' });
+        }
       }
       const search = new URLSearchParams({ search: email, limit: '25' });
       const users = await appwrite(`/users?${search.toString()}`);
