@@ -301,3 +301,16 @@ paths. Do not represent this as complete billing or licensing enforcement.
 to dispatch it if its `companyId` differs from the engine's configured
 company. This protects against a malformed or misrouted local queue item; it
 does not replace server-side authorization or secure pull handlers.
+
+
+### Follow-up: user quota guard
+
+The Function's `add_member` action now checks the active membership count
+against `company_entitlements.maxUsers` when an entitlement exists. This is a
+server-side guard for companies with entitlement records. Legacy companies
+without an entitlement remain temporarily unmetered to avoid silently blocking
+existing GTS operations during migration. Vehicle, employee, driver and site
+quota guards are not yet implemented.
+
+This code change is not active in production until the Function is deployed;
+company onboarding remains disabled.
