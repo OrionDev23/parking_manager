@@ -9,6 +9,7 @@ class AuthSession {
   final Set<String> permissions;
   final License? license;
   final bool isOfflineSession;
+  final bool isPlatformSuperAdmin;
 
   const AuthSession({
     required this.userId,
@@ -18,6 +19,7 @@ class AuthSession {
     this.permissions = const {},
     this.license,
     this.isOfflineSession = false,
+    this.isPlatformSuperAdmin = false,
   });
 
   bool hasPermission(String permission) =>
