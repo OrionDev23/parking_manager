@@ -10,11 +10,11 @@ function json(res, status, body) {
   return res.json(body, status);
 }
 
-function queryUrl(tableId, query) {
+function queryPath(tableId, query) {
   const params = new URLSearchParams();
   params.append('queries[]', JSON.stringify(query));
   params.set('limit', '100');
-  return `${endpoint}/tablesdb/${DATABASE_ID}/tables/${tableId}/rows?${params.toString()}`;
+  return `/tablesdb/${DATABASE_ID}/tables/${tableId}/rows?${params.toString()}`;
 }
 
 async function appwrite(path, { method = 'GET', body, jwt } = {}) {
@@ -30,9 +30,9 @@ async function appwrite(path, { method = 'GET', body, jwt } = {}) {
   });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const error = new Error(payload.message || `Appwrite request failed (${response.status})`);
-    error.status = response.status;
-    throw error;
+    const failure = new Error(payload.message || `Appwrite request failed (${response.status})`);
+    failure.status = response.status;
+    throw failure;
   }
   return payload;
 }
@@ -40,25 +40,25 @@ async function appwrite(path, { method = 'GET', body, jwt } = {}) {
 async function authenticate(req) {
   const jwt = req.headers['x-appwrite-user-jwt'];
   if (!jwt) {
-    const error = new Error('Authentication required.');
-    error.status = 401;
-    throw error;
+    const failure = new Error('Authentication required.');
+    failure.status = 401;
+    throw failure;
   }
   const account = await appwrite('/account', { jwt });
-  return { userId: account.$id, jwt };
+  return { userId: account.$id };
 }
 
 async function listRows(tableId, query) {
-  const result = await appwrite(queryUrl(tableId, query).replace(endpoint, ''));
+  const result = await appwrite(queryPath(tableId, query));
   return result.rows || [];
 }
 
 async function getCompany(companyId) {
   try {
     return await appwrite(`/tablesdb/${DATABASE_ID}/tables/${COMPANIES}/rows/${encodeURIComponent(companyId)}`);
-  } catch (error) {
-    if (error.status === 404) return null;
-    throw error;
+  } catch (failure) {
+    if (failure.status === 404) return null;
+    throw failure;
   }
 }
 
@@ -67,22 +67,22 @@ async function activeMembership(userId, companyId) {
     method: 'equal', attribute: 'userId', values: [userId],
   });
   return rows.find(row =>
-    row.companyId === companyId && row.status === 'active'
+    row.data?.companyId === companyId && row.data?.status === 'active'
   ) || null;
 }
 
 async function requireCompanyAdmin(userId, companyId) {
   const membership = await activeMembership(userId, companyId);
-  if (!membership || !['owner', 'admin'].includes(membership.role)) {
-    const error = new Error('You are not authorized to administer this company.');
-    error.status = 403;
-    throw error;
+  if (!membership || !['owner', 'admin'].includes(membership.data.role)) {
+    const failure = new Error('You are not authorized to administer this company.');
+    failure.status = 403;
+    throw failure;
   }
   const company = await getCompany(companyId);
-  if (!company || company.status !== 'active') {
-    const error = new Error('Company is unavailable.');
-    error.status = 404;
-    throw error;
+  if (!company || company.data?.status !== 'active') {
+    const failure = new Error('Company is unavailable.');
+    failure.status = 404;
+    throw failure;
   }
   return membership;
 }
@@ -97,24 +97,24 @@ export default async ({ req, res, log, error }) => {
     const action = input.action;
 
     if (action === 'resolve') {
-      const memberships = await listRows(MEMBERSHIPS, {
+      const rows = await listRows(MEMBERSHIPS, {
         method: 'equal', attribute: 'userId', values: [userId],
       });
-      const active = memberships.filter(row => row.status === 'active');
-      const resolved = [];
-      for (const membership of active) {
-        const company = await getCompany(membership.companyId);
-        if (company && company.status === 'active') {
-          resolved.push({
+      const memberships = [];
+      for (const row of rows.filter(item => item.data?.status === 'active')) {
+        const companyId = row.data.companyId;
+        const company = await getCompany(companyId);
+        if (company && company.data?.status === 'active') {
+          memberships.push({
             companyId: company.$id,
-            companyName: company.name,
-            companySlug: company.slug,
-            role: membership.role,
-            membershipId: membership.$id,
+            companyName: company.data.name,
+            companySlug: company.data.slug,
+            role: row.data.role,
+            membershipId: row.$id,
           });
         }
       }
-      return json(res, 200, { ok: true, userId, memberships: resolved });
+      return json(res, 200, { ok: true, userId, memberships });
     }
 
     if (action === 'list_members') {
@@ -126,21 +126,21 @@ export default async ({ req, res, log, error }) => {
       });
       const members = [];
       for (const row of rows) {
-        if (row.status === 'revoked') continue;
+        if (row.data?.status === 'revoked') continue;
         let account = null;
         try {
-          account = await appwrite(`/users/${encodeURIComponent(row.userId)}`);
-        } catch (e) {
-          log(`Could not resolve account ${row.userId}: ${e.message}`);
+          account = await appwrite(`/users/${encodeURIComponent(row.data.userId)}`);
+        } catch (failure) {
+          log(`Could not resolve account ${row.data.userId}: ${failure.message}`);
         }
         members.push({
           membershipId: row.$id,
-          userId: row.userId,
+          userId: row.data.userId,
           name: account?.name || '',
           email: account?.email || '',
-          role: row.role,
-          status: row.status,
-          createdAt: row.createdAt,
+          role: row.data.role,
+          status: row.data.status,
+          createdAt: row.data.createdAt,
         });
       }
       return json(res, 200, { ok: true, companyId, members });
@@ -155,10 +155,10 @@ export default async ({ req, res, log, error }) => {
       }
       const caller = await requireCompanyAdmin(userId, companyId);
       const target = await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`);
-      if (target.companyId !== companyId || target.role === 'owner') {
+      if (target.data?.companyId !== companyId || target.data?.role === 'owner') {
         return json(res, 403, { ok: false, message: 'The target membership cannot be changed.' });
       }
-      if (caller.role !== 'owner' && role === 'admin') {
+      if (caller.data.role !== 'owner' && role === 'admin') {
         return json(res, 403, { ok: false, message: 'Only the owner can promote an administrator.' });
       }
       await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
@@ -176,10 +176,10 @@ export default async ({ req, res, log, error }) => {
       }
       const caller = await requireCompanyAdmin(userId, companyId);
       const target = await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`);
-      if (target.companyId !== companyId || target.role === 'owner' || target.userId === userId) {
+      if (target.data?.companyId !== companyId || target.data?.role === 'owner' || target.data?.userId === userId) {
         return json(res, 403, { ok: false, message: 'The target membership cannot be revoked.' });
       }
-      if (caller.role !== 'owner' && target.role === 'admin') {
+      if (caller.data.role !== 'owner' && target.data?.role === 'admin') {
         return json(res, 403, { ok: false, message: 'Only the owner can revoke an administrator.' });
       }
       await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
@@ -190,11 +190,11 @@ export default async ({ req, res, log, error }) => {
     }
 
     return json(res, 400, { ok: false, message: 'Unknown action.' });
-  } catch (e) {
-    error(e.stack || e.message);
-    return json(res, e.status || 500, {
+  } catch (failure) {
+    error(failure.stack || failure.message);
+    return json(res, failure.status || 500, {
       ok: false,
-      message: e.status && e.status < 500 ? e.message : 'Internal tenant service error.',
+      message: failure.status && failure.status < 500 ? failure.message : 'Internal tenant service error.',
     });
   }
 };
