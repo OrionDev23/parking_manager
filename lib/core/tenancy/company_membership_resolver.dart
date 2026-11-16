@@ -5,6 +5,11 @@ import 'package:appwrite/appwrite.dart';
 import '../../providers/client_database.dart';
 import '../permissions/permission_catalog.dart';
 
+class CompanySelectionRequired implements Exception {
+  final List<CompanyMembership> memberships;
+  const CompanySelectionRequired(this.memberships);
+}
+
 class CompanyMembership {
   final String companyId;
   final String companyName;
@@ -138,8 +143,6 @@ class CompanyMembershipResolver {
     }
 
     if (memberships.length == 1) return memberships.single;
-    throw StateError(
-      'Ce compte appartient à plusieurs entreprises. Sélectionnez une entreprise.',
-    );
+    throw CompanySelectionRequired(memberships);
   }
 }
