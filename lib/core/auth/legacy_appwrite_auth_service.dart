@@ -81,6 +81,12 @@ class LegacyAppwriteAuthService implements AuthService {
         return null;
       }
 
+      if (await membershipResolver.resolvePlatformSession()) {
+        _session = _buildPlatformSession();
+        _setState(AuthState.signedIn);
+        return _session;
+      }
+
       // "project" is retained only as a legacy company selector. Appwrite's
       // project is fixed and never comes from user input or preferences.
       final selector = preferences.getString('active_company_id') ??
@@ -137,6 +143,12 @@ class LegacyAppwriteAuthService implements AuthService {
         );
       }
 
+      if (await membershipResolver.resolvePlatformSession()) {
+        _session = _buildPlatformSession();
+        _setState(AuthState.signedIn);
+        return _session!;
+      }
+
       final membership = await membershipResolver.select(
         selector: companyId,
       );
@@ -156,6 +168,19 @@ class LegacyAppwriteAuthService implements AuthService {
       _setState(AuthState.error);
       rethrow;
     }
+  }
+
+  AuthSession _buildPlatformSession() {
+    final user = DatabaseGetter.user!;
+    final profile = DatabaseGetter.me.value!;
+    return AuthSession(
+      userId: user.$id,
+      email: user.email,
+      displayName: profile.name ?? user.name,
+      company: const CompanyContext(companyId: '__platform__'),
+      permissions: const {'platform.manage'},
+      isPlatformSuperAdmin: true,
+    );
   }
 
   AuthSession _buildSession(String projectId, Set<String> permissions) {
