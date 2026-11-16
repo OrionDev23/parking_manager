@@ -97,6 +97,8 @@ class LegacyAppwriteAuthService implements AuthService {
       _session = _buildSession(membership.companyId, membership.permissions);
       _setState(AuthState.signedIn);
       return _session;
+    } on CompanySelectionRequired {
+      rethrow;
     } catch (_) {
       _session = null;
       _setState(AuthState.signedOut);
