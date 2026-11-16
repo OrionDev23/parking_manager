@@ -172,16 +172,27 @@ class _LoginScreenState extends State<LoginScreen>
       ]),
     );
 
-    final brand = Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-      Row(children: [
-        Container(width: 48, height: 48, padding: const EdgeInsets.all(7), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)), child: Image.asset('assets/images/favIcon.webp', fit: BoxFit.contain)),
-        const SizedBox(width: 13),
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('PARCOTO', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900, letterSpacing: 2.4)),
-          const SizedBox(height: 3),
-          Text('login_brand_tagline'.tr(), style: const TextStyle(color: Color(0xFF8CA3B6), fontSize: 8, letterSpacing: .8, fontWeight: FontWeight.w700)),
-        ]),
-      ]),
+    final brand = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Image.asset(
+          'assets/images/logo.webp',
+          width: 190,
+          height: 54,
+          fit: BoxFit.contain,
+          alignment: Alignment.centerLeft,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'login_brand_tagline'.tr(),
+          style: const TextStyle(
+            color: Color(0xFF8CA3B6),
+            fontSize: 10,
+            letterSpacing: .6,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       const SizedBox(height: 62),
       Container(padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7), decoration: BoxDecoration(color: mint.withValues(alpha: .12), borderRadius: BorderRadius.circular(30), border: Border.all(color: mint.withValues(alpha: .25))), child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(FluentIcons.sync, color: mint, size: 9), const SizedBox(width: 8), Text('login_hero_badge'.tr().toUpperCase(), style: TextStyle(color: mint, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: .7))])),
       const SizedBox(height: 23),
@@ -281,29 +292,24 @@ class _LoginScreenState extends State<LoginScreen>
         final mobileContent = Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Container(
-                width: 38,
-                height: 38,
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Image.asset('assets/images/favIcon.webp', fit: BoxFit.contain),
+            Image.asset(
+              'assets/images/logo.webp',
+              width: 158,
+              height: 46,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'login_brand_tagline'.tr(),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Color(0xFF8CA3B6),
+                fontSize: 9,
+                letterSpacing: .3,
+                fontWeight: FontWeight.w700,
               ),
-              const SizedBox(width: 10),
-              const Text(
-                'PARCOTO',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 2,
-                ),
-              ),
-            ]),
-            const SizedBox(height: 20),
+            ),
+            const SizedBox(height: 18),
             loginPanel,
           ],
         );
