@@ -84,154 +84,393 @@ class _LoginScreenState extends State<LoginScreen>
     if (PanesListState.firstLoading) {
       return const Center(child: ProgressRing());
     }
-    var appTheme = context.watch<AppTheme>();
-    return ScaffoldPage(
-      header: PageTitle(text: 'connexion'.tr()),
-      content: Center(
-        child: PanesListState.firstLoading
-            ? const ProgressRing()
-            : Column(
-                children: [
-                  bigSpace,
-                  bigSpace,
-                  Image.asset('assets/images/logo.webp', width: 300.px),
-                  bigSpace,
-                  bigSpace,
-                  Flexible(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(20),
-                          alignment: Alignment.center,
-                          width: pwidth,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: appTheme.backGroundColor,
-                            boxShadow: kElevationToShadow[3],
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Divider(),
-                              SizedBox(
-                                width: pwidth,
-                                child: InfoLabel(
-                                  label: validEmail || email.text.isEmpty
-                                      ? ''
-                                      : 'entervalidemail'.tr(),
-                                  labelStyle: TextStyle(color: Colors.red),
-                                  child: ParcotoTextBox(
-                                    prefix: Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                        8,
-                                        5,
-                                        5,
-                                        5,
-                                      ),
-                                      child: Icon(
-                                        FluentIcons.mail,
-                                        size: 14.px,
-                                        color: Colors.grey[100],
-                                      ),
-                                    ),
-                                    controller: email,
-                                    placeholder: 'email'.tr(),
-                                    keyboardType: TextInputType.emailAddress,
-                                    onChanged: (s) {
-                                      if (!FormValidators.isEmail(s)) {
-                                        setState(() {
-                                          validEmail = false;
-                                        });
-                                      } else {
-                                        setState(() {
-                                          validEmail = true;
-                                        });
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ),
-                              bigSpace,
-                              SizedBox(
-                                width: pwidth,
-                                child: ParcotoTextBox(
-                                  prefix: Padding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                      8,
-                                      5,
-                                      5,
-                                      5,
-                                    ),
-                                    child: Icon(
-                                      FluentIcons.lock,
-                                      size: 14.px,
-                                      color: Colors.grey[100],
-                                    ),
-                                  ),
-                                  controller: password,
-                                  placeholder: 'motdepasse'.tr(),
-                                  suffix: IconButton(
-                                    icon: Icon(
-                                      showPassword
-                                          ? FluentIcons.hide
-                                          : FluentIcons.red_eye,
-                                      color: !showPassword
-                                          ? appTheme.color
-                                          : Colors.grey[100],
-                                      size: 13.px,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        showPassword = !showPassword;
-                                      });
-                                    },
-                                  ),
-                                  obscureText: !showPassword,
-                                  onSubmitted: (s) {
-                                    signIn();
-                                  },
-                                ),
-                              ),
-                              bigSpace,
-                              smallSpace,
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  OnTapScaleAndFade(
-                                    onTap: forgotPassword,
-                                    child: Text(
-                                      'forgot',
-                                      style: TextStyle(color: appTheme.color),
-                                    ).tr(),
-                                  ),
-                                ],
-                              ),
-                              bigSpace,
-                              smallSpace,
 
-                              FilledButton(
-                                onPressed: checking ? null : signIn,
-                                child: checking
-                                    ? const ProgressRing(strokeWidth: 2.0)
-                                    : const Text('seconnecter').tr(),
-                              ),
-                            ],
+    final appTheme = context.watch<AppTheme>();
+    final fluent = FluentTheme.of(context);
+    final isDark = fluent.brightness == Brightness.dark;
+    final accent = appTheme.color;
+    final foreground = appTheme.textColor;
+    final muted = appTheme.mutedTextColor;
+    final surface = appTheme.surfaceColor;
+    final background = appTheme.backGroundColor;
+
+    return ScaffoldPage(
+      padding: EdgeInsets.zero,
+      content: LayoutBuilder(
+        builder: (context, constraints) {
+          final wide = constraints.maxWidth >= 900;
+          final compact = constraints.maxWidth < 560;
+          final panel = Container(
+            constraints: const BoxConstraints(maxWidth: 460),
+            padding: EdgeInsets.symmetric(
+              horizontal: compact ? 24 : 42,
+              vertical: compact ? 28 : 40,
+            ),
+            decoration: BoxDecoration(
+              color: surface,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(
+                color: fluent.inactiveColor.withValues(alpha: .14),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? .22 : .07),
+                  blurRadius: 36,
+                  offset: const Offset(0, 18),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (!wide) ...[
+                  Center(
+                    child: Image.asset(
+                      'assets/images/logo.webp',
+                      width: 190,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                ],
+                Text(
+                  'Bienvenue sur Parcoto',
+                  style: TextStyle(
+                    color: foreground,
+                    fontSize: compact ? 25 : 29,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -.7,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Connectez-vous pour accéder à votre espace de gestion.',
+                  style: TextStyle(
+                    color: muted,
+                    fontSize: 13,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 30),
+                _loginFieldLabel('Adresse e-mail'),
+                ParcotoTextBox(
+                  controller: email,
+                  placeholder: 'nom@entreprise.com',
+                  keyboardType: TextInputType.emailAddress,
+                  onChanged: (value) {
+                    setState(() {
+                      validEmail = FormValidators.isEmail(value);
+                      if (error.isNotEmpty) error = '';
+                    });
+                  },
+                  prefix: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Icon(
+                      FluentIcons.mail,
+                      size: 16,
+                      color: muted,
+                    ),
+                  ),
+                  style: TextStyle(color: foreground, fontSize: 13),
+                ),
+                if (email.text.isNotEmpty && !validEmail) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    'entervalidemail'.tr(),
+                    style: TextStyle(color: Colors.red, fontSize: 11),
+                  ),
+                ],
+                const SizedBox(height: 20),
+                _loginFieldLabel('Mot de passe'),
+                ParcotoTextBox(
+                  controller: password,
+                  placeholder: 'Saisissez votre mot de passe',
+                  obscureText: !showPassword,
+                  onSubmitted: (_) => signIn(),
+                  onChanged: (_) {
+                    if (error.isNotEmpty) setState(() => error = '');
+                  },
+                  prefix: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Icon(
+                      FluentIcons.lock,
+                      size: 16,
+                      color: muted,
+                    ),
+                  ),
+                  suffix: IconButton(
+                    icon: Icon(
+                      showPassword ? FluentIcons.hide : FluentIcons.red_eye,
+                      size: 15,
+                      color: muted,
+                    ),
+                    onPressed: () => setState(() {
+                      showPassword = !showPassword;
+                    }),
+                  ),
+                  style: TextStyle(color: foreground, fontSize: 13),
+                ),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: HyperlinkButton(
+                    onPressed: forgotPassword,
+                    child: Text(
+                      'forgot'.tr(),
+                      style: TextStyle(
+                        color: accent,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                if (error.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withValues(alpha: .08),
+                      borderRadius: BorderRadius.circular(9),
+                      border: Border.all(
+                        color: Colors.red.withValues(alpha: .22),
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(FluentIcons.error, color: Colors.red, size: 15),
+                        const SizedBox(width: 9),
+                        Expanded(
+                          child: Text(
+                            error,
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: 2.h),
-                  if (!signedIn && error.isNotEmpty)
-                    Text(error, style: TextStyle(color: Colors.red)),
                 ],
+                const SizedBox(height: 22),
+                SizedBox(
+                  height: 48,
+                  child: FilledButton(
+                    onPressed: checking ? null : signIn,
+                    child: checking
+                        ? const SizedBox(
+                            width: 19,
+                            height: 19,
+                            child: ProgressRing(strokeWidth: 2),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                'Se connecter',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              const Icon(FluentIcons.arrow_right, size: 14),
+                            ],
+                          ),
+                  ),
+                ),
+                const SizedBox(height: 22),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(FluentIcons.shield, size: 13, color: muted),
+                    const SizedBox(width: 7),
+                    Flexible(
+                      child: Text(
+                        'Connexion sécurisée à votre espace professionnel',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: muted, fontSize: 10),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+
+          final content = Center(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                horizontal: compact ? 18 : 36,
+                vertical: 28,
               ),
+              child: wide
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 430),
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 54),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Image.asset(
+                                    'assets/images/logo.webp',
+                                    width: 230,
+                                    fit: BoxFit.contain,
+                                  ),
+                                  const SizedBox(height: 54),
+                                  Text(
+                                    'Pilotez votre activité.\nGardez le contrôle.',
+                                    style: TextStyle(
+                                      color: foreground,
+                                      fontSize: 38,
+                                      height: 1.16,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: -1.2,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 18),
+                                  Text(
+                                    'La gestion de votre parking, de vos véhicules et de vos opérations réunie dans un seul espace.',
+                                    style: TextStyle(
+                                      color: muted,
+                                      fontSize: 15,
+                                      height: 1.65,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 34),
+                                  _loginFeature(FluentIcons.car, 'Gestion des véhicules et des conducteurs', accent, foreground, muted),
+                                  const SizedBox(height: 16),
+                                  _loginFeature(FluentIcons.chart, 'Suivi de l’activité et des performances', accent, foreground, muted),
+                                  const SizedBox(height: 16),
+                                  _loginFeature(FluentIcons.sync, 'Vos données synchronisées en toute sécurité', accent, foreground, muted),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        panel,
+                      ],
+                    )
+                  : panel,
+            ),
+          );
+
+          return Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? [
+                        background,
+                        Color.lerp(background, accent, .075)!,
+                        background,
+                      ]
+                    : [
+                        background,
+                        Color.lerp(background, accent, .035)!,
+                        background,
+                      ],
+              ),
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  top: -150,
+                  right: -110,
+                  child: Container(
+                    width: 420,
+                    height: 420,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: accent.withValues(alpha: isDark ? .055 : .045),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  bottom: -210,
+                  left: -120,
+                  child: Container(
+                    width: 480,
+                    height: 480,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: accent.withValues(alpha: isDark ? .04 : .03),
+                    ),
+                  ),
+                ),
+                content,
+                Positioned(
+                  left: 24,
+                  right: 24,
+                  bottom: 12,
+                  child: Text(
+                    'PARCOTO  •  © ${DateTime.now().year}',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: muted.withValues(alpha: .7),
+                      fontSize: 9,
+                      letterSpacing: 1.2,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
+
+  Widget _loginFieldLabel(String label) => Padding(
+    padding: const EdgeInsets.only(bottom: 9),
+    child: Text(
+      label,
+      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+    ),
+  );
+
+  Widget _loginFeature(
+    IconData icon,
+    String label,
+    Color accent,
+    Color foreground,
+    Color muted,
+  ) => Row(
+    children: [
+      Container(
+        width: 34,
+        height: 34,
+        decoration: BoxDecoration(
+          color: accent.withValues(alpha: .12),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(icon, size: 16, color: accent),
+      ),
+      const SizedBox(width: 12),
+      Expanded(
+        child: Text(
+          label,
+          style: TextStyle(
+            color: foreground.withValues(alpha: .9),
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    ],
+  );
 
   String error = "";
 
