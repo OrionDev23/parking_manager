@@ -74,355 +74,165 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    if (PanesListState.firstLoading) {
-      return const Center(child: ProgressRing());
-    }
+    if (PanesListState.firstLoading) return const Center(child: ProgressRing());
 
-    final appTheme = context.watch<AppTheme>();
-    final fluent = FluentTheme.of(context);
-    final isDark = fluent.brightness == Brightness.dark;
-    final accent = appTheme.color;
-    final foreground = appTheme.textColor;
-    final muted = appTheme.mutedTextColor;
-    final surface = appTheme.surfaceColor;
-    final background = appTheme.backGroundColor;
+    final dark = FluentTheme.of(context).brightness == Brightness.dark;
+    const navy = Color(0xFF081625);
+    const navy2 = Color(0xFF10283A);
+    const mint = Color(0xFF55E6C1);
+    const teal = Color(0xFF159F83);
+    final page = dark ? const Color(0xFF091522) : const Color(0xFFF0F4F5);
+    final surface = dark ? const Color(0xFF142438) : Colors.white;
+    final foreground = dark ? const Color(0xFFF3F7FA) : const Color(0xFF102235);
+    final muted = dark ? const Color(0xFF9BAFBE) : const Color(0xFF71818D);
+    final field = dark ? const Color(0xFF0C1B2B) : const Color(0xFFF2F6F6);
+
+    Widget feature(IconData icon, String title, String subtitle) => Row(
+      children: [
+        Container(
+          width: 42, height: 42,
+          decoration: BoxDecoration(color: Colors.white.withValues(alpha: .09), borderRadius: BorderRadius.circular(13), border: Border.all(color: Colors.white.withValues(alpha: .12))),
+          child: Icon(icon, color: mint, size: 19),
+        ),
+        const SizedBox(width: 13),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(title, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 3),
+          Text(subtitle, style: TextStyle(color: Colors.white.withValues(alpha: .58), fontSize: 10)),
+        ])),
+      ],
+    );
+
+    final loginPanel = Container(
+      width: 430,
+      padding: const EdgeInsets.fromLTRB(34, 36, 34, 28),
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: dark ? Colors.white.withValues(alpha: .08) : const Color(0xFFE4EAEC)),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: dark ? .28 : .10), blurRadius: 50, offset: const Offset(0, 24))],
+      ),
+      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Row(children: [
+          Container(width: 38, height: 38, decoration: BoxDecoration(color: mint.withValues(alpha: .14), borderRadius: BorderRadius.circular(12)), child: const Icon(FluentIcons.lock, color: teal, size: 17)),
+          const SizedBox(width: 11),
+          Text('ESPACE SÉCURISÉ', style: TextStyle(color: muted, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.7)),
+        ]),
+        const SizedBox(height: 27),
+        Text('Heureux de vous revoir.', style: TextStyle(color: foreground, fontSize: 27, fontWeight: FontWeight.w800, letterSpacing: -.8)),
+        const SizedBox(height: 8),
+        Text('Connectez-vous pour reprendre le pilotage de votre activité.', style: TextStyle(color: muted, fontSize: 12, height: 1.5)),
+        const SizedBox(height: 29),
+        _loginFieldLabel('ADRESSE E-MAIL'),
+        Container(
+          decoration: BoxDecoration(color: field, borderRadius: BorderRadius.circular(12), border: Border.all(color: dark ? Colors.white.withValues(alpha: .08) : const Color(0xFFE2E9EB))),
+          child: ParcotoTextBox(
+            controller: email, placeholder: 'vous@entreprise.com', keyboardType: TextInputType.emailAddress,
+            onChanged: (value) => setState(() { validEmail = FormValidators.isEmail(value); if (error.isNotEmpty) error = ''; }),
+            prefix: Padding(padding: const EdgeInsets.symmetric(horizontal: 13), child: Icon(FluentIcons.mail, size: 15, color: muted)),
+            style: TextStyle(color: foreground, fontSize: 13),
+          ),
+        ),
+        if (email.text.isNotEmpty && !validEmail) ...[
+          const SizedBox(height: 6), Text('entervalidemail'.tr(), style: const TextStyle(color: Colors.red, fontSize: 11)),
+        ],
+        const SizedBox(height: 19),
+        _loginFieldLabel('MOT DE PASSE'),
+        Container(
+          decoration: BoxDecoration(color: field, borderRadius: BorderRadius.circular(12), border: Border.all(color: dark ? Colors.white.withValues(alpha: .08) : const Color(0xFFE2E9EB))),
+          child: ParcotoTextBox(
+            controller: password, placeholder: 'Votre mot de passe', obscureText: !showPassword,
+            onSubmitted: (_) => signIn(),
+            onChanged: (_) { if (error.isNotEmpty) setState(() => error = ''); },
+            prefix: Padding(padding: const EdgeInsets.symmetric(horizontal: 13), child: Icon(FluentIcons.password_field, size: 15, color: muted)),
+            suffix: IconButton(icon: Icon(showPassword ? FluentIcons.hide : FluentIcons.red_eye, size: 15, color: muted), onPressed: () => setState(() => showPassword = !showPassword)),
+            style: TextStyle(color: foreground, fontSize: 13),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Align(alignment: Alignment.centerRight, child: HyperlinkButton(onPressed: forgotPassword, child: const Text('Mot de passe oublié ?', style: TextStyle(color: teal, fontSize: 11, fontWeight: FontWeight.w700)))),
+        if (error.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.red.withValues(alpha: .08), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.red.withValues(alpha: .2))), child: Row(children: [const Icon(FluentIcons.error, color: Colors.red, size: 15), const SizedBox(width: 9), Expanded(child: Text(error, style: const TextStyle(color: Colors.red, fontSize: 11)))])),
+        ],
+        const SizedBox(height: 20),
+        SizedBox(height: 52, child: FilledButton(
+          style: ButtonStyle(backgroundColor: WidgetStateProperty.all(teal), shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
+          onPressed: checking ? null : signIn,
+          child: checking ? const SizedBox(width: 19, height: 19, child: ProgressRing(strokeWidth: 2)) : const Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text('Accéder à mon espace', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)), SizedBox(width: 10), Icon(FluentIcons.arrow_up_right, size: 14)]),
+        )),
+        const SizedBox(height: 22),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(FluentIcons.shield, size: 12, color: muted), const SizedBox(width: 7), Text('Vos accès sont protégés', style: TextStyle(color: muted, fontSize: 10))]),
+      ]),
+    );
+
+    final brand = Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+      Row(children: [
+        Container(width: 48, height: 48, padding: const EdgeInsets.all(7), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)), child: Image.asset('assets/images/logo.webp', fit: BoxFit.contain)),
+        const SizedBox(width: 13),
+        const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('PARCOTO', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900, letterSpacing: 2.4)),
+          SizedBox(height: 3),
+          Text('BUSINESS CONTROL PLATFORM', style: TextStyle(color: Color(0xFF8CA3B6), fontSize: 8, letterSpacing: 1.5, fontWeight: FontWeight.w700)),
+        ]),
+      ]),
+      const SizedBox(height: 62),
+      Container(padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7), decoration: BoxDecoration(color: mint.withValues(alpha: .12), borderRadius: BorderRadius.circular(30), border: Border.all(color: mint.withValues(alpha: .25))), child: const Row(mainAxisSize: MainAxisSize.min, children: [Icon(FluentIcons.circle_ring, color: mint, size: 9), SizedBox(width: 8), Text('VOTRE ACTIVITÉ, EN TEMPS RÉEL', style: TextStyle(color: mint, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.1))])),
+      const SizedBox(height: 23),
+      const Text('Prenez une\nlongueur\nd’avance.', style: TextStyle(color: Colors.white, fontSize: 57, height: 1.02, fontWeight: FontWeight.w900, letterSpacing: -2.8)),
+      const SizedBox(height: 20),
+      Text('Toutes les opérations de votre parking. Une vision claire. Des décisions plus rapides.', style: TextStyle(color: Colors.white.withValues(alpha: .66), fontSize: 14, height: 1.65)),
+      const SizedBox(height: 42),
+      feature(FluentIcons.car, 'Flotte & conducteurs', 'Chaque véhicule, chaque mouvement, maîtrisé.'),
+      const SizedBox(height: 19),
+      feature(FluentIcons.analytics, 'Pilotage & rentabilité', 'Les indicateurs utiles, sans perdre de temps.'),
+      const SizedBox(height: 19),
+      feature(FluentIcons.cloud_sync, 'Continuité de service', 'Travaillez même lorsque le réseau vous lâche.'),
+      const SizedBox(height: 48),
+      Row(children: [Container(width: 28, height: 2, color: const Color(0xFFFFB36B)), const SizedBox(width: 10), Text('LA GESTION QUI AVANCE AVEC VOUS', style: TextStyle(color: Colors.white.withValues(alpha: .48), fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.4))]),
+    ]);
 
     return ScaffoldPage(
       padding: EdgeInsets.zero,
-      content: LayoutBuilder(
-        builder: (context, constraints) {
-          final wide = constraints.maxWidth >= 900;
-          final compact = constraints.maxWidth < 560;
-          final panel = Container(
-            constraints: const BoxConstraints(maxWidth: 460),
-            padding: EdgeInsets.symmetric(
-              horizontal: compact ? 24 : 42,
-              vertical: compact ? 28 : 40,
-            ),
-            decoration: BoxDecoration(
-              color: surface,
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(
-                color: fluent.inactiveColor.withValues(alpha: .14),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? .22 : .07),
-                  blurRadius: 36,
-                  offset: const Offset(0, 18),
+      content: LayoutBuilder(builder: (context, constraints) {
+        final wide = constraints.maxWidth >= 1000;
+        final compact = constraints.maxWidth < 560;
+        return Container(
+          width: double.infinity, height: double.infinity, color: page,
+          child: wide
+              ? Row(children: [
+                  Expanded(flex: 11, child: Container(
+                    height: double.infinity, clipBehavior: Clip.antiAlias,
+                    decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [navy, Color(0xFF102D3C), Color(0xFF0B1B2B)])),
+                    child: Stack(children: [
+                      Positioned(right: -150, top: -160, child: Container(width: 570, height: 570, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: mint.withValues(alpha: .10)))),
+                      Positioned(right: -85, top: -95, child: Container(width: 440, height: 440, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: mint.withValues(alpha: .07)))),
+                      Positioned(right: 30, bottom: -190, child: Icon(FluentIcons.car, size: 390, color: Colors.white.withValues(alpha: .025))),
+                      Center(child: SingleChildScrollView(padding: const EdgeInsets.symmetric(horizontal: 58, vertical: 55), child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 500), child: brand))),
+                    ]),
+                  )),
+                  Expanded(flex: 9, child: Center(child: SingleChildScrollView(padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 45), child: loginPanel))),
+                ])
+              : Container(
+                  decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [navy, navy2, page], stops: [0, .38, .38])),
+                  child: SingleChildScrollView(padding: EdgeInsets.fromLTRB(compact ? 18 : 30, 25, compact ? 18 : 30, 24), child: Column(children: [
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Container(width: 42, height: 42, padding: const EdgeInsets.all(6), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(13)), child: Image.asset('assets/images/logo.webp', fit: BoxFit.contain)),
+                      const SizedBox(width: 11),
+                      const Text('PARCOTO', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 2)),
+                    ]),
+                    const SizedBox(height: 27),
+                    const Text('Votre activité.\nSous contrôle.', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 32, height: 1.05, fontWeight: FontWeight.w900, letterSpacing: -1)),
+                    const SizedBox(height: 10),
+                    Text('Connectez-vous à votre espace professionnel.', textAlign: TextAlign.center, style: TextStyle(color: Colors.white.withValues(alpha: .65), fontSize: 11)),
+                    const SizedBox(height: 30),
+                    loginPanel,
+                    const SizedBox(height: 20),
+                    Text('PARCOTO  •  © 2026', style: TextStyle(color: muted, fontSize: 9, letterSpacing: 1.2)),
+                  ])),
                 ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (!wide) ...[
-                  Center(
-                    child: Image.asset(
-                      'assets/images/logo.webp',
-                      width: 190,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                ],
-                Text(
-                  'Bienvenue sur Parcoto',
-                  style: TextStyle(
-                    color: foreground,
-                    fontSize: compact ? 25 : 29,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -.7,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Connectez-vous pour accéder à votre espace de gestion.',
-                  style: TextStyle(
-                    color: muted,
-                    fontSize: 13,
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                _loginFieldLabel('Adresse e-mail'),
-                ParcotoTextBox(
-                  controller: email,
-                  placeholder: 'nom@entreprise.com',
-                  keyboardType: TextInputType.emailAddress,
-                  onChanged: (value) {
-                    setState(() {
-                      validEmail = FormValidators.isEmail(value);
-                      if (error.isNotEmpty) error = '';
-                    });
-                  },
-                  prefix: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Icon(
-                      FluentIcons.mail,
-                      size: 16,
-                      color: muted,
-                    ),
-                  ),
-                  style: TextStyle(color: foreground, fontSize: 13),
-                ),
-                if (email.text.isNotEmpty && !validEmail) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    'entervalidemail'.tr(),
-                    style: TextStyle(color: Colors.red, fontSize: 11),
-                  ),
-                ],
-                const SizedBox(height: 20),
-                _loginFieldLabel('Mot de passe'),
-                ParcotoTextBox(
-                  controller: password,
-                  placeholder: 'Saisissez votre mot de passe',
-                  obscureText: !showPassword,
-                  onSubmitted: (_) => signIn(),
-                  onChanged: (_) {
-                    if (error.isNotEmpty) setState(() => error = '');
-                  },
-                  prefix: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Icon(
-                      FluentIcons.lock,
-                      size: 16,
-                      color: muted,
-                    ),
-                  ),
-                  suffix: IconButton(
-                    icon: Icon(
-                      showPassword ? FluentIcons.hide : FluentIcons.red_eye,
-                      size: 15,
-                      color: muted,
-                    ),
-                    onPressed: () => setState(() {
-                      showPassword = !showPassword;
-                    }),
-                  ),
-                  style: TextStyle(color: foreground, fontSize: 13),
-                ),
-                const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: HyperlinkButton(
-                    onPressed: forgotPassword,
-                    child: Text(
-                      'forgot'.tr(),
-                      style: TextStyle(
-                        color: accent,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-                if (error.isNotEmpty) ...[
-                  const SizedBox(height: 10),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withValues(alpha: .08),
-                      borderRadius: BorderRadius.circular(9),
-                      border: Border.all(
-                        color: Colors.red.withValues(alpha: .22),
-                      ),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(FluentIcons.error, color: Colors.red, size: 15),
-                        const SizedBox(width: 9),
-                        Expanded(
-                          child: Text(
-                            error,
-                            style: const TextStyle(
-                              color: Colors.red,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 22),
-                SizedBox(
-                  height: 48,
-                  child: FilledButton(
-                    onPressed: checking ? null : signIn,
-                    child: checking
-                        ? const SizedBox(
-                            width: 19,
-                            height: 19,
-                            child: ProgressRing(strokeWidth: 2),
-                          )
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                'Se connecter',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              const Icon(FluentIcons.arrow_right, size: 14),
-                            ],
-                          ),
-                  ),
-                ),
-                const SizedBox(height: 22),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(FluentIcons.shield, size: 13, color: muted),
-                    const SizedBox(width: 7),
-                    Flexible(
-                      child: Text(
-                        'Connexion sécurisée à votre espace professionnel',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: muted, fontSize: 10),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-
-          final content = Center(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(
-                horizontal: compact ? 18 : 36,
-                vertical: 28,
-              ),
-              child: wide
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 430),
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 54),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Image.asset(
-                                    'assets/images/logo.webp',
-                                    width: 230,
-                                    fit: BoxFit.contain,
-                                  ),
-                                  const SizedBox(height: 54),
-                                  Text(
-                                    'Pilotez votre activité.\nGardez le contrôle.',
-                                    style: TextStyle(
-                                      color: foreground,
-                                      fontSize: 38,
-                                      height: 1.16,
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: -1.2,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 18),
-                                  Text(
-                                    'La gestion de votre parking, de vos véhicules et de vos opérations réunie dans un seul espace.',
-                                    style: TextStyle(
-                                      color: muted,
-                                      fontSize: 15,
-                                      height: 1.65,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 34),
-                                  _loginFeature(FluentIcons.car, 'Gestion des véhicules et des conducteurs', accent, foreground, muted),
-                                  const SizedBox(height: 16),
-                                  _loginFeature(FluentIcons.chart, 'Suivi de l’activité et des performances', accent, foreground, muted),
-                                  const SizedBox(height: 16),
-                                  _loginFeature(FluentIcons.sync, 'Vos données synchronisées en toute sécurité', accent, foreground, muted),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        panel,
-                      ],
-                    )
-                  : panel,
-            ),
-          );
-
-          return Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: isDark
-                    ? [
-                        background,
-                        Color.lerp(background, accent, .075)!,
-                        background,
-                      ]
-                    : [
-                        background,
-                        Color.lerp(background, accent, .035)!,
-                        background,
-                      ],
-              ),
-            ),
-            child: Stack(
-              children: [
-                Positioned(
-                  top: -150,
-                  right: -110,
-                  child: Container(
-                    width: 420,
-                    height: 420,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: accent.withValues(alpha: isDark ? .055 : .045),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: -210,
-                  left: -120,
-                  child: Container(
-                    width: 480,
-                    height: 480,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: accent.withValues(alpha: isDark ? .04 : .03),
-                    ),
-                  ),
-                ),
-                content,
-                Positioned(
-                  left: 24,
-                  right: 24,
-                  bottom: 12,
-                  child: Text(
-                    'PARCOTO  •  © ${DateTime.now().year}',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: muted.withValues(alpha: .7),
-                      fontSize: 9,
-                      letterSpacing: 1.2,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+        );
+      }),
     );
   }
 
