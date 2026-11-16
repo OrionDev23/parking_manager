@@ -262,3 +262,42 @@ Planning remains a direct unscoped TablesDB query against `planning`. The tenant
 ### Current status
 
 No application code was changed in this follow-up. No Appwrite users, memberships, records, schemas, permissions, Function configuration or deployments were modified. Company onboarding remains disabled. The platform Auth ID is now verified, but tenant isolation is still incomplete and production onboarding must remain blocked.
+
+
+## Platform company management implementation (2026-11-16)
+
+The `refactor/foundation-v1` branch now contains an initial platform company
+administration surface and server API:
+
+- Flutter screen: `lib/screens/platform/platform_companies_screen.dart`.
+- Client repository: `lib/core/tenancy/platform_companies_repository.dart`.
+- Navigation entry is shown for authenticated Appwrite user ID `999`; this is
+  only UI visibility. The Function independently checks the server-only
+  `PLATFORM_SUPER_ADMIN_IDS` allowlist.
+- Function actions: `platform_list_companies` and `create_company`.
+- Company creation provisions a first Appwrite Auth account and assigns it
+  membership role `admin`; it does not create a platform membership.
+- Company admins can no longer add or promote other admins through
+  `add_member` / `change_role`; administrator membership revocation is also
+  platform-only.
+- The create form captures license dates, user/vehicle/employee/driver/site
+  quotas, billing cycle, price/currency and commercial notes.
+
+A new proposed schema is documented in
+`docs/company-entitlements-schema.md`. The live Appwrite project has **not**
+been changed: the `company_entitlements` table does not yet exist, the
+Function has not been deployed, `PLATFORM_SUPER_ADMIN_IDS` has not been set,
+and company creation remains disabled. The UI's billing-cycle field accepts
+`monthly`, `quarterly`, `yearly` or `custom`; the server validates these
+values.
+
+The entitlement records are metadata only at this stage. User, vehicle,
+employee, driver and site quotas are **not enforced** in their respective CRUD
+paths. Do not represent this as complete billing or licensing enforcement.
+
+### Sync defense-in-depth
+
+`AppwriteSyncEngine` now marks an outbox operation as conflicted and refuses
+to dispatch it if its `companyId` differs from the engine's configured
+company. This protects against a malformed or misrouted local queue item; it
+does not replace server-side authorization or secure pull handlers.
