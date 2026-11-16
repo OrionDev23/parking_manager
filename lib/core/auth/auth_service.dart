@@ -12,5 +12,6 @@ abstract class AuthService {
     required String password,
     String? companyId,
   });
+  Future<AuthSession> selectCompany(String companyId);
   Future<void> signOut();
 }
