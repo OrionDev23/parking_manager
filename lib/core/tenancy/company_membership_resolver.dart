@@ -53,6 +53,20 @@ class CompanyMembership {
 class CompanyMembershipResolver {
   static const functionId = 'company-tenant-api';
 
+  Future<bool> resolvePlatformSession() async {
+    final client = DatabaseGetter.client;
+    if (client == null) throw StateError('Appwrite client is not initialized.');
+    final execution = await Functions(client).createExecution(
+      functionId: functionId,
+      body: jsonEncode({'action': 'platform_resolve'}),
+    );
+    if (execution.responseStatusCode < 200 || execution.responseStatusCode >= 300) {
+      return false;
+    }
+    final decoded = jsonDecode(execution.responseBody);
+    return decoded is Map && decoded['ok'] == true && decoded['isPlatformSuperAdmin'] == true;
+  }
+
   Future<List<CompanyMembership>> resolve() async {
     final client = DatabaseGetter.client;
     if (client == null) {
