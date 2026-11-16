@@ -1,4 +1,5 @@
 import 'package:appwrite/appwrite.dart';
+import 'package:parc_oto/core/permissions/permission_catalog.dart';
 
 import '../../../domain/entities/access_team.dart';
 import '../../../domain/entities/user_access.dart';
