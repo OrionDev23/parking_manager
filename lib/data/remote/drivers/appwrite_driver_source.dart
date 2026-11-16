@@ -22,16 +22,27 @@ class AppwriteDriverSource implements RemoteDriverSource {
 
   Driver _fromRow(dynamic row) {
     final data = Map<String, dynamic>.from(row.data);
+    if (data['companyId']?.toString() != companyContext.companyId) {
+      throw StateError('Driver row is outside the active company.');
+    }
     final payload = data['payload'];
 
     if (payload is String && payload.isNotEmpty) {
       final decoded = jsonDecode(payload);
       if (decoded is Map<String, dynamic>) {
-        return Driver.fromMap(decoded);
+        final driver = Driver.fromMap(decoded);
+        if (driver.companyId != companyContext.companyId) {
+          throw StateError('Driver payload company does not match its row.');
+        }
+        return driver;
       }
     }
     if (payload is Map) {
-      return Driver.fromMap(Map<String, dynamic>.from(payload));
+      final driver = Driver.fromMap(Map<String, dynamic>.from(payload));
+      if (driver.companyId != companyContext.companyId) {
+        throw StateError('Driver payload company does not match its row.');
+      }
+      return driver;
     }
 
     final createdAt =

@@ -34,15 +34,26 @@ class AppwriteVehicleSource implements RemoteVehicleSource {
 
   Vehicle _fromRow(dynamic row) {
     final data = Map<String, dynamic>.from(row.data);
+    if (data['companyId']?.toString() != companyContext.companyId) {
+      throw StateError('Vehicle row is outside the active company.');
+    }
     final payload = data['payload'];
     if (payload is String) {
       final decoded = jsonDecode(payload);
       if (decoded is Map<String, dynamic>) {
-        return Vehicle.fromMap(decoded);
+        final vehicle = Vehicle.fromMap(decoded);
+        if (vehicle.companyId != companyContext.companyId) {
+          throw StateError('Vehicle payload company does not match its row.');
+        }
+        return vehicle;
       }
     }
     if (payload is Map) {
-      return Vehicle.fromMap(Map<String, dynamic>.from(payload));
+      final vehicle = Vehicle.fromMap(Map<String, dynamic>.from(payload));
+      if (vehicle.companyId != companyContext.companyId) {
+        throw StateError('Vehicle payload company does not match its row.');
+      }
+      return vehicle;
     }
 
     // Legacy Appwrite rows store the vehicle attributes directly.
