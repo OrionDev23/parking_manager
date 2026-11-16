@@ -196,7 +196,6 @@ class _LoginScreenState extends State<LoginScreen>
       content: LayoutBuilder(builder: (context, constraints) {
         final compact = constraints.maxWidth < 560;
         final availableHeight = constraints.maxHeight;
-        final canFitWithoutScroll = availableHeight >= 740;
         final desktop = constraints.maxWidth >= 1000;
 
         if (desktop) {
@@ -248,21 +247,13 @@ class _LoginScreenState extends State<LoginScreen>
                     ),
                   ),
                   Center(
-                    child: canFitWithoutScroll
-                        ? FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 500),
-                              child: brand,
-                            ),
-                          )
-                        : SingleChildScrollView(
-                            padding: const EdgeInsets.symmetric(horizontal: 58, vertical: 35),
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 500),
-                              child: brand,
-                            ),
-                          ),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 500),
+                        child: brand,
+                      ),
+                    ),
                   ),
                 ]),
               ),
@@ -270,12 +261,10 @@ class _LoginScreenState extends State<LoginScreen>
             Expanded(
               flex: 9,
               child: Center(
-                child: canFitWithoutScroll
-                    ? FittedBox(fit: BoxFit.scaleDown, child: loginPanel)
-                    : SingleChildScrollView(
-                        padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 30),
-                        child: loginPanel,
-                      ),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: loginPanel,
+                ),
               ),
             ),
           ]);
@@ -315,7 +304,7 @@ class _LoginScreenState extends State<LoginScreen>
             ]),
             const SizedBox(height: 27),
             const Text(
-              'Votre activité.\\nSous contrôle.',
+              'Votre activité.\nSous contrôle.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
@@ -355,31 +344,21 @@ class _LoginScreenState extends State<LoginScreen>
               stops: const [0, .38, .38],
             ),
           ),
-          child: canFitWithoutScroll
-              ? Center(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: SizedBox(
-                      width: constraints.maxWidth,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: compact ? 18 : 30,
-                          vertical: 18,
-                        ),
-                        child: mobileContent,
-                      ),
-                    ),
-                  ),
-                )
-              : SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(
-                    compact ? 18 : 30,
-                    25,
-                    compact ? 18 : 30,
-                    24,
+          child: Center(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: SizedBox(
+                width: constraints.maxWidth,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: compact ? 18 : 30,
+                    vertical: 10,
                   ),
                   child: mobileContent,
                 ),
+              ),
+            ),
+          ),
         );
       }),
     );
