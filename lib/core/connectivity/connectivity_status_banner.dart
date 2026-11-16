@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/foundation.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class ConnectivityStatusBanner extends StatefulWidget {
@@ -22,9 +21,11 @@ class _ConnectivityStatusBannerState extends State<ConnectivityStatusBanner> {
     super.initState();
     _subscription = _connection.onStatusChange.listen(_handleStatus);
     _connection.hasInternetAccess.then((online) {
-      if (mounted) _handleStatus(
+      if (mounted) {
+        _handleStatus(
         online ? InternetStatus.connected : InternetStatus.disconnected,
       );
+      }
     });
   }
 
