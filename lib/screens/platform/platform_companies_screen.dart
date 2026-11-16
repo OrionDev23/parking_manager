@@ -358,7 +358,7 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
           const SizedBox(height: 8),
           _field('Nom complet', _adminName),
           _field('Adresse email', _adminEmail),
-          _field('Mot de passe initial (8 caractères minimum)', _adminPassword, password: true),
+          _field('Mot de passe initial (obligatoire uniquement si le compte n’existe pas)', _adminPassword, password: true),
           const Divider(),
           Text('Licence et contrat', style: FluentTheme.of(context).typography.subtitle),
           const SizedBox(height: 8),
