@@ -5,9 +5,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
-import 'package:parc_oto/theme.dart';
 import 'package:parc_oto/utilities/form_validators.dart';
-import 'package:provider/provider.dart';
 
 import '../main.dart';
 import '../core/tenancy/company_membership_resolver.dart';
@@ -114,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen>
       ),
       child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Row(children: [
-          Container(width: 38, height: 38, decoration: BoxDecoration(color: mint.withValues(alpha: .14), borderRadius: BorderRadius.circular(12)), child: const Icon(FluentIcons.lock, color: teal, size: 17)),
+          Container(width: 38, height: 38, decoration: BoxDecoration(color: mint.withValues(alpha: .14), borderRadius: BorderRadius.circular(12)), child: Icon(FluentIcons.lock, color: teal, size: 17)),
           const SizedBox(width: 11),
           Text('ESPACE SÉCURISÉ', style: TextStyle(color: muted, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.7)),
         ]),
@@ -126,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen>
         _loginFieldLabel('ADRESSE E-MAIL'),
         Container(
           decoration: BoxDecoration(color: field, borderRadius: BorderRadius.circular(12), border: Border.all(color: dark ? Colors.white.withValues(alpha: .08) : const Color(0xFFE2E9EB))),
-          child: ParcotoTextBox(
+          child: TextBox(
             controller: email, placeholder: 'vous@entreprise.com', keyboardType: TextInputType.emailAddress,
             onChanged: (value) => setState(() { validEmail = FormValidators.isEmail(value); if (error.isNotEmpty) error = ''; }),
             prefix: Padding(padding: const EdgeInsets.symmetric(horizontal: 13), child: Icon(FluentIcons.mail, size: 15, color: muted)),
@@ -140,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen>
         _loginFieldLabel('MOT DE PASSE'),
         Container(
           decoration: BoxDecoration(color: field, borderRadius: BorderRadius.circular(12), border: Border.all(color: dark ? Colors.white.withValues(alpha: .08) : const Color(0xFFE2E9EB))),
-          child: ParcotoTextBox(
+          child: TextBox(
             controller: password, placeholder: 'Votre mot de passe', obscureText: !showPassword,
             onSubmitted: (_) => signIn(),
             onChanged: (_) { if (error.isNotEmpty) setState(() => error = ''); },
@@ -150,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen>
           ),
         ),
         const SizedBox(height: 8),
-        Align(alignment: Alignment.centerRight, child: HyperlinkButton(onPressed: forgotPassword, child: const Text('Mot de passe oublié ?', style: TextStyle(color: teal, fontSize: 11, fontWeight: FontWeight.w700)))),
+        Align(alignment: Alignment.centerRight, child: HyperlinkButton(onPressed: forgotPassword, child: Text('Mot de passe oublié ?', style: TextStyle(color: teal, fontSize: 11, fontWeight: FontWeight.w700)))),
         if (error.isNotEmpty) ...[
           const SizedBox(height: 10),
           Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.red.withValues(alpha: .08), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.red.withValues(alpha: .2))), child: Row(children: [const Icon(FluentIcons.error, color: Colors.red, size: 15), const SizedBox(width: 9), Expanded(child: Text(error, style: const TextStyle(color: Colors.red, fontSize: 11)))])),
@@ -160,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen>
           onPressed: checking ? null : signIn,
           child: checking
               ? const SizedBox(width: 19, height: 19, child: ProgressRing(strokeWidth: 2))
-              : const Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text('Accéder à mon espace', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)), SizedBox(width: 10), Icon(FluentIcons.arrow_right, size: 14)]),
+              : Row(mainAxisAlignment: MainAxisAlignment.center, children: const [Text('Accéder à mon espace', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)), SizedBox(width: 10), Icon(FluentIcons.chevron_right, size: 14)]),
         )),
         const SizedBox(height: 22),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(FluentIcons.shield, size: 12, color: muted), const SizedBox(width: 7), Text('Vos accès sont protégés', style: TextStyle(color: muted, fontSize: 10))]),
@@ -178,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen>
         ]),
       ]),
       const SizedBox(height: 62),
-      Container(padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7), decoration: BoxDecoration(color: mint.withValues(alpha: .12), borderRadius: BorderRadius.circular(30), border: Border.all(color: mint.withValues(alpha: .25))), child: const Row(mainAxisSize: MainAxisSize.min, children: [Icon(FluentIcons.sync, color: mint, size: 9), SizedBox(width: 8), Text('VOTRE ACTIVITÉ, EN TEMPS RÉEL', style: TextStyle(color: mint, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.1))])),
+      Container(padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7), decoration: BoxDecoration(color: mint.withValues(alpha: .12), borderRadius: BorderRadius.circular(30), border: Border.all(color: mint.withValues(alpha: .25))), child: Row(mainAxisSize: MainAxisSize.min, children: [const Icon(FluentIcons.sync, color: mint, size: 9), const SizedBox(width: 8), const Text('VOTRE ACTIVITÉ, EN TEMPS RÉEL', style: TextStyle(color: mint, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.1))])),
       const SizedBox(height: 23),
       const Text('Prenez une\nlongueur\nd’avance.', style: TextStyle(color: Colors.white, fontSize: 57, height: 1.02, fontWeight: FontWeight.w900, letterSpacing: -2.8)),
       const SizedBox(height: 20),
@@ -206,8 +204,8 @@ class _LoginScreenState extends State<LoginScreen>
                     height: double.infinity, clipBehavior: Clip.antiAlias,
                     decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [navy, Color(0xFF102D3C), Color(0xFF0B1B2B)])),
                     child: Stack(children: [
-                      Positioned(right: -150, top: -160, child: Container(width: 570, height: 570, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: mint.withValues(alpha: .10)))),
-                      Positioned(right: -85, top: -95, child: Container(width: 440, height: 440, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: mint.withValues(alpha: .07)))),
+                      Positioned(right: -150, top: -160, child: Container(width: 570, height: 570, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: mint.withValues(alpha: .10))))),
+                      Positioned(right: -85, top: -95, child: Container(width: 440, height: 440, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: mint.withValues(alpha: .07))))),
                       Positioned(right: 30, bottom: -190, child: Icon(FluentIcons.car, size: 390, color: Colors.white.withValues(alpha: .025))),
                       Center(child: SingleChildScrollView(padding: const EdgeInsets.symmetric(horizontal: 58, vertical: 55), child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 500), child: brand))),
                     ]),
@@ -243,37 +241,6 @@ class _LoginScreenState extends State<LoginScreen>
       label,
       style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
     ),
-  );
-
-  Widget _loginFeature(
-    IconData icon,
-    String label,
-    Color accent,
-    Color foreground,
-    Color muted,
-  ) => Row(
-    children: [
-      Container(
-        width: 34,
-        height: 34,
-        decoration: BoxDecoration(
-          color: accent.withValues(alpha: .12),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Icon(icon, size: 16, color: accent),
-      ),
-      const SizedBox(width: 12),
-      Expanded(
-        child: Text(
-          label,
-          style: TextStyle(
-            color: foreground.withValues(alpha: .9),
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-    ],
   );
 
   String error = "";
