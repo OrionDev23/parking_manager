@@ -132,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen>
           ),
         ),
         if (email.text.isNotEmpty && !validEmail) ...[
-          const SizedBox(height: 6), Text('entervalidemail'.tr(), style: const TextStyle(color: Colors.red, fontSize: 11)),
+           SizedBox(height: 6), Text('entervalidemail'.tr(), style:  TextStyle(color: Colors.red, fontSize: 11)),
         ],
         const SizedBox(height: 19),
         _loginFieldLabel('MOT DE PASSE'),
@@ -151,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen>
         Align(alignment: Alignment.centerRight, child: HyperlinkButton(onPressed: forgotPassword, child: Text('Mot de passe oublié ?', style: TextStyle(color: teal, fontSize: 11, fontWeight: FontWeight.w700)))),
         if (error.isNotEmpty) ...[
           const SizedBox(height: 10),
-          Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.red.withValues(alpha: .08), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.red.withValues(alpha: .2))), child: Row(children: [const Icon(FluentIcons.error, color: Colors.red, size: 15), const SizedBox(width: 9), Expanded(child: Text(error, style: const TextStyle(color: Colors.red, fontSize: 11)))])),
+          Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.red.withValues(alpha: .08), borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.red.withValues(alpha: .2))), child: Row(children: [ Icon(FluentIcons.error, color: Colors.red, size: 15), const SizedBox(width: 9), Expanded(child: Text(error, style:  TextStyle(color: Colors.red, fontSize: 11)))])),
         ],
         const SizedBox(height: 20),
         SizedBox(height: 52, child: FilledButton(
