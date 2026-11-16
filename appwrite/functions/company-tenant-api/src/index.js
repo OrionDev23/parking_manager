@@ -130,6 +130,9 @@ export default async ({ req, res, log, error }) => {
     }
 
     if (action === 'create_company') {
+      if (process.env.TENANT_COMPANY_CREATION_ENABLED !== 'true') {
+        return json(res, 403, { ok: false, message: 'Company onboarding is disabled until tenant data provisioning is complete.' });
+      }
       const name = String(input.name || '').trim();
       const slug = slugify(input.slug || name);
       if (name.length < 2 || name.length > 160 || slug.length < 2) {

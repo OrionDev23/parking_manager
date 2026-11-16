@@ -16,7 +16,7 @@ Database: `6531ad112080ae3b14a7` (Parking).
 Every request requires the Appwrite user JWT in `x-appwrite-user-jwt`. The function validates it against `/account`; the caller's user ID is never accepted from request JSON.
 
 - `{ "action": "resolve" }`: active company memberships for the authenticated user.
-- `{ "action": "create_company", "name": "...", "slug": "..." }`: create a company and make the caller its owner.
+- `{ "action": "create_company", "name": "...", "slug": "..." }`: gated off by default; create a company and make the caller its owner only after all tenant data tables have been provisioned. Enable explicitly with `TENANT_COMPANY_CREATION_ENABLED=true`.
 - `{ "action": "list_members", "companyId": "..." }`: owner/admin only.
 - `{ "action": "add_member", "companyId": "...", "email": "...", "role": "employee" }`: owner/admin only; account must already exist. Only owner can grant admin.
 - `{ "action": "change_role", "companyId": "...", "membershipId": "...", "role": "manager" }`: owner/admin only; owner role is immutable through this endpoint.
