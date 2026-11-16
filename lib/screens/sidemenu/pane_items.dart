@@ -377,17 +377,18 @@ class PaneItemsAndFooters {
     );
 
     if (PanesListState.signedIn.value) {
+      final isPlatformSession = authService.session?.isPlatformSuperAdmin == true;
       originalItems = [
-        if (PanesListState.signedIn.value) dashboard,
-        if (authService.session?.userId == '999') platformCompanies,
-        if (canManageUsers || canManageAccess) userAccessManagement,
-        if (PanesListState.signedIn.value) vehicles,
-        if (PanesListState.signedIn.value) reparations,
-        if (showAtelier) atelier,
-        if (PanesListState.signedIn.value) chauffeurs,
-        if (authService.session?.hasPermission('planning.manage') == true)
+        if (isPlatformSession) platformCompanies,
+        if (!isPlatformSession && PanesListState.signedIn.value) dashboard,
+        if (!isPlatformSession && canManageUsers || canManageAccess) userAccessManagement,
+        if (!isPlatformSession && PanesListState.signedIn.value) vehicles,
+        if (!isPlatformSession && PanesListState.signedIn.value) reparations,
+        if (!isPlatformSession && showAtelier) atelier,
+        if (!isPlatformSession && PanesListState.signedIn.value) chauffeurs,
+        if (!isPlatformSession && authService.session?.hasPermission('planning.manage') == true)
           planner,
-        if (authService.session?.hasPermission('activity.view') == true)
+        if (!isPlatformSession && authService.session?.hasPermission('activity.view') == true)
           evenements,
       ];
     } else {
@@ -395,15 +396,17 @@ class PaneItemsAndFooters {
     }
     footerItems = [
       PaneItemSeparator(),
-      if (authService.session?.hasPermission('company.manage') == true &&
+      if (authService.session?.isPlatformSuperAdmin != true &&
+          authService.session?.hasPermission('company.manage') == true &&
           PanesListState.signedIn.value)
         entreprise,
-      if (authService.session?.hasPermission('backup.manage') == true &&
+      if (authService.session?.isPlatformSuperAdmin != true &&
+          authService.session?.hasPermission('backup.manage') == true &&
           PanesListState.signedIn.value)
         backup,
       if (PanesListState.signedIn.value) logout,
       parametres,
-      if (PanesListState.signedIn.value) tutorial,
+      if (PanesListState.signedIn.value && authService.session?.isPlatformSuperAdmin != true) tutorial,
     ];
   }
 
