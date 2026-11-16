@@ -24,7 +24,7 @@ it has **not** been created in the live project.
 | maxEmployees | integer | yes | 0 means no employees permitted |
 | maxDrivers | integer | yes | 0 means no drivers permitted |
 | maxSites | integer | yes | 0 means no sites permitted |
-| monthlyPrice | integer | yes | Amount in smallest currency unit; currently UI labels this as DA, so use whole DZD amounts consistently until pricing rules are finalized |
+| monthlyPrice | integer | yes | Whole DZD integer amount (the UI currently labels this as DA) |
 | currency | string (3) | yes | ISO 4217 code; currently DZD |
 | billingCycle | string (16) | yes | monthly, quarterly, yearly, custom |
 | notes | string (2000) | no | Commercial notes |
