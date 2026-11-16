@@ -1,5 +1,4 @@
 import 'package:appwrite/appwrite.dart';
-import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:appwrite/models.dart' hide Row;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -8,10 +7,7 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:parc_oto/utilities/form_validators.dart';
-import 'package:parc_oto/widgets/on_tap_scale.dart';
-import 'package:parc_oto/widgets/page_header.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../main.dart';
 import '../core/tenancy/company_membership_resolver.dart';
@@ -36,7 +32,6 @@ class _LoginScreenState extends State<LoginScreen>
   bool checking = false;
 
   bool validEmail = false;
-  bool validPassword = false;
 
   @override
   void initState() {
@@ -75,8 +70,6 @@ class _LoginScreenState extends State<LoginScreen>
     }
   }
 
-  double pwidth = 300.px;
-  double pheight = 250.px;
 
   @override
   Widget build(BuildContext context) {
@@ -500,9 +493,11 @@ class _LoginScreenState extends State<LoginScreen>
         checking = false;
         if (mounted) setState(() {});
       }
-    } else if (password.text.isEmpty) {
+    } else {
       setState(() {
-        error = "emptypassword".tr();
+        error = password.text.isEmpty
+            ? "emptypassword".tr()
+            : 'entervalidemail'.tr();
         signedIn = false;
         checking = false;
       });
@@ -617,6 +612,13 @@ class _LoginScreenState extends State<LoginScreen>
         error = "";
       });
     }
+  }
+
+  @override
+  void dispose() {
+    email.dispose();
+    password.dispose();
+    super.dispose();
   }
 
   @override
