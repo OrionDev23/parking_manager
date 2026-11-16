@@ -326,8 +326,8 @@ export default async ({ req, res, log, error }) => {
         return json(res, 400, { ok: false, message: 'Invalid companyId, email or role.' });
       }
       const caller = await requireCompanyAdmin(userId, companyId);
-      if (role === 'admin' && caller.data.role !== 'owner') {
-        return json(res, 403, { ok: false, message: 'Only the owner can add an administrator.' });
+      if (role === 'admin') {
+        return json(res, 403, { ok: false, message: 'Company administrators cannot create or promote other administrators.' });
       }
       const search = new URLSearchParams({ search: email, limit: '25' });
       const users = await appwrite(`/users?${search.toString()}`);
@@ -360,7 +360,7 @@ export default async ({ req, res, log, error }) => {
       const companyId = String(input.companyId || '');
       const membershipId = String(input.membershipId || '');
       const role = String(input.role || '');
-      if (!companyId || !membershipId || !['admin', 'manager', 'employee', 'viewer'].includes(role)) {
+      if (!companyId || !membershipId || !['manager', 'employee', 'viewer'].includes(role)) {
         return json(res, 400, { ok: false, message: 'Invalid companyId, membershipId or role.' });
       }
       const caller = await requireCompanyAdmin(userId, companyId);
@@ -368,8 +368,8 @@ export default async ({ req, res, log, error }) => {
       if (target.data?.companyId !== companyId || target.data?.role === 'owner' || target.data?.status === 'revoked') {
         return json(res, 403, { ok: false, message: 'The target membership cannot be changed.' });
       }
-      if (caller.data.role !== 'owner' && (target.data?.role === 'admin' || role === 'admin')) {
-        return json(res, 403, { ok: false, message: 'Only the owner can manage administrator roles.' });
+      if (target.data?.role === 'admin') {
+        return json(res, 403, { ok: false, message: 'Company administrator accounts are managed only by the platform.' });
       }
       await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
         method: 'PATCH', body: { data: { role, updatedAt: now } },
@@ -388,8 +388,8 @@ export default async ({ req, res, log, error }) => {
       if (target.data?.companyId !== companyId || target.data?.role === 'owner' || target.data?.userId === userId || target.data?.status === 'revoked') {
         return json(res, 403, { ok: false, message: 'The target membership cannot be revoked.' });
       }
-      if (caller.data.role !== 'owner' && target.data?.role === 'admin') {
-        return json(res, 403, { ok: false, message: 'Only the owner can revoke an administrator.' });
+      if (target.data?.role === 'admin') {
+        return json(res, 403, { ok: false, message: 'Company administrator accounts are managed only by the platform.' });
       }
       await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
         method: 'PATCH', body: { data: { status: 'revoked', updatedAt: now } },
