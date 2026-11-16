@@ -20,13 +20,45 @@ class _ConnectivityStatusBannerState extends State<ConnectivityStatusBanner> {
   @override
   void initState() {
     super.initState();
-    _subscription = _connection.onStatusChange.listen((status) {
-      if (mounted) setState(() => _status = status);
-    });
+    _subscription = _connection.onStatusChange.listen(_handleStatus);
     _connection.hasInternetAccess.then((online) {
-      if (mounted) {
-        setState(() => _status = online ? InternetStatus.connected : InternetStatus.disconnected);
-      }
+      if (mounted) _handleStatus(
+        online ? InternetStatus.connected : InternetStatus.disconnected,
+      );
+    });
+  }
+
+  void _handleStatus(InternetStatus next) {
+    if (!mounted) return;
+    final previous = _status;
+    if (previous == next) return;
+    setState(() => _status = next);
+
+    // The initial successful check is intentionally silent. Only meaningful
+    // connectivity changes should interrupt the user with a transient notice.
+    if (previous == null && next == InternetStatus.connected) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: Text(
+            next == InternetStatus.connected
+                ? 'Connexion Internet rétablie'
+                : 'Connexion Internet perdue',
+          ),
+          content: Text(
+            next == InternetStatus.connected
+                ? 'Vous êtes de nouveau en ligne.'
+                : 'Vérifiez votre connexion. Certaines opérations nécessitent Internet.',
+          ),
+          severity: next == InternetStatus.connected
+              ? InfoBarSeverity.success
+              : InfoBarSeverity.warning,
+          onClose: close,
+        ),
+        duration: const Duration(seconds: 4),
+      );
     });
   }
 
@@ -37,40 +69,5 @@ class _ConnectivityStatusBannerState extends State<ConnectivityStatusBanner> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (!kIsWeb) return widget.child;
-    final online = _status == InternetStatus.connected;
-    final checking = _status == null;
-    final background = checking
-        ? const Color(0xFF64748B)
-        : online ? const Color(0xFF16835D) : const Color(0xFFB42318);
-    final message = checking
-        ? 'Vérification de la connexion…'
-        : online
-            ? 'En ligne · Connexion Internet disponible'
-            : 'Hors ligne · Connexion requise. Les modifications sont désactivées.';
-    return Column(
-      children: [
-        Container(
-          width: double.infinity,
-          height: 30,
-          color: background,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          alignment: Alignment.centerLeft,
-          child: Row(
-            children: [
-              Icon(
-                checking ? FluentIcons.sync : FluentIcons.cloud,
-                size: 14,
-                color: Colors.white,
-              ),
-              const SizedBox(width: 8),
-              Text(message, style: const TextStyle(color: Colors.white, fontSize: 12)),
-            ],
-          ),
-        ),
-        Expanded(child: widget.child),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => widget.child;
 }
