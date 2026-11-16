@@ -218,7 +218,7 @@ class _CompanyCard extends StatelessWidget {
             _QuotaText(label: 'Chauffeurs', value: company.quota('maxDrivers').toString()),
             _QuotaText(label: 'Sites', value: company.quota('maxSites').toString()),
             _QuotaText(label: 'Échéance', value: expiry == null ? 'Non configurée' : '${expiry.day.toString().padLeft(2, '0')}/${expiry.month.toString().padLeft(2, '0')}/${expiry.year}'),
-            _QuotaText(label: 'Tarif', value: '${company.monthlyPrice} ${company.currency} / ${entitlement['billingCycle'] ?? '—'}'),
+            _QuotaText(label: 'Tarif', value: '${company.priceAmount} ${company.currency} / ${entitlement['billingCycle'] ?? '—'}'),
           ]),
           if ((entitlement['notes']?.toString() ?? '').isNotEmpty) ...[
             const SizedBox(height: 8),
@@ -281,7 +281,7 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
   final _maxEmployees = TextEditingController(text: '20');
   final _maxDrivers = TextEditingController(text: '20');
   final _maxSites = TextEditingController(text: '1');
-  final _monthlyPrice = TextEditingController(text: '0');
+  final _priceAmount = TextEditingController(text: '0');
   final _notes = TextEditingController();
   final _billingCycle = TextEditingController(text: 'monthly');
   bool _saving = false;
@@ -289,7 +289,7 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
 
   @override
   void dispose() {
-    for (final controller in [_name, _slug, _adminName, _adminEmail, _adminPassword, _startsAt, _expiresAt, _maxUsers, _maxVehicles, _maxEmployees, _maxDrivers, _maxSites, _monthlyPrice, _notes, _billingCycle]) {
+    for (final controller in [_name, _slug, _adminName, _adminEmail, _adminPassword, _startsAt, _expiresAt, _maxUsers, _maxVehicles, _maxEmployees, _maxDrivers, _maxSites, _priceAmount, _notes, _billingCycle]) {
       controller.dispose();
     }
     super.dispose();
@@ -315,7 +315,7 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
         maxEmployees: _number(_maxEmployees),
         maxDrivers: _number(_maxDrivers),
         maxSites: _number(_maxSites),
-        monthlyPrice: _number(_monthlyPrice),
+        priceAmount: _number(_priceAmount),
         billingCycle: _billingCycle.text.trim(),
         currency: 'DZD',
         notes: _notes.text.trim(),
@@ -367,7 +367,7 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
           Row(children: [
             Expanded(child: _field('Cycle de facturation (monthly / quarterly / yearly / custom)', _billingCycle)),
             const SizedBox(width: 10),
-            Expanded(child: _field('Tarif par période (DA)', _monthlyPrice, numeric: true)),
+            Expanded(child: _field('Tarif par période (DA)', _priceAmount, numeric: true)),
           ]),
           const Divider(),
           Text('Quotas contractuels', style: FluentTheme.of(context).typography.subtitle),
