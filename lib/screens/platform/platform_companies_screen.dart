@@ -16,7 +16,6 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
   final _repository = PlatformCompaniesRepository();
   final _search = TextEditingController();
   bool _loading = true;
-  bool _creating = false;
   String? _error;
   List<PlatformCompany> _companies = [];
 
@@ -128,7 +127,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                 ),
                 const SizedBox(width: 8),
                 FilledButton(
-                  onPressed: _creating ? null : _openCreateDialog,
+                  onPressed: _openCreateDialog,
                   child: const Row(mainAxisSize: MainAxisSize.min, children: [
                     Icon(FluentIcons.add), SizedBox(width: 8), Text('Nouvelle entreprise'),
                   ]),
@@ -201,10 +200,15 @@ class _CompanyCard extends StatelessWidget {
               Text(company.name, style: FluentTheme.of(context).typography.subtitle),
               Text('${company.slug} • ${company.companyId}', style: FluentTheme.of(context).typography.caption),
             ])),
-            InfoBadge(
-              severity: expired ? InfoBadgeSeverity.warning : (company.status == 'active' ? InfoBadgeSeverity.success : InfoBadgeSeverity.informational),
-              child: Text(expired ? 'Licence expirée' : company.status),
-            ),
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(
+                expired ? FluentIcons.warning : FluentIcons.check_mark,
+                size: 14,
+                color: expired ? Colors.orange : Colors.green,
+              ),
+              const SizedBox(width: 6),
+              Text(expired ? 'Licence expirée' : company.status),
+            ]),
           ]),
           const SizedBox(height: 14),
           Wrap(spacing: 18, runSpacing: 8, children: [
@@ -247,7 +251,7 @@ class _ErrorPanel extends StatelessWidget {
   Widget build(BuildContext context) => Center(child: Column(
     mainAxisSize: MainAxisSize.min,
     children: [
-      const Icon(FluentIcons.error_badge, size: 28),
+      const Icon(FluentIcons.error, size: 28),
       const SizedBox(height: 10),
       Text(message, textAlign: TextAlign.center),
       const SizedBox(height: 12),
