@@ -90,3 +90,54 @@ The following observations are security-relevant:
 - This audit inspected live table schemas, table-level permissions and row-security flags. It did not inspect every row in every table or prove the correctness of legacy ownership mapping.
 - No live business-table permissions or row-security settings were changed by this audit.
 - Flutter analysis and multi-company integration tests remain required before declaring the migration complete.
+
+## Live row-count audit (read-only, 2026-11-16)
+
+The Appwrite console TablesDB read operation was used to retrieve the exact `total` count for each legacy tenant table. Small samples were inspected for schema keys and ownership fields; no business values were copied into this report.
+
+| Table | Rows | Tenant field present in schema | Sample ownership finding |
+|---|---:|---|---|
+| chauffeur | 183 | Yes | sampled rows use `companyId=essais` |
+| vehicle | 8 | Yes | sampled rows use `companyId=essais` |
+| etat | 4 | No | rows link by `vehicle` / `vehicleMat` |
+| doc_vehic | 1 | No | row links by `vehicle` / `vehiclemat` |
+| reparation | 0 | No | empty |
+| activity | 70 | No | sample has `createdBy`, no tenant key |
+| chauf_disponibilite | 0 | No | empty |
+| doc_chauffeur | 0 | No | empty |
+| prestataire | 0 | No | empty |
+| entreprise | 1 | No | singleton company profile |
+| planning | 10 | No | sample has `createdBy`, no tenant key |
+| backup | 0 | No | empty |
+| options | 4 | No | no tenant key |
+| categories | 1 | No | no tenant key |
+| partsbrands | 1 | No | no tenant key |
+| parts | 2 | No | supplier references, no tenant key |
+| storage | 0 | No | empty |
+| fichereception | 1 | No | row links by vehicle fields, no tenant key |
+| clients | 0 | No | empty |
+| fournisseurs | 0 | No | empty |
+| access_teams | 2 | Yes | both rows use `companyId=essais` |
+| access_users | 4 | Yes | all four rows use `companyId=essais` |
+
+Observed total: **292 rows** across the 22 tables classified as tenant-scoped. Of these, **95 rows** are in tables with no `companyId` column; the remaining 197 rows are in tables whose schema has a tenant field. This is a schema/count classification, not proof that every row has correct ownership. Only sample rows were inspected for the two large tables.
+
+### Critical tenant registry inconsistency
+
+The live `companies` table currently contains two active GTS records:
+
+- `gts-guelma` (slug `gts-guelma`)
+- `essais` (slug `gts-guelma-truck-service`)
+
+The live `company_memberships` table contains eight active memberships: the same four user IDs (`999`, `1000`, `minpme`, `arrar`) are mapped once to each company ID. Meanwhile, the legacy `access_users`, `access_teams`, `chauffeur`, and `vehicle` samples still point to `companyId=essais`. The GTS duplicate is therefore not a cosmetic slug issue: the two company IDs currently describe overlapping access to the same legacy tenant.
+
+**Do not revoke either membership, delete either company row, change any legacy companyId, or run a bulk backfill yet.** First decide which identifier is canonical. Based on current operational rows, `essais` is the identifier presently used by legacy data and authorization configuration. Renaming/re-keying to `gts-guelma` would require a coordinated migration of every dependent row and client preference; it is not safe to do implicitly.
+
+The `users` profile table contains four profile rows, including `999`, `1000`, and `minpme`; the legacy access mapping also references `arrar`, whose profile row is absent. A separate read-only lookup confirms that the Appwrite Auth account `arrar` does exist and is active (`arrar@parcoto.dz`). This is therefore a missing profile-row discrepancy, not a missing Auth account; check whether any UI or legacy flow requires that profile row.
+
+### Audit limits
+
+- Counts are exact totals returned by TablesDB at audit time; samples were limited to two rows per table (up to 20 for the tenant registry tables).
+- No full-row export, payload comparison, relation integrity scan, or row-permission count was performed.
+- No production data, schema, row-security flag, or permission was modified.
+- The 95 rows without a tenant field require ownership mapping via their parent vehicle/driver/provider references or a reviewed legacy company rule; do not assign them solely from `createdBy`.
