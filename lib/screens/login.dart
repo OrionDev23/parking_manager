@@ -194,7 +194,6 @@ class _LoginScreenState extends State<LoginScreen>
     return ScaffoldPage(
       padding: EdgeInsets.zero,
       content: LayoutBuilder(builder: (context, constraints) {
-        final wide = constraints.maxWidth >= 1000;
         final compact = constraints.maxWidth < 560;
         final availableHeight = constraints.maxHeight;
         final canFitWithoutScroll = availableHeight >= 740;
@@ -289,7 +288,6 @@ class _LoginScreenState extends State<LoginScreen>
           );
         }
 
-        final compact = constraints.maxWidth < 560;
         final mobileContent = Column(
           mainAxisSize: MainAxisSize.min,
           children: [
