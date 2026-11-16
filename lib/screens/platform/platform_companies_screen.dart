@@ -1,7 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
 import '../../core/tenancy/platform_companies_repository.dart';
-import '../../main.dart';
 import '../../widgets/module_dashboard_header.dart';
 
 class PlatformCompaniesScreen extends StatefulWidget {
