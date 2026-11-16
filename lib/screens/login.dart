@@ -321,9 +321,18 @@ class _LoginScreenState extends State<LoginScreen>
             ],
           ),
         ),
+        actions: [
+          Button(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Annuler'),
+          ),
+        ],
       ),
     );
-    if (selected == null) return null;
+    if (selected == null) {
+      await authService.signOut();
+      return null;
+    }
     return authService.selectCompany(selected.companyId);
   }
 
