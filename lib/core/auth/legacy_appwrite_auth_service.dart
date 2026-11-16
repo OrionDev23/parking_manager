@@ -209,6 +209,19 @@ class LegacyAppwriteAuthService implements AuthService {
   }
 
   @override
+  Future<AuthSession> selectCompany(String companyId) async {
+    if (DatabaseGetter.user == null || DatabaseGetter.me.value == null) {
+      throw StateError('Aucune session Appwrite authentifiée.');
+    }
+    final membership = await membershipResolver.select(selector: companyId);
+    await preferences.setString('active_company_id', membership.companyId);
+    await preferences.setString('project', membership.companyId);
+    _session = _buildSession(membership.companyId, membership.permissions);
+    _setState(AuthState.signedIn);
+    return _session!;
+  }
+
+  @override
   Future<void> signOut() async {
     _setState(AuthState.signingOut);
     try {
