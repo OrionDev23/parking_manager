@@ -176,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen>
         ]),
       ]),
       const SizedBox(height: 62),
-      Container(padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7), decoration: BoxDecoration(color: mint.withValues(alpha: .12), borderRadius: BorderRadius.circular(30), border: Border.all(color: mint.withValues(alpha: .25))), child: Row(mainAxisSize: MainAxisSize.min, children: [const Icon(FluentIcons.sync, color: mint, size: 9), const SizedBox(width: 8), const Text('VOTRE ACTIVITÉ, EN TEMPS RÉEL', style: TextStyle(color: mint, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.1))])),
+      Container(padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7), decoration: BoxDecoration(color: mint.withValues(alpha: .12), borderRadius: BorderRadius.circular(30), border: Border.all(color: mint.withValues(alpha: .25))), child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(FluentIcons.sync, color: mint, size: 9), const SizedBox(width: 8), Text('VOTRE ACTIVITÉ, EN TEMPS RÉEL', style: TextStyle(color: mint, fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.1))])),
       const SizedBox(height: 23),
       const Text('Prenez une\nlongueur\nd’avance.', style: TextStyle(color: Colors.white, fontSize: 57, height: 1.02, fontWeight: FontWeight.w900, letterSpacing: -2.8)),
       const SizedBox(height: 20),
@@ -213,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen>
                   Expanded(flex: 9, child: Center(child: SingleChildScrollView(padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 45), child: loginPanel))),
                 ])
               : Container(
-                  decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [navy, navy2, page], stops: [0, .38, .38])),
+                  decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [navy, navy2, page], stops: const [0, .38, .38])),
                   child: SingleChildScrollView(padding: EdgeInsets.fromLTRB(compact ? 18 : 30, 25, compact ? 18 : 30, 24), child: Column(children: [
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                       Container(width: 42, height: 42, padding: const EdgeInsets.all(6), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(13)), child: Image.asset('assets/images/logo.webp', fit: BoxFit.contain)),
