@@ -167,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen>
 
     final brand = Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
       Row(children: [
-        Container(width: 48, height: 48, padding: const EdgeInsets.all(7), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)), child: Image.asset('assets/images/logo.webp', fit: BoxFit.contain)),
+        Container(width: 48, height: 48, padding: const EdgeInsets.all(7), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)), child: Image.asset('assets/images/favIcon.webp', fit: BoxFit.contain)),
         const SizedBox(width: 13),
         const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('PARCOTO', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900, letterSpacing: 2.4)),
@@ -289,7 +289,7 @@ class _LoginScreenState extends State<LoginScreen>
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(13),
                 ),
-                child: Image.asset('assets/images/logo.webp', fit: BoxFit.contain),
+                child: Image.asset('assets/images/favIcon.webp', fit: BoxFit.contain),
               ),
               const SizedBox(width: 11),
               const Text(
