@@ -141,3 +141,28 @@ The `users` profile table contains four profile rows, including `999`, `1000`, a
 - No full-row export, payload comparison, relation integrity scan, or row-permission count was performed.
 - No production data, schema, row-security flag, or permission was modified.
 - The 95 rows without a tenant field require ownership mapping via their parent vehicle/driver/provider references or a reviewed legacy company rule; do not assign them solely from `createdBy`.
+
+## Relationship audit (read-only, 2026-11-16)
+
+A second read-only pass inspected every row in the small non-empty tables and all 70 rows in `activity`, plus the referenced vehicle rows where the relation could be resolved. Only identifiers, relation fields, ownership fields and permission principals were examined; business content was not copied here.
+
+| Table | Relationship / ownership result | Migration implication |
+|---|---|---|
+| `etat` (4 rows) | All four rows reference vehicle row `39911741672`; that vehicle exists and has `companyId=essais`. | These four rows can be mapped to `essais` through a verified parent relation, subject to preserving the relation during migration. |
+| `doc_vehic` (1 row) | References vehicle ID `207` and registration `62413-109-16`; a vehicle row with ID `207` was not found. | Ownership remains unresolved. Do not assign by `createdBy` alone; investigate legacy ID/registration mapping. |
+| `fichereception` (1 row) | References vehicle row `45347599918`; that vehicle exists and has `companyId=essais`. | The reception row has a verified parent path to `essais`. |
+| `activity` (70 rows) | Rows reference parent records through `docID`. The rows include records created by `007` and `999`; several `docID` values match known vehicle/reception/document row IDs. | Ownership must be resolved per activity through its referenced document/entity and activity type. `createdBy` is not a tenant key. |
+| `planning` (10 rows) | All rows have `createdBy=007`, empty `resourceIds`, and no tenant or parent reference. User `007` has no active company membership in `company_memberships`. | Tenant ownership is unresolved. Do not migrate these rows to `essais` merely because they are in the legacy project. |
+| `entreprise` (1 row) | One legacy singleton profile/settings row; no tenant key or parent reference. | Requires an explicit product decision whether this becomes the profile for `essais` or a platform-level record. |
+| `options` (4), `categories` (1), `partsbrands` (1), `parts` (2) | No tenant field. Current row permissions inspected on these records refer to `user:999`. Parts reference the category and brand rows; supplier references are null. | These catalogs/inventory records need an explicit tenant scope decision and parent/reference integrity checks. Per-row user permissions are not a company boundary. |
+
+The three vehicle rows successfully resolved during this pass (`39911741672`, `39911536667`, `45347599918`) all have `companyId=essais`. A lookup for vehicle row `207` returned not found. This does not establish whether `207` is a stale identifier, a legacy external ID, or a relation-format mismatch.
+
+### Additional unresolved ownership cases
+
+- `activity` records authored by `007` cannot be assigned to a company from the creator field: there is no active membership for `007`. Some activity rows authored by `999` point to records that can be resolved, but the entire set still needs a typed parent-resolution pass.
+- `planning` records have no tenant field, no linked resource IDs, and no active membership for their creator. Their tenant ownership is currently unknown.
+- The one `doc_vehic` record has an unresolved parent vehicle reference.
+- The `entreprise` singleton and inventory/catalogue tables require a deliberate scope decision before backfill.
+
+No records, schemas, permissions, row-security flags, memberships or Function deployments were modified by this pass.
