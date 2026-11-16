@@ -41,8 +41,8 @@ class PlatformCompany {
       DateTime.tryParse(entitlement['expiresAt']?.toString() ?? '');
 
   int quota(String key) => (entitlement[key] as num?)?.toInt() ?? 0;
-  int get monthlyPrice =>
-      (entitlement['monthlyPrice'] as num?)?.toInt() ?? 0;
+  int get priceAmount =>
+      (entitlement['priceAmount'] as num?)?.toInt() ?? 0;
   String get currency => entitlement['currency']?.toString() ?? 'DZD';
 }
 
@@ -104,7 +104,7 @@ class PlatformCompaniesRepository {
     required int maxEmployees,
     required int maxDrivers,
     required int maxSites,
-    required int monthlyPrice,
+    required int priceAmount,
     required String billingCycle,
     required String currency,
     required String notes,
@@ -123,7 +123,7 @@ class PlatformCompaniesRepository {
       'maxEmployees': maxEmployees,
       'maxDrivers': maxDrivers,
       'maxSites': maxSites,
-      'monthlyPrice': monthlyPrice,
+      'priceAmount': priceAmount,
       'billingCycle': billingCycle,
       'currency': currency,
       'notes': notes,
