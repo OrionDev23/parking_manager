@@ -176,10 +176,10 @@ class _LoginScreenState extends State<LoginScreen>
       Row(children: [
         Container(width: 48, height: 48, padding: const EdgeInsets.all(7), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)), child: Image.asset('assets/images/favIcon.webp', fit: BoxFit.contain)),
         const SizedBox(width: 13),
-        const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('PARCOTO', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900, letterSpacing: 2.4)),
-          SizedBox(height: 3),
-          Text('login_brand_tagline'.tr(), style: TextStyle(color: Color(0xFF8CA3B6), fontSize: 8, letterSpacing: .8, fontWeight: FontWeight.w700)),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Text('PARCOTO', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900, letterSpacing: 2.4)),
+          const SizedBox(height: 3),
+          Text('login_brand_tagline'.tr(), style: const TextStyle(color: Color(0xFF8CA3B6), fontSize: 8, letterSpacing: .8, fontWeight: FontWeight.w700)),
         ]),
       ]),
       const SizedBox(height: 62),

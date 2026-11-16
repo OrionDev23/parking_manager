@@ -214,10 +214,12 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
           );
 
           Widget companyResults({bool shrinkWrap = false}) {
-            if (_loading) return const Center(child: Padding(
+            if (_loading) {
+              return const Center(child: Padding(
               padding: EdgeInsets.all(28),
               child: ProgressRing(),
             ));
+            }
             if (_error != null) return _ErrorPanel(message: _error!, onRetry: _load);
             if (visibleCompanies.isEmpty) {
               return const Padding(
