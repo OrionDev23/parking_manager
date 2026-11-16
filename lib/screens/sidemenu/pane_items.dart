@@ -381,7 +381,7 @@ class PaneItemsAndFooters {
       originalItems = [
         if (isPlatformSession) platformCompanies,
         if (!isPlatformSession && PanesListState.signedIn.value) dashboard,
-        if (!isPlatformSession && canManageUsers || canManageAccess) userAccessManagement,
+        if (!isPlatformSession && (canManageUsers || canManageAccess)) userAccessManagement,
         if (!isPlatformSession && PanesListState.signedIn.value) vehicles,
         if (!isPlatformSession && PanesListState.signedIn.value) reparations,
         if (!isPlatformSession && showAtelier) atelier,
