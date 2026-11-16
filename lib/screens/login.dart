@@ -201,7 +201,6 @@ class _LoginScreenState extends State<LoginScreen>
     return ScaffoldPage(
       padding: EdgeInsets.zero,
       content: LayoutBuilder(builder: (context, constraints) {
-        final compact = constraints.maxWidth < 560;
         final availableHeight = constraints.maxHeight;
         final desktop = constraints.maxWidth >= 1000;
 
