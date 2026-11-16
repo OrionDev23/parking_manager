@@ -156,15 +156,16 @@ class _TenantMembersScreenState extends State<TenantMembersScreen> {
                             ),
                           ),
                           if (member.role != 'owner')
-                            MenuButton(
-                              child: const Icon(FluentIcons.more),
-                              items: [
-                                MenuFlyoutItem(
-                                  text: const Text('Changer le rôle'),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Button(
+                                  child: const Text('Rôle'),
                                   onPressed: () => _changeRole(member),
                                 ),
-                                MenuFlyoutItem(
-                                  text: const Text('Retirer de cette entreprise'),
+                                const SizedBox(height: 4),
+                                Button(
+                                  child: const Text('Retirer'),
                                   onPressed: () => _revoke(member),
                                 ),
                               ],
