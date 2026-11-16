@@ -133,7 +133,7 @@ The live `company_memberships` table contains eight active memberships: the same
 
 **Do not revoke either membership, delete either company row, change any legacy companyId, or run a bulk backfill yet.** First decide which identifier is canonical. Based on current operational rows, `essais` is the identifier presently used by legacy data and authorization configuration. Renaming/re-keying to `gts-guelma` would require a coordinated migration of every dependent row and client preference; it is not safe to do implicitly.
 
-The `users` profile table contains four profile rows, including `999`, `1000`, and `minpme`; the legacy access mapping also references `arrar`, whose profile is not present in this table sample. The tenant Function resolves Appwrite Auth users directly, so verify that Auth account independently before treating this as a broken membership.
+The `users` profile table contains four profile rows, including `999`, `1000`, and `minpme`; the legacy access mapping also references `arrar`, whose profile row is absent. A separate read-only lookup confirms that the Appwrite Auth account `arrar` does exist and is active (`arrar@parcoto.dz`). This is therefore a missing profile-row discrepancy, not a missing Auth account; check whether any UI or legacy flow requires that profile row.
 
 ### Audit limits
 
