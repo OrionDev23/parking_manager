@@ -161,6 +161,11 @@ export default async ({ req, res, log, error }) => {
     const action = input.action;
     const now = new Date().toISOString();
 
+    if (action === 'platform_resolve') {
+      requirePlatformSuperAdmin(userId);
+      return json(res, 200, { ok: true, userId, isPlatformSuperAdmin: true });
+    }
+
     if (action === 'resolve') {
       const rows = await listRows(MEMBERSHIPS, {
         method: 'equal', attribute: 'userId', values: [userId],
