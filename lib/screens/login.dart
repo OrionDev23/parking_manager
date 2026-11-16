@@ -258,9 +258,7 @@ class _LoginScreenState extends State<LoginScreen>
   String error = "";
 
   Future<void> signIn() async {
-    if (validEmail &&
-        password.text.isNotEmpty &&
-        projectName.text.trim().isNotEmpty) {
+    if (validEmail && password.text.isNotEmpty) {
       setState(() {
         checking = true;
         error = '';
@@ -270,7 +268,9 @@ class _LoginScreenState extends State<LoginScreen>
         await authService.signIn(
           email: email.text,
           password: password.text,
-          companyId: projectName.text.trim(),
+          companyId: projectName.text.trim().isEmpty
+              ? null
+              : projectName.text.trim(),
         );
 
         PanesListState.signedIn.value = true;
