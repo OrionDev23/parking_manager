@@ -80,10 +80,19 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
 
     return ScaffoldPage(
       padding: EdgeInsets.zero,
-      content: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(28, 22, 28, 12),
+      content: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 680;
+          final horizontalPadding = compact ? 16.0 : 28.0;
+          final visibleCompanies = _visibleCompanies;
+
+          final header = Padding(
+            padding: EdgeInsets.fromLTRB(
+              horizontalPadding,
+              compact ? 16 : 22,
+              horizontalPadding,
+              12,
+            ),
             child: ModuleDashboardHeader(
               title: 'Plateforme Parcoto',
               subtitle: 'Provisionnement et suivi commercial des entreprises clientes.',
@@ -93,64 +102,178 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                   'Créez les entreprises, provisionnez leur premier administrateur et définissez les limites contractuelles de chaque licence.',
               icon: FluentIcons.cloud,
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28),
-            child: Row(
-              children: [
-                Expanded(child: _MetricCard(label: 'Entreprises', value: _companies.length.toString(), icon: FluentIcons.company_directory)),
-                const SizedBox(width: 10),
-                Expanded(child: _MetricCard(label: 'Actives', value: active.toString(), icon: FluentIcons.check_mark)),
-                const SizedBox(width: 10),
-                Expanded(child: _MetricCard(label: 'Licences expirées', value: expired.toString(), icon: FluentIcons.warning)),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(28, 18, 28, 10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextBox(
-                    controller: _search,
-                    placeholder: 'Rechercher une entreprise...',
-                    onChanged: (_) => setState(() {}),
+          );
+
+          final metrics = Padding(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: compact
+                ? Column(
+                    children: [
+                      _MetricCard(
+                        label: 'Entreprises',
+                        value: _companies.length.toString(),
+                        icon: FluentIcons.company_directory,
+                        compact: true,
+                      ),
+                      const SizedBox(height: 8),
+                      _MetricCard(
+                        label: 'Actives',
+                        value: active.toString(),
+                        icon: FluentIcons.check_mark,
+                        compact: true,
+                      ),
+                      const SizedBox(height: 8),
+                      _MetricCard(
+                        label: 'Licences expirées',
+                        value: expired.toString(),
+                        icon: FluentIcons.warning,
+                        compact: true,
+                      ),
+                    ],
+                  )
+                : Row(
+                    children: [
+                      Expanded(child: _MetricCard(label: 'Entreprises', value: _companies.length.toString(), icon: FluentIcons.company_directory)),
+                      const SizedBox(width: 10),
+                      Expanded(child: _MetricCard(label: 'Actives', value: active.toString(), icon: FluentIcons.check_mark)),
+                      const SizedBox(width: 10),
+                      Expanded(child: _MetricCard(label: 'Licences expirées', value: expired.toString(), icon: FluentIcons.warning)),
+                    ],
+                  ),
+          );
+
+          final search = TextBox(
+            controller: _search,
+            placeholder: 'Rechercher une entreprise...',
+            onChanged: (_) => setState(() {}),
+          );
+          final actions = Row(
+            children: [
+              Expanded(
+                child: Button(
+                  onPressed: _loading ? null : _load,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(FluentIcons.refresh),
+                      SizedBox(width: 8),
+                      Text('Actualiser'),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 10),
-                Button(
-                  onPressed: _loading ? null : _load,
-                  child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(FluentIcons.refresh), SizedBox(width: 8), Text('Actualiser'),
-                  ]),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: FilledButton(
                   onPressed: _openCreateDialog,
-                  child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(FluentIcons.add), SizedBox(width: 8), Text('Nouvelle entreprise'),
-                  ]),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(FluentIcons.add),
+                      SizedBox(width: 8),
+                      Flexible(child: Text('Nouvelle entreprise', overflow: TextOverflow.ellipsis)),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(28, 4, 28, 20),
-              child: _loading
-                  ? const Center(child: ProgressRing())
-                  : _error != null
-                      ? _ErrorPanel(message: _error!, onRetry: _load)
-                      : _visibleCompanies.isEmpty
-                          ? const Center(child: Text('Aucune entreprise trouvée.'))
-                          : ListView.separated(
-                              itemCount: _visibleCompanies.length,
-                              separatorBuilder: (_, _) => const SizedBox(height: 8),
-                              itemBuilder: (context, index) => _CompanyCard(company: _visibleCompanies[index]),
-                            ),
-            ),
-          ),
-        ],
+              ),
+            ],
+          );
+
+          final controls = Padding(
+            padding: EdgeInsets.fromLTRB(horizontalPadding, 18, horizontalPadding, 10),
+            child: compact
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      search,
+                      const SizedBox(height: 10),
+                      actions,
+                    ],
+                  )
+                : Row(
+                    children: [
+                      Expanded(child: search),
+                      const SizedBox(width: 10),
+                      Button(
+                        onPressed: _loading ? null : _load,
+                        child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                          Icon(FluentIcons.refresh), SizedBox(width: 8), Text('Actualiser'),
+                        ]),
+                      ),
+                      const SizedBox(width: 8),
+                      FilledButton(
+                        onPressed: _openCreateDialog,
+                        child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                          Icon(FluentIcons.add), SizedBox(width: 8), Text('Nouvelle entreprise'),
+                        ]),
+                      ),
+                    ],
+                  ),
+          );
+
+          Widget companyResults({bool shrinkWrap = false}) {
+            if (_loading) return const Center(child: Padding(
+              padding: EdgeInsets.all(28),
+              child: ProgressRing(),
+            ));
+            if (_error != null) return _ErrorPanel(message: _error!, onRetry: _load);
+            if (visibleCompanies.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.all(24),
+                child: Center(child: Text('Aucune entreprise trouvée.')),
+              );
+            }
+            if (shrinkWrap) {
+              return Column(
+                children: [
+                  for (var index = 0; index < visibleCompanies.length; index++) ...[
+                    if (index > 0) const SizedBox(height: 8),
+                    _CompanyCard(company: visibleCompanies[index]),
+                  ],
+                ],
+              );
+            }
+            return ListView.separated(
+              itemCount: visibleCompanies.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 8),
+              itemBuilder: (context, index) => _CompanyCard(company: visibleCompanies[index]),
+            );
+          }
+
+          if (compact) {
+            return SingleChildScrollView(
+              padding: EdgeInsets.only(bottom: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  header,
+                  metrics,
+                  controls,
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(horizontalPadding, 4, horizontalPadding, 0),
+                    child: companyResults(shrinkWrap: true),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return Column(
+            children: [
+              header,
+              metrics,
+              controls,
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(horizontalPadding, 4, horizontalPadding, 20),
+                  child: companyResults(),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -160,21 +283,34 @@ class _MetricCard extends StatelessWidget {
   final String label;
   final String value;
   final IconData icon;
+  final bool compact;
 
-  const _MetricCard({required this.label, required this.value, required this.icon});
+  const _MetricCard({
+    required this.label,
+    required this.value,
+    required this.icon,
+    this.compact = false,
+  });
 
   @override
   Widget build(BuildContext context) => Card(
     child: Padding(
-      padding: const EdgeInsets.all(14),
-      child: Row(children: [
-        Icon(icon, size: 22),
-        const SizedBox(width: 10),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      padding: EdgeInsets.all(compact ? 13 : 14),
+      child: Row(
+        children: [
+          Icon(icon, size: 22),
+          const SizedBox(width: 12),
           Text(value, style: FluentTheme.of(context).typography.titleLarge),
-          Text(label, style: FluentTheme.of(context).typography.caption),
-        ])),
-      ]),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              label,
+              softWrap: true,
+              style: FluentTheme.of(context).typography.caption,
+            ),
+          ),
+        ],
+      ),
     ),
   );
 }
