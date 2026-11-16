@@ -221,3 +221,44 @@ The new strict tenant repositories currently cover the migrated `chauffeur` and 
 - Main vehicle/driver CRUD has stricter client-side checks, but client-side filters are not server-side security. Legacy table permissions and row security still need a server-enforced boundary.
 
 No application code, Appwrite data, permissions, row-security flags, user accounts, memberships, Function deployment or quotas were changed by this audit.
+
+
+## Platform identity and sync-boundary follow-up (read-only, 2026-11-16)
+
+### Platform account verification
+
+A read-only Appwrite Auth lookup for `contact@parcoto.com` returned exactly one active account:
+
+- Auth user ID: `999`
+- Name: `Service technique ParcOto`
+- Email verified: yes
+- Account status: active
+
+This verifies the intended platform account exists and establishes the immutable Auth ID that should be used in a server-only super-admin allowlist. It does **not** yet make the account a platform super admin: the Function has no such allowlist check or platform-scoped actions.
+
+The account currently also has legacy active company memberships under both duplicate GTS company IDs (as already recorded in the membership audit). Those memberships are legacy state, not the platform authorization mechanism. Do not revoke them until the dedicated platform session and company-selection flow exists and has been tested; otherwise the current login path may lock this account out.
+
+### Additional sync and direct-access findings
+
+The current `AppwriteSyncEngine` was inspected directly:
+
+- The engine owns a `companyId` and asks the queue for pending operations using that company ID.
+- It does not independently assert `operation.companyId == engine.companyId` before dispatching an operation to its entity handler.
+- Pull handlers are zero-argument callbacks. The engine does not pass or verify a tenant context for them.
+- The lease is keyed by company ID and prevents concurrent drains, but it is a coordination mechanism, not an authorization boundary.
+
+Required hardening: validate the operation tenant against the engine/session tenant before dispatch; require every write handler and pull handler to obtain the active tenant context and apply tenant predicates/ownership checks. The Appwrite API must enforce authorization server-side as well; a local queue check is only defense in depth.
+
+The current `DatabaseGetter` also exposes generic direct CRUD helpers:
+
+- `addDocument`, `updateDocument`, and `getDocument` address arbitrary table/row IDs without a tenant predicate or ownership check.
+- `listDocuments` paginates an entire table without a tenant predicate.
+- `getUser` gives user ID `999` a hard-coded year-2100 trial expiry, and loads a profile from the global `users` table. This is legacy licensing behavior, not an acceptable platform-super-admin authorization check.
+- `getLimits` and `getEntreprise` load singleton rows `1`; they remain project-global and cannot represent per-company entitlements or profiles.
+- `setSecretKey` still reads encryption key material directly from `admin_keys` in the Flutter client.
+
+Planning remains a direct unscoped TablesDB query against `planning`. The tenant owner of the ten existing planning rows is unresolved, so simply adding `companyId=essais` would be an unverified data migration.
+
+### Current status
+
+No application code was changed in this follow-up. No Appwrite users, memberships, records, schemas, permissions, Function configuration or deployments were modified. Company onboarding remains disabled. The platform Auth ID is now verified, but tenant isolation is still incomplete and production onboarding must remain blocked.
