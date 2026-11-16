@@ -5,7 +5,6 @@ import 'package:parc_oto/serializables/activity.dart';
 import 'package:encrypt/encrypt.dart' as en;
 
 import '../admin_parameters.dart';
-import '../main.dart';
 import '../screens/entreprise/entreprise.dart';
 import '../screens/sidemenu/sidemenu.dart';
 import '../serializables/entreprise.dart';
@@ -88,7 +87,7 @@ class DatabaseGetter {
 
   DatabaseGetter() {
     const requestedProject = appwriteProjectId;
-    if (requestedProject == null || requestedProject.isEmpty) return;
+    if (requestedProject.isEmpty) return;
 
     // Rebuild the legacy Appwrite clients only when the project actually
     // changes. Never carry profile, licensing, team or encryption state

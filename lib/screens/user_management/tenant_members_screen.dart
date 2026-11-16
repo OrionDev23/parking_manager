@@ -126,7 +126,7 @@ class _TenantMembersScreenState extends State<TenantMembersScreen> {
             Expanded(
               child: ListView.separated(
                 itemCount: visibleMembers.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                separatorBuilder: (_, _) => const SizedBox(height: 8),
                 itemBuilder: (context, index) {
                   final member = visibleMembers[index];
                   return Card(
