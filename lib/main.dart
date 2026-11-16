@@ -210,6 +210,9 @@ Future<bool> _restoreInitialSession() async {
 /// Configures services for the authenticated tenant, then starts remote
 /// backfills after the first frame. The Future is scoped to the active company.
 Future<void> startBackgroundInitialization(String companyId) async {
+  // A platform session has no tenant context: never start tenant caches,
+  // pull handlers or sync workers until an explicit company is selected.
+  if (authService.session?.isPlatformSuperAdmin == true) return;
   _backgroundInitializationRetryTimer?.cancel();
   _backgroundInitializationRetryTimer = null;
 
