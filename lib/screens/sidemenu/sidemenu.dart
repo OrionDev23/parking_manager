@@ -158,6 +158,8 @@ class PanesListState extends State<PanesList>
     if (firstLoading) {
       return const Center(child: ProgressRing());
     }
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final compact = screenWidth < 680;
     bool portrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return ValueListenableBuilder(
       valueListenable: signedIn,
@@ -170,7 +172,7 @@ class PanesListState extends State<PanesList>
               transitionBuilder: (w, d) =>
                   DrillInPageTransition(animation: d, child: w),
               titleBar: Container(
-                height: 65.px,
+                height: compact ? 58 : 65.px,
                 color: widget.appTheme.mode == ThemeMode.dark
                     ? Colors.grey[220]
                     : Colors.white,
@@ -181,15 +183,20 @@ class PanesListState extends State<PanesList>
                       children: [
                         Image.asset(
                           'assets/images/logo.webp',
-                          width: 80.px,
-                          height: 80.px,
+                          width: compact ? 62 : 80.px,
+                          height: compact ? 52 : 80.px,
+                          fit: BoxFit.contain,
                         ),
-                        smallSpace,
-                        Text('v${packageInfo.version}'),
-                        if (DatabaseGetter.trialDate != null &&
+                        SizedBox(width: compact ? 4 : 8),
+                        Text(
+                          'v${packageInfo.version}',
+                          style: TextStyle(fontSize: compact ? 11 : 14),
+                        ),
+                        if (!compact &&
+                            DatabaseGetter.trialDate != null &&
                             DatabaseGetter.me.value != null)
                           bigSpace,
-                        if (DatabaseGetter.trialDate != null)
+                        if (!compact && DatabaseGetter.trialDate != null)
                           const Text('daysremain').tr(
                             namedArgs: {
                               'days': DatabaseGetter.trialDate!
@@ -198,8 +205,8 @@ class PanesListState extends State<PanesList>
                                   .toString(),
                             },
                           ),
-                        if (demo && !portrait) bigSpace,
-                        if (demo && !portrait)
+                        if (demo && !portrait && !compact) bigSpace,
+                        if (demo && !portrait && !compact)
                           Text(
                             'demofor'.tr().toUpperCase(),
                             style: TextStyle(
@@ -208,8 +215,8 @@ class PanesListState extends State<PanesList>
                               fontSize: 14,
                             ),
                           ),
-                        if (brandt && !portrait) smallSpace,
-                        if (brandt && !portrait)
+                        if (brandt && !portrait && !compact) smallSpace,
+                        if (brandt && !portrait && !compact)
                           Image.asset(
                             'assets/images/brandt.png',
                             width: 60.px,
@@ -246,7 +253,9 @@ class PanesListState extends State<PanesList>
                   index.value = i;
                 },
                 size: NavigationPaneSize(openMaxWidth: pwidth),
-                displayMode: widget.appTheme.displayMode,
+                displayMode: compact
+                    ? PaneDisplayMode.minimal
+                    : widget.appTheme.displayMode,
                 items: PaneItemsAndFooters.originalItems,
                 footerItems: PaneItemsAndFooters.footerItems,
               ),
