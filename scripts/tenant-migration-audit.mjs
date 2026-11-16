@@ -88,7 +88,7 @@ async function auditTable(tableId, category) {
     const rows = page.rows || [];
     for (const row of rows) {
       totalRows++;
-      const companyId = row.companyId;
+      const companyId = row.data?.companyId;
       if (typeof companyId !== 'string' || companyId.trim() === '') {
         missingCompanyId++;
       } else if (companyId === legacyCompanyId) {
