@@ -279,13 +279,13 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
   final _maxSites = TextEditingController(text: '1');
   final _monthlyPrice = TextEditingController(text: '0');
   final _notes = TextEditingController();
-  String _billingCycle = 'monthly';
+  final _billingCycle = TextEditingController(text: 'monthly');
   bool _saving = false;
   String? _error;
 
   @override
   void dispose() {
-    for (final controller in [_name, _slug, _adminName, _adminEmail, _adminPassword, _startsAt, _expiresAt, _maxUsers, _maxVehicles, _maxEmployees, _maxDrivers, _maxSites, _monthlyPrice, _notes]) {
+    for (final controller in [_name, _slug, _adminName, _adminEmail, _adminPassword, _startsAt, _expiresAt, _maxUsers, _maxVehicles, _maxEmployees, _maxDrivers, _maxSites, _monthlyPrice, _notes, _billingCycle]) {
       controller.dispose();
     }
     super.dispose();
@@ -312,7 +312,7 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
         maxDrivers: _number(_maxDrivers),
         maxSites: _number(_maxSites),
         monthlyPrice: _number(_monthlyPrice),
-        billingCycle: _billingCycle,
+        billingCycle: _billingCycle.text.trim(),
         currency: 'DZD',
         notes: _notes.text.trim(),
       );
@@ -361,7 +361,7 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
           _field('Début (ISO 8601)', _startsAt, placeholder: '2026-11-16T00:00:00Z'),
           _field('Expiration (ISO 8601)', _expiresAt, placeholder: '2027-11-16T00:00:00Z'),
           Row(children: [
-            Expanded(child: _field('Cycle de facturation', TextEditingController(text: _billingCycle))),
+            Expanded(child: _field('Cycle de facturation (monthly / quarterly / yearly / custom)', _billingCycle)),
             const SizedBox(width: 10),
             Expanded(child: _field('Tarif par période (DA)', _monthlyPrice, numeric: true)),
           ]),
