@@ -62,6 +62,7 @@ class DatabaseGetter {
   static int _projectGeneration = 0;
   static int _companyGeneration = 0;
   static Map<String, int> _defaultLimits = {};
+  static DateTime? companyLicenseStartsAt;
   static DateTime? companyLicenseExpiresAt;
 
   /// Called when the authenticated tenant expires while the legacy auth
@@ -95,6 +96,7 @@ class DatabaseGetter {
     final getter = DatabaseGetter._existing();
     await getter.getLimits();
     limits = Map<String, int>.from(_defaultLimits);
+    companyLicenseStartsAt = null;
     companyLicenseExpiresAt = null;
     if (companyId != null) {
       await getter.getEntreprise();
@@ -103,6 +105,8 @@ class DatabaseGetter {
         final maxVehicles = entitlement['maxVehicles'];
         if (maxUsers is num) limits['users'] = maxUsers.toInt();
         if (maxVehicles is num) limits['vehicles'] = maxVehicles.toInt();
+        companyLicenseStartsAt =
+            DateTime.tryParse(entitlement['startsAt']?.toString() ?? '');
         companyLicenseExpiresAt =
             DateTime.tryParse(entitlement['expiresAt']?.toString() ?? '');
       }
@@ -145,6 +149,7 @@ class DatabaseGetter {
       trialDate = null;
       limits = {};
       _defaultLimits = {};
+      companyLicenseStartsAt = null;
       companyLicenseExpiresAt = null;
       gotLimit = false;
       gettingUser = false;
