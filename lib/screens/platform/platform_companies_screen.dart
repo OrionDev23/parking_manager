@@ -315,7 +315,8 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
       content: LayoutBuilder(
         builder: (context, constraints) {
           final compact = constraints.maxWidth < 680;
-          final horizontalPadding = compact ? 16.0 : 28.0;
+          final veryNarrow = constraints.maxWidth < 390;
+          final horizontalPadding = veryNarrow ? 12.0 : compact ? 16.0 : 28.0;
           final visibleCompanies = _visibleCompanies;
 
           final header = Padding(
@@ -372,7 +373,9 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                     runSpacing: 8,
                     children: [
                       SizedBox(
-                        width: metricWidth,
+                        width: veryNarrow
+                            ? constraints.maxWidth - horizontalPadding * 2
+                            : metricWidth,
                         child: _MetricCard(
                           label: 'Entreprises',
                           value: _companies.length.toString(),
@@ -381,7 +384,9 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                         ),
                       ),
                       SizedBox(
-                        width: metricWidth,
+                        width: veryNarrow
+                            ? constraints.maxWidth - horizontalPadding * 2
+                            : metricWidth,
                         child: _MetricCard(
                           label: 'Actives',
                           value: active.toString(),
@@ -416,39 +421,48 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
             placeholder: 'Rechercher une entreprise...',
             onChanged: (_) => setState(() {}),
           );
-          final actions = Row(
-            children: [
-              Expanded(
-                child: Button(
-                  onPressed: _loading ? null : _load,
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(FluentIcons.refresh),
-                      SizedBox(width: 8),
-                      Text('Actualiser'),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: FilledButton(
-                  onPressed: _repository.canCreateCompany ? _openCreateDialog : null,
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(FluentIcons.add),
-                      SizedBox(width: 8),
-                      Flexible(child: Text('Nouvelle entreprise', overflow: TextOverflow.ellipsis)),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+          final refreshButton = Button(
+            onPressed: _loading ? null : _load,
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(FluentIcons.refresh),
+                SizedBox(width: 8),
+                Text('Actualiser'),
+              ],
+            ),
           );
+          final createButton = FilledButton(
+            onPressed: _repository.canCreateCompany ? _openCreateDialog : null,
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(FluentIcons.add),
+                SizedBox(width: 8),
+                Flexible(
+                  child: Text('Nouvelle entreprise', overflow: TextOverflow.ellipsis),
+                ),
+              ],
+            ),
+          );
+          final actions = veryNarrow
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    refreshButton,
+                    const SizedBox(height: 8),
+                    createButton,
+                  ],
+                )
+              : Row(
+                  children: [
+                    Expanded(child: refreshButton),
+                    const SizedBox(width: 8),
+                    Expanded(child: createButton),
+                  ],
+                );
 
           final provisioningNotice = !_repository.canCreateCompany
               ? Padding(
