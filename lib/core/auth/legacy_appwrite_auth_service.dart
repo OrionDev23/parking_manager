@@ -96,11 +96,18 @@ class LegacyAppwriteAuthService implements AuthService {
       await preferences.setString('active_company_id', membership.companyId);
       await DatabaseGetter.setActiveCompanyId(
         membership.companyId,
+        teamId: membership.teamId,
+        profileRowId: membership.profileRowId,
         entitlement: membership.entitlement,
       );
       _ensureCompanyLicenseValid();
 
-      _session = _buildSession(membership.companyId, membership.permissions);
+      _session = _buildSession(
+        membership.companyId,
+        membership.permissions,
+        teamId: membership.teamId,
+        profileRowId: membership.profileRowId,
+      );
       _setState(AuthState.signedIn);
       return _session;
     } on CompanySelectionRequired {
@@ -303,6 +310,8 @@ class LegacyAppwriteAuthService implements AuthService {
     await preferences.setString('project', membership.companyId);
     await DatabaseGetter.setActiveCompanyId(
       membership.companyId,
+      teamId: membership.teamId,
+      profileRowId: membership.profileRowId,
       entitlement: membership.entitlement,
     );
     _ensureCompanyLicenseValid();
