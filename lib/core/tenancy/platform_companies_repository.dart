@@ -84,6 +84,10 @@ class PlatformCompanyAdministrator {
 class PlatformCompaniesRepository {
   static const functionId = 'company-tenant-api';
 
+  bool canCreateCompany = false;
+  String createCompanyReason =
+      'La création des entreprises n’est pas encore activée.';
+
   Future<Map<String, dynamic>> _execute(
     Map<String, dynamic> payload,
   ) async {
@@ -114,6 +118,12 @@ class PlatformCompaniesRepository {
 
   Future<List<PlatformCompany>> list() async {
     final response = await _execute({'action': 'platform_list_companies'});
+    final capabilities = response['capabilities'];
+    canCreateCompany = capabilities is Map &&
+        capabilities['canCreateCompany'] == true;
+    createCompanyReason = capabilities is Map
+        ? capabilities['createCompanyReason']?.toString() ?? ''
+        : 'La création des entreprises n’est pas encore activée.';
     final values = response['companies'];
     if (values is! List) {
       throw const FormatException('Liste des entreprises invalide.');
