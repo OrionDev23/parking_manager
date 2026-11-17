@@ -266,6 +266,7 @@ class AppwriteVehicleSource implements RemoteVehicleSource {
       tableId: tableId,
       rowId: vehicle.id,
       data: _toRow(vehicle),
+      permissions: _rowPermissions(),
     );
     return vehicle;
   }
