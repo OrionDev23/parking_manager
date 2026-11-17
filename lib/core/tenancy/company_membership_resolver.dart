@@ -14,6 +14,8 @@ class CompanyMembership {
   final String companyId;
   final String companyName;
   final String companySlug;
+  final String teamId;
+  final String profileRowId;
   final String role;
   final String membershipId;
   final Map<String, dynamic> entitlement;
@@ -22,6 +24,8 @@ class CompanyMembership {
     required this.companyId,
     required this.companyName,
     required this.companySlug,
+    required this.teamId,
+    required this.profileRowId,
     required this.role,
     required this.membershipId,
     this.entitlement = const {},
@@ -32,6 +36,8 @@ class CompanyMembership {
       companyId: json['companyId']?.toString() ?? '',
       companyName: json['companyName']?.toString() ?? '',
       companySlug: json['companySlug']?.toString() ?? '',
+      teamId: json['teamId']?.toString() ?? '',
+      profileRowId: json['profileRowId']?.toString() ?? '',
       role: json['role']?.toString() ?? 'viewer',
       membershipId: json['membershipId']?.toString() ?? '',
       entitlement: json['entitlement'] is Map
@@ -103,9 +109,16 @@ class CompanyMembershipResolver {
             'Impossible d’ouvrir le contexte de cette entreprise.',
       );
     }
-    return response['entitlement'] is Map
-        ? Map<String, dynamic>.from(response['entitlement'] as Map)
+    final company = response['company'] is Map
+        ? Map<String, dynamic>.from(response['company'] as Map)
         : const <String, dynamic>{};
+    return {
+      'teamId': company['teamId']?.toString() ?? '',
+      'profileRowId': company['profileRowId']?.toString() ?? '',
+      'entitlement': response['entitlement'] is Map
+          ? Map<String, dynamic>.from(response['entitlement'] as Map)
+          : const <String, dynamic>{},
+    };
   }
 
   Future<List<CompanyMembership>> resolve() async {
