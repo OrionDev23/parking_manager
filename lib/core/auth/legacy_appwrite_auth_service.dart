@@ -233,6 +233,8 @@ class LegacyAppwriteAuthService implements AuthService {
   AuthSession _buildSession(
     String projectId,
     Set<String> permissions, {
+    String? teamId,
+    String? profileRowId,
     bool isPlatformSuperAdmin = false,
     bool isPlatformCompanyContext = false,
   }) {
@@ -254,7 +256,11 @@ class LegacyAppwriteAuthService implements AuthService {
       userId: user.$id,
       email: user.email,
       displayName: profile.name ?? user.name,
-      company: CompanyContext(companyId: projectId),
+      company: CompanyContext(
+        companyId: projectId,
+        teamId: teamId,
+        profileRowId: profileRowId,
+      ),
       permissions: permissions,
       license: license,
       isPlatformSuperAdmin: isPlatformSuperAdmin,
@@ -273,14 +279,26 @@ class LegacyAppwriteAuthService implements AuthService {
     }
 
     await onSessionEnding?.call();
-    final entitlement = await membershipResolver.authorizePlatformCompany(target);
-    await DatabaseGetter.setActiveCompanyId(target, entitlement: entitlement);
+    final context = await membershipResolver.authorizePlatformCompany(target);
+    final teamId = context['teamId']?.toString() ?? '';
+    final profileRowId = context['profileRowId']?.toString() ?? '';
+    final entitlement = context['entitlement'] is Map
+        ? Map<String, dynamic>.from(context['entitlement'] as Map)
+        : const <String, dynamic>{};
+    await DatabaseGetter.setActiveCompanyId(
+      target,
+      teamId: teamId,
+      profileRowId: profileRowId,
+      entitlement: entitlement,
+    );
 
     // Platform exploration is an ephemeral session context. Do not persist it
     // as the user's normal tenant selector or it can affect the next login.
     _session = _buildSession(
       target,
       const {'*'},
+      teamId: teamId,
+      profileRowId: profileRowId,
       isPlatformSuperAdmin: true,
       isPlatformCompanyContext: true,
     );
