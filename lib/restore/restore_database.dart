@@ -63,37 +63,12 @@ class RestoreDatabase {
   }
 
   Future<void> _deleteAllDocuments(String collectionID) async {
-    int counter = 0;
-    bool cont = true;
-    List<String> ids = [];
-    while (cont) {
-      await databases
-          .listRows(
-            databaseId: databaseId,
-            tableId: collectionID,
-            queries: [Query.limit(5000), Query.offset(counter)],
-          )
-          .then((list) {
-            counter += list.total;
-            if (list.total < 5000) {
-              cont = false;
-            }
-            for (var e in list.rows) {
-              ids.add(e.$id);
-            }
-          })
-          .onError((AppwriteException error, stackTrace) {
-            cont = false;
-          });
-    }
-
-    List<Future<void>> toDo = [];
-
-    for (int i = 0; i < ids.length; i++) {
-      toDo.add(_deleteDocument(ids[i], collectionID));
-    }
-
-    await Future.wait(toDo);
+    // Never restore by deleting a whole shared table. listDocuments applies
+    // the active companyId filter before any deletion is attempted.
+    final rows = await DatabaseGetter().listDocuments(collectionID);
+    await Future.wait(
+      rows.map((row) => _deleteDocument(row.$id, collectionID)),
+    );
   }
 
   Future<void> _deleteDocument(String docID, String collectionID) async {
@@ -145,27 +120,11 @@ class RestoreDatabase {
     String collectionID,
     Map<String, dynamic> data,
   ) async {
-    await databases
-        .createRow(
-          databaseId: databaseId,
-          tableId: collectionID,
-          rowId: docID,
-          data: data,
-        )
-        .onError((AppwriteException e, stackTrace) {
-          return Future.value(
-            Row(
-              $id: '',
-              $tableId: '',
-              $databaseId: '',
-              $createdAt: '',
-              $updatedAt: '',
-              $permissions: [],
-              data: {},
-              $sequence: '1',
-            ),
-          );
-        });
+    await DatabaseGetter().addDocument(
+      collectionId: collectionID,
+      documentId: docID,
+      data: data,
+    );
   }
 
   Future<void> addOrUpdateNewData() async {
@@ -210,35 +169,19 @@ class RestoreDatabase {
     String collectionID,
     Map<String, dynamic> data,
   ) async {
-    await databases
-        .createRow(
-          databaseId: databaseId,
-          tableId: collectionID,
-          rowId: docID,
-          data: data,
-        )
-        .onError((AppwriteException e, stackTrace) async {
-          return await databases
-              .updateRow(
-                databaseId: databaseId,
-                tableId: collectionID,
-                rowId: docID,
-                data: data,
-              )
-              .onError((AppwriteException e, stacktrace) {
-                return Future.value(
-                  Row(
-                    $id: '',
-                    $tableId: '',
-                    $databaseId: '',
-                    $createdAt: '',
-                    $updatedAt: '',
-                    $permissions: [],
-                    data: {},
-                    $sequence: '1',
-                  ),
-                );
-              });
-        });
+    try {
+      await DatabaseGetter().addDocument(
+        collectionId: collectionID,
+        documentId: docID,
+        data: data,
+      );
+    } on AppwriteException catch (error) {
+      if (error.code != 409) rethrow;
+      await DatabaseGetter().updateDocument(
+        collectionId: collectionID,
+        documentId: docID,
+        data: data,
+      );
+    }
   }
 }
