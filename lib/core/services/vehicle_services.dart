@@ -38,6 +38,7 @@ class VehicleServices {
   static Future<VehicleServices> create({
     required SharedPreferences preferences,
     required String companyId,
+    String? teamId,
   }) async {
     final localDatabase = LocalDatabase();
     await localDatabase.open();
@@ -64,7 +65,7 @@ class VehicleServices {
     await backend.initialize();
     final remoteSource = AppwriteVehicleSource(
       backend: backend,
-      companyContext: CompanyContext(companyId: companyId),
+      companyContext: CompanyContext(companyId: companyId, teamId: teamId),
       databaseId: databaseId,
       tableId: vehiculeid,
     );
@@ -81,7 +82,7 @@ class VehicleServices {
               local: localSource,
               syncQueue: syncQueue,
               deviceIdentity: deviceIdentity,
-              companyContext: CompanyContext(companyId: companyId),
+              companyContext: CompanyContext(companyId: companyId, teamId: teamId),
               remote: remoteSource,
             ),
     );
