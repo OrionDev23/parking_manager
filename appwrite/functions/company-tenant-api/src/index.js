@@ -481,15 +481,40 @@ export default async ({ req, res, log, error }) => {
       if (!company) {
         return json(res, 404, { ok: false, message: 'Company not found.' });
       }
-      const teamId = String(company.data?.teamId || '').trim();
-      if (!teamId) {
-        return json(res, 409, {
-          ok: false,
-          message: 'Cette entreprise ne possède pas encore d’équipe Appwrite provisionnée.',
-        });
-      }
-      // Close any previous exploration before opening another tenant.
+      let teamId = String(company.data?.teamId || '').trim();
+      // Legacy companies may predate dedicated tenant teams. Provision the
+      // team on first open instead of making the super admin perform a
+      // separate recovery operation.
+      // Close any previous exploration before changing tenant membership.
       await restorePlatformExploration(userId);
+      if (!teamId) {
+        teamId = `pc-${companyId.replace(/[^a-zA-Z0-9._-]/g, '-').slice(0, 32)}`;
+        try {
+          await createCompanyTeam(teamId, `Parcoto — ${company.data?.name || companyId}`);
+        } catch (failure) {
+          if (failure.status !== 409) throw failure;
+          const existingTeam = await appwrite(`/teams/${encodeURIComponent(teamId)}`);
+          if (!existingTeam?.$id) throw failure;
+        }
+        await appwrite(`/tablesdb/${DATABASE_ID}/tables/${COMPANIES}/rows/${encodeURIComponent(companyId)}`, {
+          method: 'PATCH',
+          body: { data: { teamId, updatedAt: now } },
+        });
+        const companyMemberships = await listRows(MEMBERSHIPS, {
+          method: 'equal', attribute: 'companyId', values: [companyId],
+        });
+        for (const membership of companyMemberships.filter(item => item.data?.status === 'active')) {
+          let memberName = '';
+          try {
+            const account = await appwrite(`/users/${encodeURIComponent(membership.data.userId)}`);
+            memberName = account.name || '';
+          } catch (_) {}
+          await syncTeamMembership(
+            teamId, membership.data.userId, membership.data.role || 'viewer', memberName,
+          );
+        }
+        company.data = { ...(company.data || {}), teamId };
+      }
 
       let accountName = '';
       try {
