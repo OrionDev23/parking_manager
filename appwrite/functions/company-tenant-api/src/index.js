@@ -318,7 +318,7 @@ export default async ({ req, res, log, error }) => {
         return json(res, 409, { ok: false, message: 'Company team is not provisioned.' });
       }
       const tableIds = [
-        'chauffeur', '6531ad22153b2a49ca2c', 'etat', 'doc_vehic', 'reparation',
+        '6537d87b492c80f255e8', '6531ad22153b2a49ca2c', 'etat', 'doc_vehic', 'reparation',
         'activity', 'chauf_disponibilite', 'doc_chauffeur', 'entreprise',
         'planning', 'prestataire', 'fichereception', 'clients', 'parts',
         'storage', 'backup',
