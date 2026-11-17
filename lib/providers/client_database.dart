@@ -6,7 +6,6 @@ import 'package:encrypt/encrypt.dart' as en;
 
 import '../admin_parameters.dart';
 import '../screens/entreprise/entreprise.dart';
-import '../screens/sidemenu/sidemenu.dart';
 import '../serializables/entreprise.dart';
 import '../serializables/parc_user.dart';
 import 'activities.dart';
