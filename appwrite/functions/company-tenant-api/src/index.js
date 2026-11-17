@@ -192,7 +192,15 @@ async function prepareCompanyRows(companyId, teamId) {
     const rows = await listAllRows(tableId);
     const tenantRows = rows.filter(row => row.data?.companyId === companyId);
     let updated = 0;
+    const expectedPermissions = [...rowPermissions].sort();
     for (const row of tenantRows) {
+      const currentPermissions = [...(row.$permissions || [])].sort();
+      if (currentPermissions.length === expectedPermissions.length &&
+          currentPermissions.every((permission, index) =>
+            permission === expectedPermissions[index]
+          )) {
+        continue;
+      }
       await appwrite(
         `/tablesdb/${DATABASE_ID}/tables/${encodeURIComponent(tableId)}/rows/${encodeURIComponent(row.$id)}`,
         { method: 'PATCH', body: { permissions: rowPermissions } },
@@ -407,6 +415,9 @@ export default async ({ req, res, log, error }) => {
                 now,
               )
             : null;
+          if (teamId) {
+            await prepareCompanyRows(company.$id, teamId);
+          }
           memberships.push({
             companyId: company.$id,
             companyName: company.data.name,
