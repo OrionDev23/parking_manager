@@ -15,7 +15,6 @@ const databaseId = "6531ad112080ae3b14a7";
 const userid = "users";
 const trialID = "trialdate";
 const limitsID = "limits";
-const entitlementsID = "company_entitlements";
 const chauffeurid = "6537d87b492c80f255e8";
 const genreid = "6537960246d5b0e1ab77";
 const vehiculeid = "6531ad22153b2a49ca2c";
@@ -78,8 +77,11 @@ class DatabaseGetter {
   static bool _isCurrentCompany(String companyId, int generation) =>
       _activeCompanyId == companyId && _companyGeneration == generation;
 
-  static Future<void> setActiveCompanyId(String? companyId) async {
-    if (_activeCompanyId == companyId &&
+  static Future<void> setActiveCompanyId(
+    String? companyId, {
+    Map<String, dynamic>? entitlement,
+  }) async {
+    if (_activeCompanyId == companyId && entitlement == null &&
         (companyId == null || MyEntrepriseState.p != null)) {
       return;
     }
@@ -96,7 +98,14 @@ class DatabaseGetter {
     companyLicenseExpiresAt = null;
     if (companyId != null) {
       await getter.getEntreprise();
-      await getter.getCompanyEntitlements(companyId);
+      if (entitlement != null) {
+        final maxUsers = entitlement['maxUsers'];
+        final maxVehicles = entitlement['maxVehicles'];
+        if (maxUsers is num) limits['users'] = maxUsers.toInt();
+        if (maxVehicles is num) limits['vehicles'] = maxVehicles.toInt();
+        companyLicenseExpiresAt =
+            DateTime.tryParse(entitlement['expiresAt']?.toString() ?? '');
+      }
     }
   }
   static int get tenantRevision => _projectGeneration;
@@ -354,35 +363,6 @@ class DatabaseGetter {
       gotLimit = true;
     } on AppwriteException {
       if (_isCurrentProject(generation, projectId)) gotLimit = false;
-    }
-  }
-
-  Future<void> getCompanyEntitlements(String companyId) async {
-    final projectId = _configuredProjectId;
-    final activeDatabase = database;
-    final projectGeneration = _projectGeneration;
-    final companyGeneration = _companyGeneration;
-    if (projectId == null || activeDatabase == null) return;
-
-    try {
-      final row = await activeDatabase.getRow(
-        databaseId: databaseId,
-        tableId: entitlementsID,
-        rowId: companyId,
-      );
-      if (!_isCurrentProject(projectGeneration, projectId) ||
-          !_isCurrentCompany(companyId, companyGeneration)) {
-        return;
-      }
-      final maxUsers = row.data['maxUsers'];
-      final maxVehicles = row.data['maxVehicles'];
-      if (maxUsers is num) limits['users'] = maxUsers.toInt();
-      if (maxVehicles is num) limits['vehicles'] = maxVehicles.toInt();
-      companyLicenseExpiresAt =
-          DateTime.tryParse(row.data['expiresAt']?.toString() ?? '');
-    } on AppwriteException {
-      // Legacy companies without an entitlement row keep the project's
-      // compatibility limits until their contract is configured.
     }
   }
 
