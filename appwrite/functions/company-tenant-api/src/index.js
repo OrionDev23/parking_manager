@@ -147,6 +147,14 @@ async function createRow(tableId, rowId, data, permissions = []) {
   });
 }
 
+function companyEntitlementPermissions(teamId) {
+  return [
+    `read("team:${teamId}")`,
+    `update("team:${teamId}/admin")`,
+    `delete("team:${teamId}/admin")`,
+  ];
+}
+
 async function ensureCompanyProfile(companyId, companyName, teamId, now, profile = {}) {
   const permissions = [
     `read("team:${teamId}")`,
@@ -433,7 +441,12 @@ export default async ({ req, res, log, error }) => {
             method: 'PATCH', body: { data: nextEntitlement },
           });
         } else {
-          await createRow(ENTITLEMENTS, companyId, nextEntitlement);
+          await createRow(
+            ENTITLEMENTS,
+            companyId,
+            nextEntitlement,
+            companyEntitlementPermissions(company.data?.teamId || ''),
+          );
         }
         entitlementWritten = true;
       }
@@ -875,7 +888,12 @@ export default async ({ req, res, log, error }) => {
         profileCreated = profile.created;
         profileRowId = profile.rowId;
         await syncTeamMembership(teamId, adminUserId, 'owner', adminName);
-        await createRow(ENTITLEMENTS, companyId, entitlement);
+        await createRow(
+          ENTITLEMENTS,
+          companyId,
+          entitlement,
+          companyEntitlementPermissions(teamId),
+        );
         entitlementCreated = true;
         await createRow(MEMBERSHIPS, membershipId, {
           companyId, userId: adminUserId, role: 'admin', status: 'active',
