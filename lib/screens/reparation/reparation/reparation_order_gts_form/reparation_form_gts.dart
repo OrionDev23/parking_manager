@@ -820,13 +820,11 @@ class ReparationFormGtsState extends State<ReparationFormGts>
   }
 
   Future<void> updateReparation(Reparation reparation) async {
-    await DatabaseGetter.database!
-        .updateRow(
-          databaseId: databaseId,
-          tableId: reparationId,
-          rowId: documentID!,
-          data: reparation.toJson(),
-        )
+    await DatabaseGetter().updateDocument(
+      collectionId: reparationId,
+      documentId: documentID!,
+      data: reparation.toJson(),
+    )
         .then((value) {})
         .onError((AppwriteException error, stackTrace) {
           setState(() {});
@@ -834,10 +832,9 @@ class ReparationFormGtsState extends State<ReparationFormGts>
   }
 
   Future<void> createReparation(Reparation reparation) async {
-    await DatabaseGetter.database!.createRow(
-      databaseId: databaseId,
-      tableId: reparationId,
-      rowId: documentID!,
+    await DatabaseGetter().addDocument(
+      collectionId: reparationId,
+      documentId: documentID!,
       data: reparation.toJson(),
     );
   }
