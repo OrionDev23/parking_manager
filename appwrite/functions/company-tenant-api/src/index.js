@@ -148,6 +148,9 @@ async function createRow(tableId, rowId, data, permissions = []) {
 }
 
 async function prepareCompanyRows(companyId, teamId) {
+  const company = await getCompany(companyId);
+  if (!company) throw Object.assign(new Error('Company not found.'), { status: 404 });
+  const isActive = company.data?.status === 'active';
   const tableIds = [
     '6537d87b492c80f255e8', '6531ad22153b2a49ca2c', 'etat', 'doc_vehic',
     'reparation', 'activity', 'chauf_disponibilite', 'doc_chauffeur',
@@ -156,9 +159,13 @@ async function prepareCompanyRows(companyId, teamId) {
   ];
   const rowPermissions = [
     `read("team:${teamId}")`,
-    `update("team:${teamId}/admin")`,
-    `update("team:${teamId}/manager")`,
-    `delete("team:${teamId}/admin")`,
+    ...(isActive
+      ? [
+          `update("team:${teamId}/admin")`,
+          `update("team:${teamId}/manager")`,
+          `delete("team:${teamId}/admin")`,
+        ]
+      : []),
   ];
   const createPermissions = [
     `create("team:${teamId}/admin")`,
@@ -174,8 +181,11 @@ async function prepareCompanyRows(companyId, teamId) {
     const tablePermissions = new Set(table.$permissions || []);
     let tablePermissionsChanged = false;
     for (const permission of createPermissions) {
-      if (!tablePermissions.has(permission)) {
+      if (isActive && !tablePermissions.has(permission)) {
         tablePermissions.add(permission);
+        tablePermissionsChanged = true;
+      } else if (!isActive && tablePermissions.has(permission)) {
+        tablePermissions.delete(permission);
         tablePermissionsChanged = true;
       }
     }
