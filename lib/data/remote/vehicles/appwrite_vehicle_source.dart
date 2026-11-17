@@ -20,6 +20,19 @@ class AppwriteVehicleSource implements RemoteVehicleSource {
     required this.tableId,
   });
 
+  List<String> _rowPermissions() {
+    final teamId = companyContext.teamId;
+    if (teamId == null || teamId.isEmpty) {
+      throw StateError('The active company has no Appwrite team context.');
+    }
+    return [
+      Permission.read(Role.team(teamId)),
+      Permission.update(Role.team(teamId, 'admin')),
+      Permission.update(Role.team(teamId, 'manager')),
+      Permission.delete(Role.team(teamId, 'admin')),
+    ];
+  }
+
   static DateTime? _legacyDate(dynamic raw) {
     if (raw == null) return null;
     final value = int.tryParse(raw.toString());
