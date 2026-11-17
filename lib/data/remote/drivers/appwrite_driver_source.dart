@@ -20,6 +20,19 @@ class AppwriteDriverSource implements RemoteDriverSource {
     required this.tableId,
   });
 
+  List<String> _rowPermissions() {
+    final teamId = companyContext.teamId;
+    if (teamId == null || teamId.isEmpty) {
+      throw StateError('The active company has no Appwrite team context.');
+    }
+    return [
+      Permission.read(Role.team(teamId)),
+      Permission.update(Role.team(teamId, 'admin')),
+      Permission.update(Role.team(teamId, 'manager')),
+      Permission.delete(Role.team(teamId, 'admin')),
+    ];
+  }
+
   Driver _fromRow(dynamic row) {
     final data = Map<String, dynamic>.from(row.data);
     if (data['companyId']?.toString() != companyContext.companyId) {
