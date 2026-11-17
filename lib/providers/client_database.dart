@@ -548,10 +548,9 @@ class DatabaseGetter {
       rowId: u.id,
       data: me.value!.toJson(),
       permissions: [
-        Permission.read(Role.users()),
-        Permission.write(Role.user(me.value!.id)),
-        Permission.update(Role.user(me.value!.id)),
-        Permission.delete(Role.user(me.value!.id)),
+        Permission.read(Role.user(u.id)),
+        Permission.update(Role.user(u.id)),
+        Permission.delete(Role.user(u.id)),
       ],
     );
   }
