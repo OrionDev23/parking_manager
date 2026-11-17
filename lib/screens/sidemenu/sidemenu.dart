@@ -168,8 +168,11 @@ class PanesListState extends State<PanesList>
     final screenWidth = MediaQuery.sizeOf(context).width;
     final compact = screenWidth < 680;
     bool portrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final session = authService.session;
     final isPlatformCompanyContext =
-        authService.session?.isPlatformCompanyContext == true;
+        session?.isPlatformCompanyContext == true;
+    final isPlatformHome =
+        session?.isPlatformSuperAdmin == true && !isPlatformCompanyContext;
     return ValueListenableBuilder(
       valueListenable: signedIn,
       builder: (BuildContext context, bool value, Widget? child) {
@@ -181,32 +184,103 @@ class PanesListState extends State<PanesList>
               transitionBuilder: (w, d) =>
                   DrillInPageTransition(animation: d, child: w),
               titleBar: Container(
-                height: (compact ? 58 : 65.px) +
-                    (isPlatformCompanyContext ? (compact ? 38 : 42) : 0),
-                color: widget.appTheme.mode == ThemeMode.dark
-                    ? Colors.grey[220]
-                    : Colors.white,
+                height: (compact ? 64 : 72.px) +
+                    (isPlatformCompanyContext ? (compact ? 40 : 44) : 0),
+                decoration: BoxDecoration(
+                  color: widget.appTheme.surfaceColor,
+                  border: Border(
+                    bottom: BorderSide(
+                      color: widget.appTheme.borderColor,
+                      width: 1,
+                    ),
+                  ),
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SizedBox(
-                      height: compact ? 58 : 65.px,
+                      height: compact ? 64 : 72.px,
                       child: DragToMoveArea(
-                        child: Align(
-                          alignment: AlignmentDirectional.centerStart,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: compact ? 14 : 24,
+                          ),
                           child: Row(
-                      children: [
-                        Image.asset(
-                          'assets/images/logo.webp',
-                          width: compact ? 62 : 80.px,
-                          height: compact ? 52 : 80.px,
-                          fit: BoxFit.contain,
+                            children: [
+                              Image.asset(
+                                'assets/images/logo.webp',
+                                width: compact ? 116 : 148,
+                                height: 42,
+                                fit: BoxFit.contain,
+                              ),
+                              if (!compact) ...[
+                                const SizedBox(width: 18),
+                                Container(
+                                  width: 1,
+                                  height: 30,
+                                  color: widget.appTheme.borderColor,
+                                ),
+                                const SizedBox(width: 16),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      isPlatformHome
+                                          ? 'ADMINISTRATION PLATEFORME'
+                                          : isPlatformCompanyContext
+                                              ? 'SUPERVISION ENTREPRISE'
+                                              : 'ESPACE ENTREPRISE',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        letterSpacing: 1.1,
+                                        fontWeight: FontWeight.w700,
+                                        color: widget.appTheme.mutedTextColor,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      isPlatformHome
+                                          ? 'Parcoto Control Center'
+                                          : isPlatformCompanyContext
+                                              ? 'Accès de supervision'
+                                              : 'Gestion opérationnelle',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: widget.appTheme.textColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                              const Spacer(),
+                              if (!loading &&
+                                  signedIn.value &&
+                                  !isPlatformHome &&
+                                  DatabaseGetter.trialDate != null)
+                                NotifList(
+                                  companyId: session?.company.companyId,
+                                ),
+                              if (!loading &&
+                                  signedIn.value &&
+                                  !isPlatformHome &&
+                                  DatabaseGetter.trialDate != null)
+                                SizedBox(width: compact ? 14 : 22),
+                              if (!loading && signedIn.value)
+                                const ProfilNameTopBar(),
+                              if (!kIsWeb &&
+                                  (Platform.isMacOS ||
+                                      Platform.isLinux ||
+                                      Platform.isWindows)) ...[
+                                const SizedBox(width: 14),
+                                const WindowButtons(),
+                              ],
+                            ],
+                          ),
                         ),
-                        SizedBox(width: compact ? 4 : 8),
-                        Text(
-                          'v${packageInfo.version}',
-                          style: TextStyle(fontSize: compact ? 11 : 14),
-                        ),
+                      ),
+                    ),
                         if (!compact &&
                             DatabaseGetter.trialDate != null &&
                             DatabaseGetter.me.value != null)
@@ -251,16 +325,7 @@ class PanesListState extends State<PanesList>
                             DatabaseGetter.trialDate != null)
                           const ProfilNameTopBar(),
                         smallSpace,
-                        if (!kIsWeb)
-                          if (Platform.isMacOS ||
-                              Platform.isLinux ||
-                              Platform.isWindows)
-                            const WindowButtons(),
-                      ],
-                          ),
-                        ),
-                      ),
-                    ),
+
                     if (isPlatformCompanyContext)
                       Container(
                         height: compact ? 38 : 42,
