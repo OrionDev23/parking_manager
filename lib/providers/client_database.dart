@@ -596,7 +596,7 @@ class DatabaseGetter {
     return '';
   }
 
-  Future<Row?> addDocument({
+  Future<void> addDocument({
     required String collectionId,
     required String documentId,
     required Map<String, dynamic> data,
@@ -612,7 +612,7 @@ class DatabaseGetter {
     if (tenantScoped && _activeCompanyId == null) {
       throw StateError('No active company context is selected.');
     }
-    return activeDatabase.createRow(
+    await activeDatabase.createRow(
       databaseId: databaseId,
       tableId: collectionId,
       rowId: documentId,
