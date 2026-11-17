@@ -297,6 +297,99 @@ export default async ({ req, res, log, error }) => {
     }
 
 
+    if (action === 'platform_update_company') {
+      requirePlatformSuperAdmin(userId);
+      const companyId = String(input.companyId || '').trim();
+      if (!companyId) {
+        return json(res, 400, { ok: false, message: 'companyId is required.' });
+      }
+      const company = await getCompany(companyId);
+      if (!company) return json(res, 404, { ok: false, message: 'Company not found.' });
+
+      const name = input.name === undefined
+        ? String(company.data?.name || '')
+        : String(input.name || '').trim();
+      const slug = input.slug === undefined
+        ? String(company.data?.slug || '')
+        : slugify(input.slug);
+      const status = input.status === undefined
+        ? String(company.data?.status || 'active')
+        : String(input.status);
+      if (name.length < 2 || name.length > 160 || slug.length < 2 ||
+          !['active', 'suspended'].includes(status)) {
+        return json(res, 400, { ok: false, message: 'Invalid company name, identifier or status.' });
+      }
+      const duplicateSlugs = await listRows(COMPANIES, {
+        method: 'equal', attribute: 'slug', values: [slug],
+      });
+      if (duplicateSlugs.some(row => row.$id !== companyId)) {
+        return json(res, 409, { ok: false, message: 'This company identifier is already used.' });
+      }
+
+      await appwrite(`/tablesdb/${DATABASE_ID}/tables/${COMPANIES}/rows/${encodeURIComponent(companyId)}`, {
+        method: 'PATCH',
+        body: { data: { name, slug, status, updatedAt: now } },
+      });
+
+      const entitlementKeys = [
+        'startsAt', 'expiresAt', 'maxUsers', 'maxVehicles', 'maxEmployees',
+        'maxDrivers', 'maxSites', 'priceAmount', 'billingCycle', 'currency', 'notes',
+      ];
+      const hasEntitlementChanges = entitlementKeys.some(key =>
+        Object.prototype.hasOwnProperty.call(input, key)
+      );
+      let entitlement = await getEntitlement(companyId);
+      if (hasEntitlementChanges) {
+        const startsAt = new Date(input.startsAt || entitlement?.startsAt || now);
+        const defaultExpiry = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+        const expiresAt = new Date(
+          input.expiresAt || entitlement?.expiresAt || defaultExpiry.toISOString()
+        );
+        const values = {
+          maxUsers: Number(input.maxUsers ?? entitlement?.maxUsers ?? 5),
+          maxVehicles: Number(input.maxVehicles ?? entitlement?.maxVehicles ?? 50),
+          maxEmployees: Number(input.maxEmployees ?? entitlement?.maxEmployees ?? 20),
+          maxDrivers: Number(input.maxDrivers ?? entitlement?.maxDrivers ?? 20),
+          maxSites: Number(input.maxSites ?? entitlement?.maxSites ?? 1),
+          priceAmount: Number(input.priceAmount ?? entitlement?.priceAmount ?? 0),
+        };
+        const billingCycle = String(input.billingCycle ?? entitlement?.billingCycle ?? 'monthly');
+        const currency = String(input.currency ?? entitlement?.currency ?? 'DZD').toUpperCase();
+        if (!Number.isFinite(startsAt.getTime()) ||
+            !Number.isFinite(expiresAt.getTime()) || expiresAt <= startsAt ||
+            !Object.values(values).every(Number.isSafeInteger) ||
+            Object.values(values).some(value => value < 0) ||
+            values.maxUsers < 1 ||
+            !['monthly', 'quarterly', 'yearly', 'custom'].includes(billingCycle) ||
+            !/^[A-Z]{3}$/.test(currency)) {
+          return json(res, 400, { ok: false, message: 'Invalid licence dates, quotas or billing values.' });
+        }
+        const nextEntitlement = {
+          companyId,
+          startsAt: startsAt.toISOString(),
+          expiresAt: expiresAt.toISOString(),
+          ...values,
+          currency,
+          billingCycle,
+          notes: String(input.notes ?? entitlement?.notes ?? '').trim().slice(0, 2000),
+          createdAt: entitlement?.createdAt || now,
+          updatedAt: now,
+        };
+        if (entitlement) {
+          await appwrite(`/tablesdb/${DATABASE_ID}/tables/${ENTITLEMENTS}/rows/${encodeURIComponent(companyId)}`, {
+            method: 'PATCH', body: { data: nextEntitlement },
+          });
+        } else {
+          await createRow(ENTITLEMENTS, companyId, nextEntitlement);
+        }
+        entitlement = nextEntitlement;
+      }
+      return json(res, 200, {
+        ok: true,
+        company: { companyId, name, slug, status, entitlement },
+      });
+    }
+
     if (action === 'platform_list_company_admins') {
       requirePlatformSuperAdmin(userId);
       const companyId = String(input.companyId || '').trim();
