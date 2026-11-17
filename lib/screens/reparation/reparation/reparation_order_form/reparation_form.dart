@@ -904,10 +904,9 @@ class ReparationFormState extends State<ReparationForm>
   }
 
   Future<void> createReparation(Reparation reparation) async {
-    await DatabaseGetter.database!.createRow(
-      databaseId: databaseId,
-      tableId: reparationId,
-      rowId: documentID!,
+    await DatabaseGetter().addDocument(
+      collectionId: reparationId,
+      documentId: documentID!,
       data: reparation.toJson(),
     );
   }
