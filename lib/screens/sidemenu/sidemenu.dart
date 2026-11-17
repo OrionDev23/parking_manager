@@ -63,6 +63,12 @@ class PanesListState extends State<PanesList>
       windowManager.addListener(this);
     }
     getProfil();
+    _authStateSubscription = authService.stateStream.listen((_) {
+      if (!mounted) return;
+      widget.paneList.initPanes();
+      setState(() {});
+      index.value = 0;
+    });
 
     super.initState();
   }
@@ -98,6 +104,7 @@ class PanesListState extends State<PanesList>
   bool noConnection = false;
 
   StreamSubscription<InternetStatus>? internetListener;
+  StreamSubscription<dynamic>? _authStateSubscription;
 
   void listenToInternet() async {
     internetListener = InternetConnection().onStatusChange.listen((
@@ -301,6 +308,7 @@ class PanesListState extends State<PanesList>
   @override
   void dispose() {
     internetListener?.cancel();
+    _authStateSubscription?.cancel();
     super.dispose();
   }
 
