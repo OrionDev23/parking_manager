@@ -90,6 +90,16 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
     }
   }
 
+  Future<void> _manageAdministrators(PlatformCompany company) async {
+    await showDialog<void>(
+      context: context,
+      builder: (context) => _CompanyAdministratorsDialog(
+        company: company,
+        repository: _repository,
+      ),
+    );
+  }
+
   Future<void> _prepareCompanyPermissions(PlatformCompany company) async {
     setState(() => _preparingCompanyId = company.companyId);
     try {
@@ -311,6 +321,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                       onOpen: _openingCompanyId == visibleCompanies[index].companyId
                           ? null
                           : () => _openCompany(visibleCompanies[index]),
+                      onManageAdministrators: () => _manageAdministrators(visibleCompanies[index]),
                       opening: _openingCompanyId == visibleCompanies[index].companyId,
                     ),
                   ],
@@ -325,6 +336,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                 onOpen: _openingCompanyId == visibleCompanies[index].companyId
                     ? null
                     : () => _openCompany(visibleCompanies[index]),
+                onManageAdministrators: () => _manageAdministrators(visibleCompanies[index]),
                 opening: _openingCompanyId == visibleCompanies[index].companyId,
                 onPrepare: _preparingCompanyId == visibleCompanies[index].companyId
                     ? null
@@ -410,8 +422,15 @@ class _CompanyCard extends StatelessWidget {
   final PlatformCompany company;
   final VoidCallback? onPrepare;
   final VoidCallback? onOpen;
+  final VoidCallback onManageAdministrators;
   final bool opening;
-  const _CompanyCard({required this.company, required this.onPrepare, required this.onOpen, this.opening = false});
+  const _CompanyCard({
+    required this.company,
+    required this.onPrepare,
+    required this.onOpen,
+    required this.onManageAdministrators,
+    this.opening = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -458,6 +477,10 @@ class _CompanyCard extends StatelessWidget {
               alignment: WrapAlignment.end,
               children: [
                 Button(
+                  onPressed: onManageAdministrators,
+                  child: const Text('Administrateurs'),
+                ),
+                Button(
                   onPressed: onPrepare,
                   child: const Text('Préparer les droits de ligne'),
                 ),
@@ -485,6 +508,408 @@ class _CompanyCard extends StatelessWidget {
           ],
         ]),
       ),
+    );
+  }
+}
+
+class _CompanyAdministratorsDialog extends StatefulWidget {
+  final PlatformCompany company;
+  final PlatformCompaniesRepository repository;
+
+  const _CompanyAdministratorsDialog({
+    required this.company,
+    required this.repository,
+  });
+
+  @override
+  State<_CompanyAdministratorsDialog> createState() =>
+      _CompanyAdministratorsDialogState();
+}
+
+class _CompanyAdministratorsDialogState
+    extends State<_CompanyAdministratorsDialog> {
+  List<PlatformCompanyAdministrator> _administrators = [];
+  bool _loading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final result = await widget.repository.listAdministrators(
+        widget.company.companyId,
+      );
+      if (!mounted) return;
+      setState(() {
+        _administrators = result;
+        _loading = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _error = error.toString().replaceFirst('Bad state: ', '');
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _add() async {
+    final added = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => _AddCompanyAdministratorDialog(
+        company: widget.company,
+        repository: widget.repository,
+      ),
+    );
+    if (added == true) await _load();
+  }
+
+  Future<void> _edit(PlatformCompanyAdministrator administrator) async {
+    final controller = TextEditingController(text: administrator.name);
+    final name = await showDialog<String>(
+      context: context,
+      builder: (context) => ContentDialog(
+        title: const Text('Modifier le nom de l’administrateur'),
+        content: TextBox(
+          controller: controller,
+          placeholder: 'Nom complet',
+        ),
+        actions: [
+          Button(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Annuler'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
+            child: const Text('Enregistrer'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (name == null || name.length < 2) return;
+    try {
+      await widget.repository.updateAdministratorName(
+        companyId: widget.company.companyId,
+        membershipId: administrator.membershipId,
+        name: name,
+      );
+      await _load();
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _error = error.toString().replaceFirst('Bad state: ', ''));
+    }
+  }
+
+  Future<void> _revoke(PlatformCompanyAdministrator administrator) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => ContentDialog(
+        title: const Text('Révoquer cet administrateur ?'),
+        content: Text(
+          'Le compte ${administrator.email} perdra son accès à ${widget.company.name}. '
+          'Son compte Appwrite ne sera pas supprimé.',
+        ),
+        actions: [
+          Button(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Annuler'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Révoquer'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await widget.repository.revokeAdministrator(
+        companyId: widget.company.companyId,
+        membershipId: administrator.membershipId,
+      );
+      await _load();
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _error = error.toString().replaceFirst('Bad state: ', ''));
+    }
+  }
+
+  Future<void> _restore(PlatformCompanyAdministrator administrator) async {
+    try {
+      await widget.repository.addAdministrator(
+        companyId: widget.company.companyId,
+        name: administrator.name,
+        email: administrator.email,
+        password: '',
+      );
+      await _load();
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _error = error.toString().replaceFirst('Bad state: ', ''));
+    }
+  }
+
+  Widget _administratorTile(PlatformCompanyAdministrator administrator) {
+    final active = administrator.status == 'active';
+    final protected =
+        administrator.isPlatformSuperAdmin || administrator.role == 'owner';
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            CircleAvatar(
+              child: Text(
+                administrator.name.isNotEmpty
+                    ? administrator.name.characters.first.toUpperCase()
+                    : '?',
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    administrator.name.isEmpty
+                        ? administrator.email
+                        : administrator.name,
+                    style: FluentTheme.of(context).typography.bodyStrong,
+                  ),
+                  Text(
+                    administrator.email,
+                    style: FluentTheme.of(context).typography.caption,
+                  ),
+                  const SizedBox(height: 4),
+                  Wrap(
+                    spacing: 6,
+                    children: [
+                      InfoBadge(
+                        severity: active
+                            ? InfoBadgeSeverity.success
+                            : InfoBadgeSeverity.warning,
+                        child: Text(active ? 'Actif' : 'Révoqué'),
+                      ),
+                      if (administrator.isPlatformSuperAdmin)
+                        const InfoBadge(
+                          severity: InfoBadgeSeverity.info,
+                          child: Text('Super Admin plateforme'),
+                        )
+                      else
+                        InfoBadge(
+                          severity: InfoBadgeSeverity.informational,
+                          child: Text(administrator.role),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            if (active)
+              IconButton(
+                icon: const Icon(FluentIcons.edit),
+                onPressed: () => _edit(administrator),
+              ),
+            if (!active && !administrator.isPlatformSuperAdmin)
+              IconButton(
+                icon: const Icon(FluentIcons.refresh),
+                onPressed: () => _restore(administrator),
+              ),
+            if (active && !protected)
+              IconButton(
+                icon: const Icon(FluentIcons.delete, color: Colors.red),
+                onPressed: () => _revoke(administrator),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ContentDialog(
+      title: Text('Administrateurs — ${widget.company.name}'),
+      constraints: const BoxConstraints(maxWidth: 720, maxHeight: 760),
+      content: SizedBox(
+        width: 660,
+        height: 560,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '${_administrators.where((item) => item.status == 'active').length} administrateur(s) actif(s)',
+                    style: FluentTheme.of(context).typography.caption,
+                  ),
+                ),
+                Button(
+                  onPressed: _loading ? null : _load,
+                  child: const Icon(FluentIcons.refresh),
+                ),
+                const SizedBox(width: 8),
+                FilledButton(
+                  onPressed: _add,
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(FluentIcons.add),
+                      SizedBox(width: 6),
+                      Text('Ajouter'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (_error != null)
+              InfoBar(
+                title: Text(_error!),
+                severity: InfoBarSeverity.error,
+              ),
+            Expanded(
+              child: _loading
+                  ? const Center(child: ProgressRing())
+                  : _administrators.isEmpty
+                      ? const Center(
+                          child: Text('Aucun administrateur enregistré.'),
+                        )
+                      : ListView.separated(
+                          itemCount: _administrators.length,
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(height: 8),
+                          itemBuilder: (context, index) =>
+                              _administratorTile(_administrators[index]),
+                        ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Fermer'),
+        ),
+      ],
+    );
+  }
+}
+
+class _AddCompanyAdministratorDialog extends StatefulWidget {
+  final PlatformCompany company;
+  final PlatformCompaniesRepository repository;
+
+  const _AddCompanyAdministratorDialog({
+    required this.company,
+    required this.repository,
+  });
+
+  @override
+  State<_AddCompanyAdministratorDialog> createState() =>
+      _AddCompanyAdministratorDialogState();
+}
+
+class _AddCompanyAdministratorDialogState
+    extends State<_AddCompanyAdministratorDialog> {
+  final _name = TextEditingController();
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+  bool _saving = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      await widget.repository.addAdministrator(
+        companyId: widget.company.companyId,
+        name: _name.text.trim(),
+        email: _email.text.trim(),
+        password: _password.text,
+      );
+      if (mounted) Navigator.of(context).pop(true);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _error = error.toString().replaceFirst('Bad state: ', '');
+        _saving = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ContentDialog(
+      title: Text('Ajouter un administrateur — ${widget.company.name}'),
+      content: SizedBox(
+        width: 480,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('Nom complet'),
+            const SizedBox(height: 4),
+            TextBox(controller: _name, placeholder: 'Nom et prénom'),
+            const SizedBox(height: 12),
+            const Text('Adresse e-mail'),
+            const SizedBox(height: 4),
+            TextBox(
+              controller: _email,
+              placeholder: 'administrateur@entreprise.dz',
+              keyboardType: TextInputType.emailAddress,
+            ),
+            const SizedBox(height: 12),
+            const Text('Mot de passe initial'),
+            const SizedBox(height: 4),
+            TextBox(
+              controller: _password,
+              placeholder: 'Requis uniquement pour un nouveau compte',
+              obscureText: true,
+            ),
+            if (_error != null) ...[
+              const SizedBox(height: 12),
+              InfoBar(
+                title: Text(_error!),
+                severity: InfoBarSeverity.error,
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(false),
+          child: const Text('Annuler'),
+        ),
+        FilledButton(
+          onPressed: _saving ? null : _submit,
+          child: _saving
+              ? const ProgressRing()
+              : const Text('Créer / associer'),
+        ),
+      ],
     );
   }
 }
