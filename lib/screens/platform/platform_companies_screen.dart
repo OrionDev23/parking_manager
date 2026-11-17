@@ -859,6 +859,7 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
     TextEditingController controller, {
     bool numeric = false,
     String? placeholder,
+    ValueChanged<String>? onChanged,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -875,6 +876,2233 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
         ],
       ),
     );
+  }
+
+  void _onCompanyNameChanged(String value) {
+    if (_slugManuallyEdited) return;
+    final generated = value
+        .trim()
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
+        .replaceAll(RegExp(r'^-+|-+
+    final hasLicenseInput = _hasExistingEntitlement ||
+        _licenseTouched ||
+        [
+          _startsAt,
+          _expiresAt,
+          _maxUsers,
+          _maxVehicles,
+          _maxEmployees,
+          _maxDrivers,
+          _maxSites,
+          _priceAmount,
+          _notes,
+        ].any((controller) => controller.text.trim().isNotEmpty);
+
+    DateTime? startsAt;
+    DateTime? expiresAt;
+    int? maxUsers;
+    int? maxVehicles;
+    int? maxEmployees;
+    int? maxDrivers;
+    int? maxSites;
+    int? priceAmount;
+    if (hasLicenseInput) {
+      startsAt = DateTime.tryParse(_startsAt.text.trim());
+      expiresAt = DateTime.tryParse(_expiresAt.text.trim());
+      maxUsers = _integer(_maxUsers);
+      maxVehicles = _integer(_maxVehicles);
+      maxEmployees = _integer(_maxEmployees);
+      maxDrivers = _integer(_maxDrivers);
+      maxSites = _integer(_maxSites);
+      priceAmount = _integer(_priceAmount);
+      if (startsAt == null ||
+          expiresAt == null ||
+          maxUsers == null ||
+          maxVehicles == null ||
+          maxEmployees == null ||
+          maxDrivers == null ||
+          maxSites == null ||
+          priceAmount == null) {
+        setState(() {
+          _error = 'Pour configurer une licence, renseignez toutes les dates et tous les quotas.';
+        });
+        return;
+      }
+    }
+
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      await widget.repository.updateCompany(
+        companyId: widget.company.companyId,
+        name: _name.text.trim(),
+        slug: _slug.text.trim(),
+        status: _status,
+        companyLegalName: _legalName.text.trim(),
+        address: _address.text.trim(),
+        phone: _phone.text.trim(),
+        companyEmail: _companyEmail.text.trim(),
+        nif: _nif.text.trim(),
+        nis: _nis.text.trim(),
+        rc: _rc.text.trim(),
+        art: _art.text.trim(),
+        description: _description.text.trim(),
+        startsAt: startsAt,
+        expiresAt: expiresAt,
+        maxUsers: maxUsers,
+        maxVehicles: maxVehicles,
+        maxEmployees: maxEmployees,
+        maxDrivers: maxDrivers,
+        maxSites: maxSites,
+        priceAmount: priceAmount,
+        billingCycle: hasLicenseInput ? _billingCycle : null,
+        currency: hasLicenseInput ? _currency : null,
+        notes: hasLicenseInput ? _notes.text.trim() : null,
+      );
+      if (mounted) Navigator.of(context).pop(true);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _error = error.toString().replaceFirst('Bad state: ', '');
+        _saving = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currencies = <String>{'DZD', 'EUR', 'USD', _currency}.toList();
+    return ContentDialog(
+      title: const Text('Modifier l’entreprise et sa licence'),
+      constraints: const BoxConstraints(maxWidth: 680, maxHeight: 820),
+      content: SizedBox(
+        width: MediaQuery.sizeOf(context).width < 760
+            ? MediaQuery.sizeOf(context).width * 0.82
+            : 620,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Identité de l’entreprise',
+                style: FluentTheme.of(context).typography.subtitle,
+              ),
+              const SizedBox(height: 10),
+              _field('Nom commercial', _name),
+              _field('Identifiant unique', _slug),
+              const SizedBox(height: 18),
+              Text(
+                'Informations légales et coordonnées',
+                style: FluentTheme.of(context).typography.subtitle,
+              ),
+              const SizedBox(height: 10),
+              _field('Raison sociale', _legalName),
+              _field('Adresse du siège', _address),
+              _field('Téléphone', _phone),
+              _field('E-mail de l’entreprise', _companyEmail),
+              _field('NIF', _nif),
+              _field('NIS', _nis),
+              _field('Registre de commerce (RC)', _rc),
+              _field('Article (ART)', _art),
+              const Text('Description'),
+              const SizedBox(height: 4),
+              TextBox(
+                controller: _description,
+                minLines: 2,
+                maxLines: 4,
+                placeholder: 'Activité et présentation de l’entreprise...',
+              ),
+              const SizedBox(height: 18),
+              const Text('État du compte'),
+              const SizedBox(height: 4),
+              ComboBox<String>(
+                value: _status,
+                isExpanded: true,
+                items: const [
+                  ComboBoxItem(value: 'active', child: Text('Active')),
+                  ComboBoxItem(value: 'suspended', child: Text('Suspendue')),
+                ],
+                onChanged: _saving
+                    ? null
+                    : (value) {
+                        if (value != null) setState(() => _status = value);
+                      },
+              ),
+              const SizedBox(height: 18),
+              Text(
+                'Licence et quotas',
+                style: FluentTheme.of(context).typography.subtitle,
+              ),
+              if (!_hasExistingEntitlement) ...[
+                const SizedBox(height: 4),
+                const Text(
+                  'Aucune licence contractuelle n’est configurée. Laissez ces champs vides pour modifier uniquement l’entreprise. Pour créer une licence, renseignez tous les champs.',
+                ),
+              ],
+              const SizedBox(height: 10),
+              _field('Début de licence (AAAA-MM-JJ)', _startsAt),
+              _field('Fin de licence (AAAA-MM-JJ)', _expiresAt),
+              _field('Nombre maximal d’utilisateurs', _maxUsers, numeric: true),
+              _field('Nombre maximal de véhicules', _maxVehicles, numeric: true),
+              _field('Nombre maximal d’employés', _maxEmployees, numeric: true),
+              _field('Nombre maximal de chauffeurs', _maxDrivers, numeric: true),
+              _field('Nombre maximal de sites', _maxSites, numeric: true),
+              _field('Tarif', _priceAmount, numeric: true),
+              const Text('Périodicité'),
+              const SizedBox(height: 4),
+              ComboBox<String>(
+                value: _billingCycle,
+                isExpanded: true,
+                items: const [
+                  ComboBoxItem(value: 'monthly', child: Text('Mensuelle')),
+                  ComboBoxItem(value: 'quarterly', child: Text('Trimestrielle')),
+                  ComboBoxItem(value: 'yearly', child: Text('Annuelle')),
+                  ComboBoxItem(value: 'custom', child: Text('Personnalisée')),
+                ],
+                onChanged: _saving
+                    ? null
+                    : (value) {
+                        if (value != null) {
+                          setState(() {
+                            _billingCycle = value;
+                            _licenseTouched = true;
+                          });
+                        }
+                      },
+              ),
+              const SizedBox(height: 10),
+              const Text('Devise'),
+              const SizedBox(height: 4),
+              ComboBox<String>(
+                value: _currency,
+                isExpanded: true,
+                items: currencies
+                    .map((currency) => ComboBoxItem(
+                          value: currency,
+                          child: Text(currency),
+                        ))
+                    .toList(growable: false),
+                onChanged: _saving
+                    ? null
+                    : (value) {
+                        if (value != null) {
+                          setState(() {
+                            _currency = value;
+                            _licenseTouched = true;
+                          });
+                        }
+                      },
+              ),
+              const SizedBox(height: 10),
+              const Text('Notes internes'),
+              const SizedBox(height: 4),
+              TextBox(
+                controller: _notes,
+                minLines: 2,
+                maxLines: 4,
+                placeholder: 'Informations contractuelles...',
+              ),
+              ],
+              if (_error != null) ...[
+                const SizedBox(height: 12),
+                InfoBar(
+                  title: Text(_error!),
+                  severity: InfoBarSeverity.error,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(false),
+          child: const Text('Annuler'),
+        ),
+        FilledButton(
+          onPressed: _saving ? null : _submit,
+          child: _saving ? const ProgressRing() : const Text('Enregistrer'),
+        ),
+      ],
+    );
+  }
+}
+
+class _CompanyAdministratorsDialog extends StatefulWidget {
+  final PlatformCompany company;
+  final PlatformCompaniesRepository repository;
+
+  const _CompanyAdministratorsDialog({
+    required this.company,
+    required this.repository,
+  });
+
+  @override
+  State<_CompanyAdministratorsDialog> createState() =>
+      _CompanyAdministratorsDialogState();
+}
+
+class _CompanyAdministratorsDialogState
+    extends State<_CompanyAdministratorsDialog> {
+  List<PlatformCompanyAdministrator> _administrators = [];
+  bool _loading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final result = await widget.repository.listAdministrators(
+        widget.company.companyId,
+      );
+      if (!mounted) return;
+      setState(() {
+        _administrators = result;
+        _loading = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _error = error.toString().replaceFirst('Bad state: ', '');
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _add() async {
+    final added = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => _AddCompanyAdministratorDialog(
+        company: widget.company,
+        repository: widget.repository,
+      ),
+    );
+    if (added == true) await _load();
+  }
+
+  Future<void> _edit(PlatformCompanyAdministrator administrator) async {
+    final controller = TextEditingController(text: administrator.name);
+    final name = await showDialog<String>(
+      context: context,
+      builder: (context) => ContentDialog(
+        title: const Text('Modifier le nom de l’administrateur'),
+        content: TextBox(
+          controller: controller,
+          placeholder: 'Nom complet',
+        ),
+        actions: [
+          Button(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Annuler'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
+            child: const Text('Enregistrer'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (name == null || name.length < 2) return;
+    try {
+      await widget.repository.updateAdministratorName(
+        companyId: widget.company.companyId,
+        membershipId: administrator.membershipId,
+        name: name,
+      );
+      await _load();
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _error = error.toString().replaceFirst('Bad state: ', ''));
+    }
+  }
+
+  Future<void> _revoke(PlatformCompanyAdministrator administrator) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => ContentDialog(
+        title: const Text('Révoquer cet administrateur ?'),
+        content: Text(
+          'Le compte ${administrator.email} perdra son accès à ${widget.company.name}. '
+          'Son compte Appwrite ne sera pas supprimé.',
+        ),
+        actions: [
+          Button(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Annuler'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Révoquer'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await widget.repository.revokeAdministrator(
+        companyId: widget.company.companyId,
+        membershipId: administrator.membershipId,
+      );
+      await _load();
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _error = error.toString().replaceFirst('Bad state: ', ''));
+    }
+  }
+
+  Future<void> _restore(PlatformCompanyAdministrator administrator) async {
+    try {
+      await widget.repository.addAdministrator(
+        companyId: widget.company.companyId,
+        name: administrator.name.isNotEmpty
+            ? administrator.name
+            : 'Administrateur',
+        email: administrator.email,
+        password: '',
+      );
+      await _load();
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _error = error.toString().replaceFirst('Bad state: ', ''));
+    }
+  }
+
+  Widget _administratorTile(PlatformCompanyAdministrator administrator) {
+    final active = administrator.status == 'active';
+    final protected =
+        administrator.isPlatformSuperAdmin || administrator.role == 'owner';
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: FluentTheme.of(context).accentColor,
+                shape: BoxShape.circle,
+              ),
+              child: Text(
+                administrator.name.isNotEmpty
+                    ? administrator.name.substring(0, 1).toUpperCase()
+                    : '?',
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    administrator.name.isEmpty
+                        ? administrator.email
+                        : administrator.name,
+                    style: FluentTheme.of(context).typography.bodyStrong,
+                  ),
+                  Text(
+                    administrator.email,
+                    style: FluentTheme.of(context).typography.caption,
+                  ),
+                  const SizedBox(height: 4),
+                  Wrap(
+                    spacing: 10,
+                    children: [
+                      Text(
+                        active ? 'Actif' : 'Révoqué',
+                        style: TextStyle(
+                          color: active ? Colors.green : Colors.orange,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        administrator.isPlatformSuperAdmin
+                            ? 'Super Admin plateforme'
+                            : administrator.role,
+                        style: FluentTheme.of(context).typography.caption,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            if (active)
+              IconButton(
+                icon: const Icon(FluentIcons.edit),
+                onPressed: () => _edit(administrator),
+              ),
+            if (!active && !administrator.isPlatformSuperAdmin)
+              IconButton(
+                icon: const Icon(FluentIcons.refresh),
+                onPressed: () => _restore(administrator),
+              ),
+            if (active && !protected)
+              IconButton(
+                icon: Icon(FluentIcons.delete, color: Colors.red),
+                onPressed: () => _revoke(administrator),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ContentDialog(
+      title: Text('Administrateurs — ${widget.company.name}'),
+      constraints: const BoxConstraints(maxWidth: 720, maxHeight: 760),
+      content: SizedBox(
+        width: MediaQuery.sizeOf(context).width < 800
+            ? MediaQuery.sizeOf(context).width * 0.82
+            : 660,
+        height: MediaQuery.sizeOf(context).height * 0.65,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '${_administrators.where((item) => item.status == 'active').length} administrateur(s) actif(s)',
+                    style: FluentTheme.of(context).typography.caption,
+                  ),
+                ),
+                Button(
+                  onPressed: _loading ? null : _load,
+                  child: const Icon(FluentIcons.refresh),
+                ),
+                const SizedBox(width: 8),
+                FilledButton(
+                  onPressed: _add,
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(FluentIcons.add),
+                      SizedBox(width: 6),
+                      Text('Ajouter'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (_error != null)
+              InfoBar(
+                title: Text(_error!),
+                severity: InfoBarSeverity.error,
+              ),
+            Expanded(
+              child: _loading
+                  ? const Center(child: ProgressRing())
+                  : _administrators.isEmpty
+                      ? const Center(
+                          child: Text('Aucun administrateur enregistré.'),
+                        )
+                      : ListView.separated(
+                          itemCount: _administrators.length,
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(height: 8),
+                          itemBuilder: (context, index) =>
+                              _administratorTile(_administrators[index]),
+                        ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Fermer'),
+        ),
+      ],
+    );
+  }
+}
+
+class _AddCompanyAdministratorDialog extends StatefulWidget {
+  final PlatformCompany company;
+  final PlatformCompaniesRepository repository;
+
+  const _AddCompanyAdministratorDialog({
+    required this.company,
+    required this.repository,
+  });
+
+  @override
+  State<_AddCompanyAdministratorDialog> createState() =>
+      _AddCompanyAdministratorDialogState();
+}
+
+class _AddCompanyAdministratorDialogState
+    extends State<_AddCompanyAdministratorDialog> {
+  final _name = TextEditingController();
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+  bool _saving = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      await widget.repository.addAdministrator(
+        companyId: widget.company.companyId,
+        name: _name.text.trim(),
+        email: _email.text.trim(),
+        password: _password.text,
+      );
+      if (mounted) Navigator.of(context).pop(true);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _error = error.toString().replaceFirst('Bad state: ', '');
+        _saving = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ContentDialog(
+      title: Text('Ajouter un administrateur — ${widget.company.name}'),
+      content: SizedBox(
+        width: MediaQuery.sizeOf(context).width < 600
+            ? MediaQuery.sizeOf(context).width * 0.82
+            : 480,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('Nom complet'),
+            const SizedBox(height: 4),
+            TextBox(controller: _name, placeholder: 'Nom et prénom'),
+            const SizedBox(height: 12),
+            const Text('Adresse e-mail'),
+            const SizedBox(height: 4),
+            TextBox(
+              controller: _email,
+              placeholder: 'administrateur@entreprise.dz',
+              keyboardType: TextInputType.emailAddress,
+            ),
+            const SizedBox(height: 12),
+            const Text('Mot de passe initial'),
+            const SizedBox(height: 4),
+            TextBox(
+              controller: _password,
+              placeholder: 'Requis uniquement pour un nouveau compte',
+              obscureText: true,
+            ),
+            if (_error != null) ...[
+              const SizedBox(height: 12),
+              InfoBar(
+                title: Text(_error!),
+                severity: InfoBarSeverity.error,
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(false),
+          child: const Text('Annuler'),
+        ),
+        FilledButton(
+          onPressed: _saving ? null : _submit,
+          child: _saving
+              ? const ProgressRing()
+              : const Text('Créer / associer'),
+        ),
+      ],
+    );
+  }
+}
+
+class _QuotaText extends StatelessWidget {
+  final String label;
+  final String value;
+  const _QuotaText({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
+    Text('$label : ', style: FluentTheme.of(context).typography.caption),
+    Text(value, style: FluentTheme.of(context).typography.bodyStrong),
+  ]);
+}
+
+class _ErrorPanel extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+  const _ErrorPanel({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) => Center(child: Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      const Icon(FluentIcons.error, size: 28),
+      const SizedBox(height: 10),
+      Text(message, textAlign: TextAlign.center),
+      const SizedBox(height: 12),
+      FilledButton(onPressed: onRetry, child: const Text('Réessayer')),
+    ],
+  ));
+}
+
+class _CreateCompanyDialog extends StatefulWidget {
+  final PlatformCompaniesRepository repository;
+  const _CreateCompanyDialog({required this.repository});
+
+  @override
+  State<_CreateCompanyDialog> createState() => _CreateCompanyDialogState();
+}
+
+class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
+  final _name = TextEditingController();
+  final _slug = TextEditingController();
+  final _address = TextEditingController();
+  final _companyPhone = TextEditingController();
+  final _companyEmail = TextEditingController();
+  final _nif = TextEditingController();
+  final _nis = TextEditingController();
+  final _rc = TextEditingController();
+  final _art = TextEditingController();
+  final _description = TextEditingController();
+  final _adminName = TextEditingController();
+  final _adminEmail = TextEditingController();
+  final _adminPassword = TextEditingController();
+  final _adminPasswordConfirm = TextEditingController();
+  final _startsAt = TextEditingController(
+    text: DateTime.now().toIso8601String().substring(0, 10),
+  );
+  final _expiresAt = TextEditingController(
+    text: DateTime.now().add(const Duration(days: 365)).toIso8601String().substring(0, 10),
+  );
+  final _maxUsers = TextEditingController(text: '5');
+  final _maxVehicles = TextEditingController(text: '50');
+  final _maxEmployees = TextEditingController(text: '20');
+  final _maxDrivers = TextEditingController(text: '20');
+  final _maxSites = TextEditingController(text: '1');
+  final _priceAmount = TextEditingController(text: '0');
+  final _notes = TextEditingController();
+  String _billingCycle = 'monthly';
+  String _currency = 'DZD';
+  int _step = 0;
+  bool _slugManuallyEdited = false;
+  bool _saving = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    for (final controller in [
+      _name,
+      _slug,
+      _address,
+      _companyPhone,
+      _companyEmail,
+      _nif,
+      _nis,
+      _rc,
+      _art,
+      _description,
+      _adminName,
+      _adminEmail,
+      _adminPassword,
+      _adminPasswordConfirm,
+      _startsAt,
+      _expiresAt,
+      _maxUsers,
+      _maxVehicles,
+      _maxEmployees,
+      _maxDrivers,
+      _maxSites,
+      _priceAmount,
+      _notes,
+    ]) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  int? _number(TextEditingController controller) =>
+      int.tryParse(controller.text.trim());
+
+  Widget _field(
+    String label,
+    TextEditingController controller, {
+    bool password = false,
+    bool numeric = false,
+    String? placeholder,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label),
+          const SizedBox(height: 5),
+          TextBox(
+            controller: controller,
+            obscureText: password,
+            keyboardType: numeric ? TextInputType.number : TextInputType.text,
+            placeholder: placeholder,
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _section(String title, String description, List<Widget> children) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(title, style: FluentTheme.of(context).typography.subtitle),
+            const SizedBox(height: 4),
+            Text(
+              description,
+              style: FluentTheme.of(context).typography.caption,
+            ),
+            const SizedBox(height: 14),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _submit() async {
+    final starts = DateTime.tryParse(_startsAt.text.trim());
+    final expires = DateTime.tryParse(_expiresAt.text.trim());
+    final maxUsers = _number(_maxUsers);
+    final maxVehicles = _number(_maxVehicles);
+    final maxEmployees = _number(_maxEmployees);
+    final maxDrivers = _number(_maxDrivers);
+    final maxSites = _number(_maxSites);
+    final priceAmount = _number(_priceAmount);
+
+    if (_name.text.trim().length < 2 ||
+        _adminName.text.trim().length < 2 ||
+        !_adminEmail.text.trim().contains('@') ||
+        (_adminPassword.text.isNotEmpty &&
+            _adminPassword.text != _adminPasswordConfirm.text) ||
+        starts == null ||
+        expires == null ||
+        maxUsers == null ||
+        maxVehicles == null ||
+        maxEmployees == null ||
+        maxDrivers == null ||
+        maxSites == null ||
+        priceAmount == null) {
+      setState(() {
+        _error = 'Complétez les informations obligatoires et vérifiez les dates et quotas.';
+      });
+      return;
+    }
+
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      await widget.repository.create(
+        name: _name.text.trim(),
+        slug: _slug.text.trim(),
+        adminName: _adminName.text.trim(),
+        adminEmail: _adminEmail.text.trim(),
+        adminPassword: _adminPassword.text,
+        startsAt: starts,
+        expiresAt: expires,
+        maxUsers: maxUsers,
+        maxVehicles: maxVehicles,
+        maxEmployees: maxEmployees,
+        maxDrivers: maxDrivers,
+        maxSites: maxSites,
+        priceAmount: priceAmount,
+        billingCycle: _billingCycle,
+        currency: _currency,
+        notes: _notes.text.trim(),
+        address: _address.text.trim(),
+        phone: _companyPhone.text.trim(),
+        companyEmail: _companyEmail.text.trim(),
+        nif: _nif.text.trim(),
+        nis: _nis.text.trim(),
+        rc: _rc.text.trim(),
+        art: _art.text.trim(),
+        description: _description.text.trim(),
+      );
+      if (mounted) Navigator.of(context).pop(true);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _error = error.toString().replaceFirst('Bad state: ', '');
+        _saving = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width < 760;
+    return ContentDialog(
+      title: const Text('Créer une entreprise cliente'),
+      constraints: const BoxConstraints(maxWidth: 820, maxHeight: 860),
+      content: SizedBox(
+        width: compact ? MediaQuery.sizeOf(context).width * 0.84 : 740,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (_step == 0) ...[
+                _section(
+                'Identité de l’entreprise',
+                'Informations qui identifieront l’espace client dans Parcoto.',
+                [
+                  _field(
+                    'Raison sociale / nom commercial',
+                    _name,
+                    placeholder: 'Ex. GTS Guelma Truck Service',
+                    onChanged: _onCompanyNameChanged,
+                  ),
+                  _field(
+                    'Identifiant de l’entreprise',
+                    _slug,
+                    placeholder: 'Généré automatiquement à partir du nom',
+                    onChanged: (_) => _slugManuallyEdited = true,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _section(
+                'Informations légales et coordonnées',
+                'Ces informations alimentent directement la fiche société des modules Parcoto historiques.',
+                [
+                  _field('Adresse du siège', _address),
+                  _field('Téléphone', _companyPhone),
+                  _field('E-mail de l’entreprise', _companyEmail),
+                  _field('NIF', _nif),
+                  _field('NIS', _nis),
+                  _field('Registre de commerce (RC)', _rc),
+                  _field('Article (ART)', _art),
+                  const Text('Description'),
+                  const SizedBox(height: 5),
+                  TextBox(
+                    controller: _description,
+                    minLines: 2,
+                    maxLines: 4,
+                    placeholder: 'Activité et présentation de l’entreprise...',
+                  ),
+                ],
+              ),
+              ],
+              if (_step == 1) ...[
+              const SizedBox(height: 12),
+              _section(
+                'Administrateur principal',
+                'Un véritable compte Appwrite Auth sera créé si cette adresse n’existe pas déjà. Sinon, le compte existant sera associé.',
+                [
+                  _field('Nom complet', _adminName),
+                  _field(
+                    'Adresse e-mail',
+                    _adminEmail,
+                    placeholder: 'admin@entreprise.dz',
+                  ),
+                  _field(
+                    'Mot de passe initial',
+                    _adminPassword,
+                    password: true,
+                    placeholder: 'Obligatoire uniquement pour un nouveau compte',
+                  ),
+                  _field(
+                    'Confirmer le mot de passe',
+                    _adminPasswordConfirm,
+                    password: true,
+                  ),
+                ],
+              ),
+              ],
+              if (_step == 2) ...[
+              const SizedBox(height: 12),
+              _section(
+                'Licence et facturation',
+                'La période et les limites sont enregistrées dans les droits contractuels de l’entreprise.',
+                [
+                  _field(
+                    'Début de licence (AAAA-MM-JJ)',
+                    _startsAt,
+                    placeholder: '2026-11-17',
+                  ),
+                  _field(
+                    'Expiration (AAAA-MM-JJ)',
+                    _expiresAt,
+                    placeholder: '2027-11-17',
+                  ),
+                  const Text('Périodicité'),
+                  const SizedBox(height: 5),
+                  ComboBox<String>(
+                    value: _billingCycle,
+                    isExpanded: true,
+                    items: const [
+                      ComboBoxItem(value: 'monthly', child: Text('Mensuelle')),
+                      ComboBoxItem(value: 'quarterly', child: Text('Trimestrielle')),
+                      ComboBoxItem(value: 'yearly', child: Text('Annuelle')),
+                      ComboBoxItem(value: 'custom', child: Text('Personnalisée')),
+                    ],
+                    onChanged: _saving
+                        ? null
+                        : (value) {
+                            if (value != null) {
+                              setState(() => _billingCycle = value);
+                            }
+                          },
+                  ),
+                  const SizedBox(height: 12),
+                  const Text('Devise'),
+                  const SizedBox(height: 5),
+                  ComboBox<String>(
+                    value: _currency,
+                    isExpanded: true,
+                    items: const [
+                      ComboBoxItem(value: 'DZD', child: Text('DZD — Dinar algérien')),
+                      ComboBoxItem(value: 'EUR', child: Text('EUR — Euro')),
+                      ComboBoxItem(value: 'USD', child: Text('USD — Dollar américain')),
+                    ],
+                    onChanged: _saving
+                        ? null
+                        : (value) {
+                            if (value != null) setState(() => _currency = value);
+                          },
+                  ),
+                  const SizedBox(height: 12),
+                  _field('Tarif par période', _priceAmount, numeric: true),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _section(
+                'Quotas contractuels',
+                'Les limites sont appliquées par l’API métier lorsqu’elles sont prises en charge.',
+                [
+                  _field('Utilisateurs maximum', _maxUsers, numeric: true),
+                  _field('Véhicules maximum', _maxVehicles, numeric: true),
+                  _field('Employés maximum', _maxEmployees, numeric: true),
+                  _field('Chauffeurs maximum', _maxDrivers, numeric: true),
+                  _field('Sites maximum', _maxSites, numeric: true),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _section(
+                'Notes internes',
+                'Informations commerciales ou conditions particulières.',
+                [
+                  TextBox(
+                    controller: _notes,
+                    minLines: 2,
+                    maxLines: 4,
+                    placeholder: 'Notes...',
+                  ),
+                ],
+              ),
+              if (_error != null) ...[
+                const SizedBox(height: 12),
+                InfoBar(
+                  title: Text(_error!),
+                  severity: InfoBarSeverity.error,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: _saving
+              ? null
+              : _step == 0
+                  ? () => Navigator.of(context).pop(false)
+                  : _previousStep,
+          child: Text(_step == 0 ? 'Annuler' : 'Précédent'),
+        ),
+        FilledButton(
+          onPressed: _saving ? null : _step < 2 ? _nextStep : _submit,
+          child: _saving
+              ? const ProgressRing()
+              : Text(_step < 2 ? 'Continuer' : 'Créer l’entreprise'),
+        ),
+      ],
+    );
+  }
+}
+), '');
+    _slug.value = TextEditingValue(
+      text: generated,
+      selection: TextSelection.collapsed(offset: generated.length),
+    );
+  }
+
+  void _nextStep() {
+    setState(() {
+      _error = null;
+      if (_step == 0) {
+        if (_name.text.trim().length < 2) {
+          _error = 'Saisissez au minimum deux caractères pour le nom de l’entreprise.';
+          return;
+        }
+        _step = 1;
+        return;
+      }
+      if (_step == 1) {
+        final email = _adminEmail.text.trim();
+        if (_adminName.text.trim().length < 2 ||
+            !RegExp(r'^[^\\s@]+@[^\\s@]+\\.[^\\s@]+
+    final hasLicenseInput = _hasExistingEntitlement ||
+        _licenseTouched ||
+        [
+          _startsAt,
+          _expiresAt,
+          _maxUsers,
+          _maxVehicles,
+          _maxEmployees,
+          _maxDrivers,
+          _maxSites,
+          _priceAmount,
+          _notes,
+        ].any((controller) => controller.text.trim().isNotEmpty);
+
+    DateTime? startsAt;
+    DateTime? expiresAt;
+    int? maxUsers;
+    int? maxVehicles;
+    int? maxEmployees;
+    int? maxDrivers;
+    int? maxSites;
+    int? priceAmount;
+    if (hasLicenseInput) {
+      startsAt = DateTime.tryParse(_startsAt.text.trim());
+      expiresAt = DateTime.tryParse(_expiresAt.text.trim());
+      maxUsers = _integer(_maxUsers);
+      maxVehicles = _integer(_maxVehicles);
+      maxEmployees = _integer(_maxEmployees);
+      maxDrivers = _integer(_maxDrivers);
+      maxSites = _integer(_maxSites);
+      priceAmount = _integer(_priceAmount);
+      if (startsAt == null ||
+          expiresAt == null ||
+          maxUsers == null ||
+          maxVehicles == null ||
+          maxEmployees == null ||
+          maxDrivers == null ||
+          maxSites == null ||
+          priceAmount == null) {
+        setState(() {
+          _error = 'Pour configurer une licence, renseignez toutes les dates et tous les quotas.';
+        });
+        return;
+      }
+    }
+
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      await widget.repository.updateCompany(
+        companyId: widget.company.companyId,
+        name: _name.text.trim(),
+        slug: _slug.text.trim(),
+        status: _status,
+        companyLegalName: _legalName.text.trim(),
+        address: _address.text.trim(),
+        phone: _phone.text.trim(),
+        companyEmail: _companyEmail.text.trim(),
+        nif: _nif.text.trim(),
+        nis: _nis.text.trim(),
+        rc: _rc.text.trim(),
+        art: _art.text.trim(),
+        description: _description.text.trim(),
+        startsAt: startsAt,
+        expiresAt: expiresAt,
+        maxUsers: maxUsers,
+        maxVehicles: maxVehicles,
+        maxEmployees: maxEmployees,
+        maxDrivers: maxDrivers,
+        maxSites: maxSites,
+        priceAmount: priceAmount,
+        billingCycle: hasLicenseInput ? _billingCycle : null,
+        currency: hasLicenseInput ? _currency : null,
+        notes: hasLicenseInput ? _notes.text.trim() : null,
+      );
+      if (mounted) Navigator.of(context).pop(true);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _error = error.toString().replaceFirst('Bad state: ', '');
+        _saving = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currencies = <String>{'DZD', 'EUR', 'USD', _currency}.toList();
+    return ContentDialog(
+      title: const Text('Modifier l’entreprise et sa licence'),
+      constraints: const BoxConstraints(maxWidth: 680, maxHeight: 820),
+      content: SizedBox(
+        width: MediaQuery.sizeOf(context).width < 760
+            ? MediaQuery.sizeOf(context).width * 0.82
+            : 620,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Identité de l’entreprise',
+                style: FluentTheme.of(context).typography.subtitle,
+              ),
+              const SizedBox(height: 10),
+              _field('Nom commercial', _name),
+              _field('Identifiant unique', _slug),
+              const SizedBox(height: 18),
+              Text(
+                'Informations légales et coordonnées',
+                style: FluentTheme.of(context).typography.subtitle,
+              ),
+              const SizedBox(height: 10),
+              _field('Raison sociale', _legalName),
+              _field('Adresse du siège', _address),
+              _field('Téléphone', _phone),
+              _field('E-mail de l’entreprise', _companyEmail),
+              _field('NIF', _nif),
+              _field('NIS', _nis),
+              _field('Registre de commerce (RC)', _rc),
+              _field('Article (ART)', _art),
+              const Text('Description'),
+              const SizedBox(height: 4),
+              TextBox(
+                controller: _description,
+                minLines: 2,
+                maxLines: 4,
+                placeholder: 'Activité et présentation de l’entreprise...',
+              ),
+              const SizedBox(height: 18),
+              const Text('État du compte'),
+              const SizedBox(height: 4),
+              ComboBox<String>(
+                value: _status,
+                isExpanded: true,
+                items: const [
+                  ComboBoxItem(value: 'active', child: Text('Active')),
+                  ComboBoxItem(value: 'suspended', child: Text('Suspendue')),
+                ],
+                onChanged: _saving
+                    ? null
+                    : (value) {
+                        if (value != null) setState(() => _status = value);
+                      },
+              ),
+              const SizedBox(height: 18),
+              Text(
+                'Licence et quotas',
+                style: FluentTheme.of(context).typography.subtitle,
+              ),
+              if (!_hasExistingEntitlement) ...[
+                const SizedBox(height: 4),
+                const Text(
+                  'Aucune licence contractuelle n’est configurée. Laissez ces champs vides pour modifier uniquement l’entreprise. Pour créer une licence, renseignez tous les champs.',
+                ),
+              ],
+              const SizedBox(height: 10),
+              _field('Début de licence (AAAA-MM-JJ)', _startsAt),
+              _field('Fin de licence (AAAA-MM-JJ)', _expiresAt),
+              _field('Nombre maximal d’utilisateurs', _maxUsers, numeric: true),
+              _field('Nombre maximal de véhicules', _maxVehicles, numeric: true),
+              _field('Nombre maximal d’employés', _maxEmployees, numeric: true),
+              _field('Nombre maximal de chauffeurs', _maxDrivers, numeric: true),
+              _field('Nombre maximal de sites', _maxSites, numeric: true),
+              _field('Tarif', _priceAmount, numeric: true),
+              const Text('Périodicité'),
+              const SizedBox(height: 4),
+              ComboBox<String>(
+                value: _billingCycle,
+                isExpanded: true,
+                items: const [
+                  ComboBoxItem(value: 'monthly', child: Text('Mensuelle')),
+                  ComboBoxItem(value: 'quarterly', child: Text('Trimestrielle')),
+                  ComboBoxItem(value: 'yearly', child: Text('Annuelle')),
+                  ComboBoxItem(value: 'custom', child: Text('Personnalisée')),
+                ],
+                onChanged: _saving
+                    ? null
+                    : (value) {
+                        if (value != null) {
+                          setState(() {
+                            _billingCycle = value;
+                            _licenseTouched = true;
+                          });
+                        }
+                      },
+              ),
+              const SizedBox(height: 10),
+              const Text('Devise'),
+              const SizedBox(height: 4),
+              ComboBox<String>(
+                value: _currency,
+                isExpanded: true,
+                items: currencies
+                    .map((currency) => ComboBoxItem(
+                          value: currency,
+                          child: Text(currency),
+                        ))
+                    .toList(growable: false),
+                onChanged: _saving
+                    ? null
+                    : (value) {
+                        if (value != null) {
+                          setState(() {
+                            _currency = value;
+                            _licenseTouched = true;
+                          });
+                        }
+                      },
+              ),
+              const SizedBox(height: 10),
+              const Text('Notes internes'),
+              const SizedBox(height: 4),
+              TextBox(
+                controller: _notes,
+                minLines: 2,
+                maxLines: 4,
+                placeholder: 'Informations contractuelles...',
+              ),
+              if (_error != null) ...[
+                const SizedBox(height: 12),
+                InfoBar(
+                  title: Text(_error!),
+                  severity: InfoBarSeverity.error,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(false),
+          child: const Text('Annuler'),
+        ),
+        FilledButton(
+          onPressed: _saving ? null : _submit,
+          child: _saving ? const ProgressRing() : const Text('Enregistrer'),
+        ),
+      ],
+    );
+  }
+}
+
+class _CompanyAdministratorsDialog extends StatefulWidget {
+  final PlatformCompany company;
+  final PlatformCompaniesRepository repository;
+
+  const _CompanyAdministratorsDialog({
+    required this.company,
+    required this.repository,
+  });
+
+  @override
+  State<_CompanyAdministratorsDialog> createState() =>
+      _CompanyAdministratorsDialogState();
+}
+
+class _CompanyAdministratorsDialogState
+    extends State<_CompanyAdministratorsDialog> {
+  List<PlatformCompanyAdministrator> _administrators = [];
+  bool _loading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final result = await widget.repository.listAdministrators(
+        widget.company.companyId,
+      );
+      if (!mounted) return;
+      setState(() {
+        _administrators = result;
+        _loading = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _error = error.toString().replaceFirst('Bad state: ', '');
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _add() async {
+    final added = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => _AddCompanyAdministratorDialog(
+        company: widget.company,
+        repository: widget.repository,
+      ),
+    );
+    if (added == true) await _load();
+  }
+
+  Future<void> _edit(PlatformCompanyAdministrator administrator) async {
+    final controller = TextEditingController(text: administrator.name);
+    final name = await showDialog<String>(
+      context: context,
+      builder: (context) => ContentDialog(
+        title: const Text('Modifier le nom de l’administrateur'),
+        content: TextBox(
+          controller: controller,
+          placeholder: 'Nom complet',
+        ),
+        actions: [
+          Button(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Annuler'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(controller.text.trim()),
+            child: const Text('Enregistrer'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (name == null || name.length < 2) return;
+    try {
+      await widget.repository.updateAdministratorName(
+        companyId: widget.company.companyId,
+        membershipId: administrator.membershipId,
+        name: name,
+      );
+      await _load();
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _error = error.toString().replaceFirst('Bad state: ', ''));
+    }
+  }
+
+  Future<void> _revoke(PlatformCompanyAdministrator administrator) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => ContentDialog(
+        title: const Text('Révoquer cet administrateur ?'),
+        content: Text(
+          'Le compte ${administrator.email} perdra son accès à ${widget.company.name}. '
+          'Son compte Appwrite ne sera pas supprimé.',
+        ),
+        actions: [
+          Button(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Annuler'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Révoquer'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await widget.repository.revokeAdministrator(
+        companyId: widget.company.companyId,
+        membershipId: administrator.membershipId,
+      );
+      await _load();
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _error = error.toString().replaceFirst('Bad state: ', ''));
+    }
+  }
+
+  Future<void> _restore(PlatformCompanyAdministrator administrator) async {
+    try {
+      await widget.repository.addAdministrator(
+        companyId: widget.company.companyId,
+        name: administrator.name.isNotEmpty
+            ? administrator.name
+            : 'Administrateur',
+        email: administrator.email,
+        password: '',
+      );
+      await _load();
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _error = error.toString().replaceFirst('Bad state: ', ''));
+    }
+  }
+
+  Widget _administratorTile(PlatformCompanyAdministrator administrator) {
+    final active = administrator.status == 'active';
+    final protected =
+        administrator.isPlatformSuperAdmin || administrator.role == 'owner';
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: FluentTheme.of(context).accentColor,
+                shape: BoxShape.circle,
+              ),
+              child: Text(
+                administrator.name.isNotEmpty
+                    ? administrator.name.substring(0, 1).toUpperCase()
+                    : '?',
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    administrator.name.isEmpty
+                        ? administrator.email
+                        : administrator.name,
+                    style: FluentTheme.of(context).typography.bodyStrong,
+                  ),
+                  Text(
+                    administrator.email,
+                    style: FluentTheme.of(context).typography.caption,
+                  ),
+                  const SizedBox(height: 4),
+                  Wrap(
+                    spacing: 10,
+                    children: [
+                      Text(
+                        active ? 'Actif' : 'Révoqué',
+                        style: TextStyle(
+                          color: active ? Colors.green : Colors.orange,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        administrator.isPlatformSuperAdmin
+                            ? 'Super Admin plateforme'
+                            : administrator.role,
+                        style: FluentTheme.of(context).typography.caption,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            if (active)
+              IconButton(
+                icon: const Icon(FluentIcons.edit),
+                onPressed: () => _edit(administrator),
+              ),
+            if (!active && !administrator.isPlatformSuperAdmin)
+              IconButton(
+                icon: const Icon(FluentIcons.refresh),
+                onPressed: () => _restore(administrator),
+              ),
+            if (active && !protected)
+              IconButton(
+                icon: Icon(FluentIcons.delete, color: Colors.red),
+                onPressed: () => _revoke(administrator),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ContentDialog(
+      title: Text('Administrateurs — ${widget.company.name}'),
+      constraints: const BoxConstraints(maxWidth: 720, maxHeight: 760),
+      content: SizedBox(
+        width: MediaQuery.sizeOf(context).width < 800
+            ? MediaQuery.sizeOf(context).width * 0.82
+            : 660,
+        height: MediaQuery.sizeOf(context).height * 0.65,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '${_administrators.where((item) => item.status == 'active').length} administrateur(s) actif(s)',
+                    style: FluentTheme.of(context).typography.caption,
+                  ),
+                ),
+                Button(
+                  onPressed: _loading ? null : _load,
+                  child: const Icon(FluentIcons.refresh),
+                ),
+                const SizedBox(width: 8),
+                FilledButton(
+                  onPressed: _add,
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(FluentIcons.add),
+                      SizedBox(width: 6),
+                      Text('Ajouter'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (_error != null)
+              InfoBar(
+                title: Text(_error!),
+                severity: InfoBarSeverity.error,
+              ),
+            Expanded(
+              child: _loading
+                  ? const Center(child: ProgressRing())
+                  : _administrators.isEmpty
+                      ? const Center(
+                          child: Text('Aucun administrateur enregistré.'),
+                        )
+                      : ListView.separated(
+                          itemCount: _administrators.length,
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(height: 8),
+                          itemBuilder: (context, index) =>
+                              _administratorTile(_administrators[index]),
+                        ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Fermer'),
+        ),
+      ],
+    );
+  }
+}
+
+class _AddCompanyAdministratorDialog extends StatefulWidget {
+  final PlatformCompany company;
+  final PlatformCompaniesRepository repository;
+
+  const _AddCompanyAdministratorDialog({
+    required this.company,
+    required this.repository,
+  });
+
+  @override
+  State<_AddCompanyAdministratorDialog> createState() =>
+      _AddCompanyAdministratorDialogState();
+}
+
+class _AddCompanyAdministratorDialogState
+    extends State<_AddCompanyAdministratorDialog> {
+  final _name = TextEditingController();
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+  bool _saving = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      await widget.repository.addAdministrator(
+        companyId: widget.company.companyId,
+        name: _name.text.trim(),
+        email: _email.text.trim(),
+        password: _password.text,
+      );
+      if (mounted) Navigator.of(context).pop(true);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _error = error.toString().replaceFirst('Bad state: ', '');
+        _saving = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ContentDialog(
+      title: Text('Ajouter un administrateur — ${widget.company.name}'),
+      content: SizedBox(
+        width: MediaQuery.sizeOf(context).width < 600
+            ? MediaQuery.sizeOf(context).width * 0.82
+            : 480,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('Nom complet'),
+            const SizedBox(height: 4),
+            TextBox(controller: _name, placeholder: 'Nom et prénom'),
+            const SizedBox(height: 12),
+            const Text('Adresse e-mail'),
+            const SizedBox(height: 4),
+            TextBox(
+              controller: _email,
+              placeholder: 'administrateur@entreprise.dz',
+              keyboardType: TextInputType.emailAddress,
+            ),
+            const SizedBox(height: 12),
+            const Text('Mot de passe initial'),
+            const SizedBox(height: 4),
+            TextBox(
+              controller: _password,
+              placeholder: 'Requis uniquement pour un nouveau compte',
+              obscureText: true,
+            ),
+            if (_error != null) ...[
+              const SizedBox(height: 12),
+              InfoBar(
+                title: Text(_error!),
+                severity: InfoBarSeverity.error,
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(false),
+          child: const Text('Annuler'),
+        ),
+        FilledButton(
+          onPressed: _saving ? null : _submit,
+          child: _saving
+              ? const ProgressRing()
+              : const Text('Créer / associer'),
+        ),
+      ],
+    );
+  }
+}
+
+class _QuotaText extends StatelessWidget {
+  final String label;
+  final String value;
+  const _QuotaText({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
+    Text('$label : ', style: FluentTheme.of(context).typography.caption),
+    Text(value, style: FluentTheme.of(context).typography.bodyStrong),
+  ]);
+}
+
+class _ErrorPanel extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+  const _ErrorPanel({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) => Center(child: Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      const Icon(FluentIcons.error, size: 28),
+      const SizedBox(height: 10),
+      Text(message, textAlign: TextAlign.center),
+      const SizedBox(height: 12),
+      FilledButton(onPressed: onRetry, child: const Text('Réessayer')),
+    ],
+  ));
+}
+
+class _CreateCompanyDialog extends StatefulWidget {
+  final PlatformCompaniesRepository repository;
+  const _CreateCompanyDialog({required this.repository});
+
+  @override
+  State<_CreateCompanyDialog> createState() => _CreateCompanyDialogState();
+}
+
+class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
+  final _name = TextEditingController();
+  final _slug = TextEditingController();
+  final _address = TextEditingController();
+  final _companyPhone = TextEditingController();
+  final _companyEmail = TextEditingController();
+  final _nif = TextEditingController();
+  final _nis = TextEditingController();
+  final _rc = TextEditingController();
+  final _art = TextEditingController();
+  final _description = TextEditingController();
+  final _adminName = TextEditingController();
+  final _adminEmail = TextEditingController();
+  final _adminPassword = TextEditingController();
+  final _adminPasswordConfirm = TextEditingController();
+  final _startsAt = TextEditingController(
+    text: DateTime.now().toIso8601String().substring(0, 10),
+  );
+  final _expiresAt = TextEditingController(
+    text: DateTime.now().add(const Duration(days: 365)).toIso8601String().substring(0, 10),
+  );
+  final _maxUsers = TextEditingController(text: '5');
+  final _maxVehicles = TextEditingController(text: '50');
+  final _maxEmployees = TextEditingController(text: '20');
+  final _maxDrivers = TextEditingController(text: '20');
+  final _maxSites = TextEditingController(text: '1');
+  final _priceAmount = TextEditingController(text: '0');
+  final _notes = TextEditingController();
+  String _billingCycle = 'monthly';
+  String _currency = 'DZD';
+  int _step = 0;
+  bool _slugManuallyEdited = false;
+  bool _saving = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    for (final controller in [
+      _name,
+      _slug,
+      _address,
+      _companyPhone,
+      _companyEmail,
+      _nif,
+      _nis,
+      _rc,
+      _art,
+      _description,
+      _adminName,
+      _adminEmail,
+      _adminPassword,
+      _adminPasswordConfirm,
+      _startsAt,
+      _expiresAt,
+      _maxUsers,
+      _maxVehicles,
+      _maxEmployees,
+      _maxDrivers,
+      _maxSites,
+      _priceAmount,
+      _notes,
+    ]) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  int? _number(TextEditingController controller) =>
+      int.tryParse(controller.text.trim());
+
+  Widget _field(
+    String label,
+    TextEditingController controller, {
+    bool password = false,
+    bool numeric = false,
+    String? placeholder,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label),
+          const SizedBox(height: 5),
+          TextBox(
+            controller: controller,
+            obscureText: password,
+            keyboardType: numeric ? TextInputType.number : TextInputType.text,
+            placeholder: placeholder,
+            onChanged: onChanged,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _section(String title, String description, List<Widget> children) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(title, style: FluentTheme.of(context).typography.subtitle),
+            const SizedBox(height: 4),
+            Text(
+              description,
+              style: FluentTheme.of(context).typography.caption,
+            ),
+            const SizedBox(height: 14),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _submit() async {
+    final starts = DateTime.tryParse(_startsAt.text.trim());
+    final expires = DateTime.tryParse(_expiresAt.text.trim());
+    final maxUsers = _number(_maxUsers);
+    final maxVehicles = _number(_maxVehicles);
+    final maxEmployees = _number(_maxEmployees);
+    final maxDrivers = _number(_maxDrivers);
+    final maxSites = _number(_maxSites);
+    final priceAmount = _number(_priceAmount);
+
+    if (_name.text.trim().length < 2 ||
+        _adminName.text.trim().length < 2 ||
+        !_adminEmail.text.trim().contains('@') ||
+        (_adminPassword.text.isNotEmpty &&
+            _adminPassword.text != _adminPasswordConfirm.text) ||
+        starts == null ||
+        expires == null ||
+        maxUsers == null ||
+        maxVehicles == null ||
+        maxEmployees == null ||
+        maxDrivers == null ||
+        maxSites == null ||
+        priceAmount == null) {
+      setState(() {
+        _error = 'Complétez les informations obligatoires et vérifiez les dates et quotas.';
+      });
+      return;
+    }
+
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      await widget.repository.create(
+        name: _name.text.trim(),
+        slug: _slug.text.trim(),
+        adminName: _adminName.text.trim(),
+        adminEmail: _adminEmail.text.trim(),
+        adminPassword: _adminPassword.text,
+        startsAt: starts,
+        expiresAt: expires,
+        maxUsers: maxUsers,
+        maxVehicles: maxVehicles,
+        maxEmployees: maxEmployees,
+        maxDrivers: maxDrivers,
+        maxSites: maxSites,
+        priceAmount: priceAmount,
+        billingCycle: _billingCycle,
+        currency: _currency,
+        notes: _notes.text.trim(),
+        address: _address.text.trim(),
+        phone: _companyPhone.text.trim(),
+        companyEmail: _companyEmail.text.trim(),
+        nif: _nif.text.trim(),
+        nis: _nis.text.trim(),
+        rc: _rc.text.trim(),
+        art: _art.text.trim(),
+        description: _description.text.trim(),
+      );
+      if (mounted) Navigator.of(context).pop(true);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _error = error.toString().replaceFirst('Bad state: ', '');
+        _saving = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width < 760;
+    return ContentDialog(
+      title: const Text('Créer une entreprise cliente'),
+      constraints: const BoxConstraints(maxWidth: 820, maxHeight: 860),
+      content: SizedBox(
+        width: compact ? MediaQuery.sizeOf(context).width * 0.84 : 740,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  for (var index = 0; index < 3; index++) ...[
+                    if (index > 0) const SizedBox(width: 8),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 6),
+                        decoration: BoxDecoration(
+                          color: index == _step
+                              ? FluentTheme.of(context).accentColor.withValues(alpha: 0.14)
+                              : FluentTheme.of(context).inactiveColor.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: index == _step
+                                ? FluentTheme.of(context).accentColor
+                                : Colors.transparent,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              '0${index + 1}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: index == _step
+                                    ? FluentTheme.of(context).accentColor
+                                    : null,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              ['Entreprise', 'Administrateur', 'Licence'][index],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: FluentTheme.of(context).typography.caption,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              const SizedBox(height: 16),
+              if (_step == 0) ...[
+              _section(
+                'Identité de l’entreprise',
+                'Informations qui identifieront l’espace client dans Parcoto.',
+                [
+                  _field(
+                    'Raison sociale / nom commercial',
+                    _name,
+                    placeholder: 'Ex. GTS Guelma Truck Service',
+                  ),
+                  _field(
+                    'Identifiant de l’entreprise',
+                    _slug,
+                    placeholder: 'Laisser vide pour le générer automatiquement',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _section(
+                'Informations légales et coordonnées',
+                'Ces informations alimentent directement la fiche société des modules Parcoto historiques.',
+                [
+                  _field('Adresse du siège', _address),
+                  _field('Téléphone', _companyPhone),
+                  _field('E-mail de l’entreprise', _companyEmail),
+                  _field('NIF', _nif),
+                  _field('NIS', _nis),
+                  _field('Registre de commerce (RC)', _rc),
+                  _field('Article (ART)', _art),
+                  const Text('Description'),
+                  const SizedBox(height: 5),
+                  TextBox(
+                    controller: _description,
+                    minLines: 2,
+                    maxLines: 4,
+                    placeholder: 'Activité et présentation de l’entreprise...',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _section(
+                'Administrateur principal',
+                'Un véritable compte Appwrite Auth sera créé si cette adresse n’existe pas déjà. Sinon, le compte existant sera associé.',
+                [
+                  _field('Nom complet', _adminName),
+                  _field(
+                    'Adresse e-mail',
+                    _adminEmail,
+                    placeholder: 'admin@entreprise.dz',
+                  ),
+                  _field(
+                    'Mot de passe initial',
+                    _adminPassword,
+                    password: true,
+                    placeholder: 'Obligatoire uniquement pour un nouveau compte',
+                  ),
+                  _field(
+                    'Confirmer le mot de passe',
+                    _adminPasswordConfirm,
+                    password: true,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _section(
+                'Licence et facturation',
+                'La période et les limites sont enregistrées dans les droits contractuels de l’entreprise.',
+                [
+                  _field(
+                    'Début de licence (AAAA-MM-JJ)',
+                    _startsAt,
+                    placeholder: '2026-11-17',
+                  ),
+                  _field(
+                    'Expiration (AAAA-MM-JJ)',
+                    _expiresAt,
+                    placeholder: '2027-11-17',
+                  ),
+                  const Text('Périodicité'),
+                  const SizedBox(height: 5),
+                  ComboBox<String>(
+                    value: _billingCycle,
+                    isExpanded: true,
+                    items: const [
+                      ComboBoxItem(value: 'monthly', child: Text('Mensuelle')),
+                      ComboBoxItem(value: 'quarterly', child: Text('Trimestrielle')),
+                      ComboBoxItem(value: 'yearly', child: Text('Annuelle')),
+                      ComboBoxItem(value: 'custom', child: Text('Personnalisée')),
+                    ],
+                    onChanged: _saving
+                        ? null
+                        : (value) {
+                            if (value != null) {
+                              setState(() => _billingCycle = value);
+                            }
+                          },
+                  ),
+                  const SizedBox(height: 12),
+                  const Text('Devise'),
+                  const SizedBox(height: 5),
+                  ComboBox<String>(
+                    value: _currency,
+                    isExpanded: true,
+                    items: const [
+                      ComboBoxItem(value: 'DZD', child: Text('DZD — Dinar algérien')),
+                      ComboBoxItem(value: 'EUR', child: Text('EUR — Euro')),
+                      ComboBoxItem(value: 'USD', child: Text('USD — Dollar américain')),
+                    ],
+                    onChanged: _saving
+                        ? null
+                        : (value) {
+                            if (value != null) setState(() => _currency = value);
+                          },
+                  ),
+                  const SizedBox(height: 12),
+                  _field('Tarif par période', _priceAmount, numeric: true),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _section(
+                'Quotas contractuels',
+                'Les limites sont appliquées par l’API métier lorsqu’elles sont prises en charge.',
+                [
+                  _field('Utilisateurs maximum', _maxUsers, numeric: true),
+                  _field('Véhicules maximum', _maxVehicles, numeric: true),
+                  _field('Employés maximum', _maxEmployees, numeric: true),
+                  _field('Chauffeurs maximum', _maxDrivers, numeric: true),
+                  _field('Sites maximum', _maxSites, numeric: true),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _section(
+                'Notes internes',
+                'Informations commerciales ou conditions particulières.',
+                [
+                  TextBox(
+                    controller: _notes,
+                    minLines: 2,
+                    maxLines: 4,
+                    placeholder: 'Notes...',
+                  ),
+                ],
+              ),
+              if (_error != null) ...[
+                const SizedBox(height: 12),
+                InfoBar(
+                  title: Text(_error!),
+                  severity: InfoBarSeverity.error,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(false),
+          child: const Text('Annuler'),
+        ),
+        FilledButton(
+          onPressed: _saving ? null : _submit,
+          child: _saving ? const ProgressRing() : const Text('Créer l’entreprise'),
+        ),
+      ],
+    );
+  }
+}
+).hasMatch(email) ||
+            (_adminPassword.text.isNotEmpty &&
+                _adminPassword.text != _adminPasswordConfirm.text)) {
+          _error = 'Vérifiez le nom, l’adresse e-mail et la confirmation du mot de passe.';
+          return;
+        }
+        _step = 2;
+      }
+    });
+  }
+
+  void _previousStep() {
+    if (_saving || _step == 0) return;
+    setState(() {
+      _step--;
+      _error = null;
+    });
   }
 
   Future<void> _submit() async {
@@ -1603,6 +3831,8 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
   final _notes = TextEditingController();
   String _billingCycle = 'monthly';
   String _currency = 'DZD';
+  int _step = 0;
+  bool _slugManuallyEdited = false;
   bool _saving = false;
   String? _error;
 
@@ -1660,6 +3890,7 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
             obscureText: password,
             keyboardType: numeric ? TextInputType.number : TextInputType.text,
             placeholder: placeholder,
+            onChanged: onChanged,
           ),
         ],
       ),
