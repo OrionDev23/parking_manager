@@ -10,6 +10,7 @@ class AuthSession {
   final License? license;
   final bool isOfflineSession;
   final bool isPlatformSuperAdmin;
+  final bool isPlatformCompanyContext;
 
   const AuthSession({
     required this.userId,
@@ -20,6 +21,7 @@ class AuthSession {
     this.license,
     this.isOfflineSession = false,
     this.isPlatformSuperAdmin = false,
+    this.isPlatformCompanyContext = false,
   });
 
   bool hasPermission(String permission) =>
