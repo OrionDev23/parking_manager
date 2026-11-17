@@ -11,7 +11,6 @@ import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:window_manager/window_manager.dart';
 
-import '../../admin_parameters.dart';
 import '../../main.dart';
 import '../../theme.dart';
 import '../dashboard/notifications/notif_list.dart';
