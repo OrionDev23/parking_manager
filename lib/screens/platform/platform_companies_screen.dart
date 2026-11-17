@@ -310,45 +310,82 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
           final header = Padding(
             padding: EdgeInsets.fromLTRB(
               horizontalPadding,
-              compact ? 16 : 22,
+              compact ? 14 : 22,
               horizontalPadding,
-              12,
+              compact ? 10 : 12,
             ),
-            child: ModuleDashboardHeader(
-              title: 'Plateforme Parcoto',
-              subtitle: 'Provisionnement et suivi commercial des entreprises clientes.',
-              eyebrow: 'Parcoto / Platform administration',
-              heroTitle: 'Gestion des entreprises',
-              heroDescription:
-                  'Créez les entreprises, provisionnez leur premier administrateur et définissez les limites contractuelles de chaque licence.',
-              icon: FluentIcons.cloud,
-            ),
+            child: compact
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'PARCOTO  /  ADMINISTRATION',
+                        style: FluentTheme.of(context).typography.caption?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.1,
+                              color: widget.appTheme.mutedTextColor,
+                            ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        'Gestion des entreprises',
+                        style: FluentTheme.of(context).typography.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Entreprises clientes, administrateurs et licences.',
+                        style: FluentTheme.of(context).typography.caption,
+                      ),
+                    ],
+                  )
+                : ModuleDashboardHeader(
+                    title: 'Plateforme Parcoto',
+                    subtitle: 'Provisionnement et suivi commercial des entreprises clientes.',
+                    eyebrow: 'Parcoto / Platform administration',
+                    heroTitle: 'Gestion des entreprises',
+                    heroDescription:
+                        'Créez les entreprises, provisionnez leur premier administrateur et définissez les limites contractuelles de chaque licence.',
+                    icon: FluentIcons.cloud,
+                  ),
           );
 
+          final metricWidth =
+              (constraints.maxWidth - horizontalPadding * 2 - 8) / 2;
           final metrics = Padding(
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: compact
-                ? Column(
+                ? Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
-                      _MetricCard(
-                        label: 'Entreprises',
-                        value: _companies.length.toString(),
-                        icon: FluentIcons.company_directory,
-                        compact: true,
+                      SizedBox(
+                        width: metricWidth,
+                        child: _MetricCard(
+                          label: 'Entreprises',
+                          value: _companies.length.toString(),
+                          icon: FluentIcons.company_directory,
+                          compact: true,
+                        ),
                       ),
-                      const SizedBox(height: 8),
-                      _MetricCard(
-                        label: 'Actives',
-                        value: active.toString(),
-                        icon: FluentIcons.check_mark,
-                        compact: true,
+                      SizedBox(
+                        width: metricWidth,
+                        child: _MetricCard(
+                          label: 'Actives',
+                          value: active.toString(),
+                          icon: FluentIcons.check_mark,
+                          compact: true,
+                        ),
                       ),
-                      const SizedBox(height: 8),
-                      _MetricCard(
-                        label: 'Licences expirées',
-                        value: expired.toString(),
-                        icon: FluentIcons.warning,
-                        compact: true,
+                      SizedBox(
+                        width: constraints.maxWidth - horizontalPadding * 2,
+                        child: _MetricCard(
+                          label: 'Licences expirées',
+                          value: expired.toString(),
+                          icon: FluentIcons.warning,
+                          compact: true,
+                        ),
                       ),
                     ],
                   )
@@ -511,6 +548,10 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   header,
+                  if (!_repository.canCreateCompany) ...[
+                    provisioningNotice,
+                    const SizedBox(height: 10),
+                  ],
                   metrics,
                   controls,
                   Padding(
