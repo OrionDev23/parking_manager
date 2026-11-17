@@ -162,7 +162,7 @@ async function prepareCompanyRows(companyId, teamId) {
     '6537d87b492c80f255e8', '6531ad22153b2a49ca2c', 'etat', 'doc_vehic',
     'reparation', 'activity', 'chauf_disponibilite', 'doc_chauffeur',
     'entreprise', 'planning', 'prestataire', 'fichereception', 'clients',
-    'parts', 'storage', 'backup',
+    'parts', 'storage', 'backup', 'access_teams', 'access_users',
   ];
   const rowPermissions = [
     `read("team:${teamId}")`,
