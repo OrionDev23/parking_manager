@@ -168,6 +168,8 @@ class PanesListState extends State<PanesList>
     final screenWidth = MediaQuery.sizeOf(context).width;
     final compact = screenWidth < 680;
     bool portrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final isPlatformCompanyContext =
+        authService.session?.isPlatformCompanyContext == true;
     return ValueListenableBuilder(
       valueListenable: signedIn,
       builder: (BuildContext context, bool value, Widget? child) {
@@ -179,14 +181,20 @@ class PanesListState extends State<PanesList>
               transitionBuilder: (w, d) =>
                   DrillInPageTransition(animation: d, child: w),
               titleBar: Container(
-                height: compact ? 58 : 65.px,
+                height: (compact ? 58 : 65.px) +
+                    (isPlatformCompanyContext ? (compact ? 38 : 42) : 0),
                 color: widget.appTheme.mode == ThemeMode.dark
                     ? Colors.grey[220]
                     : Colors.white,
-                child: DragToMoveArea(
-                  child: Align(
-                    alignment: AlignmentDirectional.centerStart,
-                    child: Row(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      height: compact ? 58 : 65.px,
+                      child: DragToMoveArea(
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Row(
                       children: [
                         Image.asset(
                           'assets/images/logo.webp',
@@ -249,8 +257,68 @@ class PanesListState extends State<PanesList>
                               Platform.isWindows)
                             const WindowButtons(),
                       ],
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    if (isPlatformCompanyContext)
+                      Container(
+                        height: compact ? 38 : 42,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: compact ? 10 : 18,
+                        ),
+                        color: widget.appTheme.mode == ThemeMode.dark
+                            ? const Color(0xFF493515)
+                            : const Color(0xFFFFF1D6),
+                        child: Row(
+                          children: [
+                            Icon(
+                              FluentIcons.shield,
+                              size: compact ? 14 : 16,
+                              color: widget.appTheme.mode == ThemeMode.dark
+                                  ? const Color(0xFFFFD27A)
+                                  : const Color(0xFF8A5700),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                compact
+                                    ? 'SUPERVISION • MODE SUPER ADMIN'
+                                    : 'MODE SUPERVISION — Vous consultez une entreprise avec les privilèges Super Admin',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: compact ? 10 : 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: widget.appTheme.mode == ThemeMode.dark
+                                      ? const Color(0xFFFFD27A)
+                                      : const Color(0xFF704600),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Button(
+                              onPressed: () async {
+                                try {
+                                  await authService.returnToPlatformContext();
+                                } catch (error) {
+                                  if (!context.mounted) return;
+                                  displayMessage(
+                                    context,
+                                    error.toString().replaceFirst('Bad state: ', ''),
+                                    InfoBarSeverity.error,
+                                  );
+                                }
+                              },
+                              child: Text(
+                                compact ? 'Retour' : 'Retour plateforme',
+                                style: const TextStyle(fontSize: 11),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
               ),
               pane: NavigationPane(
