@@ -132,6 +132,11 @@ class BackupUploaderState extends State<BackupUploader> {
           .createFile(
             bucketId: backupId,
             fileId: id!,
+            permissions: [
+              Permission.read(Role.team(DatabaseGetter.activeCompanyTeamId!)),
+              Permission.update(Role.team(DatabaseGetter.activeCompanyTeamId!, 'admin')),
+              Permission.delete(Role.team(DatabaseGetter.activeCompanyTeamId!, 'admin')),
+            ],
             file: InputFile.fromBytes(
               bytes: file!,
               filename:
