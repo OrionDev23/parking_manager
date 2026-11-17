@@ -154,23 +154,26 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                     itemBuilder: (context, index) {
                       final table = tables[index];
                       final hasCompanyId = table['hasCompanyId'] == true;
+                      final serverManaged = table['serverManaged'] == true;
                       final rowSecurity = table['rowSecurity'] == true;
                       final unassigned = (table['unassignedRows'] as num?)?.toInt();
                       final missingAcl = (table['rowsWithoutPermissions'] as num?)?.toInt() ?? 0;
                       final broad = table['broadTablePermissions'] is List
                           ? (table['broadTablePermissions'] as List).length
                           : 0;
-                      final status = !hasCompanyId
-                          ? 'Classification requise'
-                          : !rowSecurity
+                      final status = serverManaged
+                          ? 'Table gérée côté serveur'
+                          : !hasCompanyId
+                              ? 'Classification requise'
+                              : !rowSecurity
                               ? 'Sécurité par ligne désactivée'
-                              : (unassigned ?? 0) > 0
-                                  ? '${unassigned ?? 0} ligne(s) sans entreprise'
-                                  : missingAcl > 0
-                                      ? '$missingAcl ligne(s) sans ACL'
-                                      : broad > 0
-                                          ? '$broad droit(s) globaux au niveau table'
-                                          : 'Structure de ligne cohérente';
+                                  : (unassigned ?? 0) > 0
+                                      ? '${unassigned ?? 0} ligne(s) sans entreprise'
+                                      : missingAcl > 0
+                                          ? '$missingAcl ligne(s) sans ACL'
+                                          : broad > 0
+                                              ? '$broad droit(s) globaux au niveau table'
+                                              : 'Structure de ligne cohérente';
                       return Card(
                         child: Padding(
                           padding: const EdgeInsets.all(10),
@@ -190,11 +193,13 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                hasCompanyId
-                                    ? '${table['companyRows'] ?? 0} lignes entreprise / '
-                                      '${table['totalRows'] ?? 0} au total • '
-                                      '$missingAcl sans ACL • $broad droits globaux'
-                                    : 'Pas de colonne companyId • $broad droits globaux',
+                                serverManaged
+                                    ? 'Données accessibles uniquement par le service serveur'
+                                    : hasCompanyId
+                                        ? '${table['companyRows'] ?? 0} lignes entreprise / '
+                                          '${table['totalRows'] ?? 0} au total • '
+                                          '$missingAcl sans ACL • $broad droits globaux'
+                                        : 'Pas de colonne companyId • $broad droits globaux',
                               ),
                             ],
                           ),
