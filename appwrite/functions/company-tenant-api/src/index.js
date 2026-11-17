@@ -117,6 +117,16 @@ async function getEntitlement(companyId) {
   }
 }
 
+function isEntitlementActive(entitlement, now = Date.now()) {
+  if (!entitlement || typeof entitlement !== 'object') return false;
+  const startsAt = Date.parse(entitlement.startsAt || '');
+  const expiresAt = Date.parse(entitlement.expiresAt || '');
+  return Number.isFinite(startsAt) &&
+    Number.isFinite(expiresAt) &&
+    startsAt <= now &&
+    expiresAt > now;
+}
+
 async function getCompany(companyId) {
   try {
     return await appwrite(`/tablesdb/${DATABASE_ID}/tables/${COMPANIES}/rows/${encodeURIComponent(companyId)}`);
@@ -155,6 +165,16 @@ async function requireCompanyAdmin(userId, companyId) {
     failure.status = 404;
     throw failure;
   }
+  // Platform administrators may inspect/manage a tenant during exploration.
+  // Tenant administrators must have a valid, currently active entitlement.
+  if (!platformExploration) {
+    const entitlement = await getEntitlement(companyId);
+    if (!isEntitlementActive(entitlement)) {
+      const failure = new Error('The company license is missing, not yet active, or expired.');
+      failure.status = 403;
+      throw failure;
+    }
+  }
   return membership;
 }
 
@@ -169,13 +189,10 @@ async function prepareCompanyRows(companyId, teamId) {
   const company = await getCompany(companyId);
   if (!company) throw Object.assign(new Error('Company not found.'), { status: 404 });
   const entitlement = await getEntitlement(companyId);
-  const now = Date.now();
-  const startsAt = entitlement ? Date.parse(entitlement.startsAt || '') : NaN;
-  const expiresAt = entitlement ? Date.parse(entitlement.expiresAt || '') : NaN;
-  const licenseActive = !entitlement ||
-    (Number.isFinite(startsAt) && Number.isFinite(expiresAt) &&
-      startsAt <= now && expiresAt > now);
-  const isActive = company.data?.status === 'active' && licenseActive;
+  // Missing or malformed entitlements are denied by default. Legacy migration
+  // must create a valid entitlement before restoring tenant write access.
+  const isActive = company.data?.status === 'active' &&
+    isEntitlementActive(entitlement);
   // Global user profiles, system settings and shared reference tables are excluded.
   const tableIds = TENANT_TABLE_IDS;
   const rowPermissions = [
@@ -281,11 +298,9 @@ async function prepareCompanyRows(companyId, teamId) {
 }
 
 function companyEntitlementPermissions(teamId) {
-  return [
-    `read("team:${teamId}")`,
-    `update("team:${teamId}/admin")`,
-    `delete("team:${teamId}/admin")`,
-  ];
+  // Entitlements are billing/security state. Tenant clients may inspect them,
+  // but only the trusted server function may mutate or delete them.
+  return [`read("team:${teamId}")`];
 }
 
 async function ensureCompanyProfile(companyId, companyName, teamId, now, profile = {}) {
@@ -1323,8 +1338,6 @@ export default async ({ req, res, log, error }) => {
         );
         profileCreated = profile.created;
         profileRowId = profile.rowId;
-        await prepareCompanyRows(companyId, teamId);
-        await syncTeamMembership(teamId, adminUserId, 'owner', adminName);
         await createRow(
           ENTITLEMENTS,
           companyId,
@@ -1332,6 +1345,8 @@ export default async ({ req, res, log, error }) => {
           companyEntitlementPermissions(teamId),
         );
         entitlementCreated = true;
+        await prepareCompanyRows(companyId, teamId);
+        await syncTeamMembership(teamId, adminUserId, 'owner', adminName);
         await createRow(MEMBERSHIPS, membershipId, {
           companyId, userId: adminUserId, role: 'admin', status: 'active',
           invitedBy: userId, createdAt: now, updatedAt: now,
