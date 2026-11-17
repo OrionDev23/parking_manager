@@ -136,7 +136,14 @@ async function activeMembership(userId, companyId) {
 
 async function requireCompanyAdmin(userId, companyId) {
   const membership = await activeMembership(userId, companyId);
-  if (!membership || !['owner', 'admin'].includes(membership.data.role)) {
+  let platformExploration = false;
+  if (isPlatformSuperAdmin(userId)) {
+    const prefs = await readUserPrefs(userId);
+    platformExploration =
+      prefs.parcotoPlatformExploration?.companyId === companyId;
+  }
+  if (!platformExploration &&
+      (!membership || !['owner', 'admin'].includes(membership.data.role))) {
     const failure = new Error('You are not authorized to administer this company.');
     failure.status = 403;
     throw failure;
