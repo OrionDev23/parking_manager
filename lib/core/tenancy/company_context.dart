@@ -4,5 +4,10 @@ class CompanyContext {
   final String? profileRowId;
   final String? siteId;
 
-  const CompanyContext({required this.companyId, this.siteId});
+  const CompanyContext({
+    required this.companyId,
+    this.teamId,
+    this.profileRowId,
+    this.siteId,
+  });
 }
