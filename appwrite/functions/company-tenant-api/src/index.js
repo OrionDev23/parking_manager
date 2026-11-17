@@ -2,6 +2,7 @@ const DATABASE_ID = '6531ad112080ae3b14a7';
 const MEMBERSHIPS = 'company_memberships';
 const COMPANIES = 'companies';
 const ENTITLEMENTS = 'company_entitlements';
+const COMPANY_PROFILE = 'entreprise';
 
 const endpoint = (process.env.APPWRITE_FUNCTION_API_ENDPOINT || 'https://fra.cloud.appwrite.io/v1').replace(/\/$/, '');
 const projectId = process.env.APPWRITE_FUNCTION_PROJECT_ID;
@@ -139,11 +140,55 @@ async function requireCompanyAdmin(userId, companyId) {
   return membership;
 }
 
-async function createRow(tableId, rowId, data) {
+async function createRow(tableId, rowId, data, permissions = []) {
   return appwrite(`/tablesdb/${DATABASE_ID}/tables/${tableId}/rows`, {
     method: 'POST',
-    body: { rowId, data, permissions: [] },
+    body: { rowId, data, permissions },
   });
+}
+
+async function ensureCompanyProfile(companyId, companyName, teamId, now, profile = {}) {
+  const permissions = [
+    `read("team:${teamId}")`,
+    `update("team:${teamId}/admin")`,
+    `update("team:${teamId}/manager")`,
+    `delete("team:${teamId}/admin")`,
+  ];
+  const existingRows = await listRows(COMPANY_PROFILE, {
+    method: 'equal', attribute: 'companyId', values: [companyId],
+  });
+  if (existingRows.length) {
+    const existing = existingRows[0];
+    await appwrite(
+      `/tablesdb/${DATABASE_ID}/tables/${COMPANY_PROFILE}/rows/${encodeURIComponent(existing.$id)}`,
+      { method: 'PATCH', body: { permissions } },
+    );
+    return { rowId: existing.$id, created: false };
+  }
+
+  const rowId = companyId.length <= 36 ? companyId : crypto.randomUUID();
+  const name = String(profile.name || companyName).trim();
+  const address = String(profile.address || '').trim();
+  const data = {
+    nom: name,
+    adresse: address,
+    telephone: String(profile.phone || '').trim(),
+    email: String(profile.email || '').trim(),
+    nif: String(profile.nif || '').trim(),
+    nis: String(profile.nis || '').trim(),
+    rc: String(profile.rc || '').trim(),
+    art: String(profile.art || '').trim(),
+    description: String(profile.description || '').trim(),
+    logo: '',
+    filiales: [],
+    directions: [],
+    departments: [],
+    search: [name, address, profile.phone, profile.email, profile.nif, profile.nis, profile.rc, profile.art]
+      .filter(Boolean).join(' ').slice(0, 2000),
+    companyId,
+  };
+  await createRow(COMPANY_PROFILE, rowId, data, permissions);
+  return { rowId, created: true };
 }
 
 async function listTeamMemberships(teamId) {
@@ -241,6 +286,7 @@ export default async ({ req, res, log, error }) => {
         const account = await appwrite(`/users/${encodeURIComponent(userId)}`);
         accountName = account.name || '';
       } catch (_) {}
+      await ensureCompanyProfile(companyId, company.data?.name || companyId, teamId, now);
       const membership = await syncTeamMembership(teamId, userId, 'admin', accountName);
       return json(res, 200, {
         ok: true,
