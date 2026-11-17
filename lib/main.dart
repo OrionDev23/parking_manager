@@ -137,11 +137,13 @@ Future<void> _configureSessionRuntime(String companyId) async {
     final nextVehicles = await VehicleServices.create(
       preferences: prefs,
       companyId: companyId,
+      teamId: authService.session?.company.teamId,
     );
     final nextDrivers = await DriverServices.create(
       preferences: prefs,
       companyId: companyId,
       appwriteProjectId: appwriteProjectId,
+      teamId: authService.session?.company.teamId,
     );
     final nextStock = LegacyStockSyncService(
       localDatabase: nextVehicles.localDatabase,
