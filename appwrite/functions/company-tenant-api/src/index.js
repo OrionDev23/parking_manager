@@ -478,8 +478,13 @@ async function restorePlatformExploration(userId) {
     }
   }
 
+  // Appwrite rejects an empty preferences object. Keep a harmless marker
+  // after restoration so the preference payload remains a valid non-empty
+  // object and subsequent platform logins do not fail with "Invalid prefs".
   const nextPrefs = { ...prefs };
-  delete nextPrefs.parcotoPlatformExploration;
+  nextPrefs.parcotoPlatformExploration = {
+    restoredAt: new Date().toISOString(),
+  };
   await writeUserPrefs(userId, nextPrefs);
   return true;
 }
@@ -511,13 +516,24 @@ export default async (context) => requestContext.run(
 
     if (action === 'platform_resolve') {
       requirePlatformSuperAdmin(userId);
-      await restorePlatformExploration(userId);
+      try {
+        await restorePlatformExploration(userId);
+      } catch (failure) {
+        // Never lock the platform Super Admin out of the control center because
+        // tenant-exploration cleanup failed. Keep the error visible in logs.
+        log(`Platform exploration restoration deferred for ${userId}: ${failure.message}`);
+      }
       return json(res, 200, { ok: true, userId, isPlatformSuperAdmin: true });
     }
 
     if (action === 'platform_return_to_platform') {
       requirePlatformSuperAdmin(userId);
-      const restored = await restorePlatformExploration(userId);
+      let restored = false;
+      try {
+        restored = await restorePlatformExploration(userId);
+      } catch (failure) {
+        log(`Platform return cleanup deferred for ${userId}: ${failure.message}`);
+      }
       return json(res, 200, { ok: true, restored, userId, isPlatformSuperAdmin: true });
     }
 
