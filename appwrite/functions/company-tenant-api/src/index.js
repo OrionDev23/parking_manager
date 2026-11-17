@@ -146,6 +146,59 @@ async function createRow(tableId, rowId, data) {
   });
 }
 
+async function listTeamMemberships(teamId) {
+  const memberships = [];
+  let offset = 0;
+  while (true) {
+    const params = new URLSearchParams();
+    params.append('queries[]', JSON.stringify({ method: 'limit', values: [100] }));
+    params.append('queries[]', JSON.stringify({ method: 'offset', values: [offset] }));
+    const result = await appwrite(`/teams/${encodeURIComponent(teamId)}/memberships?${params.toString()}`);
+    const page = result.memberships || [];
+    memberships.push(...page);
+    if (page.length < 100) break;
+    offset += page.length;
+  }
+  return memberships;
+}
+
+function teamRolesForMembership(role, existingRoles = []) {
+  if (existingRoles.includes('owner')) return ['owner', 'admin'];
+  if (role === 'owner') return ['owner', 'admin'];
+  return [role || 'viewer'];
+}
+
+async function syncTeamMembership(teamId, userId, role, name = '') {
+  const existing = (await listTeamMemberships(teamId)).find(item => item.userId === userId);
+  const roles = teamRolesForMembership(role, existing?.roles || []);
+  if (existing) {
+    return appwrite(`/teams/${encodeURIComponent(teamId)}/memberships/${encodeURIComponent(existing.$id)}`, {
+      method: 'PATCH',
+      body: { roles },
+    });
+  }
+  return appwrite(`/teams/${encodeURIComponent(teamId)}/memberships`, {
+    method: 'POST',
+    body: { userId, roles, name: name || undefined },
+  });
+}
+
+async function removeTeamMembership(teamId, userId) {
+  const existing = (await listTeamMemberships(teamId)).find(item => item.userId === userId);
+  if (!existing) return false;
+  await appwrite(`/teams/${encodeURIComponent(teamId)}/memberships/${encodeURIComponent(existing.$id)}`, {
+    method: 'DELETE',
+  });
+  return true;
+}
+
+async function createCompanyTeam(teamId, name) {
+  return appwrite('/teams', {
+    method: 'POST',
+    body: { teamId, name },
+  });
+}
+
 function slugify(value) {
   return value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
     .toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 64);
@@ -208,6 +261,49 @@ export default async ({ req, res, log, error }) => {
       return json(res, 200, { ok: true, companies: result });
     }
 
+
+    if (action === 'platform_provision_company_team') {
+      requirePlatformSuperAdmin(userId);
+      const companyId = String(input.companyId || '');
+      if (!companyId) return json(res, 400, { ok: false, message: 'companyId is required.' });
+      const company = await getCompany(companyId);
+      if (!company || company.data?.status !== 'active') {
+        return json(res, 404, { ok: false, message: 'Active company not found.' });
+      }
+      let teamId = String(company.data?.teamId || '').trim();
+      if (!teamId) {
+        teamId = `pc-${companyId.replace(/[^a-zA-Z0-9._-]/g, '-').slice(0, 32)}`;
+        try {
+          await createCompanyTeam(teamId, `Parcoto — ${company.data?.name || companyId}`);
+        } catch (failure) {
+          if (failure.status !== 409) throw failure;
+          const existingTeam = await appwrite(`/teams/${encodeURIComponent(teamId)}`);
+          if (!existingTeam?.$id) throw failure;
+        }
+        await appwrite(`/tablesdb/${DATABASE_ID}/tables/${COMPANIES}/rows/${encodeURIComponent(companyId)}`, {
+          method: 'PATCH',
+          body: { data: { teamId, updatedAt: now } },
+        });
+      }
+      const memberships = await listRows(MEMBERSHIPS, {
+        method: 'equal', attribute: 'companyId', values: [companyId],
+      });
+      const synchronized = [];
+      for (const membership of memberships.filter(item => item.data?.status === 'active')) {
+        const role = membership.data.role || 'viewer';
+        let accountName = '';
+        try {
+          const account = await appwrite(`/users/${encodeURIComponent(membership.data.userId)}`);
+          accountName = account.name || '';
+        } catch (_) {}
+        const teamMembership = await syncTeamMembership(
+          teamId, membership.data.userId, role, accountName,
+        );
+        synchronized.push({ userId: membership.data.userId, teamMembershipId: teamMembership.$id, roles: teamMembership.roles });
+      }
+      return json(res, 200, { ok: true, companyId, teamId, synchronized });
+    }
+
     if (action === 'create_company') {
       requirePlatformSuperAdmin(userId);
       if (process.env.TENANT_COMPANY_CREATION_ENABLED !== 'true') {
@@ -254,9 +350,11 @@ export default async ({ req, res, log, error }) => {
         notes: String(input.notes || '').trim().slice(0, 2000),
         createdAt: now, updatedAt: now,
       };
+      const teamId = `pc-${companyId.slice(0, 32)}`;
       let accountCreated = false;
       let companyCreated = false;
       let entitlementCreated = false;
+      let teamCreated = false;
       try {
         if (!existingAdmin) {
           await appwrite('/users', {
@@ -266,9 +364,12 @@ export default async ({ req, res, log, error }) => {
           accountCreated = true;
         }
         await createRow(COMPANIES, companyId, {
-          name, slug, status: 'active', ownerUserId: adminUserId, createdAt: now, updatedAt: now,
+          name, slug, status: 'active', ownerUserId: adminUserId, teamId, createdAt: now, updatedAt: now,
         });
         companyCreated = true;
+        await createCompanyTeam(teamId, `Parcoto — ${name}`);
+        teamCreated = true;
+        await syncTeamMembership(teamId, adminUserId, 'owner', adminName);
         await createRow(ENTITLEMENTS, companyId, entitlement);
         entitlementCreated = true;
         await createRow(MEMBERSHIPS, membershipId, {
@@ -278,6 +379,9 @@ export default async ({ req, res, log, error }) => {
       } catch (failure) {
         if (entitlementCreated) {
           try { await appwrite(`/tablesdb/${DATABASE_ID}/tables/${ENTITLEMENTS}/rows/${companyId}`, { method: 'DELETE' }); } catch (_) {}
+        }
+        if (teamCreated) {
+          try { await appwrite(`/teams/${encodeURIComponent(teamId)}`, { method: 'DELETE' }); } catch (_) {}
         }
         if (companyCreated) {
           try { await appwrite(`/tablesdb/${DATABASE_ID}/tables/${COMPANIES}/rows/${companyId}`, { method: 'DELETE' }); } catch (_) {}
@@ -368,6 +472,11 @@ export default async ({ req, res, log, error }) => {
       } else {
         await createRow(MEMBERSHIPS, membershipId, data);
       }
+      const company = await getCompany(companyId);
+      if (!company?.data?.teamId) {
+        return json(res, 409, { ok: false, message: 'Company team is not provisioned. Ask the platform administrator to provision it first.' });
+      }
+      await syncTeamMembership(company.data.teamId, target.$id, role, target.name || '');
       return json(res, 201, { ok: true, membershipId, userId: target.$id, email, role });
     }
 
@@ -389,6 +498,10 @@ export default async ({ req, res, log, error }) => {
       await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
         method: 'PATCH', body: { data: { role, updatedAt: now } },
       });
+      const company = await getCompany(companyId);
+      if (company?.data?.teamId) {
+        await syncTeamMembership(company.data.teamId, target.data.userId, role);
+      }
       return json(res, 200, { ok: true });
     }
 
@@ -409,6 +522,10 @@ export default async ({ req, res, log, error }) => {
       await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
         method: 'PATCH', body: { data: { status: 'revoked', updatedAt: now } },
       });
+      const company = await getCompany(companyId);
+      if (company?.data?.teamId) {
+        await removeTeamMembership(company.data.teamId, target.data.userId);
+      }
       return json(res, 200, { ok: true });
     }
 
