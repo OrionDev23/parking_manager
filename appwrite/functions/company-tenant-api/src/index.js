@@ -368,7 +368,7 @@ async function ensureCompanyProfile(companyId, companyName, teamId, now, profile
     nom: name,
     adresse: address,
     telephone: phone,
-    email,
+    ...(email ? { email } : {}),
     nif,
     nis,
     rc,
@@ -847,7 +847,10 @@ export default async (context) => requestContext.run(
         const profilePatch = {};
         for (const [field, [inputKey, maxLength]] of Object.entries(profileInput)) {
           if (Object.prototype.hasOwnProperty.call(input, inputKey)) {
-            profilePatch[field] = String(input[inputKey] ?? '').trim().slice(0, maxLength);
+            const value = String(input[inputKey] ?? '').trim().slice(0, maxLength);
+            // Appwrite email columns reject empty strings. Omit an unset optional
+            // company email instead of sending "" to the database.
+            if (field !== 'email' || value) profilePatch[field] = value;
           }
         }
         const existingProfile = profiles[0];
