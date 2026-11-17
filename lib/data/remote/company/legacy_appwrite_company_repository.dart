@@ -15,13 +15,23 @@ class LegacyAppwriteCompanyRepository implements CompanyRepository {
       throw StateError('Appwrite database is not initialized.');
     }
 
+    final companyId = DatabaseGetter.activeCompanyId;
+    if (companyId == null) return null;
+
     try {
-      final row = await database.getRow(
+      final result = await database.listRows(
         databaseId: databaseId,
         tableId: entrepriseid,
-        rowId: '1',
+        queries: [
+          Query.equal('companyId', companyId),
+          Query.limit(1),
+        ],
       );
-      return _fromLegacy(Entreprise.fromJson(row.data));
+      if (result.rows.isEmpty) return null;
+      final row = result.rows.first;
+      return _fromLegacy(
+        row.convertTo((data) => Entreprise.fromJson(data)),
+      );
     } on AppwriteException {
       return null;
     }
@@ -51,14 +61,19 @@ class LegacyAppwriteCompanyRepository implements CompanyRepository {
       departments: List<String>.from(company.departments),
     );
 
+    final companyId = DatabaseGetter.activeCompanyId;
+    if (companyId == null) {
+      throw StateError('No active company context is selected.');
+    }
+    final data = legacy.toJson()..['companyId'] = companyId;
     final row = await database.updateRow(
       databaseId: databaseId,
       tableId: entrepriseid,
       rowId: company.id,
-      data: legacy.toJson(),
+      data: data,
     );
 
-    return _fromLegacy(Entreprise.fromJson(row.data));
+    return _fromLegacy(row.convertTo((data) => Entreprise.fromJson(data)));
   }
 
   Company _fromLegacy(Entreprise company) {
