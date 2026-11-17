@@ -1,3 +1,5 @@
+import 'package:appwrite/appwrite.dart';
+
 import '../device/device_identity.dart';
 import '../sync/sync_operation.dart';
 import '../sync/sqlite_sync_queue.dart';
