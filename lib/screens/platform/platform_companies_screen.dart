@@ -1375,6 +1375,7 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
   final _adminName = TextEditingController();
   final _adminEmail = TextEditingController();
   final _adminPassword = TextEditingController();
+  final _adminPasswordConfirm = TextEditingController();
   final _startsAt = TextEditingController(
     text: DateTime.now().toIso8601String().substring(0, 10),
   );
@@ -1409,6 +1410,7 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
       _adminName,
       _adminEmail,
       _adminPassword,
+      _adminPasswordConfirm,
       _startsAt,
       _expiresAt,
       _maxUsers,
@@ -1486,6 +1488,8 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
     if (_name.text.trim().length < 2 ||
         _adminName.text.trim().length < 2 ||
         !_adminEmail.text.trim().contains('@') ||
+        (_adminPassword.text.isNotEmpty &&
+            _adminPassword.text != _adminPasswordConfirm.text) ||
         starts == null ||
         expires == null ||
         maxUsers == null ||
@@ -1607,6 +1611,11 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
                     _adminPassword,
                     password: true,
                     placeholder: 'Obligatoire uniquement pour un nouveau compte',
+                  ),
+                  _field(
+                    'Confirmer le mot de passe',
+                    _adminPasswordConfirm,
+                    password: true,
                   ),
                 ],
               ),
