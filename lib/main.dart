@@ -153,6 +153,7 @@ Future<void> _configureSessionRuntime(String companyId) async {
         idFactory: () => 'desktop_${DateTime.now().microsecondsSinceEpoch}',
       ),
       companyId: companyId,
+      teamId: authService.session?.company.teamId,
     );
     final nextEngine = AppwriteSyncEngine(
       queue: nextVehicles.syncQueue,
