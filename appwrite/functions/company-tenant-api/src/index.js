@@ -577,12 +577,27 @@ export default async ({ req, res, log, error }) => {
         const memberships = await listRows(MEMBERSHIPS, {
           method: 'equal', attribute: 'companyId', values: [company.$id],
         });
+        const profiles = await listRows(COMPANY_PROFILE, {
+          method: 'equal', attribute: 'companyId', values: [company.$id],
+        });
+        const profile = profiles[0]?.data || {};
         result.push({
           companyId: company.$id,
           name: company.data?.name || '',
           slug: company.data?.slug || '',
           status: company.data?.status || 'active',
           createdAt: company.data?.createdAt || '',
+          profile: {
+            legalName: profile.nom || '',
+            address: profile.adresse || '',
+            phone: profile.telephone || '',
+            email: profile.email || '',
+            nif: profile.nif || '',
+            nis: profile.nis || '',
+            rc: profile.rc || '',
+            art: profile.art || '',
+            description: profile.description || '',
+          },
           entitlement,
           activeUsers: memberships.filter(item => item.data?.status === 'active').length,
         });
@@ -737,23 +752,59 @@ export default async ({ req, res, log, error }) => {
         const profiles = await listRows(COMPANY_PROFILE, {
           method: 'equal', attribute: 'companyId', values: [companyId],
         });
-        if (profiles[0] && profiles[0].data?.nom === company.data?.name) {
-          await appwrite(
-            `/tablesdb/${DATABASE_ID}/tables/${COMPANY_PROFILE}/rows/${encodeURIComponent(profiles[0].$id)}`,
-            {
-              method: 'PATCH',
-              body: {
-                data: {
-                  nom: name.slice(0, 60),
-                  search: [name, profiles[0].data?.adresse, profiles[0].data?.telephone, profiles[0].data?.email]
-                    .filter(Boolean).join(' ').slice(0, 400),
-                },
-              },
+        const profileInput = {
+          nom: ['companyLegalName', 60],
+          adresse: ['address', 100],
+          telephone: ['phone', 15],
+          email: ['companyEmail', 254],
+          nif: ['nif', 30],
+          nis: ['nis', 30],
+          rc: ['rc', 30],
+          art: ['art', 30],
+          description: ['description', 80],
+        };
+        const profilePatch = {};
+        for (const [field, [inputKey, maxLength]] of Object.entries(profileInput)) {
+          if (Object.prototype.hasOwnProperty.call(input, inputKey)) {
+            profilePatch[field] = String(input[inputKey] ?? '').trim().slice(0, maxLength);
+          }
+        }
+        const existingProfile = profiles[0];
+        if (!existingProfile && company.data?.teamId) {
+          const profile = await ensureCompanyProfile(
+            companyId, name, company.data.teamId, now, {
+              name: profilePatch.nom || name,
+              address: profilePatch.adresse || '',
+              phone: profilePatch.telephone || '',
+              email: profilePatch.email || '',
+              nif: profilePatch.nif || '',
+              nis: profilePatch.nis || '',
+              rc: profilePatch.rc || '',
+              art: profilePatch.art || '',
+              description: profilePatch.description || '',
             },
           );
+          log(`Company profile provisioned for ${companyId}: ${profile.rowId}`);
+        } else if (existingProfile) {
+          if (!Object.prototype.hasOwnProperty.call(profilePatch, 'nom') &&
+              existingProfile.data?.nom === company.data?.name) {
+            profilePatch.nom = name.slice(0, 60);
+          }
+          if (Object.keys(profilePatch).length) {
+            const nextProfile = { ...existingProfile.data, ...profilePatch };
+            profilePatch.search = [
+              nextProfile.nom, nextProfile.adresse, nextProfile.telephone,
+              nextProfile.email, nextProfile.nif, nextProfile.nis,
+              nextProfile.rc, nextProfile.art,
+            ].filter(Boolean).join(' ').slice(0, 400);
+            await appwrite(
+              `/tablesdb/${DATABASE_ID}/tables/${COMPANY_PROFILE}/rows/${encodeURIComponent(existingProfile.$id)}`,
+              { method: 'PATCH', body: { data: profilePatch } },
+            );
+          }
         }
       } catch (failure) {
-        log(`Company profile name sync skipped for ${companyId}: ${failure.message}`);
+        log(`Company profile sync skipped for ${companyId}: ${failure.message}`);
       }
 
       return json(res, 200, {
