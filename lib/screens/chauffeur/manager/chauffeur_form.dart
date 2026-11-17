@@ -781,11 +781,10 @@ class ChauffeurFormState extends State<ChauffeurForm> {
         chauffeur: chaufID!,
         chauffeurNom: '${nom.text} ${prenom.text}',
       );
-      return await DatabaseGetter.database!
-          .createRow(
-            databaseId: databaseId,
-            tableId: chaufDispID,
-            rowId: etatID!,
+      return await DatabaseGetter()
+          .addDocument(
+            collectionId: chaufDispID,
+            documentId: etatID!,
             data: disp!.toJson(),
           )
           .then((value) {
@@ -794,7 +793,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
               etatID!,
               docName: disp?.chauffeurNom,
             );
-            return value as Row;
+            return value;
           });
     } else {
       return null;
