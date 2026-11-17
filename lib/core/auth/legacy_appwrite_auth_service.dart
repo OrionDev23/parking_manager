@@ -319,6 +319,7 @@ class LegacyAppwriteAuthService implements AuthService {
       throw StateError('Aucune session Super Admin plateforme active.');
     }
     await onSessionEnding?.call();
+    await membershipResolver.returnToPlatformContext();
     await DatabaseGetter.setActiveCompanyId(null);
     _session = _buildPlatformSession();
     _setState(AuthState.signedIn);
@@ -355,6 +356,10 @@ class LegacyAppwriteAuthService implements AuthService {
     _setState(AuthState.signingOut);
     try {
       await onSessionEnding?.call();
+      if (_session?.isPlatformSuperAdmin == true &&
+          _session?.isPlatformCompanyContext == true) {
+        await membershipResolver.returnToPlatformContext();
+      }
       await DatabaseGetter.account?.deleteSession(sessionId: 'current');
     } finally {
       await DatabaseGetter.setActiveCompanyId(null);
