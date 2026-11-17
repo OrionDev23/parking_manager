@@ -523,10 +523,9 @@ class StateFormState extends State<StateForm> {
 
       DatabaseGetter().ajoutActivity(5, documentID!, docName: etat.vehicleMat);
     } else {
-      await DatabaseGetter.database!.createRow(
-        databaseId: databaseId,
-        tableId: etatId,
-        rowId: documentID!,
+      await DatabaseGetter().addDocument(
+        collectionId: etatId,
+        documentId: documentID!,
         data: etat.toJson(),
       );
       DatabaseGetter().ajoutActivity(4, documentID!, docName: etat.vehicleMat);
