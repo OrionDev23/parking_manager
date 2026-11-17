@@ -1,4 +1,3 @@
-import 'package:appwrite/appwrite.dart';
 import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart' hide ColorPicker;
