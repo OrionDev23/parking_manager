@@ -438,6 +438,10 @@ export default async ({ req, res, log, error }) => {
       if (role === 'admin') {
         return json(res, 403, { ok: false, message: 'Company administrators cannot create or promote other administrators.' });
       }
+      const company = await getCompany(companyId);
+      if (!company?.data?.teamId) {
+        return json(res, 409, { ok: false, message: 'Company team is not provisioned. Ask the platform administrator to provision it first.' });
+      }
       const entitlement = await getEntitlement(companyId);
       if (entitlement) {
         const existingMembers = await listRows(MEMBERSHIPS, {
@@ -465,18 +469,19 @@ export default async ({ req, res, log, error }) => {
         companyId, userId: target.$id, role, status: 'active',
         invitedBy: userId, createdAt: current?.data?.createdAt || now, updatedAt: now,
       };
-      if (current) {
-        await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
-          method: 'PATCH', body: { data },
-        });
-      } else {
-        await createRow(MEMBERSHIPS, membershipId, data);
-      }
-      const company = await getCompany(companyId);
-      if (!company?.data?.teamId) {
-        return json(res, 409, { ok: false, message: 'Company team is not provisioned. Ask the platform administrator to provision it first.' });
-      }
       await syncTeamMembership(company.data.teamId, target.$id, role, target.name || '');
+      try {
+        if (current) {
+          await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
+            method: 'PATCH', body: { data },
+          });
+        } else {
+          await createRow(MEMBERSHIPS, membershipId, data);
+        }
+      } catch (failure) {
+        try { await removeTeamMembership(company.data.teamId, target.$id); } catch (_) {}
+        throw failure;
+      }
       return json(res, 201, { ok: true, membershipId, userId: target.$id, email, role });
     }
 
@@ -495,13 +500,13 @@ export default async ({ req, res, log, error }) => {
       if (target.data?.role === 'admin') {
         return json(res, 403, { ok: false, message: 'Company administrator accounts are managed only by the platform.' });
       }
-      await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
-        method: 'PATCH', body: { data: { role, updatedAt: now } },
-      });
       const company = await getCompany(companyId);
       if (company?.data?.teamId) {
         await syncTeamMembership(company.data.teamId, target.data.userId, role);
       }
+      await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
+        method: 'PATCH', body: { data: { role, updatedAt: now } },
+      });
       return json(res, 200, { ok: true });
     }
 
@@ -519,13 +524,13 @@ export default async ({ req, res, log, error }) => {
       if (target.data?.role === 'admin') {
         return json(res, 403, { ok: false, message: 'Company administrator accounts are managed only by the platform.' });
       }
-      await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
-        method: 'PATCH', body: { data: { status: 'revoked', updatedAt: now } },
-      });
       const company = await getCompany(companyId);
       if (company?.data?.teamId) {
         await removeTeamMembership(company.data.teamId, target.data.userId);
       }
+      await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
+        method: 'PATCH', body: { data: { status: 'revoked', updatedAt: now } },
+      });
       return json(res, 200, { ok: true });
     }
 
