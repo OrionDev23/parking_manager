@@ -9,9 +9,8 @@ import '../../providers/client_database.dart' as legacy;
 
 /// Local-first persistence and outbox adapter for the legacy stock catalogue.
 ///
-/// The legacy Appwrite tables are already provisioned per ParcOto installation.
-/// Company identity is therefore enforced in SQLite and in the outbox; it is
-/// intentionally not injected as an unknown Appwrite column.
+/// Tenant-owned stock rows are scoped by companyId in Appwrite as well as in
+/// the local cache/outbox. Shared lookup catalogs remain installation-wide.
 class LegacyStockSyncService {
   static const tableByEntity = <String, String>{
     'part': legacy.partsID,
@@ -26,13 +25,31 @@ class LegacyStockSyncService {
   final SqliteSyncQueue queue;
   final DeviceIdentity deviceIdentity;
   final String companyId;
+  final String? teamId;
 
   LegacyStockSyncService({
     required this.localDatabase,
     required this.queue,
     required this.deviceIdentity,
     required this.companyId,
+    this.teamId,
   });
+
+  bool _isTenantScoped(String entity) =>
+      entity == 'part' || entity == 'storage';
+
+  List<String> _rowPermissions() {
+    final id = teamId;
+    if (id == null || id.isEmpty) {
+      throw StateError('The active company has no Appwrite team context.');
+    }
+    return [
+      Permission.read(Role.team(id)),
+      Permission.update(Role.team(id, 'admin')),
+      Permission.update(Role.team(id, 'manager')),
+      Permission.delete(Role.team(id, 'admin')),
+    ];
+  }
 
   Future<void> save({
     required String entity,
@@ -40,7 +57,9 @@ class LegacyStockSyncService {
     required Map<String, dynamic> data,
     required bool isNew,
   }) async {
-    final payload = <String, dynamic>{...data, r'$id': id};
+    final tenantScoped = _isTenantScoped(entity);
+    final rowData = tenantScoped ? {...data, 'companyId': companyId} : data;
+    final payload = <String, dynamic>{...rowData, r'$id': id};
     final deviceId = await deviceIdentity.getDeviceId();
     final now = DateTime.now().toUtc();
     // The outbox is the source of truth. Queue first so a cache write failure
@@ -53,7 +72,7 @@ class LegacyStockSyncService {
         entity: entity,
         entityId: id,
         type: isNew ? SyncOperationType.create : SyncOperationType.update,
-        payload: data,
+        payload: rowData,
         createdAt: now,
       ),
     );
@@ -112,7 +131,8 @@ class LegacyStockSyncService {
           databaseId: legacy.databaseId,
           tableId: tableId,
           queries: [
-            Query.greaterThan(r'$updatedAt', since.toIso8601String()),
+            if (_isTenantScoped(entity)) Query.equal('companyId', companyId),
+          Query.greaterThan(r'$updatedAt', since.toIso8601String()),
             Query.orderAsc(r'$id'),
             if (lastId != null) Query.cursorAfter(lastId),
             Query.limit(100),
@@ -185,6 +205,7 @@ class LegacyStockSyncService {
             databaseId: legacy.databaseId,
             tableId: entry.value,
             queries: [
+              if (_isTenantScoped(entry.key)) Query.equal('companyId', companyId),
               Query.orderAsc(r'$id'),
               if (lastId != null) Query.cursorAfter(lastId),
               Query.limit(100),
@@ -270,6 +291,7 @@ class LegacyStockSyncService {
             tableId: tableId,
             rowId: operation.entityId,
             data: operation.payload,
+            permissions: _isTenantScoped(operation.entity) ? _rowPermissions() : null,
           );
         } on AppwriteException catch (error) {
           // A timeout can happen after Appwrite committed the row. Retrying
@@ -292,19 +314,41 @@ class LegacyStockSyncService {
             tableId: tableId,
             rowId: operation.entityId,
             data: operation.payload,
+            permissions: _isTenantScoped(operation.entity) ? _rowPermissions() : null,
           );
         }
         break;
       case SyncOperationType.update:
+        if (_isTenantScoped(operation.entity)) {
+          final existing = await legacy.DatabaseGetter.database!.getRow(
+            databaseId: legacy.databaseId,
+            tableId: tableId,
+            rowId: operation.entityId,
+          );
+          if (existing.data['companyId'] != companyId) {
+            throw StateError('Stock row belongs to another company.');
+          }
+        }
         await legacy.DatabaseGetter.database!.updateRow(
           databaseId: legacy.databaseId,
           tableId: tableId,
           rowId: operation.entityId,
           data: operation.payload,
+          permissions: _isTenantScoped(operation.entity) ? _rowPermissions() : null,
         );
         break;
       case SyncOperationType.delete:
         try {
+          if (_isTenantScoped(operation.entity)) {
+            final existing = await legacy.DatabaseGetter.database!.getRow(
+              databaseId: legacy.databaseId,
+              tableId: tableId,
+              rowId: operation.entityId,
+            );
+            if (existing.data['companyId'] != companyId) {
+              throw StateError('Stock row belongs to another company.');
+            }
+          }
           await legacy.DatabaseGetter.database!.deleteRow(
             databaseId: legacy.databaseId,
             tableId: tableId,
