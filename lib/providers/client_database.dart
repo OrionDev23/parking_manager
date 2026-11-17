@@ -38,6 +38,25 @@ const brandsID = "partsbrands";
 const partsID = "parts";
 const backupId = "backup";
 const storageId = "storage";
+
+const Set<String> tenantScopedTableIds = {
+  chauffeurid,
+  vehiculeid,
+  etatId,
+  vehicDoc,
+  reparationId,
+  activityId,
+  chaufDispID,
+  chaufDoc,
+  entrepriseid,
+  planningID,
+  prestataireId,
+  fichesreceptionId,
+  clientsID,
+  partsID,
+  storageId,
+  backupId,
+};
 const endpoint = "https://fra.cloud.appwrite.io/v1";
 const appwriteProjectId = 'essais';
 String? project = appwriteProjectId;
@@ -81,6 +100,29 @@ class DatabaseGetter {
 
   static bool _isCurrentCompany(String companyId, int generation) =>
       _activeCompanyId == companyId && _companyGeneration == generation;
+
+  static bool _isTenantScoped(String tableId) =>
+      tenantScopedTableIds.contains(tableId);
+
+  static List<String> _tenantRowPermissions() {
+    final teamId = _activeCompanyTeamId;
+    if (teamId == null || teamId.isEmpty) {
+      throw StateError('The active company has no Appwrite team context.');
+    }
+    return [
+      Permission.read(Role.team(teamId)),
+      Permission.update(Role.team(teamId, 'admin')),
+      Permission.update(Role.team(teamId, 'manager')),
+      Permission.delete(Role.team(teamId, 'admin')),
+    ];
+  }
+
+  static void _assertTenantRow(String tableId, Map<String, dynamic> data) {
+    if (_isTenantScoped(tableId) &&
+        (_activeCompanyId == null || data['companyId'] != _activeCompanyId)) {
+      throw StateError('The requested row does not belong to the active company.');
+    }
+  }
 
   static Future<void> setActiveCompanyId(
     String? companyId, {
@@ -516,7 +558,11 @@ class DatabaseGetter {
       databaseId: databaseId,
       tableId: activityId,
       rowId: activity.id,
-      data: activity.toJson(),
+      data: {
+        ...activity.toJson(),
+        'companyId': _activeCompanyId,
+      },
+      permissions: _tenantRowPermissions(),
     );
   }
 
@@ -532,11 +578,16 @@ class DatabaseGetter {
     required String documentId,
     required Map<String, dynamic> data,
   }) async {
+    final tenantScoped = _isTenantScoped(collectionId);
+    final rowData = tenantScoped
+        ? {...data, 'companyId': _activeCompanyId}
+        : data;
     await database?.createRow(
       databaseId: databaseId,
       tableId: collectionId,
       rowId: documentId,
-      data: data,
+      data: rowData,
+      if (tenantScoped) permissions: _tenantRowPermissions(),
     );
   }
 
@@ -545,20 +596,34 @@ class DatabaseGetter {
     required String documentId,
     required Map<String, dynamic> data,
   }) async {
+    final tenantScoped = _isTenantScoped(collectionId);
+    if (tenantScoped) {
+      final existing = await database!.getRow(
+        databaseId: databaseId,
+        tableId: collectionId,
+        rowId: documentId,
+      );
+      _assertTenantRow(collectionId, Map<String, dynamic>.from(existing.data));
+    }
     await database?.updateRow(
       databaseId: databaseId,
       tableId: collectionId,
       rowId: documentId,
-      data: data,
+      data: tenantScoped ? {...data, 'companyId': _activeCompanyId} : data,
+      if (tenantScoped) permissions: _tenantRowPermissions(),
     );
   }
 
   Future<Row?> getDocument(String collectionId, String documentId) async {
-    return database?.getRow(
+    final row = await database?.getRow(
       databaseId: databaseId,
       tableId: collectionId,
       rowId: documentId,
     );
+    if (row != null) {
+      _assertTenantRow(collectionId, Map<String, dynamic>.from(row.data));
+    }
+    return row;
   }
 
   Future<List<Row>> listDocuments(String path) async {
@@ -578,6 +643,11 @@ class DatabaseGetter {
         databaseId: databaseId,
         tableId: path,
         queries: [
+          if (_isTenantScoped(path)) ...[
+            if (_activeCompanyId == null)
+              (throw StateError('No active company context is selected.')),
+            Query.equal('companyId', _activeCompanyId!),
+          ],
           Query.limit(pageSize),
           Query.offset(offset),
         ],
