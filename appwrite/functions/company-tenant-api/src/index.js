@@ -214,10 +214,13 @@ async function prepareCompanyRows(companyId, teamId) {
 
     // A tenant table must never inherit broad table-level read/write access.
     // Data access is granted on individual rows to the company's own team.
-    const isBroadTablePermission = permission =>
-      /^(read|create|update|delete)\("(any|users|team:1|team:managers)"\)$/.test(permission);
+    // On tenant tables, table-level permissions must never grant read,
+    // update or delete access. Those operations are exclusively row-scoped.
+    // Keep only team-scoped create grants required by the Flutter client.
     const tablePermissions = new Set(
-      (table.$permissions || []).filter(permission => !isBroadTablePermission(permission)),
+      (table.$permissions || []).filter(permission =>
+        /^create\("team:[^"]+\/(admin|manager)"\)$/.test(permission)
+      ),
     );
     let tablePermissionsChanged =
       table.rowSecurity !== true ||
