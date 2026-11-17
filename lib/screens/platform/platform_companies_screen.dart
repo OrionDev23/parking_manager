@@ -1856,7 +1856,7 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
                         child: Column(
                           children: [
                             Text(
-                              '0\${index + 1}',
+                              '0${index + 1}',
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 color: index == _step
