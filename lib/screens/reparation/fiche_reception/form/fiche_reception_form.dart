@@ -1518,10 +1518,9 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
   }
 
   Future<void> createFiche(FicheReception fiche) async {
-    await DatabaseGetter.database!.createRow(
-      databaseId: databaseId,
-      tableId: fichesreceptionId,
-      rowId: documentID!,
+    await DatabaseGetter().addDocument(
+      collectionId: fichesreceptionId,
+      documentId: documentID!,
       data: fiche.toJson(),
     );
   }
