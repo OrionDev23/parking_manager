@@ -16,6 +16,7 @@ class CompanyMembership {
   final String companySlug;
   final String role;
   final String membershipId;
+  final Map<String, dynamic> entitlement;
 
   const CompanyMembership({
     required this.companyId,
@@ -23,6 +24,7 @@ class CompanyMembership {
     required this.companySlug,
     required this.role,
     required this.membershipId,
+    this.entitlement = const {},
   });
 
   factory CompanyMembership.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,9 @@ class CompanyMembership {
       companySlug: json['companySlug']?.toString() ?? '',
       role: json['role']?.toString() ?? 'viewer',
       membershipId: json['membershipId']?.toString() ?? '',
+      entitlement: json['entitlement'] is Map
+          ? Map<String, dynamic>.from(json['entitlement'] as Map)
+          : const {},
     );
   }
 
@@ -72,7 +77,7 @@ class CompanyMembershipResolver {
     return decoded is Map && decoded['ok'] == true && decoded['isPlatformSuperAdmin'] == true;
   }
 
-  Future<void> authorizePlatformCompany(String companyId) async {
+  Future<Map<String, dynamic>> authorizePlatformCompany(String companyId) async {
     final client = DatabaseGetter.client;
     if (client == null) {
       throw StateError('Appwrite client is not initialized.');
@@ -98,6 +103,9 @@ class CompanyMembershipResolver {
             'Impossible d’ouvrir le contexte de cette entreprise.',
       );
     }
+    return response['entitlement'] is Map
+        ? Map<String, dynamic>.from(response['entitlement'] as Map)
+        : const <String, dynamic>{};
   }
 
   Future<List<CompanyMembership>> resolve() async {
