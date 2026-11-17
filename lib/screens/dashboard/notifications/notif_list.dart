@@ -32,6 +32,7 @@ class NotifListState extends State<NotifList>
   static List<PNotification> tiles = [];
 
   static bool loaded = false;
+  static String? _loadedCompanyId;
 
   @override
   void initState() {
