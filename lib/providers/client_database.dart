@@ -59,6 +59,8 @@ class DatabaseGetter {
   static ValueNotifier<ParcUser?> me = ValueNotifier(null);
   static String? _configuredProjectId;
   static String? _activeCompanyId;
+  static String? _activeCompanyTeamId;
+  static String? _activeCompanyProfileRowId;
   static int _projectGeneration = 0;
   static int _companyGeneration = 0;
   static Map<String, int> _defaultLimits = {};
@@ -74,19 +76,28 @@ class DatabaseGetter {
 
   static String? get activeProjectId => _configuredProjectId;
   static String? get activeCompanyId => _activeCompanyId;
+  static String? get activeCompanyTeamId => _activeCompanyTeamId;
+  static String? get activeCompanyProfileRowId => _activeCompanyProfileRowId;
 
   static bool _isCurrentCompany(String companyId, int generation) =>
       _activeCompanyId == companyId && _companyGeneration == generation;
 
   static Future<void> setActiveCompanyId(
     String? companyId, {
+    String? teamId,
+    String? profileRowId,
     Map<String, dynamic>? entitlement,
   }) async {
-    if (_activeCompanyId == companyId && entitlement == null &&
+    if (_activeCompanyId == companyId &&
+        _activeCompanyTeamId == teamId &&
+        _activeCompanyProfileRowId == profileRowId &&
+        entitlement == null &&
         (companyId == null || MyEntrepriseState.p != null)) {
       return;
     }
     _activeCompanyId = companyId;
+    _activeCompanyTeamId = teamId;
+    _activeCompanyProfileRowId = profileRowId;
     _companyGeneration++;
     MyEntrepriseState.p = null;
     MyEntrepriseState.logo = null;
@@ -402,8 +413,12 @@ class DatabaseGetter {
   Future<void> getEntreprise() async {
     final projectId = _configuredProjectId;
     final companyId = _activeCompanyId;
+    final profileRowId = _activeCompanyProfileRowId;
     final activeDatabase = database;
-    if (projectId == null || companyId == null || activeDatabase == null) {
+    if (projectId == null ||
+        companyId == null ||
+        profileRowId == null ||
+        activeDatabase == null) {
       return;
     }
     final projectGeneration = _projectGeneration;
@@ -412,18 +427,14 @@ class DatabaseGetter {
     if (MyEntrepriseState.p == null && !MyEntrepriseState.downloading) {
       MyEntrepriseState.downloading = true;
       try {
-        final result = await activeDatabase.listRows(
+        final row = await activeDatabase.getRow(
           databaseId: databaseId,
           tableId: entrepriseid,
-          queries: [
-            Query.equal('companyId', companyId),
-            Query.limit(1),
-          ],
+          rowId: profileRowId,
         );
         if (_isCurrentProject(projectGeneration, projectId) &&
-            _isCurrentCompany(companyId, companyGeneration) &&
-            result.rows.isNotEmpty) {
-          MyEntrepriseState.p = result.rows.first.convertTo(
+            _isCurrentCompany(companyId, companyGeneration)) {
+          MyEntrepriseState.p = row.convertTo(
             (data) => Entreprise.fromJson(data),
           );
         }
