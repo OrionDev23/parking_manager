@@ -17,6 +17,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
   bool _loading = true;
   String? _error;
   List<PlatformCompany> _companies = [];
+  String? _preparingCompanyId;
 
   @override
   void initState() {
@@ -59,6 +60,48 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
       company.slug.toLowerCase().contains(query) ||
       company.companyId.toLowerCase().contains(query)
     ).toList(growable: false);
+  }
+
+  Future<void> _prepareCompanyPermissions(PlatformCompany company) async {
+    setState(() => _preparingCompanyId = company.companyId);
+    try {
+      final result = await _repository.preparePermissions(company.companyId);
+      if (!mounted) return;
+      final count = (result['totalUpdated'] as num?)?.toInt() ?? 0;
+      await showDialog<void>(
+        context: context,
+        builder: (context) => ContentDialog(
+          title: const Text('Permissions de lignes préparées'),
+          content: Text(
+            '$count lignes de ' + company.name + ' disposent maintenant de permissions liées à son équipe Appwrite. '
+            'Les permissions globales des tables restent actives : aucune isolation complète n’a encore été appliquée.',
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Fermer'),
+            ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (context) => ContentDialog(
+          title: const Text('Échec de la préparation'),
+          content: Text(error.toString().replaceFirst('Bad state: ', '')),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Fermer'),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _preparingCompanyId = null);
+    }
   }
 
   Future<void> _openCreateDialog() async {
@@ -232,7 +275,12 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                 children: [
                   for (var index = 0; index < visibleCompanies.length; index++) ...[
                     if (index > 0) const SizedBox(height: 8),
-                    _CompanyCard(company: visibleCompanies[index]),
+                    _CompanyCard(
+                      company: visibleCompanies[index],
+                      onPrepare: _preparingCompanyId == visibleCompanies[index].companyId
+                          ? null
+                          : () => _prepareCompanyPermissions(visibleCompanies[index]),
+                    ),
                   ],
                 ],
               );
@@ -319,7 +367,8 @@ class _MetricCard extends StatelessWidget {
 
 class _CompanyCard extends StatelessWidget {
   final PlatformCompany company;
-  const _CompanyCard({required this.company});
+  final VoidCallback? onPrepare;
+  const _CompanyCard({required this.company, required this.onPrepare});
 
   @override
   Widget build(BuildContext context) {
@@ -357,6 +406,14 @@ class _CompanyCard extends StatelessWidget {
             _QuotaText(label: 'Échéance', value: expiry == null ? 'Non configurée' : '${expiry.day.toString().padLeft(2, '0')}/${expiry.month.toString().padLeft(2, '0')}/${expiry.year}'),
             _QuotaText(label: 'Tarif', value: '${company.priceAmount} ${company.currency} / ${entitlement['billingCycle'] ?? '—'}'),
           ]),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Button(
+              onPressed: onPrepare,
+              child: const Text('Préparer les droits de ligne'),
+            ),
+          ),
           if ((entitlement['notes']?.toString() ?? '').isNotEmpty) ...[
             const SizedBox(height: 8),
             Text(entitlement['notes'].toString()),
