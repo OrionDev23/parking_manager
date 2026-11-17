@@ -785,6 +785,17 @@ export default async ({ req, res, log, error }) => {
       const adminName = String(input.adminName || '').trim();
       const adminEmail = String(input.adminEmail || '').trim().toLowerCase();
       const adminPassword = String(input.adminPassword || '');
+      const companyProfile = {
+        name: String(input.companyLegalName || name).trim(),
+        address: String(input.address || '').trim(),
+        phone: String(input.phone || '').trim(),
+        email: String(input.companyEmail || '').trim(),
+        nif: String(input.nif || '').trim(),
+        nis: String(input.nis || '').trim(),
+        rc: String(input.rc || '').trim(),
+        art: String(input.art || '').trim(),
+        description: String(input.description || '').trim(),
+      };
       const startsAt = new Date(input.startsAt || now);
       const expiresAt = new Date(input.expiresAt || '');
       const maxUsers = Number(input.maxUsers);
@@ -826,6 +837,8 @@ export default async ({ req, res, log, error }) => {
       let companyCreated = false;
       let entitlementCreated = false;
       let teamCreated = false;
+      let profileCreated = false;
+      let profileRowId = null;
       try {
         if (!existingAdmin) {
           await appwrite('/users', {
@@ -840,6 +853,15 @@ export default async ({ req, res, log, error }) => {
         companyCreated = true;
         await createCompanyTeam(teamId, `Parcoto — ${name}`);
         teamCreated = true;
+        const profile = await ensureCompanyProfile(
+          companyId,
+          name,
+          teamId,
+          now,
+          companyProfile,
+        );
+        profileCreated = profile.created;
+        profileRowId = profile.rowId;
         await syncTeamMembership(teamId, adminUserId, 'owner', adminName);
         await createRow(ENTITLEMENTS, companyId, entitlement);
         entitlementCreated = true;
@@ -850,6 +872,9 @@ export default async ({ req, res, log, error }) => {
       } catch (failure) {
         if (entitlementCreated) {
           try { await appwrite(`/tablesdb/${DATABASE_ID}/tables/${ENTITLEMENTS}/rows/${companyId}`, { method: 'DELETE' }); } catch (_) {}
+        }
+        if (profileCreated && profileRowId) {
+          try { await appwrite(`/tablesdb/${DATABASE_ID}/tables/${COMPANY_PROFILE}/rows/${encodeURIComponent(profileRowId)}`, { method: 'DELETE' }); } catch (_) {}
         }
         if (teamCreated) {
           try { await appwrite(`/teams/${encodeURIComponent(teamId)}`, { method: 'DELETE' }); } catch (_) {}
