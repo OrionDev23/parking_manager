@@ -716,7 +716,9 @@ export default async ({ req, res, log, error }) => {
       const targetUserId = existingUser?.$id || crypto.randomUUID();
       let accountCreated = false;
       let teamMembershipChanged = false;
-      let previousRole = existingMembership?.data?.role || null;
+      let previousRole = existingMembership?.data?.status === 'active'
+        ? (existingMembership.data.role || null)
+        : null;
       try {
         if (!existingUser) {
           await appwrite('/users', {
