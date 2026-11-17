@@ -324,6 +324,14 @@ export default async ({ req, res, log, error }) => {
       for (const row of rows.filter(item => item.data?.status === 'active')) {
         const company = await getCompany(row.data.companyId);
         if (company && company.data?.status === 'active') {
+          if (company.data?.teamId) {
+            await ensureCompanyProfile(
+              company.$id,
+              company.data?.name || company.$id,
+              company.data.teamId,
+              now,
+            );
+          }
           memberships.push({
             companyId: company.$id,
             companyName: company.data.name,
