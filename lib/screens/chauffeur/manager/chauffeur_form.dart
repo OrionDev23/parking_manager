@@ -763,7 +763,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
     }
   }
 
-  Future<Row?> uploadEtat() async {
+  Future<void> uploadEtat() async {
     if (disp == null || disp!.type != etat) {
       if (disp?.id == etatID ||
           etatID == null ||
@@ -781,22 +781,16 @@ class ChauffeurFormState extends State<ChauffeurForm> {
         chauffeur: chaufID!,
         chauffeurNom: '${nom.text} ${prenom.text}',
       );
-      return await DatabaseGetter()
-          .addDocument(
-            collectionId: chaufDispID,
-            documentId: etatID!,
-            data: disp!.toJson(),
-          )
-          .then((value) {
-            DatabaseGetter().ajoutActivity(
-              20,
-              etatID!,
-              docName: disp?.chauffeurNom,
-            );
-            return value;
-          });
-    } else {
-      return null;
+      await DatabaseGetter().addDocument(
+        collectionId: chaufDispID,
+        documentId: etatID!,
+        data: disp!.toJson(),
+      );
+      await DatabaseGetter().ajoutActivity(
+        20,
+        etatID!,
+        docName: disp?.chauffeurNom,
+      );
     }
   }
 
