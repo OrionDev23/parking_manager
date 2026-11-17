@@ -3,7 +3,6 @@ import 'package:parc_oto/screens/sidemenu/profil_form.dart';
 import 'package:parc_oto/serializables/parc_user.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../main.dart';
 import '../../widgets/on_tap_scale.dart';
