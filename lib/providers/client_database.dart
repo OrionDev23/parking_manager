@@ -55,6 +55,8 @@ const Set<String> tenantScopedTableIds = {
   partsID,
   storageId,
   backupId,
+  'access_teams',
+  'access_users',
 };
 const endpoint = "https://fra.cloud.appwrite.io/v1";
 const appwriteProjectId = 'essais';
