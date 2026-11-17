@@ -1051,6 +1051,19 @@ export default async ({ req, res, log, error }) => {
         const serverManaged = [
           COMPANIES, MEMBERSHIPS, ENTITLEMENTS,
         ].includes(table.$id);
+        // These tables intentionally do not belong to a tenant: the vehicle
+        // type catalogue is shared reference data, users stores global account
+        // profiles, and the remaining tables are legacy/platform settings.
+        const platformGlobal = [
+          '6537960246d5b0e1ab77', 'users', 'trialdate', 'admin_keys', 'limits',
+        ].includes(table.$id);
+        const scope = serverManaged
+          ? 'platform_managed'
+          : hasCompanyId
+            ? 'tenant'
+            : platformGlobal
+              ? 'platform_global'
+              : 'unclassified';
         const tablePermissions = table.$permissions || [];
         const isUnsafeTablePermission = permission =>
           /^(read|update|delete)\(/.test(permission) ||
@@ -1070,6 +1083,7 @@ export default async ({ req, res, log, error }) => {
           rowSecurity: table.rowSecurity === true,
           hasCompanyId,
           serverManaged,
+          scope,
           totalRows: hasCompanyId ? rows.length : null,
           companyRows: companyRows.length,
           unassignedRows: hasCompanyId
@@ -1086,7 +1100,7 @@ export default async ({ req, res, log, error }) => {
           ).length,
           broadTablePermissions: broadPermissions,
           includedInCurrentPreparation: TENANT_TABLE_IDS.includes(table.$id),
-          requiresClassification: !hasCompanyId && !serverManaged,
+          requiresClassification: scope === 'unclassified',
         });
       }
       const tenantTables = tables.filter(table =>
