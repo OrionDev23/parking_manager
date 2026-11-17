@@ -297,6 +297,211 @@ export default async ({ req, res, log, error }) => {
     }
 
 
+    if (action === 'platform_list_company_admins') {
+      requirePlatformSuperAdmin(userId);
+      const companyId = String(input.companyId || '').trim();
+      if (!companyId) {
+        return json(res, 400, { ok: false, message: 'companyId is required.' });
+      }
+      const company = await getCompany(companyId);
+      if (!company) return json(res, 404, { ok: false, message: 'Company not found.' });
+      const rows = await listRows(MEMBERSHIPS, {
+        method: 'equal', attribute: 'companyId', values: [companyId],
+      });
+      const administrators = [];
+      for (const row of rows.filter(item =>
+        ['owner', 'admin'].includes(item.data?.role)
+      )) {
+        let account = null;
+        try {
+          account = await appwrite(`/users/${encodeURIComponent(row.data.userId)}`);
+        } catch (_) {}
+        administrators.push({
+          membershipId: row.$id,
+          userId: row.data.userId,
+          name: account?.name || '',
+          email: account?.email || '',
+          role: row.data.role || 'admin',
+          status: row.data.status || 'active',
+          isPlatformSuperAdmin: isPlatformSuperAdmin(row.data.userId),
+          createdAt: row.data.createdAt || '',
+        });
+      }
+      return json(res, 200, { ok: true, companyId, administrators });
+    }
+
+    if (action === 'platform_add_company_admin') {
+      requirePlatformSuperAdmin(userId);
+      const companyId = String(input.companyId || '').trim();
+      const name = String(input.name || '').trim();
+      const email = String(input.email || '').trim().toLowerCase();
+      const password = String(input.password || '');
+      if (!companyId || name.length < 2 || name.length > 100 ||
+          !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {
+        return json(res, 400, { ok: false, message: 'Invalid company, administrator name or email.' });
+      }
+      const company = await getCompany(companyId);
+      if (!company || company.data?.status !== 'active') {
+        return json(res, 404, { ok: false, message: 'Active company not found.' });
+      }
+      const teamId = String(company.data?.teamId || '').trim();
+      if (!teamId) {
+        return json(res, 409, { ok: false, message: 'Company team is not provisioned.' });
+      }
+
+      const search = new URLSearchParams({ search: email, limit: '25' });
+      const matchingUsers = await appwrite(`/users?${search.toString()}`);
+      const existingUser = (matchingUsers.users || []).find(item =>
+        item.email?.toLowerCase() === email
+      ) || null;
+      if (!existingUser && password.length < 8) {
+        return json(res, 400, { ok: false, message: 'A password of at least 8 characters is required for a new account.' });
+      }
+
+      const allMemberships = await listRows(MEMBERSHIPS, {
+        method: 'equal', attribute: 'companyId', values: [companyId],
+      });
+      const activeMemberships = allMemberships.filter(item => item.data?.status === 'active');
+      const existingMembership = existingUser
+        ? allMemberships.find(item => item.data?.userId === existingUser.$id) || null
+        : null;
+      if (existingMembership?.data?.status === 'active' &&
+          ['admin', 'owner'].includes(existingMembership.data?.role)) {
+        return json(res, 409, { ok: false, message: 'This account is already an administrator of the company.' });
+      }
+      const entitlement = await getEntitlement(companyId);
+      if (!existingMembership || existingMembership.data?.status !== 'active') {
+        if (entitlement && activeMemberships.length >= Number(entitlement.maxUsers || 0)) {
+          return json(res, 409, { ok: false, message: 'The company has reached its licensed user limit.' });
+        }
+      }
+
+      const targetUserId = existingUser?.$id || crypto.randomUUID();
+      let accountCreated = false;
+      let teamMembershipChanged = false;
+      let previousRole = existingMembership?.data?.role || null;
+      try {
+        if (!existingUser) {
+          await appwrite('/users', {
+            method: 'POST',
+            body: { userId: targetUserId, email, password, name },
+          });
+          accountCreated = true;
+        } else if (name && existingUser.name !== name) {
+          await appwrite(`/users/${encodeURIComponent(targetUserId)}/name`, {
+            method: 'PATCH', body: { name },
+          });
+        }
+
+        await syncTeamMembership(teamId, targetUserId, 'admin', name);
+        teamMembershipChanged = true;
+        const membershipId = existingMembership?.$id || crypto.randomUUID();
+        const membershipData = {
+          companyId,
+          userId: targetUserId,
+          role: 'admin',
+          status: 'active',
+          invitedBy: userId,
+          createdAt: existingMembership?.data?.createdAt || now,
+          updatedAt: now,
+        };
+        if (existingMembership) {
+          await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
+            method: 'PATCH', body: { data: membershipData },
+          });
+        } else {
+          await createRow(MEMBERSHIPS, membershipId, membershipData);
+        }
+      } catch (failure) {
+        if (teamMembershipChanged) {
+          try {
+            if (previousRole) await syncTeamMembership(teamId, targetUserId, previousRole);
+            else await removeTeamMembership(teamId, targetUserId);
+          } catch (_) {}
+        }
+        if (accountCreated) {
+          try { await appwrite(`/users/${encodeURIComponent(targetUserId)}`, { method: 'DELETE' }); } catch (_) {}
+        }
+        throw failure;
+      }
+      return json(res, 201, {
+        ok: true,
+        companyId,
+        userId: targetUserId,
+        email,
+        role: 'admin',
+        reusedExistingAccount: Boolean(existingUser),
+      });
+    }
+
+    if (action === 'platform_update_company_admin') {
+      requirePlatformSuperAdmin(userId);
+      const companyId = String(input.companyId || '').trim();
+      const membershipId = String(input.membershipId || '').trim();
+      const name = String(input.name || '').trim();
+      if (!companyId || !membershipId || name.length < 2 || name.length > 100) {
+        return json(res, 400, { ok: false, message: 'Invalid company, membership or administrator name.' });
+      }
+      const membership = await appwrite(
+        `/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`
+      );
+      if (membership.data?.companyId !== companyId ||
+          !['owner', 'admin'].includes(membership.data?.role) ||
+          membership.data?.status !== 'active') {
+        return json(res, 404, { ok: false, message: 'Active company administrator not found.' });
+      }
+      await appwrite(`/users/${encodeURIComponent(membership.data.userId)}/name`, {
+        method: 'PATCH', body: { name },
+      });
+      await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
+        method: 'PATCH', body: { data: { updatedAt: now } },
+      });
+      return json(res, 200, { ok: true, userId: membership.data.userId, name });
+    }
+
+    if (action === 'platform_revoke_company_admin') {
+      requirePlatformSuperAdmin(userId);
+      const companyId = String(input.companyId || '').trim();
+      const membershipId = String(input.membershipId || '').trim();
+      if (!companyId || !membershipId) {
+        return json(res, 400, { ok: false, message: 'companyId and membershipId are required.' });
+      }
+      const company = await getCompany(companyId);
+      if (!company) return json(res, 404, { ok: false, message: 'Company not found.' });
+      const membership = await appwrite(
+        `/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`
+      );
+      const targetUserId = String(membership.data?.userId || '');
+      if (membership.data?.companyId !== companyId ||
+          !['owner', 'admin'].includes(membership.data?.role) ||
+          membership.data?.status !== 'active') {
+        return json(res, 404, { ok: false, message: 'Active company administrator not found.' });
+      }
+      if (membership.data?.role === 'owner' ||
+          (company.data?.ownerUserId && company.data.ownerUserId === targetUserId)) {
+        return json(res, 403, { ok: false, message: 'The company owner cannot be revoked. Transfer ownership first.' });
+      }
+      if (isPlatformSuperAdmin(targetUserId)) {
+        return json(res, 403, { ok: false, message: 'A global platform administrator cannot be removed from a company here.' });
+      }
+      const administrators = (await listRows(MEMBERSHIPS, {
+        method: 'equal', attribute: 'companyId', values: [companyId],
+      })).filter(item =>
+        item.data?.status === 'active' &&
+        ['owner', 'admin'].includes(item.data?.role)
+      );
+      if (administrators.length <= 1) {
+        return json(res, 409, { ok: false, message: 'At least one active company administrator must remain.' });
+      }
+      if (company.data?.teamId) {
+        await removeTeamMembership(company.data.teamId, targetUserId);
+      }
+      await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
+        method: 'PATCH', body: { data: { status: 'revoked', updatedAt: now } },
+      });
+      return json(res, 200, { ok: true, companyId, userId: targetUserId });
+    }
+
     if (action === 'platform_provision_company_team') {
       requirePlatformSuperAdmin(userId);
       const companyId = String(input.companyId || '');
