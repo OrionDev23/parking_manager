@@ -136,6 +136,13 @@ class PlatformCompaniesRepository {
         .toList(growable: false);
   }
 
+  Future<Map<String, dynamic>> auditCompanyRows(String companyId) {
+    return _execute({
+      'action': 'platform_audit_company_rows',
+      'companyId': companyId,
+    });
+  }
+
   Future<Map<String, dynamic>> preparePermissions(String companyId) {
     return _execute({
       'action': 'platform_prepare_company_rows',
