@@ -730,7 +730,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
     );
     final driver = domain.Driver(
       id: legacy.id,
-      companyId: project ?? 'local',
+      companyId: DatabaseGetter.activeCompanyId ?? (throw StateError('Aucune entreprise active.')),
       firstName: legacy.prenom,
       lastName: legacy.name,
       registration: legacy.matricule,
