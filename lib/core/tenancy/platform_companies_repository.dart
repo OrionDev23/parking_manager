@@ -131,155 +131,40 @@ class PlatformCompaniesRepository {
     required String name,
     required String slug,
     required String status,
-    required DateTime startsAt,
-    required DateTime expiresAt,
-    required int maxUsers,
-    required int maxVehicles,
-    required int maxEmployees,
-    required int maxDrivers,
-    required int maxSites,
-    required int priceAmount,
-    required String billingCycle,
-    required String currency,
-    required String notes,
+    DateTime? startsAt,
+    DateTime? expiresAt,
+    int? maxUsers,
+    int? maxVehicles,
+    int? maxEmployees,
+    int? maxDrivers,
+    int? maxSites,
+    int? priceAmount,
+    String? billingCycle,
+    String? currency,
+    String? notes,
   }) async {
-    await _execute({
+    final payload = <String, dynamic>{
       'action': 'platform_update_company',
       'companyId': companyId,
       'name': name,
       'slug': slug,
       'status': status,
-      'startsAt': startsAt.toUtc().toIso8601String(),
-      'expiresAt': expiresAt.toUtc().toIso8601String(),
-      'maxUsers': maxUsers,
-      'maxVehicles': maxVehicles,
-      'maxEmployees': maxEmployees,
-      'maxDrivers': maxDrivers,
-      'maxSites': maxSites,
-      'priceAmount': priceAmount,
-      'billingCycle': billingCycle,
-      'currency': currency,
-      'notes': notes,
-    });
-  }
-
-  Future<List<PlatformCompanyAdministrator>> listAdministrators(
-    String companyId,
-  ) async {
-    final response = await _execute({
-      'action': 'platform_list_company_admins',
-      'companyId': companyId,
-    });
-    final values = response['administrators'];
-    if (values is! List) {
-      throw const FormatException('Liste des administrateurs invalide.');
+    };
+    if (startsAt != null) {
+      payload['startsAt'] = startsAt.toUtc().toIso8601String();
     }
-    return values
-        .whereType<Map>()
-        .map((value) => PlatformCompanyAdministrator.fromJson(
-              Map<String, dynamic>.from(value),
-            ))
-        .toList(growable: false);
-  }
-
-  Future<void> addAdministrator({
-    required String companyId,
-    required String name,
-    required String email,
-    required String password,
-  }) async {
-    await _execute({
-      'action': 'platform_add_company_admin',
-      'companyId': companyId,
-      'name': name,
-      'email': email,
-      'password': password,
-    });
-  }
-
-  Future<void> updateAdministratorName({
-    required String companyId,
-    required String membershipId,
-    required String name,
-  }) async {
-    await _execute({
-      'action': 'platform_update_company_admin',
-      'companyId': companyId,
-      'membershipId': membershipId,
-      'name': name,
-    });
-  }
-
-  Future<void> revokeAdministrator({
-    required String companyId,
-    required String membershipId,
-  }) async {
-    await _execute({
-      'action': 'platform_revoke_company_admin',
-      'companyId': companyId,
-      'membershipId': membershipId,
-    });
-  }
-
-  Future<Map<String, dynamic>> preparePermissions(String companyId) async {
-    return _execute({
-      'action': 'platform_prepare_company_rows',
-      'companyId': companyId,
-    });
-  }
-
-  Future<void> create({
-    required String name,
-    required String slug,
-    required String adminName,
-    required String adminEmail,
-    required String adminPassword,
-    required DateTime startsAt,
-    required DateTime expiresAt,
-    required int maxUsers,
-    required int maxVehicles,
-    required int maxEmployees,
-    required int maxDrivers,
-    required int maxSites,
-    required int priceAmount,
-    required String billingCycle,
-    required String currency,
-    required String notes,
-    String address = '',
-    String phone = '',
-    String companyEmail = '',
-    String nif = '',
-    String nis = '',
-    String rc = '',
-    String art = '',
-    String description = '',
-  }) async {
-    await _execute({
-      'action': 'create_company',
-      'name': name,
-      'slug': slug,
-      'adminName': adminName,
-      'adminEmail': adminEmail,
-      'adminPassword': adminPassword,
-      'startsAt': startsAt.toUtc().toIso8601String(),
-      'expiresAt': expiresAt.toUtc().toIso8601String(),
-      'maxUsers': maxUsers,
-      'maxVehicles': maxVehicles,
-      'maxEmployees': maxEmployees,
-      'maxDrivers': maxDrivers,
-      'maxSites': maxSites,
-      'priceAmount': priceAmount,
-      'billingCycle': billingCycle,
-      'currency': currency,
-      'notes': notes,
-      'address': address,
-      'phone': phone,
-      'companyEmail': companyEmail,
-      'nif': nif,
-      'nis': nis,
-      'rc': rc,
-      'art': art,
-      'description': description,
-    });
+    if (expiresAt != null) {
+      payload['expiresAt'] = expiresAt.toUtc().toIso8601String();
+    }
+    if (maxUsers != null) payload['maxUsers'] = maxUsers;
+    if (maxVehicles != null) payload['maxVehicles'] = maxVehicles;
+    if (maxEmployees != null) payload['maxEmployees'] = maxEmployees;
+    if (maxDrivers != null) payload['maxDrivers'] = maxDrivers;
+    if (maxSites != null) payload['maxSites'] = maxSites;
+    if (priceAmount != null) payload['priceAmount'] = priceAmount;
+    if (billingCycle != null) payload['billingCycle'] = billingCycle;
+    if (currency != null) payload['currency'] = currency;
+    if (notes != null) payload['notes'] = notes;
+    await _execute(payload);
   }
 }
