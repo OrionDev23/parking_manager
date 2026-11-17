@@ -251,6 +251,11 @@ class _ProfilFormState extends State<ProfilForm> {
               tableId: userid,
               rowId: userID,
               data: newme.toJson(),
+              permissions: [
+                Permission.read(Role.user(userID)),
+                Permission.update(Role.user(userID)),
+                Permission.delete(Role.user(userID)),
+              ],
             )
             .then((value) {
               DatabaseGetter.me.value = newme;
