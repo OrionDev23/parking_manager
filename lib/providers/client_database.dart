@@ -587,7 +587,7 @@ class DatabaseGetter {
       tableId: collectionId,
       rowId: documentId,
       data: rowData,
-      if (tenantScoped) permissions: _tenantRowPermissions(),
+      permissions: tenantScoped ? _tenantRowPermissions() : null,
     );
   }
 
@@ -610,7 +610,7 @@ class DatabaseGetter {
       tableId: collectionId,
       rowId: documentId,
       data: tenantScoped ? {...data, 'companyId': _activeCompanyId} : data,
-      if (tenantScoped) permissions: _tenantRowPermissions(),
+      permissions: tenantScoped ? _tenantRowPermissions() : null,
     );
   }
 
@@ -635,6 +635,9 @@ class DatabaseGetter {
       );
     }
 
+    if (_isTenantScoped(path) && _activeCompanyId == null) {
+      throw StateError('No active company context is selected.');
+    }
     final result = <Row>[];
     var offset = 0;
 
@@ -643,11 +646,7 @@ class DatabaseGetter {
         databaseId: databaseId,
         tableId: path,
         queries: [
-          if (_isTenantScoped(path)) ...[
-            if (_activeCompanyId == null)
-              (throw StateError('No active company context is selected.')),
-            Query.equal('companyId', _activeCompanyId!),
-          ],
+          if (_isTenantScoped(path)) Query.equal('companyId', _activeCompanyId!),
           Query.limit(pageSize),
           Query.offset(offset),
         ],
