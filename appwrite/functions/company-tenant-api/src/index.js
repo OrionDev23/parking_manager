@@ -933,9 +933,12 @@ export default async ({ req, res, log, error }) => {
         const columns = table.columns || [];
         const hasCompanyId = columns.some(column => column.key === 'companyId');
         const tablePermissions = table.$permissions || [];
-        const broadPermissions = tablePermissions.filter(permission =>
-          /^(create|read|update|delete)\\("(team:1|team:managers|users|any)(\\/[^"]*)?"\\)$/.test(permission)
-        );
+        const isLegacyBroadPermission = permission =>
+          permission.includes('"team:1') ||
+          permission.includes('"team:managers') ||
+          permission.endsWith('("users")') ||
+          permission.endsWith('("any")');
+        const broadPermissions = tablePermissions.filter(isLegacyBroadPermission);
         let rows = [];
         if (hasCompanyId) {
           rows = await listAllRows(table.$id);
@@ -960,9 +963,7 @@ export default async ({ req, res, log, error }) => {
             !(row.$permissions || []).length
           ).length,
           rowsWithLegacyPermissions: companyRows.filter(row =>
-            (row.$permissions || []).some(permission =>
-              /^(create|read|update|delete)\\("(team:1|team:managers|users|any)(\\/[^"]*)?"\\)$/.test(permission)
-            )
+            (row.$permissions || []).some(isLegacyBroadPermission)
           ).length,
           broadTablePermissions: broadPermissions,
           includedInCurrentPreparation: [
