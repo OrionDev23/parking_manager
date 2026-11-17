@@ -259,7 +259,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
               const SizedBox(width: 8),
               Expanded(
                 child: FilledButton(
-                  onPressed: _openCreateDialog,
+                  onPressed: _repository.canCreateCompany ? _openCreateDialog : null,
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
@@ -273,6 +273,17 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
               ),
             ],
           );
+
+          final provisioningNotice = !_repository.canCreateCompany
+              ? Padding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: InfoBar(
+                    title: const Text('Création d’entreprise temporairement verrouillée'),
+                    content: Text(_repository.createCompanyReason),
+                    severity: InfoBarSeverity.warning,
+                  ),
+                )
+              : const SizedBox.shrink();
 
           final controls = Padding(
             padding: EdgeInsets.fromLTRB(horizontalPadding, 18, horizontalPadding, 10),
@@ -297,7 +308,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                       ),
                       const SizedBox(width: 8),
                       FilledButton(
-                        onPressed: _openCreateDialog,
+                        onPressed: _repository.canCreateCompany ? _openCreateDialog : null,
                         child: const Row(mainAxisSize: MainAxisSize.min, children: [
                           Icon(FluentIcons.add), SizedBox(width: 8), Text('Nouvelle entreprise'),
                         ]),
@@ -381,6 +392,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
             children: [
               header,
               metrics,
+              provisioningNotice,
               controls,
               Expanded(
                 child: Padding(
