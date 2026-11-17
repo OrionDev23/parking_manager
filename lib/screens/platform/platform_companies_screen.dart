@@ -452,6 +452,7 @@ class _CompanyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final expiry = company.expiresAt;
     final expired = expiry != null && expiry.isBefore(DateTime.now());
+    final suspended = company.status == 'suspended';
     final entitlement = company.entitlement;
     return Card(
       child: Padding(
@@ -466,12 +467,20 @@ class _CompanyCard extends StatelessWidget {
             ])),
             Row(mainAxisSize: MainAxisSize.min, children: [
               Icon(
-                expired ? FluentIcons.warning : FluentIcons.check_mark,
+                expired || suspended
+                    ? FluentIcons.warning
+                    : FluentIcons.check_mark,
                 size: 14,
-                color: expired ? Colors.orange : Colors.green,
+                color: expired || suspended ? Colors.orange : Colors.green,
               ),
               const SizedBox(width: 6),
-              Text(expired ? 'Licence expirée' : company.status),
+              Text(
+                expired
+                    ? 'Licence expirée'
+                    : suspended
+                        ? 'Suspendue'
+                        : 'Active',
+              ),
             ]),
           ]),
           const SizedBox(height: 14),
