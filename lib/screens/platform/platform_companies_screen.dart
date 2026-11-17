@@ -460,7 +460,13 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                     if (index > 0) const SizedBox(height: 8),
                     _CompanyCard(
                       company: visibleCompanies[index],
-                      onPrepare: _preparingCompanyId == visibleCompanies[index].companyId
+                      onAudit: _auditingCompanyId == visibleCompanies[index].companyId
+                          ? null
+                          : () => _auditCompanyPermissions(visibleCompanies[index]),
+                      onAudit: _auditingCompanyId == visibleCompanies[index].companyId
+                    ? null
+                    : () => _auditCompanyPermissions(visibleCompanies[index]),
+                onPrepare: _preparingCompanyId == visibleCompanies[index].companyId
                           ? null
                           : () => _prepareCompanyPermissions(visibleCompanies[index]),
                       onOpen: _openingCompanyId == visibleCompanies[index].companyId
