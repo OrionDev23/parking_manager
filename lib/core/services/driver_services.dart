@@ -37,6 +37,7 @@ class DriverServices {
     required SharedPreferences preferences,
     required String companyId,
     required String appwriteProjectId,
+    String? teamId,
   }) async {
     final localDatabase = LocalDatabase();
     await localDatabase.open();
@@ -57,7 +58,7 @@ class DriverServices {
     await backend.initialize();
     final remoteSource = AppwriteDriverSource(
       backend: backend,
-      companyContext: CompanyContext(companyId: companyId),
+      companyContext: CompanyContext(companyId: companyId, teamId: teamId),
       databaseId: '6531ad112080ae3b14a7',
       tableId: '6537d87b492c80f255e8',
     );
@@ -74,7 +75,7 @@ class DriverServices {
               local: localSource,
               syncQueue: syncQueue,
               deviceIdentity: deviceIdentity,
-              companyContext: CompanyContext(companyId: companyId),
+              companyContext: CompanyContext(companyId: companyId, teamId: teamId),
               remote: remoteSource,
             ),
     );
