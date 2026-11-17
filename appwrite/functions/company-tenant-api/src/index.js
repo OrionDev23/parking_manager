@@ -4,6 +4,16 @@ const COMPANIES = 'companies';
 const ENTITLEMENTS = 'company_entitlements';
 const COMPANY_PROFILE = 'entreprise';
 
+// Single source of truth for business tables isolated by companyId.
+const TENANT_TABLE_IDS = [
+  '6537d87b492c80f255e8', // chauffeur
+  '6531ad22153b2a49ca2c', // vehicle
+  'marque', 'etat', 'doc_vehic', 'reparation', 'activity',
+  'chauf_disponibilite', 'doc_chauffeur', 'prestataire', 'entreprise',
+  'planning', 'backup', 'options', 'categories', 'partsbrands',
+  'parts', 'storage', 'fichereception', 'clients',
+];
+
 const endpoint = (process.env.APPWRITE_FUNCTION_API_ENDPOINT || 'https://fra.cloud.appwrite.io/v1').replace(/\/$/, '');
 const projectId = process.env.APPWRITE_FUNCTION_PROJECT_ID;
 const apiKey = process.env.APPWRITE_FUNCTION_API_KEY;
@@ -158,31 +168,8 @@ async function prepareCompanyRows(companyId, teamId) {
     (Number.isFinite(startsAt) && Number.isFinite(expiresAt) &&
       startsAt <= now && expiresAt > now);
   const isActive = company.data?.status === 'active' && licenseActive;
-  // Only business tables that actually exist and carry companyId.
-  // Global user profiles, system settings and shared reference tables are
-  // deliberately excluded from tenant row ACL provisioning.
-  const tableIds = [
-    '6537d87b492c80f255e8', // chauffeur
-    '6531ad22153b2a49ca2c', // vehicle
-    'marque',
-    'etat',
-    'doc_vehic',
-    'reparation',
-    'activity',
-    'chauf_disponibilite',
-    'doc_chauffeur',
-    'prestataire',
-    'entreprise',
-    'planning',
-    'backup',
-    'options',
-    'categories',
-    'partsbrands',
-    'parts',
-    'storage',
-    'fichereception',
-    'clients',
-  ];
+  // Global user profiles, system settings and shared reference tables are excluded.
+  const tableIds = TENANT_TABLE_IDS;
   const rowPermissions = [
     `read("team:${teamId}")`,
     ...(isActive
@@ -1058,12 +1045,11 @@ export default async ({ req, res, log, error }) => {
           COMPANIES, MEMBERSHIPS, ENTITLEMENTS,
         ].includes(table.$id);
         const tablePermissions = table.$permissions || [];
-        const isLegacyBroadPermission = permission =>
-          permission.includes('"team:1') ||
-          permission.includes('"team:managers') ||
-          permission.endsWith('("users")') ||
-          permission.endsWith('("any")');
-        const broadPermissions = tablePermissions.filter(isLegacyBroadPermission);
+        const isUnsafeTablePermission = permission =>
+          /^(read|update|delete)\(/.test(permission) ||
+          (/^create\(/.test(permission) &&
+            !/^create\("team:[^"]+\/(admin|manager)"\)$/.test(permission));
+        const broadPermissions = tablePermissions.filter(isUnsafeTablePermission);
         let rows = [];
         if (hasCompanyId) {
           rows = await listAllRows(table.$id);
@@ -1089,17 +1075,10 @@ export default async ({ req, res, log, error }) => {
             !(row.$permissions || []).length
           ).length,
           rowsWithLegacyPermissions: companyRows.filter(row =>
-            (row.$permissions || []).some(isLegacyBroadPermission)
+            (row.$permissions || []).some(isUnsafeTablePermission)
           ).length,
           broadTablePermissions: broadPermissions,
-          includedInCurrentPreparation: [
-            '6537d87b492c80f255e8', '6531ad22153b2a49ca2c', 'etat',
-            'doc_vehic', 'reparation', 'activity', 'chauf_disponibilite',
-            'doc_chauffeur', 'entreprise', 'planning', 'prestataire',
-            'fichereception', 'clients', 'parts', 'storage', 'backup',
-            'access_teams', 'access_users', 'fournisseurs', 'options',
-            'categories', 'partsbrands', 'marque',
-          ].includes(table.$id),
+          includedInCurrentPreparation: TENANT_TABLE_IDS.includes(table.$id),
           requiresClassification: !hasCompanyId && !serverManaged,
         });
       }
