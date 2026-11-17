@@ -13,5 +13,7 @@ abstract class AuthService {
     String? companyId,
   });
   Future<AuthSession> selectCompany(String companyId);
+  Future<AuthSession> enterPlatformCompany(String companyId);
+  Future<AuthSession> returnToPlatformContext();
   Future<void> signOut();
 }
