@@ -196,7 +196,7 @@ async function prepareCompanyRows(companyId, teamId) {
     // A tenant table must never inherit broad table-level read/write access.
     // Data access is granted on individual rows to the company's own team.
     const isBroadTablePermission = permission =>
-      /^(read|create|update|delete)\\("(any|users|team:1|team:managers)"\\)$/.test(permission);
+      /^(read|create|update|delete)\("(any|users|team:1|team:managers)"\)$/.test(permission);
     const tablePermissions = new Set(
       (table.$permissions || []).filter(permission => !isBroadTablePermission(permission)),
     );
