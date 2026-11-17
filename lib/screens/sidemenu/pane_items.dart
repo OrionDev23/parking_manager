@@ -378,10 +378,10 @@ class PaneItemsAndFooters {
 
     final isPlatformCompanyContext =
         authService.session?.isPlatformCompanyContext == true;
+    final isPlatformSession =
+        authService.session?.isPlatformSuperAdmin == true &&
+        !isPlatformCompanyContext;
     if (PanesListState.signedIn.value) {
-      final isPlatformSession =
-          authService.session?.isPlatformSuperAdmin == true &&
-          authService.session?.isPlatformCompanyContext != true;
       originalItems = [
         if (isPlatformSession) platformCompanies,
         if (!isPlatformSession && PanesListState.signedIn.value) dashboard,
@@ -400,11 +400,11 @@ class PaneItemsAndFooters {
     }
     footerItems = [
       PaneItemSeparator(),
-      if (authService.session?.isPlatformSuperAdmin != true &&
+      if (!isPlatformSession &&
           authService.session?.hasPermission('company.manage') == true &&
           PanesListState.signedIn.value)
         entreprise,
-      if (authService.session?.isPlatformSuperAdmin != true &&
+      if (!isPlatformSession &&
           authService.session?.hasPermission('backup.manage') == true &&
           PanesListState.signedIn.value)
         backup,
@@ -417,7 +417,7 @@ class PaneItemsAndFooters {
         ),
       if (PanesListState.signedIn.value) logout,
       parametres,
-      if (PanesListState.signedIn.value && authService.session?.isPlatformSuperAdmin != true) tutorial,
+      if (PanesListState.signedIn.value && !isPlatformSession) tutorial,
     ];
   }
 
