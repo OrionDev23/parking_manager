@@ -1755,7 +1755,7 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
 
     if (_name.text.trim().length < 2 ||
         _adminName.text.trim().length < 2 ||
-        !RegExp(r'^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$')
+        !RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
             .hasMatch(_adminEmail.text.trim()) ||
         (_adminPassword.text.isNotEmpty &&
             _adminPassword.text != _adminPasswordConfirm.text) ||
