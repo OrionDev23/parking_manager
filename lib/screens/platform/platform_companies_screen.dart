@@ -826,7 +826,6 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
   void dispose() {
     for (final controller in [
       _name,
-      _legalName,
       _slug,
       _legalName,
       _address,
@@ -933,7 +932,6 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
       await widget.repository.updateCompany(
         companyId: widget.company.companyId,
         name: _name.text.trim(),
-        companyLegalName: _legalName.text.trim(),
         slug: _slug.text.trim(),
         status: _status,
         companyLegalName: _legalName.text.trim(),
@@ -1615,6 +1613,7 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
   void dispose() {
     for (final controller in [
       _name,
+      _legalName,
       _slug,
       _address,
       _companyPhone,
@@ -1792,6 +1791,7 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
     try {
       await widget.repository.create(
         name: _name.text.trim(),
+        companyLegalName: _legalName.text.trim(),
         slug: _slug.text.trim(),
         adminName: _adminName.text.trim(),
         adminEmail: _adminEmail.text.trim(),
