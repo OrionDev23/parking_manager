@@ -205,6 +205,10 @@ class PanesListState extends State<PanesList>
                           ),
                           child: Row(
                             children: [
+                              if (compact) ...[
+                                const PaneToggleButton(),
+                                const SizedBox(width: 8),
+                              ],
                               Image.asset(
                                 'assets/images/logo.webp',
                                 width: compact ? 116 : 148,
