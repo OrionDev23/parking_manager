@@ -454,6 +454,11 @@ class _CompanyCard extends StatelessWidget {
     final expired = expiry != null && expiry.isBefore(DateTime.now());
     final suspended = company.status == 'suspended';
     final entitlement = company.entitlement;
+    final hasEntitlement = entitlement.isNotEmpty;
+    String quotaValue(String key) {
+      final value = company.quota(key);
+      return value > 0 ? value.toString() : '—';
+    }
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -485,13 +490,28 @@ class _CompanyCard extends StatelessWidget {
           ]),
           const SizedBox(height: 14),
           Wrap(spacing: 18, runSpacing: 8, children: [
-            _QuotaText(label: 'Utilisateurs', value: '${company.activeUsers}/${company.quota('maxUsers')}'),
-            _QuotaText(label: 'Véhicules', value: company.quota('maxVehicles').toString()),
-            _QuotaText(label: 'Employés', value: company.quota('maxEmployees').toString()),
-            _QuotaText(label: 'Chauffeurs', value: company.quota('maxDrivers').toString()),
-            _QuotaText(label: 'Sites', value: company.quota('maxSites').toString()),
-            _QuotaText(label: 'Échéance', value: expiry == null ? 'Non configurée' : '${expiry.day.toString().padLeft(2, '0')}/${expiry.month.toString().padLeft(2, '0')}/${expiry.year}'),
-            _QuotaText(label: 'Tarif', value: '${company.priceAmount} ${company.currency} / ${entitlement['billingCycle'] ?? '—'}'),
+            _QuotaText(
+              label: 'Utilisateurs',
+              value: hasEntitlement
+                  ? '${company.activeUsers}/${quotaValue('maxUsers')}'
+                  : '${company.activeUsers}/—',
+            ),
+            _QuotaText(label: 'Véhicules', value: quotaValue('maxVehicles')),
+            _QuotaText(label: 'Employés', value: quotaValue('maxEmployees')),
+            _QuotaText(label: 'Chauffeurs', value: quotaValue('maxDrivers')),
+            _QuotaText(label: 'Sites', value: quotaValue('maxSites')),
+            _QuotaText(
+              label: 'Échéance',
+              value: expiry == null
+                  ? 'Non configurée'
+                  : '${expiry.day.toString().padLeft(2, '0')}/${expiry.month.toString().padLeft(2, '0')}/${expiry.year}',
+            ),
+            _QuotaText(
+              label: 'Tarif',
+              value: hasEntitlement
+                  ? '${company.priceAmount} ${company.currency} / ${entitlement['billingCycle'] ?? '—'}'
+                  : 'Non configuré',
+            ),
           ]),
           const SizedBox(height: 12),
           Align(
