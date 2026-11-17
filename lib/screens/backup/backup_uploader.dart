@@ -184,10 +184,9 @@ class BackupUploaderState extends State<BackupUploader> {
   }
 
   void updateDb() async {
-    await DatabaseGetter.database!.createRow(
-      databaseId: databaseId,
-      tableId: backupId,
-      rowId: id!,
+    await DatabaseGetter().addDocument(
+      collectionId: backupId,
+      documentId: id!,
       data: Backup(
         id: id!,
         vehicles: widget.vehicCount,
