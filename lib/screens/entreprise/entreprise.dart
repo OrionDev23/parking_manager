@@ -1064,7 +1064,10 @@ class MyEntrepriseState extends State<MyEntreprise> {
 
   Future<void> uploadEntreprise() async {
     Entreprise prest = Entreprise(
-      id: p?.id ?? DatabaseGetter.activeCompanyId ?? '1',
+      id: p?.id ??
+          DatabaseGetter.activeCompanyProfileRowId ??
+          DatabaseGetter.activeCompanyId ??
+          '1',
       nom: nom.text,
       email: email.text.isEmpty ? null : email.text,
       telephone: telephone.text,
