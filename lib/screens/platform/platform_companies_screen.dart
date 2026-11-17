@@ -734,6 +734,15 @@ class _EditCompanyDialog extends StatefulWidget {
 class _EditCompanyDialogState extends State<_EditCompanyDialog> {
   late final TextEditingController _name;
   late final TextEditingController _slug;
+  late final TextEditingController _legalName;
+  late final TextEditingController _address;
+  late final TextEditingController _phone;
+  late final TextEditingController _companyEmail;
+  late final TextEditingController _nif;
+  late final TextEditingController _nis;
+  late final TextEditingController _rc;
+  late final TextEditingController _art;
+  late final TextEditingController _description;
   late final TextEditingController _startsAt;
   late final TextEditingController _expiresAt;
   late final TextEditingController _maxUsers;
@@ -764,6 +773,16 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
     _hasExistingEntitlement = entitlement.isNotEmpty;
     _name = TextEditingController(text: company.name);
     _slug = TextEditingController(text: company.slug);
+    final profile = company.profile;
+    _legalName = TextEditingController(text: profile['legalName']?.toString() ?? '');
+    _address = TextEditingController(text: profile['address']?.toString() ?? '');
+    _phone = TextEditingController(text: profile['phone']?.toString() ?? '');
+    _companyEmail = TextEditingController(text: profile['email']?.toString() ?? '');
+    _nif = TextEditingController(text: profile['nif']?.toString() ?? '');
+    _nis = TextEditingController(text: profile['nis']?.toString() ?? '');
+    _rc = TextEditingController(text: profile['rc']?.toString() ?? '');
+    _art = TextEditingController(text: profile['art']?.toString() ?? '');
+    _description = TextEditingController(text: profile['description']?.toString() ?? '');
     _startsAt = TextEditingController(
       text: _hasExistingEntitlement
           ? _dateValue(entitlement['startsAt']?.toString())
@@ -808,6 +827,15 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
     for (final controller in [
       _name,
       _slug,
+      _legalName,
+      _address,
+      _phone,
+      _companyEmail,
+      _nif,
+      _nis,
+      _rc,
+      _art,
+      _description,
       _startsAt,
       _expiresAt,
       _maxUsers,
@@ -906,6 +934,15 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
         name: _name.text.trim(),
         slug: _slug.text.trim(),
         status: _status,
+        companyLegalName: _legalName.text.trim(),
+        address: _address.text.trim(),
+        phone: _phone.text.trim(),
+        companyEmail: _companyEmail.text.trim(),
+        nif: _nif.text.trim(),
+        nis: _nis.text.trim(),
+        rc: _rc.text.trim(),
+        art: _art.text.trim(),
+        description: _description.text.trim(),
         startsAt: startsAt,
         expiresAt: expiresAt,
         maxUsers: maxUsers,
@@ -949,6 +986,29 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
               const SizedBox(height: 10),
               _field('Nom commercial', _name),
               _field('Identifiant unique', _slug),
+              const SizedBox(height: 18),
+              Text(
+                'Informations légales et coordonnées',
+                style: FluentTheme.of(context).typography.subtitle,
+              ),
+              const SizedBox(height: 10),
+              _field('Raison sociale', _legalName),
+              _field('Adresse du siège', _address),
+              _field('Téléphone', _phone),
+              _field('E-mail de l’entreprise', _companyEmail),
+              _field('NIF', _nif),
+              _field('NIS', _nis),
+              _field('Registre de commerce (RC)', _rc),
+              _field('Article (ART)', _art),
+              const Text('Description'),
+              const SizedBox(height: 4),
+              TextBox(
+                controller: _description,
+                minLines: 2,
+                maxLines: 4,
+                placeholder: 'Activité et présentation de l’entreprise...',
+              ),
+              const SizedBox(height: 18),
               const Text('État du compte'),
               const SizedBox(height: 4),
               ComboBox<String>(
