@@ -554,6 +554,24 @@ export default async ({ req, res, log, error }) => {
           method: 'PATCH',
           body: { data: { name, slug, status, updatedAt: now } },
         });
+        const profiles = await listRows(COMPANY_PROFILE, {
+          method: 'equal', attribute: 'companyId', values: [companyId],
+        });
+        if (profiles[0] && profiles[0].data?.nom === company.data?.name) {
+          await appwrite(
+            `/tablesdb/${DATABASE_ID}/tables/${COMPANY_PROFILE}/rows/${encodeURIComponent(profiles[0].$id)}`,
+            {
+              method: 'PATCH',
+              body: {
+                data: {
+                  nom: name.slice(0, 60),
+                  search: [name, profiles[0].data?.adresse, profiles[0].data?.telephone, profiles[0].data?.email]
+                    .filter(Boolean).join(' ').slice(0, 400),
+                },
+              },
+            },
+          );
+        }
       } catch (failure) {
         if (entitlementWritten) {
           try {
