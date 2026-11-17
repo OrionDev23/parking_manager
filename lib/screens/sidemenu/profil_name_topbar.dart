@@ -15,11 +15,15 @@ class ProfilNameTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = context.watch<AppTheme>();
     final session = authService.session;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final avatarSize = screenWidth < 680 ? 36.0 : 40.0;
+    final showEmail = screenWidth >= 900;
 
     return OnTapScaleAndFade(
       child: Row(
         children: [
           CircleAvatar(
+            radius: avatarSize / 2,
             child: Hero(
               tag: 'myprofil',
               child: Container(
@@ -28,8 +32,8 @@ class ProfilNameTopBar extends StatelessWidget {
                   color: appTheme.color,
                   shape: BoxShape.circle,
                 ),
-                width: 4.w,
-                height: 4.w,
+                width: avatarSize,
+                height: avatarSize,
                 alignment: Alignment.center,
                 child: Text(
                   _initials(session?.displayName ?? session?.email ?? ''),
@@ -41,10 +45,16 @@ class ProfilNameTopBar extends StatelessWidget {
               ),
             ),
           ),
-          if (Device.orientation == Orientation.landscape)
-            const SizedBox(width: 10),
-          if (Device.orientation == Orientation.landscape)
-            Text(session?.email ?? ''),
+          if (showEmail) const SizedBox(width: 10),
+          if (showEmail)
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 220),
+              child: Text(
+                session?.email ?? '',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
         ],
       ),
       onTap: () => _openProfile(context),
