@@ -596,7 +596,7 @@ class DatabaseGetter {
     return '';
   }
 
-  Future<void> addDocument({
+  Future<Row?> addDocument({
     required String collectionId,
     required String documentId,
     required Map<String, dynamic> data,
@@ -605,7 +605,14 @@ class DatabaseGetter {
     final rowData = tenantScoped
         ? {...data, 'companyId': _activeCompanyId}
         : data;
-    await database?.createRow(
+    final activeDatabase = database;
+    if (activeDatabase == null) {
+      throw StateError('Appwrite database is not initialized.');
+    }
+    if (tenantScoped && _activeCompanyId == null) {
+      throw StateError('No active company context is selected.');
+    }
+    return activeDatabase.createRow(
       databaseId: databaseId,
       tableId: collectionId,
       rowId: documentId,
