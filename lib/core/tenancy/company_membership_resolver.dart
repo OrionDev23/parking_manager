@@ -83,6 +83,31 @@ class CompanyMembershipResolver {
     return decoded is Map && decoded['ok'] == true && decoded['isPlatformSuperAdmin'] == true;
   }
 
+  Future<void> returnToPlatformContext() async {
+    final client = DatabaseGetter.client;
+    if (client == null) {
+      throw StateError('Appwrite client is not initialized.');
+    }
+    final execution = await Functions(client).createExecution(
+      functionId: functionId,
+      body: jsonEncode({'action': 'platform_return_to_platform'}),
+    );
+    Map<String, dynamic> response = {};
+    try {
+      response = Map<String, dynamic>.from(
+        jsonDecode(execution.responseBody) as Map,
+      );
+    } catch (_) {}
+    if (execution.responseStatusCode < 200 ||
+        execution.responseStatusCode >= 300 ||
+        response['ok'] != true) {
+      throw StateError(
+        response['message']?.toString() ??
+            'Impossible de restaurer les droits du Super Admin.',
+      );
+    }
+  }
+
   Future<Map<String, dynamic>> authorizePlatformCompany(String companyId) async {
     final client = DatabaseGetter.client;
     if (client == null) {
