@@ -594,13 +594,14 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
   late String _status;
   late String _billingCycle;
   late String _currency;
+  bool _hasExistingEntitlement = false;
+  bool _licenseTouched = false;
   bool _saving = false;
   String? _error;
 
-  String _dateValue(String? raw, DateTime fallback) {
+  String _dateValue(String? raw) {
     final parsed = DateTime.tryParse(raw ?? '');
-    final value = parsed ?? fallback;
-    return value.toIso8601String().substring(0, 10);
+    return parsed?.toIso8601String().substring(0, 10) ?? '';
   }
 
   @override
@@ -608,41 +609,46 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
     super.initState();
     final company = widget.company;
     final entitlement = company.entitlement;
-    final now = DateTime.now();
+    _hasExistingEntitlement = entitlement.isNotEmpty;
     _name = TextEditingController(text: company.name);
     _slug = TextEditingController(text: company.slug);
     _startsAt = TextEditingController(
-      text: _dateValue(entitlement['startsAt']?.toString(), now),
+      text: _hasExistingEntitlement
+          ? _dateValue(entitlement['startsAt']?.toString())
+          : '',
     );
     _expiresAt = TextEditingController(
-      text: _dateValue(
-        entitlement['expiresAt']?.toString(),
-        now.add(const Duration(days: 365)),
-      ),
+      text: _hasExistingEntitlement
+          ? _dateValue(entitlement['expiresAt']?.toString())
+          : '',
     );
     _maxUsers = TextEditingController(
-      text: (company.quota('maxUsers') == 0 ? 5 : company.quota('maxUsers')).toString(),
+      text: _hasExistingEntitlement ? company.quota('maxUsers').toString() : '',
     );
     _maxVehicles = TextEditingController(
-      text: (company.quota('maxVehicles') == 0 ? 50 : company.quota('maxVehicles')).toString(),
+      text: _hasExistingEntitlement ? company.quota('maxVehicles').toString() : '',
     );
     _maxEmployees = TextEditingController(
-      text: (company.quota('maxEmployees') == 0 ? 20 : company.quota('maxEmployees')).toString(),
+      text: _hasExistingEntitlement ? company.quota('maxEmployees').toString() : '',
     );
     _maxDrivers = TextEditingController(
-      text: (company.quota('maxDrivers') == 0 ? 20 : company.quota('maxDrivers')).toString(),
+      text: _hasExistingEntitlement ? company.quota('maxDrivers').toString() : '',
     );
     _maxSites = TextEditingController(
-      text: (company.quota('maxSites') == 0 ? 1 : company.quota('maxSites')).toString(),
+      text: _hasExistingEntitlement ? company.quota('maxSites').toString() : '',
     );
-    _priceAmount = TextEditingController(text: company.priceAmount.toString());
-    _notes = TextEditingController(text: entitlement['notes']?.toString() ?? '');
+    _priceAmount = TextEditingController(
+      text: _hasExistingEntitlement ? company.priceAmount.toString() : '',
+    );
+    _notes = TextEditingController(
+      text: entitlement['notes']?.toString() ?? '',
+    );
     _status = company.status == 'suspended' ? 'suspended' : 'active';
     final cycle = entitlement['billingCycle']?.toString() ?? 'monthly';
     _billingCycle = const ['monthly', 'quarterly', 'yearly', 'custom'].contains(cycle)
         ? cycle
         : 'monthly';
-    _currency = company.currency;
+    _currency = _hasExistingEntitlement ? company.currency : 'DZD';
   }
 
   @override
@@ -692,19 +698,50 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
   }
 
   Future<void> _submit() async {
-    final startsAt = DateTime.tryParse(_startsAt.text.trim());
-    final expiresAt = DateTime.tryParse(_expiresAt.text.trim());
-    final maxUsers = _integer(_maxUsers);
-    final maxVehicles = _integer(_maxVehicles);
-    final maxEmployees = _integer(_maxEmployees);
-    final maxDrivers = _integer(_maxDrivers);
-    final maxSites = _integer(_maxSites);
-    final priceAmount = _integer(_priceAmount);
-    if (startsAt == null || expiresAt == null || maxUsers == null ||
-        maxVehicles == null || maxEmployees == null || maxDrivers == null ||
-        maxSites == null || priceAmount == null) {
-      setState(() => _error = 'Vérifiez les dates et les valeurs numériques.');
-      return;
+    final hasLicenseInput = _hasExistingEntitlement ||
+        _licenseTouched ||
+        [
+          _startsAt,
+          _expiresAt,
+          _maxUsers,
+          _maxVehicles,
+          _maxEmployees,
+          _maxDrivers,
+          _maxSites,
+          _priceAmount,
+          _notes,
+        ].any((controller) => controller.text.trim().isNotEmpty);
+
+    DateTime? startsAt;
+    DateTime? expiresAt;
+    int? maxUsers;
+    int? maxVehicles;
+    int? maxEmployees;
+    int? maxDrivers;
+    int? maxSites;
+    int? priceAmount;
+    if (hasLicenseInput) {
+      startsAt = DateTime.tryParse(_startsAt.text.trim());
+      expiresAt = DateTime.tryParse(_expiresAt.text.trim());
+      maxUsers = _integer(_maxUsers);
+      maxVehicles = _integer(_maxVehicles);
+      maxEmployees = _integer(_maxEmployees);
+      maxDrivers = _integer(_maxDrivers);
+      maxSites = _integer(_maxSites);
+      priceAmount = _integer(_priceAmount);
+      if (startsAt == null ||
+          expiresAt == null ||
+          maxUsers == null ||
+          maxVehicles == null ||
+          maxEmployees == null ||
+          maxDrivers == null ||
+          maxSites == null ||
+          priceAmount == null) {
+        setState(() {
+          _error = 'Pour configurer une licence, renseignez toutes les dates et tous les quotas.';
+        });
+        return;
+      }
     }
 
     setState(() {
@@ -725,17 +762,9 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
         maxDrivers: maxDrivers,
         maxSites: maxSites,
         priceAmount: priceAmount,
-        billingCycle: _billingCycle,
-        currency: _currency,
-        notes: _notes.text.trim(),
-        address: _address.text.trim(),
-        phone: _companyPhone.text.trim(),
-        companyEmail: _companyEmail.text.trim(),
-        nif: _nif.text.trim(),
-        nis: _nis.text.trim(),
-        rc: _rc.text.trim(),
-        art: _art.text.trim(),
-        description: _description.text.trim(),
+        billingCycle: hasLicenseInput ? _billingCycle : null,
+        currency: hasLicenseInput ? _currency : null,
+        notes: hasLicenseInput ? _notes.text.trim() : null,
       );
       if (mounted) Navigator.of(context).pop(true);
     } catch (error) {
@@ -788,6 +817,12 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
                 'Licence et quotas',
                 style: FluentTheme.of(context).typography.subtitle,
               ),
+              if (!_hasExistingEntitlement) ...[
+                const SizedBox(height: 4),
+                const Text(
+                  'Aucune licence contractuelle n’est configurée. Laissez ces champs vides pour modifier uniquement l’entreprise. Pour créer une licence, renseignez tous les champs.',
+                ),
+              ],
               const SizedBox(height: 10),
               _field('Début de licence (AAAA-MM-JJ)', _startsAt),
               _field('Fin de licence (AAAA-MM-JJ)', _expiresAt),
@@ -811,7 +846,12 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
                 onChanged: _saving
                     ? null
                     : (value) {
-                        if (value != null) setState(() => _billingCycle = value);
+                        if (value != null) {
+                          setState(() {
+                            _billingCycle = value;
+                            _licenseTouched = true;
+                          });
+                        }
                       },
               ),
               const SizedBox(height: 10),
@@ -829,7 +869,12 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
                 onChanged: _saving
                     ? null
                     : (value) {
-                        if (value != null) setState(() => _currency = value);
+                        if (value != null) {
+                          setState(() {
+                            _currency = value;
+                            _licenseTouched = true;
+                          });
+                        }
                       },
               ),
               const SizedBox(height: 10),
