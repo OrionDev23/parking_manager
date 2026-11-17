@@ -312,6 +312,7 @@ export default async ({ req, res, log, error }) => {
           teamId,
         },
         teamMembershipId: membership.$id,
+        entitlement: await getEntitlement(companyId),
       });
     }
 
@@ -329,6 +330,7 @@ export default async ({ req, res, log, error }) => {
             companySlug: company.data.slug,
             role: row.data.role,
             membershipId: row.$id,
+            entitlement: await getEntitlement(company.$id),
           });
         }
       }
