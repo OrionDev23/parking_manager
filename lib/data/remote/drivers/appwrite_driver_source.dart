@@ -221,6 +221,7 @@ class AppwriteDriverSource implements RemoteDriverSource {
       tableId: tableId,
       rowId: driver.id,
       data: _toRow(driver),
+      permissions: _rowPermissions(),
     );
     return driver;
   }
