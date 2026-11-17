@@ -158,12 +158,30 @@ async function prepareCompanyRows(companyId, teamId) {
     (Number.isFinite(startsAt) && Number.isFinite(expiresAt) &&
       startsAt <= now && expiresAt > now);
   const isActive = company.data?.status === 'active' && licenseActive;
+  // Only business tables that actually exist and carry companyId.
+  // Global user profiles, system settings and shared reference tables are
+  // deliberately excluded from tenant row ACL provisioning.
   const tableIds = [
-    '6537d87b492c80f255e8', '6531ad22153b2a49ca2c', 'etat', 'doc_vehic',
-    'reparation', 'activity', 'chauf_disponibilite', 'doc_chauffeur',
-    'entreprise', 'planning', 'prestataire', 'fichereception', 'clients',
-    'parts', 'storage', 'backup', 'access_teams', 'access_users',
-    'fournisseurs', 'options', 'categories', 'partsbrands', 'marque',
+    '6537d87b492c80f255e8', // chauffeur
+    '6531ad22153b2a49ca2c', // vehicle
+    'marque',
+    'etat',
+    'doc_vehic',
+    'reparation',
+    'activity',
+    'chauf_disponibilite',
+    'doc_chauffeur',
+    'prestataire',
+    'entreprise',
+    'planning',
+    'backup',
+    'options',
+    'categories',
+    'partsbrands',
+    'parts',
+    'storage',
+    'fichereception',
+    'clients',
   ];
   const rowPermissions = [
     `read("team:${teamId}")`,
@@ -499,6 +517,7 @@ export default async ({ req, res, log, error }) => {
         const profile = await ensureCompanyProfile(
           companyId, company.data?.name || companyId, teamId, now,
         );
+        const aclPreparation = await prepareCompanyRows(companyId, teamId);
         const membership = await syncTeamMembership(teamId, userId, 'admin', accountName);
         return json(res, 200, {
           ok: true,
@@ -510,6 +529,7 @@ export default async ({ req, res, log, error }) => {
             profileRowId: profile.rowId,
           },
           teamMembershipId: membership.$id,
+          aclPreparation,
           entitlement: await getEntitlement(companyId),
         });
       } catch (failure) {
