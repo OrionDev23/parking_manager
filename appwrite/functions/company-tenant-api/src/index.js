@@ -1,3 +1,6 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
+
+const requestContext = new AsyncLocalStorage();
 const DATABASE_ID = '6531ad112080ae3b14a7';
 const MEMBERSHIPS = 'company_memberships';
 const COMPANIES = 'companies';
@@ -17,7 +20,6 @@ const TENANT_TABLE_IDS = [
 
 const endpoint = (process.env.APPWRITE_FUNCTION_API_ENDPOINT || 'https://fra.cloud.appwrite.io/v1').replace(/\/$/, '');
 const projectId = process.env.APPWRITE_FUNCTION_PROJECT_ID;
-const apiKey = process.env.APPWRITE_FUNCTION_API_KEY;
 
 function json(res, status, body) {
   return res.json(body, status);
@@ -36,7 +38,11 @@ function queryPath(tableId, queries, offset) {
 async function appwrite(path, { method = 'GET', body, jwt } = {}) {
   const headers = { 'X-Appwrite-Project': projectId };
   if (jwt) headers['X-Appwrite-JWT'] = jwt;
-  else headers['X-Appwrite-Key'] = apiKey;
+  else {
+    const executionKey = requestContext.getStore()?.apiKey;
+    if (!executionKey) throw new Error('Appwrite function execution key is unavailable.');
+    headers['X-Appwrite-Key'] = executionKey;
+  }
   if (body !== undefined) headers['Content-Type'] = 'application/json';
 
   const response = await fetch(`${endpoint}${path}`, {
@@ -490,9 +496,12 @@ function slugify(value) {
     .toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 64);
 }
 
-export default async ({ req, res, log, error }) => {
-  try {
-    if (!projectId || !apiKey) {
+export default async (context) => requestContext.run(
+  { apiKey: context.req.headers['x-appwrite-key'] },
+  async () => {
+    const { req, res, log, error } = context;
+    try {
+    if (!projectId || !requestContext.getStore()?.apiKey) {
       return json(res, 500, { ok: false, message: 'Function configuration is incomplete.' });
     }
     const { userId } = await authenticate(req);
@@ -1552,4 +1561,5 @@ export default async ({ req, res, log, error }) => {
       message: failure.status && failure.status < 500 ? failure.message : 'Internal tenant service error.',
     });
   }
-};
+  }
+);
