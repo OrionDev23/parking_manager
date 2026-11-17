@@ -1280,8 +1280,12 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
   final _adminName = TextEditingController();
   final _adminEmail = TextEditingController();
   final _adminPassword = TextEditingController();
-  final _startsAt = TextEditingController(text: DateTime.now().toUtc().toIso8601String());
-  final _expiresAt = TextEditingController(text: DateTime.now().toUtc().add(const Duration(days: 365)).toIso8601String());
+  final _startsAt = TextEditingController(
+    text: DateTime.now().toIso8601String().substring(0, 10),
+  );
+  final _expiresAt = TextEditingController(
+    text: DateTime.now().add(const Duration(days: 365)).toIso8601String().substring(0, 10),
+  );
   final _maxUsers = TextEditingController(text: '5');
   final _maxVehicles = TextEditingController(text: '50');
   final _maxEmployees = TextEditingController(text: '20');
@@ -1289,25 +1293,115 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
   final _maxSites = TextEditingController(text: '1');
   final _priceAmount = TextEditingController(text: '0');
   final _notes = TextEditingController();
-  final _billingCycle = TextEditingController(text: 'monthly');
+  String _billingCycle = 'monthly';
+  String _currency = 'DZD';
   bool _saving = false;
   String? _error;
 
   @override
   void dispose() {
-    for (final controller in [_name, _slug, _adminName, _adminEmail, _adminPassword, _startsAt, _expiresAt, _maxUsers, _maxVehicles, _maxEmployees, _maxDrivers, _maxSites, _priceAmount, _notes, _billingCycle]) {
+    for (final controller in [
+      _name,
+      _slug,
+      _adminName,
+      _adminEmail,
+      _adminPassword,
+      _startsAt,
+      _expiresAt,
+      _maxUsers,
+      _maxVehicles,
+      _maxEmployees,
+      _maxDrivers,
+      _maxSites,
+      _priceAmount,
+      _notes,
+    ]) {
       controller.dispose();
     }
     super.dispose();
   }
 
-  int _number(TextEditingController controller) => int.tryParse(controller.text.trim()) ?? -1;
+  int? _number(TextEditingController controller) =>
+      int.tryParse(controller.text.trim());
+
+  Widget _field(
+    String label,
+    TextEditingController controller, {
+    bool password = false,
+    bool numeric = false,
+    String? placeholder,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label),
+          const SizedBox(height: 5),
+          TextBox(
+            controller: controller,
+            obscureText: password,
+            keyboardType: numeric ? TextInputType.number : TextInputType.text,
+            placeholder: placeholder,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _section(String title, String description, List<Widget> children) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(title, style: FluentTheme.of(context).typography.subtitle),
+            const SizedBox(height: 4),
+            Text(
+              description,
+              style: FluentTheme.of(context).typography.caption,
+            ),
+            const SizedBox(height: 14),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
 
   Future<void> _submit() async {
-    setState(() { _saving = true; _error = null; });
+    final starts = DateTime.tryParse(_startsAt.text.trim());
+    final expires = DateTime.tryParse(_expiresAt.text.trim());
+    final maxUsers = _number(_maxUsers);
+    final maxVehicles = _number(_maxVehicles);
+    final maxEmployees = _number(_maxEmployees);
+    final maxDrivers = _number(_maxDrivers);
+    final maxSites = _number(_maxSites);
+    final priceAmount = _number(_priceAmount);
+
+    if (_name.text.trim().length < 2 ||
+        _adminName.text.trim().length < 2 ||
+        !_adminEmail.text.trim().contains('@') ||
+        starts == null ||
+        expires == null ||
+        maxUsers == null ||
+        maxVehicles == null ||
+        maxEmployees == null ||
+        maxDrivers == null ||
+        maxSites == null ||
+        priceAmount == null) {
+      setState(() {
+        _error = 'Complétez les informations obligatoires et vérifiez les dates et quotas.';
+      });
+      return;
+    }
+
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
     try {
-      final starts = DateTime.parse(_startsAt.text.trim());
-      final expires = DateTime.parse(_expiresAt.text.trim());
       await widget.repository.create(
         name: _name.text.trim(),
         slug: _slug.text.trim(),
@@ -1316,14 +1410,14 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
         adminPassword: _adminPassword.text,
         startsAt: starts,
         expiresAt: expires,
-        maxUsers: _number(_maxUsers),
-        maxVehicles: _number(_maxVehicles),
-        maxEmployees: _number(_maxEmployees),
-        maxDrivers: _number(_maxDrivers),
-        maxSites: _number(_maxSites),
-        priceAmount: _number(_priceAmount),
-        billingCycle: _billingCycle.text.trim(),
-        currency: 'DZD',
+        maxUsers: maxUsers,
+        maxVehicles: maxVehicles,
+        maxEmployees: maxEmployees,
+        maxDrivers: maxDrivers,
+        maxSites: maxSites,
+        priceAmount: priceAmount,
+        billingCycle: _billingCycle,
+        currency: _currency,
         notes: _notes.text.trim(),
       );
       if (mounted) Navigator.of(context).pop(true);
@@ -1336,68 +1430,154 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
     }
   }
 
-  Widget _field(String label, TextEditingController controller, {bool password = false, bool numeric = false, String? placeholder}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(label),
-        const SizedBox(height: 4),
-        TextBox(controller: controller, obscureText: password, keyboardType: numeric ? TextInputType.number : TextInputType.text, placeholder: placeholder),
-      ]),
+  @override
+  Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width < 760;
+    return ContentDialog(
+      title: const Text('Créer une entreprise cliente'),
+      constraints: const BoxConstraints(maxWidth: 820, maxHeight: 860),
+      content: SizedBox(
+        width: compact ? MediaQuery.sizeOf(context).width * 0.84 : 740,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _section(
+                'Identité de l’entreprise',
+                'Informations qui identifieront l’espace client dans Parcoto.',
+                [
+                  _field(
+                    'Raison sociale / nom commercial',
+                    _name,
+                    placeholder: 'Ex. GTS Guelma Truck Service',
+                  ),
+                  _field(
+                    'Identifiant de l’entreprise',
+                    _slug,
+                    placeholder: 'Laisser vide pour le générer automatiquement',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _section(
+                'Administrateur principal',
+                'Un véritable compte Appwrite Auth sera créé si cette adresse n’existe pas déjà. Sinon, le compte existant sera associé.',
+                [
+                  _field('Nom complet', _adminName),
+                  _field(
+                    'Adresse e-mail',
+                    _adminEmail,
+                    placeholder: 'admin@entreprise.dz',
+                  ),
+                  _field(
+                    'Mot de passe initial',
+                    _adminPassword,
+                    password: true,
+                    placeholder: 'Obligatoire uniquement pour un nouveau compte',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _section(
+                'Licence et facturation',
+                'La période et les limites sont enregistrées dans les droits contractuels de l’entreprise.',
+                [
+                  _field(
+                    'Début de licence (AAAA-MM-JJ)',
+                    _startsAt,
+                    placeholder: '2026-11-17',
+                  ),
+                  _field(
+                    'Expiration (AAAA-MM-JJ)',
+                    _expiresAt,
+                    placeholder: '2027-11-17',
+                  ),
+                  const Text('Périodicité'),
+                  const SizedBox(height: 5),
+                  ComboBox<String>(
+                    value: _billingCycle,
+                    isExpanded: true,
+                    items: const [
+                      ComboBoxItem(value: 'monthly', child: Text('Mensuelle')),
+                      ComboBoxItem(value: 'quarterly', child: Text('Trimestrielle')),
+                      ComboBoxItem(value: 'yearly', child: Text('Annuelle')),
+                      ComboBoxItem(value: 'custom', child: Text('Personnalisée')),
+                    ],
+                    onChanged: _saving
+                        ? null
+                        : (value) {
+                            if (value != null) {
+                              setState(() => _billingCycle = value);
+                            }
+                          },
+                  ),
+                  const SizedBox(height: 12),
+                  const Text('Devise'),
+                  const SizedBox(height: 5),
+                  ComboBox<String>(
+                    value: _currency,
+                    isExpanded: true,
+                    items: const [
+                      ComboBoxItem(value: 'DZD', child: Text('DZD — Dinar algérien')),
+                      ComboBoxItem(value: 'EUR', child: Text('EUR — Euro')),
+                      ComboBoxItem(value: 'USD', child: Text('USD — Dollar américain')),
+                    ],
+                    onChanged: _saving
+                        ? null
+                        : (value) {
+                            if (value != null) setState(() => _currency = value);
+                          },
+                  ),
+                  const SizedBox(height: 12),
+                  _field('Tarif par période', _priceAmount, numeric: true),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _section(
+                'Quotas contractuels',
+                'Les limites sont appliquées par l’API métier lorsqu’elles sont prises en charge.',
+                [
+                  _field('Utilisateurs maximum', _maxUsers, numeric: true),
+                  _field('Véhicules maximum', _maxVehicles, numeric: true),
+                  _field('Employés maximum', _maxEmployees, numeric: true),
+                  _field('Chauffeurs maximum', _maxDrivers, numeric: true),
+                  _field('Sites maximum', _maxSites, numeric: true),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _section(
+                'Notes internes',
+                'Informations commerciales ou conditions particulières.',
+                [
+                  TextBox(
+                    controller: _notes,
+                    minLines: 2,
+                    maxLines: 4,
+                    placeholder: 'Notes...',
+                  ),
+                ],
+              ),
+              if (_error != null) ...[
+                const SizedBox(height: 12),
+                InfoBar(
+                  title: Text(_error!),
+                  severity: InfoBarSeverity.error,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(false),
+          child: const Text('Annuler'),
+        ),
+        FilledButton(
+          onPressed: _saving ? null : _submit,
+          child: _saving ? const ProgressRing() : const Text('Créer l’entreprise'),
+        ),
+      ],
     );
   }
-
-  @override
-  Widget build(BuildContext context) => ContentDialog(
-    title: const Text('Créer une entreprise cliente'),
-    constraints: const BoxConstraints(maxWidth: 760, maxHeight: 820),
-    content: SizedBox(
-      width: 700,
-      child: SingleChildScrollView(
-        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Text('Identité de l’entreprise', style: FluentTheme.of(context).typography.subtitle),
-          const SizedBox(height: 8),
-          _field('Nom commercial / raison sociale', _name),
-          _field('Identifiant (slug)', _slug, placeholder: 'Ex. societe-annaba'),
-          const Divider(),
-          Text('Premier administrateur de l’entreprise', style: FluentTheme.of(context).typography.subtitle),
-          const SizedBox(height: 8),
-          _field('Nom complet', _adminName),
-          _field('Adresse email', _adminEmail),
-          _field('Mot de passe initial (obligatoire uniquement si le compte n’existe pas)', _adminPassword, password: true),
-          const Divider(),
-          Text('Licence et contrat', style: FluentTheme.of(context).typography.subtitle),
-          const SizedBox(height: 8),
-          _field('Début (ISO 8601)', _startsAt, placeholder: '2026-11-16T00:00:00Z'),
-          _field('Expiration (ISO 8601)', _expiresAt, placeholder: '2027-11-16T00:00:00Z'),
-          Row(children: [
-            Expanded(child: _field('Cycle de facturation (monthly / quarterly / yearly / custom)', _billingCycle)),
-            const SizedBox(width: 10),
-            Expanded(child: _field('Tarif par période (DA)', _priceAmount, numeric: true)),
-          ]),
-          const Divider(),
-          Text('Quotas contractuels', style: FluentTheme.of(context).typography.subtitle),
-          const SizedBox(height: 8),
-          Row(children: [
-            Expanded(child: _field('Utilisateurs', _maxUsers, numeric: true)),
-            const SizedBox(width: 10),
-            Expanded(child: _field('Véhicules', _maxVehicles, numeric: true)),
-          ]),
-          Row(children: [
-            Expanded(child: _field('Employés', _maxEmployees, numeric: true)),
-            const SizedBox(width: 10),
-            Expanded(child: _field('Chauffeurs', _maxDrivers, numeric: true)),
-            const SizedBox(width: 10),
-            Expanded(child: _field('Sites', _maxSites, numeric: true)),
-          ]),
-          _field('Notes commerciales / conditions', _notes),
-          if (_error != null) InfoBar(title: Text(_error!), severity: InfoBarSeverity.error),
-        ]),
-      ),
-    ),
-    actions: [
-      Button(onPressed: _saving ? null : () => Navigator.of(context).pop(false), child: const Text('Annuler')),
-      FilledButton(onPressed: _saving ? null : _submit, child: _saving ? const ProgressRing() : const Text('Créer l’entreprise')),
-    ],
-  );
 }
