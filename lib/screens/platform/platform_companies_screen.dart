@@ -668,10 +668,17 @@ class _CompanyAdministratorsDialogState
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            CircleAvatar(
+            Container(
+              width: 38,
+              height: 38,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: FluentTheme.of(context).accentColor,
+                shape: BoxShape.circle,
+              ),
               child: Text(
                 administrator.name.isNotEmpty
-                    ? administrator.name.characters.first.toUpperCase()
+                    ? administrator.name.substring(0, 1).toUpperCase()
                     : '?',
               ),
             ),
@@ -692,24 +699,21 @@ class _CompanyAdministratorsDialogState
                   ),
                   const SizedBox(height: 4),
                   Wrap(
-                    spacing: 6,
+                    spacing: 10,
                     children: [
-                      InfoBadge(
-                        severity: active
-                            ? InfoBadgeSeverity.success
-                            : InfoBadgeSeverity.warning,
-                        child: Text(active ? 'Actif' : 'Révoqué'),
-                      ),
-                      if (administrator.isPlatformSuperAdmin)
-                        const InfoBadge(
-                          severity: InfoBadgeSeverity.info,
-                          child: Text('Super Admin plateforme'),
-                        )
-                      else
-                        InfoBadge(
-                          severity: InfoBadgeSeverity.informational,
-                          child: Text(administrator.role),
+                      Text(
+                        active ? 'Actif' : 'Révoqué',
+                        style: TextStyle(
+                          color: active ? Colors.green : Colors.orange,
+                          fontWeight: FontWeight.w600,
                         ),
+                      ),
+                      Text(
+                        administrator.isPlatformSuperAdmin
+                            ? 'Super Admin plateforme'
+                            : administrator.role,
+                        style: FluentTheme.of(context).typography.caption,
+                      ),
                     ],
                   ),
                 ],
