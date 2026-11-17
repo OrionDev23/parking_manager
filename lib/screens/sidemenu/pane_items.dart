@@ -377,7 +377,11 @@ class PaneItemsAndFooters {
     );
 
     if (PanesListState.signedIn.value) {
-      final isPlatformSession = authService.session?.isPlatformSuperAdmin == true;
+      final isPlatformSession =
+          authService.session?.isPlatformSuperAdmin == true &&
+          authService.session?.isPlatformCompanyContext != true;
+      final isPlatformCompanyContext =
+          authService.session?.isPlatformCompanyContext == true;
       originalItems = [
         if (isPlatformSession) platformCompanies,
         if (!isPlatformSession && PanesListState.signedIn.value) dashboard,
@@ -404,6 +408,13 @@ class PaneItemsAndFooters {
           authService.session?.hasPermission('backup.manage') == true &&
           PanesListState.signedIn.value)
         backup,
+      if (isPlatformCompanyContext)
+        PaneItem(
+          key: const ValueKey('platform-return'),
+          icon: Icon(FluentIcons.back, color: appTheme.color.lightest),
+          title: const Text('Retour administration plateforme'),
+          body: const _PlatformContextReturnScreen(),
+        ),
       if (PanesListState.signedIn.value) logout,
       parametres,
       if (PanesListState.signedIn.value && authService.session?.isPlatformSuperAdmin != true) tutorial,
@@ -472,4 +483,55 @@ class PaneItemsAndFooters {
 
   static List<NavigationPaneItem> originalItems = List.empty(growable: true);
   static List<NavigationPaneItem> footerItems = List.empty(growable: true);
+}
+
+
+class _PlatformContextReturnScreen extends StatelessWidget {
+  const _PlatformContextReturnScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaffoldPage(
+      content: Center(
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(FluentIcons.cloud, size: 36),
+                const SizedBox(height: 16),
+                const Text(
+                  'Contexte entreprise',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Vous consultez Parcoto avec vos privilèges Super Admin. '
+                  'Vous pouvez revenir à tout moment à la gestion globale des entreprises.',
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                FilledButton(
+                  onPressed: () async {
+                    try {
+                      await authService.returnToPlatformContext();
+                    } catch (error) {
+                      if (!context.mounted) return;
+                      displayMessage(
+                        context,
+                        error.toString().replaceFirst('Bad state: ', ''),
+                        InfoBarSeverity.error,
+                      );
+                    }
+                  },
+                  child: const Text('Retour à l’administration plateforme'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
