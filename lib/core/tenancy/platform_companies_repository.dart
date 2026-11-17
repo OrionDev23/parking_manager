@@ -131,6 +131,17 @@ class PlatformCompaniesRepository {
     required String name,
     required String slug,
     required String status,
+    required DateTime startsAt,
+    required DateTime expiresAt,
+    required int maxUsers,
+    required int maxVehicles,
+    required int maxEmployees,
+    required int maxDrivers,
+    required int maxSites,
+    required int priceAmount,
+    required String billingCycle,
+    required String currency,
+    required String notes,
   }) async {
     await _execute({
       'action': 'platform_update_company',
@@ -138,6 +149,17 @@ class PlatformCompaniesRepository {
       'name': name,
       'slug': slug,
       'status': status,
+      'startsAt': startsAt.toUtc().toIso8601String(),
+      'expiresAt': expiresAt.toUtc().toIso8601String(),
+      'maxUsers': maxUsers,
+      'maxVehicles': maxVehicles,
+      'maxEmployees': maxEmployees,
+      'maxDrivers': maxDrivers,
+      'maxSites': maxSites,
+      'priceAmount': priceAmount,
+      'billingCycle': billingCycle,
+      'currency': currency,
+      'notes': notes,
     });
   }
 
