@@ -456,16 +456,11 @@ class _AppointmentFormState extends State<AppointmentForm> {
       isAllDay: _isAllDay,
       type: _selectedCategorie,
     );
-    await DatabaseGetter.database!
-        .createRow(
-          databaseId: databaseId,
-          tableId: planningID,
-          rowId: documentID!,
+    await DatabaseGetter()
+        .addDocument(
+          collectionId: planningID,
+          documentId: documentID!,
           data: planning.toJson(),
-          permissions: [
-            Permission.delete(Role.user(DatabaseGetter.me.value!.id)),
-            Permission.update(Role.user(DatabaseGetter.me.value!.id)),
-          ],
         )
         .then((value) {
           if (mounted) {
