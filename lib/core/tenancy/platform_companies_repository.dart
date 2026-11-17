@@ -91,6 +91,13 @@ class PlatformCompaniesRepository {
         .toList(growable: false);
   }
 
+  Future<Map<String, dynamic>> preparePermissions(String companyId) async {
+    return _execute({
+      'action': 'platform_prepare_company_rows',
+      'companyId': companyId,
+    });
+  }
+
   Future<void> create({
     required String name,
     required String slug,
