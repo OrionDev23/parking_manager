@@ -212,7 +212,8 @@ Future<bool> _restoreInitialSession() async {
 Future<void> startBackgroundInitialization(String companyId) async {
   // A platform session has no tenant context: never start tenant caches,
   // pull handlers or sync workers until an explicit company is selected.
-  if (authService.session?.isPlatformSuperAdmin == true) return;
+  if (authService.session?.isPlatformSuperAdmin == true &&
+      authService.session?.isPlatformCompanyContext != true) return;
   _backgroundInitializationRetryTimer?.cancel();
   _backgroundInitializationRetryTimer = null;
 
