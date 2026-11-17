@@ -326,11 +326,6 @@ export default async ({ req, res, log, error }) => {
         return json(res, 409, { ok: false, message: 'This company identifier is already used.' });
       }
 
-      await appwrite(`/tablesdb/${DATABASE_ID}/tables/${COMPANIES}/rows/${encodeURIComponent(companyId)}`, {
-        method: 'PATCH',
-        body: { data: { name, slug, status, updatedAt: now } },
-      });
-
       const entitlementKeys = [
         'startsAt', 'expiresAt', 'maxUsers', 'maxVehicles', 'maxEmployees',
         'maxDrivers', 'maxSites', 'priceAmount', 'billingCycle', 'currency', 'notes',
@@ -338,23 +333,24 @@ export default async ({ req, res, log, error }) => {
       const hasEntitlementChanges = entitlementKeys.some(key =>
         Object.prototype.hasOwnProperty.call(input, key)
       );
-      let entitlement = await getEntitlement(companyId);
+      const previousEntitlement = await getEntitlement(companyId);
+      let nextEntitlement = previousEntitlement;
       if (hasEntitlementChanges) {
-        const startsAt = new Date(input.startsAt || entitlement?.startsAt || now);
+        const startsAt = new Date(input.startsAt || previousEntitlement?.startsAt || now);
         const defaultExpiry = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
         const expiresAt = new Date(
-          input.expiresAt || entitlement?.expiresAt || defaultExpiry.toISOString()
+          input.expiresAt || previousEntitlement?.expiresAt || defaultExpiry.toISOString()
         );
         const values = {
-          maxUsers: Number(input.maxUsers ?? entitlement?.maxUsers ?? 5),
-          maxVehicles: Number(input.maxVehicles ?? entitlement?.maxVehicles ?? 50),
-          maxEmployees: Number(input.maxEmployees ?? entitlement?.maxEmployees ?? 20),
-          maxDrivers: Number(input.maxDrivers ?? entitlement?.maxDrivers ?? 20),
-          maxSites: Number(input.maxSites ?? entitlement?.maxSites ?? 1),
-          priceAmount: Number(input.priceAmount ?? entitlement?.priceAmount ?? 0),
+          maxUsers: Number(input.maxUsers ?? previousEntitlement?.maxUsers ?? 5),
+          maxVehicles: Number(input.maxVehicles ?? previousEntitlement?.maxVehicles ?? 50),
+          maxEmployees: Number(input.maxEmployees ?? previousEntitlement?.maxEmployees ?? 20),
+          maxDrivers: Number(input.maxDrivers ?? previousEntitlement?.maxDrivers ?? 20),
+          maxSites: Number(input.maxSites ?? previousEntitlement?.maxSites ?? 1),
+          priceAmount: Number(input.priceAmount ?? previousEntitlement?.priceAmount ?? 0),
         };
-        const billingCycle = String(input.billingCycle ?? entitlement?.billingCycle ?? 'monthly');
-        const currency = String(input.currency ?? entitlement?.currency ?? 'DZD').toUpperCase();
+        const billingCycle = String(input.billingCycle ?? previousEntitlement?.billingCycle ?? 'monthly');
+        const currency = String(input.currency ?? previousEntitlement?.currency ?? 'DZD').toUpperCase();
         if (!Number.isFinite(startsAt.getTime()) ||
             !Number.isFinite(expiresAt.getTime()) || expiresAt <= startsAt ||
             !Object.values(values).every(Number.isSafeInteger) ||
@@ -364,29 +360,56 @@ export default async ({ req, res, log, error }) => {
             !/^[A-Z]{3}$/.test(currency)) {
           return json(res, 400, { ok: false, message: 'Invalid licence dates, quotas or billing values.' });
         }
-        const nextEntitlement = {
+        nextEntitlement = {
           companyId,
           startsAt: startsAt.toISOString(),
           expiresAt: expiresAt.toISOString(),
           ...values,
           currency,
           billingCycle,
-          notes: String(input.notes ?? entitlement?.notes ?? '').trim().slice(0, 2000),
-          createdAt: entitlement?.createdAt || now,
+          notes: String(input.notes ?? previousEntitlement?.notes ?? '').trim().slice(0, 2000),
+          createdAt: previousEntitlement?.createdAt || now,
           updatedAt: now,
         };
-        if (entitlement) {
+      }
+
+      let entitlementWritten = false;
+      if (hasEntitlementChanges && nextEntitlement) {
+        if (previousEntitlement) {
           await appwrite(`/tablesdb/${DATABASE_ID}/tables/${ENTITLEMENTS}/rows/${encodeURIComponent(companyId)}`, {
             method: 'PATCH', body: { data: nextEntitlement },
           });
         } else {
           await createRow(ENTITLEMENTS, companyId, nextEntitlement);
         }
-        entitlement = nextEntitlement;
+        entitlementWritten = true;
       }
+
+      try {
+        await appwrite(`/tablesdb/${DATABASE_ID}/tables/${COMPANIES}/rows/${encodeURIComponent(companyId)}`, {
+          method: 'PATCH',
+          body: { data: { name, slug, status, updatedAt: now } },
+        });
+      } catch (failure) {
+        if (entitlementWritten) {
+          try {
+            if (previousEntitlement) {
+              await appwrite(`/tablesdb/${DATABASE_ID}/tables/${ENTITLEMENTS}/rows/${encodeURIComponent(companyId)}`, {
+                method: 'PATCH', body: { data: previousEntitlement },
+              });
+            } else {
+              await appwrite(`/tablesdb/${DATABASE_ID}/tables/${ENTITLEMENTS}/rows/${encodeURIComponent(companyId)}`, {
+                method: 'DELETE',
+              });
+            }
+          } catch (_) {}
+        }
+        throw failure;
+      }
+
       return json(res, 200, {
         ok: true,
-        company: { companyId, name, slug, status, entitlement },
+        company: { companyId, name, slug, status, entitlement: nextEntitlement },
       });
     }
 
