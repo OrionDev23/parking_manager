@@ -212,6 +212,10 @@ async function prepareCompanyRows(companyId, teamId) {
       tableId,
       totalRows: rows.length,
       tenantRows: tenantRows.length,
+      unassignedRows: rows.filter(row => !row.data?.companyId).length,
+      otherCompanyRows: rows.filter(
+        row => row.data?.companyId && row.data.companyId !== companyId
+      ).length,
       permissionsUpdated: updated,
       createPermissionsAdded: tablePermissionsChanged,
     });
