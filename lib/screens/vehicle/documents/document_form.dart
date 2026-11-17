@@ -270,10 +270,9 @@ class DocumentFormState extends State<DocumentForm>
         createdBy: DatabaseGetter.me.value?.id,
       );
       if (widget.vd != null) {
-        await DatabaseGetter.database!.updateRow(
-          databaseId: databaseId,
-          tableId: vehicDoc,
-          rowId: documentID!,
+        await DatabaseGetter().updateDocument(
+          collectionId: vehicDoc,
+          documentId: documentID!,
           data: dv.toJson(),
         );
         DatabaseGetter().ajoutActivity(
@@ -282,10 +281,9 @@ class DocumentFormState extends State<DocumentForm>
           docName: selectedVehicle?.matricule,
         );
       } else {
-        await DatabaseGetter.database!.createRow(
-          databaseId: databaseId,
-          tableId: vehicDoc,
-          rowId: documentID!,
+        await DatabaseGetter().addDocument(
+          collectionId: vehicDoc,
+          documentId: documentID!,
           data: dv.toJson(),
         );
         DatabaseGetter().ajoutActivity(
