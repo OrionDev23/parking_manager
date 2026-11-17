@@ -20,6 +20,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
   String? _error;
   List<PlatformCompany> _companies = [];
   String? _preparingCompanyId;
+  String? _auditingCompanyId;
   String? _openingCompanyId;
 
   @override
@@ -110,6 +111,127 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
         repository: _repository,
       ),
     );
+  }
+
+  Future<void> _auditCompanyPermissions(PlatformCompany company) async {
+    setState(() => _auditingCompanyId = company.companyId);
+    try {
+      final result = await _repository.auditCompanyRows(company.companyId);
+      if (!mounted) return;
+      final summary = Map<String, dynamic>.from(result['summary'] as Map? ?? {});
+      final tables = (result['tables'] as List? ?? [])
+          .whereType<Map>()
+          .map((value) => Map<String, dynamic>.from(value))
+          .toList(growable: false);
+      await showDialog<void>(
+        context: context,
+        builder: (context) => ContentDialog(
+          title: Text('Audit de sécurité — ${company.name}'),
+          constraints: const BoxConstraints(maxWidth: 820, maxHeight: 760),
+          content: SizedBox(
+            width: 760,
+            height: 560,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Audit en lecture seule : aucune permission ni donnée n’a été modifiée.',
+                  style: FluentTheme.of(context).typography.bodyStrong,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${summary['tables'] ?? 0} tables • '
+                  '${summary['tenantScopedTables'] ?? 0} avec companyId • '
+                  '${summary['tablesWithBroadPermissions'] ?? 0} avec droits globaux • '
+                  '${summary['rowsWithoutCompanyId'] ?? 0} lignes sans entreprise • '
+                  '${summary['companyRowsWithoutPermissions'] ?? 0} lignes sans ACL.',
+                ),
+                const SizedBox(height: 12),
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: tables.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 6),
+                    itemBuilder: (context, index) {
+                      final table = tables[index];
+                      final hasCompanyId = table['hasCompanyId'] == true;
+                      final rowSecurity = table['rowSecurity'] == true;
+                      final unassigned = (table['unassignedRows'] as num?)?.toInt();
+                      final missingAcl = (table['rowsWithoutPermissions'] as num?)?.toInt() ?? 0;
+                      final broad = table['broadTablePermissions'] is List
+                          ? (table['broadTablePermissions'] as List).length
+                          : 0;
+                      final status = !hasCompanyId
+                          ? 'Classification requise'
+                          : !rowSecurity
+                              ? 'Sécurité par ligne désactivée'
+                              : (unassigned ?? 0) > 0
+                                  ? '${unassigned ?? 0} ligne(s) sans entreprise'
+                                  : missingAcl > 0
+                                      ? '$missingAcl ligne(s) sans ACL'
+                                      : broad > 0
+                                          ? '$broad droit(s) globaux au niveau table'
+                                          : 'Structure de ligne cohérente';
+                      return Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      table['name']?.toString() ?? table['tableId']?.toString() ?? 'Table',
+                                      style: FluentTheme.of(context).typography.bodyStrong,
+                                    ),
+                                  ),
+                                  Text(status),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                hasCompanyId
+                                    ? '${table['companyRows'] ?? 0} lignes entreprise / '
+                                      '${table['totalRows'] ?? 0} au total • '
+                                      '$missingAcl sans ACL • $broad droits globaux'
+                                    : 'Pas de colonne companyId • ${broad} droits globaux',
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Fermer'),
+            ),
+          ],
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (context) => ContentDialog(
+          title: const Text('Échec de l’audit'),
+          content: Text(error.toString().replaceFirst('Bad state: ', '')),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Fermer'),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _auditingCompanyId = null);
+    }
   }
 
   Future<void> _prepareCompanyPermissions(PlatformCompany company) async {
@@ -447,6 +569,7 @@ class _MetricCard extends StatelessWidget {
 class _CompanyCard extends StatelessWidget {
   final PlatformCompany company;
   final VoidCallback? onPrepare;
+  final VoidCallback? onAudit;
   final VoidCallback? onOpen;
   final VoidCallback onManageAdministrators;
   final VoidCallback onEdit;
@@ -454,6 +577,7 @@ class _CompanyCard extends StatelessWidget {
   const _CompanyCard({
     required this.company,
     required this.onPrepare,
+    required this.onAudit,
     required this.onOpen,
     required this.onManageAdministrators,
     required this.onEdit,
@@ -545,6 +669,10 @@ class _CompanyCard extends StatelessWidget {
                 Button(
                   onPressed: onManageAdministrators,
                   child: const Text('Administrateurs'),
+                ),
+                Button(
+                  onPressed: onAudit,
+                  child: const Text('Audit sécurité'),
                 ),
                 Button(
                   onPressed: onPrepare,
