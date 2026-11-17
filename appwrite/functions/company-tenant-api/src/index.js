@@ -12,6 +12,7 @@ const TENANT_TABLE_IDS = [
   'chauf_disponibilite', 'doc_chauffeur', 'prestataire', 'entreprise',
   'planning', 'backup', 'options', 'categories', 'partsbrands',
   'parts', 'storage', 'fichereception', 'clients',
+  'access_teams', 'access_users', 'fournisseurs',
 ];
 
 const endpoint = (process.env.APPWRITE_FUNCTION_API_ENDPOINT || 'https://fra.cloud.appwrite.io/v1').replace(/\/$/, '');
