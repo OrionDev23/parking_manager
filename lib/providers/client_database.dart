@@ -58,7 +58,9 @@ class DatabaseGetter {
 
   static ValueNotifier<ParcUser?> me = ValueNotifier(null);
   static String? _configuredProjectId;
+  static String? _activeCompanyId;
   static int _projectGeneration = 0;
+  static int _companyGeneration = 0;
 
   /// Called when the authenticated tenant expires while the legacy auth
   /// adapter is loading its profile. Keeps session teardown centralized.
@@ -68,6 +70,27 @@ class DatabaseGetter {
       generation == _projectGeneration && _configuredProjectId == projectId;
 
   static String? get activeProjectId => _configuredProjectId;
+  static String? get activeCompanyId => _activeCompanyId;
+
+  static bool _isCurrentCompany(String companyId, int generation) =>
+      _activeCompanyId == companyId && _companyGeneration == generation;
+
+  static Future<void> setActiveCompanyId(String? companyId) async {
+    if (_activeCompanyId == companyId &&
+        (companyId == null || MyEntrepriseState.p != null)) {
+      return;
+    }
+    _activeCompanyId = companyId;
+    _companyGeneration++;
+    MyEntrepriseState.p = null;
+    MyEntrepriseState.logo = null;
+    MyEntrepriseState.imageFile = null;
+    MyEntrepriseState.logoExists = false;
+    MyEntrepriseState.downloading = false;
+    if (companyId != null) {
+      await DatabaseGetter._existing().getEntreprise();
+    }
+  }
   static int get tenantRevision => _projectGeneration;
 
   static bool isCurrentTenant(String projectId) =>
@@ -80,10 +103,13 @@ class DatabaseGetter {
   /// Appwrite project. This is required for logout/login in one tenant.
   static void invalidatePendingRequests() {
     _projectGeneration++;
+    _companyGeneration++;
     gettingUser = false;
     settingSecretKey = false;
     MyEntrepriseState.downloading = false;
   }
+
+  DatabaseGetter._existing();
 
   DatabaseGetter() {
     const requestedProject = appwriteProjectId;
@@ -359,7 +385,7 @@ class DatabaseGetter {
       final value = await activeDatabase.getRow(
         databaseId: databaseId,
         tableId: trialID,
-        rowId: '1',
+        rowId: userId,
       );
       if (_isCurrentProject(generation, projectId)) {
         trialDate = DateTime.tryParse(value.data['date']);
@@ -371,32 +397,46 @@ class DatabaseGetter {
 
   Future<void> getEntreprise() async {
     final projectId = _configuredProjectId;
+    final companyId = _activeCompanyId;
     final activeDatabase = database;
-    if (projectId == null || activeDatabase == null) return;
-    final generation = _projectGeneration;
+    if (projectId == null || companyId == null || activeDatabase == null) {
+      return;
+    }
+    final projectGeneration = _projectGeneration;
+    final companyGeneration = _companyGeneration;
 
     if (MyEntrepriseState.p == null && !MyEntrepriseState.downloading) {
       MyEntrepriseState.downloading = true;
       try {
-        final value = await activeDatabase.getRow(
+        final result = await activeDatabase.listRows(
           databaseId: databaseId,
           tableId: entrepriseid,
-          rowId: '1',
+          queries: [
+            Query.equal('companyId', companyId),
+            Query.limit(1),
+          ],
         );
-        if (_isCurrentProject(generation, projectId)) {
-          MyEntrepriseState.p = value.convertTo(
-            (p0) => Entreprise.fromJson(p0),
+        if (_isCurrentProject(projectGeneration, projectId) &&
+            _isCurrentCompany(companyId, companyGeneration) &&
+            result.rows.isNotEmpty) {
+          MyEntrepriseState.p = result.rows.first.convertTo(
+            (data) => Entreprise.fromJson(data),
           );
         }
-      } catch (_) {
-        // The company profile is optional during initial rendering.
+      } catch (error) {
+        if (kDebugMode) {
+          debugPrint('[ParcOto Company] profile load failed for $companyId: $error');
+        }
       } finally {
-        if (_isCurrentProject(generation, projectId)) {
+        if (_isCurrentProject(projectGeneration, projectId) &&
+            _isCurrentCompany(companyId, companyGeneration)) {
           MyEntrepriseState.downloading = false;
         }
       }
     }
-    if (kIsWeb && _isCurrentProject(generation, projectId)) {
+    if (kIsWeb &&
+        _isCurrentProject(projectGeneration, projectId) &&
+        _isCurrentCompany(companyId, companyGeneration)) {
       await downloadLogo();
     }
   }
@@ -409,7 +449,9 @@ class DatabaseGetter {
     try {
       final value = await activeStorage.getFileDownload(
         bucketId: buckedId,
-        fileId: 'mylogo.png',
+        fileId: MyEntrepriseState.p?.logo?.isNotEmpty == true
+            ? MyEntrepriseState.p!.logo!
+            : (_activeCompanyId ?? 'mylogo.png'),
       );
       if (_isCurrentProject(generation, projectId)) {
         MyEntrepriseState.logo = value;
