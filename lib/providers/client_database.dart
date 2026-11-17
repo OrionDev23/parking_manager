@@ -381,6 +381,7 @@ class DatabaseGetter {
   Future<void> getCompanyEntitlements(String companyId) async {
     final projectId = _configuredProjectId;
     final activeDatabase = database;
+    final projectGeneration = _projectGeneration;
     final companyGeneration = _companyGeneration;
     if (projectId == null || activeDatabase == null) return;
 
@@ -390,7 +391,7 @@ class DatabaseGetter {
         tableId: entitlementsID,
         rowId: companyId,
       );
-      if (!_isCurrentProject(_projectGeneration, projectId) ||
+      if (!_isCurrentProject(projectGeneration, projectId) ||
           !_isCurrentCompany(companyId, companyGeneration)) {
         return;
       }
