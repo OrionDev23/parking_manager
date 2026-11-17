@@ -147,6 +147,77 @@ async function createRow(tableId, rowId, data, permissions = []) {
   });
 }
 
+async function prepareCompanyRows(companyId, teamId) {
+  const tableIds = [
+    '6537d87b492c80f255e8', '6531ad22153b2a49ca2c', 'etat', 'doc_vehic',
+    'reparation', 'activity', 'chauf_disponibilite', 'doc_chauffeur',
+    'entreprise', 'planning', 'prestataire', 'fichereception', 'clients',
+    'parts', 'storage', 'backup',
+  ];
+  const rowPermissions = [
+    `read("team:${teamId}")`,
+    `update("team:${teamId}/admin")`,
+    `update("team:${teamId}/manager")`,
+    `delete("team:${teamId}/admin")`,
+  ];
+  const createPermissions = [
+    `create("team:${teamId}/admin")`,
+    `create("team:${teamId}/manager")`,
+  ];
+  const result = [];
+  let totalUpdated = 0;
+
+  for (const tableId of tableIds) {
+    const table = await appwrite(
+      `/tablesdb/${DATABASE_ID}/tables/${encodeURIComponent(tableId)}`
+    );
+    const tablePermissions = new Set(table.$permissions || []);
+    let tablePermissionsChanged = false;
+    for (const permission of createPermissions) {
+      if (!tablePermissions.has(permission)) {
+        tablePermissions.add(permission);
+        tablePermissionsChanged = true;
+      }
+    }
+    if (tablePermissionsChanged) {
+      await appwrite(
+        `/tablesdb/${DATABASE_ID}/tables/${encodeURIComponent(tableId)}`,
+        {
+          method: 'PATCH',
+          body: { permissions: [...tablePermissions] },
+        },
+      );
+    }
+
+    const rows = await listAllRows(tableId);
+    const tenantRows = rows.filter(row => row.data?.companyId === companyId);
+    let updated = 0;
+    for (const row of tenantRows) {
+      await appwrite(
+        `/tablesdb/${DATABASE_ID}/tables/${encodeURIComponent(tableId)}/rows/${encodeURIComponent(row.$id)}`,
+        { method: 'PATCH', body: { permissions: rowPermissions } },
+      );
+      updated++;
+    }
+    totalUpdated += updated;
+    result.push({
+      tableId,
+      totalRows: rows.length,
+      tenantRows: tenantRows.length,
+      permissionsUpdated: updated,
+      createPermissionsAdded: tablePermissionsChanged,
+    });
+  }
+
+  return {
+    companyId,
+    teamId,
+    totalUpdated,
+    permissions: rowPermissions,
+    tables: result,
+  };
+}
+
 function companyEntitlementPermissions(teamId) {
   return [
     `read("team:${teamId}")`,
@@ -302,6 +373,7 @@ export default async ({ req, res, log, error }) => {
         accountName = account.name || '';
       } catch (_) {}
       const profile = await ensureCompanyProfile(companyId, company.data?.name || companyId, teamId, now);
+      const aclPreparation = await prepareCompanyRows(companyId, teamId);
       const membership = await syncTeamMembership(teamId, userId, 'admin', accountName);
       return json(res, 200, {
         ok: true,
@@ -313,6 +385,7 @@ export default async ({ req, res, log, error }) => {
           profileRowId: profile.rowId,
         },
         teamMembershipId: membership.$id,
+        aclPreparation,
         entitlement: await getEntitlement(companyId),
       });
     }
@@ -760,52 +833,23 @@ export default async ({ req, res, log, error }) => {
 
     if (action === 'platform_prepare_company_rows') {
       requirePlatformSuperAdmin(userId);
-      const companyId = String(input.companyId || '');
-      if (!companyId) return json(res, 400, { ok: false, message: 'companyId is required.' });
+      const companyId = String(input.companyId || '').trim();
+      if (!companyId) {
+        return json(res, 400, { ok: false, message: 'companyId is required.' });
+      }
       const company = await getCompany(companyId);
-      if (!company || company.data?.status !== 'active') {
-        return json(res, 404, { ok: false, message: 'Active company not found.' });
+      if (!company) {
+        return json(res, 404, { ok: false, message: 'Company not found.' });
       }
       const teamId = String(company.data?.teamId || '').trim();
       if (!teamId) {
         return json(res, 409, { ok: false, message: 'Company team is not provisioned.' });
       }
-      const tableIds = [
-        '6537d87b492c80f255e8', '6531ad22153b2a49ca2c', 'etat', 'doc_vehic', 'reparation',
-        'activity', 'chauf_disponibilite', 'doc_chauffeur', 'entreprise',
-        'planning', 'prestataire', 'fichereception', 'clients', 'parts',
-        'storage', 'backup',
-      ];
-      const permissions = [
-        `read("team:${teamId}")`,
-        `update("team:${teamId}/admin")`,
-        `update("team:${teamId}/manager")`,
-        `delete("team:${teamId}/admin")`,
-      ];
-      const result = [];
-      let totalUpdated = 0;
-      for (const tableId of tableIds) {
-        const rows = await listAllRows(tableId);
-        const tenantRows = rows.filter(row => row.data?.companyId === companyId);
-        let updated = 0;
-        for (const row of tenantRows) {
-          await appwrite(`/tablesdb/${DATABASE_ID}/tables/${encodeURIComponent(tableId)}/rows/${encodeURIComponent(row.$id)}`, {
-            method: 'PATCH',
-            body: { permissions },
-          });
-          updated++;
-        }
-        totalUpdated += updated;
-        result.push({ tableId, totalRows: rows.length, tenantRows: tenantRows.length, permissionsUpdated: updated });
-      }
+      const preparation = await prepareCompanyRows(companyId, teamId);
       return json(res, 200, {
         ok: true,
-        companyId,
-        teamId,
-        totalUpdated,
-        permissions,
-        tables: result,
-        note: 'Row permissions are prepared. Global table permissions have intentionally not been removed.',
+        ...preparation,
+        note: 'Tenant row ACLs are prepared. Existing global table permissions are preserved; only company-scoped create permissions are added.',
       });
     }
 
