@@ -251,58 +251,41 @@ class ConducteurDataSource extends ParcOtoDatasource<Conducteur> {
   }
 
   Future<void> uploadEtat(Conducteur c, int etat) async {
-    if (etat != c.etat) {
-      String etatID = DateTime.now()
-          .difference(DatabaseGetter.ref)
-          .inMilliseconds
-          .abs()
-          .toString();
-      DisponibiliteChauffeur disp = DisponibiliteChauffeur(
-        id: etatID,
-        type: etat,
-        createdBy: DatabaseGetter.me.value?.id,
-        chauffeur: c.id,
-        chauffeurNom: '${c.name} ${c.prenom}',
+    if (etat == c.etat) return;
+
+    final etatID = DateTime.now()
+        .difference(DatabaseGetter.ref)
+        .inMilliseconds
+        .abs()
+        .toString();
+    final disp = DisponibiliteChauffeur(
+      id: etatID,
+      type: etat,
+      createdBy: DatabaseGetter.me.value?.id,
+      chauffeur: c.id,
+      chauffeurNom: '${c.name} ${c.prenom}',
+    );
+
+    try {
+      await DatabaseGetter().addDocument(
+        collectionId: chaufDispID,
+        documentId: etatID,
+        data: disp.toJson(),
       );
-      await DatabaseGetter.database!
-          .createRow(
-            databaseId: databaseId,
-            tableId: chaufDispID,
-            rowId: etatID,
-            data: disp.toJson(),
-          )
-          .then((value) async {
-            await DatabaseGetter.database!
-                .updateRow(
-                  databaseId: databaseId,
-                  tableId: chauffeurid,
-                  rowId: c.id,
-                  data: {'etatactuel': etatID, 'etat': etat},
-                )
-                .then((value) {
-                  if (etat == 3) {
-                    DatabaseGetter().ajoutActivity(
-                      19,
-                      c.id,
-                      docName: '${c.name} ${c.prenom}',
-                    );
-                  } else {
-                    DatabaseGetter().ajoutActivity(
-                      21,
-                      c.id,
-                      docName: '${c.name} ${c.prenom}',
-                    );
-                  }
-                  displayMessageDone();
-                  changeEtat(c, disp);
-                })
-                .onError((error, stackTrace) {
-                  displayMessageError();
-                });
-          })
-          .onError((error, stackTrace) {
-            displayMessageError();
-          });
+      await DatabaseGetter().updateDocument(
+        collectionId: chauffeurid,
+        documentId: c.id,
+        data: {'etatactuel': etatID, 'etat': etat},
+      );
+      await DatabaseGetter().ajoutActivity(
+        etat == 3 ? 19 : 21,
+        c.id,
+        docName: '${c.name} ${c.prenom}',
+      );
+      displayMessageDone();
+      changeEtat(c, disp);
+    } catch (_) {
+      displayMessageError();
     }
   }
 
