@@ -185,7 +185,12 @@ class LegacyAppwriteAuthService implements AuthService {
     );
   }
 
-  AuthSession _buildSession(String projectId, Set<String> permissions) {
+  AuthSession _buildSession(
+    String projectId,
+    Set<String> permissions, {
+    bool isPlatformSuperAdmin = false,
+    bool isPlatformCompanyContext = false,
+  }) {
     final user = DatabaseGetter.user!;
     final profile = DatabaseGetter.me.value!;
 
@@ -207,7 +212,45 @@ class LegacyAppwriteAuthService implements AuthService {
       company: CompanyContext(companyId: projectId),
       permissions: permissions,
       license: license,
+      isPlatformSuperAdmin: isPlatformSuperAdmin,
+      isPlatformCompanyContext: isPlatformCompanyContext,
     );
+  }
+
+  @override
+  Future<AuthSession> enterPlatformCompany(String companyId) async {
+    if (_session?.isPlatformSuperAdmin != true) {
+      throw StateError('Accès réservé au Super Admin plateforme.');
+    }
+    final target = companyId.trim();
+    if (target.isEmpty) {
+      throw ArgumentError('Identifiant entreprise manquant.');
+    }
+
+    await onSessionEnding?.call();
+    await membershipResolver.authorizePlatformCompany(target);
+    await preferences.setString('active_company_id', target);
+    await preferences.setString('project', target);
+
+    _session = _buildSession(
+      target,
+      const {'*'},
+      isPlatformSuperAdmin: true,
+      isPlatformCompanyContext: true,
+    );
+    _setState(AuthState.signedIn);
+    return _session!;
+  }
+
+  @override
+  Future<AuthSession> returnToPlatformContext() async {
+    if (_session?.isPlatformSuperAdmin != true) {
+      throw StateError('Aucune session Super Admin plateforme active.');
+    }
+    await onSessionEnding?.call();
+    _session = _buildPlatformSession();
+    _setState(AuthState.signedIn);
+    return _session!;
   }
 
   @override
