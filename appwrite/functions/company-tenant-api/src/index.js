@@ -304,6 +304,58 @@ export default async ({ req, res, log, error }) => {
       return json(res, 200, { ok: true, companyId, teamId, synchronized });
     }
 
+
+    if (action === 'platform_prepare_company_rows') {
+      requirePlatformSuperAdmin(userId);
+      const companyId = String(input.companyId || '');
+      if (!companyId) return json(res, 400, { ok: false, message: 'companyId is required.' });
+      const company = await getCompany(companyId);
+      if (!company || company.data?.status !== 'active') {
+        return json(res, 404, { ok: false, message: 'Active company not found.' });
+      }
+      const teamId = String(company.data?.teamId || '').trim();
+      if (!teamId) {
+        return json(res, 409, { ok: false, message: 'Company team is not provisioned.' });
+      }
+      const tableIds = [
+        'chauffeur', '6531ad22153b2a49ca2c', 'etat', 'doc_vehic', 'reparation',
+        'activity', 'chauf_disponibilite', 'doc_chauffeur', 'entreprise',
+        'planning', 'prestataire', 'fichereception', 'clients', 'parts',
+        'storage', 'backup',
+      ];
+      const permissions = [
+        `read(team:${teamId})`,
+        `update(team:${teamId}/admin)`,
+        `update(team:${teamId}/manager)`,
+        `delete(team:${teamId}/admin)`,
+      ];
+      const result = [];
+      let totalUpdated = 0;
+      for (const tableId of tableIds) {
+        const rows = await listAllRows(tableId);
+        const tenantRows = rows.filter(row => row.data?.companyId === companyId);
+        let updated = 0;
+        for (const row of tenantRows) {
+          await appwrite(`/tablesdb/${DATABASE_ID}/tables/${encodeURIComponent(tableId)}/rows/${encodeURIComponent(row.$id)}`, {
+            method: 'PATCH',
+            body: { permissions },
+          });
+          updated++;
+        }
+        totalUpdated += updated;
+        result.push({ tableId, totalRows: rows.length, tenantRows: tenantRows.length, permissionsUpdated: updated });
+      }
+      return json(res, 200, {
+        ok: true,
+        companyId,
+        teamId,
+        totalUpdated,
+        permissions,
+        tables: result,
+        note: 'Row permissions are prepared. Global table permissions have intentionally not been removed.',
+      });
+    }
+
     if (action === 'create_company') {
       requirePlatformSuperAdmin(userId);
       if (process.env.TENANT_COMPANY_CREATION_ENABLED !== 'true') {
