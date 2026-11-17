@@ -826,6 +826,7 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
   void dispose() {
     for (final controller in [
       _name,
+      _legalName,
       _slug,
       _legalName,
       _address,
@@ -932,6 +933,7 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
       await widget.repository.updateCompany(
         companyId: widget.company.companyId,
         name: _name.text.trim(),
+        companyLegalName: _legalName.text.trim(),
         slug: _slug.text.trim(),
         status: _status,
         companyLegalName: _legalName.text.trim(),
@@ -1575,6 +1577,7 @@ class _CreateCompanyDialog extends StatefulWidget {
 
 class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
   final _name = TextEditingController();
+  final _legalName = TextEditingController();
   final _slug = TextEditingController();
   final _address = TextEditingController();
   final _companyPhone = TextEditingController();
@@ -1885,10 +1888,15 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
                 'Informations qui identifieront l’espace client dans Parcoto.',
                 [
                   _field(
-                    'Raison sociale / nom commercial',
+                    'Nom commercial',
                     _name,
                     placeholder: 'Ex. GTS Guelma Truck Service',
                     onChanged: _onCompanyNameChanged,
+                  ),
+                  _field(
+                    'Raison sociale',
+                    _legalName,
+                    placeholder: 'Dénomination légale enregistrée',
                   ),
                   _field(
                     'Identifiant de l’entreprise',
