@@ -493,12 +493,29 @@ export default async ({ req, res, log, error }) => {
       if (administrators.length <= 1) {
         return json(res, 409, { ok: false, message: 'At least one active company administrator must remain.' });
       }
+      let teamMembershipRemoved = false;
       if (company.data?.teamId) {
-        await removeTeamMembership(company.data.teamId, targetUserId);
+        teamMembershipRemoved = await removeTeamMembership(
+          company.data.teamId,
+          targetUserId,
+        );
       }
-      await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
-        method: 'PATCH', body: { data: { status: 'revoked', updatedAt: now } },
-      });
+      try {
+        await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`, {
+          method: 'PATCH', body: { data: { status: 'revoked', updatedAt: now } },
+        });
+      } catch (failure) {
+        if (teamMembershipRemoved && company.data?.teamId) {
+          try {
+            await syncTeamMembership(
+              company.data.teamId,
+              targetUserId,
+              membership.data.role || 'admin',
+            );
+          } catch (_) {}
+        }
+        throw failure;
+      }
       return json(res, 200, { ok: true, companyId, userId: targetUserId });
     }
 
