@@ -229,9 +229,9 @@ class LegacyAppwriteAuthService implements AuthService {
 
     await onSessionEnding?.call();
     await membershipResolver.authorizePlatformCompany(target);
-    await preferences.setString('active_company_id', target);
-    await preferences.setString('project', target);
 
+    // Platform exploration is an ephemeral session context. Do not persist it
+    // as the user's normal tenant selector or it can affect the next login.
     _session = _buildSession(
       target,
       const {'*'},
