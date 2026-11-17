@@ -46,6 +46,41 @@ class PlatformCompany {
   String get currency => entitlement['currency']?.toString() ?? 'DZD';
 }
 
+class PlatformCompanyAdministrator {
+  final String membershipId;
+  final String userId;
+  final String name;
+  final String email;
+  final String role;
+  final String status;
+  final bool isPlatformSuperAdmin;
+  final String createdAt;
+
+  const PlatformCompanyAdministrator({
+    required this.membershipId,
+    required this.userId,
+    required this.name,
+    required this.email,
+    required this.role,
+    required this.status,
+    required this.isPlatformSuperAdmin,
+    required this.createdAt,
+  });
+
+  factory PlatformCompanyAdministrator.fromJson(Map<String, dynamic> json) {
+    return PlatformCompanyAdministrator(
+      membershipId: json['membershipId']?.toString() ?? '',
+      userId: json['userId']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      role: json['role']?.toString() ?? 'admin',
+      status: json['status']?.toString() ?? 'active',
+      isPlatformSuperAdmin: json['isPlatformSuperAdmin'] == true,
+      createdAt: json['createdAt']?.toString() ?? '',
+    );
+  }
+}
+
 class PlatformCompaniesRepository {
   static const functionId = 'company-tenant-api';
 
@@ -89,6 +124,64 @@ class PlatformCompaniesRepository {
               Map<String, dynamic>.from(value),
             ))
         .toList(growable: false);
+  }
+
+  Future<List<PlatformCompanyAdministrator>> listAdministrators(
+    String companyId,
+  ) async {
+    final response = await _execute({
+      'action': 'platform_list_company_admins',
+      'companyId': companyId,
+    });
+    final values = response['administrators'];
+    if (values is! List) {
+      throw const FormatException('Liste des administrateurs invalide.');
+    }
+    return values
+        .whereType<Map>()
+        .map((value) => PlatformCompanyAdministrator.fromJson(
+              Map<String, dynamic>.from(value),
+            ))
+        .toList(growable: false);
+  }
+
+  Future<void> addAdministrator({
+    required String companyId,
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    await _execute({
+      'action': 'platform_add_company_admin',
+      'companyId': companyId,
+      'name': name,
+      'email': email,
+      'password': password,
+    });
+  }
+
+  Future<void> updateAdministratorName({
+    required String companyId,
+    required String membershipId,
+    required String name,
+  }) async {
+    await _execute({
+      'action': 'platform_update_company_admin',
+      'companyId': companyId,
+      'membershipId': membershipId,
+      'name': name,
+    });
+  }
+
+  Future<void> revokeAdministrator({
+    required String companyId,
+    required String membershipId,
+  }) async {
+    await _execute({
+      'action': 'platform_revoke_company_admin',
+      'companyId': companyId,
+      'membershipId': membershipId,
+    });
   }
 
   Future<Map<String, dynamic>> preparePermissions(String companyId) async {
