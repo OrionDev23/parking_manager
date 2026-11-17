@@ -286,7 +286,18 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => _CreateCompanyDialog(repository: _repository),
+      builder: (dialogContext) {
+        final mediaQuery = MediaQuery.of(dialogContext);
+        final keyboardInset = mediaQuery.viewInsets.bottom;
+        return AnimatedPadding(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          padding: EdgeInsets.only(bottom: keyboardInset),
+          child: SafeArea(
+            child: _CreateCompanyDialog(repository: _repository),
+          ),
+        );
+      },
     );
     if (result == true) await _load();
   }
@@ -1870,11 +1881,21 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
   @override
   Widget build(BuildContext context) {
     final compact = MediaQuery.sizeOf(context).width < 760;
+    final mediaQuery = MediaQuery.of(context);
+    final availableHeight = mediaQuery.size.height -
+        mediaQuery.viewInsets.bottom -
+        mediaQuery.padding.vertical -
+        32;
+    final dialogMaxHeight = availableHeight.clamp(280.0, 860.0);
+
     return ContentDialog(
       title: const Text('Créer une entreprise cliente'),
-      constraints: const BoxConstraints(maxWidth: 820, maxHeight: 860),
+      constraints: BoxConstraints(
+        maxWidth: 820,
+        maxHeight: dialogMaxHeight,
+      ),
       content: SizedBox(
-        width: compact ? MediaQuery.sizeOf(context).width * 0.84 : 740,
+        width: compact ? mediaQuery.size.width * 0.90 : 740,
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
