@@ -565,7 +565,23 @@ export default async ({ req, res, log, error }) => {
           method: 'PATCH',
           body: { data: { name, slug, status, updatedAt: now } },
         });
+        if (company.data?.teamId) {
+          await prepareCompanyRows(companyId, company.data.teamId);
+        }
       } catch (failure) {
+        try {
+          await appwrite(`/tablesdb/${DATABASE_ID}/tables/${COMPANIES}/rows/${encodeURIComponent(companyId)}`, {
+            method: 'PATCH',
+            body: {
+              data: {
+                name: company.data?.name || name,
+                slug: company.data?.slug || slug,
+                status: company.data?.status || 'active',
+                updatedAt: now,
+              },
+            },
+          });
+        } catch (_) {}
         if (entitlementWritten) {
           try {
             if (previousEntitlement) {
