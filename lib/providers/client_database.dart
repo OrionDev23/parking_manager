@@ -494,23 +494,39 @@ class DatabaseGetter {
     if (kIsWeb &&
         _isCurrentProject(projectGeneration, projectId) &&
         _isCurrentCompany(companyId, companyGeneration)) {
-      await downloadLogo();
+      await downloadLogo(
+        companyId: companyId,
+        companyGeneration: companyGeneration,
+        fileId: MyEntrepriseState.p?.logo,
+      );
     }
   }
 
-  static Future<void> downloadLogo() async {
+  static Future<void> downloadLogo({
+    String? companyId,
+    int? companyGeneration,
+    String? fileId,
+  }) async {
     final projectId = _configuredProjectId;
     final activeStorage = storage;
-    if (projectId == null || activeStorage == null) return;
-    final generation = _projectGeneration;
+    final selectedCompanyId = companyId ?? _activeCompanyId;
+    final selectedCompanyGeneration = companyGeneration ?? _companyGeneration;
+    if (projectId == null ||
+        activeStorage == null ||
+        selectedCompanyId == null) {
+      return;
+    }
+    final projectGeneration = _projectGeneration;
+    final selectedFileId = fileId?.isNotEmpty == true
+        ? fileId!
+        : selectedCompanyId;
     try {
       final value = await activeStorage.getFileDownload(
         bucketId: buckedId,
-        fileId: MyEntrepriseState.p?.logo?.isNotEmpty == true
-            ? MyEntrepriseState.p!.logo!
-            : (_activeCompanyId ?? 'mylogo.png'),
+        fileId: selectedFileId,
       );
-      if (_isCurrentProject(generation, projectId)) {
+      if (_isCurrentProject(projectGeneration, projectId) &&
+          _isCurrentCompany(selectedCompanyId, selectedCompanyGeneration)) {
         MyEntrepriseState.logo = value;
       }
     } catch (_) {
