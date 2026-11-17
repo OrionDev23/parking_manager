@@ -1132,7 +1132,7 @@ class _CompanyAdministratorsDialogState
               ),
             if (active && !protected)
               IconButton(
-                icon: const Icon(FluentIcons.delete, color: Colors.red),
+                icon: Icon(FluentIcons.delete, color: Colors.red),
                 onPressed: () => _revoke(administrator),
               ),
           ],
