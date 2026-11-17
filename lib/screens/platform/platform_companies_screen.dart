@@ -1697,7 +1697,47 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
         .trim()
         .toLowerCase()
         .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
-        .replaceAll(RegExp(r'^-+|-+
+        .replaceAll(RegExp(r'^-+|-+$'), '');
+    _slug.value = TextEditingValue(
+      text: generated,
+      selection: TextSelection.collapsed(offset: generated.length),
+    );
+  }
+
+  void _nextStep() {
+    setState(() {
+      _error = null;
+      if (_step == 0) {
+        if (_name.text.trim().length < 2) {
+          _error = 'Saisissez au minimum deux caractères pour le nom de l’entreprise.';
+          return;
+        }
+        _step = 1;
+        return;
+      }
+      if (_step == 1) {
+        final email = _adminEmail.text.trim();
+        if (_adminName.text.trim().length < 2 ||
+            !RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email) ||
+            (_adminPassword.text.isNotEmpty &&
+                _adminPassword.text != _adminPasswordConfirm.text)) {
+          _error = 'Vérifiez le nom, l’adresse e-mail et la confirmation du mot de passe.';
+          return;
+        }
+        _step = 2;
+      }
+    });
+  }
+
+  void _previousStep() {
+    if (_saving || _step == 0) return;
+    setState(() {
+      _step--;
+      _error = null;
+    });
+  }
+
+  Future<void> _submit() async {
     final starts = DateTime.tryParse(_startsAt.text.trim());
     final expires = DateTime.tryParse(_expiresAt.text.trim());
     final maxUsers = _number(_maxUsers);
@@ -1800,7 +1840,7 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
                         child: Column(
                           children: [
                             Text(
-                              '0${index + 1}',
+                              '0' + (index + 1).toString(),
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 color: index == _step
@@ -1998,542 +2038,6 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
           child: _saving
               ? const ProgressRing()
               : Text(_step < 2 ? 'Continuer' : 'Créer l’entreprise'),
-        ),
-      ],
-    );
-  }
-}
-), '');
-    _slug.value = TextEditingValue(
-      text: generated,
-      selection: TextSelection.collapsed(offset: generated.length),
-    );
-  }
-
-  void _nextStep() {
-    setState(() {
-      _error = null;
-      if (_step == 0) {
-        if (_name.text.trim().length < 2) {
-          _error = 'Saisissez au minimum deux caractères pour le nom de l’entreprise.';
-          return;
-        }
-        _step = 1;
-        return;
-      }
-      if (_step == 1) {
-        final email = _adminEmail.text.trim();
-        if (_adminName.text.trim().length < 2 ||
-            !RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+
-    final starts = DateTime.tryParse(_startsAt.text.trim());
-    final expires = DateTime.tryParse(_expiresAt.text.trim());
-    final maxUsers = _number(_maxUsers);
-    final maxVehicles = _number(_maxVehicles);
-    final maxEmployees = _number(_maxEmployees);
-    final maxDrivers = _number(_maxDrivers);
-    final maxSites = _number(_maxSites);
-    final priceAmount = _number(_priceAmount);
-
-    if (_name.text.trim().length < 2 ||
-        _adminName.text.trim().length < 2 ||
-        !_adminEmail.text.trim().contains('@') ||
-        (_adminPassword.text.isNotEmpty &&
-            _adminPassword.text != _adminPasswordConfirm.text) ||
-        starts == null ||
-        expires == null ||
-        maxUsers == null ||
-        maxVehicles == null ||
-        maxEmployees == null ||
-        maxDrivers == null ||
-        maxSites == null ||
-        priceAmount == null) {
-      setState(() {
-        _error = 'Complétez les informations obligatoires et vérifiez les dates et quotas.';
-      });
-      return;
-    }
-
-    setState(() {
-      _saving = true;
-      _error = null;
-    });
-    try {
-      await widget.repository.create(
-        name: _name.text.trim(),
-        slug: _slug.text.trim(),
-        adminName: _adminName.text.trim(),
-        adminEmail: _adminEmail.text.trim(),
-        adminPassword: _adminPassword.text,
-        startsAt: starts,
-        expiresAt: expires,
-        maxUsers: maxUsers,
-        maxVehicles: maxVehicles,
-        maxEmployees: maxEmployees,
-        maxDrivers: maxDrivers,
-        maxSites: maxSites,
-        priceAmount: priceAmount,
-        billingCycle: _billingCycle,
-        currency: _currency,
-        notes: _notes.text.trim(),
-        address: _address.text.trim(),
-        phone: _companyPhone.text.trim(),
-        companyEmail: _companyEmail.text.trim(),
-        nif: _nif.text.trim(),
-        nis: _nis.text.trim(),
-        rc: _rc.text.trim(),
-        art: _art.text.trim(),
-        description: _description.text.trim(),
-      );
-      if (mounted) Navigator.of(context).pop(true);
-    } catch (error) {
-      if (!mounted) return;
-      setState(() {
-        _error = error.toString().replaceFirst('Bad state: ', '');
-        _saving = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final compact = MediaQuery.sizeOf(context).width < 760;
-    return ContentDialog(
-      title: const Text('Créer une entreprise cliente'),
-      constraints: const BoxConstraints(maxWidth: 820, maxHeight: 860),
-      content: SizedBox(
-        width: compact ? MediaQuery.sizeOf(context).width * 0.84 : 740,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _section(
-                'Identité de l’entreprise',
-                'Informations qui identifieront l’espace client dans Parcoto.',
-                [
-                  _field(
-                    'Raison sociale / nom commercial',
-                    _name,
-                    placeholder: 'Ex. GTS Guelma Truck Service',
-                  ),
-                  _field(
-                    'Identifiant de l’entreprise',
-                    _slug,
-                    placeholder: 'Laisser vide pour le générer automatiquement',
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _section(
-                'Informations légales et coordonnées',
-                'Ces informations alimentent directement la fiche société des modules Parcoto historiques.',
-                [
-                  _field('Adresse du siège', _address),
-                  _field('Téléphone', _companyPhone),
-                  _field('E-mail de l’entreprise', _companyEmail),
-                  _field('NIF', _nif),
-                  _field('NIS', _nis),
-                  _field('Registre de commerce (RC)', _rc),
-                  _field('Article (ART)', _art),
-                  const Text('Description'),
-                  const SizedBox(height: 5),
-                  TextBox(
-                    controller: _description,
-                    minLines: 2,
-                    maxLines: 4,
-                    placeholder: 'Activité et présentation de l’entreprise...',
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _section(
-                'Administrateur principal',
-                'Un véritable compte Appwrite Auth sera créé si cette adresse n’existe pas déjà. Sinon, le compte existant sera associé.',
-                [
-                  _field('Nom complet', _adminName),
-                  _field(
-                    'Adresse e-mail',
-                    _adminEmail,
-                    placeholder: 'admin@entreprise.dz',
-                  ),
-                  _field(
-                    'Mot de passe initial',
-                    _adminPassword,
-                    password: true,
-                    placeholder: 'Obligatoire uniquement pour un nouveau compte',
-                  ),
-                  _field(
-                    'Confirmer le mot de passe',
-                    _adminPasswordConfirm,
-                    password: true,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _section(
-                'Licence et facturation',
-                'La période et les limites sont enregistrées dans les droits contractuels de l’entreprise.',
-                [
-                  _field(
-                    'Début de licence (AAAA-MM-JJ)',
-                    _startsAt,
-                    placeholder: '2026-11-17',
-                  ),
-                  _field(
-                    'Expiration (AAAA-MM-JJ)',
-                    _expiresAt,
-                    placeholder: '2027-11-17',
-                  ),
-                  const Text('Périodicité'),
-                  const SizedBox(height: 5),
-                  ComboBox<String>(
-                    value: _billingCycle,
-                    isExpanded: true,
-                    items: const [
-                      ComboBoxItem(value: 'monthly', child: Text('Mensuelle')),
-                      ComboBoxItem(value: 'quarterly', child: Text('Trimestrielle')),
-                      ComboBoxItem(value: 'yearly', child: Text('Annuelle')),
-                      ComboBoxItem(value: 'custom', child: Text('Personnalisée')),
-                    ],
-                    onChanged: _saving
-                        ? null
-                        : (value) {
-                            if (value != null) {
-                              setState(() => _billingCycle = value);
-                            }
-                          },
-                  ),
-                  const SizedBox(height: 12),
-                  const Text('Devise'),
-                  const SizedBox(height: 5),
-                  ComboBox<String>(
-                    value: _currency,
-                    isExpanded: true,
-                    items: const [
-                      ComboBoxItem(value: 'DZD', child: Text('DZD — Dinar algérien')),
-                      ComboBoxItem(value: 'EUR', child: Text('EUR — Euro')),
-                      ComboBoxItem(value: 'USD', child: Text('USD — Dollar américain')),
-                    ],
-                    onChanged: _saving
-                        ? null
-                        : (value) {
-                            if (value != null) setState(() => _currency = value);
-                          },
-                  ),
-                  const SizedBox(height: 12),
-                  _field('Tarif par période', _priceAmount, numeric: true),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _section(
-                'Quotas contractuels',
-                'Les limites sont appliquées par l’API métier lorsqu’elles sont prises en charge.',
-                [
-                  _field('Utilisateurs maximum', _maxUsers, numeric: true),
-                  _field('Véhicules maximum', _maxVehicles, numeric: true),
-                  _field('Employés maximum', _maxEmployees, numeric: true),
-                  _field('Chauffeurs maximum', _maxDrivers, numeric: true),
-                  _field('Sites maximum', _maxSites, numeric: true),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _section(
-                'Notes internes',
-                'Informations commerciales ou conditions particulières.',
-                [
-                  TextBox(
-                    controller: _notes,
-                    minLines: 2,
-                    maxLines: 4,
-                    placeholder: 'Notes...',
-                  ),
-                ],
-              ),
-              if (_error != null) ...[
-                const SizedBox(height: 12),
-                InfoBar(
-                  title: Text(_error!),
-                  severity: InfoBarSeverity.error,
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        Button(
-          onPressed: _saving ? null : () => Navigator.of(context).pop(false),
-          child: const Text('Annuler'),
-        ),
-        FilledButton(
-          onPressed: _saving ? null : _submit,
-          child: _saving ? const ProgressRing() : const Text('Créer l’entreprise'),
-        ),
-      ],
-    );
-  }
-}
-).hasMatch(email) ||
-            (_adminPassword.text.isNotEmpty &&
-                _adminPassword.text != _adminPasswordConfirm.text)) {
-          _error = 'Vérifiez le nom, l’adresse e-mail et la confirmation du mot de passe.';
-          return;
-        }
-        _step = 2;
-      }
-    });
-  }
-
-  void _previousStep() {
-    if (_saving || _step == 0) return;
-    setState(() {
-      _step--;
-      _error = null;
-    });
-  }
-
-  Future<void> _submit() async {
-    final starts = DateTime.tryParse(_startsAt.text.trim());
-    final expires = DateTime.tryParse(_expiresAt.text.trim());
-    final maxUsers = _number(_maxUsers);
-    final maxVehicles = _number(_maxVehicles);
-    final maxEmployees = _number(_maxEmployees);
-    final maxDrivers = _number(_maxDrivers);
-    final maxSites = _number(_maxSites);
-    final priceAmount = _number(_priceAmount);
-
-    if (_name.text.trim().length < 2 ||
-        _adminName.text.trim().length < 2 ||
-        !_adminEmail.text.trim().contains('@') ||
-        (_adminPassword.text.isNotEmpty &&
-            _adminPassword.text != _adminPasswordConfirm.text) ||
-        starts == null ||
-        expires == null ||
-        maxUsers == null ||
-        maxVehicles == null ||
-        maxEmployees == null ||
-        maxDrivers == null ||
-        maxSites == null ||
-        priceAmount == null) {
-      setState(() {
-        _error = 'Complétez les informations obligatoires et vérifiez les dates et quotas.';
-      });
-      return;
-    }
-
-    setState(() {
-      _saving = true;
-      _error = null;
-    });
-    try {
-      await widget.repository.create(
-        name: _name.text.trim(),
-        slug: _slug.text.trim(),
-        adminName: _adminName.text.trim(),
-        adminEmail: _adminEmail.text.trim(),
-        adminPassword: _adminPassword.text,
-        startsAt: starts,
-        expiresAt: expires,
-        maxUsers: maxUsers,
-        maxVehicles: maxVehicles,
-        maxEmployees: maxEmployees,
-        maxDrivers: maxDrivers,
-        maxSites: maxSites,
-        priceAmount: priceAmount,
-        billingCycle: _billingCycle,
-        currency: _currency,
-        notes: _notes.text.trim(),
-        address: _address.text.trim(),
-        phone: _companyPhone.text.trim(),
-        companyEmail: _companyEmail.text.trim(),
-        nif: _nif.text.trim(),
-        nis: _nis.text.trim(),
-        rc: _rc.text.trim(),
-        art: _art.text.trim(),
-        description: _description.text.trim(),
-      );
-      if (mounted) Navigator.of(context).pop(true);
-    } catch (error) {
-      if (!mounted) return;
-      setState(() {
-        _error = error.toString().replaceFirst('Bad state: ', '');
-        _saving = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final compact = MediaQuery.sizeOf(context).width < 760;
-    return ContentDialog(
-      title: const Text('Créer une entreprise cliente'),
-      constraints: const BoxConstraints(maxWidth: 820, maxHeight: 860),
-      content: SizedBox(
-        width: compact ? MediaQuery.sizeOf(context).width * 0.84 : 740,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _section(
-                'Identité de l’entreprise',
-                'Informations qui identifieront l’espace client dans Parcoto.',
-                [
-                  _field(
-                    'Raison sociale / nom commercial',
-                    _name,
-                    placeholder: 'Ex. GTS Guelma Truck Service',
-                  ),
-                  _field(
-                    'Identifiant de l’entreprise',
-                    _slug,
-                    placeholder: 'Laisser vide pour le générer automatiquement',
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _section(
-                'Informations légales et coordonnées',
-                'Ces informations alimentent directement la fiche société des modules Parcoto historiques.',
-                [
-                  _field('Adresse du siège', _address),
-                  _field('Téléphone', _companyPhone),
-                  _field('E-mail de l’entreprise', _companyEmail),
-                  _field('NIF', _nif),
-                  _field('NIS', _nis),
-                  _field('Registre de commerce (RC)', _rc),
-                  _field('Article (ART)', _art),
-                  const Text('Description'),
-                  const SizedBox(height: 5),
-                  TextBox(
-                    controller: _description,
-                    minLines: 2,
-                    maxLines: 4,
-                    placeholder: 'Activité et présentation de l’entreprise...',
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _section(
-                'Administrateur principal',
-                'Un véritable compte Appwrite Auth sera créé si cette adresse n’existe pas déjà. Sinon, le compte existant sera associé.',
-                [
-                  _field('Nom complet', _adminName),
-                  _field(
-                    'Adresse e-mail',
-                    _adminEmail,
-                    placeholder: 'admin@entreprise.dz',
-                  ),
-                  _field(
-                    'Mot de passe initial',
-                    _adminPassword,
-                    password: true,
-                    placeholder: 'Obligatoire uniquement pour un nouveau compte',
-                  ),
-                  _field(
-                    'Confirmer le mot de passe',
-                    _adminPasswordConfirm,
-                    password: true,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _section(
-                'Licence et facturation',
-                'La période et les limites sont enregistrées dans les droits contractuels de l’entreprise.',
-                [
-                  _field(
-                    'Début de licence (AAAA-MM-JJ)',
-                    _startsAt,
-                    placeholder: '2026-11-17',
-                  ),
-                  _field(
-                    'Expiration (AAAA-MM-JJ)',
-                    _expiresAt,
-                    placeholder: '2027-11-17',
-                  ),
-                  const Text('Périodicité'),
-                  const SizedBox(height: 5),
-                  ComboBox<String>(
-                    value: _billingCycle,
-                    isExpanded: true,
-                    items: const [
-                      ComboBoxItem(value: 'monthly', child: Text('Mensuelle')),
-                      ComboBoxItem(value: 'quarterly', child: Text('Trimestrielle')),
-                      ComboBoxItem(value: 'yearly', child: Text('Annuelle')),
-                      ComboBoxItem(value: 'custom', child: Text('Personnalisée')),
-                    ],
-                    onChanged: _saving
-                        ? null
-                        : (value) {
-                            if (value != null) {
-                              setState(() => _billingCycle = value);
-                            }
-                          },
-                  ),
-                  const SizedBox(height: 12),
-                  const Text('Devise'),
-                  const SizedBox(height: 5),
-                  ComboBox<String>(
-                    value: _currency,
-                    isExpanded: true,
-                    items: const [
-                      ComboBoxItem(value: 'DZD', child: Text('DZD — Dinar algérien')),
-                      ComboBoxItem(value: 'EUR', child: Text('EUR — Euro')),
-                      ComboBoxItem(value: 'USD', child: Text('USD — Dollar américain')),
-                    ],
-                    onChanged: _saving
-                        ? null
-                        : (value) {
-                            if (value != null) setState(() => _currency = value);
-                          },
-                  ),
-                  const SizedBox(height: 12),
-                  _field('Tarif par période', _priceAmount, numeric: true),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _section(
-                'Quotas contractuels',
-                'Les limites sont appliquées par l’API métier lorsqu’elles sont prises en charge.',
-                [
-                  _field('Utilisateurs maximum', _maxUsers, numeric: true),
-                  _field('Véhicules maximum', _maxVehicles, numeric: true),
-                  _field('Employés maximum', _maxEmployees, numeric: true),
-                  _field('Chauffeurs maximum', _maxDrivers, numeric: true),
-                  _field('Sites maximum', _maxSites, numeric: true),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _section(
-                'Notes internes',
-                'Informations commerciales ou conditions particulières.',
-                [
-                  TextBox(
-                    controller: _notes,
-                    minLines: 2,
-                    maxLines: 4,
-                    placeholder: 'Notes...',
-                  ),
-                ],
-              ),
-              if (_error != null) ...[
-                const SizedBox(height: 12),
-                InfoBar(
-                  title: Text(_error!),
-                  severity: InfoBarSeverity.error,
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        Button(
-          onPressed: _saving ? null : () => Navigator.of(context).pop(false),
-          child: const Text('Annuler'),
-        ),
-        FilledButton(
-          onPressed: _saving ? null : _submit,
-          child: _saving ? const ProgressRing() : const Text('Créer l’entreprise'),
         ),
       ],
     );
