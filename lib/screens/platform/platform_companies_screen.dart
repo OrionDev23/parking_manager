@@ -548,26 +548,131 @@ class _EditCompanyDialog extends StatefulWidget {
 class _EditCompanyDialogState extends State<_EditCompanyDialog> {
   late final TextEditingController _name;
   late final TextEditingController _slug;
+  late final TextEditingController _startsAt;
+  late final TextEditingController _expiresAt;
+  late final TextEditingController _maxUsers;
+  late final TextEditingController _maxVehicles;
+  late final TextEditingController _maxEmployees;
+  late final TextEditingController _maxDrivers;
+  late final TextEditingController _maxSites;
+  late final TextEditingController _priceAmount;
+  late final TextEditingController _notes;
   late String _status;
+  late String _billingCycle;
+  late String _currency;
   bool _saving = false;
   String? _error;
+
+  String _dateValue(String? raw, DateTime fallback) {
+    final parsed = DateTime.tryParse(raw ?? '');
+    final value = parsed ?? fallback;
+    return value.toIso8601String().substring(0, 10);
+  }
 
   @override
   void initState() {
     super.initState();
-    _name = TextEditingController(text: widget.company.name);
-    _slug = TextEditingController(text: widget.company.slug);
-    _status = widget.company.status == 'suspended' ? 'suspended' : 'active';
+    final company = widget.company;
+    final entitlement = company.entitlement;
+    final now = DateTime.now();
+    _name = TextEditingController(text: company.name);
+    _slug = TextEditingController(text: company.slug);
+    _startsAt = TextEditingController(
+      text: _dateValue(entitlement['startsAt']?.toString(), now),
+    );
+    _expiresAt = TextEditingController(
+      text: _dateValue(
+        entitlement['expiresAt']?.toString(),
+        now.add(const Duration(days: 365)),
+      ),
+    );
+    _maxUsers = TextEditingController(
+      text: (company.quota('maxUsers') == 0 ? 5 : company.quota('maxUsers')).toString(),
+    );
+    _maxVehicles = TextEditingController(
+      text: (company.quota('maxVehicles') == 0 ? 50 : company.quota('maxVehicles')).toString(),
+    );
+    _maxEmployees = TextEditingController(
+      text: (company.quota('maxEmployees') == 0 ? 20 : company.quota('maxEmployees')).toString(),
+    );
+    _maxDrivers = TextEditingController(
+      text: (company.quota('maxDrivers') == 0 ? 20 : company.quota('maxDrivers')).toString(),
+    );
+    _maxSites = TextEditingController(
+      text: (company.quota('maxSites') == 0 ? 1 : company.quota('maxSites')).toString(),
+    );
+    _priceAmount = TextEditingController(text: company.priceAmount.toString());
+    _notes = TextEditingController(text: entitlement['notes']?.toString() ?? '');
+    _status = company.status == 'suspended' ? 'suspended' : 'active';
+    final cycle = entitlement['billingCycle']?.toString() ?? 'monthly';
+    _billingCycle = const ['monthly', 'quarterly', 'yearly', 'custom'].contains(cycle)
+        ? cycle
+        : 'monthly';
+    _currency = company.currency;
   }
 
   @override
   void dispose() {
-    _name.dispose();
-    _slug.dispose();
+    for (final controller in [
+      _name,
+      _slug,
+      _startsAt,
+      _expiresAt,
+      _maxUsers,
+      _maxVehicles,
+      _maxEmployees,
+      _maxDrivers,
+      _maxSites,
+      _priceAmount,
+      _notes,
+    ]) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
+  int? _integer(TextEditingController controller) =>
+      int.tryParse(controller.text.trim());
+
+  Widget _field(
+    String label,
+    TextEditingController controller, {
+    bool numeric = false,
+    String? placeholder,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label),
+          const SizedBox(height: 4),
+          TextBox(
+            controller: controller,
+            placeholder: placeholder,
+            keyboardType: numeric ? TextInputType.number : TextInputType.text,
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _submit() async {
+    final startsAt = DateTime.tryParse(_startsAt.text.trim());
+    final expiresAt = DateTime.tryParse(_expiresAt.text.trim());
+    final maxUsers = _integer(_maxUsers);
+    final maxVehicles = _integer(_maxVehicles);
+    final maxEmployees = _integer(_maxEmployees);
+    final maxDrivers = _integer(_maxDrivers);
+    final maxSites = _integer(_maxSites);
+    final priceAmount = _integer(_priceAmount);
+    if (startsAt == null || expiresAt == null || maxUsers == null ||
+        maxVehicles == null || maxEmployees == null || maxDrivers == null ||
+        maxSites == null || priceAmount == null) {
+      setState(() => _error = 'Vérifiez les dates et les valeurs numériques.');
+      return;
+    }
+
     setState(() {
       _saving = true;
       _error = null;
@@ -578,6 +683,17 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
         name: _name.text.trim(),
         slug: _slug.text.trim(),
         status: _status,
+        startsAt: startsAt,
+        expiresAt: expiresAt,
+        maxUsers: maxUsers,
+        maxVehicles: maxVehicles,
+        maxEmployees: maxEmployees,
+        maxDrivers: maxDrivers,
+        maxSites: maxSites,
+        priceAmount: priceAmount,
+        billingCycle: _billingCycle,
+        currency: _currency,
+        notes: _notes.text.trim(),
       );
       if (mounted) Navigator.of(context).pop(true);
     } catch (error) {
@@ -591,51 +707,107 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final currencies = <String>{'DZD', 'EUR', 'USD', _currency}.toList();
     return ContentDialog(
-      title: const Text('Modifier l’entreprise'),
+      title: const Text('Modifier l’entreprise et sa licence'),
+      constraints: const BoxConstraints(maxWidth: 680, maxHeight: 820),
       content: SizedBox(
-        width: 500,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text('Nom commercial'),
-            const SizedBox(height: 4),
-            TextBox(controller: _name, placeholder: 'Nom de l’entreprise'),
-            const SizedBox(height: 12),
-            const Text('Identifiant unique'),
-            const SizedBox(height: 4),
-            TextBox(controller: _slug, placeholder: 'identifiant-entreprise'),
-            const SizedBox(height: 12),
-            const Text('État du compte'),
-            const SizedBox(height: 4),
-            ComboBox<String>(
-              value: _status,
-              isExpanded: true,
-              items: const [
-                ComboBoxItem(
-                  value: 'active',
-                  child: Text('Active'),
-                ),
-                ComboBoxItem(
-                  value: 'suspended',
-                  child: Text('Suspendue'),
+        width: MediaQuery.sizeOf(context).width < 760
+            ? MediaQuery.sizeOf(context).width * 0.82
+            : 620,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Identité de l’entreprise',
+                style: FluentTheme.of(context).typography.subtitle,
+              ),
+              const SizedBox(height: 10),
+              _field('Nom commercial', _name),
+              _field('Identifiant unique', _slug),
+              const Text('État du compte'),
+              const SizedBox(height: 4),
+              ComboBox<String>(
+                value: _status,
+                isExpanded: true,
+                items: const [
+                  ComboBoxItem(value: 'active', child: Text('Active')),
+                  ComboBoxItem(value: 'suspended', child: Text('Suspendue')),
+                ],
+                onChanged: _saving
+                    ? null
+                    : (value) {
+                        if (value != null) setState(() => _status = value);
+                      },
+              ),
+              const SizedBox(height: 18),
+              Text(
+                'Licence et quotas',
+                style: FluentTheme.of(context).typography.subtitle,
+              ),
+              const SizedBox(height: 10),
+              _field('Début de licence (AAAA-MM-JJ)', _startsAt),
+              _field('Fin de licence (AAAA-MM-JJ)', _expiresAt),
+              _field('Nombre maximal d’utilisateurs', _maxUsers, numeric: true),
+              _field('Nombre maximal de véhicules', _maxVehicles, numeric: true),
+              _field('Nombre maximal d’employés', _maxEmployees, numeric: true),
+              _field('Nombre maximal de chauffeurs', _maxDrivers, numeric: true),
+              _field('Nombre maximal de sites', _maxSites, numeric: true),
+              _field('Tarif', _priceAmount, numeric: true),
+              const Text('Périodicité'),
+              const SizedBox(height: 4),
+              ComboBox<String>(
+                value: _billingCycle,
+                isExpanded: true,
+                items: const [
+                  ComboBoxItem(value: 'monthly', child: Text('Mensuelle')),
+                  ComboBoxItem(value: 'quarterly', child: Text('Trimestrielle')),
+                  ComboBoxItem(value: 'yearly', child: Text('Annuelle')),
+                  ComboBoxItem(value: 'custom', child: Text('Personnalisée')),
+                ],
+                onChanged: _saving
+                    ? null
+                    : (value) {
+                        if (value != null) setState(() => _billingCycle = value);
+                      },
+              ),
+              const SizedBox(height: 10),
+              const Text('Devise'),
+              const SizedBox(height: 4),
+              ComboBox<String>(
+                value: _currency,
+                isExpanded: true,
+                items: currencies
+                    .map((currency) => ComboBoxItem(
+                          value: currency,
+                          child: Text(currency),
+                        ))
+                    .toList(growable: false),
+                onChanged: _saving
+                    ? null
+                    : (value) {
+                        if (value != null) setState(() => _currency = value);
+                      },
+              ),
+              const SizedBox(height: 10),
+              const Text('Notes internes'),
+              const SizedBox(height: 4),
+              TextBox(
+                controller: _notes,
+                minLines: 2,
+                maxLines: 4,
+                placeholder: 'Informations contractuelles...',
+              ),
+              if (_error != null) ...[
+                const SizedBox(height: 12),
+                InfoBar(
+                  title: Text(_error!),
+                  severity: InfoBarSeverity.error,
                 ),
               ],
-              onChanged: _saving
-                  ? null
-                  : (value) {
-                      if (value != null) setState(() => _status = value);
-                    },
-            ),
-            if (_error != null) ...[
-              const SizedBox(height: 12),
-              InfoBar(
-                title: Text(_error!),
-                severity: InfoBarSeverity.error,
-              ),
             ],
-          ],
+          ),
         ),
       ),
       actions: [
