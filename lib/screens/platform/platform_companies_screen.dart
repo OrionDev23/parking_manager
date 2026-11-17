@@ -194,7 +194,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                                     ? '${table['companyRows'] ?? 0} lignes entreprise / '
                                       '${table['totalRows'] ?? 0} au total • '
                                       '$missingAcl sans ACL • $broad droits globaux'
-                                    : 'Pas de colonne companyId • ${broad} droits globaux',
+                                    : 'Pas de colonne companyId • $broad droits globaux',
                               ),
                             ],
                           ),
@@ -463,10 +463,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                       onAudit: _auditingCompanyId == visibleCompanies[index].companyId
                           ? null
                           : () => _auditCompanyPermissions(visibleCompanies[index]),
-                      onAudit: _auditingCompanyId == visibleCompanies[index].companyId
-                    ? null
-                    : () => _auditCompanyPermissions(visibleCompanies[index]),
-                onPrepare: _preparingCompanyId == visibleCompanies[index].companyId
+                      onPrepare: _preparingCompanyId == visibleCompanies[index].companyId
                           ? null
                           : () => _prepareCompanyPermissions(visibleCompanies[index]),
                       onOpen: _openingCompanyId == visibleCompanies[index].companyId
@@ -475,7 +472,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                       onManageAdministrators: () => _manageAdministrators(visibleCompanies[index]),
                       onEdit: () => _editCompany(visibleCompanies[index]),
                       opening: _openingCompanyId == visibleCompanies[index].companyId,
-                    ),
+                    )
                   ],
                 ],
               );
@@ -485,6 +482,9 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
               separatorBuilder: (_, _) => const SizedBox(height: 8),
               itemBuilder: (context, index) => _CompanyCard(
                 company: visibleCompanies[index],
+                onAudit: _auditingCompanyId == visibleCompanies[index].companyId
+                    ? null
+                    : () => _auditCompanyPermissions(visibleCompanies[index]),
                 onOpen: _openingCompanyId == visibleCompanies[index].companyId
                     ? null
                     : () => _openCompany(visibleCompanies[index]),
@@ -494,7 +494,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                 onPrepare: _preparingCompanyId == visibleCompanies[index].companyId
                     ? null
                     : () => _prepareCompanyPermissions(visibleCompanies[index]),
-              ),
+              )
             );
           }
 
