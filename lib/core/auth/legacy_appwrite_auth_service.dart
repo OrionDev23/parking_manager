@@ -98,6 +98,7 @@ class LegacyAppwriteAuthService implements AuthService {
         membership.companyId,
         entitlement: membership.entitlement,
       );
+      _ensureCompanyLicenseValid();
 
       _session = _buildSession(membership.companyId, membership.permissions);
       _setState(AuthState.signedIn);
@@ -106,6 +107,9 @@ class LegacyAppwriteAuthService implements AuthService {
       rethrow;
     } catch (_) {
       await DatabaseGetter.setActiveCompanyId(null);
+      try {
+        await DatabaseGetter.account?.deleteSession(sessionId: 'current');
+      } catch (_) {}
       _session = null;
       _setState(AuthState.signedOut);
       return null;
@@ -168,17 +172,24 @@ class LegacyAppwriteAuthService implements AuthService {
         membership.companyId,
         entitlement: membership.entitlement,
       );
+      _ensureCompanyLicenseValid();
 
       _session = _buildSession(membership.companyId, membership.permissions);
       _setState(AuthState.signedIn);
       return _session!;
     } on AppwriteException {
       await DatabaseGetter.setActiveCompanyId(null);
+      try {
+        await DatabaseGetter.account?.deleteSession(sessionId: 'current');
+      } catch (_) {}
       _session = null;
       _setState(AuthState.error);
       rethrow;
     } catch (_) {
       await DatabaseGetter.setActiveCompanyId(null);
+      try {
+        await DatabaseGetter.account?.deleteSession(sessionId: 'current');
+      } catch (_) {}
       _session = null;
       _setState(AuthState.error);
       rethrow;
@@ -196,6 +207,20 @@ class LegacyAppwriteAuthService implements AuthService {
       permissions: const {'platform.manage'},
       isPlatformSuperAdmin: true,
     );
+  }
+
+  void _ensureCompanyLicenseValid() {
+    final now = DateTime.now();
+    final startsAt = DatabaseGetter.companyLicenseStartsAt;
+    final expiresAt =
+        DatabaseGetter.companyLicenseExpiresAt ?? DatabaseGetter.trialDate;
+
+    if (startsAt != null && startsAt.isAfter(now)) {
+      throw StateError('La licence de cette entreprise n’est pas encore active.');
+    }
+    if (expiresAt == null || !expiresAt.isAfter(now)) {
+      throw StateError('La licence de cette entreprise est expirée ou non configurée.');
+    }
   }
 
   AuthSession _buildSession(
@@ -280,6 +305,7 @@ class LegacyAppwriteAuthService implements AuthService {
       membership.companyId,
       entitlement: membership.entitlement,
     );
+    _ensureCompanyLicenseValid();
     _session = _buildSession(membership.companyId, membership.permissions);
     _setState(AuthState.signedIn);
     return _session!;
