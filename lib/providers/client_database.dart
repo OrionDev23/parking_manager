@@ -34,6 +34,7 @@ const fournsID = "fournisseurs";
 const optionsID = "options";
 const categoriesID = "categories";
 const brandsID = "partsbrands";
+const marqueID = "marque";
 const partsID = "parts";
 const backupId = "backup";
 const storageId = "storage";
@@ -61,6 +62,7 @@ const Set<String> tenantScopedTableIds = {
   optionsID,
   categoriesID,
   brandsID,
+  marqueID,
 };
 const endpoint = "https://fra.cloud.appwrite.io/v1";
 const appwriteProjectId = 'essais';
