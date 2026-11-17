@@ -554,6 +554,24 @@ export default async ({ req, res, log, error }) => {
           method: 'PATCH',
           body: { data: { name, slug, status, updatedAt: now } },
         });
+      } catch (failure) {
+        if (entitlementWritten) {
+          try {
+            if (previousEntitlement) {
+              await appwrite(`/tablesdb/${DATABASE_ID}/tables/${ENTITLEMENTS}/rows/${encodeURIComponent(companyId)}`, {
+                method: 'PATCH', body: { data: previousEntitlement },
+              });
+            } else {
+              await appwrite(`/tablesdb/${DATABASE_ID}/tables/${ENTITLEMENTS}/rows/${encodeURIComponent(companyId)}`, {
+                method: 'DELETE',
+              });
+            }
+          } catch (_) {}
+        }
+        throw failure;
+      }
+
+      try {
         const profiles = await listRows(COMPANY_PROFILE, {
           method: 'equal', attribute: 'companyId', values: [companyId],
         });
@@ -573,20 +591,7 @@ export default async ({ req, res, log, error }) => {
           );
         }
       } catch (failure) {
-        if (entitlementWritten) {
-          try {
-            if (previousEntitlement) {
-              await appwrite(`/tablesdb/${DATABASE_ID}/tables/${ENTITLEMENTS}/rows/${encodeURIComponent(companyId)}`, {
-                method: 'PATCH', body: { data: previousEntitlement },
-              });
-            } else {
-              await appwrite(`/tablesdb/${DATABASE_ID}/tables/${ENTITLEMENTS}/rows/${encodeURIComponent(companyId)}`, {
-                method: 'DELETE',
-              });
-            }
-          } catch (_) {}
-        }
-        throw failure;
+        log(`Company profile name sync skipped for ${companyId}: ${failure.message}`);
       }
 
       return json(res, 200, {
