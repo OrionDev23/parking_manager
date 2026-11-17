@@ -123,7 +123,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
         builder: (context) => ContentDialog(
           title: const Text('Permissions de lignes préparées'),
           content: Text(
-            '$count lignes de ' + company.name + ' disposent maintenant de permissions liées à son équipe Appwrite. '
+            '$count lignes de ${company.name} disposent maintenant de permissions liées à son équipe Appwrite. '
             'Les permissions globales des tables restent actives : aucune isolation complète n’a encore été appliquée.',
           ),
           actions: [
