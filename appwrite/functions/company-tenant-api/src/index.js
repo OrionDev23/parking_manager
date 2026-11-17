@@ -150,7 +150,14 @@ async function createRow(tableId, rowId, data, permissions = []) {
 async function prepareCompanyRows(companyId, teamId) {
   const company = await getCompany(companyId);
   if (!company) throw Object.assign(new Error('Company not found.'), { status: 404 });
-  const isActive = company.data?.status === 'active';
+  const entitlement = await getEntitlement(companyId);
+  const now = Date.now();
+  const startsAt = entitlement ? Date.parse(entitlement.startsAt || '') : NaN;
+  const expiresAt = entitlement ? Date.parse(entitlement.expiresAt || '') : NaN;
+  const licenseActive = !entitlement ||
+    (Number.isFinite(startsAt) && Number.isFinite(expiresAt) &&
+      startsAt <= now && expiresAt > now);
+  const isActive = company.data?.status === 'active' && licenseActive;
   const tableIds = [
     '6537d87b492c80f255e8', '6531ad22153b2a49ca2c', 'etat', 'doc_vehic',
     'reparation', 'activity', 'chauf_disponibilite', 'doc_chauffeur',
