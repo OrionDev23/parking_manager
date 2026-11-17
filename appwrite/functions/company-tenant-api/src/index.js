@@ -219,6 +219,41 @@ export default async ({ req, res, log, error }) => {
       return json(res, 200, { ok: true, userId, isPlatformSuperAdmin: true });
     }
 
+    if (action === 'platform_select_company') {
+      requirePlatformSuperAdmin(userId);
+      const companyId = String(input.companyId || '').trim();
+      if (!companyId) {
+        return json(res, 400, { ok: false, message: 'companyId is required.' });
+      }
+      const company = await getCompany(companyId);
+      if (!company || company.data?.status !== 'active') {
+        return json(res, 404, { ok: false, message: 'Active company not found.' });
+      }
+      const teamId = String(company.data?.teamId || '').trim();
+      if (!teamId) {
+        return json(res, 409, {
+          ok: false,
+          message: 'Cette entreprise ne possède pas encore d’équipe Appwrite provisionnée.',
+        });
+      }
+      let accountName = '';
+      try {
+        const account = await appwrite(`/users/${encodeURIComponent(userId)}`);
+        accountName = account.name || '';
+      } catch (_) {}
+      const membership = await syncTeamMembership(teamId, userId, 'admin', accountName);
+      return json(res, 200, {
+        ok: true,
+        company: {
+          companyId: company.$id,
+          name: company.data?.name || '',
+          slug: company.data?.slug || '',
+          teamId,
+        },
+        teamMembershipId: membership.$id,
+      });
+    }
+
     if (action === 'resolve') {
       const rows = await listRows(MEMBERSHIPS, {
         method: 'equal', attribute: 'userId', values: [userId],
