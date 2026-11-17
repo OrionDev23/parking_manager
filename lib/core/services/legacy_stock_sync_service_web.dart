@@ -28,8 +28,7 @@ class LegacyStockSyncService {
   final String companyId;
   final String? teamId;
 
-  bool _isTenantScoped(String entity) =>
-      entity == 'part' || entity == 'storage';
+  bool _isTenantScoped(String entity) => tableByEntity.containsKey(entity);
 
   List<String> _rowPermissions() {
     final id = teamId;
