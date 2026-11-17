@@ -1522,6 +1522,14 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
         billingCycle: _billingCycle,
         currency: _currency,
         notes: _notes.text.trim(),
+        address: _address.text.trim(),
+        phone: _companyPhone.text.trim(),
+        companyEmail: _companyEmail.text.trim(),
+        nif: _nif.text.trim(),
+        nis: _nis.text.trim(),
+        rc: _rc.text.trim(),
+        art: _art.text.trim(),
+        description: _description.text.trim(),
       );
       if (mounted) Navigator.of(context).pop(true);
     } catch (error) {
