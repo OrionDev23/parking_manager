@@ -728,6 +728,14 @@ class _EditCompanyDialogState extends State<_EditCompanyDialog> {
         billingCycle: _billingCycle,
         currency: _currency,
         notes: _notes.text.trim(),
+        address: _address.text.trim(),
+        phone: _companyPhone.text.trim(),
+        companyEmail: _companyEmail.text.trim(),
+        nif: _nif.text.trim(),
+        nis: _nis.text.trim(),
+        rc: _rc.text.trim(),
+        art: _art.text.trim(),
+        description: _description.text.trim(),
       );
       if (mounted) Navigator.of(context).pop(true);
     } catch (error) {
@@ -1311,6 +1319,14 @@ class _CreateCompanyDialog extends StatefulWidget {
 class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
   final _name = TextEditingController();
   final _slug = TextEditingController();
+  final _address = TextEditingController();
+  final _companyPhone = TextEditingController();
+  final _companyEmail = TextEditingController();
+  final _nif = TextEditingController();
+  final _nis = TextEditingController();
+  final _rc = TextEditingController();
+  final _art = TextEditingController();
+  final _description = TextEditingController();
   final _adminName = TextEditingController();
   final _adminEmail = TextEditingController();
   final _adminPassword = TextEditingController();
@@ -1337,6 +1353,14 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
     for (final controller in [
       _name,
       _slug,
+      _address,
+      _companyPhone,
+      _companyEmail,
+      _nif,
+      _nis,
+      _rc,
+      _art,
+      _description,
       _adminName,
       _adminEmail,
       _adminPassword,
@@ -1489,6 +1513,28 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
                     'Identifiant de l’entreprise',
                     _slug,
                     placeholder: 'Laisser vide pour le générer automatiquement',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              _section(
+                'Informations légales et coordonnées',
+                'Ces informations alimentent directement la fiche société des modules Parcoto historiques.',
+                [
+                  _field('Adresse du siège', _address),
+                  _field('Téléphone', _companyPhone),
+                  _field('E-mail de l’entreprise', _companyEmail),
+                  _field('NIF', _nif),
+                  _field('NIS', _nis),
+                  _field('Registre de commerce (RC)', _rc),
+                  _field('Article (ART)', _art),
+                  const Text('Description'),
+                  const SizedBox(height: 5),
+                  TextBox(
+                    controller: _description,
+                    minLines: 2,
+                    maxLines: 4,
+                    placeholder: 'Activité et présentation de l’entreprise...',
                   ),
                 ],
               ),
