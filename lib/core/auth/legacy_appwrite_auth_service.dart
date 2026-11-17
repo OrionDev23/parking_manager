@@ -207,7 +207,7 @@ class LegacyAppwriteAuthService implements AuthService {
       id: '${projectId}_${user.$id}',
       companyId: projectId,
       edition: edition,
-      expiresAt: trialDate,
+      expiresAt: DatabaseGetter.companyLicenseExpiresAt ?? trialDate,
       maxUsers: limits['users'],
       maxVehicles: limits['vehicles'],
     );
