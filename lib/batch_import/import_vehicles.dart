@@ -604,11 +604,6 @@ class _ImportVehiclesState extends State<ImportVehicles> {
       setState(() {
         uploading = true;
       });
-      Client client = Client()
-        ..setEndpoint(endpoint)
-        ..setProject(project!)
-        ..setKey(secretKey!);
-      TablesDB databases = TablesDB(client);
       List<Future> tasks = [];
       importedVehicles.forEach((key, value) {
         if (value.selected) {
