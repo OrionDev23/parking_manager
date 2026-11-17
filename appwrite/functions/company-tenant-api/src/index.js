@@ -415,9 +415,6 @@ export default async ({ req, res, log, error }) => {
                 now,
               )
             : null;
-          if (teamId) {
-            await prepareCompanyRows(company.$id, teamId);
-          }
           memberships.push({
             companyId: company.$id,
             companyName: company.data.name,
@@ -979,6 +976,7 @@ export default async ({ req, res, log, error }) => {
         );
         profileCreated = profile.created;
         profileRowId = profile.rowId;
+        await prepareCompanyRows(companyId, teamId);
         await syncTeamMembership(teamId, adminUserId, 'owner', adminName);
         await createRow(
           ENTITLEMENTS,
