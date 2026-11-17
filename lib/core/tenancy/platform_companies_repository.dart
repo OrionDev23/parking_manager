@@ -245,6 +245,14 @@ class PlatformCompaniesRepository {
     required String billingCycle,
     required String currency,
     required String notes,
+    String address = '',
+    String phone = '',
+    String companyEmail = '',
+    String nif = '',
+    String nis = '',
+    String rc = '',
+    String art = '',
+    String description = '',
   }) async {
     await _execute({
       'action': 'create_company',
@@ -264,6 +272,14 @@ class PlatformCompaniesRepository {
       'billingCycle': billingCycle,
       'currency': currency,
       'notes': notes,
+      'address': address,
+      'phone': phone,
+      'companyEmail': companyEmail,
+      'nif': nif,
+      'nis': nis,
+      'rc': rc,
+      'art': art,
+      'description': description,
     });
   }
 }
