@@ -1,5 +1,4 @@
 import 'package:dart_appwrite/dart_appwrite.dart' hide Client;
-import 'package:dart_appwrite/models.dart';
 import 'package:parc_oto/providers/client_database.dart';
 
 import '../serializables/activity.dart';
