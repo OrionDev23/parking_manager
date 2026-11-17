@@ -323,7 +323,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                         style: FluentTheme.of(context).typography.caption?.copyWith(
                               fontWeight: FontWeight.w700,
                               letterSpacing: 1.1,
-                              color: widget.appTheme.mutedTextColor,
+                              color: FluentTheme.of(context).inactiveColor,
                             ),
                       ),
                       const SizedBox(height: 5),
