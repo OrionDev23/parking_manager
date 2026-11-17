@@ -1165,6 +1165,12 @@ class MyEntrepriseState extends State<MyEntreprise> {
     await activeStorage.createFile(
       bucketId: buckedId,
       fileId: logoid,
+      permissions: [
+        Permission.read(Role.team(DatabaseGetter.activeCompanyTeamId!)),
+        Permission.update(Role.team(DatabaseGetter.activeCompanyTeamId!, 'admin')),
+        Permission.update(Role.team(DatabaseGetter.activeCompanyTeamId!, 'manager')),
+        Permission.delete(Role.team(DatabaseGetter.activeCompanyTeamId!, 'admin')),
+      ],
       file: InputFile.fromBytes(bytes: bytes, filename: logoid),
     );
     if (!DatabaseGetter.isCurrentTenant(projectId)) {
