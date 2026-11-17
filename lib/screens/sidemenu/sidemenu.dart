@@ -349,6 +349,12 @@ class PanesListState extends State<PanesList>
                 displayMode: compact
                     ? PaneDisplayMode.minimal
                     : widget.appTheme.displayMode,
+                // The app uses a fully custom title bar. Explicitly place the
+                // minimal-pane toggle there so mobile users can reach every
+                // module instead of relying on the default automatic slot.
+                toggleButtonPosition: compact
+                    ? PaneToggleButtonPreferredPosition.titleBar
+                    : PaneToggleButtonPreferredPosition.auto,
                 items: PaneItemsAndFooters.originalItems,
                 footerItems: PaneItemsAndFooters.footerItems,
               ),
