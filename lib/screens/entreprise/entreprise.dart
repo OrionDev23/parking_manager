@@ -17,7 +17,13 @@ import '../../serializables/entreprise.dart';
 import '../../theme.dart';
 import '../../widgets/zone_box.dart';
 
-const logoid = "mylogo.png";
+String get logoid {
+  final configuredLogo = MyEntrepriseState.p?.logo;
+  if (configuredLogo != null && configuredLogo.isNotEmpty) {
+    return configuredLogo;
+  }
+  return DatabaseGetter.activeCompanyId ?? 'mylogo.png';
+}
 
 class MyEntreprise extends StatefulWidget {
   const MyEntreprise({super.key});
@@ -1058,7 +1064,7 @@ class MyEntrepriseState extends State<MyEntreprise> {
 
   Future<void> uploadEntreprise() async {
     Entreprise prest = Entreprise(
-      id: p?.id ?? '1',
+      id: p?.id ?? DatabaseGetter.activeCompanyId ?? '1',
       nom: nom.text,
       email: email.text.isEmpty ? null : email.text,
       telephone: telephone.text,
