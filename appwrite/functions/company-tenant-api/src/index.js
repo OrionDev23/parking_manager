@@ -912,6 +912,96 @@ export default async ({ req, res, log, error }) => {
     }
 
 
+    if (action === 'platform_audit_company_rows') {
+      requirePlatformSuperAdmin(userId);
+      const companyId = String(input.companyId || '').trim();
+      if (!companyId) {
+        return json(res, 400, { ok: false, message: 'companyId is required.' });
+      }
+      const company = await getCompany(companyId);
+      if (!company) {
+        return json(res, 404, { ok: false, message: 'Company not found.' });
+      }
+      const teamId = String(company.data?.teamId || '').trim();
+      const params = new URLSearchParams();
+      params.append('queries[]', JSON.stringify({ method: 'limit', values: [100] }));
+      const tableResult = await appwrite(
+        `/tablesdb/${DATABASE_ID}/tables?${params.toString()}`
+      );
+      const tables = [];
+      for (const table of tableResult.tables || []) {
+        const columns = table.columns || [];
+        const hasCompanyId = columns.some(column => column.key === 'companyId');
+        const tablePermissions = table.$permissions || [];
+        const broadPermissions = tablePermissions.filter(permission =>
+          /^(create|read|update|delete)\\("(team:1|team:managers|users|any)(\\/[^"]*)?"\\)$/.test(permission)
+        );
+        let rows = [];
+        if (hasCompanyId) {
+          rows = await listAllRows(table.$id);
+        }
+        const companyRows = hasCompanyId
+          ? rows.filter(row => row.data?.companyId === companyId)
+          : [];
+        tables.push({
+          tableId: table.$id,
+          name: table.name || table.$id,
+          rowSecurity: table.rowSecurity === true,
+          hasCompanyId,
+          totalRows: hasCompanyId ? rows.length : null,
+          companyRows: companyRows.length,
+          unassignedRows: hasCompanyId
+            ? rows.filter(row => !row.data?.companyId).length
+            : null,
+          otherCompanyRows: hasCompanyId
+            ? rows.filter(row => row.data?.companyId && row.data.companyId !== companyId).length
+            : null,
+          rowsWithoutPermissions: companyRows.filter(row =>
+            !(row.$permissions || []).length
+          ).length,
+          rowsWithLegacyPermissions: companyRows.filter(row =>
+            (row.$permissions || []).some(permission =>
+              /^(create|read|update|delete)\\("(team:1|team:managers|users|any)(\\/[^"]*)?"\\)$/.test(permission)
+            )
+          ).length,
+          broadTablePermissions: broadPermissions,
+          includedInCurrentPreparation: [
+            '6537d87b492c80f255e8', '6531ad22153b2a49ca2c', 'etat',
+            'doc_vehic', 'reparation', 'activity', 'chauf_disponibilite',
+            'doc_chauffeur', 'entreprise', 'planning', 'prestataire',
+            'fichereception', 'clients', 'parts', 'storage', 'backup',
+            'access_teams', 'access_users',
+          ].includes(table.$id),
+          requiresClassification: !hasCompanyId,
+        });
+      }
+      const tenantTables = tables.filter(table => table.hasCompanyId);
+      return json(res, 200, {
+        ok: true,
+        readOnly: true,
+        companyId,
+        teamId,
+        summary: {
+          tables: tables.length,
+          tenantScopedTables: tenantTables.length,
+          tablesWithoutRowSecurity: tables.filter(table => !table.rowSecurity).length,
+          tablesWithBroadPermissions: tables.filter(table =>
+            table.broadTablePermissions.length > 0
+          ).length,
+          rowsWithoutCompanyId: tenantTables.reduce(
+            (total, table) => total + table.unassignedRows, 0
+          ),
+          companyRowsWithoutPermissions: tenantTables.reduce(
+            (total, table) => total + table.rowsWithoutPermissions, 0
+          ),
+          tablesRequiringClassification: tables.filter(
+            table => table.requiresClassification
+          ).length,
+        },
+        tables,
+      });
+    }
+
     if (action === 'platform_prepare_company_rows') {
       requirePlatformSuperAdmin(userId);
       const companyId = String(input.companyId || '').trim();
