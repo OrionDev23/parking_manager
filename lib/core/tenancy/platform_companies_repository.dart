@@ -126,6 +126,21 @@ class PlatformCompaniesRepository {
         .toList(growable: false);
   }
 
+  Future<void> updateCompany({
+    required String companyId,
+    required String name,
+    required String slug,
+    required String status,
+  }) async {
+    await _execute({
+      'action': 'platform_update_company',
+      'companyId': companyId,
+      'name': name,
+      'slug': slug,
+      'status': status,
+    });
+  }
+
   Future<List<PlatformCompanyAdministrator>> listAdministrators(
     String companyId,
   ) async {
