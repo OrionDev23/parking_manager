@@ -94,7 +94,10 @@ class LegacyAppwriteAuthService implements AuthService {
           preferences.getString('project');
       final membership = await membershipResolver.select(selector: selector);
       await preferences.setString('active_company_id', membership.companyId);
-      await DatabaseGetter.setActiveCompanyId(membership.companyId);
+      await DatabaseGetter.setActiveCompanyId(
+        membership.companyId,
+        entitlement: membership.entitlement,
+      );
 
       _session = _buildSession(membership.companyId, membership.permissions);
       _setState(AuthState.signedIn);
@@ -235,8 +238,8 @@ class LegacyAppwriteAuthService implements AuthService {
     }
 
     await onSessionEnding?.call();
-    await membershipResolver.authorizePlatformCompany(target);
-    await DatabaseGetter.setActiveCompanyId(target);
+    final entitlement = await membershipResolver.authorizePlatformCompany(target);
+    await DatabaseGetter.setActiveCompanyId(target, entitlement: entitlement);
 
     // Platform exploration is an ephemeral session context. Do not persist it
     // as the user's normal tenant selector or it can affect the next login.
