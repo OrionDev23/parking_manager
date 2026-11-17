@@ -324,10 +324,10 @@ export default async ({ req, res, log, error }) => {
         'storage', 'backup',
       ];
       const permissions = [
-        `read(team:${teamId})`,
-        `update(team:${teamId}/admin)`,
-        `update(team:${teamId}/manager)`,
-        `delete(team:${teamId}/admin)`,
+        `read("team:${teamId}")`,
+        `update("team:${teamId}/admin")`,
+        `update("team:${teamId}/manager")`,
+        `delete("team:${teamId}/admin")`,
       ];
       const result = [];
       let totalUpdated = 0;
