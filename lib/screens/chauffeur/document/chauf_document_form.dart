@@ -286,10 +286,9 @@ class CDocumentFormState extends State<CDocumentForm>
         createdBy: DatabaseGetter.me.value?.id,
       );
       if (widget.dc != null) {
-        await DatabaseGetter.database!.updateRow(
-          databaseId: databaseId,
-          tableId: chaufDoc,
-          rowId: documentID!,
+        await DatabaseGetter().updateDocument(
+          collectionId: chaufDoc,
+          documentId: documentID!,
           data: dv.toJson(),
         );
         DatabaseGetter().ajoutActivity(
@@ -298,10 +297,9 @@ class CDocumentFormState extends State<CDocumentForm>
           docName: dv.chauffeurNom,
         );
       } else {
-        await DatabaseGetter.database!.createRow(
-          databaseId: databaseId,
-          tableId: chaufDoc,
-          rowId: documentID!,
+        await DatabaseGetter().addDocument(
+          collectionId: chaufDoc,
+          documentId: documentID!,
           data: dv.toJson(),
         );
         DatabaseGetter().ajoutActivity(
