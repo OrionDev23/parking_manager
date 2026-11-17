@@ -356,7 +356,7 @@ class _ImportConducteursState extends State<ImportConducteurs> {
       List<Future> tasks = [];
       importedConducteurs.forEach((key, value) {
         if (value.selected) {
-          tasks.add(uploadConducteur(value, databases));
+          tasks.add(uploadConducteur(value));
         }
       });
 
@@ -367,7 +367,7 @@ class _ImportConducteursState extends State<ImportConducteurs> {
     }
   }
 
-  Future<void> uploadConducteur(Conducteur c, TablesDB db) async {
+  Future<void> uploadConducteur(Conducteur c) async {
     await DatabaseGetter()
         .addDocument(
           collectionId: chauffeurid,
