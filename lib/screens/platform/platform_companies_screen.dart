@@ -459,6 +459,11 @@ class _CompanyCard extends StatelessWidget {
       final value = company.quota(key);
       return value > 0 ? value.toString() : '—';
     }
+    final maxUsers = quotaValue('maxUsers');
+    final maxVehicles = quotaValue('maxVehicles');
+    final maxEmployees = quotaValue('maxEmployees');
+    final maxDrivers = quotaValue('maxDrivers');
+    final maxSites = quotaValue('maxSites');
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -493,13 +498,13 @@ class _CompanyCard extends StatelessWidget {
             _QuotaText(
               label: 'Utilisateurs',
               value: hasEntitlement
-                  ? '${company.activeUsers}/${quotaValue('maxUsers')}'
+                  ? '${company.activeUsers}/$maxUsers'
                   : '${company.activeUsers}/—',
             ),
-            _QuotaText(label: 'Véhicules', value: quotaValue('maxVehicles')),
-            _QuotaText(label: 'Employés', value: quotaValue('maxEmployees')),
-            _QuotaText(label: 'Chauffeurs', value: quotaValue('maxDrivers')),
-            _QuotaText(label: 'Sites', value: quotaValue('maxSites')),
+            _QuotaText(label: 'Véhicules', value: maxVehicles),
+            _QuotaText(label: 'Employés', value: maxEmployees),
+            _QuotaText(label: 'Chauffeurs', value: maxDrivers),
+            _QuotaText(label: 'Sites', value: maxSites),
             _QuotaText(
               label: 'Échéance',
               value: expiry == null
