@@ -368,11 +368,10 @@ class _ImportConducteursState extends State<ImportConducteurs> {
   }
 
   Future<void> uploadConducteur(Conducteur c, TablesDB db) async {
-    await db
-        .createRow(
-          databaseId: databaseId,
-          tableId: chauffeurid,
-          rowId: c.id,
+    await DatabaseGetter()
+        .addDocument(
+          collectionId: chauffeurid,
+          documentId: c.id,
           data: c.toJson(),
         )
         .then((value) {
