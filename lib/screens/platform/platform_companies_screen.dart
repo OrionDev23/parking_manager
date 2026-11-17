@@ -90,6 +90,18 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
     }
   }
 
+  Future<void> _editCompany(PlatformCompany company) async {
+    final updated = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => _EditCompanyDialog(
+        company: company,
+        repository: _repository,
+      ),
+    );
+    if (updated == true) await _load();
+  }
+
   Future<void> _manageAdministrators(PlatformCompany company) async {
     await showDialog<void>(
       context: context,
@@ -322,6 +334,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                           ? null
                           : () => _openCompany(visibleCompanies[index]),
                       onManageAdministrators: () => _manageAdministrators(visibleCompanies[index]),
+                      onEdit: () => _editCompany(visibleCompanies[index]),
                       opening: _openingCompanyId == visibleCompanies[index].companyId,
                     ),
                   ],
@@ -337,6 +350,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                     ? null
                     : () => _openCompany(visibleCompanies[index]),
                 onManageAdministrators: () => _manageAdministrators(visibleCompanies[index]),
+                onEdit: () => _editCompany(visibleCompanies[index]),
                 opening: _openingCompanyId == visibleCompanies[index].companyId,
                 onPrepare: _preparingCompanyId == visibleCompanies[index].companyId
                     ? null
@@ -423,12 +437,14 @@ class _CompanyCard extends StatelessWidget {
   final VoidCallback? onPrepare;
   final VoidCallback? onOpen;
   final VoidCallback onManageAdministrators;
+  final VoidCallback onEdit;
   final bool opening;
   const _CompanyCard({
     required this.company,
     required this.onPrepare,
     required this.onOpen,
     required this.onManageAdministrators,
+    required this.onEdit,
     this.opening = false,
   });
 
@@ -477,6 +493,10 @@ class _CompanyCard extends StatelessWidget {
               alignment: WrapAlignment.end,
               children: [
                 Button(
+                  onPressed: onEdit,
+                  child: const Text('Modifier'),
+                ),
+                Button(
                   onPressed: onManageAdministrators,
                   child: const Text('Administrateurs'),
                 ),
@@ -508,6 +528,126 @@ class _CompanyCard extends StatelessWidget {
           ],
         ]),
       ),
+    );
+  }
+}
+
+class _EditCompanyDialog extends StatefulWidget {
+  final PlatformCompany company;
+  final PlatformCompaniesRepository repository;
+
+  const _EditCompanyDialog({
+    required this.company,
+    required this.repository,
+  });
+
+  @override
+  State<_EditCompanyDialog> createState() => _EditCompanyDialogState();
+}
+
+class _EditCompanyDialogState extends State<_EditCompanyDialog> {
+  late final TextEditingController _name;
+  late final TextEditingController _slug;
+  late String _status;
+  bool _saving = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _name = TextEditingController(text: widget.company.name);
+    _slug = TextEditingController(text: widget.company.slug);
+    _status = widget.company.status == 'suspended' ? 'suspended' : 'active';
+  }
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _slug.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    setState(() {
+      _saving = true;
+      _error = null;
+    });
+    try {
+      await widget.repository.updateCompany(
+        companyId: widget.company.companyId,
+        name: _name.text.trim(),
+        slug: _slug.text.trim(),
+        status: _status,
+      );
+      if (mounted) Navigator.of(context).pop(true);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _error = error.toString().replaceFirst('Bad state: ', '');
+        _saving = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ContentDialog(
+      title: const Text('Modifier l’entreprise'),
+      content: SizedBox(
+        width: 500,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('Nom commercial'),
+            const SizedBox(height: 4),
+            TextBox(controller: _name, placeholder: 'Nom de l’entreprise'),
+            const SizedBox(height: 12),
+            const Text('Identifiant unique'),
+            const SizedBox(height: 4),
+            TextBox(controller: _slug, placeholder: 'identifiant-entreprise'),
+            const SizedBox(height: 12),
+            const Text('État du compte'),
+            const SizedBox(height: 4),
+            ComboBox<String>(
+              value: _status,
+              isExpanded: true,
+              items: const [
+                ComboBoxItem(
+                  value: 'active',
+                  child: Text('Active'),
+                ),
+                ComboBoxItem(
+                  value: 'suspended',
+                  child: Text('Suspendue'),
+                ),
+              ],
+              onChanged: _saving
+                  ? null
+                  : (value) {
+                      if (value != null) setState(() => _status = value);
+                    },
+            ),
+            if (_error != null) ...[
+              const SizedBox(height: 12),
+              InfoBar(
+                title: Text(_error!),
+                severity: InfoBarSeverity.error,
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(false),
+          child: const Text('Annuler'),
+        ),
+        FilledButton(
+          onPressed: _saving ? null : _submit,
+          child: _saving ? const ProgressRing() : const Text('Enregistrer'),
+        ),
+      ],
     );
   }
 }
