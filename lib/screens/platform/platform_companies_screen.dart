@@ -1,5 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
+import '../../main.dart';
+
 import '../../core/tenancy/platform_companies_repository.dart';
 import '../../widgets/module_dashboard_header.dart';
 
@@ -18,6 +20,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
   String? _error;
   List<PlatformCompany> _companies = [];
   String? _preparingCompanyId;
+  String? _openingCompanyId;
 
   @override
   void initState() {
@@ -60,6 +63,31 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
       company.slug.toLowerCase().contains(query) ||
       company.companyId.toLowerCase().contains(query)
     ).toList(growable: false);
+  }
+
+  Future<void> _openCompany(PlatformCompany company) async {
+    setState(() => _openingCompanyId = company.companyId);
+    try {
+      await authService.enterPlatformCompany(company.companyId);
+      await startBackgroundInitialization(company.companyId);
+    } catch (error) {
+      if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (context) => ContentDialog(
+          title: const Text('Impossible d’ouvrir l’entreprise'),
+          content: Text(error.toString().replaceFirst('Bad state: ', '')),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Fermer'),
+            ),
+          ],
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _openingCompanyId = null);
+    }
   }
 
   Future<void> _prepareCompanyPermissions(PlatformCompany company) async {
@@ -280,6 +308,10 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                       onPrepare: _preparingCompanyId == visibleCompanies[index].companyId
                           ? null
                           : () => _prepareCompanyPermissions(visibleCompanies[index]),
+                      onOpen: _openingCompanyId == visibleCompanies[index].companyId
+                          ? null
+                          : () => _openCompany(visibleCompanies[index]),
+                      opening: _openingCompanyId == visibleCompanies[index].companyId,
                     ),
                   ],
                 ],
@@ -288,7 +320,16 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
             return ListView.separated(
               itemCount: visibleCompanies.length,
               separatorBuilder: (_, _) => const SizedBox(height: 8),
-              itemBuilder: (context, index) => _CompanyCard(company: visibleCompanies[index]),
+              itemBuilder: (context, index) => _CompanyCard(
+                company: visibleCompanies[index],
+                onOpen: _openingCompanyId == visibleCompanies[index].companyId
+                    ? null
+                    : () => _openCompany(visibleCompanies[index]),
+                opening: _openingCompanyId == visibleCompanies[index].companyId,
+                onPrepare: _preparingCompanyId == visibleCompanies[index].companyId
+                    ? null
+                    : () => _prepareCompanyPermissions(visibleCompanies[index]),
+              ),
             );
           }
 
@@ -368,7 +409,9 @@ class _MetricCard extends StatelessWidget {
 class _CompanyCard extends StatelessWidget {
   final PlatformCompany company;
   final VoidCallback? onPrepare;
-  const _CompanyCard({required this.company, required this.onPrepare});
+  final VoidCallback? onOpen;
+  final bool opening;
+  const _CompanyCard({required this.company, required this.onPrepare, required this.onOpen, this.opening = false});
 
   @override
   Widget build(BuildContext context) {
@@ -409,9 +452,31 @@ class _CompanyCard extends StatelessWidget {
           const SizedBox(height: 12),
           Align(
             alignment: Alignment.centerRight,
-            child: Button(
-              onPressed: onPrepare,
-              child: const Text('Préparer les droits de ligne'),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              alignment: WrapAlignment.end,
+              children: [
+                Button(
+                  onPressed: onPrepare,
+                  child: const Text('Préparer les droits de ligne'),
+                ),
+                FilledButton(
+                  onPressed: onOpen,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (opening) const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: ProgressRing(strokeWidth: 2),
+                      ) else const Icon(FluentIcons.open_in_new_window, size: 14),
+                      const SizedBox(width: 8),
+                      const Text('Ouvrir Parcoto'),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
           if ((entitlement['notes']?.toString() ?? '').isNotEmpty) ...[
