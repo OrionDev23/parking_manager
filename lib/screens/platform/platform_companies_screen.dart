@@ -1696,6 +1696,12 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
     final generated = value
         .trim()
         .toLowerCase()
+        .replaceAll(RegExp(r'[àáâãäå]'), 'a')
+        .replaceAll(RegExp(r'[èéêë]'), 'e')
+        .replaceAll(RegExp(r'[ìíîï]'), 'i')
+        .replaceAll(RegExp(r'[òóôõö]'), 'o')
+        .replaceAll(RegExp(r'[ùúûü]'), 'u')
+        .replaceAll('ç', 'c')
         .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
         .replaceAll(RegExp(r'^-+|-+$'), '');
     _slug.value = TextEditingValue(
@@ -1749,7 +1755,8 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
 
     if (_name.text.trim().length < 2 ||
         _adminName.text.trim().length < 2 ||
-        !_adminEmail.text.trim().contains('@') ||
+        !RegExp(r'^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$')
+            .hasMatch(_adminEmail.text.trim()) ||
         (_adminPassword.text.isNotEmpty &&
             _adminPassword.text != _adminPasswordConfirm.text) ||
         starts == null ||
@@ -1762,6 +1769,15 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
         priceAmount == null) {
       setState(() {
         _error = 'Complétez les informations obligatoires et vérifiez les dates et quotas.';
+      });
+      return;
+    }
+    if (!expires.isAfter(starts) ||
+        maxUsers < 1 ||
+        [maxVehicles, maxEmployees, maxDrivers, maxSites, priceAmount]
+            .any((value) => value < 0)) {
+      setState(() {
+        _error = 'La date de fin doit suivre la date de début. Les quotas doivent être positifs ou nuls, avec au moins un utilisateur.';
       });
       return;
     }
