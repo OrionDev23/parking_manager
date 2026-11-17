@@ -15,20 +15,15 @@ class LegacyAppwriteCompanyRepository implements CompanyRepository {
       throw StateError('Appwrite database is not initialized.');
     }
 
-    final companyId = DatabaseGetter.activeCompanyId;
-    if (companyId == null) return null;
+    final profileRowId = DatabaseGetter.activeCompanyProfileRowId;
+    if (profileRowId == null) return null;
 
     try {
-      final result = await database.listRows(
+      final row = await database.getRow(
         databaseId: databaseId,
         tableId: entrepriseid,
-        queries: [
-          Query.equal('companyId', companyId),
-          Query.limit(1),
-        ],
+        rowId: profileRowId,
       );
-      if (result.rows.isEmpty) return null;
-      final row = result.rows.first;
       return _fromLegacy(
         row.convertTo((data) => Entreprise.fromJson(data)),
       );
