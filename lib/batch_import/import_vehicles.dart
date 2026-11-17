@@ -612,7 +612,7 @@ class _ImportVehiclesState extends State<ImportVehicles> {
       List<Future> tasks = [];
       importedVehicles.forEach((key, value) {
         if (value.selected) {
-          tasks.add(uploadVehicle(value, databases));
+          tasks.add(uploadVehicle(value));
         }
       });
 
@@ -623,7 +623,7 @@ class _ImportVehiclesState extends State<ImportVehicles> {
     }
   }
 
-  Future<void> uploadVehicle(Vehicle v, TablesDB db) async {
+  Future<void> uploadVehicle(Vehicle v) async {
     await DatabaseGetter()
         .addDocument(
           collectionId: vehiculeid,
