@@ -82,6 +82,7 @@ class LegacyAppwriteAuthService implements AuthService {
       }
 
       if (await membershipResolver.resolvePlatformSession()) {
+        await DatabaseGetter.setActiveCompanyId(null);
         _session = _buildPlatformSession();
         _setState(AuthState.signedIn);
         return _session;
@@ -93,6 +94,7 @@ class LegacyAppwriteAuthService implements AuthService {
           preferences.getString('project');
       final membership = await membershipResolver.select(selector: selector);
       await preferences.setString('active_company_id', membership.companyId);
+      await DatabaseGetter.setActiveCompanyId(membership.companyId);
 
       _session = _buildSession(membership.companyId, membership.permissions);
       _setState(AuthState.signedIn);
@@ -100,6 +102,7 @@ class LegacyAppwriteAuthService implements AuthService {
     } on CompanySelectionRequired {
       rethrow;
     } catch (_) {
+      await DatabaseGetter.setActiveCompanyId(null);
       _session = null;
       _setState(AuthState.signedOut);
       return null;
@@ -146,6 +149,7 @@ class LegacyAppwriteAuthService implements AuthService {
       }
 
       if (await membershipResolver.resolvePlatformSession()) {
+        await DatabaseGetter.setActiveCompanyId(null);
         _session = _buildPlatformSession();
         _setState(AuthState.signedIn);
         return _session!;
@@ -157,15 +161,18 @@ class LegacyAppwriteAuthService implements AuthService {
       await preferences.setString('active_company_id', membership.companyId);
       // Keep the old key as a company selector for older UI code only.
       await preferences.setString('project', membership.companyId);
+      await DatabaseGetter.setActiveCompanyId(membership.companyId);
 
       _session = _buildSession(membership.companyId, membership.permissions);
       _setState(AuthState.signedIn);
       return _session!;
     } on AppwriteException {
+      await DatabaseGetter.setActiveCompanyId(null);
       _session = null;
       _setState(AuthState.error);
       rethrow;
     } catch (_) {
+      await DatabaseGetter.setActiveCompanyId(null);
       _session = null;
       _setState(AuthState.error);
       rethrow;
@@ -229,6 +236,7 @@ class LegacyAppwriteAuthService implements AuthService {
 
     await onSessionEnding?.call();
     await membershipResolver.authorizePlatformCompany(target);
+    await DatabaseGetter.setActiveCompanyId(target);
 
     // Platform exploration is an ephemeral session context. Do not persist it
     // as the user's normal tenant selector or it can affect the next login.
@@ -248,6 +256,7 @@ class LegacyAppwriteAuthService implements AuthService {
       throw StateError('Aucune session Super Admin plateforme active.');
     }
     await onSessionEnding?.call();
+    await DatabaseGetter.setActiveCompanyId(null);
     _session = _buildPlatformSession();
     _setState(AuthState.signedIn);
     return _session!;
@@ -261,6 +270,7 @@ class LegacyAppwriteAuthService implements AuthService {
     final membership = await membershipResolver.select(selector: companyId);
     await preferences.setString('active_company_id', membership.companyId);
     await preferences.setString('project', membership.companyId);
+    await DatabaseGetter.setActiveCompanyId(membership.companyId);
     _session = _buildSession(membership.companyId, membership.permissions);
     _setState(AuthState.signedIn);
     return _session!;
@@ -273,6 +283,7 @@ class LegacyAppwriteAuthService implements AuthService {
       await onSessionEnding?.call();
       await DatabaseGetter.account?.deleteSession(sessionId: 'current');
     } finally {
+      await DatabaseGetter.setActiveCompanyId(null);
       DatabaseGetter.user = null;
       DatabaseGetter.me.value = null;
       _session = null;
