@@ -185,8 +185,24 @@ async function prepareCompanyRows(companyId, teamId) {
     const table = await appwrite(
       `/tablesdb/${DATABASE_ID}/tables/${encodeURIComponent(tableId)}`
     );
-    const tablePermissions = new Set(table.$permissions || []);
-    let tablePermissionsChanged = false;
+    const columns = table.columns || [];
+    if (!columns.some(column => column.key === 'companyId')) {
+      throw Object.assign(
+        new Error(`Tenant table "${tableId}" is missing the companyId column.`),
+        { status: 409 },
+      );
+    }
+
+    // A tenant table must never inherit broad table-level read/write access.
+    // Data access is granted on individual rows to the company's own team.
+    const isBroadTablePermission = permission =>
+      /^(read|create|update|delete)\\("(any|users|team:1|team:managers)"\\)$/.test(permission);
+    const tablePermissions = new Set(
+      (table.$permissions || []).filter(permission => !isBroadTablePermission(permission)),
+    );
+    let tablePermissionsChanged =
+      table.rowSecurity !== true ||
+      tablePermissions.size !== (table.$permissions || []).length;
     for (const permission of createPermissions) {
       if (isActive && !tablePermissions.has(permission)) {
         tablePermissions.add(permission);
@@ -201,7 +217,7 @@ async function prepareCompanyRows(companyId, teamId) {
         `/tablesdb/${DATABASE_ID}/tables/${encodeURIComponent(tableId)}`,
         {
           method: 'PATCH',
-          body: { permissions: [...tablePermissions] },
+          body: { permissions: [...tablePermissions], rowSecurity: true },
         },
       );
     }
@@ -352,6 +368,58 @@ async function removeTeamMembership(teamId, userId) {
   return true;
 }
 
+async function readUserPrefs(userId) {
+  try {
+    const result = await appwrite(`/users/${encodeURIComponent(userId)}/prefs`);
+    return result && typeof result === 'object' ? result : {};
+  } catch (_) {
+    return {};
+  }
+}
+
+async function writeUserPrefs(userId, prefs) {
+  return appwrite(`/users/${encodeURIComponent(userId)}/prefs`, {
+    method: 'PATCH',
+    body: { prefs },
+  });
+}
+
+// Platform exploration temporarily elevates the Super Admin inside one tenant.
+// Restore the exact previous team membership on explicit return and on the next
+// platform login, including after an app crash or browser close.
+async function restorePlatformExploration(userId) {
+  const prefs = await readUserPrefs(userId);
+  const state = prefs.parcotoPlatformExploration;
+  if (!state || typeof state !== 'object' || !state.teamId) return false;
+
+  const teamId = String(state.teamId);
+  const existing = (await listTeamMemberships(teamId))
+    .find(item => item.userId === userId);
+  if (existing) {
+    if (state.existed === true) {
+      const roles = Array.isArray(state.previousRoles)
+        ? state.previousRoles.filter(role => typeof role === 'string')
+        : [];
+      if (roles.length) {
+        await appwrite(
+          `/teams/${encodeURIComponent(teamId)}/memberships/${encodeURIComponent(existing.$id)}`,
+          { method: 'PATCH', body: { roles } },
+        );
+      }
+    } else {
+      await appwrite(
+        `/teams/${encodeURIComponent(teamId)}/memberships/${encodeURIComponent(existing.$id)}`,
+        { method: 'DELETE' },
+      );
+    }
+  }
+
+  const nextPrefs = { ...prefs };
+  delete nextPrefs.parcotoPlatformExploration;
+  await writeUserPrefs(userId, nextPrefs);
+  return true;
+}
+
 async function createCompanyTeam(teamId, name) {
   return appwrite('/teams', {
     method: 'POST',
@@ -376,7 +444,14 @@ export default async ({ req, res, log, error }) => {
 
     if (action === 'platform_resolve') {
       requirePlatformSuperAdmin(userId);
+      await restorePlatformExploration(userId);
       return json(res, 200, { ok: true, userId, isPlatformSuperAdmin: true });
+    }
+
+    if (action === 'platform_return_to_platform') {
+      requirePlatformSuperAdmin(userId);
+      const restored = await restorePlatformExploration(userId);
+      return json(res, 200, { ok: true, restored, userId, isPlatformSuperAdmin: true });
     }
 
     if (action === 'platform_select_company') {
@@ -396,27 +471,50 @@ export default async ({ req, res, log, error }) => {
           message: 'Cette entreprise ne possède pas encore d’équipe Appwrite provisionnée.',
         });
       }
+      // Close any previous exploration before opening another tenant.
+      await restorePlatformExploration(userId);
+
       let accountName = '';
       try {
         const account = await appwrite(`/users/${encodeURIComponent(userId)}`);
         accountName = account.name || '';
       } catch (_) {}
-      const profile = await ensureCompanyProfile(companyId, company.data?.name || companyId, teamId, now);
-      const aclPreparation = await prepareCompanyRows(companyId, teamId);
-      const membership = await syncTeamMembership(teamId, userId, 'admin', accountName);
-      return json(res, 200, {
-        ok: true,
-        company: {
-          companyId: company.$id,
-          name: company.data?.name || '',
-          slug: company.data?.slug || '',
+
+      const existingMembership = (await listTeamMemberships(teamId))
+        .find(item => item.userId === userId) || null;
+      const prefs = await readUserPrefs(userId);
+      await writeUserPrefs(userId, {
+        ...prefs,
+        parcotoPlatformExploration: {
+          companyId,
           teamId,
-          profileRowId: profile.rowId,
+          existed: Boolean(existingMembership),
+          previousRoles: existingMembership?.roles || [],
+          startedAt: now,
         },
-        teamMembershipId: membership.$id,
-        aclPreparation,
-        entitlement: await getEntitlement(companyId),
       });
+
+      try {
+        const profile = await ensureCompanyProfile(
+          companyId, company.data?.name || companyId, teamId, now,
+        );
+        const membership = await syncTeamMembership(teamId, userId, 'admin', accountName);
+        return json(res, 200, {
+          ok: true,
+          company: {
+            companyId: company.$id,
+            name: company.data?.name || '',
+            slug: company.data?.slug || '',
+            teamId,
+            profileRowId: profile.rowId,
+          },
+          teamMembershipId: membership.$id,
+          entitlement: await getEntitlement(companyId),
+        });
+      } catch (failure) {
+        await restorePlatformExploration(userId);
+        throw failure;
+      }
     }
 
     if (action === 'resolve') {
