@@ -167,24 +167,31 @@ async function ensureCompanyProfile(companyId, companyName, teamId, now, profile
   }
 
   const rowId = companyId.length <= 36 ? companyId : crypto.randomUUID();
-  const name = String(profile.name || companyName).trim();
-  const address = String(profile.address || '').trim();
+  const name = String(profile.name || companyName).trim().slice(0, 60);
+  const address = String(profile.address || '').trim().slice(0, 100);
+  const phone = String(profile.phone || '').trim().slice(0, 15);
+  const email = String(profile.email || '').trim().slice(0, 254);
+  const nif = String(profile.nif || '').trim().slice(0, 30);
+  const nis = String(profile.nis || '').trim().slice(0, 30);
+  const rc = String(profile.rc || '').trim().slice(0, 30);
+  const art = String(profile.art || '').trim().slice(0, 30);
+  const description = String(profile.description || '').trim().slice(0, 80);
   const data = {
     nom: name,
     adresse: address,
-    telephone: String(profile.phone || '').trim(),
-    email: String(profile.email || '').trim(),
-    nif: String(profile.nif || '').trim(),
-    nis: String(profile.nis || '').trim(),
-    rc: String(profile.rc || '').trim(),
-    art: String(profile.art || '').trim(),
-    description: String(profile.description || '').trim(),
+    telephone: phone,
+    email,
+    nif,
+    nis,
+    rc,
+    art,
+    description,
     logo: '',
     filiales: [],
     directions: [],
     departments: [],
-    search: [name, address, profile.phone, profile.email, profile.nif, profile.nis, profile.rc, profile.art]
-      .filter(Boolean).join(' ').slice(0, 2000),
+    search: [name, address, phone, email, nif, nis, rc, art]
+      .filter(Boolean).join(' ').slice(0, 400),
     companyId,
   };
   await createRow(COMPANY_PROFILE, rowId, data, permissions);
