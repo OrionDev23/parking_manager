@@ -185,6 +185,32 @@ async function createRow(tableId, rowId, data, permissions = []) {
   });
 }
 
+async function enforceCompanyAccessState(company, entitlement) {
+  const teamId = String(company.data?.teamId || '').trim();
+  if (!teamId) {
+    return { licenseActive: false, aclEnforced: false };
+  }
+  const licenseActive = company.data?.status === 'active' &&
+    isEntitlementActive(entitlement);
+  const expectedState = licenseActive ? 'active' : 'inactive';
+  if (company.data?.tenantAclLicenseState !== expectedState) {
+    await prepareCompanyRows(company.$id, teamId);
+    await appwrite(
+      `/tablesdb/${DATABASE_ID}/tables/${COMPANIES}/rows/${encodeURIComponent(company.$id)}`,
+      {
+        method: 'PATCH',
+        body: {
+          data: {
+            tenantAclLicenseState: expectedState,
+            tenantAclEnforcedAt: new Date().toISOString(),
+          },
+        },
+      },
+    );
+  }
+  return { licenseActive, aclEnforced: true };
+}
+
 async function prepareCompanyRows(companyId, teamId) {
   const company = await getCompany(companyId);
   if (!company) throw Object.assign(new Error('Company not found.'), { status: 404 });
@@ -585,6 +611,7 @@ export default async ({ req, res, log, error }) => {
         const company = await getCompany(row.data.companyId);
         if (company && company.data?.status === 'active') {
           const teamId = String(company.data?.teamId || '').trim();
+          const entitlement = await getEntitlement(company.$id);
           const profile = teamId
             ? await ensureCompanyProfile(
                 company.$id,
@@ -593,6 +620,9 @@ export default async ({ req, res, log, error }) => {
                 now,
               )
             : null;
+          const accessState = teamId
+            ? await enforceCompanyAccessState(company, entitlement)
+            : { licenseActive: false, aclEnforced: false };
           memberships.push({
             companyId: company.$id,
             companyName: company.data.name,
@@ -601,7 +631,9 @@ export default async ({ req, res, log, error }) => {
             profileRowId: profile?.rowId || '',
             role: row.data.role,
             membershipId: row.$id,
-            entitlement: await getEntitlement(company.$id),
+            entitlement,
+            licenseActive: accessState.licenseActive,
+            aclEnforced: accessState.aclEnforced,
           });
         }
       }
