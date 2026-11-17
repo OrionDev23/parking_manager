@@ -17,8 +17,33 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
     return database;
   }
 
+  String _requireActiveTeam(String companyId) {
+    if (companyId.isEmpty || DatabaseGetter.activeCompanyId != companyId) {
+      throw StateError('Access-control operation is outside the active company.');
+    }
+    final teamId = DatabaseGetter.activeCompanyTeamId;
+    if (teamId == null || teamId.isEmpty) {
+      throw StateError('The active company has no Appwrite team context.');
+    }
+    return teamId;
+  }
+
+  List<String> _teamRowPermissions(String teamId) => [
+    'read("team:$teamId")',
+    'update("team:$teamId/admin")',
+    'delete("team:$teamId/admin")',
+  ];
+
+  List<String> _userAccessRowPermissions(String teamId, String userId) => [
+    'read("user:$userId")',
+    'read("team:$teamId")',
+    'update("team:$teamId/admin")',
+    'delete("team:$teamId/admin")',
+  ];
+
   @override
   Future<List<AccessTeam>> getTeams(String companyId) async {
+    _requireActiveTeam(companyId);
     final result = await _database.listRows(
       databaseId: databaseId,
       tableId: 'access_teams',
@@ -33,6 +58,7 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
 
   @override
   Future<AccessTeam?> getTeam(String teamId) async {
+    _requireActiveTeam(DatabaseGetter.activeCompanyId ?? '');
     try {
       final row = await _database.getRow(
         databaseId: databaseId,
@@ -55,11 +81,9 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
       tableId: 'access_teams',
       rowId: id,
       data: _teamToMap(team),
-      permissions: const [
-        'read("users")',
-        'update("team:1")',
-        'delete("team:1")',
-      ],
+      permissions: _teamRowPermissions(
+        _requireActiveTeam(team.companyId),
+      ),
     );
     return AccessTeam(
       id: id,
@@ -79,12 +103,22 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
       tableId: 'access_teams',
       rowId: team.id,
       data: _teamToMap(team),
+      permissions: _teamRowPermissions(
+        _requireActiveTeam(team.companyId),
+      ),
     );
     return team;
   }
 
   @override
   Future<void> deleteTeam(String teamId) async {
+    final companyId = DatabaseGetter.activeCompanyId;
+    if (companyId == null) {
+      throw StateError('No active company context is selected.');
+    }
+    final existing = await getTeam(teamId);
+    if (existing == null || existing.companyId != companyId) return;
+    _requireActiveTeam(companyId);
     await _database.deleteRow(
       databaseId: databaseId,
       tableId: 'access_teams',
@@ -94,6 +128,7 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
 
   @override
   Future<UserAccess> getUserAccess(String companyId, String userId) async {
+    _requireActiveTeam(companyId);
     try {
       final row = await _database.getRow(
         databaseId: databaseId,
@@ -118,6 +153,7 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
 
   @override
   Future<UserAccess> updateUserAccess(UserAccess access) async {
+    final teamId = _requireActiveTeam(access.companyId);
     final data = _userAccessToMap(access);
     try {
       await _database.updateRow(
@@ -125,12 +161,7 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
         tableId: 'access_users',
         rowId: access.userId,
         data: data,
-        permissions: [
-          'read("user:" + access.userId + ")',
-          'read("team:1")',
-          'update("team:1")',
-          'delete("team:1")',
-        ],
+        permissions: _userAccessRowPermissions(teamId, access.userId),
       );
     } on AppwriteException catch (error) {
       if (error.code != 404) rethrow;
@@ -139,12 +170,7 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
         tableId: 'access_users',
         rowId: access.userId,
         data: data,
-        permissions: [
-          'read("user:${access.userId}")',
-          'read("team:1")',
-          'update("team:1")',
-          'delete("team:1")',
-        ],
+        permissions: _userAccessRowPermissions(teamId, access.userId),
       );
     }
     return access;
@@ -155,6 +181,7 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
     String companyId,
     String userId,
   ) async {
+    _requireActiveTeam(companyId);
     final access = await getUserAccess(companyId, userId);
     final teams = <Set<String>>[];
     for (final teamId in access.teamIds) {
@@ -211,9 +238,7 @@ class AppwriteAccessControlRepository implements AccessControlRepository {
   }
 
   void _checkTeam(AccessTeam team) {
-    if (team.companyId.isEmpty) {
-      throw StateError('An access team must belong to a company.');
-    }
+    _requireActiveTeam(team.companyId);
     final unknown = team.permissions
         .where((id) => PermissionCatalog.find(id) == null)
         .toList();
