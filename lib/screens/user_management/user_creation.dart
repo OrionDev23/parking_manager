@@ -449,9 +449,9 @@ class _UserFormState extends State<UserForm> {
             tableId: userid,
             rowId: newme.id,
             permissions: [
+              Permission.read(Role.user(newme.id)),
               Permission.update(Role.user(newme.id)),
               Permission.delete(Role.user(newme.id)),
-              Permission.write(Role.user(newme.id)),
             ],
             data: newme.toJson(),
           )
