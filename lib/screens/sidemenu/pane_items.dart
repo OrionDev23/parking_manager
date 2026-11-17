@@ -376,12 +376,12 @@ class PaneItemsAndFooters {
       ],
     );
 
+    final isPlatformCompanyContext =
+        authService.session?.isPlatformCompanyContext == true;
     if (PanesListState.signedIn.value) {
       final isPlatformSession =
           authService.session?.isPlatformSuperAdmin == true &&
           authService.session?.isPlatformCompanyContext != true;
-      final isPlatformCompanyContext =
-          authService.session?.isPlatformCompanyContext == true;
       originalItems = [
         if (isPlatformSession) platformCompanies,
         if (!isPlatformSession && PanesListState.signedIn.value) dashboard,
