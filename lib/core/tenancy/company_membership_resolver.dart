@@ -72,6 +72,34 @@ class CompanyMembershipResolver {
     return decoded is Map && decoded['ok'] == true && decoded['isPlatformSuperAdmin'] == true;
   }
 
+  Future<void> authorizePlatformCompany(String companyId) async {
+    final client = DatabaseGetter.client;
+    if (client == null) {
+      throw StateError('Appwrite client is not initialized.');
+    }
+    final execution = await Functions(client).createExecution(
+      functionId: functionId,
+      body: jsonEncode({
+        'action': 'platform_select_company',
+        'companyId': companyId,
+      }),
+    );
+    Map<String, dynamic> response = {};
+    try {
+      response = Map<String, dynamic>.from(
+        jsonDecode(execution.responseBody) as Map,
+      );
+    } catch (_) {}
+    if (execution.responseStatusCode < 200 ||
+        execution.responseStatusCode >= 300 ||
+        response['ok'] != true) {
+      throw StateError(
+        response['message']?.toString() ??
+            'Impossible d’ouvrir le contexte de cette entreprise.',
+      );
+    }
+  }
+
   Future<List<CompanyMembership>> resolve() async {
     final client = DatabaseGetter.client;
     if (client == null) {
