@@ -3046,7 +3046,7 @@ class _VehicleFormState extends State<VehicleForm>
     vehicle.updatedAt = DateTime.now().toUtc();
     final domainVehicle = VehicleMapper.toDomain(
       vehicle,
-      companyId: project ?? 'local',
+      companyId: DatabaseGetter.activeCompanyId ?? (throw StateError('Aucune entreprise active.')),
     );
     await vehicleServices.repository.updateVehicle(domainVehicle);
   }
@@ -3057,7 +3057,7 @@ class _VehicleFormState extends State<VehicleForm>
     vehicle.updatedAt = now;
     final domainVehicle = VehicleMapper.toDomain(
       vehicle,
-      companyId: project ?? 'local',
+      companyId: DatabaseGetter.activeCompanyId ?? (throw StateError('Aucune entreprise active.')),
     );
     await vehicleServices.repository.createVehicle(domainVehicle);
   }
