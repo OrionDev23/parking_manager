@@ -11,6 +11,7 @@ class PlatformCompany {
   final String status;
   final String createdAt;
   final int activeUsers;
+  final Map<String, dynamic> profile;
   final Map<String, dynamic> entitlement;
 
   const PlatformCompany({
@@ -20,6 +21,7 @@ class PlatformCompany {
     required this.status,
     required this.createdAt,
     required this.activeUsers,
+    required this.profile,
     required this.entitlement,
   });
 
@@ -31,6 +33,9 @@ class PlatformCompany {
       status: json['status']?.toString() ?? 'unknown',
       createdAt: json['createdAt']?.toString() ?? '',
       activeUsers: (json['activeUsers'] as num?)?.toInt() ?? 0,
+      profile: json['profile'] is Map
+          ? Map<String, dynamic>.from(json['profile'] as Map)
+          : const {},
       entitlement: json['entitlement'] is Map
           ? Map<String, dynamic>.from(json['entitlement'] as Map)
           : const {},
@@ -279,6 +284,15 @@ class PlatformCompaniesRepository {
     String? billingCycle,
     String? currency,
     String? notes,
+    String? companyLegalName,
+    String? address,
+    String? phone,
+    String? companyEmail,
+    String? nif,
+    String? nis,
+    String? rc,
+    String? art,
+    String? description,
   }) async {
     final payload = <String, dynamic>{
       'action': 'platform_update_company',
@@ -302,6 +316,15 @@ class PlatformCompaniesRepository {
     if (billingCycle != null) payload['billingCycle'] = billingCycle;
     if (currency != null) payload['currency'] = currency;
     if (notes != null) payload['notes'] = notes;
+    if (companyLegalName != null) payload['companyLegalName'] = companyLegalName;
+    if (address != null) payload['address'] = address;
+    if (phone != null) payload['phone'] = phone;
+    if (companyEmail != null) payload['companyEmail'] = companyEmail;
+    if (nif != null) payload['nif'] = nif;
+    if (nis != null) payload['nis'] = nis;
+    if (rc != null) payload['rc'] = rc;
+    if (art != null) payload['art'] = art;
+    if (description != null) payload['description'] = description;
     await _execute(payload);
   }
 }
