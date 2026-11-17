@@ -1074,7 +1074,8 @@ export default async ({ req, res, log, error }) => {
             'doc_vehic', 'reparation', 'activity', 'chauf_disponibilite',
             'doc_chauffeur', 'entreprise', 'planning', 'prestataire',
             'fichereception', 'clients', 'parts', 'storage', 'backup',
-            'access_teams', 'access_users',
+            'access_teams', 'access_users', 'fournisseurs', 'options',
+            'categories', 'partsbrands',
           ].includes(table.$id),
           requiresClassification: !hasCompanyId && !serverManaged,
         });
