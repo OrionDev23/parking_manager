@@ -470,7 +470,18 @@ export default async ({ req, res, log, error }) => {
           activeUsers: memberships.filter(item => item.data?.status === 'active').length,
         });
       }
-      return json(res, 200, { ok: true, companies: result });
+      const canCreateCompany =
+        process.env.TENANT_COMPANY_CREATION_ENABLED === 'true';
+      return json(res, 200, {
+        ok: true,
+        companies: result,
+        capabilities: {
+          canCreateCompany,
+          createCompanyReason: canCreateCompany
+            ? ''
+            : 'La création est temporairement verrouillée tant que l’isolation des anciennes données et permissions n’est pas terminée.',
+        },
+      });
     }
 
 
