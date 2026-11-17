@@ -9,8 +9,8 @@ import '../../providers/client_database.dart' as legacy;
 
 /// Local-first persistence and outbox adapter for the legacy stock catalogue.
 ///
-/// Tenant-owned stock rows are scoped by companyId in Appwrite as well as in
-/// the local cache/outbox. Shared lookup catalogs remain installation-wide.
+/// Every stock catalogue row is owned by one company. Appwrite row ACLs,
+/// companyId filters, the local cache and the sync outbox use the same tenant.
 class LegacyStockSyncService {
   static const tableByEntity = <String, String>{
     'part': legacy.partsID,
@@ -35,8 +35,7 @@ class LegacyStockSyncService {
     this.teamId,
   });
 
-  bool _isTenantScoped(String entity) =>
-      entity == 'part' || entity == 'storage';
+  bool _isTenantScoped(String entity) => tableByEntity.containsKey(entity);
 
   List<String> _rowPermissions() {
     final id = teamId;
