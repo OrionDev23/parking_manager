@@ -167,7 +167,6 @@ class PanesListState extends State<PanesList>
     }
     final screenWidth = MediaQuery.sizeOf(context).width;
     final compact = screenWidth < 680;
-    bool portrait = MediaQuery.of(context).orientation == Orientation.portrait;
     final session = authService.session;
     final isPlatformCompanyContext =
         session?.isPlatformCompanyContext == true;
@@ -281,51 +280,6 @@ class PanesListState extends State<PanesList>
                         ),
                       ),
                     ),
-                        if (!compact &&
-                            DatabaseGetter.trialDate != null &&
-                            DatabaseGetter.me.value != null)
-                          bigSpace,
-                        if (!compact && DatabaseGetter.trialDate != null)
-                          const Text('daysremain').tr(
-                            namedArgs: {
-                              'days': DatabaseGetter.trialDate!
-                                  .difference(DateTime.now())
-                                  .inDays
-                                  .toString(),
-                            },
-                          ),
-                        if (demo && !portrait && !compact) bigSpace,
-                        if (demo && !portrait && !compact)
-                          Text(
-                            'demofor'.tr().toUpperCase(),
-                            style: TextStyle(
-                              fontStyle: FontStyle.italic,
-                              color: Colors.red,
-                              fontSize: 14,
-                            ),
-                          ),
-                        if (brandt && !portrait && !compact) smallSpace,
-                        if (brandt && !portrait && !compact)
-                          Image.asset(
-                            'assets/images/brandt.png',
-                            width: 60.px,
-                            height: 60.px,
-                          ),
-                        const Spacer(),
-                        if (!loading &&
-                            signedIn.value &&
-                            DatabaseGetter.trialDate != null)
-                          const NotifList(),
-                        if (!loading &&
-                            signedIn.value &&
-                            DatabaseGetter.trialDate != null)
-                          const SizedBox(width: 10),
-                        if (!loading &&
-                            signedIn.value &&
-                            DatabaseGetter.trialDate != null)
-                          const ProfilNameTopBar(),
-                        smallSpace,
-
                     if (isPlatformCompanyContext)
                       Container(
                         height: compact ? 38 : 42,
