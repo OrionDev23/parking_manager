@@ -512,7 +512,7 @@ class _CompanyCard extends StatelessWidget {
                       if (opening) const SizedBox(
                         width: 14,
                         height: 14,
-                        child: ProgressRing(strokeWidth: 2),
+                        child: ProgressRing(),
                       ) else const Icon(FluentIcons.open_in_new_window, size: 14),
                       const SizedBox(width: 8),
                       const Text('Ouvrir Parcoto'),
@@ -788,7 +788,9 @@ class _CompanyAdministratorsDialogState
     try {
       await widget.repository.addAdministrator(
         companyId: widget.company.companyId,
-        name: administrator.name,
+        name: administrator.name.isNotEmpty
+            ? administrator.name
+            : 'Administrateur',
         email: administrator.email,
         password: '',
       );
@@ -886,8 +888,10 @@ class _CompanyAdministratorsDialogState
       title: Text('Administrateurs — ${widget.company.name}'),
       constraints: const BoxConstraints(maxWidth: 720, maxHeight: 760),
       content: SizedBox(
-        width: 660,
-        height: 560,
+        width: MediaQuery.sizeOf(context).width < 800
+            ? MediaQuery.sizeOf(context).width * 0.82
+            : 660,
+        height: MediaQuery.sizeOf(context).height * 0.65,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -1008,7 +1012,9 @@ class _AddCompanyAdministratorDialogState
     return ContentDialog(
       title: Text('Ajouter un administrateur — ${widget.company.name}'),
       content: SizedBox(
-        width: 480,
+        width: MediaQuery.sizeOf(context).width < 600
+            ? MediaQuery.sizeOf(context).width * 0.82
+            : 480,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
