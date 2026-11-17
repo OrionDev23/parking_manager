@@ -286,8 +286,8 @@ export default async ({ req, res, log, error }) => {
         return json(res, 400, { ok: false, message: 'companyId is required.' });
       }
       const company = await getCompany(companyId);
-      if (!company || company.data?.status !== 'active') {
-        return json(res, 404, { ok: false, message: 'Active company not found.' });
+      if (!company) {
+        return json(res, 404, { ok: false, message: 'Company not found.' });
       }
       const teamId = String(company.data?.teamId || '').trim();
       if (!teamId) {
