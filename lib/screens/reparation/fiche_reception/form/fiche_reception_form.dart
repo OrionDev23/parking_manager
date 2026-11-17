@@ -48,6 +48,18 @@ class FicheReceptionForm extends StatefulWidget {
 
 class FicheReceptionFormState extends State<FicheReceptionForm>
     with AutomaticKeepAliveClientMixin<FicheReceptionForm> {
+  List<String> _tenantFilePermissions() {
+    final teamId = DatabaseGetter.activeCompanyTeamId;
+    if (teamId == null || teamId.isEmpty) {
+      throw StateError('The active company has no Appwrite team context.');
+    }
+    return [
+      Permission.read(Role.team(teamId)),
+      Permission.update(Role.team(teamId, 'admin')),
+      Permission.update(Role.team(teamId, 'manager')),
+      Permission.delete(Role.team(teamId, 'admin')),
+    ];
+  }
   static Map<Key, int> reservedFiches = {};
 
   EntretienVehicle entretienVehicle = EntretienVehicle();
@@ -1466,6 +1478,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                     DatabaseGetter.storage!.createFile(
                       bucketId: buckedId,
                       fileId: "$documentID$i.jpg",
+                      permissions: _tenantFilePermissions(),
                       file: InputFile.fromBytes(
                         bytes: images[i]!,
                         filename: "$documentID$i.jpg",
@@ -1478,6 +1491,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                     DatabaseGetter.storage!.createFile(
                       bucketId: buckedId,
                       fileId: "$documentID$i.jpg",
+                      permissions: _tenantFilePermissions(),
                       file: InputFile.fromBytes(
                         bytes: images[i]!,
                         filename: "$documentID$i.jpg",
@@ -1490,6 +1504,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
               DatabaseGetter.storage!.createFile(
                 bucketId: buckedId,
                 fileId: "$documentID$i.jpg",
+                permissions: _tenantFilePermissions(),
                 file: InputFile.fromBytes(
                   bytes: images[i]!,
                   filename: "$documentID$i.jpg",
