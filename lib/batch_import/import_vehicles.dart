@@ -624,11 +624,10 @@ class _ImportVehiclesState extends State<ImportVehicles> {
   }
 
   Future<void> uploadVehicle(Vehicle v, TablesDB db) async {
-    await db
-        .createRow(
-          databaseId: databaseId,
-          tableId: vehiculeid,
-          rowId: v.id,
+    await DatabaseGetter()
+        .addDocument(
+          collectionId: vehiculeid,
+          documentId: v.id,
           data: v.toJson(),
         )
         .then((value) {
