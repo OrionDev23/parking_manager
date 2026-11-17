@@ -818,6 +818,11 @@ export default async ({ req, res, log, error }) => {
       const existingAdmin = (matchingUsers.users || []).find(item => item.email?.toLowerCase() === adminEmail) || null;
       if (name.length < 2 || name.length > 160 || slug.length < 2 ||
           adminName.length < 2 || !adminEmail || (!existingAdmin && adminPassword.length < 8) ||
+          companyProfile.name.length > 60 || companyProfile.address.length > 100 ||
+          companyProfile.phone.length > 15 || companyProfile.email.length > 254 ||
+          companyProfile.nif.length > 30 || companyProfile.nis.length > 30 ||
+          companyProfile.rc.length > 30 || companyProfile.art.length > 30 ||
+          companyProfile.description.length > 80 ||
           !Number.isFinite(startsAt.getTime()) || !Number.isFinite(expiresAt.getTime()) ||
           expiresAt <= startsAt ||
           ![maxUsers, maxVehicles, maxEmployees, maxDrivers, maxSites, priceAmount].every(Number.isSafeInteger) ||
