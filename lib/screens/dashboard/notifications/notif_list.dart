@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:material_ui/material_ui.dart' show Badge, LinearProgressIndicator;
+import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/driver_provider.dart';
 import 'package:parc_oto/providers/planning_provider.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
@@ -16,7 +17,9 @@ import '../../../widgets/on_tap_scale.dart';
 import 'notification_list_tile.dart';
 
 class NotifList extends StatefulWidget {
-  const NotifList({super.key});
+  final String? companyId;
+
+  const NotifList({super.key, required this.companyId});
 
   @override
   State<NotifList> createState() => NotifListState();
@@ -32,8 +35,19 @@ class NotifListState extends State<NotifList>
 
   @override
   void initState() {
-    getNotifs();
     super.initState();
+    getNotifs();
+  }
+
+  @override
+  void didUpdateWidget(covariant NotifList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.companyId != widget.companyId) {
+      loaded = false;
+      _loadedCompanyId = null;
+      tiles.clear();
+      getNotifs();
+    }
   }
 
   static void remove(String id) {
@@ -52,21 +66,34 @@ class NotifListState extends State<NotifList>
   List<DocumentChauffeur> docChauf = [];
 
   Future<void> getNotifs() async {
-    if (!loaded) {
-      loading = true;
+    final companyId = widget.companyId;
+    if (companyId == null) {
       tiles.clear();
-
-      if (mounted) {
-        setState(() {});
-      }
-      await Future.wait([getVehicDocs(), getPlanningDocs(), getChaufDocs()]);
-      createNotifListFromLists();
-      loading = false;
-      loaded = true;
-      if (mounted) {
-        setState(() {});
-      }
+      loaded = false;
+      _loadedCompanyId = null;
+      return;
     }
+    if (loaded && _loadedCompanyId == companyId) return;
+
+    loading = true;
+    loaded = false;
+    tiles.clear();
+    if (mounted) setState(() {});
+
+    await Future.wait([getVehicDocs(), getPlanningDocs(), getChaufDocs()]);
+    if (!mounted) return;
+    if (widget.companyId != companyId ||
+        DatabaseGetter.activeCompanyId != companyId) {
+      loading = false;
+      setState(() {});
+      return;
+    }
+
+    createNotifListFromLists();
+    _loadedCompanyId = companyId;
+    loaded = true;
+    loading = false;
+    setState(() {});
   }
 
   DateTime beforTime = DateTime.now().add(const Duration(days: 60));
