@@ -301,7 +301,7 @@ export default async ({ req, res, log, error }) => {
         const account = await appwrite(`/users/${encodeURIComponent(userId)}`);
         accountName = account.name || '';
       } catch (_) {}
-      await ensureCompanyProfile(companyId, company.data?.name || companyId, teamId, now);
+      const profile = await ensureCompanyProfile(companyId, company.data?.name || companyId, teamId, now);
       const membership = await syncTeamMembership(teamId, userId, 'admin', accountName);
       return json(res, 200, {
         ok: true,
@@ -310,6 +310,7 @@ export default async ({ req, res, log, error }) => {
           name: company.data?.name || '',
           slug: company.data?.slug || '',
           teamId,
+          profileRowId: profile.rowId,
         },
         teamMembershipId: membership.$id,
         entitlement: await getEntitlement(companyId),
@@ -324,18 +325,21 @@ export default async ({ req, res, log, error }) => {
       for (const row of rows.filter(item => item.data?.status === 'active')) {
         const company = await getCompany(row.data.companyId);
         if (company && company.data?.status === 'active') {
-          if (company.data?.teamId) {
-            await ensureCompanyProfile(
-              company.$id,
-              company.data?.name || company.$id,
-              company.data.teamId,
-              now,
-            );
-          }
+          const teamId = String(company.data?.teamId || '').trim();
+          const profile = teamId
+            ? await ensureCompanyProfile(
+                company.$id,
+                company.data?.name || company.$id,
+                teamId,
+                now,
+              )
+            : null;
           memberships.push({
             companyId: company.$id,
             companyName: company.data.name,
             companySlug: company.data.slug,
+            teamId,
+            profileRowId: profile?.rowId || '',
             role: row.data.role,
             membershipId: row.$id,
             entitlement: await getEntitlement(company.$id),
