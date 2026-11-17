@@ -932,6 +932,9 @@ export default async ({ req, res, log, error }) => {
       for (const table of tableResult.tables || []) {
         const columns = table.columns || [];
         const hasCompanyId = columns.some(column => column.key === 'companyId');
+        const serverManaged = [
+          COMPANIES, MEMBERSHIPS, ENTITLEMENTS,
+        ].includes(table.$id);
         const tablePermissions = table.$permissions || [];
         const isLegacyBroadPermission = permission =>
           permission.includes('"team:1') ||
@@ -951,6 +954,7 @@ export default async ({ req, res, log, error }) => {
           name: table.name || table.$id,
           rowSecurity: table.rowSecurity === true,
           hasCompanyId,
+          serverManaged,
           totalRows: hasCompanyId ? rows.length : null,
           companyRows: companyRows.length,
           unassignedRows: hasCompanyId
@@ -959,7 +963,7 @@ export default async ({ req, res, log, error }) => {
           otherCompanyRows: hasCompanyId
             ? rows.filter(row => row.data?.companyId && row.data.companyId !== companyId).length
             : null,
-          rowsWithoutPermissions: companyRows.filter(row =>
+          rowsWithoutPermissions: serverManaged ? 0 : companyRows.filter(row =>
             !(row.$permissions || []).length
           ).length,
           rowsWithLegacyPermissions: companyRows.filter(row =>
@@ -973,10 +977,12 @@ export default async ({ req, res, log, error }) => {
             'fichereception', 'clients', 'parts', 'storage', 'backup',
             'access_teams', 'access_users',
           ].includes(table.$id),
-          requiresClassification: !hasCompanyId,
+          requiresClassification: !hasCompanyId && !serverManaged,
         });
       }
-      const tenantTables = tables.filter(table => table.hasCompanyId);
+      const tenantTables = tables.filter(table =>
+        table.hasCompanyId && !table.serverManaged
+      );
       return json(res, 200, {
         ok: true,
         readOnly: true,
