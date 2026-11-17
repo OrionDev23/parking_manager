@@ -271,31 +271,10 @@ class DatabaseGetter {
         await getTrialDate(loadedUser.$id, generation, projectId);
         if (!_isCurrentProject(generation, projectId)) return;
 
-        if (trialDate == null ||
-            trialDate!.difference(DateTime.now()).inMilliseconds <= 0) {
-          await onSessionExpired?.call();
-          // The callback invalidates pending requests, so use the captured
-          // account to revoke this expired session even after generation changes.
-          if (_configuredProjectId != projectId) return;
-          try {
-            await activeAccount.deleteSession(sessionId: 'current');
-          } catch (error) {
-            // The session may already have been revoked server-side.
-            if (kDebugMode) {
-              debugPrint('Expired session revocation failed: $error');
-            }
-          } finally {
-            if (_configuredProjectId == projectId) {
-              user = null;
-              me.value = null;
-              myTeams = List.empty(growable: true);
-              trialDate = null;
-              PanesListState.signedIn.value = false;
-              PanesListState.index.value = 0;
-            }
-          }
-          return;
-        }
+        // License validity is evaluated after the authenticated account's
+        // company membership and company entitlement have been resolved.
+        // A newly provisioned company administrator may not have a legacy
+        // per-user trialdate row, but can still have a valid company licence.
 
         try {
           final result = await activeDatabase.getRow(
