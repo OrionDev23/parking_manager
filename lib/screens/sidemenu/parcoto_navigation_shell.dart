@@ -68,7 +68,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final compact = width < ParcotoBreakpoints.tablet;
+    final compact = width < ParcotoTokens.tabletBreakpoint;
     final theme = widget.appTheme;
 
     return ValueListenableBuilder<int>(
@@ -80,10 +80,12 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
             : 0;
         final active = destinations.isEmpty ? null : destinations[safeIndex];
 
-        return ColoredBox(
-          color: theme.backGroundColor,
-          child: Column(
-            children: [
+        return Stack(
+          children: [
+            ColoredBox(
+              color: theme.backGroundColor,
+              child: Column(
+                children: [
               if (compact)
                 Row(
                   children: [
@@ -113,8 +115,10 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                   ],
                 ),
               ),
-              if (compact && _drawerOpen)
-                Positioned.fill(
+              ],
+            ),
+            if (compact && _drawerOpen)
+              Positioned.fill(
                   child: Material(
                     color: const Color(0x66000000),
                     child: Row(
@@ -138,8 +142,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                     ),
                   ),
                 ),
-            ],
-          ),
+          ],
         );
       },
     );
