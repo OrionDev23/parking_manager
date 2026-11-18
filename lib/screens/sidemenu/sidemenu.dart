@@ -183,7 +183,7 @@ class PanesListState extends State<PanesList>
               transitionBuilder: (w, d) =>
                   DrillInPageTransition(animation: d, child: w),
               titleBar: Container(
-                height: (compact ? 64 : 72.px) +
+                height: (compact ? 65 : 73.px) +
                     (isPlatformCompanyContext ? (compact ? 40 : 44) : 0),
                 decoration: BoxDecoration(
                   color: widget.appTheme.surfaceColor,
