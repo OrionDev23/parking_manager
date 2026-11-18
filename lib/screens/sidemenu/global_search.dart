@@ -73,7 +73,7 @@ class _GlobalSearchLauncherState extends State<GlobalSearchLauncher> {
                 ),
               ),
               suffix: IconButton(
-                icon: const Icon(FluentIcons.arrow_right, size: 13),
+                icon: const Icon(FluentIcons.chevron_right, size: 13),
                 onPressed: _submitSearch,
               ),
             ),
