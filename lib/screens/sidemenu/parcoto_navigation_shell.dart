@@ -1,6 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
-import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/ui/design_system/parcoto_tokens.dart';
 import 'package:parc_oto/theme.dart';
 
@@ -43,7 +42,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
   ];
 
   List<NavigationPaneItem> _flatten(List<NavigationPaneItem> source) {
-    final result = <PaneItem>[];
+    final result = <NavigationPaneItem>[];
     for (final item in source) {
       if (item is PaneItem || item is PaneItemExpander) {
         result.add(item);
@@ -209,7 +208,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
 
   List<Widget> _buildItems(
     List<NavigationPaneItem> items,
-    List<PaneItem> destinations,
+    List<NavigationPaneItem> destinations,
     int selected,
     VoidCallback? onNavigate,
   ) {
@@ -243,9 +242,10 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
         );
         final isExpanded = _expanded.contains(key) || childSelected;
         widgets.add(_navRow(
-          item,
-          index,
-          selected,
+          icon: item.icon,
+          title: item.title,
+          index: index,
+          selected: selected,
           expandable: true,
           expanded: isExpanded,
           onTap: () {
@@ -266,9 +266,10 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
               widgets.add(Padding(
                 padding: const EdgeInsets.only(left: 18),
                 child: _navRow(
-                  child,
-                  _indexOf(child),
-                  selected,
+                  icon: child.icon,
+                  title: child.title,
+                  index: _indexOf(child),
+                  selected: selected,
                   onTap: () {
                     widget.onSelected(_indexOf(child));
                     onNavigate?.call();
@@ -295,9 +296,10 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
         }
       } else if (item is PaneItem) {
         widgets.add(_navRow(
-          item,
-          _indexOf(item),
-          selected,
+          icon: item.icon,
+          title: item.title,
+          index: _indexOf(item),
+          selected: selected,
           onTap: () {
             widget.onSelected(_indexOf(item));
             onNavigate?.call();
@@ -308,10 +310,11 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
     return widgets;
   }
 
-  Widget _navRow(
-    NavigationPaneItem item,
-    int index,
-    int selected, {
+  Widget _navRow({
+    required Widget icon,
+    required Widget title,
+    required int index,
+    required int selected,
     required VoidCallback onTap,
     bool expandable = false,
     bool expanded = false,
@@ -340,7 +343,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                       size: 17,
                       color: active ? theme.color : theme.mutedTextColor,
                     ),
-                    child: item.icon,
+                    child: icon,
                   ),
                   const SizedBox(width: 11),
                   Expanded(
@@ -352,7 +355,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                         fontSize: 12,
                         fontWeight: active ? FontWeight.w700 : FontWeight.w500,
                       ),
-                      child: item.title,
+                      child: title,
                     ),
                   ),
                   if (expandable)
