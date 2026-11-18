@@ -637,9 +637,11 @@ export default async (context) => requestContext.run(
       const rows = await listRows(MEMBERSHIPS, {
         method: 'equal', attribute: 'userId', values: [userId],
       });
+      log(`Tenant resolve diagnostic user=${userId} membershipRows=${rows.length} rows=${JSON.stringify(rows.map(row => ({ id: row.$id, userId: row.data?.userId, companyId: row.data?.companyId, status: row.data?.status }))) }`);
       const memberships = [];
       for (const row of rows.filter(item => item.data?.status === 'active')) {
         const company = await getCompany(row.data.companyId);
+        log(`Tenant resolve company diagnostic companyId=${row.data.companyId} found=${Boolean(company)} status=${company?.data?.status || 'missing'} teamId=${company?.data?.teamId || ''}`);
         if (company && company.data?.status === 'active') {
           const teamId = String(company.data?.teamId || '').trim();
           const entitlement = await getEntitlement(company.$id);
