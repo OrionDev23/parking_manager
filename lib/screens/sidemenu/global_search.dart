@@ -9,83 +9,57 @@ import 'pane_items.dart';
 import '../vehicle/manager/vehicles_table.dart';
 import '../chauffeur/manager/chauffeur_table.dart';
 
-class GlobalSearchLauncher extends StatelessWidget {
+class GlobalSearchLauncher extends StatefulWidget {
   const GlobalSearchLauncher({super.key});
+
+  @override
+  State<GlobalSearchLauncher> createState() => _GlobalSearchLauncherState();
+}
+
+class _GlobalSearchLauncherState extends State<GlobalSearchLauncher> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submitSearch() {
+    final query = _controller.text.trim();
+    showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => _GlobalSearchDialog(initialQuery: query),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = FluentTheme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 18, 14, 18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 2, bottom: 9),
-            child: Text(
-              'RECHERCHE GLOBALE',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.15,
-                color: theme.typography.caption?.color,
-              ),
+      // NavigationPane gives its header a compact, finite height. Keep this
+      // widget deliberately short: tall headers overlap the first pane items.
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+      child: SizedBox(
+        height: 40,
+        child: TextBox(
+          controller: _controller,
+          placeholder: 'Recherche globale…',
+          onSubmitted: (_) => _submitSearch(),
+          prefix: Padding(
+            padding: const EdgeInsets.only(left: 10),
+            child: Icon(
+              FluentIcons.search,
+              size: 15,
+              color: theme.typography.caption?.color,
             ),
           ),
-          Button(
-            onPressed: () => showDialog<void>(
-              context: context,
-              barrierDismissible: true,
-              builder: (_) => const _GlobalSearchDialog(),
-            ),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 13,
-              ),
-              decoration: BoxDecoration(
-                color: theme.resources.subtleFillColorTertiary,
-                borderRadius: BorderRadius.circular(9),
-                border: Border.all(
-                  color: theme.resources.controlStrokeColorDefault,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    FluentIcons.search,
-                    size: 16,
-                    color: theme.typography.body?.color,
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'Rechercher un écran, un véhicule…',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: theme.typography.body?.color,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          suffix: IconButton(
+            icon: const Icon(FluentIcons.enter, size: 13),
+            onPressed: _submitSearch,
           ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.only(left: 2),
-            child: Text(
-              'Interfaces • Véhicules • Conducteurs',
-              style: TextStyle(
-                fontSize: 10,
-                color: theme.typography.caption?.color,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
