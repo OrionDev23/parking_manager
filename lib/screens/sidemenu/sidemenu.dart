@@ -8,6 +8,7 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
+import 'package:parc_oto/screens/sidemenu/global_search.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -154,7 +155,7 @@ class PanesListState extends State<PanesList>
     });
   }
 
-  double pwidth = 250.px;
+  double pwidth = 286.px;
 
   FlyoutController flyoutController = FlyoutController();
 
@@ -344,6 +345,7 @@ class PanesListState extends State<PanesList>
                 ),
               ),
               pane: NavigationPane(
+                header: const GlobalSearchLauncher(),
                 selected: value,
                 onChanged: (i) {
                   previousValue = index.value;
