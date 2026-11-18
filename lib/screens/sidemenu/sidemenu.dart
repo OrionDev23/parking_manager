@@ -155,7 +155,7 @@ class PanesListState extends State<PanesList>
     });
   }
 
-  double pwidth = 332.px;
+  double pwidth = 304;
 
   FlyoutController flyoutController = FlyoutController();
 
@@ -166,7 +166,7 @@ class PanesListState extends State<PanesList>
       return const Center(child: ProgressRing());
     }
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final compact = screenWidth < 680;
+    final compact = screenWidth < 760;\n    pwidth = compact ? 304 : (screenWidth < 1280 ? 276 : 304);
     final session = authService.session;
     final isPlatformCompanyContext =
         session?.isPlatformCompanyContext == true;
@@ -352,15 +352,17 @@ class PanesListState extends State<PanesList>
                   index.value = i;
                 },
                 size: NavigationPaneSize(openMaxWidth: pwidth),
+                // Keep one predictable navigation model: persistent on desktop,
+                // overlay drawer on narrow screens. Do not inherit user placement
+                // preferences that can leave the menu collapsed unexpectedly.
                 displayMode: compact
                     ? PaneDisplayMode.minimal
-                    : widget.appTheme.displayMode,
+                    : PaneDisplayMode.open,
                 // The app uses a fully custom title bar. Explicitly place the
                 // minimal-pane toggle there so mobile users can reach every
                 // module instead of relying on the default automatic slot.
-                toggleButtonPosition: compact
-                    ? PaneToggleButtonPreferredPosition.titleBar
-                    : PaneToggleButtonPreferredPosition.auto,
+                toggleButtonPosition:
+                    PaneToggleButtonPreferredPosition.titleBar,
                 items: PaneItemsAndFooters.originalItems,
                 footerItems: PaneItemsAndFooters.footerItems,
               ),
