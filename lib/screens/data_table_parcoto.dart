@@ -61,6 +61,11 @@ class _DataTableParcState extends State<DataTableParc> {
     // The package's table controls inherit the material_ui theme at the app root.
     // This local Flutter theme remains for legacy Material widgets in the table subtree.
     final materialTheme = appTheme.materialTheme;
+    final compact = MediaQuery.sizeOf(context).width < 760;
+    final effectiveRowHeight = widget.autoRowHeight
+        ? (compact ? 56.0 : kMinInteractiveDimension)
+        : widget.rowHeight ??
+            (widget.numberOfRows == null ? rowHeight : rowHeight * 2);
 
     return Theme(
       data: materialTheme,
@@ -82,7 +87,7 @@ class _DataTableParcState extends State<DataTableParc> {
           child: AsyncPaginatedDataTable2(
             header: widget.header,
             sortAscending: widget.sortAscending,
-            headingRowHeight: 48,
+            headingRowHeight: compact ? 54 : 50,
             minWidth: widget.horizontalScroll ? 2000.px : null,
             isHorizontalScrollBarVisible: widget.horizontalScroll,
             headingRowDecoration: BoxDecoration(
@@ -122,12 +127,9 @@ class _DataTableParcState extends State<DataTableParc> {
             autoRowsToHeight: widget.autoRowHeight,
             empty: NoDataWidget(datasource: widget.source),
             pageSyncApproach: PageSyncApproach.goToLast,
-            horizontalMargin: 18,
-            columnSpacing: 16,
-            dataRowHeight: widget.autoRowHeight
-                ? kMinInteractiveDimension
-                : widget.rowHeight ??
-                      (widget.numberOfRows == null ? rowHeight : rowHeight * 2),
+            horizontalMargin: compact ? 12 : 20,
+            columnSpacing: compact ? 12 : 18,
+            dataRowHeight: effectiveRowHeight,
             onPageChanged: (_) {},
             rowsPerPage: widget.numberOfRows ?? rowPerPage,
             onRowsPerPageChanged: widget.pages
@@ -148,7 +150,7 @@ class _DataTableParcState extends State<DataTableParc> {
                 : [widget.numberOfRows!],
             showCheckboxColumn: false,
             sortColumnIndex: widget.sortColumnIndex,
-            showFirstLastButtons: true,
+            showFirstLastButtons: !compact,
             renderEmptyRowsInTheEnd: false,
             fit: FlexFit.loose,
             columns: widget.columns,
