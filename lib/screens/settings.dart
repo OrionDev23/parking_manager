@@ -74,35 +74,6 @@ class Settings extends ScrollablePage {
       ),
       biggerSpacer,
       Text(
-        'dispositionpaneau',
-        style: FluentTheme.of(context).typography.subtitle,
-      ).tr(),
-      spacer,
-      RadioGroup<PaneDisplayMode>(
-        groupValue: appTheme.displayMode,
-        onChanged: (value) {
-          if (value != null) {
-            appTheme.displayMode = value;
-            prefs.setInt('display', PaneDisplayMode.values.indexOf(value));
-          }
-        },
-        child: Column(
-          children: List.generate(PaneDisplayMode.values.length, (index) {
-            final mode = PaneDisplayMode.values[index];
-            return Padding(
-              padding: const EdgeInsetsDirectional.only(bottom: 8.0),
-              child: RadioButton<PaneDisplayMode>(
-                value: mode,
-                content: Text(
-                  mode.toString().replaceAll('PaneDisplayMode.', ''),
-                ).tr(),
-              ),
-            );
-          }),
-        ),
-      ),
-      biggerSpacer,
-      Text(
         'couleurprincipale',
         style: FluentTheme.of(context).typography.subtitle,
       ).tr(),
