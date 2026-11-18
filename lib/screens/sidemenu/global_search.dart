@@ -55,10 +55,6 @@ class _GlobalSearchLauncherState extends State<GlobalSearchLauncher> {
               color: theme.typography.caption?.color,
             ),
           ),
-          suffix: IconButton(
-            icon: const Icon(FluentIcons.enter, size: 13),
-            onPressed: _submitSearch,
-          ),
         ),
       ),
     );
@@ -66,7 +62,9 @@ class _GlobalSearchLauncherState extends State<GlobalSearchLauncher> {
 }
 
 class _GlobalSearchDialog extends StatefulWidget {
-  const _GlobalSearchDialog();
+  final String initialQuery;
+
+  const _GlobalSearchDialog({this.initialQuery = ''});
 
   @override
   State<_GlobalSearchDialog> createState() => _GlobalSearchDialogState();
@@ -74,6 +72,18 @@ class _GlobalSearchDialog extends StatefulWidget {
 
 class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
   final TextEditingController _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.text = widget.initialQuery;
+    _query = widget.initialQuery.trim();
+    if (_query.length >= 2) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _runSearch(_query);
+      });
+    }
+  }
   Timer? _debounce;
   bool _searching = false;
   String _query = '';
