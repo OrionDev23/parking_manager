@@ -42,9 +42,12 @@ class ParcotoPageLayout extends StatelessWidget {
             ? ParcotoTokens.space5
             : ParcotoTokens.space8;
 
-    final content = ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: maxWidth),
-      child: Column(
+    final content = SizedBox(
+      width: double.infinity,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxWidth),
+          child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
@@ -65,7 +68,7 @@ class ParcotoPageLayout extends StatelessWidget {
                         fontSize: width < ParcotoTokens.mobileBreakpoint
                             ? 22
                             : 27,
-                        fontWeight: FontWeight.w750,
+                        fontWeight: FontWeight.w700,
                         letterSpacing: -.8,
                         height: 1.15,
                       ),
@@ -96,7 +99,9 @@ class ParcotoPageLayout extends StatelessWidget {
             const SizedBox(height: ParcotoTokens.space6),
             bottom!,
           ],
-        ],
+          ],
+          ),
+        ),
       ),
     );
 
