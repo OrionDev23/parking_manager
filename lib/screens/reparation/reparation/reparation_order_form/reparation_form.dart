@@ -265,6 +265,7 @@ class ReparationFormState extends State<ReparationForm>
   Widget build(BuildContext context) {
     super.build(context);
     var appTheme = context.watch<AppTheme>();
+    final compact = MediaQuery.sizeOf(context).width < 760;
     return ScaffoldPage(
       content: Container(
         padding: const EdgeInsets.all(10),
@@ -274,7 +275,10 @@ class ReparationFormState extends State<ReparationForm>
           children: [
             Positioned.fill(
               child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(
+                  horizontal: compact ? 8 : 20,
+                  vertical: compact ? 8 : 12,
+                ),
                 children: [
                   Row(
                     children: [
@@ -539,8 +543,11 @@ class ReparationFormState extends State<ReparationForm>
       bottomBar: Container(
         decoration: BoxDecoration(color: appTheme.backGroundColor),
         padding: const EdgeInsets.all(10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+        child: Wrap(
+          alignment: WrapAlignment.end,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 10,
+          runSpacing: 8,
           children: [
             FilledButton(
               style: ButtonStyle(
@@ -551,7 +558,6 @@ class ReparationFormState extends State<ReparationForm>
               onPressed: uploading ? null : showPdf,
               child: const Text('voir'),
             ),
-            smallSpace,
             FilledButton(
               style: ButtonStyle(
                 backgroundColor: WidgetStatePropertyAll(appTheme.color.darkest),
