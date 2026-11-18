@@ -68,7 +68,7 @@ class TableStats extends StatelessWidget {
                   ),
                 ),
               ),
-              if (additionalWidget != null) additionalWidget!,
+              ?additionalWidget,
             ],
           ),
           const SizedBox(height: 14),
@@ -92,7 +92,7 @@ class TableStats extends StatelessWidget {
                   children: [
                     const Text('voirplus').tr(),
                     const SizedBox(width: 7),
-                    const Icon(FluentIcons.arrow_right, size: 12),
+                    const Icon(FluentIcons.chevron_right, size: 12),
                   ],
                 ),
               ),
