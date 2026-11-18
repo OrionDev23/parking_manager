@@ -515,7 +515,13 @@ export default async (context) => requestContext.run(
     const now = new Date().toISOString();
 
     if (action === 'platform_resolve') {
-      requirePlatformSuperAdmin(userId);
+      // This is a capability probe called by every account during login.
+      // A normal tenant user must receive a successful "not a platform admin"
+      // result, not HTTP 403: Appwrite Functions SDKs may throw on non-2xx
+      // executions and abort the regular tenant-membership resolution.
+      if (!isPlatformSuperAdmin(userId)) {
+        return json(res, 200, { ok: true, userId, isPlatformSuperAdmin: false });
+      }
       try {
         await restorePlatformExploration(userId);
       } catch (failure) {
