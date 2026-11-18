@@ -291,7 +291,7 @@ async function prepareCompanyRows(companyId, teamId) {
       await appwrite(
         `/tablesdb/${DATABASE_ID}/tables/${encodeURIComponent(tableId)}`,
         {
-          method: 'PATCH',
+          method: 'PUT',
           body: { permissions: [...tablePermissions], rowSecurity: true },
         },
       );
