@@ -37,15 +37,15 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
   final Set<String> _expanded = <String>{};
   bool _drawerOpen = false;
 
-  List<PaneItem> get _destinations => [
+  List<NavigationPaneItem> get _destinations => [
     ..._flatten(widget.items),
     ..._flatten(widget.footerItems),
   ];
 
-  List<PaneItem> _flatten(List<NavigationPaneItem> source) {
+  List<NavigationPaneItem> _flatten(List<NavigationPaneItem> source) {
     final result = <PaneItem>[];
     for (final item in source) {
-      if (item is PaneItem) {
+      if (item is PaneItem || item is PaneItemExpander) {
         result.add(item);
         if (item is PaneItemExpander) {
           result.addAll(_flatten(item.items));
@@ -55,11 +55,11 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
     return result;
   }
 
-  int _indexOf(PaneItem target) {
+  int _indexOf(NavigationPaneItem target) {
     return _destinations.indexWhere((item) => identical(item, target));
   }
 
-  String _keyOf(PaneItem item) {
+  String _keyOf(NavigationPaneItem item) {
     final key = item.key;
     if (key is ValueKey) return key.value.toString();
     return item.hashCode.toString();
@@ -79,6 +79,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
             ? selected
             : 0;
         final active = destinations.isEmpty ? null : destinations[safeIndex];
+        final activeBody = active is PaneItem ? active.body : active is PaneItemExpander ? active.body : null;
 
         return Stack(
           children: [
@@ -108,7 +109,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                         child: _sidebar(theme, selected, destinations),
                       ),
                     Expanded(
-                      child: active?.body ??
+                      child: activeBody ??
                           widget.emptyState ??
                           const Center(child: Text('Aucune destination disponible')),
                     ),
@@ -152,7 +153,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
   Widget _sidebar(
     AppTheme theme,
     int selected,
-    List<PaneItem> destinations, {
+    List<NavigationPaneItem> destinations, {
     VoidCallback? onNavigate,
   }) {
     return Container(
@@ -308,7 +309,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
   }
 
   Widget _navRow(
-    PaneItem item,
+    NavigationPaneItem item,
     int index,
     int selected, {
     required VoidCallback onTap,
