@@ -31,14 +31,6 @@ class GlobalSearchLauncher extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.withValues(alpha: .35)),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Text('⌘ K', style: TextStyle(fontSize: 10)),
-            ),
           ],
         ),
       ),
@@ -145,7 +137,7 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
   @override
   Widget build(BuildContext context) {
     final q = _query.toLowerCase();
-    final destinations = _destinations
+    final destinations = _query.length < 2 ? <({String key, String title, String group})>[] : _destinations
         .where((item) => item.title.toLowerCase().contains(q) ||
             item.group.toLowerCase().contains(q))
         .take(6)
