@@ -382,24 +382,39 @@ class PaneItemsAndFooters {
         authService.session?.isPlatformSuperAdmin == true &&
         !isPlatformCompanyContext;
     if (PanesListState.signedIn.value) {
-      originalItems = [
-        if (isPlatformSession) platformCompanies,
-        if (!isPlatformSession && PanesListState.signedIn.value) dashboard,
-        if (!isPlatformSession && (canManageUsers || canManageAccess)) userAccessManagement,
-        if (!isPlatformSession && PanesListState.signedIn.value) vehicles,
-        if (!isPlatformSession && PanesListState.signedIn.value) reparations,
-        if (!isPlatformSession && showAtelier) atelier,
-        if (!isPlatformSession && PanesListState.signedIn.value) chauffeurs,
-        if (!isPlatformSession && authService.session?.hasPermission('planning.manage') == true)
-          planner,
-        if (!isPlatformSession && authService.session?.hasPermission('activity.view') == true)
-          evenements,
-      ];
+      if (isPlatformSession) {
+        originalItems = [
+          PaneItemHeader(header: const Text('ADMINISTRATION CENTRALE')),
+          platformCompanies,
+        ];
+      } else {
+        originalItems = [
+          PaneItemHeader(header: const Text('ESPACE DE TRAVAIL')),
+          dashboard,
+          if (canManageUsers || canManageAccess) userAccessManagement,
+          PaneItemHeader(header: const Text('GESTION OPÉRATIONNELLE')),
+          vehicles,
+          reparations,
+          if (showAtelier) atelier,
+          chauffeurs,
+          if (authService.session?.hasPermission('planning.manage') == true ||
+              authService.session?.hasPermission('activity.view') == true)
+            PaneItemHeader(header: const Text('PILOTAGE')),
+          if (authService.session?.hasPermission('planning.manage') == true)
+            planner,
+          if (authService.session?.hasPermission('activity.view') == true)
+            evenements,
+        ];
+      }
     } else {
-      originalItems = [login];
+      originalItems = [
+        PaneItemHeader(header: const Text('BIENVENUE SUR PARCOTO')),
+        login,
+      ];
     }
     footerItems = [
       PaneItemSeparator(),
+      PaneItemHeader(header: const Text('PARAMÈTRES & COMPTE')),
       if (!isPlatformSession &&
           authService.session?.hasPermission('company.manage') == true &&
           PanesListState.signedIn.value)
