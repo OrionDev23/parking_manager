@@ -6,6 +6,8 @@ import '../../main.dart' show driverServices, vehicleServices;
 import '../../domain/entities/driver.dart';
 import '../../domain/entities/vehicle.dart';
 import 'pane_items.dart';
+import '../vehicle/manager/vehicles_table.dart';
+import '../chauffeur/manager/chauffeur_table.dart';
 
 class GlobalSearchLauncher extends StatelessWidget {
   const GlobalSearchLauncher({super.key});
@@ -131,8 +133,17 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
     });
   }
 
-  void _openVehicle(Vehicle vehicle) => _openDestination('vehicle-manager');
-  void _openDriver(Driver driver) => _openDestination('driver-manager');
+  void _openVehicle(Vehicle vehicle) {
+    VehicleTable.filterVehicule.value = vehicle.registration;
+    VehicleTable.filterNow = true;
+    _openDestination('vehicle-manager');
+  }
+
+  void _openDriver(Driver driver) {
+    ChauffeurTable.filterDocument.value = driver.registration;
+    ChauffeurTable.filterNow = true;
+    _openDestination('driver-manager');
+  }
 
   @override
   Widget build(BuildContext context) {
