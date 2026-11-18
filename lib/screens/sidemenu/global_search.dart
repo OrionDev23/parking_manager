@@ -14,27 +14,104 @@ class GlobalSearchLauncher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = FluentTheme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
-      child: Button(
-        onPressed: () => showDialog<void>(
-          context: context,
-          barrierDismissible: true,
-          builder: (_) => const _GlobalSearchDialog(),
-        ),
-        child: Row(
-          children: [
-            const Icon(FluentIcons.search, size: 15),
-            const SizedBox(width: 10),
-            const Expanded(
-              child: Text(
-                'Rechercher dans Parcoto',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+      padding: const EdgeInsets.fromLTRB(14, 18, 14, 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 2, bottom: 9),
+            child: Text(
+              'RECHERCHE GLOBALE',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.15,
+                color: theme.typography.caption?.color,
               ),
             ),
-          ],
-        ),
+          ),
+          Button(
+            onPressed: () => showDialog<void>(
+              context: context,
+              barrierDismissible: true,
+              builder: (_) => const _GlobalSearchDialog(),
+            ),
+            style: ButtonStyle(
+              padding: ButtonState.all(const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 13,
+              )),
+              backgroundColor: ButtonState.resolveWith((states) {
+                if (states.isHovering) {
+                  return theme.resources.subtleFillColorSecondary;
+                }
+                return theme.resources.subtleFillColorTertiary;
+              }),
+              shape: ButtonState.all(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(9),
+                  side: BorderSide(
+                    color: theme.resources.controlStrokeColorDefault,
+                  ),
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  FluentIcons.search,
+                  size: 16,
+                  color: theme.typography.body?.color,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Rechercher un écran, un véhicule…',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.typography.body?.color,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(
+                      color: theme.resources.controlStrokeColorDefault,
+                    ),
+                  ),
+                  child: Text(
+                    '⌘ K',
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: theme.typography.caption?.color,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.only(left: 2),
+            child: Text(
+              'Interfaces • Véhicules • Conducteurs',
+              style: TextStyle(
+                fontSize: 10,
+                color: theme.typography.caption?.color,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
