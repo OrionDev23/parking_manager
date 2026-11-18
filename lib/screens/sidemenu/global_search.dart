@@ -142,14 +142,14 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
   }
 
   void _openVehicle(Vehicle vehicle) {
-    VehicleTable.filterVehicule.value = vehicle.registration;
-    VehicleTable.filterNow = true;
+    VehicleTableState.filterVehicule.value = vehicle.registration;
+    VehicleTableState.filterNow = true;
     _openDestination('vehicle-manager');
   }
 
   void _openDriver(Driver driver) {
-    ChauffeurTable.filterDocument.value = driver.registration;
-    ChauffeurTable.filterNow = true;
+    ChauffeurTableState.filterDocument.value = driver.registration;
+    ChauffeurTableState.filterNow = true;
     _openDestination('driver-manager');
   }
 
