@@ -166,7 +166,8 @@ class PanesListState extends State<PanesList>
       return const Center(child: ProgressRing());
     }
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final compact = screenWidth < 760;\n    pwidth = compact ? 304 : (screenWidth < 1280 ? 276 : 304);
+    final compact = screenWidth < 760;
+    pwidth = compact ? 304 : (screenWidth < 1280 ? 276 : 304);
     final session = authService.session;
     final isPlatformCompanyContext =
         session?.isPlatformCompanyContext == true;
@@ -357,7 +358,7 @@ class PanesListState extends State<PanesList>
                 // preferences that can leave the menu collapsed unexpectedly.
                 displayMode: compact
                     ? PaneDisplayMode.minimal
-                    : PaneDisplayMode.open,
+                    : PaneDisplayMode.expanded,
                 // The app uses a fully custom title bar. Explicitly place the
                 // minimal-pane toggle there so mobile users can reach every
                 // module instead of relying on the default automatic slot.
