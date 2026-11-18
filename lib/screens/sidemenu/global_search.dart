@@ -38,24 +38,47 @@ class _GlobalSearchLauncherState extends State<GlobalSearchLauncher> {
   Widget build(BuildContext context) {
     final theme = FluentTheme.of(context);
     return Padding(
-      // NavigationPane gives its header a compact, finite height. Keep this
-      // widget deliberately short: tall headers overlap the first pane items.
-      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-      child: SizedBox(
-        height: 40,
-        child: TextBox(
-          controller: _controller,
-          placeholder: 'Recherche globale…',
-          onSubmitted: (_) => _submitSearch(),
-          prefix: Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Icon(
-              FluentIcons.search,
-              size: 15,
-              color: theme.typography.caption?.color,
+      // A compact two-level header: section identity + a real input.
+      // Fixed dimensions prevent the NavigationPane header from pushing
+      // the first destination underneath it on desktop or mobile.
+      padding: const EdgeInsets.fromLTRB(12, 9, 12, 10),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 3, bottom: 7),
+            child: Text(
+              'NAVIGATION',
+              style: TextStyle(
+                fontSize: 9,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.35,
+                color: theme.typography.caption?.color,
+              ),
             ),
           ),
-        ),
+          SizedBox(
+            height: 42,
+            child: TextBox(
+              controller: _controller,
+              placeholder: 'Module, véhicule, conducteur…',
+              onSubmitted: (_) => _submitSearch(),
+              prefix: Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: Icon(
+                  FluentIcons.search,
+                  size: 15,
+                  color: theme.typography.caption?.color,
+                ),
+              ),
+              suffix: IconButton(
+                icon: const Icon(FluentIcons.arrow_right, size: 13),
+                onPressed: _submitSearch,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
