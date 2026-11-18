@@ -58,6 +58,7 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
 
   static const _destinations = <({String key, String title, String group})>[
     (key: 'dashboard', title: 'Tableau de bord', group: 'Général'),
+    (key: 'platform-companies', title: 'Entreprises clientes', group: 'Plateforme'),
     (key: 'vehicle-manager', title: 'Gestion des véhicules', group: 'Véhicules'),
     (key: 'vehicle-brands', title: 'Marques de véhicules', group: 'Véhicules'),
     (key: 'vehicle-states', title: 'États des véhicules', group: 'Véhicules'),
@@ -149,8 +150,9 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
   Widget build(BuildContext context) {
     final q = _query.toLowerCase();
     final destinations = _query.length < 2 ? <({String key, String title, String group})>[] : _destinations
-        .where((item) => item.title.toLowerCase().contains(q) ||
-            item.group.toLowerCase().contains(q))
+        .where((item) => PaneItemsAndFooters.indexForPaneKey(item.key) != null &&
+            (item.title.toLowerCase().contains(q) ||
+             item.group.toLowerCase().contains(q)))
         .take(6)
         .toList(growable: false);
 
