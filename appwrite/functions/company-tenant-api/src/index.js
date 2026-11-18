@@ -1573,7 +1573,7 @@ export default async (context) => requestContext.run(
         return json(res, 400, { ok: false, message: 'companyId and membershipId are required.' });
       }
       const caller = await requireCompanyAdmin(userId, companyId);
-      const target = await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`);
+      const target = normalizeRow(await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`));
       if (target.data?.companyId !== companyId || target.data?.role === 'owner' || target.data?.userId === userId || target.data?.status === 'revoked') {
         return json(res, 403, { ok: false, message: 'The target membership cannot be revoked.' });
       }
