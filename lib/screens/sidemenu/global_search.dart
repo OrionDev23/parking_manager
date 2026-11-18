@@ -187,7 +187,7 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
                 padding: const EdgeInsets.all(8),
                 child: Text(
                   'Recherche de données indisponible : $_error',
-                  style: const TextStyle(color: Colors.red),
+                  style:  TextStyle(color: Colors.red),
                 ),
               ),
             if (_vehicles.isNotEmpty) ...[
