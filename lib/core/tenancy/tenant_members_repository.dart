@@ -12,6 +12,7 @@ class TenantMember {
   final String role;
   final String status;
   final String createdAt;
+  final bool isCurrentUser;
 
   const TenantMember({
     required this.membershipId,
@@ -21,6 +22,7 @@ class TenantMember {
     required this.role,
     required this.status,
     required this.createdAt,
+    required this.isCurrentUser,
   });
 
   factory TenantMember.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class TenantMember {
       role: json['role']?.toString() ?? 'viewer',
       status: json['status']?.toString() ?? 'active',
       createdAt: json['createdAt']?.toString() ?? '',
+      isCurrentUser: json['isCurrentUser'] == true,
     );
   }
 }
