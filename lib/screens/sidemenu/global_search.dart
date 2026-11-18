@@ -38,47 +38,24 @@ class _GlobalSearchLauncherState extends State<GlobalSearchLauncher> {
   Widget build(BuildContext context) {
     final theme = FluentTheme.of(context);
     return Padding(
-      // A compact two-level header: section identity + a real input.
-      // Fixed dimensions prevent the NavigationPane header from pushing
-      // the first destination underneath it on desktop or mobile.
-      padding: const EdgeInsets.fromLTRB(12, 9, 12, 10),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 3, bottom: 7),
-            child: Text(
-              'NAVIGATION',
-              style: TextStyle(
-                fontSize: 9,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.35,
-                color: theme.typography.caption?.color,
-              ),
-            ),
+      // NavigationPane allocates a short header slot. Keep the command field
+      // within that slot so the first destination never gets overlapped.
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: SizedBox(
+        height: 36,
+        child: TextBox(
+          controller: _controller,
+          placeholder: 'Rechercher un module ou une donnée…',
+          onSubmitted: (_) => _submitSearch(),
+          prefix: const Padding(
+            padding: EdgeInsets.only(left: 9),
+            child: Icon(FluentIcons.search, size: 15),
           ),
-          SizedBox(
-            height: 42,
-            child: TextBox(
-              controller: _controller,
-              placeholder: 'Module, véhicule, conducteur…',
-              onSubmitted: (_) => _submitSearch(),
-              prefix: Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Icon(
-                  FluentIcons.search,
-                  size: 15,
-                  color: theme.typography.caption?.color,
-                ),
-              ),
-              suffix: IconButton(
-                icon: const Icon(FluentIcons.chevron_right, size: 13),
-                onPressed: _submitSearch,
-              ),
-            ),
+          suffix: IconButton(
+            icon: const Icon(FluentIcons.chevron_right, size: 12),
+            onPressed: _submitSearch,
           ),
-        ],
+        ),
       ),
     );
   }
