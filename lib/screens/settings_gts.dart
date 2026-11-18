@@ -204,36 +204,6 @@ class SettingsGTS extends ScrollablePage {
         ),
       ),
       biggerSpacer,
-      Text(
-        'dispositionpaneau',
-        style: FluentTheme.of(context).typography.subtitle,
-      ).tr(),
-      spacer,
-      RadioGroup<PaneDisplayMode>(
-        groupValue: appTheme.displayMode,
-        onChanged: (value) {
-          if (value != null) {
-            appTheme.displayMode = value;
-            prefs.setInt('display', PaneDisplayMode.values.indexOf(value));
-          }
-        },
-        child: Column(
-          children: PaneDisplayMode.values
-              .map(
-                (mode) => Padding(
-                  padding: const EdgeInsetsDirectional.only(bottom: 8.0),
-                  child: RadioButton<PaneDisplayMode>(
-                    value: mode,
-                    content: Text(
-                      mode.toString().replaceAll('PaneDisplayMode.', ''),
-                    ).tr(),
-                  ),
-                ),
-              )
-              .toList(),
-        ),
-      ),
-      biggerSpacer,
       biggerSpacer,
       Text('langue', style: FluentTheme.of(context).typography.subtitle).tr(),
       RadioGroup<Locale>(
