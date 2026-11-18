@@ -103,7 +103,8 @@ class ChauffeurFormState extends State<ChauffeurForm> {
         ),
       );
     }
-    bool portrait = Device.orientation == Orientation.portrait;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final compact = screenWidth < 680;
     return Container(
       color: appTheme.backGroundColor,
       child: Column(
@@ -113,14 +114,15 @@ class ChauffeurFormState extends State<ChauffeurForm> {
             child: Container(
               color: appTheme.backGroundColor,
               child: ListView(
-                padding: portrait
-                    ? null
-                    : EdgeInsets.symmetric(horizontal: 200.px),
+                padding: EdgeInsets.symmetric(
+                  horizontal: compact ? 12 : 24,
+                  vertical: compact ? 12 : 20,
+                ),
                 shrinkWrap: true,
                 children: [
                   SizedBox(
                     height: 700.px,
-                    width: 500.px,
+                    width: double.infinity,
                     child: Column(
                       children: [
                         Flexible(
@@ -150,7 +152,29 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                             label: 'fullname'.tr(),
                             child: Padding(
                               padding: const EdgeInsets.all(10.0),
-                              child: Row(
+                              child: compact
+                                  ? Column(
+                                      children: [
+                                        ParcotoTextBox(
+                                          controller: nom,
+                                          placeholder: 'Nom',
+                                          style: appTheme.writingStyle,
+                                          placeholderStyle: placeStyle,
+                                          cursorColor: appTheme.color.darker,
+                                          onChanged: (s) => checkChanges(),
+                                        ),
+                                        smallSpace,
+                                        ParcotoTextBox(
+                                          controller: prenom,
+                                          placeholder: 'Prénom',
+                                          style: appTheme.writingStyle,
+                                          placeholderStyle: placeStyle,
+                                          cursorColor: appTheme.color.darker,
+                                          onChanged: (s) => checkChanges(),
+                                        ),
+                                      ],
+                                    )
+                                  : Row(
                                 children: [
                                   Flexible(
                                     child: ParcotoTextBox(
@@ -191,7 +215,35 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                             label: 'poste'.tr(),
                             child: Padding(
                               padding: const EdgeInsets.all(10.0),
-                              child: Row(
+                              child: compact
+                                  ? Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: [
+                                        ParcotoTextBox(
+                                          controller: profession,
+                                          placeholder: 'poste'.tr(),
+                                          style: appTheme.writingStyle,
+                                          placeholderStyle: placeStyle,
+                                          cursorColor: appTheme.color.darker,
+                                          onChanged: (s) => checkChanges(),
+                                        ),
+                                        smallSpace,
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            const Text('fonction').tr(),
+                                            smallSpace,
+                                            ToggleSwitch(
+                                              checked: service,
+                                              onChanged: (s) => setState(() => service = s),
+                                            ),
+                                            smallSpace,
+                                            const Text('service').tr(),
+                                          ],
+                                        ),
+                                      ],
+                                    )
+                                  : Row(
                                 children: [
                                   Flexible(
                                     child: ParcotoTextBox(
@@ -259,7 +311,29 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                               padding: const EdgeInsets.all(10.0),
                               child: Column(
                                 children: [
-                                  Row(
+                                  compact
+                                      ? Column(
+                                          children: [
+                                            ParcotoTextBox(
+                                              controller: email,
+                                              placeholder: 'email'.tr(),
+                                              style: appTheme.writingStyle,
+                                              placeholderStyle: placeStyle,
+                                              cursorColor: appTheme.color.darker,
+                                              onChanged: (s) => checkChanges(),
+                                            ),
+                                            smallSpace,
+                                            ParcotoTextBox(
+                                              controller: telephone,
+                                              placeholder: 'telephone'.tr(),
+                                              style: appTheme.writingStyle,
+                                              placeholderStyle: placeStyle,
+                                              cursorColor: appTheme.color.darker,
+                                              onChanged: (s) => checkChanges(),
+                                            ),
+                                          ],
+                                        )
+                                      : Row(
                                     children: [
                                       Expanded(
                                         flex: 4,
@@ -459,7 +533,9 @@ class ChauffeurFormState extends State<ChauffeurForm> {
               ),
             ),
           ),
-          Row(
+          Padding(
+            padding: EdgeInsets.fromLTRB(compact ? 12 : 24, 8, compact ? 12 : 24, 12),
+            child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -469,6 +545,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
               ),
               const SizedBox(width: 10),
             ],
+          ),
           ),
         ],
       ),
