@@ -155,7 +155,7 @@ class _TenantMembersScreenState extends State<TenantMembersScreen> {
                               ],
                             ),
                           ),
-                          if (member.role != 'owner')
+                          if (member.role != 'owner' && !member.isCurrentUser && member.role != 'admin')
                             Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -259,7 +259,6 @@ class _TenantMembersScreenState extends State<TenantMembersScreen> {
             value: role,
             isExpanded: true,
             items: const [
-              ComboBoxItem(value: 'admin', child: Text('Administrateur')),
               ComboBoxItem(value: 'manager', child: Text('Manager')),
               ComboBoxItem(value: 'employee', child: Text('Employé')),
               ComboBoxItem(value: 'viewer', child: Text('Lecture seule')),
