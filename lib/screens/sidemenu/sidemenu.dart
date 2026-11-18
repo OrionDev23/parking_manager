@@ -9,6 +9,7 @@ import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
 import 'package:parc_oto/screens/sidemenu/global_search.dart';
+import 'package:parc_oto/screens/sidemenu/parcoto_navigation_shell.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -180,10 +181,17 @@ class PanesListState extends State<PanesList>
         return ValueListenableBuilder(
           valueListenable: index,
           builder: (BuildContext context, int value, Widget? child) {
-            return NavigationView(
-              transitionBuilder: (w, d) =>
-                  DrillInPageTransition(animation: d, child: w),
-              titleBar: Container(
+            return ParcotoNavigationShell(
+              items: PaneItemsAndFooters.originalItems,
+              footerItems: PaneItemsAndFooters.footerItems,
+              selectedIndex: index,
+              onSelected: (i) {
+                previousValue = index.value;
+                index.value = i;
+              },
+              appTheme: widget.appTheme,
+              search: const GlobalSearchLauncher(),
+              topBar: Container(
                 height: (compact ? 65 : 73.px) +
                     (isPlatformCompanyContext ? (compact ? 40 : 44) : 0),
                 decoration: BoxDecoration(
@@ -207,10 +215,6 @@ class PanesListState extends State<PanesList>
                           ),
                           child: Row(
                             children: [
-                              if (compact) ...[
-                                const PaneToggleButton(),
-                                const SizedBox(width: 8),
-                              ],
                               Image.asset(
                                 'assets/images/logo.webp',
                                 width: compact ? 116 : 148,
@@ -344,28 +348,6 @@ class PanesListState extends State<PanesList>
                       ),
                   ],
                 ),
-              ),
-              pane: NavigationPane(
-                header: const GlobalSearchLauncher(),
-                selected: value,
-                onChanged: (i) {
-                  previousValue = index.value;
-                  index.value = i;
-                },
-                size: NavigationPaneSize(openMaxWidth: pwidth),
-                // Keep one predictable navigation model: persistent on desktop,
-                // overlay drawer on narrow screens. Do not inherit user placement
-                // preferences that can leave the menu collapsed unexpectedly.
-                displayMode: compact
-                    ? PaneDisplayMode.minimal
-                    : PaneDisplayMode.expanded,
-                // The app uses a fully custom title bar. Explicitly place the
-                // minimal-pane toggle there so mobile users can reach every
-                // module instead of relying on the default automatic slot.
-                toggleButtonPosition:
-                    PaneToggleButtonPreferredPosition.titleBar,
-                items: PaneItemsAndFooters.originalItems,
-                footerItems: PaneItemsAndFooters.footerItems,
               ),
             );
           },
