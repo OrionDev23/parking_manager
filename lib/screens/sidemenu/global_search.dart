@@ -36,7 +36,6 @@ class _GlobalSearchLauncherState extends State<GlobalSearchLauncher> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = FluentTheme.of(context);
     return Padding(
       // NavigationPane allocates a short header slot. Keep the command field
       // within that slot so the first destination never gets overlapped.
