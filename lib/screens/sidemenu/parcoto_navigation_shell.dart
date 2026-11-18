@@ -311,8 +311,8 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
   }
 
   Widget _navRow({
-    required Widget icon,
-    required Widget title,
+    required Widget? icon,
+    required Widget? title,
     required int index,
     required int selected,
     required VoidCallback onTap,
@@ -343,7 +343,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                       size: 17,
                       color: active ? theme.color : theme.mutedTextColor,
                     ),
-                    child: icon,
+                    child: icon ?? const SizedBox.shrink(),
                   ),
                   const SizedBox(width: 11),
                   Expanded(
@@ -355,7 +355,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                         fontSize: 12,
                         fontWeight: active ? FontWeight.w700 : FontWeight.w500,
                       ),
-                      child: title,
+                      child: title ?? const SizedBox.shrink(),
                     ),
                   ),
                   if (expandable)
