@@ -117,9 +117,10 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
               ),
               ],
             ),
+          ),
             if (compact && _drawerOpen)
               Positioned.fill(
-                  child: Material(
+                  child: Container(
                     color: const Color(0x66000000),
                     child: Row(
                       children: [
@@ -231,11 +232,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
       } else if (item is PaneItemSeparator) {
         widgets.add(Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-          child: Divider(
-            style: DividerThemeData(
-              decoration: BoxDecoration(color: widget.appTheme.borderColor),
-            ),
-          ),
+          child: Container(height: 1, color: widget.appTheme.borderColor),
         ));
       } else if (item is PaneItemExpander) {
         final index = _indexOf(item);
@@ -322,14 +319,15 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
     final theme = widget.appTheme;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Material(
-        color: active
-            ? theme.color.withValues(alpha: .13)
-            : const Color(0x00000000),
-        borderRadius: BorderRadius.circular(10),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(10),
-          onTap: onTap,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            color: active
+                ? theme.color.withValues(alpha: .13)
+                : const Color(0x00000000),
+            borderRadius: BorderRadius.circular(10),
+          ),
           child: SizedBox(
             height: 42,
             child: Padding(
