@@ -77,26 +77,7 @@ class GlobalSearchLauncher extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(
-                      color: theme.resources.controlStrokeColorDefault,
-                    ),
-                  ),
-                  child: Text(
-                    '⌘ K',
-                    style: TextStyle(
-                      fontSize: 9,
-                      color: theme.typography.caption?.color,
-                    ),
-                  ),
-                ),
+
               ],
             ),
           ),
