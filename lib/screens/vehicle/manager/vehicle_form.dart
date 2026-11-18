@@ -273,7 +273,7 @@ class _VehicleFormState extends State<VehicleForm>
         builder: (context, constraints) {
           final compact = constraints.maxWidth < 680;
           final message = errorUploading
-              ? Text('errupld', style: const TextStyle(color: Colors.red)).tr()
+              ? Text('errupld', style:  TextStyle(color: Colors.red)).tr()
               : const Text(
                   'Les modifications ne sont enregistrées qu’après confirmation.',
                   style: TextStyle(fontSize: 11),
