@@ -38,47 +38,40 @@ class GlobalSearchLauncher extends StatelessWidget {
               barrierDismissible: true,
               builder: (_) => const _GlobalSearchDialog(),
             ),
-            style: ButtonStyle(
-              padding: ButtonState.all(const EdgeInsets.symmetric(
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
                 horizontal: 12,
                 vertical: 13,
-              )),
-              backgroundColor: ButtonState.resolveWith((states) {
-                if (states.isHovering) {
-                  return theme.resources.subtleFillColorSecondary;
-                }
-                return theme.resources.subtleFillColorTertiary;
-              }),
-              shape: ButtonState.all(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(9),
-                  side: BorderSide(
-                    color: theme.resources.controlStrokeColorDefault,
-                  ),
+              ),
+              decoration: BoxDecoration(
+                color: theme.resources.subtleFillColorTertiary,
+                borderRadius: BorderRadius.circular(9),
+                border: Border.all(
+                  color: theme.resources.controlStrokeColorDefault,
                 ),
               ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  FluentIcons.search,
-                  size: 16,
-                  color: theme.typography.body?.color,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Rechercher un écran, un véhicule…',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: theme.typography.body?.color,
+              child: Row(
+                children: [
+                  Icon(
+                    FluentIcons.search,
+                    size: 16,
+                    color: theme.typography.body?.color,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Rechercher un écran, un véhicule…',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.typography.body?.color,
+                      ),
                     ),
                   ),
-                ),
-
-              ],
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 8),
