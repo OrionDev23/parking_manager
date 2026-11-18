@@ -1471,6 +1471,7 @@ export default async (context) => requestContext.run(
         }
         members.push({
           membershipId: row.$id,
+          isCurrentUser: row.data.userId === userId,
           userId: row.data.userId,
           name: account?.name || '',
           email: account?.email || '',
@@ -1548,7 +1549,7 @@ export default async (context) => requestContext.run(
         return json(res, 400, { ok: false, message: 'Invalid companyId, membershipId or role.' });
       }
       const caller = await requireCompanyAdmin(userId, companyId);
-      const target = await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`);
+      const target = normalizeRow(await appwrite(`/tablesdb/${DATABASE_ID}/tables/${MEMBERSHIPS}/rows/${encodeURIComponent(membershipId)}`));
       if (target.data?.companyId !== companyId || target.data?.role === 'owner' || target.data?.status === 'revoked') {
         return json(res, 403, { ok: false, message: 'The target membership cannot be changed.' });
       }
