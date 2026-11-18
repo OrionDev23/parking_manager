@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:fluent_ui/fluent_ui.dart';
 
-import '../../main.dart' show driverServices, vehicleServices;
+import '../../main.dart' show authService, driverServices, vehicleServices;
 import '../../domain/entities/driver.dart';
 import '../../domain/entities/vehicle.dart';
 import 'pane_items.dart';
@@ -108,6 +108,13 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
   Future<void> _runSearch(String query) async {
     setState(() => _searching = true);
     try {
+      final session = authService.session;
+      if (session?.isPlatformSuperAdmin == true &&
+          session?.isPlatformCompanyContext != true) {
+        if (!mounted || query != _query) return;
+        setState(() => _searching = false);
+        return;
+      }
       final results = await Future.wait([
         vehicleServices.repository.getVehicles(search: query, limit: 6),
         driverServices.repository.getDrivers(search: query, limit: 6),
