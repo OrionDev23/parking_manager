@@ -269,29 +269,65 @@ class _VehicleFormState extends State<VehicleForm>
           ]),
         );
       }),
-      bottomBar: widget.readOnly ? null : Padding(
-        padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 18),
-        child: Row(children: [
-          if (errorUploading)
-            Expanded(child: Text('errupld', style: TextStyle(color: Colors.red)).tr())
-          else
-            const Expanded(child: Text(
-              'Les modifications ne sont enregistrées qu’après confirmation.',
-              style: TextStyle(fontSize: 11),
-            )),
-          Button(
-            onPressed: uploading ? null : () => setState(() => selectedFormSection = 0),
-            child: const Text('Retour à l’identification'),
-          ),
-          const SizedBox(width: 10),
-          FilledButton(
-            onPressed: uploading ? null : confirmAndUpload,
-            child: uploading ? const ProgressRing() : const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [Icon(FluentIcons.save, size: 14), SizedBox(width: 8), Text('Enregistrer le véhicule')],
+      bottomBar: widget.readOnly ? null : LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 680;
+          final message = errorUploading
+              ? Text('errupld', style: const TextStyle(color: Colors.red)).tr()
+              : const Text(
+                  'Les modifications ne sont enregistrées qu’après confirmation.',
+                  style: TextStyle(fontSize: 11),
+                );
+          final actions = [
+            Button(
+              onPressed: uploading ? null : () => setState(() => selectedFormSection = 0),
+              child: const Text('Retour à l’identification'),
             ),
-          ),
-        ]),
+            FilledButton(
+              onPressed: uploading ? null : confirmAndUpload,
+              child: uploading
+                  ? const ProgressRing()
+                  : const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(FluentIcons.save, size: 14),
+                        SizedBox(width: 8),
+                        Text('Enregistrer le véhicule'),
+                      ],
+                    ),
+            ),
+          ];
+          return Padding(
+            padding: EdgeInsets.symmetric(
+              vertical: 9,
+              horizontal: compact ? 12 : 18,
+            ),
+            child: compact
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      message,
+                      const SizedBox(height: 9),
+                      Wrap(
+                        alignment: WrapAlignment.end,
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: actions,
+                      ),
+                    ],
+                  )
+                : Row(
+                    children: [
+                      Expanded(child: message),
+                      ...actions.expand((action) => [
+                        if (action != actions.first) const SizedBox(width: 10),
+                        action,
+                      ]),
+                    ],
+                  ),
+          );
+        },
       ),
     );
   }
@@ -301,31 +337,98 @@ class _VehicleFormState extends State<VehicleForm>
     final registration = widget.vehicle?.matricule ??
         (autreMat ? matriculeEtr.text : [matr1.text, matr2.text, matr3.text]
             .where((part) => part.trim().isNotEmpty).join('-'));
-    return Container(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 18),
-      decoration: BoxDecoration(
-        color: FluentTheme.of(context).micaBackgroundColor,
-        border: Border(bottom: BorderSide(color: Colors.grey[30])),
-      ),
-      child: Row(children: [
-        Container(width: 54, height: 54,
-          decoration: BoxDecoration(color: appTheme.color.withValues(alpha: .12), borderRadius: BorderRadius.circular(15)),
-          child: Icon(FluentIcons.car, size: 26, color: appTheme.color)),
-        const SizedBox(width: 16),
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(isEditing ? 'Modifier un véhicule' : 'Nouveau véhicule',
-            style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 4),
-          Text(registration.isEmpty ? 'Fiche véhicule · Parcoto' : '$registration · Fiche véhicule',
-            style: TextStyle(color: Colors.grey[100], fontSize: 12)),
-        ])),
-        _headerPill(isEditing ? FluentIcons.edit : FluentIcons.add,
-          isEditing ? 'Modification' : 'Création', appTheme.color),
-        const SizedBox(width: 10),
-        _headerPill(widget.readOnly ? FluentIcons.lock : FluentIcons.edit,
-          widget.readOnly ? 'Consultation' : 'Brouillon',
-          widget.readOnly ? Colors.grey : appTheme.color),
-      ]),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < 680;
+        final title = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isEditing ? 'Modifier un véhicule' : 'Nouveau véhicule',
+              style: TextStyle(
+                fontSize: compact ? 17 : 21,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              registration.isEmpty
+                  ? 'Fiche véhicule · Parcoto'
+                  : '$registration · Fiche véhicule',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: Colors.grey[100], fontSize: 12),
+            ),
+          ],
+        );
+        final status = Wrap(
+          spacing: 8,
+          runSpacing: 6,
+          children: [
+            _headerPill(
+              isEditing ? FluentIcons.edit : FluentIcons.add,
+              isEditing ? 'Modification' : 'Création',
+              appTheme.color,
+            ),
+            _headerPill(
+              widget.readOnly ? FluentIcons.lock : FluentIcons.edit,
+              widget.readOnly ? 'Consultation' : 'Brouillon',
+              widget.readOnly ? Colors.grey : appTheme.color,
+            ),
+          ],
+        );
+        return Container(
+          padding: EdgeInsets.fromLTRB(
+            compact ? 14 : 24,
+            compact ? 14 : 20,
+            compact ? 14 : 24,
+            compact ? 14 : 18,
+          ),
+          decoration: BoxDecoration(
+            color: FluentTheme.of(context).micaBackgroundColor,
+            border: Border(bottom: BorderSide(color: Colors.grey[30])),
+          ),
+          child: compact
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 42,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            color: appTheme.color.withValues(alpha: .12),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(FluentIcons.car, size: 21, color: appTheme.color),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(child: title),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    status,
+                  ],
+                )
+              : Row(
+                  children: [
+                    Container(
+                      width: 54,
+                      height: 54,
+                      decoration: BoxDecoration(
+                        color: appTheme.color.withValues(alpha: .12),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Icon(FluentIcons.car, size: 26, color: appTheme.color),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(child: title),
+                    status,
+                  ],
+                ),
+        );
+      },
     );
   }
 
