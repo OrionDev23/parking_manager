@@ -412,6 +412,11 @@ class VehicleTableState extends State<VehicleTable> {
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final compactToolbar = screenWidth < 760;
+    final searchWidth = compactToolbar
+        ? (screenWidth - 64).clamp(180.0, 320.0).toDouble()
+        : 300.0;
     vehicleDataSource.appTheme = appTheme;
     return ValueListenableBuilder(
       valueListenable: filterMarque,
