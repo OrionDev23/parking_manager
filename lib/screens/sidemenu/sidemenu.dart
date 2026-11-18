@@ -155,7 +155,7 @@ class PanesListState extends State<PanesList>
     });
   }
 
-  double pwidth = 286.px;
+  double pwidth = 332.px;
 
   FlyoutController flyoutController = FlyoutController();
 
