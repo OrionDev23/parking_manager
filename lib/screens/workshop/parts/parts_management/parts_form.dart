@@ -284,7 +284,14 @@ class _PartsFormState extends State<PartsForm>
                         builder: (context) {
                           return ContentDialog(
                             constraints: BoxConstraints.tight(
-                              Size(700.px, 550.px),
+                              Size(
+                                (MediaQuery.sizeOf(context).width - 32)
+                                    .clamp(320.0, 700.0)
+                                    .toDouble(),
+                                (MediaQuery.sizeOf(context).height - 80)
+                                    .clamp(320.0, 550.0)
+                                    .toDouble(),
+                              ),
                             ),
                             title: const Text('fournselect').tr(),
                             style: ContentDialogThemeData(
@@ -448,7 +455,14 @@ class _PartsFormState extends State<PartsForm>
                         builder: (context) {
                           return ContentDialog(
                             constraints: BoxConstraints.tight(
-                              Size(700.px, 550.px),
+                              Size(
+                                (MediaQuery.sizeOf(context).width - 32)
+                                    .clamp(320.0, 700.0)
+                                    .toDouble(),
+                                (MediaQuery.sizeOf(context).height - 80)
+                                    .clamp(320.0, 550.0)
+                                    .toDouble(),
+                              ),
                             ),
                             title: const Text('brand').tr(),
                             style: ContentDialogThemeData(
@@ -501,7 +515,14 @@ class _PartsFormState extends State<PartsForm>
                         builder: (context) {
                           return ContentDialog(
                             constraints: BoxConstraints.tight(
-                              Size(700.px, 550.px),
+                              Size(
+                                (MediaQuery.sizeOf(context).width - 32)
+                                    .clamp(320.0, 700.0)
+                                    .toDouble(),
+                                (MediaQuery.sizeOf(context).height - 80)
+                                    .clamp(320.0, 550.0)
+                                    .toDouble(),
+                              ),
                             ),
                             title: const Text('category').tr(),
                             style: ContentDialogThemeData(
@@ -588,7 +609,14 @@ class _PartsFormState extends State<PartsForm>
                                       builder: (context) {
                                         return ContentDialog(
                                           constraints: BoxConstraints.tight(
-                                            Size(700.px, 550.px),
+                                            Size(
+                                (MediaQuery.sizeOf(context).width - 32)
+                                    .clamp(320.0, 700.0)
+                                    .toDouble(),
+                                (MediaQuery.sizeOf(context).height - 80)
+                                    .clamp(320.0, 550.0)
+                                    .toDouble(),
+                              ),
                                           ),
                                           title: const Text('addoption').tr(),
                                           style: ContentDialogThemeData(
