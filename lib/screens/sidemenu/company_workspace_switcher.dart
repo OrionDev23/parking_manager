@@ -33,11 +33,25 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
   bool _loading = false;
   String? _selectedCompanyName;
   String? _selectedCompanyId;
+  String? _observedCompanyId;
 
   @override
   void initState() {
     super.initState();
+    _observedCompanyId = authService.session?.company.companyId;
     _loadCurrentCompanyName();
+  }
+
+  @override
+  void didUpdateWidget(covariant CompanyWorkspaceSwitcher oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final companyId = authService.session?.company.companyId;
+    if (companyId != _observedCompanyId) {
+      _observedCompanyId = companyId;
+      _selectedCompanyId = null;
+      _selectedCompanyName = null;
+      _loadCurrentCompanyName();
+    }
   }
 
   Future<void> _loadCurrentCompanyName() async {
