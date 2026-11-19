@@ -756,11 +756,15 @@ class _DashboardState extends State<Dashboard>
         .toList(growable: false);
 
     final start = now.subtract(const Duration(days: 30));
-    return List.generate(7, (index) {
+    // Six complete five-day buckets cover the full 30-day period. Each point
+    // is plotted at the end of its bucket so the final point reaches today.
+    return List.generate(6, (index) {
       final bucketStart = start.add(Duration(days: index * 5));
-      final bucketEnd = index == 6
+      final bucketBoundary = bucketStart.add(const Duration(days: 5));
+      final isLastBucket = index == 5;
+      final bucketEnd = isLastBucket
           ? now.add(const Duration(milliseconds: 1))
-          : bucketStart.add(const Duration(days: 5));
+          : bucketBoundary;
 
       final repairsCount = history.where((repair) =>
           !repair.date.isBefore(bucketStart) &&
@@ -793,7 +797,7 @@ class _DashboardState extends State<Dashboard>
               1000.0;
 
       return DashboardActivityPoint(
-        date: bucketStart,
+        date: isLastBucket ? now : bucketBoundary,
         mileageThousands: mileageThousands,
         interventions: repairsCount,
       );
