@@ -229,29 +229,24 @@ class DriverProvider extends ChangeNotifier {
         }
       }
     } else {
-      await DatabaseGetter.database!
-          .listRows(
-            databaseId: databaseId,
-            tableId: chaufDoc,
-            queries: [
-              Query.lessThanEqual('date_expiration', dateToIntJson(expiration)),
-              if (removedCondDocs.isNotEmpty)
-                ...removedCondDocs.map((e) => Query.notEqual(r'$id', e)),
-            ],
-          )
-          .then((value) {
-            for (int i = 0; i < value.rows.length; i++) {
-              result.add(
-                value.rows[i].convertTo((p0) => DocumentChauffeur.fromJson(p0)),
-              );
-            }
-          })
-          .onError((AppwriteException error, stackTrace) {
-            if (kDebugMode) {
-              print(error.message);
-              print(error.response);
-            }
-          });
+      try {
+        final rows = await DatabaseGetter().listDocuments(chaufDoc);
+        for (final row in rows) {
+          final document = row.convertTo(
+            (data) => DocumentChauffeur.fromJson(data),
+          );
+          if (document.dateExpiration != null &&
+              document.dateExpiration!.isBefore(expiration) &&
+              !removedCondDocs.contains(document.id)) {
+            result.add(document);
+          }
+        }
+      } catch (error, stackTrace) {
+        if (kDebugMode) {
+          debugPrint('[ParcOto Driver documents] fallback failed: $error');
+          debugPrintStack(stackTrace: stackTrace);
+        }
+      }
     }
 
     return result;
