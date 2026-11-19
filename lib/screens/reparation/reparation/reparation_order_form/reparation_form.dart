@@ -502,33 +502,57 @@ class ReparationFormState extends State<ReparationForm>
                     ),
                   ),
                   if (showEtretient)
-                    Container(
-                      height: 260.px,
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(border: Border.all()),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          EntretienWidget(entretienVehicle: entretienVehicle),
-                          bigSpace,
-                          SizedBox(
-                            height: 180.px,
-                            width: 400.px,
-                            child: ZoneBox(
-                              label: 'remarqueplus'.tr(),
-                              child: Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: ParcotoTextBox(
-                                  controller: remarqueEntretien,
-                                  placeholder: 'remarqueplus'.tr(),
-                                  maxLines: 4,
-                                  placeholderStyle: placeStyle,
-                                  style: appTheme.writingStyle,
-                                  cursorColor: appTheme.color.darker,
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final compactMaintenance = constraints.maxWidth < 1100;
+                        final notesWidth = compactMaintenance
+                            ? constraints.maxWidth
+                            : 400.0;
+                        final checklistWidth = compactMaintenance
+                            ? constraints.maxWidth
+                            : constraints.maxWidth - notesWidth - 16;
+                        return Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: appTheme.color.darker.withValues(alpha: .25),
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Wrap(
+                            spacing: 16,
+                            runSpacing: 12,
+                            crossAxisAlignment: WrapCrossAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: checklistWidth,
+                                child: EntretienWidget(
+                                  entretienVehicle: entretienVehicle,
                                 ),
                               ),
-                            ),
+                              SizedBox(
+                                width: notesWidth,
+                                height: 180,
+                                child: ZoneBox(
+                                  label: 'remarqueplus'.tr(),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: ParcotoTextBox(
+                                      controller: remarqueEntretien,
+                                      placeholder: 'remarqueplus'.tr(),
+                                      maxLines: 4,
+                                      placeholderStyle: placeStyle,
+                                      style: appTheme.writingStyle,
+                                      cursorColor: appTheme.color.darker,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
+                        );
+                      },
+                    ),
                         ],
                       ),
                     ),
