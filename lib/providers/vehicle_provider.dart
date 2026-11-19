@@ -247,26 +247,24 @@ class VehicleProvider extends ChangeNotifier {
         }
       }
     } else {
-      await DatabaseGetter.database!
-          .listRows(
-            databaseId: databaseId,
-            tableId: vehicDoc,
-            queries: [
-              Query.lessThanEqual('date_expiration', dateToIntJson(expiration)),
-              if (removedVehiDocs.isNotEmpty)
-                ...removedVehiDocs.map((e) => Query.notEqual(r'\$id', e)),
-            ],
-          )
-          .then((value) {
-            for (final row in value.rows) {
-              result.add(
-                row.convertTo((data) => DocumentVehicle.fromJson(data)),
-              );
-            }
-          })
-          .onError((error, stackTrace) {
-            if (kDebugMode) print(stackTrace);
-          });
+      try {
+        final rows = await DatabaseGetter().listDocuments(vehicDoc);
+        for (final row in rows) {
+          final document = row.convertTo(
+            (data) => DocumentVehicle.fromJson(data),
+          );
+          if (document.dateExpiration != null &&
+              document.dateExpiration!.isBefore(expiration) &&
+              !removedVehiDocs.contains(document.id)) {
+            result.add(document);
+          }
+        }
+      } catch (error, stackTrace) {
+        if (kDebugMode) {
+          debugPrint('[ParcOto Vehicle documents] fallback failed: $error');
+          debugPrintStack(stackTrace: stackTrace);
+        }
+      }
     }
 
     return result;
@@ -279,14 +277,14 @@ class VehicleProvider extends ChangeNotifier {
     }
 
     try {
-      final row = await DatabaseGetter.database!.getRow(
-        databaseId: databaseId,
-        tableId: vehiculeid,
-        rowId: docID,
-      );
+      final row = await DatabaseGetter().getDocument(vehiculeid, docID);
+      if (row == null) return null;
       final legacy = row.convertTo((data) => Vehicle.fromJson(data));
       await vehicleServices.repository.createVehicle(
-        VehicleMapper.toDomain(legacy, companyId: project ?? 'local'),
+        VehicleMapper.toDomain(
+          legacy,
+          companyId: vehicleServices.companyId,
+        ),
       );
       return legacy;
     } on AppwriteException {
