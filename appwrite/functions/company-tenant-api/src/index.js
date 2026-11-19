@@ -258,16 +258,13 @@ async function requireQuotaWriterContext(
   }
 
   const entitlement = await getEntitlement(companyId);
-  if (!allowExpiredLicense && !isEntitlementActive(entitlement)) {
+  // Historical tenants without an explicit entitlement keep their existing
+  // unmetered behavior. Once a company has an entitlement row, its license
+  // dates and quotas are enforced consistently.
+  if (entitlement && !allowExpiredLicense && !isEntitlementActive(entitlement)) {
     throw Object.assign(
-      new Error('The company license is missing, not yet active, or expired.'),
+      new Error('The company license is not yet active or has expired.'),
       { status: 403 },
-    );
-  }
-  if (allowExpiredLicense && !entitlement) {
-    throw Object.assign(
-      new Error('Company entitlement is not configured.'),
-      { status: 409 },
     );
   }
 
@@ -332,10 +329,15 @@ async function createQuotaResource(userId, input) {
 
   const { entitlement, teamId } =
     await requireQuotaWriterContext(userId, companyId);
-  const maximum = Number(entitlement[resource.maxColumn]);
-  const used = Number(entitlement[resource.usedColumn] ?? 0);
-  if (!Number.isSafeInteger(maximum) || maximum < 0 ||
-      !Number.isSafeInteger(used) || used < 0) {
+  const maximum = entitlement
+    ? Number(entitlement[resource.maxColumn])
+    : null;
+  const used = entitlement
+    ? Number(entitlement[resource.usedColumn] ?? 0)
+    : null;
+  if (entitlement &&
+      (!Number.isSafeInteger(maximum) || maximum < 0 ||
+       !Number.isSafeInteger(used) || used < 0)) {
     throw Object.assign(
       new Error(`The ${resourceKey} quota counters are not configured correctly.`),
       { status: 503 },
@@ -350,6 +352,24 @@ async function createQuotaResource(userId, input) {
       throw Object.assign(new Error('Resource ID is already used by another company.'), { status: 403 });
     }
     return { created: false, alreadyExists: true, rowId, resource: resourceKey };
+  }
+
+  // Legacy tenant without an entitlement row: preserve its former behavior,
+  // but still enforce tenant ownership and server-controlled row ACLs.
+  if (!entitlement) {
+    await createRow(
+      resource.tableId,
+      rowId,
+      { ...inputData, companyId },
+      tenantRowPermissions(teamId),
+    );
+    return {
+      created: true,
+      alreadyExists: false,
+      unmeteredLegacyTenant: true,
+      rowId,
+      resource: resourceKey,
+    };
   }
 
   if (used >= maximum) {
@@ -429,6 +449,21 @@ async function deleteQuotaResource(userId, input) {
   if (!existing) return { deleted: false, rowId, resource: resourceKey };
   if (existing.data?.companyId !== companyId) {
     throw Object.assign(new Error('Resource does not belong to the active company.'), { status: 404 });
+  }
+
+  // Legacy tenant without entitlement: preserve deletion behavior without
+  // touching a usage counter that has never been initialized.
+  if (!entitlement) {
+    await appwrite(
+      `/tablesdb/${DATABASE_ID}/tables/${resource.tableId}/rows/${encodeURIComponent(rowId)}`,
+      { method: 'DELETE' },
+    );
+    return {
+      deleted: true,
+      unmeteredLegacyTenant: true,
+      rowId,
+      resource: resourceKey,
+    };
   }
 
   const used = Number(entitlement[resource.usedColumn] ?? 0);
