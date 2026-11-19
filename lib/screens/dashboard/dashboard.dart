@@ -13,8 +13,6 @@ import '../../providers/planning_provider.dart';
 import '../../providers/repair_provider.dart';
 import '../../providers/vehicle_provider.dart';
 import '../../serializables/activity.dart';
-import '../../serializables/planning.dart';
-import '../../serializables/reparation/fiche_reception.dart';
 import '../../serializables/reparation/reparation.dart';
 import '../../theme.dart';
 import '../sidemenu/pane_items.dart';
@@ -81,8 +79,13 @@ class _DashboardState extends State<Dashboard>
     // from the previous company's cache.
     if (_hasLoaded &&
         companyId != _loadedCompanyId &&
-        !_refreshing &&
         !_reloadScheduled) {
+      // Clear the previous tenant's dashboard immediately; do not leave its
+      // values visible while the new tenant's data is loading.
+      _snapshot = const DashboardSnapshot();
+      _hasLoaded = false;
+      _loadMessage = null;
+      _refreshing = true;
       _reloadScheduled = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _reloadScheduled = false;
@@ -188,7 +191,7 @@ class _DashboardState extends State<Dashboard>
           const SizedBox(height: 18),
           _buildOperationsLayout(wide: wide),
           const SizedBox(height: 18),
-          _buildQuickActions(theme, compact: compact),
+          _buildQuickActions(compact: compact),
           if (_loadMessage != null) ...[
             const SizedBox(height: 12),
             InfoBar(
@@ -297,7 +300,7 @@ class _DashboardState extends State<Dashboard>
     );
     final recent = DashboardPanel(
       title: 'Activités récentes',
-      icon: FluentIcons.history,
+      icon: FluentIcons.database_activity,
       height: 310,
       trailing: _viewAllButton('events'),
       child: RecentActivityTimeline(
@@ -356,7 +359,7 @@ class _DashboardState extends State<Dashboard>
     );
     final watchlist = DashboardPanel(
       title: 'Véhicules à surveiller',
-      icon: FluentIcons.warning,
+      icon: FluentIcons.health,
       height: 270,
       trailing: _viewAllButton('vehicle-manager'),
       child: VehiclesWatchlist(alerts: _snapshot.alerts),
@@ -382,7 +385,7 @@ class _DashboardState extends State<Dashboard>
     );
   }
 
-  Widget _buildQuickActions(AppTheme theme, {required bool compact}) {
+  Widget _buildQuickActions({required bool compact}) {
     final actions = <({
       String label,
       IconData icon,
@@ -409,7 +412,7 @@ class _DashboardState extends State<Dashboard>
       ),
       (
         label: 'Consulter le stock',
-        icon: FluentIcons.database,
+        icon: FluentIcons.database_activity,
         tone: const Color(0xFFE6A23C),
         destination: 'workshop-stock',
       ),
@@ -421,7 +424,7 @@ class _DashboardState extends State<Dashboard>
       ),
       (
         label: 'Journal d’activité',
-        icon: FluentIcons.history,
+        icon: FluentIcons.database_activity,
         tone: const Color(0xFF19C997),
         destination: 'events',
       ),
@@ -430,7 +433,7 @@ class _DashboardState extends State<Dashboard>
     return DashboardPanel(
       title: 'Accès rapides',
       icon: FluentIcons.more,
-      height: compact ? 228 : 150,
+      height: compact ? 228 : 205,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final columns = constraints.maxWidth >= 1050
@@ -543,7 +546,15 @@ class _DashboardState extends State<Dashboard>
 
     if (!mounted) return;
     if (companyId != DatabaseGetter.activeCompanyId) {
-      setState(() => _refreshing = false);
+      setState(() {
+        _snapshot = const DashboardSnapshot();
+        _hasLoaded = false;
+        _loadedCompanyId = null;
+        _refreshing = false;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !_refreshing) unawaited(_refreshDashboard());
+      });
       return;
     }
 
@@ -629,7 +640,6 @@ class _DashboardState extends State<Dashboard>
     for (final vehicle in vehicles) {
       final state = vehicle.currentState ?? 0;
       switch (state) {
-        case 0:
         case 5:
           available++;
           break;
@@ -738,11 +748,12 @@ class _DashboardState extends State<Dashboard>
         if (mileage > previous) mileageByVehicle[key] = mileage;
       }
 
-      final mileageThousands = mileageByVehicle.values.fold<int>(
-            0,
-            (total, value) => total + value,
-          ) /
-          1000.0;
+      final readings = mileageByVehicle.values.toList(growable: false);
+      final mileageThousands = readings.isEmpty
+          ? 0.0
+          : readings.reduce((a, b) => a + b) /
+              readings.length /
+              1000.0;
 
       return DashboardActivityPoint(
         date: bucketStart,
