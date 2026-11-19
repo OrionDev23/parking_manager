@@ -177,11 +177,11 @@ class PanesListState extends State<PanesList>
         session?.isPlatformSuperAdmin == true && !isPlatformCompanyContext;
     return ValueListenableBuilder(
       valueListenable: signedIn,
-      builder: (BuildContext context, bool value, Widget? child) {
+      builder: (BuildContext context, bool isSignedIn, Widget? child) {
         widget.paneList.initPanes();
         return ValueListenableBuilder(
           valueListenable: index,
-          builder: (BuildContext context, int value, Widget? child) {
+          builder: (BuildContext context, int selectedIndex, Widget? child) {
             return ParcotoNavigationShell(
               items: PaneItemsAndFooters.originalItems,
               footerItems: PaneItemsAndFooters.footerItems,
@@ -231,9 +231,9 @@ class PanesListState extends State<PanesList>
                                   fit: BoxFit.contain,
                                 ),
                                 const Spacer(),
-                                if (value)
+                                if (isSignedIn)
                                   const GlobalSearchLauncher(compact: true),
-                              ] else if (value) ...[
+                              ] else if (isSignedIn) ...[
                                 const SizedBox(
                                   width: 230,
                                   child: CompanyWorkspaceSwitcher(),
@@ -251,7 +251,7 @@ class PanesListState extends State<PanesList>
                                 ),
                                 const Spacer(),
                               ],
-                              if (!compact && value) ...[
+                              if (!compact && isSignedIn) ...[
                                 const SizedBox(width: 8),
                                 Tooltip(
                                   message: 'Aide',
