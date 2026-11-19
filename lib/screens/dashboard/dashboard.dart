@@ -1,33 +1,25 @@
 import 'dart:async';
-import 'package:appwrite/appwrite.dart';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:material_ui/material_ui.dart' show Icons;
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:parc_oto/admin_parameters.dart';
-import 'package:parc_oto/providers/driver_provider.dart';
-import 'package:parc_oto/providers/log_provider.dart';
-import 'package:parc_oto/providers/planning_provider.dart';
-import 'package:parc_oto/providers/repair_provider.dart';
-import 'package:parc_oto/providers/vehicle_provider.dart';
-import 'package:parc_oto/screens/dashboard/charts/state_category_bar.dart';
-import 'package:parc_oto/screens/entreprise/entreprise.dart';
-import 'package:parc_oto/screens/logs/logging/log_table.dart';
-import 'package:parc_oto/utilities/vehicle_util.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
-import 'charts/pie_chart.dart';
-
-import '../../providers/counters.dart';
+import '../../domain/entities/vehicle.dart' as domain;
+import '../../main.dart' show authService;
+import '../../providers/client_database.dart';
+import '../../providers/driver_provider.dart';
+import '../../providers/log_provider.dart';
+import '../../providers/planning_provider.dart';
+import '../../providers/repair_provider.dart';
+import '../../providers/vehicle_provider.dart';
+import '../../serializables/activity.dart';
+import '../../serializables/planning.dart';
+import '../../serializables/reparation/fiche_reception.dart';
+import '../../serializables/reparation/reparation.dart';
 import '../../theme.dart';
-import '../../widgets/module_dashboard_action.dart';
-import '../../widgets/module_dashboard_header.dart';
-import '../../widgets/module_dashboard_section_header.dart';
 import '../sidemenu/pane_items.dart';
-import 'charts/state_bars.dart';
-import 'charts/costs_graph.dart';
-import 'table_stats.dart';
+import 'models/dashboard_models.dart';
+import 'widgets/dashboard_widgets.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -43,23 +35,29 @@ class _DashboardState extends State<Dashboard>
   late final LogProvider _logs;
   late final PlanningProvider _plannings;
   late final RepairProvider _repairs;
-  late final DateTime _periodStart;
-  late final DateTime _periodEnd;
-  int _refreshVersion = 0;
-  bool _refreshing = false;
+
+  DashboardSnapshot _snapshot = const DashboardSnapshot();
+  bool _refreshing = true;
+  bool _hasLoaded = false;
+  bool _reloadScheduled = false;
+  String? _loadMessage;
+  String? _loadedCompanyId;
 
   @override
   void initState() {
     super.initState();
-    _periodEnd = DateTime.now();
-    _periodStart = _periodEnd.subtract(const Duration(days: 30 * 6));
-    // Keep provider instances stable across dashboard rebuilds. Recreating
-    // them during refresh caused chart inputs to be replaced repeatedly.
+
+    // Keep provider instances stable. Their caches are tenant-aware and are
+    // invalidated by the session runtime when the active company changes.
     _vehicles = VehicleProvider();
     _drivers = DriverProvider();
     _logs = LogProvider();
     _plannings = PlanningProvider();
     _repairs = RepairProvider();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) unawaited(_refreshDashboard());
+    });
   }
 
   @override
@@ -75,528 +73,790 @@ class _DashboardState extends State<Dashboard>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var appTheme = context.watch<AppTheme>();
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<VehicleProvider>.value(value: _vehicles),
-        ChangeNotifierProvider<DriverProvider>.value(value: _drivers),
-        ChangeNotifierProvider<LogProvider>.value(value: _logs),
-        ChangeNotifierProvider<PlanningProvider>.value(value: _plannings),
-        ChangeNotifierProvider<RepairProvider>.value(value: _repairs),
-      ],
-      builder: (con, w) {
-        // Refresh is coordinated by the button; avoid rebuilding the entire
-        // dashboard for every individual provider notification.
-        final vehicles = Provider.of<VehicleProvider>(con, listen: false);
-        final drivers = Provider.of<DriverProvider>(con, listen: false);
-        final logs = Provider.of<LogProvider>(con, listen: false);
-        final plannings = Provider.of<PlanningProvider>(con, listen: false);
-        final repairs = Provider.of<RepairProvider>(con, listen: false);
-        return ScaffoldPage(
-          padding: EdgeInsets.zero,
-          content: LayoutBuilder(
-            builder: (context, constraints) {
-              final compact = constraints.maxWidth < 760;
-              return ListView(
-                padding: EdgeInsets.symmetric(
-                  horizontal: compact ? 14 : 28,
-                  vertical: 22,
-                ),
-                children: [
-                  ModuleDashboardHeader(
-                    title: 'home'.tr(),
-                    subtitle: 'Vue d’ensemble de votre activité',
-                    eyebrow: 'ParcOto / Overview',
-                    heroTitle: 'Pilotage de votre parc automobile',
-                    heroDescription:
-                        'Retrouvez vos véhicules, interventions et équipes au même endroit.',
-                    icon: FluentIcons.car,
-                    trailing: Tooltip(
-                      message: 'Actualiser les données',
-                      child: IconButton(
-                        icon: const Icon(FluentIcons.refresh),
-                        onPressed: _refreshing ? null : () => onRefresh(
-                          vehicles,
-                          drivers,
-                          logs,
-                          plannings,
-                          repairs,
-                        ),
+    final theme = context.watch<AppTheme>();
+    final companyId = DatabaseGetter.activeCompanyId;
+
+    // Dashboard is kept alive by the navigation system. A tenant switch can
+    // therefore return to the same State object; reload before showing metrics
+    // from the previous company's cache.
+    if (_hasLoaded &&
+        companyId != _loadedCompanyId &&
+        !_refreshing &&
+        !_reloadScheduled) {
+      _reloadScheduled = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _reloadScheduled = false;
+        if (mounted) unawaited(_refreshDashboard());
+      });
+    }
+
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final wide = screenWidth >= 1240;
+    final compact = screenWidth < 680;
+    final sessionName = authService.session?.displayName?.trim();
+    final firstName = sessionName == null || sessionName.isEmpty
+        ? 'votre espace'
+        : sessionName.split(RegExp(r'\s+')).first;
+    final dateLabel = DateFormat('EEEE d MMMM yyyy', 'fr')
+        .format(DateTime.now());
+
+    return ScaffoldPage(
+      padding: EdgeInsets.zero,
+      content: ListView(
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? 14 : (wide ? 26 : 20),
+          vertical: compact ? 16 : 22,
+        ),
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Bonjour $firstName',
+                      style: TextStyle(
+                        color: theme.textColor,
+                        fontSize: compact ? 23 : 27,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Voici la situation de votre parc aujourd’hui.',
+                      style: TextStyle(
+                        color: theme.mutedTextColor,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (!compact)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 9,
                   ),
-                  ModuleDashboardSectionHeader(
-                    title: 'Accès directs aux modules',
-                    subtitle:
-                        'Accédez directement aux fonctions les plus utilisées.',
+                  decoration: BoxDecoration(
+                    color: theme.surfaceColor,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: theme.borderColor),
                   ),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: buttonList(),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        FluentIcons.calendar,
+                        size: 15,
+                        color: theme.mutedTextColor,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        dateLabel,
+                        style: TextStyle(
+                          color: theme.textColor,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 28),
-                  ModuleDashboardSectionHeader(
-                    title: 'Indicateurs de votre activité',
-                    subtitle:
-                        'Une vue synthétique de la flotte, des opérations et des mouvements récents.',
-                  ),
-                  StaggeredGrid.count(
-                    crossAxisCount: compact ? 1 : 2,
-                    mainAxisSpacing: 14,
-                    crossAxisSpacing: 14,
-                    children: widgetList(appTheme),
-                  ),
-                ],
-              );
-            },
+                ),
+              const SizedBox(width: 8),
+              Tooltip(
+                message: 'Actualiser les données',
+                child: IconButton(
+                  icon: _refreshing
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: ProgressRing(),
+                        )
+                      : const Icon(FluentIcons.refresh),
+                  onPressed: _refreshing ? null : _refreshDashboard,
+                ),
+              ),
+            ],
           ),
+          const SizedBox(height: 20),
+          _buildMetricGrid(wide: wide, compact: compact),
+          const SizedBox(height: 18),
+          _buildAnalyticsLayout(wide: wide),
+          const SizedBox(height: 18),
+          _buildOperationsLayout(wide: wide),
+          const SizedBox(height: 18),
+          _buildQuickActions(theme, compact: compact),
+          if (_loadMessage != null) ...[
+            const SizedBox(height: 12),
+            InfoBar(
+              title: const Text('Certaines données sont indisponibles'),
+              content: Text(_loadMessage!),
+              severity: InfoBarSeverity.warning,
+            ),
+          ],
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMetricGrid({
+    required bool wide,
+    required bool compact,
+  }) {
+    final metrics = <({String label, String value, String detail, IconData icon, Color tone})>[
+      (
+        label: 'Véhicules',
+        value: _metricValue(_snapshot.vehicleCount),
+        detail: _hasLoaded ? 'Dans le parc de l’entreprise' : 'Chargement…',
+        icon: FluentIcons.car,
+        tone: const Color(0xFF279BFA),
+      ),
+      (
+        label: 'Conducteurs',
+        value: _metricValue(_snapshot.driverCount),
+        detail: _hasLoaded ? 'Conducteurs enregistrés' : 'Chargement…',
+        icon: FluentIcons.people,
+        tone: const Color(0xFF19C997),
+      ),
+      (
+        label: 'En maintenance',
+        value: _metricValue(_snapshot.maintenanceCount),
+        detail: _hasLoaded ? 'Pannes et réparations' : 'Chargement…',
+        icon: FluentIcons.repair,
+        tone: const Color(0xFFE96B8A),
+      ),
+      (
+        label: 'Réservations',
+        value: _metricValue(_snapshot.reservationsToday),
+        detail: 'Aujourd’hui',
+        icon: FluentIcons.calendar,
+        tone: const Color(0xFFA375F5),
+      ),
+      (
+        label: 'Coût des réparations',
+        value: _hasLoaded
+            ? _formatAmount(_snapshot.monthlyRepairCosts)
+            : '—',
+        detail: _snapshot.costsVerified
+            ? 'Réparations enregistrées ce mois'
+            : 'Montant local, potentiellement partiel',
+        icon: FluentIcons.money,
+        tone: const Color(0xFFE6A23C),
+      ),
+    ];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = constraints.maxWidth >= 1240
+            ? 5
+            : constraints.maxWidth < 680
+                ? 2
+                : 3;
+        final gap = 12.0;
+        final width =
+            (constraints.maxWidth - gap * (columns - 1)) / columns;
+
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: [
+            for (final metric in metrics)
+              SizedBox(
+                width: width,
+                child: DashboardMetricCard(
+                  label: metric.label,
+                  value: metric.value,
+                  detail: metric.detail,
+                  icon: metric.icon,
+                  tone: metric.tone,
+                ),
+              ),
+          ],
         );
       },
     );
   }
 
-  void onRefresh(
-    VehicleProvider vehicles,
-    DriverProvider drivers,
-    LogProvider logs,
-    PlanningProvider plannings,
-    RepairProvider repairs,
-  ) async {
-    if (_refreshing) return;
-    setState(() => _refreshing = true);
+  Widget _buildAnalyticsLayout({required bool wide}) {
+    final activity = DashboardPanel(
+      title: 'Évolution de l’activité',
+      icon: FluentIcons.chart,
+      height: 310,
+      trailing: _PeriodLabel(),
+      child: FleetActivityChart(points: _snapshot.activity),
+    );
+    final states = DashboardPanel(
+      title: 'État du parc',
+      icon: FluentIcons.health,
+      height: 310,
+      child: FleetStateDonut(
+        total: _snapshot.vehicleCount,
+        segments: _snapshot.fleetStatus,
+      ),
+    );
+    final recent = DashboardPanel(
+      title: 'Activités récentes',
+      icon: FluentIcons.history,
+      height: 310,
+      trailing: _viewAllButton('events'),
+      child: RecentActivityTimeline(
+        activities: _snapshot.recentActivities,
+      ),
+    );
+
+    if (wide) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(flex: 5, child: activity),
+          const SizedBox(width: 14),
+          Expanded(flex: 4, child: states),
+          const SizedBox(width: 14),
+          Expanded(flex: 3, child: recent),
+        ],
+      );
+    }
+
+    if (MediaQuery.sizeOf(context).width >= 760) {
+      return Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: activity),
+              const SizedBox(width: 14),
+              Expanded(child: states),
+            ],
+          ),
+          const SizedBox(height: 14),
+          SizedBox(width: double.infinity, child: recent),
+        ],
+      );
+    }
+
+    return Column(
+      children: [
+        activity,
+        const SizedBox(height: 14),
+        states,
+        const SizedBox(height: 14),
+        recent,
+      ],
+    );
+  }
+
+  Widget _buildOperationsLayout({required bool wide}) {
+    final upcoming = DashboardPanel(
+      title: 'Interventions à venir',
+      icon: FluentIcons.calendar,
+      height: 270,
+      trailing: _viewAllButton('planner'),
+      child: UpcomingInterventions(items: _snapshot.upcoming),
+    );
+    final watchlist = DashboardPanel(
+      title: 'Véhicules à surveiller',
+      icon: FluentIcons.warning,
+      height: 270,
+      trailing: _viewAllButton('vehicle-manager'),
+      child: VehiclesWatchlist(alerts: _snapshot.alerts),
+    );
+
+    if (wide) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(child: upcoming),
+          const SizedBox(width: 14),
+          Expanded(child: watchlist),
+        ],
+      );
+    }
+
+    return Column(
+      children: [
+        upcoming,
+        const SizedBox(height: 14),
+        watchlist,
+      ],
+    );
+  }
+
+  Widget _buildQuickActions(AppTheme theme, {required bool compact}) {
+    final actions = <({
+      String label,
+      IconData icon,
+      Color tone,
+      String destination,
+    })>[
+      (
+        label: 'Ajouter un véhicule',
+        icon: FluentIcons.car,
+        tone: const Color(0xFF279BFA),
+        destination: 'vehicle-manager',
+      ),
+      (
+        label: 'Créer une réparation',
+        icon: FluentIcons.repair,
+        tone: const Color(0xFFA375F5),
+        destination: 'repair-orders',
+      ),
+      (
+        label: 'Nouvelle réservation',
+        icon: FluentIcons.calendar,
+        tone: const Color(0xFF19C997),
+        destination: 'planner',
+      ),
+      (
+        label: 'Consulter le stock',
+        icon: FluentIcons.box,
+        tone: const Color(0xFFE6A23C),
+        destination: 'workshop-stock',
+      ),
+      (
+        label: 'Voir les conducteurs',
+        icon: FluentIcons.people,
+        tone: const Color(0xFF279BFA),
+        destination: 'driver-manager',
+      ),
+      (
+        label: 'Journal d’activité',
+        icon: FluentIcons.history,
+        tone: const Color(0xFF19C997),
+        destination: 'events',
+      ),
+    ];
+
+    return DashboardPanel(
+      title: 'Accès rapides',
+      icon: FluentIcons.flash,
+      height: compact ? 228 : 150,
+      trailing: _viewAllButton('dashboard'),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final columns = constraints.maxWidth >= 1050
+              ? 6
+              : constraints.maxWidth < 480
+                  ? 2
+                  : constraints.maxWidth < 760
+                      ? 3
+                      : 4;
+          final gap = 9.0;
+          final width =
+              (constraints.maxWidth - gap * (columns - 1)) / columns;
+          return Wrap(
+            spacing: gap,
+            runSpacing: gap,
+            children: [
+              for (final action in actions)
+                SizedBox(
+                  width: width,
+                  child: DashboardQuickActionTile(
+                    label: action.label,
+                    icon: action.icon,
+                    tone: action.tone,
+                    onPressed: () =>
+                        PaneItemsAndFooters.selectPane(action.destination),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _viewAllButton(String destination) {
+    return Button(
+      onPressed: () => PaneItemsAndFooters.selectPane(destination),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('Tout voir'),
+          const SizedBox(width: 5),
+          const Icon(FluentIcons.chevron_right, size: 11),
+        ],
+      ),
+    );
+  }
+
+  String _metricValue(int value) =>
+      _hasLoaded ? value.toString() : '—';
+
+  String _formatAmount(double value) =>
+      '${NumberFormat('#,##0', 'fr').format(value)} DA';
+
+  Future<void> _refreshDashboard() async {
+    if (_refreshing && _hasLoaded) return;
+
+    final companyId = DatabaseGetter.activeCompanyId;
+    setState(() {
+      _refreshing = true;
+      _loadMessage = null;
+    });
+
+    List<Reparation> history = [];
+    var costsVerified = DatabaseGetter.database != null;
 
     try {
-      // Some providers may already be synchronizing from their constructors.
-      // Bound the dashboard refresh so one stalled endpoint cannot prevent
-      // chart refresh and UI recovery forever.
       await Future.wait<void>([
-        vehicles.refreshVehicles(),
-        vehicles.refreshDocuments(),
-        drivers.refreshConducteurs(),
-        drivers.refreshDocuments(),
-        logs.refreshLogs(),
-        plannings.refreshPlannings(),
-        repairs.refreshReparations(),
-        repairs.refreshPrestataires(),
+        _vehicles.refreshVehicles(),
+        _vehicles.refreshDocuments(),
+        _drivers.refreshConducteurs(),
+        _drivers.refreshDocuments(),
+        _logs.refreshLogs(),
+        _plannings.refreshPlannings(),
+        _repairs.refreshReparations(),
+        _repairs.refreshPrestataires(),
       ]).timeout(const Duration(seconds: 30));
-    } on TimeoutException {
-      debugPrint('[ParcOto Dashboard] refresh timed out after 30 seconds');
-    } catch (error, stackTrace) {
-      debugPrint('[ParcOto Dashboard] refresh failed: $error');
-      debugPrintStack(stackTrace: stackTrace);
-    } finally {
-      DatabaseCounters.invalidateCache();
-      if (mounted) {
-        setState(() {
-          _refreshVersion++;
-          _refreshing = false;
-        });
-      }
+    } catch (error) {
+      _loadMessage = 'Synchronisation incomplète : $error';
+    }
+
+    await _waitForProviderLoads();
+
+    final now = DateTime.now();
+    final historyStart = now.subtract(const Duration(days: 180));
+
+    try {
+      history = await _repairs
+          .getReparationInMarge(historyStart, now)
+          .timeout(const Duration(seconds: 30));
+    } catch (error) {
+      costsVerified = false;
+      history = RepairProvider.reparations.values
+          .where((repair) =>
+              !repair.date.isBefore(historyStart) &&
+              !repair.date.isAfter(now))
+          .toList(growable: false);
+      _loadMessage ??=
+          'Les coûts affichés proviennent du cache local et peuvent être partiels.';
+      debugPrint('[ParcOto Dashboard] repair history fallback: $error');
+    }
+
+    try {
+      await RepairProvider.downloadFicheReparations()
+          .timeout(const Duration(seconds: 25));
+    } catch (error) {
+      _loadMessage ??= 'Les relevés kilométriques ne sont pas disponibles.';
+      debugPrint('[ParcOto Dashboard] reception sheets load failed: $error');
+    }
+
+    if (!mounted || companyId != DatabaseGetter.activeCompanyId) {
+      return;
+    }
+
+    final snapshot = _createSnapshot(
+      history: history,
+      costsVerified: costsVerified,
+      now: now,
+    );
+
+    setState(() {
+      _snapshot = snapshot;
+      _loadedCompanyId = companyId;
+      _hasLoaded = true;
+      _refreshing = false;
+    });
+  }
+
+  Future<void> _waitForProviderLoads() async {
+    final deadline = DateTime.now().add(const Duration(seconds: 20));
+    bool pending() =>
+        VehicleProvider.downloadingVehicles ||
+        VehicleProvider.downloadingDocuments ||
+        DriverProvider.downloadingConducteurs ||
+        DriverProvider.downloadingDocuments ||
+        LogProvider.downloadingActivities ||
+        PlanningProvider.downloadingPlanning ||
+        RepairProvider.downloadingReparations ||
+        RepairProvider.downloadingPrestataires;
+
+    while (pending() && DateTime.now().isBefore(deadline)) {
+      await Future.delayed(const Duration(milliseconds: 60));
     }
   }
 
-  List<Widget> buttonList() {
-    final vehicleCount = VehicleProvider.downloadedVehicles
-        ? VehicleProvider.vehicles.length
-        : null;
-    final vehicleDocumentCount = VehicleProvider.downloadedDocuments
-        ? VehicleProvider.documentsVehicules.length
-        : null;
-    final repairCount = RepairProvider.downloadedReparations
-        ? RepairProvider.reparations.length
-        : null;
-    final providerCount = RepairProvider.downloadedPrestataires
-        ? RepairProvider.prestataires.length
-        : null;
-    final driverCount = DriverProvider.downloadedConducteurs
-        ? DriverProvider.conducteurs.length
-        : null;
-    final driverDocumentCount = DriverProvider.downloadedDocuments
-        ? DriverProvider.documentConducteurs.length
-        : null;
-    final planningCount = PlanningProvider.downloadedPlanning
-        ? PlanningProvider.plannings.length
-        : null;
-    final activityCount = LogProvider.downloadedActivities
-        ? LogProvider.activities.length
-        : null;
+  DashboardSnapshot _createSnapshot({
+    required List<Reparation> history,
+    required bool costsVerified,
+    required DateTime now,
+  }) {
+    final vehicles = VehicleProvider.vehicles.values.toList(growable: false);
+    final drivers = DriverProvider.conducteurs.values.toList(growable: false);
+    final todayStart = DateTime(now.year, now.month, now.day);
+    final tomorrow = todayStart.add(const Duration(days: 1));
+    final currentMonthRepairs = history.where((repair) =>
+        repair.date.year == now.year && repair.date.month == now.month);
+    final monthlyCost = currentMonthRepairs.fold<double>(
+      0,
+      (total, repair) => total + repair.getPrixTTC(),
+    );
 
-    String countDetail(int? count, String singular, String plural) =>
-        count == null ? 'Synchronisation des données' : '$count ${count == 1 ? singular : plural}';
+    final reservations = PlanningProvider.plannings.values.toList()
+      ..sort((a, b) => a.startTime.compareTo(b.startTime));
+    final reservationsToday = reservations.where((item) =>
+        !item.startTime.isBefore(todayStart) &&
+        item.startTime.isBefore(tomorrow)).length;
+    final upcoming = reservations
+        .where((item) => item.endTime.isAfter(now))
+        .take(4)
+        .toList(growable: false);
 
-    return [
-      ModuleDashboardAction(
-        label: 'vehicules'.tr(),
-        detail: countDetail(vehicleCount, 'véhicule', 'véhicules'),
-        icon: FluentIcons.car,
-        onPressed: () => PaneItemsAndFooters.selectPane('vehicles'),
+    var available = 0;
+    var broken = 0;
+    var repairing = 0;
+    var onMission = 0;
+    var otherState = 0;
+    var maintenance = 0;
+
+    for (final vehicle in vehicles) {
+      final state = vehicle.currentState ?? 0;
+      switch (state) {
+        case 0:
+        case 5:
+          available++;
+          break;
+        case 6:
+          broken++;
+          maintenance++;
+          break;
+        case 7:
+          repairing++;
+          maintenance++;
+          break;
+        case 8:
+          onMission++;
+          break;
+        default:
+          otherState++;
+      }
+    }
+
+    final fleetStatus = <DashboardStatusSegment>[
+      DashboardStatusSegment(
+        label: 'Disponible',
+        value: available,
+        color: const Color(0xFF19C997),
       ),
-      ModuleDashboardAction(
-        label: 'vehicledocuments'.tr(),
-        detail: countDetail(vehicleDocumentCount, 'document', 'documents'),
-        icon: FluentIcons.document_set,
-        onPressed: () => PaneItemsAndFooters.selectPane('vehicle-documents'),
+      DashboardStatusSegment(
+        label: 'En panne',
+        value: broken,
+        color: const Color(0xFFF05D76),
       ),
-      ModuleDashboardAction(
-        label: 'reparations'.tr(),
-        detail: countDetail(repairCount, 'intervention', 'interventions'),
-        icon: FluentIcons.repair,
-        onPressed: () => PaneItemsAndFooters.selectPane('repairs'),
+      DashboardStatusSegment(
+        label: 'En réparation',
+        value: repairing,
+        color: const Color(0xFFE6A23C),
       ),
-      ModuleDashboardAction(
-        label: 'prestataires'.tr(),
-        detail: countDetail(providerCount, 'prestataire', 'prestataires'),
-        icon: FluentIcons.service_activity,
-        onPressed: () => PaneItemsAndFooters.selectPane('repair-providers'),
+      DashboardStatusSegment(
+        label: 'En mission',
+        value: onMission,
+        color: const Color(0xFF279BFA),
       ),
-      ModuleDashboardAction(
-        label: 'chauffeurs'.tr(),
-        detail: countDetail(driverCount, 'conducteur', 'conducteurs'),
-        icon: FluentIcons.people,
-        onPressed: () => PaneItemsAndFooters.selectPane('chauffeurs'),
-      ),
-      ModuleDashboardAction(
-        label: 'chaufdocuments'.tr(),
-        detail: countDetail(driverDocumentCount, 'document', 'documents'),
-        icon: FluentIcons.document_set,
-        onPressed: () => PaneItemsAndFooters.selectPane('driver-documents'),
-      ),
-      ModuleDashboardAction(
-        label: 'reservation'.tr(),
-        detail: countDetail(planningCount, 'réservation', 'réservations'),
-        icon: FluentIcons.edit_event,
-        onPressed: () => PaneItemsAndFooters.selectPane('planner'),
-      ),
-      ModuleDashboardAction(
-        label: 'activities'.tr(),
-        detail: countDetail(activityCount, 'activité', 'activités'),
-        icon: FluentIcons.database_activity,
-        onPressed: () => PaneItemsAndFooters.selectPane('events'),
+      DashboardStatusSegment(
+        label: 'Autre état',
+        value: otherState,
+        color: const Color(0xFF929CB7),
       ),
     ];
+
+    final activity = _buildActivitySeries(history, now);
+    final recentActivities =
+        LogProvider.activities.values.where((item) => item.createdAt != null || item.updatedAt != null).toList()
+          ..sort((a, b) => _activityDate(b).compareTo(_activityDate(a)));
+
+    final alerts = _buildAlerts(vehicles, now);
+
+    return DashboardSnapshot(
+      vehicleCount: vehicles.length,
+      driverCount: drivers.length,
+      maintenanceCount: maintenance,
+      reservationsToday: reservationsToday,
+      monthlyRepairCosts: monthlyCost,
+      costsVerified: costsVerified,
+      fleetStatus: fleetStatus,
+      activity: activity,
+      upcoming: upcoming,
+      recentActivities: recentActivities.take(6).toList(growable: false),
+      alerts: alerts,
+    );
   }
 
-  List<Widget> widgetList(AppTheme appTheme) {
-    final start = _periodStart;
-    final end = _periodEnd;
+  List<DashboardActivityPoint> _buildActivitySeries(
+    List<Reparation> history,
+    DateTime now,
+  ) {
+    final receptions = RepairProvider.repPerVeh.values
+        .expand((items) => items)
+        .where((fiche) => fiche.kilometrage != null && fiche.kilometrage! > 0)
+        .toList(growable: false);
 
-    double height = 400.px;
+    final start = now.subtract(const Duration(days: 30));
+    return List.generate(7, (index) {
+      final bucketStart = start.add(Duration(days: index * 5));
+      final bucketEnd = index == 6
+          ? now.add(const Duration(milliseconds: 1))
+          : bucketStart.add(const Duration(days: 5));
 
-    return [
-      StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
-        child: TableStats(
-          height: height,
-          title: 'vstates'.tr(),
-          icon: Icon(FluentIcons.health, color: appTheme.color.darker),
-          content: StateBars(
-            refreshVersion: _refreshVersion,
-            labels: conducteurEmploye
-                ? [
-                    MapEntry(
-                      'gstate',
-                      DatabaseCounters().countVehicles(etat: 0),
-                    ),
-                    MapEntry(
-                      'bstate',
-                      DatabaseCounters().countVehicles(etat: 1),
-                    ),
-                    MapEntry(
-                      'rstate',
-                      DatabaseCounters().countVehicles(etat: 2),
-                    ),
-                    MapEntry(
-                      'ostate',
-                      DatabaseCounters().countVehicles(etat: 3),
-                    ),
-                    MapEntry(
-                      'restate',
-                      DatabaseCounters().countVehicles(etat: 4),
-                    ),
-                  ]
-                : [
-                    MapEntry(
-                      'dispo',
-                      DatabaseCounters().countVehicles(etat: 5),
-                    ),
-                    MapEntry(
-                      'panne',
-                      DatabaseCounters().countVehicles(etat: 6),
-                    ),
-                    MapEntry(
-                      'enreparation',
-                      DatabaseCounters().countVehicles(etat: 7),
-                    ),
-                    MapEntry(
-                      'enmission',
-                      DatabaseCounters().countVehicles(etat: 8),
-                    ),
-                  ],
-          ),
-          onTap: () {
-            PaneItemsAndFooters.selectPane('vehicle-manager');
-          },
-        ),
-      ),
-      if (MyEntrepriseState.p != null)
-        StaggeredGridTile.fit(
-          crossAxisCellCount: 1,
-          child: TableStats(
-            height: height,
-            title: 'appartenancevehicule'.tr(),
-            icon: Icon(
-              Icons.emoji_transportation,
-              color: appTheme.color.darker,
-            ),
-            content: ParcOtoPie(
-              refreshVersion: _refreshVersion,
-              labels: List.generate(
-                MyEntrepriseState.p?.filiales?.length ?? 0,
-                (index) => MapEntry(
-                  MyEntrepriseState.p!.filiales![index],
-                  DatabaseCounters().countVehiclesWithCondition([
-                    Query.equal(
-                      'appartenance',
-                      MyEntrepriseState.p!.filiales![index]
-                          .replaceAll(' ', '')
-                          .trim()
-                          .toUpperCase(),
-                    ),
-                  ]),
-                ),
-              ),
-            ),
-            onTap: () {
-              PaneItemsAndFooters.selectPane('vehicle-manager');
-            },
-          ),
-        ),
-      StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
-        child: TableStats(
-          height: height,
-          title: 'perimetre'.tr(),
-          icon: Icon(FluentIcons.map_directions, color: appTheme.color.darker),
-          content: StateCategoryBars(
-            refreshVersion: _refreshVersion,
-            labels: List.generate(
-              conducteurEmploye ? 5 : 4,
-              (index) => MapEntry(
-                VehiclesUtilities.getEtatName(
-                  conducteurEmploye ? index : index + 5,
-                ),
-                [
-                  if (conducteurEmploye)
-                    MapEntry(
-                      VehiclesUtilities.getPerimetre(0),
-                      DatabaseCounters().countVehiclesInStateAndPerimeter(
-                        state: index,
-                        perimeter: 0,
-                      ),
-                    ),
-                  if (conducteurEmploye)
-                    MapEntry(
-                      VehiclesUtilities.getPerimetre(1),
-                      DatabaseCounters().countVehiclesInStateAndPerimeter(
-                        state: index,
-                        perimeter: 1,
-                      ),
-                    ),
-                  if (conducteurEmploye)
-                    MapEntry(
-                      VehiclesUtilities.getPerimetre(2),
-                      DatabaseCounters().countVehiclesInStateAndPerimeter(
-                        state: index,
-                        perimeter: 2,
-                      ),
-                    ),
-                  if (!conducteurEmploye)
-                    MapEntry(
-                      VehiclesUtilities.getPerimetre(3),
-                      DatabaseCounters().countVehiclesInStateAndPerimeter(
-                        state: index,
-                        perimeter: 3,
-                      ),
-                    ),
-                  if (!conducteurEmploye)
-                    MapEntry(
-                      VehiclesUtilities.getPerimetre(4),
-                      DatabaseCounters().countVehiclesInStateAndPerimeter(
-                        state: index,
-                        perimeter: 4,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-          onTap: () {
-            PaneItemsAndFooters.selectPane('vehicle-manager');
-          },
-        ),
-      ),
-      if (MyEntrepriseState.p != null)
-        StaggeredGridTile.fit(
-          crossAxisCellCount: 1,
-          child: TableStats(
-            height: height * 2,
-            title: 'exploitationvehicule'.tr(),
-            icon: Icon(Icons.hub, color: appTheme.color.darker),
-            content: StateBars(
-              hideEmpty: true,
-              vertical: true,
-              labels: List.generate(
-                MyEntrepriseState.p!.filiales?.length ?? 0,
-                (index) => MapEntry(
-                  MyEntrepriseState.p!.filiales![index],
-                  DatabaseCounters().countVehiclesWithCondition([
-                    Query.equal(
-                      'filliale',
-                      MyEntrepriseState.p!.filiales![index]
-                          .replaceAll(' ', '')
-                          .trim()
-                          .toUpperCase(),
-                    ),
-                  ]),
-                ),
-              ),
-            ),
-            onTap: () {
-              PaneItemsAndFooters.selectPane('vehicle-manager');
-            },
-          ),
-        ),
-      if (MyEntrepriseState.p != null)
-        StaggeredGridTile.fit(
-          crossAxisCellCount: 1,
-          child: TableStats(
-            height: height * 2,
-            title: 'directions'.tr(),
-            icon: Icon(Icons.apartment, color: appTheme.color.darker),
-            content: StateBars(
-              hideEmpty: true,
-              vertical: true,
-              labels: List.generate(
-                MyEntrepriseState.p!.directions?.length ?? 0,
-                (index) => MapEntry(
-                  MyEntrepriseState.p!.directions![index],
-                  DatabaseCounters().countVehiclesWithCondition([
-                    Query.equal(
-                      'direction',
-                      MyEntrepriseState.p!.directions![index]
-                          .replaceAll(' ', '')
-                          .trim()
-                          .toUpperCase(),
-                    ),
-                  ]),
-                ),
-              ),
-            ),
-            onTap: () {
-              PaneItemsAndFooters.selectPane('vehicle-manager');
-            },
-          ),
-        ),
-      if (MyEntrepriseState.p != null)
-        StaggeredGridTile.fit(
-          crossAxisCellCount: 1,
-          child: TableStats(
-            height: height,
-            title: 'appartenanceconducteur'.tr(),
-            icon: Icon(Icons.home_work_outlined, color: appTheme.color.darker),
-            content: ParcOtoPie(
-              refreshVersion: _refreshVersion,
-              labels: List.generate(
-                MyEntrepriseState.p!.filiales?.length ?? 0,
-                (index) => MapEntry(
-                  MyEntrepriseState.p!.filiales![index],
-                  DatabaseCounters().countChauffeurWithCondition([
-                    Query.equal(
-                      'filliale',
-                      MyEntrepriseState.p!.filiales![index]
-                          .replaceAll(' ', '')
-                          .trim()
-                          .toUpperCase(),
-                    ),
-                  ]),
-                ),
-              ),
-            ),
-            onTap: () {
-              PaneItemsAndFooters.selectPane('driver-manager');
-            },
-          ),
-        ),
-      StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
-        child: TableStats(
-          height: height,
-          title: 'majvehicules'.tr(),
-          icon: Icon(FluentIcons.car, color: appTheme.color.darker),
-          content: const LogTable(
-            pages: false,
-            fieldsToShow: ['act', 'id', 'date'],
-            filters: {'typemin': '0', 'typemax': '9'},
-            statTable: true,
-            numberOfRows: 5,
-          ),
-          onTap: () {
-            PaneItemsAndFooters.selectPane('vehicle-manager');
-          },
-        ),
-      ),
-      StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
-        child: TableStats(
-          height: height,
-          title: 'depenses'.tr(),
-          icon: Icon(FluentIcons.cost_control, color: appTheme.color.darker),
-          content: CostGraph(start: start, end: end, appTheme: appTheme, refreshVersion: _refreshVersion),
-          onTap: () {
-            PaneItemsAndFooters.selectPane('vehicle-manager');
-          },
-        ),
-      ),
-      StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
-        child: TableStats(
-          height: height,
-          title: 'majreparation'.tr(),
-          icon: Icon(FluentIcons.repair, color: appTheme.color.darker),
-          content: const LogTable(
-            pages: false,
-            fieldsToShow: ['act', 'id', 'date'],
-            filters: {'typemin': '10', 'typemax': '15'},
-            statTable: true,
-            numberOfRows: 5,
-          ),
-          onTap: () {
-            PaneItemsAndFooters.selectPane('repair-orders');
-          },
-        ),
-      ),
-      StaggeredGridTile.fit(
-        crossAxisCellCount: 1,
-        child: TableStats(
-          height: height,
-          title: 'majconducteurs'.tr(),
-          icon: Icon(FluentIcons.people, color: appTheme.color.darker),
-          content: const LogTable(
-            pages: false,
-            fieldsToShow: ['act', 'id', 'date'],
-            filters: {'typemin': '16', 'typemax': '25'},
-            statTable: true,
-            numberOfRows: 5,
-          ),
-          onTap: () {
-            PaneItemsAndFooters.selectPane('driver-manager');
-          },
-        ),
-      ),
-    ];
+      final repairsCount = history.where((repair) =>
+          !repair.date.isBefore(bucketStart) &&
+          repair.date.isBefore(bucketEnd)).length;
+
+      // Reception sheets store odometer readings, not travelled distance.
+      // Keep the highest reading per vehicle in each five-day bucket to avoid
+      // summing several visits for the same vehicle in that bucket.
+      final mileageByVehicle = <String, int>{};
+      for (final fiche in receptions) {
+        if (fiche.dateEntre.isBefore(bucketStart) ||
+            !fiche.dateEntre.isBefore(bucketEnd)) {
+          continue;
+        }
+        final key = fiche.vehiculemat?.trim().isNotEmpty == true
+            ? fiche.vehiculemat!.trim()
+            : fiche.vehicule?.trim().isNotEmpty == true
+                ? fiche.vehicule!.trim()
+                : fiche.id;
+        final mileage = fiche.kilometrage!;
+        final previous = mileageByVehicle[key] ?? 0;
+        if (mileage > previous) mileageByVehicle[key] = mileage;
+      }
+
+      final mileageThousands = mileageByVehicle.values.fold<int>(
+            0,
+            (total, value) => total + value,
+          ) /
+          1000.0;
+
+      return DashboardActivityPoint(
+        date: bucketStart,
+        mileageThousands: mileageThousands,
+        interventions: repairsCount,
+      );
+    });
   }
+
+  List<DashboardAlert> _buildAlerts(
+    List<domain.Vehicle> vehicles,
+    DateTime now,
+  ) {
+    final alerts = <DashboardAlert>[];
+    final horizon = now.add(const Duration(days: 45));
+
+    for (final document in VehicleProvider.documentsVehicules.values) {
+      final expiration = document.dateExpiration;
+      if (expiration == null || expiration.isAfter(horizon)) continue;
+
+      final vehicle = _findVehicle(
+        vehicles,
+        id: document.vehicle,
+        registration: document.vehiclemat,
+      );
+      final days = expiration.difference(now).inDays;
+      final overdue = expiration.isBefore(now);
+      alerts.add(
+        DashboardAlert(
+          title: vehicle?.registration ??
+              document.vehiclemat ??
+              document.nom,
+          subtitle: document.nom,
+          tag: overdue ? 'Échu' : 'J-$days',
+          severity: overdue
+              ? DashboardAlertSeverity.danger
+              : DashboardAlertSeverity.warning,
+          dueDate: expiration,
+        ),
+      );
+    }
+
+    for (final vehicle in vehicles) {
+      final currentMileage = vehicle.currentMileage;
+      final nextService = vehicle.nextServiceMileage;
+      if (currentMileage != null && nextService != null) {
+        final remaining = nextService - currentMileage;
+        if (remaining <= 500) {
+          alerts.add(
+            DashboardAlert(
+              title: vehicle.registration,
+              subtitle: 'Révision kilométrique à prévoir',
+              tag: remaining < 0 ? 'Dépassé' : '$remaining km',
+              severity: remaining < 0
+                  ? DashboardAlertSeverity.danger
+                  : DashboardAlertSeverity.warning,
+            ),
+          );
+        }
+      }
+
+      if (vehicle.currentState == 6 || vehicle.currentState == 7) {
+        alerts.add(
+          DashboardAlert(
+            title: vehicle.registration,
+            subtitle: vehicle.currentState == 6
+                ? 'Véhicule signalé en panne'
+                : 'Véhicule actuellement en réparation',
+            tag: vehicle.currentState == 6 ? 'Panne' : 'Atelier',
+            severity: vehicle.currentState == 6
+                ? DashboardAlertSeverity.danger
+                : DashboardAlertSeverity.warning,
+          ),
+        );
+      }
+    }
+
+    alerts.sort((a, b) {
+      final severity = a.severity.index.compareTo(b.severity.index);
+      if (severity != 0) return severity;
+      return (a.dueDate ?? DateTime(9999))
+          .compareTo(b.dueDate ?? DateTime(9999));
+    });
+    return alerts.take(6).toList(growable: false);
+  }
+
+  domain.Vehicle? _findVehicle(
+    List<domain.Vehicle> vehicles, {
+    String? id,
+    String? registration,
+  }) {
+    for (final vehicle in vehicles) {
+      if ((id != null && id.isNotEmpty && vehicle.id == id) ||
+          (registration != null &&
+              registration.isNotEmpty &&
+              vehicle.registration == registration)) {
+        return vehicle;
+      }
+    }
+    return null;
+  }
+
+  DateTime _activityDate(Activity activity) =>
+      activity.createdAt ?? activity.updatedAt ?? DateTime(1970);
 
   @override
   bool get wantKeepAlive => true;
+}
+
+class _PeriodLabel extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.watch<AppTheme>();
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+      decoration: BoxDecoration(
+        color: theme.fillColor,
+        borderRadius: BorderRadius.circular(9),
+        border: Border.all(color: theme.borderColor),
+      ),
+      child: Text(
+        '30 derniers jours',
+        style: TextStyle(
+          color: theme.mutedTextColor,
+          fontSize: 10,
+        ),
+      ),
+    );
+  }
 }
