@@ -10,6 +10,8 @@ import 'pane_items.dart';
 /// Displays the active tenant and lets users switch between companies for
 /// which the current Appwrite account has an active membership.
 class CompanyWorkspaceSwitcher extends StatefulWidget {
+  static final Map<String, String> companyNamesById = {};
+
   final bool compact;
 
   const CompanyWorkspaceSwitcher({super.key, this.compact = false});
@@ -25,6 +27,7 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
 
   bool _loading = false;
   String? _selectedCompanyName;
+  String? _selectedCompanyId;
 
   String get _companyLabel {
     final session = authService.session;
@@ -35,17 +38,27 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
       return 'Administration plateforme';
     }
 
-    final cachedName = MyEntrepriseState.p?.nom;
-    if (cachedName != null && cachedName.trim().isNotEmpty) {
-      return cachedName;
+    final activeCompanyId = session.company.companyId;
+    final profile = MyEntrepriseState.p;
+    if (profile?.id == activeCompanyId &&
+        profile!.nom.trim().isNotEmpty) {
+      return profile.nom;
     }
 
-    final selectedName = _selectedCompanyName;
+    final sharedName =
+        CompanyWorkspaceSwitcher.companyNamesById[activeCompanyId];
+    if (sharedName != null && sharedName.trim().isNotEmpty) {
+      return sharedName;
+    }
+
+    final selectedName = _selectedCompanyId == activeCompanyId
+        ? _selectedCompanyName
+        : null;
     if (selectedName != null && selectedName.trim().isNotEmpty) {
       return selectedName;
     }
 
-    return session.company.companyId;
+    return activeCompanyId;
   }
 
   String get _subtitle {
@@ -218,6 +231,9 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
       MyEntrepriseState.p = null;
       MyEntrepriseState.downloading = false;
       _selectedCompanyName = membership.companyName;
+      _selectedCompanyId = membership.companyId;
+      CompanyWorkspaceSwitcher.companyNamesById[membership.companyId] =
+          membership.companyName;
 
       await startBackgroundInitialization(membership.companyId);
       if (!mounted) return;
