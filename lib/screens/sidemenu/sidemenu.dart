@@ -12,7 +12,6 @@ import 'package:parc_oto/screens/sidemenu/global_search.dart';
 import 'package:parc_oto/screens/sidemenu/parcoto_navigation_shell.dart';
 import 'package:parc_oto/screens/sidemenu/company_workspace_switcher.dart';
 import 'package:parc_oto/ui/design_system/parcoto_tokens.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../../main.dart';
@@ -211,9 +210,12 @@ class PanesListState extends State<PanesList>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SizedBox(
-                      height: compact
-                          ? ParcotoTokens.mobileTopbarHeight
-                          : ParcotoTokens.topbarHeight,
+                      // Keep a one-pixel layout tolerance between the
+                      // draggable header row and its parent container.
+                      height: (compact
+                              ? ParcotoTokens.mobileTopbarHeight
+                              : ParcotoTokens.topbarHeight) -
+                          1,
                       child: DragToMoveArea(
                         child: Padding(
                           padding: EdgeInsets.symmetric(
