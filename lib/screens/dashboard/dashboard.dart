@@ -452,7 +452,7 @@ class _DashboardState extends State<Dashboard>
     return DashboardPanel(
       title: 'Accès rapides',
       icon: FluentIcons.chart,
-      height: compact ? 228 : 205,
+      height: compact ? 228 : 220,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final columns = constraints.maxWidth >= 1050
