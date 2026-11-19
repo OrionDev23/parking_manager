@@ -4,7 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 
-import '../../domain/entities/vehicle.dart' as domain;
+import '../../serializables/vehicle/vehicle.dart' as legacy;
 import '../../main.dart' show authService;
 import '../../providers/client_database.dart';
 import '../../providers/driver_provider.dart';
@@ -432,7 +432,7 @@ class _DashboardState extends State<Dashboard>
 
     return DashboardPanel(
       title: 'Accès rapides',
-      icon: FluentIcons.more,
+      icon: FluentIcons.chart,
       height: compact ? 228 : 205,
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -638,7 +638,7 @@ class _DashboardState extends State<Dashboard>
     var maintenance = 0;
 
     for (final vehicle in vehicles) {
-      final state = vehicle.currentState ?? 0;
+      final state = vehicle.etatactuel ?? 0;
       switch (state) {
         case 5:
           available++;
@@ -764,7 +764,7 @@ class _DashboardState extends State<Dashboard>
   }
 
   List<DashboardAlert> _buildAlerts(
-    List<domain.Vehicle> vehicles,
+    List<legacy.Vehicle> vehicles,
     DateTime now,
   ) {
     final alerts = <DashboardAlert>[];
@@ -804,7 +804,7 @@ class _DashboardState extends State<Dashboard>
         if (remaining <= 500) {
           alerts.add(
             DashboardAlert(
-              title: vehicle.registration,
+              title: vehicle.matricule,
               subtitle: 'Révision kilométrique à prévoir',
               tag: remaining < 0 ? 'Dépassé' : '$remaining km',
               severity: remaining < 0
@@ -815,11 +815,11 @@ class _DashboardState extends State<Dashboard>
         }
       }
 
-      if (vehicle.currentState == 6 || vehicle.currentState == 7) {
+      if (vehicle.etatactuel == 6 || vehicle.etatactuel == 7) {
         alerts.add(
           DashboardAlert(
             title: vehicle.registration,
-            subtitle: vehicle.currentState == 6
+            subtitle: vehicle.etatactuel == 6
                 ? 'Véhicule signalé en panne'
                 : 'Véhicule actuellement en réparation',
             tag: vehicle.currentState == 6 ? 'Panne' : 'Atelier',
@@ -840,8 +840,8 @@ class _DashboardState extends State<Dashboard>
     return alerts.take(6).toList(growable: false);
   }
 
-  domain.Vehicle? _findVehicle(
-    List<domain.Vehicle> vehicles, {
+  legacy.Vehicle? _findVehicle(
+    List<legacy.Vehicle> vehicles, {
     String? id,
     String? registration,
   }) {
@@ -849,7 +849,7 @@ class _DashboardState extends State<Dashboard>
       if ((id != null && id.isNotEmpty && vehicle.id == id) ||
           (registration != null &&
               registration.isNotEmpty &&
-              vehicle.registration == registration)) {
+              vehicle.matricule == registration)) {
         return vehicle;
       }
     }
