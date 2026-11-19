@@ -10,7 +10,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:material_ui/material_ui.dart' show Icons, Material;
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:get/get.dart' hide Trans;
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:parc_oto/main.dart';
 import 'package:parc_oto/providers/client_database.dart';
