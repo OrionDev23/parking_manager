@@ -89,8 +89,9 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
 
     final activeCompanyId = session.company.companyId;
     final profile = MyEntrepriseState.p;
-    if (profile?.id == activeCompanyId &&
-        profile!.nom.trim().isNotEmpty) {
+    if (profile != null &&
+        profile.id == activeCompanyId &&
+        profile.nom.trim().isNotEmpty) {
       return profile.nom;
     }
 
