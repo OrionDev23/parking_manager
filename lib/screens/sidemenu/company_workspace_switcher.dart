@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/tenancy/company_membership_resolver.dart';
+import '../../core/tenancy/platform_companies_repository.dart';
 import '../../main.dart' show authService, companyService, startBackgroundInitialization;
 import '../../theme.dart';
 import '../entreprise/entreprise.dart' show MyEntrepriseState;
@@ -29,29 +32,52 @@ class CompanyWorkspaceSwitcher extends StatefulWidget {
 class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
   final CompanyMembershipResolver _membershipResolver =
       CompanyMembershipResolver();
+  final PlatformCompaniesRepository _platformCompaniesRepository =
+      PlatformCompaniesRepository();
+
+  StreamSubscription<dynamic>? _authStateSubscription;
 
   bool _loading = false;
   String? _selectedCompanyName;
   String? _selectedCompanyId;
-  String? _observedCompanyId;
+  String? _observedSessionMarker;
+
+  String? _sessionMarker() {
+    final session = authService.session;
+    if (session == null) return null;
+    return [
+      session.userId,
+      session.company.companyId,
+      session.isPlatformSuperAdmin,
+      session.isPlatformCompanyContext,
+    ].join('|');
+  }
 
   @override
   void initState() {
     super.initState();
-    _observedCompanyId = authService.session?.company.companyId;
+    _observedSessionMarker = _sessionMarker();
     _loadCurrentCompanyName();
+    // The parent navigation shell is kept alive and the switcher is often
+    // passed as a const child. Listen directly so session/company changes
+    // update this widget without requiring a resize or theme rebuild.
+    _authStateSubscription = authService.stateStream.listen((_) {
+      if (!mounted) return;
+      final marker = _sessionMarker();
+      if (marker != _observedSessionMarker) {
+        _observedSessionMarker = marker;
+        _selectedCompanyId = null;
+        _selectedCompanyName = null;
+        _loadCurrentCompanyName();
+      }
+      setState(() {});
+    });
   }
 
   @override
-  void didUpdateWidget(covariant CompanyWorkspaceSwitcher oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    final companyId = authService.session?.company.companyId;
-    if (companyId != _observedCompanyId) {
-      _observedCompanyId = companyId;
-      _selectedCompanyId = null;
-      _selectedCompanyName = null;
-      _loadCurrentCompanyName();
-    }
+  void dispose() {
+    _authStateSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadCurrentCompanyName() async {
@@ -129,135 +155,13 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
     final session = authService.session;
     if (session == null) return;
 
-    // Platform administrators choose a tenant from the secured company
-    // directory, where every target is authorized server-side.
-    if (session.isPlatformSuperAdmin &&
-        !session.isPlatformCompanyContext) {
-      PaneItemsAndFooters.selectPane('platform-companies');
-      widget.onCompanyChanged?.call();
-      return;
-    }
-
-    // Selecting a normal membership here would leave the Super Admin
-    // supervision context. Return to the platform through its dedicated action.
-    if (session.isPlatformCompanyContext) return;
-
     setState(() => _loading = true);
     try {
-      final memberships = await _membershipResolver.resolve();
-      if (!mounted) return;
-
-      if (memberships.isEmpty) {
-        await _showError(
-          'Aucune entreprise active n’est associée à ce compte.',
-        );
-        return;
+      if (session.isPlatformSuperAdmin) {
+        await _openPlatformCompanyPicker();
+      } else {
+        await _openMembershipCompanyPicker();
       }
-
-      await showDialog<void>(
-        context: context,
-        builder: (dialogContext) {
-          final theme = context.read<AppTheme>();
-          final currentCompanyId = authService.session?.company.companyId;
-          return ContentDialog(
-            title: const Text('Changer d’entreprise'),
-            content: SizedBox(
-              width: 380,
-              height: (memberships.length * 68.0)
-                  .clamp(76.0, 408.0)
-                  .toDouble(),
-              child: ListView.separated(
-                shrinkWrap: true,
-                itemCount: memberships.length,
-                separatorBuilder: (_, _) => Container(
-                  height: 1,
-                  color: theme.borderColor,
-                ),
-                itemBuilder: (itemContext, index) {
-                  final membership = memberships[index];
-                  final active =
-                      membership.companyId == currentCompanyId;
-                  return Button(
-                    onPressed: active
-                        ? null
-                        : () async {
-                            Navigator.of(dialogContext).pop();
-                            await _selectCompany(membership);
-                          },
-                    style: ButtonStyle(
-                      padding: WidgetStatePropertyAll(
-                        const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 12,
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          FluentIcons.company_directory,
-                          color: active
-                              ? theme.color
-                              : theme.mutedTextColor,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                membership.companyName.isNotEmpty
-                                    ? membership.companyName
-                                    : membership.companySlug,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: theme.textColor,
-                                ),
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                '${membership.role} • ${membership.companySlug}',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: theme.mutedTextColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        if (active)
-                          Icon(
-                            FluentIcons.check_mark,
-                            color: theme.color,
-                            size: 16,
-                          )
-                        else
-                          Icon(
-                            FluentIcons.chevron_right,
-                            color: theme.mutedTextColor,
-                            size: 13,
-                          ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-            actions: [
-              Button(
-                child: const Text('Fermer'),
-                onPressed: () => Navigator.of(dialogContext).pop(),
-              ),
-            ],
-          );
-        },
-      );
     } catch (error) {
       if (mounted) {
         await _showError(
@@ -269,39 +173,205 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
     }
   }
 
+  Future<void> _openPlatformCompanyPicker() async {
+    final companies = await _platformCompaniesRepository.list();
+    if (!mounted) return;
+
+    for (final company in companies) {
+      if (company.companyId.isNotEmpty && company.name.trim().isNotEmpty) {
+        CompanyWorkspaceSwitcher.companyNamesById[company.companyId] =
+            company.name;
+      }
+    }
+    setState(() {});
+
+    final selected = await showDialog<PlatformCompany>(
+      context: context,
+      builder: (dialogContext) => _PlatformCompanyPickerDialog(
+        companies: companies,
+        currentCompanyId: authService.session?.company.companyId,
+      ),
+    );
+    if (selected == null || !mounted) return;
+
+    await _enterPlatformCompany(selected);
+  }
+
+  Future<void> _openMembershipCompanyPicker() async {
+    final session = authService.session;
+    if (session == null || session.isPlatformCompanyContext) return;
+
+    final memberships = await _membershipResolver.resolve();
+    if (!mounted) return;
+
+    if (memberships.isEmpty) {
+      await _showError(
+        'Aucune entreprise active n’est associée à ce compte.',
+      );
+      return;
+    }
+
+    final selected = await showDialog<CompanyMembership>(
+      context: context,
+      builder: (dialogContext) {
+        final theme = context.read<AppTheme>();
+        final currentCompanyId = authService.session?.company.companyId;
+        return ContentDialog(
+          title: const Text('Changer d’entreprise'),
+          content: SizedBox(
+            width: 380,
+            height: (memberships.length * 68.0)
+                .clamp(76.0, 408.0)
+                .toDouble(),
+            child: ListView.separated(
+              shrinkWrap: true,
+              itemCount: memberships.length,
+              separatorBuilder: (_, _) => Container(
+                height: 1,
+                color: theme.borderColor,
+              ),
+              itemBuilder: (itemContext, index) {
+                final membership = memberships[index];
+                final active =
+                    membership.companyId == currentCompanyId;
+                return Button(
+                  onPressed: active
+                      ? null
+                      : () => Navigator.of(dialogContext).pop(membership),
+                  style: ButtonStyle(
+                    padding: WidgetStatePropertyAll(
+                      const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 12,
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        FluentIcons.company_directory,
+                        color: active
+                            ? theme.color
+                            : theme.mutedTextColor,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              membership.companyName.isNotEmpty
+                                  ? membership.companyName
+                                  : membership.companySlug,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: theme.textColor,
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              '${membership.role} • ${membership.companySlug}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: theme.mutedTextColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      if (active)
+                        Icon(
+                          FluentIcons.check_mark,
+                          color: theme.color,
+                          size: 16,
+                        )
+                      else
+                        Icon(
+                          FluentIcons.chevron_right,
+                          color: theme.mutedTextColor,
+                          size: 13,
+                        ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+          actions: [
+            Button(
+              child: const Text('Fermer'),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (selected == null || !mounted) return;
+    await _selectCompany(selected);
+  }
+
+  Future<void> _enterPlatformCompany(PlatformCompany company) async {
+    final currentSession = authService.session;
+    if (currentSession?.isPlatformSuperAdmin != true) {
+      throw StateError('Accès réservé au Super Admin plateforme.');
+    }
+    if (currentSession?.isPlatformCompanyContext == true &&
+        currentSession?.company.companyId == company.companyId) {
+      return;
+    }
+
+    // The server function validates the Super Admin and resolves the target
+    // tenant's team/profile context. Never use ordinary membership selection
+    // for a platform administrator: they may not be a member of that tenant.
+    await authService.enterPlatformCompany(company.companyId);
+    CompanyWorkspaceSwitcher.companyNamesById[company.companyId] =
+        company.name;
+    _selectedCompanyId = company.companyId;
+    _selectedCompanyName = company.name;
+
+    await startBackgroundInitialization(company.companyId);
+    if (!mounted) return;
+
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+
+    PaneItemsAndFooters.selectPane('dashboard');
+    widget.onCompanyChanged?.call();
+    setState(() {});
+    _showNotice('Espace « ${company.name} » ouvert en supervision.');
+  }
+
   Future<void> _selectCompany(CompanyMembership membership) async {
     final previousCompanyId = authService.session?.company.companyId;
     if (membership.companyId == previousCompanyId) return;
 
-    setState(() => _loading = true);
-    try {
-      await authService.selectCompany(membership.companyId);
+    await authService.selectCompany(membership.companyId);
 
-      // Clear tenant-specific presentation cache before initializing the new
-      // company. The runtime swap invalidates all provider/data caches.
-      MyEntrepriseState.p = null;
-      MyEntrepriseState.downloading = false;
-      _selectedCompanyName = membership.companyName;
-      _selectedCompanyId = membership.companyId;
-      CompanyWorkspaceSwitcher.companyNamesById[membership.companyId] =
-          membership.companyName;
+    // setActiveCompanyId already reloads the selected company profile. Do not
+    // clear it here: doing so used to leave the switcher showing the raw ID
+    // until a later unrelated rebuild.
+    _selectedCompanyName = membership.companyName;
+    _selectedCompanyId = membership.companyId;
+    CompanyWorkspaceSwitcher.companyNamesById[membership.companyId] =
+        membership.companyName;
 
-      await startBackgroundInitialization(membership.companyId);
-      if (!mounted) return;
+    await startBackgroundInitialization(membership.companyId);
+    if (!mounted) return;
 
-      PaneItemsAndFooters.selectPane('dashboard');
-      widget.onCompanyChanged?.call();
-      setState(() {});
-      _showNotice('Espace « ${membership.companyName} » activé.');
-    } catch (error) {
-      if (mounted) {
-        await _showError(
-          error.toString().replaceFirst('Bad state: ', ''),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
+    await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return;
+
+    PaneItemsAndFooters.selectPane('dashboard');
+    widget.onCompanyChanged?.call();
+    setState(() {});
+    _showNotice('Espace « ${membership.companyName} » activé.');
   }
 
   void _showNotice(String message) {
@@ -337,15 +407,14 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
     final session = authService.session;
     final platformHome = session?.isPlatformSuperAdmin == true &&
         session?.isPlatformCompanyContext != true;
-    final supervision = session?.isPlatformCompanyContext == true;
-    final interactive = session != null && !supervision;
+    final interactive = session != null;
 
     return Tooltip(
       message: interactive
           ? platformHome
-              ? 'Ouvrir les entreprises clientes'
-              : 'Changer d’entreprise'
-          : 'Entreprise consultée en mode supervision',
+              ? 'Choisir une entreprise cliente'
+              : 'Changer rapidement d’entreprise'
+          : 'Connectez-vous pour choisir une entreprise',
       child: GestureDetector(
         onTap: interactive ? _openSwitcher : null,
         child: Container(
@@ -413,6 +482,178 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
           ),
         ),
       ),
+    );
+  }
+}
+
+
+class _PlatformCompanyPickerDialog extends StatefulWidget {
+  final List<PlatformCompany> companies;
+  final String? currentCompanyId;
+
+  const _PlatformCompanyPickerDialog({
+    required this.companies,
+    required this.currentCompanyId,
+  });
+
+  @override
+  State<_PlatformCompanyPickerDialog> createState() =>
+      _PlatformCompanyPickerDialogState();
+}
+
+class _PlatformCompanyPickerDialogState
+    extends State<_PlatformCompanyPickerDialog> {
+  final TextEditingController _searchController = TextEditingController();
+
+  List<PlatformCompany> get _visibleCompanies {
+    final query = _searchController.text.trim().toLowerCase();
+    final values = widget.companies.where((company) {
+      if (query.isEmpty) return true;
+      return company.name.toLowerCase().contains(query) ||
+          company.slug.toLowerCase().contains(query) ||
+          company.companyId.toLowerCase().contains(query);
+    }).toList(growable: false)
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    return values;
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.watch<AppTheme>();
+    final companies = _visibleCompanies;
+
+    return ContentDialog(
+      title: const Text('Changer d’entreprise'),
+      constraints: const BoxConstraints(maxWidth: 520, maxHeight: 620),
+      content: SizedBox(
+        width: 460,
+        height: 480,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextBox(
+              controller: _searchController,
+              placeholder: 'Rechercher par nom, code ou identifiant...',
+              prefix: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Icon(FluentIcons.search, size: 15),
+              ),
+              onChanged: (_) => setState(() {}),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '${companies.length} entreprise(s)',
+              style: TextStyle(
+                color: theme.mutedTextColor,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: companies.isEmpty
+                  ? const Center(
+                      child: Text('Aucune entreprise ne correspond à la recherche.'),
+                    )
+                  : ListView.separated(
+                      itemCount: companies.length,
+                      separatorBuilder: (_, _) => Divider(
+                        style: DividerThemeData(
+                          decoration: BoxDecoration(color: theme.borderColor),
+                        ),
+                      ),
+                      itemBuilder: (context, index) {
+                        final company = companies[index];
+                        final active =
+                            company.companyId == widget.currentCompanyId;
+                        final status = company.status.trim().isEmpty
+                            ? 'Statut inconnu'
+                            : company.status;
+                        return Button(
+                          onPressed: active
+                              ? null
+                              : () => Navigator.of(context).pop(company),
+                          style: ButtonStyle(
+                            padding: WidgetStatePropertyAll(
+                              const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 10,
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                FluentIcons.company_directory,
+                                color: active
+                                    ? theme.color
+                                    : theme.mutedTextColor,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 11),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      company.name.isNotEmpty
+                                          ? company.name
+                                          : company.slug,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: theme.textColor,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      '${company.slug} • $status',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: theme.mutedTextColor,
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              if (active)
+                                Icon(
+                                  FluentIcons.check_mark,
+                                  color: theme.color,
+                                  size: 16,
+                                )
+                              else
+                                Icon(
+                                  FluentIcons.chevron_right,
+                                  color: theme.mutedTextColor,
+                                  size: 13,
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Fermer'),
+        ),
+      ],
     );
   }
 }
