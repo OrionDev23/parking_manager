@@ -210,29 +210,49 @@ class _DashboardState extends State<Dashboard>
     final metrics = <({String label, String value, String detail, IconData icon, Color tone})>[
       (
         label: 'Véhicules',
-        value: _metricValue(_snapshot.vehicleCount),
-        detail: _hasLoaded ? 'Dans le parc de l’entreprise' : 'Chargement…',
+        value: _metricValue(
+          _snapshot.vehicleCount,
+          VehicleProvider.downloadedVehicles,
+        ),
+        detail: VehicleProvider.downloadedVehicles
+            ? 'Dans le parc de l’entreprise'
+            : 'Données indisponibles',
         icon: FluentIcons.car,
         tone: const Color(0xFF279BFA),
       ),
       (
         label: 'Conducteurs',
-        value: _metricValue(_snapshot.driverCount),
-        detail: _hasLoaded ? 'Conducteurs enregistrés' : 'Chargement…',
+        value: _metricValue(
+          _snapshot.driverCount,
+          DriverProvider.downloadedConducteurs,
+        ),
+        detail: DriverProvider.downloadedConducteurs
+            ? 'Conducteurs enregistrés'
+            : 'Données indisponibles',
         icon: FluentIcons.people,
         tone: const Color(0xFF19C997),
       ),
       (
         label: 'En maintenance',
-        value: _metricValue(_snapshot.maintenanceCount),
-        detail: _hasLoaded ? 'Pannes et réparations' : 'Chargement…',
+        value: _metricValue(
+          _snapshot.maintenanceCount,
+          VehicleProvider.downloadedVehicles,
+        ),
+        detail: VehicleProvider.downloadedVehicles
+            ? 'Pannes et réparations'
+            : 'Données indisponibles',
         icon: FluentIcons.repair,
         tone: const Color(0xFFE96B8A),
       ),
       (
         label: 'Réservations',
-        value: _metricValue(_snapshot.reservationsToday),
-        detail: 'Aujourd’hui',
+        value: _metricValue(
+          _snapshot.reservationsToday,
+          PlanningProvider.downloadedPlanning,
+        ),
+        detail: PlanningProvider.downloadedPlanning
+            ? 'Aujourd’hui'
+            : 'Données indisponibles',
         icon: FluentIcons.event,
         tone: const Color(0xFFA375F5),
       ),
@@ -482,8 +502,8 @@ class _DashboardState extends State<Dashboard>
     );
   }
 
-  String _metricValue(int value) =>
-      _hasLoaded ? value.toString() : '—';
+  String _metricValue(int value, bool available) =>
+      _hasLoaded && available ? value.toString() : '—';
 
   String _formatAmount(double value) =>
       '${NumberFormat('#,##0', 'fr').format(value)} DA';
