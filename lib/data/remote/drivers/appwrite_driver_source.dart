@@ -4,6 +4,8 @@ import 'package:appwrite/appwrite.dart';
 
 import '../../../core/backend/appwrite_backend.dart';
 import '../../../core/tenancy/company_context.dart';
+import '../../../core/tenancy/tenant_resource_api.dart';
+import '../../../providers/client_database.dart';
 import '../../../domain/entities/driver.dart';
 import 'remote_driver_source.dart';
 
@@ -216,12 +218,15 @@ class AppwriteDriverSource implements RemoteDriverSource {
   @override
   Future<Driver> createDriver(Driver driver) async {
     _checkCompany(driver);
-    await backend.database.createRow(
-      databaseId: databaseId,
-      tableId: tableId,
+    final client = DatabaseGetter.client;
+    if (client == null) {
+      throw StateError('Appwrite session client is not initialized.');
+    }
+    await TenantResourceApi(client).createResource(
+      resource: 'driver',
+      companyId: companyContext.companyId,
       rowId: driver.id,
       data: _toRow(driver),
-      permissions: _rowPermissions(),
     );
     return driver;
   }
@@ -247,9 +252,13 @@ class AppwriteDriverSource implements RemoteDriverSource {
     final existing = await getDriver(id);
     if (existing == null) return;
     _checkCompany(existing);
-    await backend.database.deleteRow(
-      databaseId: databaseId,
-      tableId: tableId,
+    final client = DatabaseGetter.client;
+    if (client == null) {
+      throw StateError('Appwrite session client is not initialized.');
+    }
+    await TenantResourceApi(client).deleteResource(
+      resource: 'driver',
+      companyId: companyContext.companyId,
       rowId: id,
     );
   }
