@@ -10,8 +10,9 @@ import '../../theme.dart';
 import '../entreprise/entreprise.dart' show MyEntrepriseState;
 import 'pane_items.dart';
 
-/// Displays the active tenant and lets users switch between companies for
-/// which the current Appwrite account has an active membership.
+/// Displays the active workspace and lets users switch to authorized
+/// tenants. Standard users are limited to memberships; platform Super Admins
+/// use the server-authorized company directory.
 class CompanyWorkspaceSwitcher extends StatefulWidget {
   static final Map<String, String> companyNamesById = {};
 
