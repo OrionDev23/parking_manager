@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../../../providers/client_database.dart';
@@ -24,8 +25,7 @@ class DashboardMetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = FluentTheme.of(context);
-    final appTheme = _appTheme(context);
+    final appTheme = context.watch<AppTheme>();
 
     return Container(
       padding: const EdgeInsets.all(15),
@@ -99,22 +99,6 @@ class DashboardMetricCard extends StatelessWidget {
     );
   }
 
-  AppTheme _appTheme(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<_AppThemeScope>()?.theme ??
-      throw StateError('DashboardMetricCard must be inside AppThemeScope');
-}
-
-class _AppThemeScope extends InheritedWidget {
-  final AppTheme theme;
-
-  const _AppThemeScope({
-    required this.theme,
-    required super.child,
-  });
-
-  @override
-  bool updateShouldNotify(_AppThemeScope oldWidget) =>
-      !identical(theme, oldWidget.theme);
 }
 
 /// Shared dashboard card. Its content is kept separate from the heading so
@@ -372,7 +356,7 @@ class FleetStateDonut extends StatelessWidget {
           child: ListView.separated(
             shrinkWrap: true,
             itemCount: visible.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 10),
+            separatorBuilder: (context, index) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
               final segment = visible[index];
               final percentage =
