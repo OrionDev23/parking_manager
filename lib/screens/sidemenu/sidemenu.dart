@@ -10,6 +10,8 @@ import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/screens/sidemenu/profil_name_topbar.dart';
 import 'package:parc_oto/screens/sidemenu/global_search.dart';
 import 'package:parc_oto/screens/sidemenu/parcoto_navigation_shell.dart';
+import 'package:parc_oto/screens/sidemenu/company_workspace_switcher.dart';
+import 'package:parc_oto/ui/design_system/parcoto_tokens.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -167,7 +169,7 @@ class PanesListState extends State<PanesList>
       return const Center(child: ProgressRing());
     }
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final compact = screenWidth < 760;
+    final compact = screenWidth < ParcotoTokens.tabletBreakpoint;
     pwidth = compact ? 304 : (screenWidth < 1280 ? 276 : 304);
     final session = authService.session;
     final isPlatformCompanyContext =
@@ -192,8 +194,10 @@ class PanesListState extends State<PanesList>
               appTheme: widget.appTheme,
               search: const GlobalSearchLauncher(),
               topBar: Container(
-                height: (compact ? 65 : 73.px) +
-                    (isPlatformCompanyContext ? (compact ? 40 : 44) : 0),
+                height: (compact
+                        ? ParcotoTokens.mobileTopbarHeight
+                        : ParcotoTokens.topbarHeight) +
+                    (isPlatformCompanyContext ? (compact ? 38 : 42) : 0),
                 decoration: BoxDecoration(
                   color: widget.appTheme.surfaceColor,
                   border: Border(
@@ -207,62 +211,36 @@ class PanesListState extends State<PanesList>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SizedBox(
-                      height: compact ? 64 : 72.px,
+                      height: compact
+                          ? ParcotoTokens.mobileTopbarHeight
+                          : ParcotoTokens.topbarHeight,
                       child: DragToMoveArea(
                         child: Padding(
                           padding: EdgeInsets.symmetric(
-                            horizontal: compact ? 14 : 24,
+                            horizontal: compact ? 12 : 18,
                           ),
                           child: Row(
                             children: [
-                              Image.asset(
-                                'assets/images/logo.webp',
-                                width: compact ? 116 : 148,
-                                height: 42,
-                                fit: BoxFit.contain,
-                              ),
-                              if (!compact) ...[
-                                const SizedBox(width: 18),
-                                Container(
-                                  width: 1,
-                                  height: 30,
-                                  color: widget.appTheme.borderColor,
+                              if (compact) ...[
+                                Image.asset(
+                                  'assets/images/logo.webp',
+                                  width: 112,
+                                  height: 38,
+                                  fit: BoxFit.contain,
+                                ),
+                                const Spacer(),
+                                const GlobalSearchLauncher(compact: true),
+                              ] else ...[
+                                const SizedBox(
+                                  width: 230,
+                                  child: CompanyWorkspaceSwitcher(),
                                 ),
                                 const SizedBox(width: 16),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      isPlatformHome
-                                          ? 'ADMINISTRATION PLATEFORME'
-                                          : isPlatformCompanyContext
-                                              ? 'SUPERVISION ENTREPRISE'
-                                              : 'ESPACE ENTREPRISE',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        letterSpacing: 1.1,
-                                        fontWeight: FontWeight.w700,
-                                        color: widget.appTheme.mutedTextColor,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 3),
-                                    Text(
-                                      isPlatformHome
-                                          ? 'Parcoto Control Center'
-                                          : isPlatformCompanyContext
-                                              ? 'Accès de supervision'
-                                              : 'Gestion opérationnelle',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                        color: widget.appTheme.textColor,
-                                      ),
-                                    ),
-                                  ],
+                                const Expanded(
+                                  child: GlobalSearchLauncher(),
                                 ),
                               ],
-                              const Spacer(),
+                              if (!compact) const SizedBox(width: 12),
                               if (!loading &&
                                   signedIn.value &&
                                   !isPlatformHome &&
@@ -274,14 +252,14 @@ class PanesListState extends State<PanesList>
                                   signedIn.value &&
                                   !isPlatformHome &&
                                   DatabaseGetter.trialDate != null)
-                                SizedBox(width: compact ? 14 : 22),
+                                SizedBox(width: compact ? 6 : 14),
                               if (!loading && signedIn.value)
                                 const ProfilNameTopBar(),
                               if (!kIsWeb &&
                                   (Platform.isMacOS ||
                                       Platform.isLinux ||
                                       Platform.isWindows)) ...[
-                                const SizedBox(width: 14),
+                                SizedBox(width: compact ? 4 : 12),
                                 const WindowButtons(),
                               ],
                             ],
