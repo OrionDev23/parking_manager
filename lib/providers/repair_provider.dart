@@ -431,6 +431,7 @@ class RepairProvider extends ChangeNotifier {
           databaseId: databaseId,
           tableId: reparationId,
           queries: [
+            Query.equal('companyId', companyId),
             Query.greaterThanEqual('date', dateToIntJson(start)),
             Query.lessThanEqual('date', dateToIntJson(end)),
             Query.limit(pageSize),
