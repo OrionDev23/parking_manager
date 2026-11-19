@@ -6,6 +6,23 @@ const MEMBERSHIPS = 'company_memberships';
 const COMPANIES = 'companies';
 const ENTITLEMENTS = 'company_entitlements';
 const COMPANY_PROFILE = 'entreprise';
+const QUOTA_RESOURCES = {
+  vehicle: {
+    tableId: '6531ad22153b2a49ca2c',
+    maxColumn: 'maxVehicles',
+    usedColumn: 'vehiclesUsed',
+    label: 'véhicules',
+  },
+  driver: {
+    tableId: '6537d87b492c80f255e8',
+    maxColumn: 'maxDrivers',
+    usedColumn: 'driversUsed',
+    label: 'chauffeurs',
+  },
+};
+const QUOTA_RESOURCE_TABLE_IDS = new Set(
+  Object.values(QUOTA_RESOURCES).map(resource => resource.tableId),
+);
 
 // Single source of truth for business tables isolated by companyId.
 const TENANT_TABLE_IDS = [
@@ -193,11 +210,269 @@ async function requireCompanyAdmin(userId, companyId) {
   return membership;
 }
 
-async function createRow(tableId, rowId, data, permissions = []) {
+async function createRow(tableId, rowId, data, permissions = [], transactionId) {
   return appwrite(`/tablesdb/${DATABASE_ID}/tables/${tableId}/rows`, {
     method: 'POST',
-    body: { rowId, data, permissions },
+    body: {
+      rowId,
+      data,
+      permissions,
+      ...(transactionId ? { transactionId } : {}),
+    },
   });
+}
+
+function tenantRowPermissions(teamId) {
+  return [
+    `read("team:${teamId}")`,
+    `update("team:${teamId}/admin")`,
+    `update("team:${teamId}/manager")`,
+    `delete("team:${teamId}/admin")`,
+  ];
+}
+
+async function requireQuotaWriterContext(userId, companyId) {
+  const membership = await activeMembership(userId, companyId);
+  let platformExploration = false;
+  if (isPlatformSuperAdmin(userId)) {
+    const prefs = await readUserPrefs(userId);
+    platformExploration =
+      prefs.parcotoPlatformExploration?.companyId === companyId;
+  }
+
+  if (!platformExploration &&
+      (!membership || !['owner', 'admin', 'manager'].includes(membership.data.role))) {
+    throw Object.assign(
+      new Error('You are not authorized to create or delete resources for this company.'),
+      { status: 403 },
+    );
+  }
+
+  const company = await getCompany(companyId);
+  if (!company || company.data?.status !== 'active') {
+    throw Object.assign(new Error('Company is unavailable.'), { status: 404 });
+  }
+
+  const entitlement = await getEntitlement(companyId);
+  if (!isEntitlementActive(entitlement)) {
+    throw Object.assign(
+      new Error('The company license is missing, not yet active, or expired.'),
+      { status: 403 },
+    );
+  }
+
+  const teamId = String(company.data?.teamId || '').trim();
+  if (!teamId) {
+    throw Object.assign(
+      new Error('The company team is not provisioned.'),
+      { status: 409 },
+    );
+  }
+
+  return { company, entitlement, teamId, membership, platformExploration };
+}
+
+async function createQuotaTransaction() {
+  return appwrite('/tablesdb/transactions', {
+    method: 'POST',
+    body: { ttl: 60 },
+  });
+}
+
+async function finishQuotaTransaction(transactionId, commit) {
+  return appwrite(`/tablesdb/transactions/${encodeURIComponent(transactionId)}`, {
+    method: 'PATCH',
+    body: commit ? { commit: true } : { rollback: true },
+  });
+}
+
+async function readQuotaResourceRow(resource, rowId) {
+  try {
+    return normalizeRow(await appwrite(
+      `/tablesdb/${DATABASE_ID}/tables/${resource.tableId}/rows/${encodeURIComponent(rowId)}`,
+    ));
+  } catch (failure) {
+    if (failure.status === 404) return null;
+    throw failure;
+  }
+}
+
+function quotaExceededFailure(label, used, maximum) {
+  return Object.assign(
+    new Error(`Le quota autorisé de ${label} est atteint (${used}/${maximum}).`),
+    { status: 409, code: 'quota_exceeded' },
+  );
+}
+
+async function createQuotaResource(userId, input) {
+  const resourceKey = String(input.resource || '');
+  const resource = QUOTA_RESOURCES[resourceKey];
+  const companyId = String(input.companyId || '').trim();
+  const rowId = String(input.rowId || '').trim();
+  const inputData = input.data && typeof input.data === 'object' && !Array.isArray(input.data)
+    ? input.data
+    : null;
+
+  if (!resource || !companyId || !rowId || rowId.length > 36 || !inputData) {
+    throw Object.assign(
+      new Error('A valid resource, companyId, rowId and data object are required.'),
+      { status: 400 },
+    );
+  }
+
+  const { entitlement, teamId } =
+    await requireQuotaWriterContext(userId, companyId);
+  const maximum = Number(entitlement[resource.maxColumn]);
+  const used = Number(entitlement[resource.usedColumn] ?? 0);
+  if (!Number.isSafeInteger(maximum) || maximum < 0 ||
+      !Number.isSafeInteger(used) || used < 0) {
+    throw Object.assign(
+      new Error(`The ${resourceKey} quota counters are not configured correctly.`),
+      { status: 503 },
+    );
+  }
+
+  // Make queued/offline retries idempotent. A row already committed for this
+  // tenant must not consume a second licensed slot.
+  const existing = await readQuotaResourceRow(resource, rowId);
+  if (existing) {
+    if (existing.data?.companyId !== companyId) {
+      throw Object.assign(new Error('Resource ID is already used by another company.'), { status: 403 });
+    }
+    return { created: false, alreadyExists: true, rowId, resource: resourceKey };
+  }
+
+  if (used >= maximum) {
+    throw quotaExceededFailure(resource.label, used, maximum);
+  }
+
+  const transaction = await createQuotaTransaction();
+  const transactionId = transaction.$id;
+  if (!transactionId) {
+    throw Object.assign(new Error('Could not start a quota transaction.'), { status: 503 });
+  }
+
+  try {
+    await appwrite(
+      `/tablesdb/${DATABASE_ID}/tables/${ENTITLEMENTS}/rows/${encodeURIComponent(companyId)}/${resource.usedColumn}/increment`,
+      {
+        method: 'PATCH',
+        body: {
+          value: 1,
+          // Appwrite checks the current value atomically. max = quota - 1
+          // allows the final licensed slot, then rejects the next increment.
+          max: maximum - 1,
+          transactionId,
+        },
+      },
+    );
+
+    const data = { ...inputData, companyId };
+    delete data.$id;
+    delete data.$createdAt;
+    delete data.$updatedAt;
+    await createRow(
+      resource.tableId,
+      rowId,
+      data,
+      tenantRowPermissions(teamId),
+      transactionId,
+    );
+    await finishQuotaTransaction(transactionId, true);
+    return { created: true, alreadyExists: false, rowId, resource: resourceKey };
+  } catch (failure) {
+    try {
+      await finishQuotaTransaction(transactionId, false);
+    } catch (rollbackFailure) {
+      log(`Quota transaction rollback failed for ${resourceKey} ${rowId}: ${rollbackFailure.message}`);
+    }
+
+    if ([400, 409].includes(failure.status)) {
+      const latest = await getEntitlement(companyId);
+      const currentUsed = Number(latest?.[resource.usedColumn] ?? 0);
+      if (Number.isSafeInteger(currentUsed) && currentUsed >= maximum) {
+        throw quotaExceededFailure(resource.label, currentUsed, maximum);
+      }
+    }
+    throw failure;
+  }
+}
+
+async function deleteQuotaResource(userId, input) {
+  const resourceKey = String(input.resource || '');
+  const resource = QUOTA_RESOURCES[resourceKey];
+  const companyId = String(input.companyId || '').trim();
+  const rowId = String(input.rowId || '').trim();
+  if (!resource || !companyId || !rowId) {
+    throw Object.assign(
+      new Error('A valid resource, companyId and rowId are required.'),
+      { status: 400 },
+    );
+  }
+
+  const { entitlement } = await requireQuotaWriterContext(userId, companyId);
+  const existing = await readQuotaResourceRow(resource, rowId);
+  if (!existing) return { deleted: false, rowId, resource: resourceKey };
+  if (existing.data?.companyId !== companyId) {
+    throw Object.assign(new Error('Resource does not belong to the active company.'), { status: 404 });
+  }
+
+  const used = Number(entitlement[resource.usedColumn] ?? 0);
+  if (!Number.isSafeInteger(used) || used < 1) {
+    throw Object.assign(
+      new Error(`The ${resourceKey} usage counter is inconsistent. Reconcile company quotas before deleting this resource.`),
+      { status: 409, code: 'quota_counter_mismatch' },
+    );
+  }
+
+  const transaction = await createQuotaTransaction();
+  const transactionId = transaction.$id;
+  if (!transactionId) {
+    throw Object.assign(new Error('Could not start a quota transaction.'), { status: 503 });
+  }
+
+  try {
+    await appwrite(
+      `/tablesdb/${DATABASE_ID}/tables/${ENTITLEMENTS}/rows/${encodeURIComponent(companyId)}/${resource.usedColumn}/decrement`,
+      {
+        method: 'PATCH',
+        body: { value: 1, min: 1, transactionId },
+      },
+    );
+    await appwrite(
+      `/tablesdb/${DATABASE_ID}/tables/${resource.tableId}/rows/${encodeURIComponent(rowId)}`,
+      { method: 'DELETE', body: { transactionId } },
+    );
+    await finishQuotaTransaction(transactionId, true);
+    return { deleted: true, rowId, resource: resourceKey };
+  } catch (failure) {
+    try {
+      await finishQuotaTransaction(transactionId, false);
+    } catch (rollbackFailure) {
+      log(`Quota delete rollback failed for ${resourceKey} ${rowId}: ${rollbackFailure.message}`);
+    }
+    throw failure;
+  }
+}
+
+async function lockQuotaTableCreatePermissions() {
+  const result = [];
+  for (const tableId of QUOTA_RESOURCE_TABLE_IDS) {
+    const table = await appwrite(
+      `/tablesdb/${DATABASE_ID}/tables/${encodeURIComponent(tableId)}`,
+    );
+    const current = table.$permissions || [];
+    const next = current.filter(permission => !permission.startsWith('create('));
+    const changed = next.length !== current.length || table.rowSecurity !== true;
+    if (changed) {
+      await appwrite(
+        `/tablesdb/${DATABASE_ID}/tables/${encodeURIComponent(tableId)}`,
+        { method: 'PUT', body: { permissions: next, rowSecurity: true } },
+      );
+    }
+    result.push({ tableId, removedCreatePermissions: current.length - next.length, changed });
+  }
+  return result;
 }
 
 async function enforceCompanyAccessState(company, entitlement) {
@@ -246,10 +521,12 @@ async function prepareCompanyRows(companyId, teamId) {
         ]
       : []),
   ];
-  const createPermissions = [
-    `create("team:${teamId}/admin")`,
-    `create("team:${teamId}/manager")`,
-  ];
+  const createPermissions = QUOTA_RESOURCE_TABLE_IDS.has(tableId)
+    ? []
+    : [
+        `create("team:${teamId}/admin")`,
+        `create("team:${teamId}/manager")`,
+      ];
   const result = [];
   let totalUpdated = 0;
 
@@ -272,6 +549,7 @@ async function prepareCompanyRows(companyId, teamId) {
     // Keep only team-scoped create grants required by the Flutter client.
     const tablePermissions = new Set(
       (table.$permissions || []).filter(permission =>
+        !QUOTA_RESOURCE_TABLE_IDS.has(tableId) &&
         /^create\("team:[^"]+\/(admin|manager)"\)$/.test(permission)
       ),
     );
@@ -1299,6 +1577,26 @@ export default async (context) => requestContext.run(
         },
         tables,
       });
+    }
+
+    if (action === 'platform_lock_quota_table_creates') {
+      requirePlatformSuperAdmin(userId);
+      const tables = await lockQuotaTableCreatePermissions();
+      return json(res, 200, {
+        ok: true,
+        tables,
+        note: 'Direct table-level create permissions are removed for quota-controlled resources. Creates must use the quota transaction endpoint.',
+      });
+    }
+
+    if (action === 'tenant_create_resource') {
+      const result = await createQuotaResource(userId, input);
+      return json(res, result.created ? 201 : 200, { ok: true, ...result });
+    }
+
+    if (action === 'tenant_delete_resource') {
+      const result = await deleteQuotaResource(userId, input);
+      return json(res, 200, { ok: true, ...result });
     }
 
     if (action === 'platform_prepare_company_rows') {
