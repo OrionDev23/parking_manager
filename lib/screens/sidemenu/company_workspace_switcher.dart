@@ -2,7 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/tenancy/company_membership_resolver.dart';
-import '../../main.dart' show authService, startBackgroundInitialization;
+import '../../main.dart' show authService, companyService, startBackgroundInitialization;
 import '../../theme.dart';
 import '../entreprise/entreprise.dart' show MyEntrepriseState;
 import 'pane_items.dart';
@@ -33,6 +33,36 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
   bool _loading = false;
   String? _selectedCompanyName;
   String? _selectedCompanyId;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentCompanyName();
+  }
+
+  Future<void> _loadCurrentCompanyName() async {
+    final session = authService.session;
+    if (session == null ||
+        (session.isPlatformSuperAdmin &&
+            !session.isPlatformCompanyContext)) {
+      return;
+    }
+
+    final companyId = session.company.companyId;
+    try {
+      final company = await companyService.getCurrent();
+      if (!mounted ||
+          company == null ||
+          authService.session?.company.companyId != companyId) {
+        return;
+      }
+      CompanyWorkspaceSwitcher.companyNamesById[companyId] = company.name;
+      setState(() {});
+    } catch (_) {
+      // The company ID remains a valid fallback when the profile API is
+      // temporarily unavailable.
+    }
+  }
 
   String get _companyLabel {
     final session = authService.session;
