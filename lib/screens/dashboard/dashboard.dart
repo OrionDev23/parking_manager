@@ -244,13 +244,13 @@ class _DashboardState extends State<Dashboard>
         tone: const Color(0xFFE96B8A),
       ),
       (
-        label: 'Réservations',
+        label: 'Événements du jour',
         value: _metricValue(
           _snapshot.reservationsToday,
           PlanningProvider.downloadedPlanning,
         ),
         detail: PlanningProvider.downloadedPlanning
-            ? 'Aujourd’hui'
+            ? 'Planifications du jour'
             : 'Données indisponibles',
         icon: FluentIcons.event,
         tone: const Color(0xFFA375F5),
@@ -370,7 +370,7 @@ class _DashboardState extends State<Dashboard>
 
   Widget _buildOperationsLayout({required bool wide}) {
     final upcoming = DashboardPanel(
-      title: 'Interventions à venir',
+      title: 'Événements à venir',
       icon: FluentIcons.event,
       height: 270,
       trailing: _viewAllButton('planner'),
@@ -659,13 +659,23 @@ class _DashboardState extends State<Dashboard>
 
     final reservations = PlanningProvider.plannings.values.toList()
       ..sort((a, b) => a.startTime.compareTo(b.startTime));
+    // Count every planning item that overlaps today, including events
+    // started earlier and still in progress.
     final reservationsToday = reservations.where((item) =>
-        !item.startTime.isBefore(todayStart) &&
-        item.startTime.isBefore(tomorrow)).length;
+        item.startTime.isBefore(tomorrow) &&
+        item.endTime.isAfter(todayStart)).length;
     final upcoming = reservations
         .where((item) => item.endTime.isAfter(now))
-        .take(4)
-        .toList(growable: false);
+        .toList()
+      ..sort((a, b) {
+        final aInProgress = !a.startTime.isAfter(now);
+        final bInProgress = !b.startTime.isAfter(now);
+        if (aInProgress != bInProgress) {
+          return aInProgress ? -1 : 1;
+        }
+        return a.startTime.compareTo(b.startTime);
+      });
+    final upcomingItems = upcoming.take(4).toList(growable: false);
 
     var available = 0;
     var broken = 0;
@@ -740,7 +750,7 @@ class _DashboardState extends State<Dashboard>
       costsVerified: costsVerified,
       fleetStatus: fleetStatus,
       activity: activity,
-      upcoming: upcoming,
+      upcoming: upcomingItems,
       recentActivities: recentActivities.take(6).toList(growable: false),
       alerts: alerts,
     );
@@ -809,30 +819,43 @@ class _DashboardState extends State<Dashboard>
     DateTime now,
   ) {
     final alerts = <DashboardAlert>[];
-    final horizon = now.add(const Duration(days: 45));
+    final today = DateTime(now.year, now.month, now.day);
+    final horizon = today.add(const Duration(days: 45));
 
     for (final document in VehicleProvider.documentsVehicules.values) {
       final expiration = document.dateExpiration;
-      if (expiration == null || expiration.isAfter(horizon)) continue;
+      if (expiration == null) continue;
+      // Expiration dates are calendar dates. A document expiring today must
+      // not be marked overdue merely because its stored time is midnight.
+      final expirationDate = DateTime(
+        expiration.year,
+        expiration.month,
+        expiration.day,
+      );
+      if (expirationDate.isAfter(horizon)) continue;
 
       final vehicle = _findVehicle(
         vehicles,
         id: document.vehicle,
         registration: document.vehiclemat,
       );
-      final days = expiration.difference(now).inDays;
-      final overdue = expiration.isBefore(now);
+      final days = expirationDate.difference(today).inDays;
+      final overdue = days < 0;
       alerts.add(
         DashboardAlert(
           title: vehicle?.matricule ??
               document.vehiclemat ??
               document.nom,
           subtitle: document.nom,
-          tag: overdue ? 'Échu' : 'J-$days',
+          tag: overdue
+              ? 'Échu'
+              : days == 0
+                  ? 'Aujourd’hui'
+                  : 'J-$days',
           severity: overdue
               ? DashboardAlertSeverity.danger
               : DashboardAlertSeverity.warning,
-          dueDate: expiration,
+          dueDate: expirationDate,
         ),
       );
     }
