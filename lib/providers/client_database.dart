@@ -655,8 +655,12 @@ class DatabaseGetter {
     return row;
   }
 
-  Future<List<Row>> listDocuments(String path) async {
+  Future<List<Row>> listDocuments(
+    String path, {
+    int? maxResults,
+  }) async {
     const pageSize = 5000;
+    if (maxResults != null && maxResults <= 0) return [];
     final activeDatabase = database;
     if (activeDatabase == null) {
       throw StateError(
@@ -671,12 +675,18 @@ class DatabaseGetter {
     var offset = 0;
 
     while (true) {
+      final remaining = maxResults == null
+          ? pageSize
+          : maxResults - result.length;
+      if (remaining <= 0) break;
+      final requestLimit =
+          remaining < pageSize ? remaining : pageSize;
       final page = await activeDatabase.listRows(
         databaseId: databaseId,
         tableId: path,
         queries: [
           if (_isTenantScoped(path)) Query.equal('companyId', _activeCompanyId!),
-          Query.limit(pageSize),
+          Query.limit(requestLimit),
           Query.offset(offset),
         ],
       );
@@ -685,10 +695,10 @@ class DatabaseGetter {
 
       result.addAll(page.rows);
 
-      // Appwrite's total is the total matching row count, not the number of
-      // rows in this page. Use the actual page length to decide whether to
-      // continue; an exact multiple of pageSize ends with one empty request.
-      if (page.rows.length < pageSize) break;
+      // Use actual page length rather than the API's total count; a bounded
+      // caller stops exactly at maxResults, while unbounded reads remain
+      // fully paginated.
+      if (page.rows.length < requestLimit) break;
       offset += page.rows.length;
     }
 
