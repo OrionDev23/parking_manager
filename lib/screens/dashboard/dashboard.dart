@@ -413,31 +413,31 @@ class _DashboardState extends State<Dashboard>
       String destination,
     })>[
       (
-        label: 'Ajouter un véhicule',
+        label: 'Gérer les véhicules',
         icon: FluentIcons.car,
         tone: const Color(0xFF279BFA),
         destination: 'vehicle-manager',
       ),
       (
-        label: 'Créer une réparation',
+        label: 'Ordres de réparation',
         icon: FluentIcons.repair,
         tone: const Color(0xFFA375F5),
         destination: 'repair-orders',
       ),
       (
-        label: 'Nouvelle réservation',
+        label: 'Planning & réservations',
         icon: FluentIcons.event,
         tone: const Color(0xFF19C997),
         destination: 'planner',
       ),
       (
-        label: 'Consulter le stock',
+        label: 'Gérer le stock',
         icon: FluentIcons.database_activity,
         tone: const Color(0xFFE6A23C),
         destination: 'workshop-stock',
       ),
       (
-        label: 'Voir les conducteurs',
+        label: 'Gérer les conducteurs',
         icon: FluentIcons.people,
         tone: const Color(0xFF279BFA),
         destination: 'driver-manager',
@@ -470,7 +470,7 @@ class _DashboardState extends State<Dashboard>
             spacing: gap,
             runSpacing: gap,
             children: [
-              for (final action in actions)
+              for (final action in actions.take(compact ? 4 : 6))
                 SizedBox(
                   width: width,
                   child: DashboardQuickActionTile(
