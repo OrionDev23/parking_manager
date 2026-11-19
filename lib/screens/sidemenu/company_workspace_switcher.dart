@@ -529,7 +529,7 @@ class _PlatformCompanyPickerDialogState
     final companies = _visibleCompanies;
     final screenSize = MediaQuery.sizeOf(context);
     final contentWidth =
-        (screenSize.width - 48).clamp(260.0, 460.0).toDouble();
+        (screenSize.width - 64).clamp(220.0, 460.0).toDouble();
     final contentHeight =
         (screenSize.height - 180).clamp(220.0, 480.0).toDouble();
 
