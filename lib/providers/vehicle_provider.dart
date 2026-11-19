@@ -7,7 +7,6 @@ import '../main.dart';
 import '../serializables/vehicle/document_vehicle.dart';
 import '../serializables/vehicle/state.dart';
 import '../serializables/vehicle/vehicle.dart';
-import '../utilities/profil_beautifier.dart';
 import 'client_database.dart';
 
 class VehicleProvider extends ChangeNotifier {
