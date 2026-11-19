@@ -442,7 +442,16 @@ class PaneItemsAndFooters {
   /// NavigationPane. Headers and separators are structural and do not occupy
   /// a selected index.
   static int? indexForPaneKey(String value) {
-    return _findPaneIndex(originalItems, value, 0);
+    final mainIndex = _findPaneIndex(originalItems, value, 0);
+    if (mainIndex != null) return mainIndex;
+
+    // Footer items are rendered after the primary navigation destinations in
+    // ParcotoNavigationShell, so their indices begin after the main menu.
+    return _findPaneIndex(
+      footerItems,
+      value,
+      _selectablePaneCount(originalItems),
+    );
   }
 
   static int? _findPaneIndex(
