@@ -38,6 +38,7 @@ class ParcotoNavigationShell extends StatefulWidget {
 class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
   final Set<String> _expanded = <String>{};
   bool _drawerOpen = false;
+  bool _sidebarCollapsed = false;
 
   List<NavigationPaneItem> get _destinations => [
         ..._flatten(widget.items),
@@ -244,12 +245,17 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                   : Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        SizedBox(
-                          width: ParcotoTokens.sidebarWidth,
+                        AnimatedContainer(
+                          duration: ParcotoTokens.motionStandard,
+                          curve: ParcotoTokens.motionCurve,
+                          width: _sidebarCollapsed
+                              ? ParcotoTokens.sidebarCollapsedWidth
+                              : ParcotoTokens.sidebarWidth,
                           child: _sidebar(
                             theme,
                             selected,
                             destinations,
+                            collapsed: _sidebarCollapsed,
                           ),
                         ),
                         Expanded(
@@ -394,6 +400,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
     int selected,
     List<NavigationPaneItem> destinations, {
     VoidCallback? onNavigate,
+    bool collapsed = false,
   }) {
     final drawer = onNavigate != null;
 
@@ -408,21 +415,46 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(17, 16, 12, 14),
+            padding: EdgeInsets.fromLTRB(
+              collapsed ? 10 : 17,
+              16,
+              12,
+              14,
+            ),
             child: Row(
               children: [
-                Expanded(
-                  child: Image.asset(
+                if (collapsed)
+                  Image.asset(
                     'assets/images/logo.webp',
-                    alignment: Alignment.centerLeft,
-                    height: 40,
+                    width: 38,
+                    height: 38,
                     fit: BoxFit.contain,
+                  )
+                else
+                  Expanded(
+                    child: Image.asset(
+                      'assets/images/logo.webp',
+                      alignment: Alignment.centerLeft,
+                      height: 40,
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                ),
                 if (drawer)
                   IconButton(
                     icon: const Icon(FluentIcons.cancel, size: 16),
                     onPressed: onNavigate,
+                  )
+                else if (!collapsed)
+                  IconButton(
+                    icon: const Icon(FluentIcons.chevron_left, size: 13),
+                    onPressed: () =>
+                        setState(() => _sidebarCollapsed = true),
+                  )
+                else
+                  IconButton(
+                    icon: const Icon(FluentIcons.chevron_right, size: 13),
+                    onPressed: () =>
+                        setState(() => _sidebarCollapsed = false),
                   ),
               ],
             ),
@@ -449,6 +481,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                   destinations,
                   selected,
                   onNavigate,
+                  collapsed: collapsed,
                 ),
                 if (widget.footerItems.isNotEmpty) ...[
                   Padding(
@@ -463,12 +496,13 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                     destinations,
                     selected,
                     onNavigate,
+                    collapsed: collapsed,
                   ),
                 ],
               ],
             ),
           ),
-          if (!drawer)
+          if (!drawer && !collapsed)
             Padding(
               padding: const EdgeInsets.fromLTRB(18, 10, 18, 14),
               child: Text(
@@ -490,25 +524,28 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
     List<NavigationPaneItem> items,
     List<NavigationPaneItem> destinations,
     int selected,
-    VoidCallback? onNavigate,
-  ) {
+    VoidCallback? onNavigate, {
+    bool collapsed = false,
+  }) {
     final widgets = <Widget>[];
 
     for (final item in items) {
       if (item is PaneItemHeader) {
         widgets.add(
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 15, 8, 7),
-            child: DefaultTextStyle(
-              style: TextStyle(
-                color: widget.appTheme.mutedTextColor,
-                fontSize: 9,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.05,
-              ),
-              child: item.header,
-            ),
-          ),
+          collapsed
+              ? const SizedBox(height: 12)
+              : Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 15, 8, 7),
+                  child: DefaultTextStyle(
+                    style: TextStyle(
+                      color: widget.appTheme.mutedTextColor,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.05,
+                    ),
+                    child: item.header,
+                  ),
+                ),
         );
       } else if (item is PaneItemSeparator) {
         widgets.add(
@@ -542,6 +579,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
             selected: selected,
             expandable: true,
             expanded: isExpanded,
+            collapsed: collapsed,
             onTap: () {
               if (index >= 0) widget.onSelected(index);
               setState(() {
@@ -567,6 +605,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                     index: _indexOf(child),
                     selected: selected,
                     childItem: true,
+                    collapsed: collapsed,
                     onTap: () {
                       widget.onSelected(_indexOf(child));
                       onNavigate?.call();
@@ -616,6 +655,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
             title: item.title,
             index: _indexOf(item),
             selected: selected,
+            collapsed: collapsed,
             onTap: () {
               widget.onSelected(_indexOf(item));
               onNavigate?.call();
@@ -637,34 +677,40 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
     bool expandable = false,
     bool expanded = false,
     bool childItem = false,
+    bool collapsed = false,
   }) {
     final active = index == selected;
     final theme = widget.appTheme;
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: childItem ? 1 : 2),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: onTap,
-          child: AnimatedContainer(
-            duration: ParcotoTokens.motionFast,
-            curve: ParcotoTokens.motionCurve,
-            decoration: BoxDecoration(
-              color: active
-                  ? theme.color.withValues(alpha: .17)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(9),
-            ),
-            child: SizedBox(
-              height: childItem ? 36 : 39,
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: childItem ? 9 : 11,
-                ),
-                child: Row(
-                  children: [
+      child: Tooltip(
+        message: collapsed ? _titleLabel(title) : '',
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: onTap,
+            child: AnimatedContainer(
+              duration: ParcotoTokens.motionFast,
+              curve: ParcotoTokens.motionCurve,
+              decoration: BoxDecoration(
+                color: active
+                    ? theme.color.withValues(alpha: .17)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: SizedBox(
+                height: childItem ? 36 : 39,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: collapsed ? 0 : (childItem ? 9 : 11),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: collapsed
+                        ? MainAxisAlignment.center
+                        : MainAxisAlignment.start,
+                    children: [
                     IconTheme(
                       data: IconThemeData(
                         size: childItem ? 15 : 17,
@@ -675,22 +721,23 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                       child: icon ?? const SizedBox.shrink(),
                     ),
                     SizedBox(width: childItem ? 9 : 11),
-                    Expanded(
-                      child: DefaultTextStyle(
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: active
-                              ? theme.textColor
-                              : theme.mutedTextColor,
-                          fontSize: childItem ? 11 : 12,
-                          fontWeight: active
-                              ? FontWeight.w700
-                              : FontWeight.w500,
+                    if (!collapsed)
+                      Expanded(
+                        child: DefaultTextStyle(
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: active
+                                ? theme.textColor
+                                : theme.mutedTextColor,
+                            fontSize: childItem ? 11 : 12,
+                            fontWeight: active
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                          ),
+                          child: title ?? const SizedBox.shrink(),
                         ),
-                        child: title ?? const SizedBox.shrink(),
                       ),
-                    ),
                     if (expandable)
                       Icon(
                         expanded
@@ -708,7 +755,8 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -716,6 +764,13 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
         ),
       ),
     );
+  }
+
+  String _titleLabel(Widget? title) {
+    if (title is Text) {
+      return title.data ?? title.textSpan?.toPlainText() ?? 'Parcoto';
+    }
+    return 'Ouvrir la rubrique';
   }
 }
 
