@@ -240,7 +240,28 @@ class PanesListState extends State<PanesList>
                                   child: GlobalSearchLauncher(),
                                 ),
                               ],
-                              if (!compact) const SizedBox(width: 12),
+                              if (!compact && signedIn.value) ...[
+                                const SizedBox(width: 8),
+                                Tooltip(
+                                  message: 'Aide',
+                                  child: IconButton(
+                                    icon: const Icon(FluentIcons.help, size: 17),
+                                    onPressed: _openHelp,
+                                  ),
+                                ),
+                                Tooltip(
+                                  message: 'Applications',
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      FluentIcons.grid_view_large,
+                                      size: 17,
+                                    ),
+                                    onPressed: _openAppLauncher,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                              ],
+                              if (!compact) const SizedBox(width: 4),
                               if (!loading &&
                                   signedIn.value &&
                                   !isPlatformHome &&
@@ -331,6 +352,95 @@ class PanesListState extends State<PanesList>
           },
         );
       },
+    );
+  }
+
+  void _openHelp() {
+    if (!PaneItemsAndFooters.selectPane('tutorials')) {
+      PaneItemsAndFooters.selectPane('settings');
+    }
+  }
+
+  void _openAppLauncher() {
+    const shortcuts = <({
+      String key,
+      String label,
+      IconData icon,
+    })>[
+      (key: 'dashboard', label: 'Tableau de bord', icon: FluentIcons.home),
+      (key: 'vehicles', label: 'Véhicules', icon: FluentIcons.car),
+      (key: 'driver-manager', label: 'Conducteurs', icon: FluentIcons.people),
+      (key: 'repairs', label: 'Maintenance', icon: FluentIcons.repair),
+      (key: 'planner', label: 'Planning', icon: FluentIcons.event),
+      (key: 'workshop-stock', label: 'Stock', icon: FluentIcons.database),
+      (key: 'workshop-parts', label: 'Pièces', icon: FluentIcons.product),
+      (key: 'events', label: 'Journal', icon: FluentIcons.database_activity),
+      (key: 'company', label: 'Mon entreprise', icon: FluentIcons.company_directory),
+      (key: 'user-access-management', label: 'Utilisateurs & accès', icon: FluentIcons.people),
+      (key: 'platform-companies', label: 'Entreprises clientes', icon: FluentIcons.cloud),
+      (key: 'settings', label: 'Paramètres', icon: FluentIcons.settings),
+    ];
+
+    final available = shortcuts
+        .where((item) => PaneItemsAndFooters.indexForPaneKey(item.key) != null)
+        .toList(growable: false);
+    if (available.isEmpty) return;
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => ContentDialog(
+        title: const Text('Applications'),
+        constraints: const BoxConstraints(
+          maxWidth: 520,
+          maxHeight: 480,
+        ),
+        content: SizedBox(
+          width: 480,
+          height: 320,
+          child: GridView.builder(
+            itemCount: available.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 1.22,
+            ),
+            itemBuilder: (context, index) {
+              final item = available[index];
+              return Button(
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  PaneItemsAndFooters.selectPane(item.key);
+                },
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      item.icon,
+                      size: 24,
+                      color: widget.appTheme.color,
+                    ),
+                    const SizedBox(height: 9),
+                    Text(
+                      item.label,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 11),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+        actions: [
+          Button(
+            child: const Text('Fermer'),
+            onPressed: () => Navigator.of(dialogContext).pop(),
+          ),
+        ],
+      ),
     );
   }
 
