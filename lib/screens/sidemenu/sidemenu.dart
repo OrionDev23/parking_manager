@@ -231,15 +231,23 @@ class PanesListState extends State<PanesList>
                           child: Row(
                             children: [
                               if (compact) ...[
-                                Image.asset(
-                                  'assets/images/logo.webp',
-                                  width: 112,
-                                  height: 38,
-                                  fit: BoxFit.contain,
-                                ),
-                                const Spacer(),
-                                if (isSignedIn)
+                                if (isSignedIn) ...[
+                                  const Expanded(
+                                    child: CompanyWorkspaceSwitcher(
+                                      compact: true,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
                                   const GlobalSearchLauncher(compact: true),
+                                ] else ...[
+                                  Image.asset(
+                                    'assets/images/logo.webp',
+                                    width: 112,
+                                    height: 38,
+                                    fit: BoxFit.contain,
+                                  ),
+                                  const Spacer(),
+                                ],
                               ] else if (isSignedIn) ...[
                                 const SizedBox(
                                   width: 230,
