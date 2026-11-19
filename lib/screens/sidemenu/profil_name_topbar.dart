@@ -16,7 +16,7 @@ class ProfilNameTopBar extends StatelessWidget {
     final session = authService.session;
     final screenWidth = MediaQuery.sizeOf(context).width;
     final avatarSize = screenWidth < 680 ? 36.0 : 40.0;
-    final showEmail = screenWidth >= 900;
+    final showEmail = screenWidth >= 1200;
 
     return OnTapScaleAndFade(
       child: Row(
