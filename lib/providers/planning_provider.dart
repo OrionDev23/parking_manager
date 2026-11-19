@@ -75,10 +75,10 @@ class PlanningProvider extends ChangeNotifier {
     try {
       final database = DatabaseGetter.database;
       if (database == null) throw StateError('Appwrite database unavailable');
-      final value = await database.listRows(databaseId: databaseId, tableId: planningID, queries: [Query.limit(5000)]);
+      final value = await DatabaseGetter().listDocuments(planningID);
       if (!_isCurrentCompany(companyId, generation)) return;
       final refreshed = <String, Planning>{};
-      for (final row in value.rows) {
+      for (final row in value) {
         final payload = <String, dynamic>{...row.data, r'$id': row.$id, r'$createdAt': row.$createdAt, r'$updatedAt': row.$updatedAt};
         try {
           final item = Planning.fromJson(payload); refreshed[item.id] = item;
