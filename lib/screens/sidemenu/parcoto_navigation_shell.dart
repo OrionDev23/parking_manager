@@ -126,7 +126,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
       );
     }
 
-    final repairs = _destinationForKey('reparations');
+    final repairs = _destinationForKey('repairs');
     if (repairs != null) {
       result.add(
         _MobileDestination(
@@ -142,7 +142,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
       result.add(
         _MobileDestination(
           label: 'Planning',
-          icon: FluentIcons.calendar,
+          icon: FluentIcons.event,
           destination: planner,
         ),
       );
@@ -215,7 +215,16 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
               child: compact
                   ? Column(
                       children: [
-                        widget.topBar,
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(FluentIcons.global_nav_button),
+                              onPressed: () =>
+                                  setState(() => _drawerOpen = true),
+                            ),
+                            Expanded(child: widget.topBar),
+                          ],
+                        ),
                         Expanded(
                           child: activeBody ??
                               widget.emptyState ??
@@ -412,7 +421,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                 ),
                 if (drawer)
                   IconButton(
-                    icon: const Icon(FluentIcons.clear, size: 16),
+                    icon: const Icon(FluentIcons.cancel, size: 16),
                     onPressed: onNavigate,
                   ),
               ],
