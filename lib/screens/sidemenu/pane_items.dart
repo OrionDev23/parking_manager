@@ -389,21 +389,24 @@ class PaneItemsAndFooters {
         ];
       } else {
         originalItems = [
-          PaneItemHeader(header: const Text('ESPACE DE TRAVAIL')),
           dashboard,
-          if (canManageUsers || canManageAccess) userAccessManagement,
-          PaneItemHeader(header: const Text('GESTION OPÉRATIONNELLE')),
+          PaneItemHeader(header: const Text('EXPLOITATION')),
           vehicles,
-          reparations,
-          if (showAtelier) atelier,
           chauffeurs,
-          if (authService.session?.hasPermission('planning.manage') == true ||
-              authService.session?.hasPermission('activity.view') == true)
-            PaneItemHeader(header: const Text('PILOTAGE')),
           if (authService.session?.hasPermission('planning.manage') == true)
             planner,
+          PaneItemHeader(header: const Text('MAINTENANCE')),
+          reparations,
+          if (showAtelier) atelier,
+          if (authService.session?.hasPermission('activity.view') == true)
+            PaneItemHeader(header: const Text('GESTION & SUIVI')),
           if (authService.session?.hasPermission('activity.view') == true)
             evenements,
+          PaneItemHeader(header: const Text('ORGANISATION')),
+          if (canManageUsers || canManageAccess) userAccessManagement,
+          if (authService.session?.hasPermission('company.manage') == true)
+            entreprise,
+          parametres,
         ];
       }
     } else {
@@ -412,13 +415,10 @@ class PaneItemsAndFooters {
         login,
       ];
     }
+
     footerItems = [
       PaneItemSeparator(),
-      PaneItemHeader(header: const Text('PARAMÈTRES & COMPTE')),
-      if (!isPlatformSession &&
-          authService.session?.hasPermission('company.manage') == true &&
-          PanesListState.signedIn.value)
-        entreprise,
+      PaneItemHeader(header: const Text('COMPTE & SYSTÈME')),
       if (!isPlatformSession &&
           authService.session?.hasPermission('backup.manage') == true &&
           PanesListState.signedIn.value)
@@ -431,7 +431,7 @@ class PaneItemsAndFooters {
           body: const _PlatformContextReturnScreen(),
         ),
       if (PanesListState.signedIn.value) logout,
-      parametres,
+      if (!PanesListState.signedIn.value) parametres,
       if (PanesListState.signedIn.value && !isPlatformSession) tutorial,
     ];
   }
