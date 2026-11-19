@@ -285,8 +285,10 @@ class LegacyAppwriteAuthService implements AuthService {
       throw ArgumentError('Identifiant entreprise manquant.');
     }
 
-    await onSessionEnding?.call();
+    // Authorize the requested tenant before stopping the current runtime.
+    // A denied/invalid target must not leave the active company disconnected.
     final context = await membershipResolver.authorizePlatformCompany(target);
+    await onSessionEnding?.call();
     final teamId = context['teamId']?.toString() ?? '';
     final profileRowId = context['profileRowId']?.toString() ?? '';
     final entitlement = context['entitlement'] is Map
