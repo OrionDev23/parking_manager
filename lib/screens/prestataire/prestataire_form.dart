@@ -83,8 +83,10 @@ class PrestataireFormState extends State<PrestataireForm> {
             child: Column(
               children: [
                 SizedBox(
-                  height: 63.h,
-                  width: 40.w,
+                  height: (MediaQuery.sizeOf(context).height - 180)
+                      .clamp(420.0, 720.0),
+                  width: (MediaQuery.sizeOf(context).width - 32)
+                      .clamp(320.0, 720.0),
                   child: Column(
                     children: [
                       Flexible(
@@ -280,7 +282,7 @@ class PrestataireFormState extends State<PrestataireForm> {
           ),
           Container(
             padding: const EdgeInsets.all(10),
-            width: 40.w,
+            width: (MediaQuery.sizeOf(context).width - 32)\n                .clamp(320.0, 720.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.center,
