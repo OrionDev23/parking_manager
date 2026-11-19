@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/client_database.dart';
 
@@ -296,7 +295,8 @@ class PrestataireFormState extends State<PrestataireForm> {
           ),
           Container(
             padding: const EdgeInsets.all(10),
-            width: (MediaQuery.sizeOf(context).width - 32)\n                .clamp(320.0, 720.0),
+            width: (MediaQuery.sizeOf(context).width - 32)
+                .clamp(320.0, 720.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.center,
