@@ -129,7 +129,7 @@ class _PartsFormState extends State<PartsForm>
   Widget build(BuildContext context) {
     super.build(context);
     var appTheme = context.watch<AppTheme>();
-    bool portrait = context.orientation == Orientation.portrait;
+    final portrait = MediaQuery.sizeOf(context).width < 760;
     if (loading) {
       return const Column(
         mainAxisAlignment: MainAxisAlignment.center,
