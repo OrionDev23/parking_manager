@@ -423,7 +423,7 @@ class RecentActivityTimeline extends StatelessWidget {
   Widget build(BuildContext context) {
     if (activities.isEmpty) {
       return const _DashboardEmptyState(
-        icon: FluentIcons.history,
+        icon: FluentIcons.database_activity,
         message: 'Aucune activité récente enregistrée.',
       );
     }
@@ -519,7 +519,7 @@ class UpcomingInterventions extends StatelessWidget {
   Widget build(BuildContext context) {
     if (items.isEmpty) {
       return const _DashboardEmptyState(
-        icon: FluentIcons.calendar,
+        icon: FluentIcons.event,
         message: 'Aucune réservation ou intervention planifiée à venir.',
       );
     }
@@ -613,7 +613,7 @@ class VehiclesWatchlist extends StatelessWidget {
   Widget build(BuildContext context) {
     if (alerts.isEmpty) {
       return const _DashboardEmptyState(
-        icon: FluentIcons.shield_check,
+        icon: FluentIcons.shield,
         message: 'Aucun véhicule ne nécessite de suivi immédiat.',
       );
     }
