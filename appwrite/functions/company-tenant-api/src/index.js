@@ -234,7 +234,7 @@ function tenantRowPermissions(teamId) {
 async function requireQuotaWriterContext(
   userId,
   companyId,
-  { allowExpiredLicense = false } = {},
+  { allowExpiredLicense = false, allowManager = true } = {},
 ) {
   const membership = await activeMembership(userId, companyId);
   let platformExploration = false;
@@ -244,8 +244,11 @@ async function requireQuotaWriterContext(
       prefs.parcotoPlatformExploration?.companyId === companyId;
   }
 
+  const allowedRoles = allowManager
+    ? ['owner', 'admin', 'manager']
+    : ['owner', 'admin'];
   if (!platformExploration &&
-      (!membership || !['owner', 'admin', 'manager'].includes(membership.data.role))) {
+      (!membership || !allowedRoles.includes(membership.data.role))) {
     throw Object.assign(
       new Error('You are not authorized to create or delete resources for this company.'),
       { status: 403 },
@@ -443,7 +446,7 @@ async function deleteQuotaResource(userId, input) {
   const { entitlement } = await requireQuotaWriterContext(
     userId,
     companyId,
-    { allowExpiredLicense: true },
+    { allowExpiredLicense: true, allowManager: false },
   );
   const existing = await readQuotaResourceRow(resource, rowId);
   if (!existing) return { deleted: false, rowId, resource: resourceKey };
