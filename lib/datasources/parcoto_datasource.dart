@@ -11,8 +11,9 @@ import 'package:parc_oto/datasources/parcoto_webservice_response.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../providers/client_database.dart';
-import '../main.dart' show vehicleServices, legacyStockSyncService;
+import '../main.dart' show vehicleServices, driverServices, legacyStockSyncService;
 import '../core/services/legacy_stock_sync_service.dart';
+import '../core/tenancy/tenant_resource_api.dart';
 import '../core/sync/sync_operation.dart';
 import '../serializables/parc_oto_serializable.dart';
 import '../theme.dart';
@@ -395,6 +396,40 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
       if (entity != null &&
           LegacyStockSyncService.tableByEntity.containsKey(entity)) {
         await legacyStockSyncService.delete(entity: entity, id: c.id);
+      } else if (collectionID == vehiculeid) {
+        final existing = await vehicleServices.repository.getVehicle(c.id);
+        if (existing != null) {
+          // Use the offline-first repository so the local cache and usage
+          // counter are updated together with the queued remote deletion.
+          await vehicleServices.repository.deleteVehicle(c.id);
+        } else {
+          final companyId = DatabaseGetter.activeCompanyId;
+          final client = DatabaseGetter.client;
+          if (companyId == null || client == null) {
+            throw StateError('Active authenticated company context is required.');
+          }
+          await TenantResourceApi(client).deleteResource(
+            resource: 'vehicle',
+            companyId: companyId,
+            rowId: c.id,
+          );
+        }
+      } else if (collectionID == chauffeurid) {
+        final existing = await driverServices.repository.getDriver(c.id);
+        if (existing != null) {
+          await driverServices.repository.deleteDriver(c.id);
+        } else {
+          final companyId = DatabaseGetter.activeCompanyId;
+          final client = DatabaseGetter.client;
+          if (companyId == null || client == null) {
+            throw StateError('Active authenticated company context is required.');
+          }
+          await TenantResourceApi(client).deleteResource(
+            resource: 'driver',
+            companyId: companyId,
+            rowId: c.id,
+          );
+        }
       } else {
         await DatabaseGetter.database!.deleteRow(
           databaseId: databaseId,
