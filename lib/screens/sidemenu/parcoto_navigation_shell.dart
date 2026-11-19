@@ -430,7 +430,10 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
           if (drawer) ...[
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-              child: CompanyWorkspaceSwitcher(compact: true),
+              child: CompanyWorkspaceSwitcher(
+                compact: true,
+                onCompanyChanged: onNavigate,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 12),
