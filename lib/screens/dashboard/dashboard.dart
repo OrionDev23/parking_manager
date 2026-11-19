@@ -256,12 +256,12 @@ class _DashboardState extends State<Dashboard>
         tone: const Color(0xFFA375F5),
       ),
       (
-        label: 'Coût des réparations',
+        label: 'Coût TTC des réparations',
         value: _hasLoaded
             ? _formatAmount(_snapshot.monthlyRepairCosts)
             : '—',
         detail: _snapshot.costsVerified
-            ? 'Réparations enregistrées ce mois'
+            ? 'Ordres enregistrés ce mois (tous statuts)'
             : 'Montant local, potentiellement partiel',
         icon: FluentIcons.money,
         tone: const Color(0xFFE6A23C),
