@@ -142,7 +142,7 @@ class RepairProvider extends ChangeNotifier {
       final value = await DatabaseGetter().listDocuments(prestataireId);
       if (!_isCurrentCompany(companyId, generation)) return;
       final refreshed = <String, Client>{};
-      for (final row in value.rows) {
+      for (final row in value) {
         final payload = _rowPayload(row);
         try {
           final item = Client.fromJson(payload); refreshed[item.id] = item;
