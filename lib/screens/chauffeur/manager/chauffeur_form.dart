@@ -576,9 +576,15 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                           context: context,
                           barrierDismissible: true,
                           builder: (context) {
+                            final dialogWidth =
+                                (MediaQuery.sizeOf(context).width - 32)
+                                    .clamp(320.0, 700.0);
+                            final dialogHeight =
+                                (MediaQuery.sizeOf(context).height - 80)
+                                    .clamp(320.0, 550.0);
                             return ContentDialog(
                               constraints: BoxConstraints.tight(
-                                Size(700.px, 550.px),
+                                Size(dialogWidth, dialogHeight),
                               ),
                               title: const Text('selectvehicle').tr(),
                               style: ContentDialogThemeData(
@@ -640,6 +646,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                         overflow: TextOverflow.ellipsis,
                       ),
                       trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Button(
                             child: const Text('voir').tr(),
