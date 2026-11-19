@@ -4,6 +4,8 @@ import 'package:appwrite/appwrite.dart';
 
 import '../../../core/backend/appwrite_backend.dart';
 import '../../../core/tenancy/company_context.dart';
+import '../../../core/tenancy/tenant_resource_api.dart';
+import '../../../providers/client_database.dart';
 import '../../../domain/entities/vehicle.dart';
 import 'remote_vehicle_source.dart';
 
@@ -261,12 +263,15 @@ class AppwriteVehicleSource implements RemoteVehicleSource {
   @override
   Future<Vehicle> createVehicle(Vehicle vehicle) async {
     _checkCompany(vehicle);
-    await backend.database.createRow(
-      databaseId: databaseId,
-      tableId: tableId,
+    final client = DatabaseGetter.client;
+    if (client == null) {
+      throw StateError('Appwrite session client is not initialized.');
+    }
+    await TenantResourceApi(client).createResource(
+      resource: 'vehicle',
+      companyId: companyContext.companyId,
       rowId: vehicle.id,
       data: _toRow(vehicle),
-      permissions: _rowPermissions(),
     );
     return vehicle;
   }
@@ -288,9 +293,13 @@ class AppwriteVehicleSource implements RemoteVehicleSource {
     final vehicle = await getVehicle(id);
     if (vehicle == null) return;
     _checkCompany(vehicle);
-    await backend.database.deleteRow(
-      databaseId: databaseId,
-      tableId: tableId,
+    final client = DatabaseGetter.client;
+    if (client == null) {
+      throw StateError('Appwrite session client is not initialized.');
+    }
+    await TenantResourceApi(client).deleteResource(
+      resource: 'vehicle',
+      companyId: companyContext.companyId,
       rowId: id,
     );
   }
