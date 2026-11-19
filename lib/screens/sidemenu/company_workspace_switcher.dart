@@ -169,7 +169,7 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
               child: ListView.separated(
                 shrinkWrap: true,
                 itemCount: memberships.length,
-                separatorBuilder: (_, __) => Container(
+                separatorBuilder: (_, _) => Container(
                   height: 1,
                   color: theme.borderColor,
                 ),
