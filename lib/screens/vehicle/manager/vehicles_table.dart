@@ -546,7 +546,7 @@ class VehicleTableState extends State<VehicleTable> {
                       ),
                     ),
                     SizedBox(
-                      width: 300,
+                      width: searchWidth,
                       height: 38,
                       child: ParcotoTextBox(
                         controller: searchController,
