@@ -60,10 +60,10 @@ class LogProvider extends ChangeNotifier {
       if (activities.isNotEmpty) notifyListeners();
       final database = DatabaseGetter.database;
       if (database == null) throw StateError('Appwrite database unavailable');
-      final result = await database.listRows(databaseId: databaseId, tableId: activityId, queries: [Query.limit(5000)]);
+      final result = await DatabaseGetter().listDocuments(activityId);
       if (!_isCurrentCompany(companyId, generation)) return;
       final refreshed = <String, Activity>{};
-      for (final row in result.rows) {
+      for (final row in result) {
         final payload = <String, dynamic>{...row.data, r'$id': row.$id, r'$createdAt': row.$createdAt, r'$updatedAt': row.$updatedAt};
         try {
           final item = Activity.fromJson(payload); refreshed[item.id] = item;
