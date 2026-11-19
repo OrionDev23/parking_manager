@@ -51,11 +51,6 @@ class DashboardMetricCard extends StatelessWidget {
                 child: Icon(icon, color: tone, size: 21),
               ),
               const Spacer(),
-              Icon(
-                FluentIcons.more,
-                size: 14,
-                color: appTheme.mutedTextColor.withValues(alpha: .7),
-              ),
             ],
           ),
           const SizedBox(height: 13),
@@ -208,6 +203,7 @@ class FleetActivityChart extends StatelessWidget {
             primaryXAxis: DateTimeAxis(
               dateFormat: DateFormat('dd MMM'),
               intervalType: DateTimeIntervalType.days,
+              interval: 5,
               majorGridLines: const MajorGridLines(width: 0),
               axisLine: AxisLine(color: theme.borderColor),
               labelStyle: TextStyle(
@@ -256,7 +252,7 @@ class FleetActivityChart extends StatelessWidget {
                 markerSettings: const MarkerSettings(isVisible: true, height: 6, width: 6),
               ),
               SplineSeries<DashboardActivityPoint, DateTime>(
-                name: 'Relevés kilométriques',
+                name: 'Kilométrage moyen relevé',
                 dataSource: usable,
                 xValueMapper: (point, _) => point.date,
                 yValueMapper: (point, _) => point.mileageThousands,
@@ -274,7 +270,7 @@ class FleetActivityChart extends StatelessWidget {
           runSpacing: 5,
           alignment: WrapAlignment.center,
           children: const [
-            _ChartLegend(color: Color(0xFFB16CF2), label: 'Kilométrage relevé'),
+            _ChartLegend(color: Color(0xFFB16CF2), label: 'Kilométrage moyen relevé'),
             _ChartLegend(color: Color(0xFF279BFA), label: 'Interventions'),
           ],
         ),
@@ -305,10 +301,9 @@ class FleetStateDonut extends StatelessWidget {
       );
     }
 
-    return Row(
-      children: [
-        SizedBox(
-          width: 170,
+    Widget donut(double size) => SizedBox(
+          width: size,
+          height: size,
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -324,7 +319,8 @@ class FleetStateDonut extends StatelessWidget {
                     radius: '92%',
                     cornerStyle: CornerStyle.bothCurve,
                     explode: false,
-                    dataLabelSettings: const DataLabelSettings(isVisible: false),
+                    dataLabelSettings:
+                        const DataLabelSettings(isVisible: false),
                   ),
                 ],
               ),
@@ -350,66 +346,101 @@ class FleetStateDonut extends StatelessWidget {
               ),
             ],
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: ListView.separated(
-            shrinkWrap: true,
-            itemCount: visible.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 10),
-            itemBuilder: (context, index) {
-              final segment = visible[index];
-              final percentage =
-                  total == 0 ? 0.0 : segment.value * 100 / total;
-              return Row(
-                children: [
-                  Container(
-                    width: 9,
-                    height: 9,
-                    decoration: BoxDecoration(
-                      color: segment.color,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      segment.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: theme.textColor,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    segment.value.toString(),
-                    style: TextStyle(
-                      color: theme.textColor,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 11,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  SizedBox(
-                    width: 43,
-                    child: Text(
-                      '${percentage.toStringAsFixed(1)}%',
-                      textAlign: TextAlign.end,
-                      style: TextStyle(
-                        color: theme.mutedTextColor,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
+        );
+
+    Widget legendRow(DashboardStatusSegment segment) {
+      final percentage = segment.value * 100 / total;
+      return Row(
+        children: [
+          Container(
+            width: 9,
+            height: 9,
+            decoration: BoxDecoration(
+              color: segment.color,
+              shape: BoxShape.circle,
+            ),
           ),
-        ),
-      ],
+          const SizedBox(width: 7),
+          Expanded(
+            child: Text(
+              segment.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: theme.textColor,
+                fontSize: 11,
+              ),
+            ),
+          ),
+          const SizedBox(width: 5),
+          Text(
+            segment.value.toString(),
+            style: TextStyle(
+              color: theme.textColor,
+              fontWeight: FontWeight.w700,
+              fontSize: 11,
+            ),
+          ),
+          const SizedBox(width: 7),
+          SizedBox(
+            width: 42,
+            child: Text(
+              '${percentage.toStringAsFixed(1)}%',
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                color: theme.mutedTextColor,
+                fontSize: 10,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 470) {
+          final itemWidth = (constraints.maxWidth - 10) / 2;
+          return Column(
+            children: [
+              SizedBox(
+                height: 142,
+                child: Center(child: donut(138)),
+              ),
+              const SizedBox(height: 5),
+              Wrap(
+                spacing: 10,
+                runSpacing: 9,
+                children: [
+                  for (final segment in visible)
+                    SizedBox(
+                      width: itemWidth,
+                      child: legendRow(segment),
+                    ),
+                ],
+              ),
+            ],
+          );
+        }
+
+        return Row(
+          children: [
+            donut(160),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: visible.length,
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 10),
+                itemBuilder: (context, index) =>
+                    legendRow(visible[index]),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
