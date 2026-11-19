@@ -114,7 +114,10 @@ class VehicleProvider extends ChangeNotifier {
     required String companyId,
     required int generation,
   }) async {
-    final result = await DatabaseGetter().listDocuments(vehiculeid);
+    final result = await DatabaseGetter().listDocuments(
+      vehiculeid,
+      maxResults: DatabaseGetter.limits['vehicles'] ?? 500,
+    );
     if (!_isCurrentCompany(companyId, generation)) return;
     for (final row in result) {
       if (!_isCurrentCompany(companyId, generation)) return;
