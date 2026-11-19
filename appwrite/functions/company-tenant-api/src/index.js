@@ -231,7 +231,11 @@ function tenantRowPermissions(teamId) {
   ];
 }
 
-async function requireQuotaWriterContext(userId, companyId) {
+async function requireQuotaWriterContext(
+  userId,
+  companyId,
+  { allowExpiredLicense = false } = {},
+) {
   const membership = await activeMembership(userId, companyId);
   let platformExploration = false;
   if (isPlatformSuperAdmin(userId)) {
@@ -254,10 +258,16 @@ async function requireQuotaWriterContext(userId, companyId) {
   }
 
   const entitlement = await getEntitlement(companyId);
-  if (!isEntitlementActive(entitlement)) {
+  if (!allowExpiredLicense && !isEntitlementActive(entitlement)) {
     throw Object.assign(
       new Error('The company license is missing, not yet active, or expired.'),
       { status: 403 },
+    );
+  }
+  if (allowExpiredLicense && !entitlement) {
+    throw Object.assign(
+      new Error('Company entitlement is not configured.'),
+      { status: 409 },
     );
   }
 
@@ -403,14 +413,18 @@ async function deleteQuotaResource(userId, input) {
   const resource = QUOTA_RESOURCES[resourceKey];
   const companyId = String(input.companyId || '').trim();
   const rowId = String(input.rowId || '').trim();
-  if (!resource || !companyId || !rowId) {
+  if (!resource || !companyId || !/^[A-Za-z0-9][A-Za-z0-9._-]{0,35}$/.test(rowId)) {
     throw Object.assign(
-      new Error('A valid resource, companyId and rowId are required.'),
+      new Error('A valid resource, companyId and Appwrite rowId are required.'),
       { status: 400 },
     );
   }
 
-  const { entitlement } = await requireQuotaWriterContext(userId, companyId);
+  const { entitlement } = await requireQuotaWriterContext(
+    userId,
+    companyId,
+    { allowExpiredLicense: true },
+  );
   const existing = await readQuotaResourceRow(resource, rowId);
   if (!existing) return { deleted: false, rowId, resource: resourceKey };
   if (existing.data?.companyId !== companyId) {
@@ -521,16 +535,16 @@ async function prepareCompanyRows(companyId, teamId) {
         ]
       : []),
   ];
-  const createPermissions = QUOTA_RESOURCE_TABLE_IDS.has(tableId)
-    ? []
-    : [
-        `create("team:${teamId}/admin")`,
-        `create("team:${teamId}/manager")`,
-      ];
   const result = [];
   let totalUpdated = 0;
 
   for (const tableId of tableIds) {
+    const createPermissions = QUOTA_RESOURCE_TABLE_IDS.has(tableId)
+      ? []
+      : [
+          `create("team:${teamId}/admin")`,
+          `create("team:${teamId}/manager")`,
+        ];
     const table = await appwrite(
       `/tablesdb/${DATABASE_ID}/tables/${encodeURIComponent(tableId)}`
     );
