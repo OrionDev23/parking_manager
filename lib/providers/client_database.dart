@@ -5,6 +5,7 @@ import 'package:parc_oto/serializables/activity.dart';
 import 'package:encrypt/encrypt.dart' as en;
 
 import '../admin_parameters.dart';
+import '../core/tenancy/tenant_resource_api.dart';
 import '../screens/entreprise/entreprise.dart';
 import '../serializables/entreprise.dart';
 import '../serializables/parc_user.dart';
@@ -600,6 +601,27 @@ class DatabaseGetter {
     required String documentId,
     required Map<String, dynamic> data,
   }) async {
+    // Vehicle and driver writes consume licensed quota. Route all legacy
+    // imports, restore jobs and direct addDocument callers through the same
+    // server transaction as the modern repository sources.
+    if (collectionId == vehiculeid || collectionId == chauffeurid) {
+      final companyId = _activeCompanyId;
+      final activeClient = client;
+      if (companyId == null) {
+        throw StateError('No active company context is selected.');
+      }
+      if (activeClient == null) {
+        throw StateError('Appwrite client is not initialized.');
+      }
+      await TenantResourceApi(activeClient).createResource(
+        resource: collectionId == vehiculeid ? 'vehicle' : 'driver',
+        companyId: companyId,
+        rowId: documentId,
+        data: data,
+      );
+      return;
+    }
+
     final tenantScoped = _isTenantScoped(collectionId);
     final rowData = tenantScoped
         ? {...data, 'companyId': _activeCompanyId}
