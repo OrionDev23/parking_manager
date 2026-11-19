@@ -527,13 +527,21 @@ class _PlatformCompanyPickerDialogState
   Widget build(BuildContext context) {
     final theme = context.watch<AppTheme>();
     final companies = _visibleCompanies;
+    final screenSize = MediaQuery.sizeOf(context);
+    final contentWidth =
+        (screenSize.width - 48).clamp(260.0, 460.0).toDouble();
+    final contentHeight =
+        (screenSize.height - 180).clamp(220.0, 480.0).toDouble();
 
     return ContentDialog(
       title: const Text('Changer d’entreprise'),
-      constraints: const BoxConstraints(maxWidth: 520, maxHeight: 620),
+      constraints: BoxConstraints(
+        maxWidth: contentWidth + 40,
+        maxHeight: contentHeight + 120,
+      ),
       content: SizedBox(
-        width: 460,
-        height: 480,
+        width: contentWidth,
+        height: contentHeight,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
