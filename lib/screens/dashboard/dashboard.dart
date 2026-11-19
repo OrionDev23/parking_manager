@@ -35,7 +35,7 @@ class _DashboardState extends State<Dashboard>
   late final RepairProvider _repairs;
 
   DashboardSnapshot _snapshot = const DashboardSnapshot();
-  bool _refreshing = true;
+  bool _refreshing = false;
   bool _hasLoaded = false;
   bool _reloadScheduled = false;
   String? _loadMessage;
@@ -85,7 +85,6 @@ class _DashboardState extends State<Dashboard>
       _snapshot = const DashboardSnapshot();
       _hasLoaded = false;
       _loadMessage = null;
-      _refreshing = true;
       _reloadScheduled = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _reloadScheduled = false;
@@ -509,7 +508,7 @@ class _DashboardState extends State<Dashboard>
       '${NumberFormat('#,##0', 'fr').format(value)} DA';
 
   Future<void> _refreshDashboard() async {
-    if (_refreshing && _hasLoaded) return;
+    if (_refreshing) return;
 
     final companyId = DatabaseGetter.activeCompanyId;
     setState(() {
