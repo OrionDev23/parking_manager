@@ -35,9 +35,9 @@ class EntretienWidgetState extends State<EntretienWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(child: children[0]),
-              const SizedBox(width: spacing),
+              SizedBox(width: spacing),
               Expanded(child: children[1]),
-              const SizedBox(width: spacing),
+              SizedBox(width: spacing),
               Expanded(child: children[2]),
             ],
           );
