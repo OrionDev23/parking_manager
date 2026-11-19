@@ -551,7 +551,7 @@ class UpcomingInterventions extends StatelessWidget {
     if (items.isEmpty) {
       return const _DashboardEmptyState(
         icon: FluentIcons.event,
-        message: 'Aucune réservation ou intervention planifiée à venir.',
+        message: 'Aucun événement planifié à venir.',
       );
     }
 
@@ -605,7 +605,7 @@ class UpcomingInterventions extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
-            Icon(FluentIcons.car, color: theme.mutedTextColor, size: 16),
+            Icon(FluentIcons.event, color: theme.mutedTextColor, size: 16),
             const SizedBox(width: 9),
             Expanded(
               child: Column(
