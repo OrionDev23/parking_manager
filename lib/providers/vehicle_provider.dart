@@ -114,13 +114,9 @@ class VehicleProvider extends ChangeNotifier {
     required String companyId,
     required int generation,
   }) async {
-    final result = await DatabaseGetter.database!.listRows(
-      databaseId: databaseId,
-      tableId: vehiculeid,
-      queries: [Query.limit(DatabaseGetter.limits['vehicles'] ?? 500)],
-    );
+    final result = await DatabaseGetter().listDocuments(vehiculeid);
     if (!_isCurrentCompany(companyId, generation)) return;
-    for (final row in result.rows) {
+    for (final row in result) {
       if (!_isCurrentCompany(companyId, generation)) return;
       final legacy = row.convertTo((data) => Vehicle.fromJson(data));
       final domainVehicle = VehicleMapper.toDomain(legacy, companyId: companyId);
@@ -135,13 +131,13 @@ class VehicleProvider extends ChangeNotifier {
     downloadingDocuments = true;
     documentsVehicules.clear();
     try {
-      final value = await DatabaseGetter.database!.listRows(
-        databaseId: databaseId, tableId: vehicDoc, queries: [Query.limit(5000)],
-      );
+      final value = await DatabaseGetter().listDocuments(vehicDoc);
       if (!_isCurrentCompany(companyId, generation)) return;
       final refreshed = <String, DocumentVehicle>{};
-      for (final row in value.rows) {
-        refreshed[row.$id] = row.convertTo((data) => DocumentVehicle.fromJson(data));
+      for (final row in value) {
+        refreshed[row.$id] = row.convertTo(
+          (data) => DocumentVehicle.fromJson(data),
+        );
       }
       documentsVehicules..clear()..addAll(refreshed);
       downloadedDocuments = true;
@@ -165,12 +161,10 @@ class VehicleProvider extends ChangeNotifier {
     downloadingStates = true;
     etats.clear();
     try {
-      final value = await DatabaseGetter.database!.listRows(
-        databaseId: databaseId, tableId: etatId, queries: [Query.limit(5000)],
-      );
+      final value = await DatabaseGetter().listDocuments(etatId);
       if (!_isCurrentCompany(companyId, generation)) return;
       final refreshed = <String, Etat>{};
-      for (final row in value.rows) {
+      for (final row in value) {
         refreshed[row.$id] = row.convertTo((data) => Etat.fromJson(data));
       }
       etats..clear()..addAll(refreshed);
