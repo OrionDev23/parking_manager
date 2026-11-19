@@ -373,7 +373,7 @@ class PanesListState extends State<PanesList>
       (key: 'repairs', label: 'Maintenance', icon: FluentIcons.repair),
       (key: 'planner', label: 'Planning', icon: FluentIcons.event),
       (key: 'workshop-stock', label: 'Stock', icon: FluentIcons.database),
-      (key: 'workshop-parts', label: 'Pièces', icon: FluentIcons.product),
+      (key: 'workshop-parts', label: 'Pièces', icon: FluentIcons.repair),
       (key: 'events', label: 'Journal', icon: FluentIcons.database_activity),
       (key: 'company', label: 'Mon entreprise', icon: FluentIcons.company_directory),
       (key: 'user-access-management', label: 'Utilisateurs & accès', icon: FluentIcons.people),
