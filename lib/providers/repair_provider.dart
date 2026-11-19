@@ -99,10 +99,10 @@ class RepairProvider extends ChangeNotifier {
       if (reparations.isNotEmpty) notifyListeners();
       final database = DatabaseGetter.database;
       if (database == null) throw StateError('Appwrite database unavailable');
-      final value = await database.listRows(databaseId: databaseId, tableId: reparationId, queries: [Query.limit(5000)]);
+      final value = await DatabaseGetter().listDocuments(reparationId);
       if (!_isCurrentCompany(companyId, generation)) return;
       final refreshed = <String, Reparation>{};
-      for (final row in value.rows) {
+      for (final row in value) {
         final payload = _rowPayload(row);
         try {
           final item = Reparation.fromJson(payload); refreshed[item.id] = item;
@@ -139,7 +139,7 @@ class RepairProvider extends ChangeNotifier {
       if (prestataires.isNotEmpty) notifyListeners();
       final database = DatabaseGetter.database;
       if (database == null) throw StateError('Appwrite database unavailable');
-      final value = await database.listRows(databaseId: databaseId, tableId: prestataireId, queries: [Query.limit(5000)]);
+      final value = await DatabaseGetter().listDocuments(prestataireId);
       if (!_isCurrentCompany(companyId, generation)) return;
       final refreshed = <String, Client>{};
       for (final row in value.rows) {
