@@ -553,9 +553,6 @@ class ReparationFormState extends State<ReparationForm>
                         );
                       },
                     ),
-                        ],
-                      ),
-                    ),
                   smallSpace,
                   const BigTitleForm(
                     bigTitle: 'travaileffect',
