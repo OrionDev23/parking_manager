@@ -231,8 +231,9 @@ class PanesListState extends State<PanesList>
                                   fit: BoxFit.contain,
                                 ),
                                 const Spacer(),
-                                const GlobalSearchLauncher(compact: true),
-                              ] else ...[
+                                if (value)
+                                  const GlobalSearchLauncher(compact: true),
+                              ] else if (value) ...[
                                 const SizedBox(
                                   width: 230,
                                   child: CompanyWorkspaceSwitcher(),
@@ -241,8 +242,16 @@ class PanesListState extends State<PanesList>
                                 const Expanded(
                                   child: GlobalSearchLauncher(),
                                 ),
+                              ] else ...[
+                                Image.asset(
+                                  'assets/images/logo.webp',
+                                  width: 112,
+                                  height: 38,
+                                  fit: BoxFit.contain,
+                                ),
+                                const Spacer(),
                               ],
-                              if (!compact && signedIn.value) ...[
+                              if (!compact && value) ...[
                                 const SizedBox(width: 8),
                                 Tooltip(
                                   message: 'Aide',
