@@ -19,6 +19,7 @@ class RepairProvider extends ChangeNotifier {
     reparations.clear();
     prestataires.clear();
     repPerVeh.clear();
+    receptionSheetsVerified = false;
     downloadedReparations = false;
     downloadingReparations = false;
     downloadedPrestataires = false;
@@ -64,6 +65,7 @@ class RepairProvider extends ChangeNotifier {
   }
 
   static Map<String, List<FicheReception>> repPerVeh = {};
+  static bool receptionSheetsVerified = false;
 
   List<Map<String, dynamic>> _readCached(String entity) {
     return vehicleServices.localDatabase.readLegacyCache(
@@ -188,6 +190,7 @@ class RepairProvider extends ChangeNotifier {
     final generation = _cacheGeneration;
     final database = DatabaseGetter.database;
     repPerVeh = {};
+    receptionSheetsVerified = false;
 
     // The local cache is partitioned by tenant, and the remote query is
     // explicitly tenant-filtered. Never fall back to an unscoped table scan.
@@ -262,6 +265,7 @@ class RepairProvider extends ChangeNotifier {
 
       if (_isCurrentCompany(companyId, generation)) {
         repPerVeh = refreshed;
+        receptionSheetsVerified = true;
       }
     } catch (error) {
       debugPrint(
