@@ -253,7 +253,7 @@ class FleetActivityChart extends StatelessWidget {
               ),
               SplineSeries<DashboardActivityPoint, DateTime>(
                 name: 'Kilométrage moyen relevé',
-                dataSource: usable,
+                dataSource: points,
                 xValueMapper: (point, _) => point.date,
                 yValueMapper: (point, _) => point.mileageThousands,
                 yAxisName: 'mileageAxis',
