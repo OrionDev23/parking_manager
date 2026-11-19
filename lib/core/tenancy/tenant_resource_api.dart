@@ -14,7 +14,9 @@ class TenantResourceException implements Exception {
     required this.message,
   });
 
-  bool get isPermanent => statusCode >= 400 && statusCode < 500;
+  bool get isPermanent =>
+      statusCode >= 400 && statusCode < 500 &&
+      statusCode != 401 && statusCode != 429;
 
   @override
   String toString() => message;
