@@ -331,6 +331,12 @@ class LegacyAppwriteAuthService implements AuthService {
     if (DatabaseGetter.user == null || DatabaseGetter.me.value == null) {
       throw StateError('Aucune session Appwrite authentifiée.');
     }
+
+    // Stop the previous tenant's background sync before switching the active
+    // company context. The new tenant runtime is started by the caller after
+    // this method has committed the selected membership.
+    await onSessionEnding?.call();
+
     final membership = await membershipResolver.select(selector: companyId);
     await preferences.setString('active_company_id', membership.companyId);
     await preferences.setString('project', membership.companyId);
