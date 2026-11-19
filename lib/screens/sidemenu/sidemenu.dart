@@ -67,6 +67,13 @@ class PanesListState extends State<PanesList>
     getProfil();
     _authStateSubscription = authService.stateStream.listen((_) {
       if (!mounted) return;
+      // Appwrite session state is the source of truth. Keep navigation and
+      // the company switcher synchronized even when a session expires or is
+      // ended outside the explicit logout screen.
+      final hasSession = authService.session != null;
+      if (signedIn.value != hasSession) {
+        signedIn.value = hasSession;
+      }
       widget.paneList.initPanes();
       setState(() {});
       index.value = 0;
