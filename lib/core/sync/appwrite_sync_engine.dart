@@ -4,6 +4,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:flutter/foundation.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
+import '../tenancy/tenant_resource_api.dart';
 import 'sync_engine.dart';
 import 'sync_operation.dart';
 import 'sync_queue.dart';
@@ -206,6 +207,19 @@ class AppwriteSyncEngine implements SyncEngine {
           debugPrint(
             '[ParcOto Sync] SUCCESS ${operation.entity} ${operation.type.name} id=${operation.entityId}',
           );
+        } on TenantResourceException catch (error, stackTrace) {
+          debugPrint(
+            '[ParcOto Sync] TENANT API ERROR entity=${operation.entity} op=${operation.type.name} id=${operation.entityId} status=${error.statusCode} code=${error.code} message=${error.message}\n$stackTrace',
+          );
+          if (error.isPermanent) {
+            await queue.markConflict(
+              operation.id,
+              reason: 'Quota / tenant API rejection (${error.statusCode}, ${error.code}): ${error.message}',
+            );
+          } else {
+            await queue.markFailed(operation.id);
+          }
+          blockedRecords.add(recordKey);
         } on AppwriteException catch (error, stackTrace) {
           debugPrint(
             '[ParcOto Sync] APPWRITE ERROR entity=${operation.entity} op=${operation.type.name} id=${operation.entityId} code=${error.code} type=${error.type} message=${error.message}\n$stackTrace',
