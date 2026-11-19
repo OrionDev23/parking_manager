@@ -13,8 +13,13 @@ class CompanyWorkspaceSwitcher extends StatefulWidget {
   static final Map<String, String> companyNamesById = {};
 
   final bool compact;
+  final VoidCallback? onCompanyChanged;
 
-  const CompanyWorkspaceSwitcher({super.key, this.compact = false});
+  const CompanyWorkspaceSwitcher({
+    super.key,
+    this.compact = false,
+    this.onCompanyChanged,
+  });
 
   @override
   State<CompanyWorkspaceSwitcher> createState() =>
@@ -84,6 +89,7 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
     if (session.isPlatformSuperAdmin &&
         !session.isPlatformCompanyContext) {
       PaneItemsAndFooters.selectPane('platform-companies');
+      widget.onCompanyChanged?.call();
       return;
     }
 
@@ -239,6 +245,7 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
       if (!mounted) return;
 
       PaneItemsAndFooters.selectPane('dashboard');
+      widget.onCompanyChanged?.call();
       setState(() {});
       _showNotice('Espace « ${membership.companyName} » activé.');
     } catch (error) {
