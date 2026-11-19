@@ -369,9 +369,9 @@ async function createQuotaResource(userId, input) {
         method: 'PATCH',
         body: {
           value: 1,
-          // Appwrite checks the current value atomically. max = quota - 1
-          // allows the final licensed slot, then rejects the next increment.
-          max: maximum - 1,
+          // Appwrite validates the resulting value atomically, so the
+          // final permitted create can bring usage exactly up to the quota.
+          max: maximum,
           transactionId,
         },
       },
@@ -450,7 +450,7 @@ async function deleteQuotaResource(userId, input) {
       `/tablesdb/${DATABASE_ID}/tables/${ENTITLEMENTS}/rows/${encodeURIComponent(companyId)}/${resource.usedColumn}/decrement`,
       {
         method: 'PATCH',
-        body: { value: 1, min: 1, transactionId },
+        body: { value: 1, min: 0, transactionId },
       },
     );
     await appwrite(
