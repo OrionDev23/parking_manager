@@ -265,7 +265,8 @@ class ReparationFormState extends State<ReparationForm>
   Widget build(BuildContext context) {
     super.build(context);
     var appTheme = context.watch<AppTheme>();
-    final compact = MediaQuery.sizeOf(context).width < 760;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final compact = screenWidth < 760;
     return ScaffoldPage(
       content: Container(
         padding: const EdgeInsets.all(10),
@@ -280,11 +281,13 @@ class ReparationFormState extends State<ReparationForm>
                   vertical: compact ? 8 : 12,
                 ),
                 children: [
-                  Row(
+                  Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    runSpacing: 12,
                     children: [
                       if (MyEntrepriseState.p != null)
                         const EntreprisePlacement(),
-                      const Spacer(),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
@@ -344,8 +347,10 @@ class ReparationFormState extends State<ReparationForm>
                       ),
                     ],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  Wrap(
+                    alignment: WrapAlignment.end,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
                     children: [
                       Text('date', style: boldStyle).tr(),
                       smallSpace,
@@ -366,10 +371,12 @@ class ReparationFormState extends State<ReparationForm>
                     ],
                   ),
                   smallSpace,
-                  Row(
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
-                      Expanded(
-                        flex: 7,
+                      SizedBox(
+                        width: compact ? screenWidth - 56 : (screenWidth - 80) * 0.58,
                         child: SizedBox(
                           height: 50.px,
                           child: ListTile(
@@ -421,7 +428,6 @@ class ReparationFormState extends State<ReparationForm>
                           ),
                         ),
                       ),
-                      smallSpace,
                       if (selectedVehicle != null)
                         IconButton(
                           icon: const Icon(FluentIcons.cancel),
@@ -430,8 +436,8 @@ class ReparationFormState extends State<ReparationForm>
                             setVehicleValues();
                           },
                         ),
-                      Expanded(
-                        flex: 5,
+                      SizedBox(
+                        width: compact ? screenWidth - 56 : (screenWidth - 80) * 0.38,
                         child: SizedBox(
                           height: 50.px,
                           child: ListTile(
