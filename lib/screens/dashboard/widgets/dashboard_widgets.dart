@@ -178,12 +178,10 @@ class FleetActivityChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = context.watch<AppTheme>();
-    final usable = points
-        .where((point) =>
-            point.interventions > 0 || point.mileageThousands > 0)
-        .toList(growable: false);
+    final hasActivity = points.any((point) =>
+        point.interventions > 0 || point.mileageThousands > 0);
 
-    if (usable.isEmpty) {
+    if (!hasActivity) {
       return _DashboardEmptyState(
         icon: FluentIcons.chart,
         message: 'Aucun relevé kilométrique ou ordre de réparation sur cette période.',
@@ -246,7 +244,7 @@ class FleetActivityChart extends StatelessWidget {
             series: <CartesianSeries<DashboardActivityPoint, DateTime>>[
               SplineSeries<DashboardActivityPoint, DateTime>(
                 name: 'Interventions',
-                dataSource: usable,
+                dataSource: points,
                 xValueMapper: (point, _) => point.date,
                 yValueMapper: (point, _) => point.interventions,
                 color: const Color(0xFF279BFA),
@@ -569,12 +567,19 @@ class UpcomingInterventions extends StatelessWidget {
         final item = items[index];
         final date = item.startTime.toLocal();
         final now = DateTime.now();
+        final inProgress =
+            !item.startTime.isAfter(now) && item.endTime.isAfter(now);
         final today = date.year == now.year &&
             date.month == now.month &&
             date.day == now.day;
-        final dateLabel = today
-            ? 'Aujourd’hui'
-            : DateFormat('dd MMM', 'fr').format(date);
+        final dateLabel = inProgress
+            ? 'En cours'
+            : today
+                ? 'Aujourd’hui'
+                : DateFormat('dd MMM', 'fr').format(date);
+        final timeLabel = inProgress
+            ? 'Jusqu’à ${DateFormat('HH:mm').format(item.endTime.toLocal())}'
+            : DateFormat('HH:mm').format(date);
         final detail = [
           if (item.location?.trim().isNotEmpty ?? false) item.location!,
           if (item.notes?.trim().isNotEmpty ?? false) item.notes!,
@@ -618,8 +623,8 @@ class UpcomingInterventions extends StatelessWidget {
                   ),
                   Text(
                     detail.isEmpty
-                        ? DateFormat('HH:mm').format(date)
-                        : '${DateFormat('HH:mm').format(date)} • $detail',
+                        ? timeLabel
+                        : '$timeLabel • $detail',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
