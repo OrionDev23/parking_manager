@@ -551,7 +551,6 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                   _expanded.add(key);
                 }
               });
-              onNavigate?.call();
             },
           ),
         );
