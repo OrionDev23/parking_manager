@@ -386,6 +386,8 @@ class PaneItemsAndFooters {
         originalItems = [
           PaneItemHeader(header: const Text('ADMINISTRATION CENTRALE')),
           platformCompanies,
+          PaneItemHeader(header: const Text('ORGANISATION')),
+          parametres,
         ];
       } else {
         originalItems = [
