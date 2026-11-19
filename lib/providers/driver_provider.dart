@@ -5,7 +5,6 @@ import '../serializables/conducteur/disponibilite_chauffeur.dart';
 import '../serializables/conducteur/document_chauffeur.dart';
 import '../serializables/conducteur/conducteur.dart';
 import '../domain/entities/driver.dart';
-import '../utilities/profil_beautifier.dart';
 import 'client_database.dart';
 
 class DriverProvider extends ChangeNotifier {
