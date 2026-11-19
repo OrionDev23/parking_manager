@@ -183,16 +183,21 @@ class RepairProvider extends ChangeNotifier {
 
   static Future<Map<String, List<FicheReception>>>
   downloadFicheReparations() async {
-    repPerVeh = {};
+    _ensureCompanyCache();
+    final companyId = vehicleServices.companyId;
+    final generation = _cacheGeneration;
     final database = DatabaseGetter.database;
+    repPerVeh = {};
 
-    // Local cache provides an offline fallback and is refreshed when online.
+    // The local cache is partitioned by tenant, and the remote query is
+    // explicitly tenant-filtered. Never fall back to an unscoped table scan.
     try {
       final cached = vehicleServices.localDatabase.readLegacyCache(
-        companyId: vehicleServices.companyId,
+        companyId: companyId,
         entity: 'reception_sheet',
       );
       for (final payload in cached) {
+        if (!_isCurrentCompany(companyId, generation)) return repPerVeh;
         try {
           final fiche = FicheReception.fromJson(payload);
           final key = fiche.vehiculemat ?? fiche.vehicule ?? 'nonind';
@@ -208,38 +213,59 @@ class RepairProvider extends ChangeNotifier {
     }
 
     if (database == null) return repPerVeh;
+
     try {
-      final value = await database.listRows(
-        databaseId: databaseId,
-        tableId: fichesreceptionId,
-        queries: [Query.limit(5000)],
-      );
+      const pageSize = 5000;
+      var offset = 0;
+      var total = 0;
       final refreshed = <String, List<FicheReception>>{};
-      for (final row in value.rows) {
-        final payload = <String, dynamic>{
-          ...row.data,
-          r'$id': row.$id,
-          r'$createdAt': row.$createdAt,
-          r'$updatedAt': row.$updatedAt,
-        };
-        try {
-          final fiche = FicheReception.fromJson(payload);
-          final key = fiche.vehiculemat ?? fiche.vehicule ?? 'nonind';
-          refreshed.putIfAbsent(key, () => <FicheReception>[]).add(fiche);
-          vehicleServices.localDatabase.cacheLegacyRow(
-            companyId: vehicleServices.companyId,
-            entity: 'reception_sheet',
-            entityId: row.$id,
-            payload: payload,
-          );
-        } catch (error) {
-          debugPrint('[ParcOto Reception] remote row ignored: $error');
+
+      do {
+        final page = await database.listRows(
+          databaseId: databaseId,
+          tableId: fichesreceptionId,
+          queries: [
+            Query.equal('companyId', companyId),
+            Query.limit(pageSize),
+            Query.offset(offset),
+          ],
+        );
+        if (!_isCurrentCompany(companyId, generation)) return repPerVeh;
+
+        total = page.total;
+        for (final row in page.rows) {
+          if (!_isCurrentCompany(companyId, generation)) return repPerVeh;
+          final payload = <String, dynamic>{
+            ...row.data,
+            r'$id': row.$id,
+            r'$createdAt': row.$createdAt,
+            r'$updatedAt': row.$updatedAt,
+          };
+          try {
+            final fiche = FicheReception.fromJson(payload);
+            final key = fiche.vehiculemat ?? fiche.vehicule ?? 'nonind';
+            refreshed.putIfAbsent(key, () => <FicheReception>[]).add(fiche);
+            vehicleServices.localDatabase.cacheLegacyRow(
+              companyId: companyId,
+              entity: 'reception_sheet',
+              entityId: row.$id,
+              payload: payload,
+            );
+          } catch (error) {
+            debugPrint('[ParcOto Reception] remote row ignored: $error');
+          }
         }
+
+        if (page.rows.isEmpty) break;
+        offset += page.rows.length;
+      } while (offset < total);
+
+      if (_isCurrentCompany(companyId, generation)) {
+        repPerVeh = refreshed;
       }
-      repPerVeh = refreshed;
     } catch (error) {
       debugPrint(
-        '[ParcOto Reception] remote refresh failed; using cache: $error',
+        '[ParcOto Reception] remote refresh failed; using tenant cache: $error',
       );
     }
     return repPerVeh;
