@@ -114,13 +114,13 @@ class DriverProvider extends ChangeNotifier {
     downloadingDocuments = true;
     documentConducteurs.clear();
     try {
-      final value = await DatabaseGetter.database!.listRows(
-        databaseId: databaseId, tableId: chaufDoc, queries: [Query.limit(5000)],
-      );
+      final value = await DatabaseGetter().listDocuments(chaufDoc);
       if (!_isCurrentCompany(companyId, generation)) return;
       final refreshed = <String, DocumentChauffeur>{};
-      for (final row in value.rows) {
-        refreshed[row.$id] = row.convertTo((data) => DocumentChauffeur.fromJson(data));
+      for (final row in value) {
+        refreshed[row.$id] = row.convertTo(
+          (data) => DocumentChauffeur.fromJson(data),
+        );
       }
       documentConducteurs..clear()..addAll(refreshed);
       downloadedDocuments = true;
@@ -144,13 +144,13 @@ class DriverProvider extends ChangeNotifier {
     downloadingDisp = true;
     disponibiliteConducteurs.clear();
     try {
-      final value = await DatabaseGetter.database!.listRows(
-        databaseId: databaseId, tableId: chaufDispID, queries: [Query.limit(5000)],
-      );
+      final value = await DatabaseGetter().listDocuments(chaufDispID);
       if (!_isCurrentCompany(companyId, generation)) return;
       final refreshed = <String, DisponibiliteChauffeur>{};
-      for (final row in value.rows) {
-        refreshed[row.$id] = row.convertTo((data) => DisponibiliteChauffeur.fromJson(data));
+      for (final row in value) {
+        refreshed[row.$id] = row.convertTo(
+          (data) => DisponibiliteChauffeur.fromJson(data),
+        );
       }
       disponibiliteConducteurs..clear()..addAll(refreshed);
       downloadedDisp = true;
