@@ -10,7 +10,9 @@ import '../vehicle/manager/vehicles_table.dart';
 import '../chauffeur/manager/chauffeur_table.dart';
 
 class GlobalSearchLauncher extends StatefulWidget {
-  const GlobalSearchLauncher({super.key});
+  final bool compact;
+
+  const GlobalSearchLauncher({super.key, this.compact = false});
 
   @override
   State<GlobalSearchLauncher> createState() => _GlobalSearchLauncherState();
@@ -36,18 +38,26 @@ class _GlobalSearchLauncherState extends State<GlobalSearchLauncher> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.compact) {
+      return Tooltip(
+        message: 'Recherche globale',
+        child: IconButton(
+          icon: const Icon(FluentIcons.search, size: 19),
+          onPressed: _submitSearch,
+        ),
+      );
+    }
+
     return Padding(
-      // NavigationPane allocates a short header slot. Keep the command field
-      // within that slot so the first destination never gets overlapped.
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       child: SizedBox(
-        height: 36,
+        height: 38,
         child: TextBox(
           controller: _controller,
-          placeholder: 'Rechercher un module ou une donnée…',
+          placeholder: 'Rechercher un module, un véhicule, un conducteur…',
           onSubmitted: (_) => _submitSearch(),
           prefix: const Padding(
-            padding: EdgeInsets.only(left: 9),
+            padding: EdgeInsets.only(left: 10),
             child: Icon(FluentIcons.search, size: 15),
           ),
           suffix: IconButton(
@@ -197,11 +207,15 @@ class _GlobalSearchDialogState extends State<_GlobalSearchDialog> {
         .take(6)
         .toList(growable: false);
 
+    final viewport = MediaQuery.sizeOf(context);
+    final dialogWidth = (viewport.width - 40).clamp(280.0, 620.0).toDouble();
+    final dialogHeight = (viewport.height - 100).clamp(300.0, 680.0).toDouble();
+
     return ContentDialog(
-      constraints: const BoxConstraints(maxWidth: 680, maxHeight: 720),
+      constraints: BoxConstraints(maxWidth: dialogWidth, maxHeight: dialogHeight),
       title: const Text('Recherche globale'),
       content: SizedBox(
-        width: 620,
+        width: dialogWidth,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
