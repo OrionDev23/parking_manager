@@ -644,7 +644,7 @@ class VehiclesWatchlist extends StatelessWidget {
   Widget build(BuildContext context) {
     if (alerts.isEmpty) {
       return const _DashboardEmptyState(
-        icon: FluentIcons.shield,
+        icon: FluentIcons.health,
         message: 'Aucun véhicule ne nécessite de suivi immédiat.',
       );
     }
