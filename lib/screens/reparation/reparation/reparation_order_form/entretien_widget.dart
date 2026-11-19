@@ -16,18 +16,39 @@ class EntretienWidget extends StatefulWidget {
 class EntretienWidgetState extends State<EntretienWidget> {
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        bigSpace,
-        bigSpace,
-        firstColumn(),
-        smallSpace,
-        secondColumn(),
-        smallSpace,
-        thirdColumn(),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final columns = width >= 900 ? 3 : width >= 560 ? 2 : 1;
+        final spacing = 12.0;
+        final columnWidth = columns == 1
+            ? width
+            : (width - spacing * (columns - 1)) / columns;
+        final children = [
+          SizedBox(width: columnWidth, child: firstColumn()),
+          SizedBox(width: columnWidth, child: secondColumn()),
+          SizedBox(width: columnWidth, child: thirdColumn()),
+        ];
+
+        if (columns == 3) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: children[0]),
+              const SizedBox(width: spacing),
+              Expanded(child: children[1]),
+              const SizedBox(width: spacing),
+              Expanded(child: children[2]),
+            ],
+          );
+        }
+
+        return Wrap(
+          spacing: spacing,
+          runSpacing: 12,
+          children: children,
+        );
+      },
     );
   }
 
