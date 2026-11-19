@@ -536,6 +536,16 @@ class _DashboardState extends State<Dashboard>
 
     await _waitForProviderLoads();
 
+    if (!VehicleProvider.downloadedVehicles ||
+        !DriverProvider.downloadedConducteurs ||
+        !PlanningProvider.downloadedPlanning ||
+        !LogProvider.downloadedActivities ||
+        !RepairProvider.downloadedReparations ||
+        !VehicleProvider.downloadedDocuments) {
+      _loadMessage ??=
+          'Certaines données du tableau de bord ne sont pas synchronisées.';
+    }
+
     final now = DateTime.now();
     final historyStart = now.subtract(const Duration(days: 180));
 
@@ -558,6 +568,10 @@ class _DashboardState extends State<Dashboard>
     try {
       await RepairProvider.downloadFicheReparations()
           .timeout(const Duration(seconds: 25));
+      if (!RepairProvider.receptionSheetsVerified) {
+        _loadMessage ??=
+            'Les relevés kilométriques affichés proviennent du cache local et peuvent être partiels.';
+      }
     } catch (error) {
       _loadMessage ??= 'Les relevés kilométriques ne sont pas disponibles.';
       debugPrint('[ParcOto Dashboard] reception sheets load failed: $error');
@@ -620,6 +634,10 @@ class _DashboardState extends State<Dashboard>
 
     while (pending() && DateTime.now().isBefore(deadline)) {
       await Future.delayed(const Duration(milliseconds: 60));
+    }
+    if (pending()) {
+      _loadMessage ??=
+          'La synchronisation prend plus de temps que prévu. Certaines valeurs peuvent être incomplètes.';
     }
   }
 
