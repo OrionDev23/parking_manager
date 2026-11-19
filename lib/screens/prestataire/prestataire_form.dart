@@ -59,6 +59,20 @@ class PrestataireFormState extends State<PrestataireForm> {
   bool? selected = false;
 
   @override
+  void dispose() {
+    nom.dispose();
+    email.dispose();
+    telephone.dispose();
+    adresse.dispose();
+    nif.dispose();
+    nis.dispose();
+    descr.dispose();
+    art.dispose();
+    rc.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
     if (uploading) {
