@@ -1,6 +1,7 @@
 import 'package:dart_appwrite/dart_appwrite.dart' hide Client;
 import 'package:parc_oto/providers/client_database.dart';
 
+import '../core/tenancy/tenant_resource_api.dart';
 import '../serializables/activity.dart';
 import '../serializables/conducteur/conducteur.dart';
 import '../serializables/conducteur/disponibilite_chauffeur.dart';
@@ -71,6 +72,20 @@ class RestoreDatabase {
   }
 
   Future<void> _deleteDocument(String docID, String collectionID) async {
+    if (collectionID == vehiculeid || collectionID == chauffeurid) {
+      final companyId = DatabaseGetter.activeCompanyId;
+      final client = DatabaseGetter.client;
+      if (companyId == null || client == null) {
+        throw StateError('Active authenticated company context is required to restore quota-controlled rows.');
+      }
+      await TenantResourceApi(client).deleteResource(
+        resource: collectionID == vehiculeid ? 'vehicle' : 'driver',
+        companyId: companyId,
+        rowId: docID,
+      );
+      return;
+    }
+
     await databases.deleteRow(
       databaseId: databaseId,
       tableId: collectionID,
@@ -168,6 +183,30 @@ class RestoreDatabase {
     String collectionID,
     Map<String, dynamic> data,
   ) async {
+    // Quota-controlled creates are idempotent at the Function boundary.
+    // Decide update-vs-create here so an existing row is not mistaken for a
+    // successful new create and silently left unchanged.
+    if (collectionID == vehiculeid || collectionID == chauffeurid) {
+      final existing = await DatabaseGetter().getDocument(
+        collectionID,
+        docID,
+      );
+      if (existing != null) {
+        await DatabaseGetter().updateDocument(
+          collectionId: collectionID,
+          documentId: docID,
+          data: data,
+        );
+      } else {
+        await DatabaseGetter().addDocument(
+          collectionId: collectionID,
+          documentId: docID,
+          data: data,
+        );
+      }
+      return;
+    }
+
     try {
       await DatabaseGetter().addDocument(
         collectionId: collectionID,
