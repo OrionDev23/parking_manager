@@ -415,49 +415,47 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(
-              collapsed ? 10 : 17,
-              16,
-              12,
-              14,
-            ),
-            child: Row(
-              children: [
-                if (collapsed)
-                  Image.asset(
-                    'assets/images/logo.webp',
-                    width: 38,
-                    height: 38,
-                    fit: BoxFit.contain,
-                  )
-                else
-                  Expanded(
-                    child: Image.asset(
-                      'assets/images/logo.webp',
-                      alignment: Alignment.centerLeft,
-                      height: 40,
-                      fit: BoxFit.contain,
+            padding: const EdgeInsets.fromLTRB(10, 16, 10, 14),
+            child: collapsed
+                ? SizedBox(
+                    height: 40,
+                    child: Center(
+                      child: IconButton(
+                        icon: const Icon(
+                          FluentIcons.chevron_right,
+                          size: 13,
+                        ),
+                        onPressed: () =>
+                            setState(() => _sidebarCollapsed = false),
+                      ),
                     ),
-                  ),
-                if (drawer)
-                  IconButton(
-                    icon: const Icon(FluentIcons.cancel, size: 16),
-                    onPressed: onNavigate,
                   )
-                else if (!collapsed)
-                  IconButton(
-                    icon: const Icon(FluentIcons.chevron_left, size: 13),
-                    onPressed: () =>
-                        setState(() => _sidebarCollapsed = true),
-                  )
-                else
-                  IconButton(
-                    icon: const Icon(FluentIcons.chevron_right, size: 13),
-                    onPressed: () =>
-                        setState(() => _sidebarCollapsed = false),
+                : Row(
+                    children: [
+                      Expanded(
+                        child: Image.asset(
+                          'assets/images/logo.webp',
+                          alignment: Alignment.centerLeft,
+                          height: 40,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      if (drawer)
+                        IconButton(
+                          icon: const Icon(FluentIcons.cancel, size: 16),
+                          onPressed: onNavigate,
+                        )
+                      else
+                        IconButton(
+                          icon: const Icon(
+                            FluentIcons.chevron_left,
+                            size: 13,
+                          ),
+                          onPressed: () =>
+                              setState(() => _sidebarCollapsed = true),
+                        ),
+                    ],
                   ),
-              ],
-            ),
           ),
           if (drawer) ...[
             Padding(
@@ -720,7 +718,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                       ),
                       child: icon ?? const SizedBox.shrink(),
                     ),
-                    SizedBox(width: childItem ? 9 : 11),
+                    if (!collapsed) SizedBox(width: childItem ? 9 : 11),
                     if (!collapsed)
                       Expanded(
                         child: DefaultTextStyle(
@@ -738,7 +736,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                           child: title ?? const SizedBox.shrink(),
                         ),
                       ),
-                    if (expandable)
+                    if (expandable && !collapsed)
                       Icon(
                         expanded
                             ? FluentIcons.chevron_up
@@ -746,7 +744,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                         size: 11,
                         color: theme.mutedTextColor,
                       ),
-                    if (active && !expandable)
+                    if (active && !expandable && !collapsed)
                       Container(
                         width: 3,
                         height: 17,
