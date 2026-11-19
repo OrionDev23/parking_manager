@@ -47,6 +47,7 @@ class RepairProvider extends ChangeNotifier {
     reparations.clear();
     prestataires.clear();
     repPerVeh.clear();
+    receptionSheetsVerified = false;
     downloadedReparations = false;
     downloadingReparations = false;
     downloadedPrestataires = false;
