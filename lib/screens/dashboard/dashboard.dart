@@ -449,6 +449,12 @@ class _DashboardState extends State<Dashboard>
       ),
     ];
 
+    final availableActions = actions
+        .where((action) =>
+            PaneItemsAndFooters.indexForPaneKey(action.destination) != null)
+        .toList(growable: false);
+    if (availableActions.isEmpty) return const SizedBox.shrink();
+
     return DashboardPanel(
       title: 'Accès rapides',
       icon: FluentIcons.chart,
@@ -469,7 +475,7 @@ class _DashboardState extends State<Dashboard>
             spacing: gap,
             runSpacing: gap,
             children: [
-              for (final action in actions.take(compact ? 4 : 6))
+              for (final action in availableActions.take(compact ? 4 : 6))
                 SizedBox(
                   width: width,
                   child: DashboardQuickActionTile(
@@ -487,7 +493,10 @@ class _DashboardState extends State<Dashboard>
     );
   }
 
-  Widget _viewAllButton(String destination) {
+  Widget? _viewAllButton(String destination) {
+    if (PaneItemsAndFooters.indexForPaneKey(destination) == null) {
+      return null;
+    }
     return Button(
       onPressed: () => PaneItemsAndFooters.selectPane(destination),
       child: Row(
