@@ -783,7 +783,7 @@ class _DashboardState extends State<Dashboard>
       final overdue = expiration.isBefore(now);
       alerts.add(
         DashboardAlert(
-          title: vehicle?.registration ??
+          title: vehicle?.matricule ??
               document.vehiclemat ??
               document.nom,
           subtitle: document.nom,
@@ -818,12 +818,12 @@ class _DashboardState extends State<Dashboard>
       if (vehicle.etatactuel == 6 || vehicle.etatactuel == 7) {
         alerts.add(
           DashboardAlert(
-            title: vehicle.registration,
+            title: vehicle.matricule,
             subtitle: vehicle.etatactuel == 6
                 ? 'Véhicule signalé en panne'
                 : 'Véhicule actuellement en réparation',
-            tag: vehicle.currentState == 6 ? 'Panne' : 'Atelier',
-            severity: vehicle.currentState == 6
+            tag: vehicle.etatactuel == 6 ? 'Panne' : 'Atelier',
+            severity: vehicle.etatactuel == 6
                 ? DashboardAlertSeverity.danger
                 : DashboardAlertSeverity.warning,
           ),
