@@ -201,7 +201,7 @@ class FleetActivityChart extends StatelessWidget {
               textStyle: theme.writingStyle,
             ),
             primaryXAxis: DateTimeAxis(
-              dateFormat: DateFormat('dd MMM'),
+              dateFormat: DateFormat('dd MMM', 'fr'),
               intervalType: DateTimeIntervalType.days,
               interval: 5,
               majorGridLines: const MajorGridLines(width: 0),
