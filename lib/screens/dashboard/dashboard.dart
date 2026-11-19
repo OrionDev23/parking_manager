@@ -91,7 +91,7 @@ class _DashboardState extends State<Dashboard>
     }
 
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final wide = screenWidth >= 1240;
+    final wide = screenWidth >= 1500;
     final compact = screenWidth < 680;
     final sessionName = authService.session?.displayName?.trim();
     final firstName = sessionName == null || sessionName.isEmpty
@@ -149,7 +149,7 @@ class _DashboardState extends State<Dashboard>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        FluentIcons.calendar,
+                        FluentIcons.event,
                         size: 15,
                         color: theme.mutedTextColor,
                       ),
@@ -182,7 +182,7 @@ class _DashboardState extends State<Dashboard>
             ],
           ),
           const SizedBox(height: 20),
-          _buildMetricGrid(wide: wide, compact: compact),
+          _buildMetricGrid(compact: compact),
           const SizedBox(height: 18),
           _buildAnalyticsLayout(wide: wide),
           const SizedBox(height: 18),
@@ -203,10 +203,7 @@ class _DashboardState extends State<Dashboard>
     );
   }
 
-  Widget _buildMetricGrid({
-    required bool wide,
-    required bool compact,
-  }) {
+  Widget _buildMetricGrid({required bool compact}) {
     final metrics = <({String label, String value, String detail, IconData icon, Color tone})>[
       (
         label: 'Véhicules',
@@ -233,7 +230,7 @@ class _DashboardState extends State<Dashboard>
         label: 'Réservations',
         value: _metricValue(_snapshot.reservationsToday),
         detail: 'Aujourd’hui',
-        icon: FluentIcons.calendar,
+        icon: FluentIcons.event,
         tone: const Color(0xFFA375F5),
       ),
       (
@@ -251,7 +248,7 @@ class _DashboardState extends State<Dashboard>
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final columns = constraints.maxWidth >= 1240
+        final columns = constraints.maxWidth >= 1050
             ? 5
             : constraints.maxWidth < 680
                 ? 2
@@ -352,7 +349,7 @@ class _DashboardState extends State<Dashboard>
   Widget _buildOperationsLayout({required bool wide}) {
     final upcoming = DashboardPanel(
       title: 'Interventions à venir',
-      icon: FluentIcons.calendar,
+      icon: FluentIcons.event,
       height: 270,
       trailing: _viewAllButton('planner'),
       child: UpcomingInterventions(items: _snapshot.upcoming),
@@ -406,13 +403,13 @@ class _DashboardState extends State<Dashboard>
       ),
       (
         label: 'Nouvelle réservation',
-        icon: FluentIcons.calendar,
+        icon: FluentIcons.event,
         tone: const Color(0xFF19C997),
         destination: 'planner',
       ),
       (
         label: 'Consulter le stock',
-        icon: FluentIcons.box,
+        icon: FluentIcons.database,
         tone: const Color(0xFFE6A23C),
         destination: 'workshop-stock',
       ),
@@ -432,9 +429,8 @@ class _DashboardState extends State<Dashboard>
 
     return DashboardPanel(
       title: 'Accès rapides',
-      icon: FluentIcons.flash,
+      icon: FluentIcons.more,
       height: compact ? 228 : 150,
-      trailing: _viewAllButton('dashboard'),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final columns = constraints.maxWidth >= 1050
@@ -545,15 +541,32 @@ class _DashboardState extends State<Dashboard>
       debugPrint('[ParcOto Dashboard] reception sheets load failed: $error');
     }
 
-    if (!mounted || companyId != DatabaseGetter.activeCompanyId) {
+    if (!mounted) return;
+    if (companyId != DatabaseGetter.activeCompanyId) {
+      setState(() => _refreshing = false);
       return;
     }
 
-    final snapshot = _createSnapshot(
-      history: history,
-      costsVerified: costsVerified,
-      now: now,
-    );
+    late final DashboardSnapshot snapshot;
+    try {
+      snapshot = _createSnapshot(
+        history: history,
+        costsVerified: costsVerified,
+        now: now,
+      );
+    } catch (error, stackTrace) {
+      debugPrint('[ParcOto Dashboard] snapshot failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      _loadMessage ??= 'Certaines statistiques n’ont pas pu être calculées.';
+      if (!mounted) return;
+      setState(() {
+        _snapshot = const DashboardSnapshot();
+        _loadedCompanyId = companyId;
+        _hasLoaded = true;
+        _refreshing = false;
+      });
+      return;
+    }
 
     setState(() {
       _snapshot = snapshot;
