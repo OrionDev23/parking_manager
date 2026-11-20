@@ -206,7 +206,7 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
     );
   }
 
-  static bool lastPortrait = false;
+  static bool lastCompactViewport = false;
 
   List<Map<String, dynamic>> getJsonData(List<dynamic> data) {
     bool isDocument = data.first is Document;
@@ -226,10 +226,10 @@ abstract class ParcOtoDatasource<T> extends AsyncDataTableSource {
   Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
     _activeRowsRequests++;
     try {
-      bool portrait = MediaQuery.of(current).orientation == Orientation.portrait;
-      if (portrait != lastPortrait) {
-        rowTextStyle = TextStyle(fontSize: portrait ? 13.sp : 10.sp);
-        lastPortrait = portrait;
+      final compactViewport = MediaQuery.sizeOf(current).width < 640;
+      if (compactViewport != lastCompactViewport) {
+        rowTextStyle = TextStyle(fontSize: compactViewport ? 13.sp : 10.sp);
+        lastCompactViewport = compactViewport;
       }
       if (errorCounter != null) {
         errorCounter = errorCounter! + 1;
@@ -529,14 +529,14 @@ abstract class ParcOtoDatasourceUsers<S, T> extends AsyncDataTableSource {
     );
   }
 
-  static bool lastPortrait = false;
+  static bool lastCompactViewport = false;
 
   @override
   Future<AsyncRowsResponse> getRows(int startIndex, int count) async {
-    bool portrait = MediaQuery.of(current).orientation == Orientation.portrait;
-    if (portrait != lastPortrait) {
-      rowTextStyle = TextStyle(fontSize: portrait ? 13.sp : 10.sp);
-      lastPortrait = portrait;
+    final compactViewport = MediaQuery.sizeOf(current).width < 640;
+    if (compactViewport != lastCompactViewport) {
+      rowTextStyle = TextStyle(fontSize: compactViewport ? 13.sp : 10.sp);
+      lastCompactViewport = compactViewport;
     }
     if (errorCounter != null) {
       errorCounter = errorCounter! + 1;
