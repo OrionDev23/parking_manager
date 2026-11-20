@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/client_database.dart';
 import '../theme.dart';
 
 /// A compact business KPI card with explicit loading, failure and retry states.
@@ -28,11 +29,21 @@ class ModuleDashboardMetric extends StatefulWidget {
 
 class _ModuleDashboardMetricState extends State<ModuleDashboardMetric> {
   late Future<int> _value;
+  late final VoidCallback _companyRevisionListener;
+
+  void _handleCompanyRevisionChanged() {
+    if (!mounted) return;
+    setState(() => _value = _load());
+  }
 
   @override
   void initState() {
     super.initState();
     _value = _load();
+    _companyRevisionListener = _handleCompanyRevisionChanged;
+    DatabaseGetter.companyRevisionListenable.addListener(
+      _companyRevisionListener,
+    );
   }
 
   Future<int> _load() => Future<int>.sync(widget.loadValue);
@@ -48,6 +59,14 @@ class _ModuleDashboardMetricState extends State<ModuleDashboardMetric> {
   void _retry() {
     widget.onRefresh?.call();
     setState(() => _value = _load());
+  }
+
+  @override
+  void dispose() {
+    DatabaseGetter.companyRevisionListenable.removeListener(
+      _companyRevisionListener,
+    );
+    super.dispose();
   }
 
   @override
