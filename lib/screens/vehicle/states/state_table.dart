@@ -14,6 +14,14 @@ import '../../../widgets/zone_box.dart';
 import '../../data_table_parcoto.dart';
 import '../manager/vehicles_table.dart';
 
+Size _responsiveStateTableDialogSize(BuildContext context) {
+  final screenSize = MediaQuery.sizeOf(context);
+  return Size(
+    (screenSize.width - 32).clamp(0.0, 700.0).toDouble(),
+    (screenSize.height - 80).clamp(0.0, 550.0).toDouble(),
+  );
+}
+
 class StateTable extends StatefulWidget {
   final bool selectD;
 
@@ -158,11 +166,19 @@ class StateTableState extends State<StateTable> {
     var appTheme = context.watch<AppTheme>();
     vehicleStateDatasource.appTheme = appTheme;
     return DataTableParc(
-      header: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
+      header: LayoutBuilder(
+        builder: (context, constraints) {
+          final searchWidth = (constraints.maxWidth - 105)
+              .clamp(140.0, 350.0)
+              .toDouble();
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+            child: Wrap(
+              alignment: WrapAlignment.end,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 10,
+              runSpacing: 8,
+              children: [
             SizedBox(
               width: 80.px,
               child: Stack(
@@ -222,9 +238,8 @@ class StateTableState extends State<StateTable> {
                 ],
               ),
             ),
-            const SizedBox(width: 10),
             SizedBox(
-              width: 350.px,
+              width: searchWidth,
               height: 45.px,
               child: ParcotoTextBox(
                 onChanged: (s) {
@@ -270,8 +285,10 @@ class StateTableState extends State<StateTable> {
                     : null,
               ),
             ),
-          ],
-        ),
+              ],
+            ),
+          );
+        },
       ),
       sortAscending: assending,
       sortColumnIndex: sortColumn,
@@ -284,9 +301,10 @@ class StateTableState extends State<StateTable> {
   Widget filterBuilder(AppTheme appTheme) {
     return StatefulBuilder(
       builder: (context, setS) {
+        final screenSize = MediaQuery.sizeOf(context);
         return SizedBox(
-          width: 30.w,
-          height: 49.h,
+          width: (screenSize.width - 24).clamp(260.0, 420.0).toDouble(),
+          height: (screenSize.height - 140).clamp(280.0, 520.0).toDouble(),
           child: Column(
             children: [
               ListTile(
@@ -344,7 +362,7 @@ class StateTableState extends State<StateTable> {
                       children: [
                         Row(
                           children: [
-                            SizedBox(width: 5.w, child: const Text('min').tr()),
+                            SizedBox(width: 44.px, child: const Text('min').tr()),
                             smallSpace,
                             smallSpace,
                             Flexible(
@@ -363,7 +381,7 @@ class StateTableState extends State<StateTable> {
                         smallSpace,
                         Row(
                           children: [
-                            SizedBox(width: 5.w, child: const Text('max').tr()),
+                            SizedBox(width: 44.px, child: const Text('max').tr()),
                             smallSpace,
                             smallSpace,
                             Flexible(
@@ -399,7 +417,7 @@ class StateTableState extends State<StateTable> {
                           builder: (context) {
                             return ContentDialog(
                               constraints: BoxConstraints.tight(
-                                Size(700.px, 550.px),
+                                _responsiveStateTableDialogSize(context),
                               ),
                               title: const Text('selectvehicle').tr(),
                               style: ContentDialogThemeData(
@@ -430,8 +448,10 @@ class StateTableState extends State<StateTable> {
               smallSpace,
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  spacing: 6,
+                  runSpacing: 6,
                   children: [
                     FilledButton(
                       style: ButtonStyle(
@@ -455,15 +475,12 @@ class StateTableState extends State<StateTable> {
                           : null,
                       child: const Text('clear').tr(),
                     ),
-                    const Spacer(),
                     Button(
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
                       child: const Text('annuler').tr(),
                     ),
-                    smallSpace,
-                    smallSpace,
                     FilledButton(
                       style: ButtonStyle(
                         backgroundColor: WidgetStatePropertyAll<Color>(
