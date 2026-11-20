@@ -16,24 +16,28 @@ class Tutorial extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var appTheme = context.watch<AppTheme>();
-    bool portrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final appTheme = context.watch<AppTheme>();
     return Column(
       children: [
         const PageTitle(text: 'tutorial'),
-        SizedBox(height: 100.px),
-        Center(
-          child: ListView(
-            shrinkWrap: true,
-            padding: const EdgeInsets.all(10),
-            children: [
-              StaggeredGrid.count(
-                crossAxisCount: portrait ? 2 : 3,
-                mainAxisSpacing: 5,
-                crossAxisSpacing: 5,
-                children: buttonList(appTheme, context),
-              ),
-            ],
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final columns = constraints.maxWidth < 640
+                  ? 1
+                  : constraints.maxWidth < 960
+                      ? 2
+                      : 3;
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(12),
+                child: StaggeredGrid.count(
+                  crossAxisCount: columns,
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  children: buttonList(appTheme, context),
+                ),
+              );
+            },
           ),
         ),
       ],
