@@ -74,7 +74,7 @@ class _ButtonContainerState extends State<ButtonContainer> {
     return OnTapScaleAndFade(
       onTap: widget.action,
       child: Container(
-        height: 112,
+        constraints: const BoxConstraints(minHeight: 112),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: appTheme.surfaceColor,
