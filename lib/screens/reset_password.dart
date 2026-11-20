@@ -41,136 +41,139 @@ class _ResetScreenState extends State<ResetScreen> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.sizeOf(context);
-    final formWidth = (screenSize.width - 32).clamp(280.0, 460.0).toDouble();
-    final formHeight = (screenSize.height - 160).clamp(320.0, 480.0).toDouble();
-    var appTheme = context.watch<AppTheme>();
+    final compact = screenSize.width < 640;
+    final formWidth = (screenSize.width - 32).clamp(0.0, 460.0).toDouble();
+    final appTheme = context.watch<AppTheme>();
+
     if (done) {
       return NoDataWidget(
         icon: linknotvalid ? FluentIcons.error : FluentIcons.check_mark,
         text: linknotvalid ? 'linknotvalid' : 'donepassword',
       );
     }
+
     return ScaffoldPage(
-      content: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: 5.h),
-            Image.asset('assets/images/favIcon.webp', width: 30.w),
-            SizedBox(height: 5.h),
-            Container(
-              padding: const EdgeInsets.all(10),
-              alignment: Alignment.center,
-              width: formWidth,
-              height: formHeight,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: appTheme.mode == ThemeMode.dark
-                    ? Colors.grey
-                    : appTheme.mode == ThemeMode.light
-                    ? Colors.white
-                    : ThemeMode.system == ThemeMode.light
-                    ? Colors.white
-                    : Colors.grey,
-                boxShadow: kElevationToShadow[2],
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: ParcotoTextBox(
-                      controller: password,
-                      placeholder: 'motdepasse'.tr(),
-                      suffix: IconButton(
-                        icon: Icon(
-                          showPassword ? FluentIcons.hide : FluentIcons.red_eye,
-                          color: !showPassword
-                              ? appTheme.color
-                              : Colors.grey[100],
-                          size: 12.sp,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            showPassword = !showPassword;
-                          });
-                        },
-                      ),
-                      obscureText: !showPassword,
-                      onSubmitted: (s) {
-                        if (password.text.length < 8 ||
-                            passwordConfirmation.text.length < 8 ||
-                            passwordConfirmation.text != password.text) {
-                          setState(() {
-                            validPassword = false;
-                          });
-                        } else {
-                          setState(() {
-                            validPassword = true;
-                          });
-                        }
-                        confirm();
-                      },
+      content: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            padding: EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: compact ? 20 : 36,
+            ),
+            child: Center(
+              child: SizedBox(
+                width: formWidth,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      'assets/images/favIcon.webp',
+                      width: compact ? 112 : 144,
+                      fit: BoxFit.contain,
                     ),
-                  ),
-                  SizedBox(height: 2.h),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ParcotoTextBox(
-                      controller: passwordConfirmation,
-                      placeholder: 'confirmation'.tr(),
-                      suffix: IconButton(
-                        icon: Icon(
-                          showPassword ? FluentIcons.hide : FluentIcons.red_eye,
-                          color: !showPassword
-                              ? appTheme.color
-                              : Colors.grey[100],
-                          size: 12.sp,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            showPassword = !showPassword;
-                          });
-                        },
+                    const SizedBox(height: 24),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: appTheme.mode == ThemeMode.dark
+                            ? Colors.grey
+                            : Colors.white,
+                        boxShadow: kElevationToShadow[2],
                       ),
-                      obscureText: !showPassword,
-                      onSubmitted: (s) {
-                        if (password.text.length < 8 ||
-                            passwordConfirmation.text.length < 8 ||
-                            passwordConfirmation.text != password.text) {
-                          setState(() {
-                            validPassword = false;
-                          });
-                        } else {
-                          setState(() {
-                            validPassword = true;
-                          });
-                        }
-                        confirm();
-                      },
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            child: ParcotoTextBox(
+                              controller: password,
+                              placeholder: 'motdepasse'.tr(),
+                              suffix: IconButton(
+                                icon: Icon(
+                                  showPassword
+                                      ? FluentIcons.hide
+                                      : FluentIcons.red_eye,
+                                  color: !showPassword
+                                      ? appTheme.color
+                                      : Colors.grey[100],
+                                  size: 16,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    showPassword = !showPassword;
+                                  });
+                                },
+                              ),
+                              obscureText: !showPassword,
+                              onSubmitted: (_) {
+                                _validatePassword();
+                                confirm();
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ParcotoTextBox(
+                              controller: passwordConfirmation,
+                              placeholder: 'confirmation'.tr(),
+                              suffix: IconButton(
+                                icon: Icon(
+                                  showPassword
+                                      ? FluentIcons.hide
+                                      : FluentIcons.red_eye,
+                                  color: !showPassword
+                                      ? appTheme.color
+                                      : Colors.grey[100],
+                                  size: 16,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    showPassword = !showPassword;
+                                  });
+                                },
+                              ),
+                              obscureText: !showPassword,
+                              onSubmitted: (_) {
+                                _validatePassword();
+                                confirm();
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 46,
+                            child: FilledButton(
+                              onPressed: checking ? null : confirm,
+                              child: checking
+                                  ? const ProgressRing(strokeWidth: 2)
+                                  : const Text('confirmer').tr(),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 2.h),
-                  SizedBox(height: 2.h),
-                  FilledButton(
-                    onPressed: checking ? null : confirm,
-                    child: checking
-                        ? const ProgressRing(strokeWidth: 2.0)
-                        : const Text('confirmer').tr(),
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    if (!signedIn && error.isNotEmpty)
+                      Text(error, style: const TextStyle(color: Colors.red)),
+                  ],
+                ),
               ),
             ),
-            SizedBox(height: 2.h),
-            if (!signedIn && error.isNotEmpty)
-              Text(error, style: TextStyle(color: Colors.red)),
-          ],
-        ),
+          );
+        },
       ),
     );
+  }
+
+  void _validatePassword() {
+    validPassword = password.text.length >= 8 &&
+        passwordConfirmation.text.length >= 8 &&
+        passwordConfirmation.text == password.text;
+    if (mounted) setState(() {});
   }
 
   String error = "";
