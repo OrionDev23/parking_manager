@@ -10,18 +10,10 @@ class DatabaseCounters {
   static final Map<String, _CachedCount> _countCache = {};
   static int _cacheTenantRevision = -1;
 
-  // These tables were verified in the active Appwrite project and expose a
-  // companyId column. Never count a tenant table without an explicit tenant
-  // predicate just because its legacy table permissions happen to allow it.
-  static const Set<String> _companyScopedCountTables = {
-    chauffeurid,
-    vehicDoc,
-    chaufDoc,
-    planningID,
-    activityId,
-    reparationId,
-    prestataireId,
-  };
+  // Use the same authoritative list as DatabaseGetter. The live Appwrite
+  // schema confirms companyId on all of these tables, including stock and
+  // catalogue tables; new counters must never fall back to an unscoped count.
+  static const Set<String> _companyScopedCountTables = tenantScopedTableIds;
 
   /// Clears memoized counts after an explicit dashboard refresh.
   static void invalidateCache() {
@@ -280,6 +272,20 @@ class DatabaseCounters {
   }
 
   Future<int> countPrestataire() => _countRows(tableId: prestataireId);
+
+  Future<int> countParts() => _countRows(tableId: partsID);
+
+  Future<int> countCategories() => _countRows(tableId: categoriesID);
+
+  Future<int> countBrands() => _countRows(tableId: brandsID);
+
+  Future<int> countOptions() => _countRows(tableId: optionsID);
+
+  Future<int> countStockEntries() => _countRows(tableId: storageId);
+
+  Future<int> countSuppliers() => _countRows(tableId: fournsID);
+
+  Future<int> countClients() => _countRows(tableId: clientsID);
 }
 
 class _CachedCount {
