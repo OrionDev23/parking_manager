@@ -180,7 +180,7 @@ class VehicleDashboard extends StatelessWidget {
                   ModuleDashboardMetric(
                     label: 'En panne',
                     detail: 'État panne',
-                    icon: FluentIcons.warning,
+                    icon: FluentIcons.repair,
                     loadValue: () => DatabaseCounters().countVehicles(etat: 1),
                   ),
                   ModuleDashboardMetric(
@@ -192,7 +192,7 @@ class VehicleDashboard extends StatelessWidget {
                   ModuleDashboardMetric(
                     label: 'En marche',
                     detail: 'État en marche',
-                    icon: FluentIcons.speed_high,
+                    icon: FluentIcons.car,
                     loadValue: () => DatabaseCounters().countVehicles(etat: 3),
                   ),
                   ModuleDashboardMetric(
