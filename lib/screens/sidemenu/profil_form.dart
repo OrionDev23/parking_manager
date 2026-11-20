@@ -58,30 +58,20 @@ class _ProfilFormState extends State<ProfilForm> {
   bool validEmail = false;
 
   void testIfSomethingChanged() {
-    if (email.text != widget.user?.email) {
-      setState(() {
-        somethingChanged = true;
-      });
-      return;
-    } else if (name.text != widget.user?.name) {
-      setState(() {
-        somethingChanged = true;
-      });
-      return;
-    } else if (countrySelected !=
-        Countries.getCountryCodeFromPhone(widget.user?.tel)) {
-      setState(() {
-        somethingChanged = true;
-      });
-    } else if (widget.user?.tel?.substring(4, widget.user?.tel?.length) !=
-        phone.text) {
-      setState(() {
-        somethingChanged = true;
-      });
-    } else if (somethingChanged) {
-      setState(() {
-        somethingChanged = false;
-      });
+    final originalPhone = widget.user?.tel;
+    final originalLocalPhone =
+        originalPhone != null && originalPhone.length > 3
+        ? originalPhone.substring(4)
+        : '';
+
+    final hasChanges =
+        email.text != widget.user?.email ||
+        name.text != widget.user?.name ||
+        countrySelected != Countries.getCountryCodeFromPhone(originalPhone) ||
+        phone.text != originalLocalPhone;
+
+    if (hasChanges != somethingChanged && mounted) {
+      setState(() => somethingChanged = hasChanges);
     }
   }
 
@@ -146,13 +136,11 @@ class _ProfilFormState extends State<ProfilForm> {
                     controller: email,
                     placeholder: 'email'.tr(),
                     onChanged: (s) {
-                      if (FormValidators.isEmail(s)) {
-                        validEmail = true;
-                      } else {
-                        validEmail = false;
+                      final nextValid = FormValidators.isEmail(s);
+                      if (nextValid != validEmail) {
+                        setState(() => validEmail = nextValid);
                       }
-                      setState(() {});
-                      if (validEmail) {
+                      if (nextValid) {
                         testIfSomethingChanged();
                       }
                     },
