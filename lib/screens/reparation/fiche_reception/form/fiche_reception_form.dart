@@ -424,13 +424,16 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                               style: TextStyle(color: Colors.red),
                             ).tr(),
                           if (errorNumFiche) smallSpace,
-                          Row(
+                          Wrap(
+                            alignment: WrapAlignment.end,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 8,
+                            runSpacing: 8,
                             children: [
                               Text(
                                 'fichereception'.tr().toUpperCase(),
                                 style: headerStyle,
                               ),
-                              smallSpace,
                               Container(
                                 width: 200.px,
                                 height: 40.px,
