@@ -1,11 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
-import '../../providers/counters.dart';
-import '../../widgets/module_dashboard_metric.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../providers/counters.dart';
 import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
+import '../../widgets/module_dashboard_metric.dart';
 import '../../widgets/module_dashboard_panel.dart';
 import '../../widgets/module_dashboard_section_header.dart';
 import '../logs/logging/log_table.dart';
