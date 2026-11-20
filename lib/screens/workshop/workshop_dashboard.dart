@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 import '../../providers/parts_provider.dart';
+import '../../providers/counters.dart';
 import '../../theme.dart';
 import '../../widgets/module_dashboard_header.dart';
+import '../../widgets/module_dashboard_metric.dart';
 import '../../widgets/module_dashboard_action.dart';
 import '../sidemenu/pane_items.dart';
 
@@ -17,6 +19,9 @@ class WorkshopDashboard extends StatefulWidget {
 
 class _WorkshopDashboardState extends State<WorkshopDashboard> {
   late final PartsProvider _partsProvider;
+  late final Future<int> Function() _stockCountLoader =
+      () => DatabaseCounters().countStockEntries();
+  int _stockMetricRevision = 0;
   bool? _hasInternet;
 
   @override
@@ -27,6 +32,8 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
   }
 
   Future<void> _refreshCatalog() async {
+    // Recreate the async stock KPI after explicit refreshes and tenant changes.
+    _stockMetricRevision++;
     try {
       final hasInternet = await InternetConnection().hasInternetAccess;
       if (mounted) setState(() => _hasInternet = hasInternet);
@@ -137,6 +144,14 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                         value: PartsProvider.fournisseurs.length,
                         icon: FluentIcons.people,
                         accent: theme.color,
+                      ),
+                      ModuleDashboardMetric(
+                        key: ValueKey('workshop-stock-$_stockMetricRevision'),
+                        width: double.infinity,
+                        label: 'Entrées de stock',
+                        detail: 'Enregistrements de stock de l’entreprise',
+                        icon: FluentIcons.database,
+                        loadValue: _stockCountLoader,
                       ),
                     ],
                   ),
