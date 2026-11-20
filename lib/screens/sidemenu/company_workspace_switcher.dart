@@ -7,6 +7,7 @@ import '../../core/tenancy/company_membership_resolver.dart';
 import '../../core/tenancy/platform_companies_repository.dart';
 import '../../main.dart' show authService, companyService, startBackgroundInitialization;
 import '../../theme.dart';
+import '../../ui/design_system/parcoto_surface.dart';
 import '../../ui/design_system/parcoto_tokens.dart';
 import '../entreprise/entreprise.dart' show MyEntrepriseState;
 import 'pane_items.dart';
@@ -419,7 +420,9 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
           : 'Connectez-vous pour choisir une entreprise',
       child: GestureDetector(
         onTap: interactive ? _openSwitcher : null,
-        child: Container(
+        child: ParcotoSurface(
+          tone: ParcotoSurfaceTone.subtle,
+          radius: theme.controlRadius,
           padding: EdgeInsets.symmetric(
             horizontal: widget.compact
                 ? ParcotoTokens.space3
@@ -427,11 +430,6 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
             vertical: widget.compact
                 ? ParcotoTokens.space3
                 : ParcotoTokens.space2,
-          ),
-          decoration: BoxDecoration(
-            color: theme.fillColor,
-            borderRadius: BorderRadius.circular(theme.controlRadius),
-            border: Border.all(color: theme.borderColor),
           ),
           child: Row(
             children: [
