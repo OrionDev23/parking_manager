@@ -174,14 +174,17 @@ class _VehicleDamageState extends State<VehicleDamage> {
           4: FixedColumnWidth(compact ? 180 : 11.w),
         },
         children: [
-          ...getTopRow(appTheme),
+          ...getTopRow(appTheme, compact: compact),
           ...getBottomRows(appTheme, compact: compact),
         ],
       ),
     );
   }
 
-  List<TableRow> getTopRow(AppTheme appTheme) {
+  List<TableRow> getTopRow(
+    AppTheme appTheme, {
+    bool compact = false,
+  }) {
     return [
       TableRow(
         children: [
