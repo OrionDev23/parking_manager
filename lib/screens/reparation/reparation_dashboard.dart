@@ -129,13 +129,13 @@ class ReparationDashboard extends StatelessWidget {
                   ModuleDashboardMetric(
                     label: 'En attente',
                     detail: 'Ordres en attente',
-                    icon: FluentIcons.clock,
+                    icon: FluentIcons.event,
                     loadValue: () => DatabaseCounters().countReparations(etat: 0),
                   ),
                   ModuleDashboardMetric(
                     label: 'En cours',
                     detail: 'Ordres en traitement',
-                    icon: FluentIcons.processing,
+                    icon: FluentIcons.repair,
                     loadValue: () => DatabaseCounters().countReparations(etat: 1),
                   ),
                   ModuleDashboardMetric(
