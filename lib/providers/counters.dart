@@ -9,7 +9,8 @@ import 'package:parc_oto/serializables/vehicle/vehicle.dart';
 class DatabaseCounters {
   static const Duration _cacheTtl = Duration(seconds: 15);
   static final Map<String, _CachedCount> _countCache = {};
-  static int _cacheTenantRevision = -1;
+  static int _cacheProjectRevision = -1;
+  static int _cacheCompanyRevision = -1;
 
   // Use the same authoritative list as DatabaseGetter. The live Appwrite
   // schema confirms companyId on all of these tables, including stock and
@@ -22,12 +23,16 @@ class DatabaseCounters {
   }
 
   String _cacheKey(String source) {
-    final revision = DatabaseGetter.companyRevision;
-    if (_cacheTenantRevision != revision) {
+    final projectRevision = DatabaseGetter.tenantRevision;
+    final companyRevision = DatabaseGetter.companyRevision;
+    if (_cacheProjectRevision != projectRevision ||
+        _cacheCompanyRevision != companyRevision) {
       _countCache.clear();
-      _cacheTenantRevision = revision;
+      _cacheProjectRevision = projectRevision;
+      _cacheCompanyRevision = companyRevision;
     }
-    return '$revision|${DatabaseGetter.activeCompanyId ?? 'no-company'}|$source';
+    return '$projectRevision|$companyRevision|'
+        '${DatabaseGetter.activeCompanyId ?? 'no-company'}|$source';
   }
 
   Future<int> _countRows({
