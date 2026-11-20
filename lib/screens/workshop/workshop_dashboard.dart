@@ -1,10 +1,11 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:provider/provider.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 import '../../providers/parts_provider.dart';
 import '../../providers/counters.dart';
+import '../../theme.dart';
 import '../../widgets/module_dashboard_header.dart';
-import '../../widgets/module_dashboard_metric.dart';
 import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_metric.dart';
 import '../sidemenu/pane_items.dart';
@@ -61,6 +62,7 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = context.watch<AppTheme>();
     return AnimatedBuilder(
       animation: _partsProvider,
       builder: (context, _) {
