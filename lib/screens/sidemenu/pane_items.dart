@@ -34,10 +34,6 @@ import '../../tutorials/tutorial.dart';
 import '../user_management/user_management.dart';
 import '../platform/platform_companies_screen.dart';
 import '../access/access_management.dart';
-import '../vehicle/brand/brand_list.dart';
-import '../vehicle/documents/document_tabs.dart';
-import '../vehicle/manager/vehicle_tabs.dart';
-import '../vehicle/states/state_tabs.dart';
 import '../vehicle/vehicle_dashboard.dart';
 import '../workshop/inventory/fournisseurs/fournisseur_tabs.dart';
 import '../workshop/parts/brands/brand_tabs.dart';
@@ -57,7 +53,7 @@ class PaneItemsAndFooters {
   static late PaneItem platformCompanies;
   static late PaneItem accessManagement;
   static late PaneItemExpander userAccessManagement;
-  static late PaneItemExpander vehicles;
+  static late PaneItem vehicles;
   static late PaneItemExpander reparations;
   static late PaneItemExpander chauffeurs;
   static late PaneItem evenements;
@@ -103,42 +99,13 @@ class PaneItemsAndFooters {
       ),
       body: const UserManagement(),
     );
-    vehicles = PaneItemExpander(
-      key: Key("vehicles"),
+    vehicles = PaneItem(
+      key: const ValueKey('vehicles'),
       icon: Icon(
         gts ? Icons.local_shipping_outlined : Icons.directions_car,
         color: appTheme.color.lightest,
       ),
       title: Text('thevehicles', style: paneTextStyle).tr(),
-      items: [
-        PaneItem(
-          key: const Key('vehicle-manager'),
-          icon: Icon(FluentIcons.list, color: appTheme.color.lightest),
-          title: Text('gestionvehicles', style: paneTextStyle).tr(),
-          body: const VehicleTabs(),
-        ),
-        PaneItem(
-          key: const Key('vehicle-brands'),
-          icon: Icon(
-            FluentIcons.verified_brand,
-            color: appTheme.color.lightest,
-          ),
-          title: Text('brands', style: paneTextStyle).tr(),
-          body: const BrandList(),
-        ),
-        PaneItem(
-          key: const Key('vehicle-states'),
-          icon: Icon(FluentIcons.health, color: appTheme.color.lightest),
-          title: Text('vstates', style: paneTextStyle).tr(),
-          body: const StateTabs(),
-        ),
-        PaneItem(
-          key: const Key('vehicle-documents'),
-          icon: Icon(FluentIcons.document_set, color: appTheme.color.lightest),
-          title: Text('documents', style: paneTextStyle).tr(),
-          body: const DocumentTabs(),
-        ),
-      ],
       body: const VehicleDashboard(),
     );
     chauffeurs = PaneItemExpander(
@@ -442,6 +409,7 @@ class PaneItemsAndFooters {
   /// NavigationPane. Headers and separators are structural and do not occupy
   /// a selected index.
   static int? indexForPaneKey(String value) {
+    if (_isLegacyVehiclePaneKey(value)) value = 'vehicles';
     final mainIndex = _findPaneIndex(originalItems, value, 0);
     if (mainIndex != null) return mainIndex;
 
@@ -498,6 +466,10 @@ class PaneItemsAndFooters {
   }
 
   static bool selectPane(String value) {
+    if (_isLegacyVehiclePaneKey(value)) {
+      VehicleDashboard.selectLegacySection(value);
+      value = 'vehicles';
+    }
     final targetIndex = indexForPaneKey(value);
     if (targetIndex == null) {
       debugPrint('[ParcOto Navigation] Pane not found: $value');
@@ -506,6 +478,13 @@ class PaneItemsAndFooters {
     PanesListState.index.value = targetIndex;
     return true;
   }
+
+  static bool _isLegacyVehiclePaneKey(String value) => const {
+    'vehicle-manager',
+    'vehicle-documents',
+    'vehicle-brands',
+    'vehicle-states',
+  }.contains(value);
 
   static List<NavigationPaneItem> originalItems = List.empty(growable: true);
   static List<NavigationPaneItem> footerItems = List.empty(growable: true);

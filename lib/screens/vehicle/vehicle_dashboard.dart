@@ -1,273 +1,273 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:provider/provider.dart';
 
-import '../../providers/counters.dart';
+import '../../theme.dart';
 import '../../ui/design_system/parcoto_tokens.dart';
-import '../../widgets/module_dashboard_action.dart';
-import '../../widgets/module_dashboard_header.dart';
-import '../../widgets/module_dashboard_metric.dart';
-import '../../widgets/module_dashboard_section_header.dart';
-import '../../widgets/module_dashboard_panel.dart';
-import '../dashboard/charts/pie_chart.dart';
-import '../logs/logging/log_table.dart';
-import '../sidemenu/pane_items.dart';
-import 'documents/document_form.dart';
+import 'brand/brand_list.dart';
 import 'documents/document_tabs.dart';
-import 'manager/vehicle_form.dart';
 import 'manager/vehicle_tabs.dart';
-import 'states/state_form.dart';
-import 'states/state_manager.dart';
+import 'states/state_tabs.dart';
 
+/// Unified workspace for the vehicle domain.
+/// Legacy destinations are mapped to sections inside this workspace.
 class VehicleDashboard extends StatelessWidget {
   const VehicleDashboard({super.key});
 
-  void _openNewVehicle() {
-    if (!PaneItemsAndFooters.selectPane('vehicle-manager')) return;
+  static final ValueNotifier<int> selectedSection = ValueNotifier<int>(0);
+  static final ValueNotifier<int> selectedReference = ValueNotifier<int>(0);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      late Tab tab;
-      tab = Tab(
-        key: UniqueKey(),
-        text: Text('nouvvehicule'.tr()),
-        semanticLabel: 'nouvvehicule'.tr(),
-        icon: const Icon(FluentIcons.new_folder),
-        body: const VehicleForm(),
-        onClosed: () {
-          VehicleTabsState.tabs.remove(tab);
-          if (VehicleTabsState.currentIndex.value > 0) {
-            VehicleTabsState.currentIndex.value--;
-          }
-        },
-      );
-      final index = VehicleTabsState.tabs.length;
-      VehicleTabsState.tabs.add(tab);
-      VehicleTabsState.currentIndex.value = index;
-    });
-  }
-
-  void _openNewDocument() {
-    if (!PaneItemsAndFooters.selectPane('vehicle-documents')) return;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      late Tab tab;
-      tab = Tab(
-        key: UniqueKey(),
-        text: Text('nouvdocument'.tr()),
-        semanticLabel: 'nouvdocument'.tr(),
-        icon: const Icon(FluentIcons.new_folder),
-        body: const ScaffoldPage(content: DocumentForm()),
-        onClosed: () {
-          DocumentTabsState.tabs.remove(tab);
-          if (DocumentTabsState.currentIndex.value > 0) {
-            DocumentTabsState.currentIndex.value--;
-          }
-        },
-      );
-      final index = DocumentTabsState.tabs.length;
-      DocumentTabsState.tabs.add(tab);
-      DocumentTabsState.currentIndex.value = index;
-    });
-  }
-
-  void _openStateDialog(BuildContext context) {
-    if (!PaneItemsAndFooters.selectPane('vehicle-states')) return;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final dialogContext = EtatManagerState.current;
-      if (dialogContext == null || !dialogContext.mounted) return;
-      showDialog(
-        context: dialogContext,
-        barrierDismissible: true,
-        builder: (context) => ContentDialog(
-          title: const Text('nouvetat').tr(),
-          constraints: const BoxConstraints(maxWidth: 800, maxHeight: 500),
-          content: const StateForm(),
-        ),
-      );
-    });
+  static void selectLegacySection(String key) {
+    switch (key) {
+      case 'vehicle-manager':
+        selectedSection.value = 0;
+        break;
+      case 'vehicle-documents':
+        selectedSection.value = 1;
+        break;
+      case 'vehicle-brands':
+        selectedSection.value = 2;
+        selectedReference.value = 0;
+        break;
+      case 'vehicle-states':
+        selectedSection.value = 2;
+        selectedReference.value = 1;
+        break;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-
     return ScaffoldPage(
       padding: EdgeInsets.zero,
-      content: LayoutBuilder(
-        builder: (context, constraints) {
-          final compact = constraints.maxWidth < ParcotoTokens.tabletBreakpoint;
-          final moduleActions = <Widget>[
-            ModuleDashboardAction(
-              label: 'gestionvehicles'.tr(),
-              detail: 'Parc et fiches véhicules',
-              icon: FluentIcons.task_manager,
-              onPressed: () => PaneItemsAndFooters.selectPane('vehicle-manager'),
-            ),
-            ModuleDashboardAction(
-              label: 'nouvvehicule'.tr(),
-              detail: 'Ajouter un véhicule',
-              icon: FluentIcons.car,
-              onPressed: _openNewVehicle,
-            ),
-            ModuleDashboardAction(
-              label: 'brands'.tr(),
-              detail: 'Référentiels fabricants',
-              icon: FluentIcons.verified_brand,
-              onPressed: () => PaneItemsAndFooters.selectPane('vehicle-brands'),
-            ),
-            ModuleDashboardAction(
-              label: 'vstates'.tr(),
-              detail: 'États et statuts du parc',
-              icon: FluentIcons.health,
-              onPressed: () => PaneItemsAndFooters.selectPane('vehicle-states'),
-            ),
-            ModuleDashboardAction(
-              label: 'nouvetat'.tr(),
-              detail: 'Créer un état',
-              icon: FluentIcons.health_refresh,
-              onPressed: () => _openStateDialog(context),
-            ),
-            ModuleDashboardAction(
-              label: 'documents'.tr(),
-              detail: 'Documents administratifs',
-              icon: FluentIcons.document_set,
-              onPressed: () => PaneItemsAndFooters.selectPane('vehicle-documents'),
-            ),
-            ModuleDashboardAction(
-              label: 'nouvdocument'.tr(),
-              detail: 'Ajouter un document',
-              icon: FluentIcons.document,
-              onPressed: _openNewDocument,
-            ),
-          ];
-
-          return ListView(
-            padding: EdgeInsets.symmetric(
-              horizontal: compact ? ParcotoTokens.space4 : ParcotoTokens.space8,
-              vertical: ParcotoTokens.space6,
-            ),
-            children: [
-              ModuleDashboardHeader(
-                title: 'vehicules'.tr(),
-                subtitle:
-                    'Gérez votre parc, ses documents et ses états depuis un seul espace.',
-                eyebrow: 'Gestion de flotte',
-                heroTitle: 'Votre parc automobile, en un coup d’œil',
-                heroDescription:
-                    'Accédez aux véhicules, aux états et aux documents administratifs.',
-                icon: FluentIcons.car,
-              ),
-              ModuleDashboardSectionHeader(
-                title: 'Indicateurs du parc',
-                subtitle:
-                    'Consultez les volumes du parc et la répartition des principaux états.',
-              ),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  ModuleDashboardMetric(
-                    label: 'Véhicules',
-                    detail: 'Parc total',
-                    icon: FluentIcons.car,
-                    loadValue: () => DatabaseCounters().countVehicles(),
-                    onRefresh: DatabaseCounters.invalidateCache,
-                  ),
-                  ModuleDashboardMetric(
-                    label: 'Libres',
-                    detail: 'État libre',
-                    icon: FluentIcons.check_mark,
-                    loadValue: () => DatabaseCounters().countVehiclesByDashboardStatus(etat: 0),
-                    onRefresh: DatabaseCounters.invalidateCache,
-                  ),
-                  ModuleDashboardMetric(
-                    label: 'En panne',
-                    detail: 'État panne',
-                    icon: FluentIcons.repair,
-                    loadValue: () => DatabaseCounters().countVehiclesByDashboardStatus(etat: 1),
-                    onRefresh: DatabaseCounters.invalidateCache,
-                  ),
-                  ModuleDashboardMetric(
-                    label: 'Au garage',
-                    detail: 'État garage',
-                    icon: FluentIcons.repair,
-                    loadValue: () => DatabaseCounters().countVehiclesByDashboardStatus(etat: 2),
-                    onRefresh: DatabaseCounters.invalidateCache,
-                  ),
-                  ModuleDashboardMetric(
-                    label: 'En marche',
-                    detail: 'État en marche',
-                    icon: FluentIcons.car,
-                    loadValue: () => DatabaseCounters().countVehiclesByDashboardStatus(etat: 3),
-                    onRefresh: DatabaseCounters.invalidateCache,
-                  ),
-                  ModuleDashboardMetric(
-                    label: 'En réforme',
-                    detail: 'Véhicules réformés',
-                    icon: FluentIcons.document,
-                    loadValue: () => DatabaseCounters().countVehiclesByDashboardStatus(etat: 4),
-                    onRefresh: DatabaseCounters.invalidateCache,
-                  ),
-                  ModuleDashboardMetric(
-                    label: 'Documents',
-                    detail: 'Documents véhicules',
-                    icon: FluentIcons.document_set,
-                    loadValue: () => DatabaseCounters().countVdocs(),
-                    onRefresh: DatabaseCounters.invalidateCache,
-                  ),
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _WorkspaceHeader(),
+          _WorkspaceNavigation(),
+          Expanded(
+            child: ValueListenableBuilder<int>(
+              valueListenable: selectedSection,
+              builder: (context, section, _) => IndexedStack(
+                index: section.clamp(0, 2),
+                children: const [
+                  VehicleTabs(),
+                  DocumentTabs(),
+                  _VehicleReferencesWorkspace(),
                 ],
               ),
-              const SizedBox(height: 26),
-              ModuleDashboardSectionHeader(
-                title: 'Gérer le parc automobile',
-                subtitle:
-                    'Ouvrez directement la gestion des véhicules, documents et référentiels.',
-              ),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: moduleActions,
-              ),
-              const SizedBox(height: 28),
-              ModuleDashboardSectionHeader(
-                title: 'État et activité du parc',
-                subtitle:
-                    'Suivez la répartition des véhicules et les dernières opérations enregistrées.',
-              ),
-              StaggeredGrid.count(
-                crossAxisCount: compact ? 1 : 2,
-                mainAxisSpacing: ParcotoTokens.space3,
-                crossAxisSpacing: ParcotoTokens.space3,
-                children: [
-                  ModuleDashboardPanel(
-                    title: 'Activité récente',
-                    child: const LogTable(
-                      statTable: true,
-                      numberOfRows: 4,
-                      pages: false,
-                      filters: {'typemin': '0', 'typemax': '9'},
-                      fieldsToShow: ['act', 'id', 'date'],
-                    ),
-                  ),
-                  ModuleDashboardPanel(
-                    title: 'Répartition des véhicules',
-                    child: ParcOtoPie(
-                      labels: [
-                        MapEntry('gstate', DatabaseCounters().countVehiclesByDashboardStatus(etat: 0)),
-                        MapEntry('bstate', DatabaseCounters().countVehiclesByDashboardStatus(etat: 1)),
-                        MapEntry('rstate', DatabaseCounters().countVehiclesByDashboardStatus(etat: 2)),
-                        MapEntry('ostate', DatabaseCounters().countVehiclesByDashboardStatus(etat: 3)),
-                        MapEntry('restate', DatabaseCounters().countVehiclesByDashboardStatus(etat: 4)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          );
-        },
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
+class _WorkspaceHeader extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.watch<AppTheme>();
+    final compact =
+        MediaQuery.sizeOf(context).width < ParcotoTokens.mobileBreakpoint;
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 16 : 28,
+        vertical: compact ? 16 : 20,
+      ),
+      decoration: BoxDecoration(
+        color: theme.surfaceColor,
+        border: Border(bottom: BorderSide(color: theme.borderColor)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: compact ? 42 : 48,
+            height: compact ? 42 : 48,
+            decoration: BoxDecoration(
+              color: theme.color.withValues(alpha: .12),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              FluentIcons.car,
+              color: theme.color,
+              size: compact ? 21 : 24,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Véhicules',
+                  style: TextStyle(
+                    color: theme.textColor,
+                    fontSize: compact ? 21 : 25,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -.6,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  compact
+                      ? 'Votre parc automobile'
+                      : 'Pilotez votre parc, ses documents et ses référentiels depuis un seul espace.',
+                  maxLines: compact ? 1 : 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: theme.mutedTextColor, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WorkspaceNavigation extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.watch<AppTheme>();
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+      decoration: BoxDecoration(
+        color: theme.surfaceColor,
+        border: Border(bottom: BorderSide(color: theme.borderColor)),
+      ),
+      child: ValueListenableBuilder<int>(
+        valueListenable: VehicleDashboard.selectedSection,
+        builder: (context, selected, _) => Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            _WorkspaceTab(
+              label: 'Parc automobile',
+              icon: FluentIcons.car,
+              selected: selected == 0,
+              onPressed: () => VehicleDashboard.selectedSection.value = 0,
+            ),
+            _WorkspaceTab(
+              label: 'Documents',
+              icon: FluentIcons.document_set,
+              selected: selected == 1,
+              onPressed: () => VehicleDashboard.selectedSection.value = 1,
+            ),
+            _WorkspaceTab(
+              label: 'Référentiels',
+              icon: FluentIcons.settings,
+              selected: selected == 2,
+              onPressed: () => VehicleDashboard.selectedSection.value = 2,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WorkspaceTab extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onPressed;
+
+  const _WorkspaceTab({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.watch<AppTheme>();
+    return Button(
+      onPressed: onPressed,
+      style: ButtonStyle(
+        padding: WidgetStateProperty.all(
+          const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        ),
+        backgroundColor: WidgetStateProperty.all(
+          selected ? theme.color.withValues(alpha: .12) : Colors.transparent,
+        ),
+        foregroundColor: WidgetStateProperty.all(
+          selected ? theme.color : theme.mutedTextColor,
+        ),
+        shape: WidgetStateProperty.all(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 15),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VehicleReferencesWorkspace extends StatelessWidget {
+  const _VehicleReferencesWorkspace();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.watch<AppTheme>();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 12),
+          decoration: BoxDecoration(
+            color: theme.backGroundColor,
+            border: Border(bottom: BorderSide(color: theme.borderColor)),
+          ),
+          child: ValueListenableBuilder<int>(
+            valueListenable: VehicleDashboard.selectedReference,
+            builder: (context, selected, _) => Wrap(
+              spacing: 8,
+              children: [
+                _WorkspaceTab(
+                  label: 'Marques',
+                  icon: FluentIcons.verified_brand,
+                  selected: selected == 0,
+                  onPressed: () =>
+                      VehicleDashboard.selectedReference.value = 0,
+                ),
+                _WorkspaceTab(
+                  label: 'États du véhicule',
+                  icon: FluentIcons.health,
+                  selected: selected == 1,
+                  onPressed: () =>
+                      VehicleDashboard.selectedReference.value = 1,
+                ),
+              ],
+            ),
+          ),
+        ),
+        Expanded(
+          child: ValueListenableBuilder<int>(
+            valueListenable: VehicleDashboard.selectedReference,
+            builder: (context, selected, _) => IndexedStack(
+              index: selected.clamp(0, 1),
+              children: const [
+                BrandList(),
+                StateTabs(),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
