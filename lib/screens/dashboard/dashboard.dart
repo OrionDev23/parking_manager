@@ -620,16 +620,20 @@ class _DashboardState extends State<Dashboard>
     }
 
     var inventory = const DashboardInventorySummary();
-    try {
-      inventory = await _loadInventorySnapshot(companyId)
-          .timeout(const Duration(seconds: 25));
-      if (!inventory.verified) {
-        _loadMessage ??=
-            'Le stock affiché provient du cache local et peut être incomplet.';
+    if (companyId == null || companyId.isEmpty) {
+      _loadMessage ??= 'Aucune entreprise active pour charger le stock.';
+    } else {
+      try {
+        inventory = await _loadInventorySnapshot(companyId)
+            .timeout(const Duration(seconds: 25));
+        if (!inventory.verified) {
+          _loadMessage ??=
+              'Le stock affiché provient du cache local et peut être incomplet.';
+        }
+      } catch (error) {
+        _loadMessage ??= 'Les données du stock ne sont pas disponibles.';
+        debugPrint('[ParcOto Dashboard] inventory snapshot failed: $error');
       }
-    } catch (error) {
-      _loadMessage ??= 'Les données du stock ne sont pas disponibles.';
-      debugPrint('[ParcOto Dashboard] inventory snapshot failed: $error');
     }
 
     final now = DateTime.now();
