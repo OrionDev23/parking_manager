@@ -27,6 +27,8 @@ class _AppointmentFormState extends State<AppointmentForm> {
   String _subject = '';
   bool _isAllDay = false;
   String? _notes = '';
+  late final TextEditingController _subjectController;
+  late final TextEditingController _notesController;
   late DateTime _startDate;
 
   late DateTime _endDate;
@@ -44,6 +46,9 @@ class _AppointmentFormState extends State<AppointmentForm> {
 
   @override
   void initState() {
+    super.initState();
+    _subjectController = TextEditingController(text: _subject);
+    _notesController = TextEditingController(text: _notes);
     if (widget.startDate != null) {
       _startDate = DateTime(
         widget.startDate!.year,
@@ -57,7 +62,13 @@ class _AppointmentFormState extends State<AppointmentForm> {
       _startDate = DateTime.now();
     }
     _endDate = _startDate.add(const Duration(hours: 2));
-    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _subjectController.dispose();
+    _notesController.dispose();
+    super.dispose();
   }
 
   List<String> categories = [
@@ -94,7 +105,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                     color: appTheme.color.lightest,
                   ),
                   title: ParcotoTextBox(
-                    controller: TextEditingController(text: _subject),
+                    controller: _subjectController,
                     onChanged: (String value) {
                       _subject = value;
                     },
@@ -384,7 +395,7 @@ class _AppointmentFormState extends State<AppointmentForm> {
                     color: appTheme.color.lightest,
                   ),
                   title: ParcotoTextBox(
-                    controller: TextEditingController(text: _notes),
+                    controller: _notesController,
                     onChanged: (String value) {
                       _notes = value;
                     },
