@@ -382,7 +382,7 @@ class _DashboardState extends State<Dashboard>
       child: UpcomingInterventions(items: _snapshot.upcoming),
     );
     final watchlist = DashboardPanel(
-      title: 'Alertes du parc et des conducteurs',
+      title: 'Véhicules à surveiller',
       icon: FluentIcons.health,
       height: 270,
       trailing: _viewAllButton('vehicle-manager'),
@@ -467,6 +467,7 @@ class _DashboardState extends State<Dashboard>
                 title: 'Documents à renouveler',
                 icon: FluentIcons.document_set,
                 height: 292,
+                trailing: _documentModuleActions(),
                 child: ExpiringDocumentsWidget(
                   summary: _snapshot.documents,
                 ),
@@ -581,6 +582,25 @@ class _DashboardState extends State<Dashboard>
           const Icon(FluentIcons.chevron_right, size: 11),
         ],
       ),
+    );
+  }
+
+  Widget _documentModuleActions() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Button(
+          onPressed: () =>
+              PaneItemsAndFooters.selectPane('vehicle-documents'),
+          child: const Text('Véhicules'),
+        ),
+        const SizedBox(width: 5),
+        Button(
+          onPressed: () =>
+              PaneItemsAndFooters.selectPane('driver-documents'),
+          child: const Text('Conducteurs'),
+        ),
+      ],
     );
   }
 
