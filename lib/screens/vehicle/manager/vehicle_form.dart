@@ -52,8 +52,17 @@ class VehicleForm extends StatefulWidget {
   final Tab? tab;
 
   final bool readOnly;
+  final VoidCallback? onCancel;
+  final ValueChanged<Vehicle>? onSaved;
 
-  const VehicleForm({super.key, this.vehicle, this.tab, this.readOnly = false});
+  const VehicleForm({
+    super.key,
+    this.vehicle,
+    this.tab,
+    this.readOnly = false,
+    this.onCancel,
+    this.onSaved,
+  });
 
   @override
   State<VehicleForm> createState() => _VehicleFormState();
@@ -110,7 +119,6 @@ class _VehicleFormState extends State<VehicleForm>
   final nextServiceMileageController = TextEditingController();
   DateTime? selectedAnnee = DateTime(2023);
   bool autreMat = false;
-  int selectedFormSection = 0;
   int? marque;
 
   bool erreurMatricule = false;
@@ -248,111 +256,138 @@ class _VehicleFormState extends State<VehicleForm>
   Widget build(BuildContext context) {
     super.build(context);
     final appTheme = context.watch<AppTheme>();
+
     return ScaffoldPage(
-      content: LayoutBuilder(builder: (context, constraints) {
-        final wide = constraints.maxWidth >= 1180;
-        final showSummary = constraints.maxWidth >= 1540;
-        return Container(
-          color: appTheme.backGroundColor,
-          child: Column(children: [
-            _buildEditorHeader(appTheme),
-            Expanded(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              if (wide) _buildEditorSidebar(appTheme),
-              Expanded(child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: wide ? 26 : 14, vertical: 22),
-                child: Center(child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1120),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                    if (!wide) _buildFormSectionNavigation(appTheme),
-                    _buildActiveSectionHeading(appTheme),
-                    Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: FluentTheme.of(context).micaBackgroundColor,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey[30]),
-                      ),
-                      child: StaggeredGrid.count(
-                        crossAxisCount: 12,
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 8,
-                        children: gridChildren(appTheme),
-                      ),
-                    ),
-                  ]),
-                )),
-              )),
-              if (showSummary) SizedBox(
-                width: 278,
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(0, 22, 20, 22),
-                  child: _buildEditorSummary(appTheme),
-                ),
-              ),
-            ])),
-          ]),
-        );
-      }),
-      bottomBar: widget.readOnly ? null : LayoutBuilder(
+      padding: EdgeInsets.zero,
+      content: LayoutBuilder(
         builder: (context, constraints) {
-          final compact = constraints.maxWidth < 680;
-          final message = errorUploading
-              ? Text('errupld', style:  TextStyle(color: Colors.red)).tr()
-              : const Text(
-                  'Les modifications ne sont enregistrées qu’après confirmation.',
-                  style: TextStyle(fontSize: 11),
-                );
-          final actions = [
-            Button(
-              onPressed: uploading ? null : () => setState(() => selectedFormSection = 0),
-              child: const Text('Retour à l’identification'),
+          final compact = constraints.maxWidth < 720;
+          final showSummary = constraints.maxWidth >= 1220;
+
+          final formContent = Container(
+            padding: EdgeInsets.all(compact ? 12 : 20),
+            decoration: BoxDecoration(
+              color: FluentTheme.of(context).micaBackgroundColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.grey[30]),
             ),
-            FilledButton(
-              onPressed: uploading ? null : confirmAndUpload,
-              child: uploading
-                  ? const ProgressRing()
-                  : const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(FluentIcons.save, size: 14),
-                        SizedBox(width: 8),
-                        Text('Enregistrer le véhicule'),
-                      ],
+            child: StaggeredGrid.count(
+              crossAxisCount: 12,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              children: gridChildren(appTheme),
+            ),
+          );
+
+          return Container(
+            color: appTheme.backGroundColor,
+            child: Column(
+              children: [
+                _buildEditorHeader(appTheme),
+                Expanded(
+                  child: SingleChildScrollView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: compact ? 12 : 24,
+                      vertical: compact ? 14 : 22,
                     ),
-            ),
-          ];
-          return Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: 9,
-              horizontal: compact ? 12 : 18,
-            ),
-            child: compact
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      message,
-                      const SizedBox(height: 9),
-                      Wrap(
-                        alignment: WrapAlignment.end,
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: actions,
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1380),
+                        child: showSummary
+                            ? Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(flex: 7, child: formContent),
+                                  const SizedBox(width: 20),
+                                  SizedBox(
+                                    width: 300,
+                                    child: _buildEditorSummary(appTheme),
+                                  ),
+                                ],
+                              )
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [formContent],
+                              ),
                       ),
-                    ],
-                  )
-                : Row(
-                    children: [
-                      Expanded(child: message),
-                      ...actions.expand((action) => [
-                        if (action != actions.first) const SizedBox(width: 10),
-                        action,
-                      ]),
-                    ],
+                    ),
                   ),
+                ),
+              ],
+            ),
           );
         },
       ),
+      bottomBar: widget.readOnly
+          ? null
+          : LayoutBuilder(
+              builder: (context, constraints) {
+                final compact = constraints.maxWidth < 680;
+                final message = errorUploading
+                    ? Text(
+                        'errupld',
+                        style: const TextStyle(color: Colors.red),
+                      ).tr()
+                    : const Text(
+                        'Les modifications ne sont enregistrées qu’après confirmation.',
+                        style: TextStyle(fontSize: 11),
+                      );
+                final actions = <Widget>[
+                  if (widget.onCancel != null)
+                    Button(
+                      onPressed: uploading ? null : widget.onCancel,
+                      child: const Text('Annuler'),
+                    ),
+                  FilledButton(
+                    onPressed: uploading ? null : confirmAndUpload,
+                    child: uploading
+                        ? const ProgressRing()
+                        : const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(FluentIcons.save, size: 14),
+                              SizedBox(width: 8),
+                              Text('Enregistrer le véhicule'),
+                            ],
+                          ),
+                  ),
+                ];
+
+                return Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 9,
+                    horizontal: compact ? 12 : 18,
+                  ),
+                  child: compact
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            message,
+                            const SizedBox(height: 9),
+                            Wrap(
+                              alignment: WrapAlignment.end,
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: actions,
+                            ),
+                          ],
+                        )
+                      : Row(
+                          children: [
+                            Expanded(child: message),
+                            ...actions.expand((action) => [
+                                  if (action != actions.first)
+                                    const SizedBox(width: 10),
+                                  action,
+                                ]),
+                          ],
+                        ),
+                );
+              },
+            ),
     );
   }
 
@@ -464,90 +499,6 @@ class _VehicleFormState extends State<VehicleForm>
       Text(label, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600)),
     ]),
   );
-
-  Widget _buildEditorSidebar(AppTheme appTheme) => Container(
-    width: 236,
-    padding: const EdgeInsets.fromLTRB(14, 22, 12, 18),
-    decoration: BoxDecoration(border: Border(right: BorderSide(color: Colors.grey[30]))),
-    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Padding(
-        padding: const EdgeInsets.fromLTRB(8, 0, 8, 14),
-        child: Text('CONFIGURATION DU VÉHICULE',
-          style: TextStyle(fontSize: 10, letterSpacing: 1.1, color: Colors.grey[100], fontWeight: FontWeight.w700)),
-      ),
-      Expanded(child: ListView(children: List.generate(_formSections.length, (index) {
-        final active = selectedFormSection == index;
-        const descriptions = [
-          'Identité et immatriculation',
-          'Carte grise et localisation',
-          'Conducteur et organisation',
-          'Motorisation et dimensions',
-          'Acquisition et exploitation',
-          'Anciens numéros connus',
-        ];
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 5),
-          child: Button(
-            style: ButtonStyle(
-              padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 10, vertical: 12)),
-              backgroundColor: WidgetStateProperty.all(active ? appTheme.color.withValues(alpha: .12) : Colors.transparent),
-              foregroundColor: WidgetStateProperty.all(active ? appTheme.color : null),
-            ),
-            onPressed: () => setState(() => selectedFormSection = index),
-            child: Row(children: [
-              Container(width: 30, height: 30, alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: active ? appTheme.color.withValues(alpha: .16) : Colors.grey[20],
-                  borderRadius: BorderRadius.circular(9)),
-                child: Icon(_formSections[index].$2, size: 14, color: active ? appTheme.color : Colors.grey[100])),
-              const SizedBox(width: 10),
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(_formSections[index].$1, style: TextStyle(fontSize: 12, fontWeight: active ? FontWeight.w700 : FontWeight.w600)),
-                const SizedBox(height: 3),
-                Text(descriptions[index], maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 10, color: Colors.grey[100])),
-              ])),
-              if (active) Icon(FluentIcons.chevron_right, size: 12, color: appTheme.color),
-            ]),
-          ),
-        );
-      }))),
-      Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: appTheme.color.withValues(alpha: .07), borderRadius: BorderRadius.circular(12)),
-        child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Icon(FluentIcons.info, size: 16), SizedBox(height: 8),
-          Text('Conseil', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-          SizedBox(height: 4),
-          Text('Renseignez les informations disponibles. Les données facultatives pourront être complétées plus tard.',
-            style: TextStyle(fontSize: 10, height: 1.4)),
-        ]),
-      ),
-    ]),
-  );
-
-  Widget _buildActiveSectionHeading(AppTheme appTheme) {
-    const subtitles = [
-      'Définissez l’identité du véhicule et son immatriculation.',
-      'Renseignez les informations de carte grise et son adresse administrative.',
-      'Décrivez le rattachement organisationnel et le conducteur associé.',
-      'Configurez les caractéristiques mécaniques et physiques.',
-      'Centralisez l’acquisition, la garantie et le suivi kilométrique.',
-      'Conservez la traçabilité des anciennes immatriculations.',
-    ];
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(children: [
-        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(_formSections[selectedFormSection].$1, style: const TextStyle(fontSize: 23, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 5),
-          Text(subtitles[selectedFormSection], style: TextStyle(fontSize: 12, color: Colors.grey[100])),
-        ])),
-        Text('${selectedFormSection + 1} / ${_formSections.length}',
-          style: TextStyle(fontSize: 12, color: appTheme.color, fontWeight: FontWeight.w700)),
-      ]),
-    );
-  }
 
   Widget _buildEditorSummary(AppTheme appTheme) {
     final previewListenable = Listenable.merge([
@@ -722,118 +673,46 @@ class _VehicleFormState extends State<VehicleForm>
     ]),
   );
 
-  static const _formSections = [
-    ('Identification', FluentIcons.car),
-    ('Administratif', FluentIcons.document),
-    ('Affectation', FluentIcons.people),
-    ('Technique', FluentIcons.repair),
-    ('Exploitation & finances', FluentIcons.money),
-    ('Immatriculations', FluentIcons.document),
-  ];
-
-  Widget _buildFormSectionNavigation(AppTheme appTheme) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(
-          color: appTheme.color.withValues(alpha: .18),
-        )),
-      ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: List.generate(_formSections.length, (index) {
-            final active = selectedFormSection == index;
-            return Padding(
-              padding: const EdgeInsets.only(right: 6),
-              child: Button(
-                style: ButtonStyle(
-                  padding: WidgetStateProperty.all(
-                    const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
-                  ),
-                  backgroundColor: WidgetStateProperty.all(
-                    active ? appTheme.color.withValues(alpha: .13) : Colors.transparent,
-                  ),
-                  foregroundColor: WidgetStateProperty.all(active ? appTheme.color : null),
-                ),
-                onPressed: () => setState(() => selectedFormSection = index),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(_formSections[index].$2, size: 14),
-                    const SizedBox(width: 7),
-                    Text(_formSections[index].$1, style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-                    )),
-                  ],
-                ),
-              ),
-            );
-          }),
-        ),
-      ),
-    );
-  }
-
   List<Widget> gridChildren(AppTheme appTheme) {
-    switch (selectedFormSection) {
-      case 0:
-        return [_buildVehicleIdentitySection(appTheme)];
-      case 1:
-        return [
-          _sectionHeader(
-            appTheme,
-            'Localisation et documents administratifs',
-            'Pays, wilaya, commune et informations de la carte grise',
-          ),
-          ...getWilayaCommuneWidget(appTheme),
-          ...secondLine(appTheme),
-        ];
-      case 2:
-        return [
-          if (conducteurEmploye) ...[
-            _sectionHeader(
-              appTheme,
-              'Propriétaire et conducteur',
-              'Informations sur le propriétaire et le conducteur associé',
-            ),
-            ...thirdLine(appTheme),
-            ...forthLine(appTheme),
-          ],
-          _sectionHeader(
-            appTheme,
-            'Organisation et rattachement',
-            'Appartenance, filiale, direction et département',
-          ),
-          ...fifthLine(appTheme),
-        ];
-      case 3:
-        return [
-          _sectionHeader(
-            appTheme,
-            'Caractéristiques techniques',
-            'Configuration, motorisation, capacité et caractéristiques du véhicule',
-          ),
-          ...seventhLine(appTheme),
-        ];
-      case 4:
-        return [_buildProfessionalDetailsSection(appTheme)];
-      case 5:
-        return [
-          _sectionHeader(
-            appTheme,
-            'Historique des immatriculations',
-            'Anciennes immatriculations connues pour ce véhicule',
-          ),
-          ...eightLine(appTheme),
-        ];
-      default:
-        return const [];
-    }
+    return [
+      _buildVehicleIdentitySection(appTheme),
+      _sectionHeader(
+        appTheme,
+        'Carte grise et localisation',
+        'Informations administratives, date de carte grise et adresse du véhicule',
+      ),
+      ...getWilayaCommuneWidget(appTheme),
+      ...secondLine(appTheme),
+      if (conducteurEmploye) ...[
+        _sectionHeader(
+          appTheme,
+          'Propriétaire et conducteur',
+          'Identité du propriétaire et conducteur actuellement associé',
+        ),
+        ...thirdLine(appTheme),
+        ...forthLine(appTheme),
+      ],
+      _sectionHeader(
+        appTheme,
+        'Organisation et rattachement',
+        'Appartenance, filiale, direction et département',
+      ),
+      ...fifthLine(appTheme),
+      _sectionHeader(
+        appTheme,
+        'Caractéristiques techniques',
+        'Motorisation, transmission, dimensions et capacités',
+      ),
+      ...seventhLine(appTheme),
+      _buildProfessionalDetailsSection(appTheme),
+      _sectionHeader(
+        appTheme,
+        'Historique des immatriculations',
+        'Anciennes immatriculations connues pour ce véhicule',
+      ),
+      ...eightLine(appTheme),
+    ];
   }
-
   Widget _buildVehicleIdentitySection(AppTheme appTheme) {
     return StaggeredGridTile.fit(
       crossAxisCellCount: 12,
@@ -3118,6 +2997,7 @@ class _VehicleFormState extends State<VehicleForm>
         } catch (_) {
           // Activity logging remains best-effort while offline.
         }
+        widget.onSaved?.call(vehicle);
       } catch (_) {
         if (mounted) {
           displayInfoBar(

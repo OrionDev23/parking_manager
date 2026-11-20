@@ -12,13 +12,18 @@ import 'package:provider/provider.dart';
 class VehicleDetailsPage extends StatefulWidget {
   final Vehicle vehicle;
   final VoidCallback? onEdit;
-  const VehicleDetailsPage({super.key, required this.vehicle, this.onEdit});
+  final VoidCallback? onBack;
+  const VehicleDetailsPage({
+    super.key,
+    required this.vehicle,
+    this.onEdit,
+    this.onBack,
+  });
   @override
   State<VehicleDetailsPage> createState() => _VehicleDetailsPageState();
 }
 
 class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
-  int selected = 0;
   bool _requestedDocuments = false;
   bool _requestedMaintenance = false;
   bool _loadingMaintenance = false;
@@ -27,6 +32,16 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   List<Etat> _vehicleStates = [];
   List<FicheReception> _receptionSheets = [];
   Vehicle get v => widget.vehicle;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _loadMaintenance();
+      _loadHistory();
+    });
+  }
 
   @override
   void didChangeDependencies() {
@@ -41,18 +56,6 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     }
   }
 
-  static const sections = [
-    ('Vue générale', FluentIcons.car),
-    ('Identification', FluentIcons.people),
-    ('Spécifications', FluentIcons.car),
-    ('Affectation', FluentIcons.people),
-    ('GPS', FluentIcons.car),
-    ('Maintenance', FluentIcons.repair),
-    ('Documents', FluentIcons.document),
-    ('Historique', FluentIcons.document),
-    ('Finances', FluentIcons.money),
-  ];
-
   String val(String? s) =>
       s == null || s.trim().isEmpty ? 'Non renseigné' : s.trim();
   String n(num? x, [String suffix = '']) =>
@@ -65,16 +68,26 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     final model = [val(v.marque), val(v.type), v.modelYear?.toString() ?? '']
         .where((e) => e != 'Non renseigné' && e.isNotEmpty)
         .join(' ');
+    final compact = MediaQuery.sizeOf(context).width < 640;
     return Container(
       color: app.backGroundColor,
       child: Column(
         children: [
           _header(accent, model.isEmpty ? 'Fiche véhicule' : model),
-          _navigation(accent),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(22, 20, 22, 28),
-              child: _content(accent),
+              padding: EdgeInsets.fromLTRB(
+                compact ? 12 : 22,
+                18,
+                compact ? 12 : 22,
+                28,
+              ),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1440),
+                  child: _content(accent),
+                ),
+              ),
             ),
           ),
         ],
@@ -85,47 +98,64 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   Widget _header(Color accent, String model) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final compact = constraints.maxWidth < 650;
-        final identity = Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'FICHE VÉHICULE',
-              style: TextStyle(
-                color: accent,
-                fontSize: 10,
-                letterSpacing: 1.1,
-                fontWeight: FontWeight.w700,
+        final compact = constraints.maxWidth < 680;
+        final identity = Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'FICHE VÉHICULE',
+                style: TextStyle(
+                  color: accent,
+                  fontSize: 10,
+                  letterSpacing: 1.1,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              v.matricule,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: compact ? 21 : 25,
-                fontWeight: FontWeight.w800,
-                letterSpacing: .2,
+              const SizedBox(height: 5),
+              Text(
+                v.matricule,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: compact ? 20 : 25,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: .2,
+                ),
               ),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              model.isEmpty ? 'Modèle non renseigné' : model,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.grey[100],
-                fontSize: 13,
-                height: 1.3,
+              const SizedBox(height: 4),
+              Text(
+                model.isEmpty ? 'Modèle non renseigné' : model,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.grey[100],
+                  fontSize: 12,
+                  height: 1.3,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
 
-        final actions = widget.onEdit == null
-            ? const SizedBox.shrink()
-            : FilledButton(
+        final actions = Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            if (widget.onBack != null)
+              Button(
+                onPressed: widget.onBack,
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(FluentIcons.back, size: 13),
+                    SizedBox(width: 7),
+                    Text('Retour au parc'),
+                  ],
+                ),
+              ),
+            if (widget.onEdit != null)
+              FilledButton(
                 onPressed: widget.onEdit,
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
@@ -135,74 +165,45 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                     Text('Modifier'),
                   ],
                 ),
-              );
-
-        final statusChips = <Widget>[
-          if (v.etat?.trim().isNotEmpty == true) _chip(v.etat!.trim(), accent),
-          if (v.service) _chip('Véhicule de service', accent),
-          if (v.lourd) _chip('Poids lourd', accent),
-        ];
-
-        final quickStats = <Widget>[
-          if (v.currentMileage != null)
-            _headerStat('KILOMÉTRAGE', n(v.currentMileage, ' km')),
-          if (v.fleetNumber?.trim().isNotEmpty == true)
-            _headerStat('N° DE PARC', v.fleetNumber!.trim()),
-          if (v.numeroSerie?.trim().isNotEmpty == true)
-            _headerStat('VIN / CHÂSSIS', v.numeroSerie!.trim()),
-        ];
+              ),
+          ],
+        );
 
         return Container(
           padding: EdgeInsets.fromLTRB(
-            compact ? 14 : 22,
+            compact ? 12 : 22,
+            compact ? 12 : 18,
+            compact ? 12 : 22,
             compact ? 14 : 18,
-            compact ? 14 : 22,
-            compact ? 15 : 18,
           ),
           decoration: BoxDecoration(
             color: FluentTheme.of(context).micaBackgroundColor,
             border: Border(bottom: BorderSide(color: Colors.grey[30])),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _vehicleAvatar(accent, compact: compact),
-                  SizedBox(width: compact ? 12 : 18),
-                  Expanded(child: identity),
-                  if (!compact) ...[
+          child: compact
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        _vehicleAvatar(accent, compact: true),
+                        const SizedBox(width: 12),
+                        identity,
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    actions,
+                  ],
+                )
+              : Row(
+                  children: [
+                    _vehicleAvatar(accent, compact: false),
+                    const SizedBox(width: 18),
+                    identity,
                     const SizedBox(width: 14),
                     actions,
                   ],
-                ],
-              ),
-              if (compact && widget.onEdit != null) ...[
-                const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: actions,
                 ),
-              ],
-              if (statusChips.isNotEmpty) ...[
-                const SizedBox(height: 13),
-                Wrap(
-                  spacing: 7,
-                  runSpacing: 7,
-                  children: statusChips,
-                ),
-              ],
-              if (quickStats.isNotEmpty) ...[
-                const SizedBox(height: 14),
-                Wrap(
-                  spacing: 9,
-                  runSpacing: 9,
-                  children: quickStats,
-                ),
-              ],
-            ],
-          ),
         );
       },
     );
@@ -291,48 +292,6 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 color: accent, fontSize: 11, fontWeight: FontWeight.w600)),
       );
 
-  Widget _navigation(Color accent) => Container(
-        height: 58,
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        decoration:
-            BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey[30]))),
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: sections.length,
-          separatorBuilder: (_, _) => const SizedBox(width: 5),
-          itemBuilder: (context, i) {
-            final active = selected == i;
-            return Button(
-              style: ButtonStyle(
-                padding: WidgetStateProperty.all(
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
-                backgroundColor: WidgetStateProperty.all(
-                    active ? accent.withValues(alpha: .12) : Colors.transparent),
-                foregroundColor:
-                    WidgetStateProperty.all(active ? accent : null),
-              ),
-              onPressed: () {
-                setState(() => selected = i);
-                if (i == 5) _loadMaintenance();
-                if (i == 7) _loadHistory();
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(sections[i].$2, size: 14),
-                  const SizedBox(width: 7),
-                  Text(sections[i].$1,
-                      style: TextStyle(
-                          fontSize: 12,
-                          fontWeight:
-                              active ? FontWeight.w700 : FontWeight.w500)),
-                ],
-              ),
-            );
-          },
-        ),
-      );
-
   Future<void> _loadHistory() async {
     if (_requestedHistory || _loadingHistory) return;
     _requestedHistory = true;
@@ -402,122 +361,203 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   }
 
   Widget _content(Color accent) {
-    switch (selected) {
-      case 0:
-        return _overview(accent);
-      case 1:
-        return _section('Identification',
-            'Identité administrative et informations principales', [
-          _group('Immatriculation', [
-            _field('Immatriculation', v.matricule),
-            _field('Anciennes immatriculations', v.matriculePrec?.join(', ')),
-            _field('Pays', v.pays),
-            _field('Date carte grise', _date(v.date)),
-            _field('Numéro carte grise', v.numero),
-            _field('Numéro de série / VIN', v.numeroSerie)
-          ]),
-          _group('Identité du véhicule', [
-            _field('Marque', v.marque),
-            _field('Modèle / type', v.type),
-            _field('Finition', v.trim),
-            _field('Année modèle', v.modelYear?.toString()),
-            _field('Mise en circulation', v.anneeUtil?.toString()),
-            _field('Couleur', v.color),
-            _field('Carrosserie', v.carrosserie)
-          ]),
-          _group('Adresse administrative', [
-            _field('Wilaya', v.wilaya?.toString()),
-            _field('Daïra', v.daira),
-            _field('Commune', v.commune),
-            _field('Adresse', v.adresse)
-          ]),
-        ]);
-      case 2:
-        return _section(
-            'Spécifications techniques',
-            'Motorisation, transmission, dimensions et capacités', [
-          _group('Motorisation', [
-            _field('Énergie', v.energie),
-            _field('Puissance fiscale', v.puissance == null ? null : '${v.puissance} CV fiscaux'),
-            _field('Puissance moteur (ch)', v.enginePowerHp == null ? null : '${v.enginePowerHp} ch'),
-            _field('Puissance moteur (kW)', v.enginePowerKw == null ? null : '${v.enginePowerKw} kW'),
-            _field('Cylindrée',
-                v.engineDisplacement == null ? null : '${v.engineDisplacement} cm³'),
-            _field('Code moteur', v.engineCode)
-          ]),
-          _group('Transmission', [
-            _field('Transmission', v.transmission),
-            _field('Boîte', v.gearbox),
-            _field('Roues motrices', v.driveType)
-          ]),
-          _group('Dimensions & capacité', [
-            _field('Portes', v.doors?.toString()),
-            _field('Places', v.placesAssises?.toString()),
-            _field('Poids total',
-                v.poidsTotal == null ? null : '${v.poidsTotal} kg'),
-            _field('Charge utile',
-                v.charegeUtile == null ? null : '${v.charegeUtile} kg'),
-            _field('Longueur',
-                v.lengthMm == null ? null : '${v.lengthMm} mm'),
-            _field('Largeur', v.widthMm == null ? null : '${v.widthMm} mm'),
-            _field('Hauteur', v.heightMm == null ? null : '${v.heightMm} mm')
-          ]),
-        ]);
-      case 3:
-        return _section(
-            'Affectation & organisation',
-            'Rattachement administratif et conducteur associé', [
-          _group('Organisation', [
-            _field('Appartenance', v.appartenance),
-            _field('Filiale', v.filliale),
-            _field('Direction', v.direction),
-            _field('Département', v.departement),
-            _field('Périmètre', v.perimetre.toString()),
-            _field('Emplacement', v.emplacement)
-          ]),
-          _group('Propriétaire', [
-            _field('Nom', v.nom),
-            _field('Prénom', v.prenom),
-            _field('Profession', v.profession)
-          ]),
-          _group('Conducteur', [
-            _field('Matricule conducteur', v.matriculeConducteur),
-            _field('Appartenance conducteur', v.appartenanceconducteur)
-          ]),
-        ]);
-      case 4:
-        return _empty(
-            FluentIcons.car,
-            'Aucune position GPS disponible',
-            'La dernière position apparaîtra ici lorsqu’un conducteur autorisé aura transmis sa position depuis Parcoto Mobile.',
-            'Suivi GPS non encore activé');
-      case 5:
-        return _maintenanceSection(accent);
-      case 6:
-        return _documentsSection(accent);
-      case 7:
-        return _historySection(accent);
-      default:
-        return _section(
-            'Finances & cycle de vie',
-            'Acquisition, garantie et suivi kilométrique', [
-          _group('Acquisition', [
-            _field('Mode', v.acquisitionType),
-            _field('Date', _date(v.acquisitionDate)),
-            _field('Prix d’achat',
-                v.purchasePrice == null ? null : '${v.purchasePrice} DA'),
-            _field('Fournisseur', v.supplier),
-            _field('Fin de garantie', _date(v.warrantyEndDate))
-          ]),
-          _group('Kilométrage', [
-            _field('Kilométrage actuel',
-                v.currentMileage == null ? null : '${v.currentMileage} km'),
-            _field('Prochaine révision',
-                v.nextServiceMileage == null ? null : '${v.nextServiceMileage} km')
-          ]),
-        ]);
-    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _overview(accent),
+        _section(
+          'Identification',
+          'Identité administrative et informations principales',
+          [
+            _group('Immatriculation', [
+              _field('Immatriculation', v.matricule),
+              _field('Anciennes immatriculations', v.matriculePrec?.join(', ')),
+              _field('Pays', v.pays),
+              _field('Date carte grise', _date(v.date)),
+              _field('Numéro carte grise', v.numero),
+              _field('Numéro de série / VIN', v.numeroSerie),
+            ]),
+            _group('Identité du véhicule', [
+              _field('Marque', v.marque),
+              _field('Modèle / type', v.type),
+              _field('Finition', v.trim),
+              _field('Année modèle', v.modelYear?.toString()),
+              _field('Mise en circulation', v.anneeUtil?.toString()),
+              _field('Couleur', v.color),
+              _field('Carrosserie', v.carrosserie),
+            ]),
+            _group('Adresse administrative', [
+              _field('Wilaya', v.wilaya?.toString()),
+              _field('Daïra', v.daira),
+              _field('Commune', v.commune),
+              _field('Adresse', v.adresse),
+            ]),
+          ],
+        ),
+        _section(
+          'Spécifications techniques',
+          'Motorisation, transmission, dimensions et capacités',
+          [
+            _group('Motorisation', [
+              _field('Énergie', v.energie),
+              _field('Puissance fiscale',
+                  v.puissance == null ? null : '${v.puissance} CV fiscaux'),
+              _field('Puissance moteur (ch)',
+                  v.enginePowerHp == null ? null : '${v.enginePowerHp} ch'),
+              _field('Puissance moteur (kW)',
+                  v.enginePowerKw == null ? null : '${v.enginePowerKw} kW'),
+              _field('Cylindrée',
+                  v.engineDisplacement == null
+                      ? null
+                      : '${v.engineDisplacement} cm³'),
+              _field('Code moteur', v.engineCode),
+            ]),
+            _group('Transmission', [
+              _field('Transmission', v.transmission),
+              _field('Boîte', v.gearbox),
+              _field('Roues motrices', v.driveType),
+            ]),
+            _group('Dimensions & capacité', [
+              _field('Portes', v.doors?.toString()),
+              _field('Places', v.placesAssises?.toString()),
+              _field('Poids total',
+                  v.poidsTotal == null ? null : '${v.poidsTotal} kg'),
+              _field('Charge utile',
+                  v.charegeUtile == null ? null : '${v.charegeUtile} kg'),
+              _field('Longueur',
+                  v.lengthMm == null ? null : '${v.lengthMm} mm'),
+              _field('Largeur', v.widthMm == null ? null : '${v.widthMm} mm'),
+              _field('Hauteur', v.heightMm == null ? null : '${v.heightMm} mm'),
+            ]),
+          ],
+        ),
+        _section(
+          'Affectation & organisation',
+          'Rattachement administratif et conducteur associé',
+          [
+            _group('Organisation', [
+              _field('Appartenance', v.appartenance),
+              _field('Filiale', v.filliale),
+              _field('Direction', v.direction),
+              _field('Département', v.departement),
+              _field('Périmètre', v.perimetre.toString()),
+              _field('Emplacement', v.emplacement),
+            ]),
+            _group('Propriétaire', [
+              _field('Nom', v.nom),
+              _field('Prénom', v.prenom),
+              _field('Profession', v.profession),
+            ]),
+            _group('Conducteur', [
+              _field('Matricule conducteur', v.matriculeConducteur),
+              _field('Appartenance conducteur', v.appartenanceconducteur),
+            ]),
+          ],
+        ),
+        _gpsParkingSection(accent),
+        _maintenanceSection(accent),
+        _documentsSection(accent),
+        _historySection(accent),
+        _section(
+          'Finances & cycle de vie',
+          'Acquisition, garantie et suivi kilométrique',
+          [
+            _group('Acquisition', [
+              _field('Mode', v.acquisitionType),
+              _field('Date', _date(v.acquisitionDate)),
+              _field('Prix d’achat',
+                  v.purchasePrice == null ? null : '${v.purchasePrice} DA'),
+              _field('Fournisseur', v.supplier),
+              _field('Fin de garantie', _date(v.warrantyEndDate)),
+            ]),
+            _group('Kilométrage', [
+              _field('Kilométrage actuel',
+                  v.currentMileage == null ? null : '${v.currentMileage} km'),
+              _field('Prochaine révision',
+                  v.nextServiceMileage == null
+                      ? null
+                      : '${v.nextServiceMileage} km'),
+            ]),
+          ],
+        ),
+      ],
+    );
   }
+
+  Widget _gpsParkingSection(Color accent) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _heading(
+          'Géolocalisation & stationnement',
+          'Position et emplacement du véhicule dans le parc',
+        ),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final twoColumns = constraints.maxWidth >= 620;
+            final cardWidth = twoColumns
+                ? (constraints.maxWidth - 14) / 2
+                : constraints.maxWidth;
+            return Wrap(
+              spacing: 14,
+              runSpacing: 14,
+              children: [
+                SizedBox(
+                  width: cardWidth,
+                  child: _panel(
+                    'Suivi GPS',
+                    FluentIcons.car,
+                    accent,
+                    [
+                      _statusValue(
+                        'Dernière position reçue',
+                        'Aucune donnée GPS disponible',
+                        accent,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Le suivi GPS n’est pas encore connecté à une source de position pour ce véhicule.',
+                        style: TextStyle(
+                          color: Colors.grey[100],
+                          fontSize: 11,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  width: cardWidth,
+                  child: _panel(
+                    'Parking & emplacement',
+                    FluentIcons.car,
+                    accent,
+                    [
+                      _statusValue(
+                        'Emplacement enregistré',
+                        val(v.emplacement),
+                        accent,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'L’affectation à un parking et à une place numérotée sera reliée au plan interactif du site.',
+                        style: TextStyle(
+                          color: Colors.grey[100],
+                          fontSize: 11,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+
 
   Widget _overview(Color accent) {
     final documents = VehicleProvider.documentsVehicules.values.where((doc) =>
@@ -621,11 +661,12 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: HyperlinkButton(
-                      onPressed: () => setState(() => selected = 6),
-                      child: const Text('Consulter les documents'),
+                  Text(
+                    'Les échéances et pièces enregistrées sont détaillées plus bas dans cette fiche.',
+                    style: TextStyle(
+                      color: Colors.grey[100],
+                      fontSize: 11,
+                      height: 1.4,
                     ),
                   ),
                 ],

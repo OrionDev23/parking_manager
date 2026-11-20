@@ -15,7 +15,8 @@ import '../../../utilities/vehicle_util.dart';
 import '../../../widgets/forms/parcoto_form_field.dart';
 import 'vehicle_details_page.dart';
 import 'vehicle_form.dart';
-import 'vehicle_tabs.dart';
+
+enum _VehicleWorkspaceView { fleet, details, editor }
 
 class VehicleManagement extends StatefulWidget {
   const VehicleManagement({super.key});
@@ -35,6 +36,9 @@ class VehicleManagementState extends State<VehicleManagement>
   String searchQuery = '';
   int? selectedState;
   int? selectedBrand;
+  _VehicleWorkspaceView _workspaceView = _VehicleWorkspaceView.fleet;
+  Vehicle? _selectedVehicle;
+  Vehicle? _editingVehicle;
 
   @override
   void initState() {
@@ -49,7 +53,6 @@ class VehicleManagementState extends State<VehicleManagement>
     externalSearchRequest.value = null;
     externalSearchRequest.addListener(_handleExternalSearchRequest);
     brandFilterRequest.addListener(_handleExternalBrandFilter);
-    VehicleTabsState.currentIndex.addListener(_handleEditorTabChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (!VehicleProvider.downloadedVehicles &&
@@ -77,16 +80,10 @@ class VehicleManagementState extends State<VehicleManagement>
     brandFilterRequest.value = null;
   }
 
-  void _handleEditorTabChanged() {
-    if (!mounted || VehicleTabsState.currentIndex.value != 0) return;
-    context.read<VehicleProvider>().refreshVehicles();
-  }
-
   @override
   void dispose() {
     externalSearchRequest.removeListener(_handleExternalSearchRequest);
     brandFilterRequest.removeListener(_handleExternalBrandFilter);
-    VehicleTabsState.currentIndex.removeListener(_handleEditorTabChanged);
     searchController.dispose();
     super.dispose();
   }
@@ -94,6 +91,21 @@ class VehicleManagementState extends State<VehicleManagement>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    if (_workspaceView == _VehicleWorkspaceView.editor) {
+      return VehicleForm(
+        vehicle: _editingVehicle,
+        onCancel: _cancelEditor,
+        onSaved: _handleVehicleSaved,
+      );
+    }
+    if (_workspaceView == _VehicleWorkspaceView.details &&
+        _selectedVehicle != null) {
+      return VehicleDetailsPage(
+        vehicle: _selectedVehicle!,
+        onEdit: () => _openEditor(_selectedVehicle),
+        onBack: _backToFleet,
+      );
+    }
     context.watch<VehicleProvider>();
     final theme = context.watch<AppTheme>();
     final vehicles = _visibleVehicles();
@@ -621,67 +633,49 @@ class VehicleManagementState extends State<VehicleManagement>
   void _openNewVehicle() => _openEditor();
 
   void _openEditor([Vehicle? vehicle]) {
-    late final Tab tab;
-    tab = Tab(
-      key: UniqueKey(),
-      text: Text(
-        vehicle == null ? 'Nouveau véhicule' : 'Modifier ${vehicle.matricule}',
-      ),
-      semanticLabel: vehicle == null
-          ? 'Nouveau véhicule'
-          : 'Modifier ${vehicle.matricule}',
-      icon: Icon(vehicle == null ? FluentIcons.add : FluentIcons.edit),
-      body: VehicleForm(vehicle: vehicle),
-      onClosed: () {
-        final index = VehicleTabsState.tabs.indexOf(tab);
-        if (index < 0) return;
-        VehicleTabsState.tabs.removeAt(index);
-        if (VehicleTabsState.tabs.isEmpty) {
-          VehicleTabsState.currentIndex.value = 0;
-        } else if (VehicleTabsState.currentIndex.value >=
-            VehicleTabsState.tabs.length) {
-          VehicleTabsState.currentIndex.value =
-              VehicleTabsState.tabs.length - 1;
-        } else if (VehicleTabsState.currentIndex.value > index) {
-          VehicleTabsState.currentIndex.value--;
-        }
-      },
-    );
-
-    VehicleTabsState.tabs.add(tab);
-    VehicleTabsState.currentIndex.value = VehicleTabsState.tabs.length - 1;
+    setState(() {
+      _editingVehicle = vehicle;
+      _selectedVehicle = vehicle;
+      _workspaceView = _VehicleWorkspaceView.editor;
+    });
   }
 
   void _openDetails(Vehicle vehicle) {
-    showDialog<void>(
-      context: context,
-      barrierDismissible: true,
-      builder: (dialogContext) {
-        final size = MediaQuery.sizeOf(dialogContext);
-        return ContentDialog(
-          constraints: BoxConstraints.loose(
-            Size(size.width * .96, size.height * .94),
-          ),
-          content: SizedBox(
-            width: size.width < 900 ? size.width * .88 : 1180,
-            height: size.height * .78,
-            child: VehicleDetailsPage(
-              vehicle: vehicle,
-              onEdit: () {
-                Navigator.of(dialogContext).pop();
-                _openEditor(vehicle);
-              },
-            ),
-          ),
-          actions: [
-            Button(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Fermer'),
-            ),
-          ],
-        );
-      },
-    );
+    setState(() {
+      _selectedVehicle = vehicle;
+      _editingVehicle = null;
+      _workspaceView = _VehicleWorkspaceView.details;
+    });
+  }
+
+  void _cancelEditor() {
+    setState(() {
+      _workspaceView = _editingVehicle == null
+          ? _VehicleWorkspaceView.fleet
+          : _VehicleWorkspaceView.details;
+      if (_workspaceView == _VehicleWorkspaceView.fleet) {
+        _selectedVehicle = null;
+      }
+      _editingVehicle = null;
+    });
+  }
+
+  void _handleVehicleSaved(Vehicle vehicle) {
+    setState(() {
+      _selectedVehicle = vehicle;
+      _editingVehicle = null;
+      _workspaceView = _VehicleWorkspaceView.details;
+    });
+    context.read<VehicleProvider>().refreshVehicles();
+  }
+
+  void _backToFleet() {
+    setState(() {
+      _selectedVehicle = null;
+      _editingVehicle = null;
+      _workspaceView = _VehicleWorkspaceView.fleet;
+    });
+    context.read<VehicleProvider>().refreshVehicles();
   }
 
   Future<void> importList() async {
