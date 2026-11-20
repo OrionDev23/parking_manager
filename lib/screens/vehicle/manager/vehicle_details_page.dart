@@ -82,98 +82,194 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     );
   }
 
-  Widget _header(Color accent, String model) => Container(
-        padding: const EdgeInsets.fromLTRB(22, 18, 22, 16),
-        decoration: BoxDecoration(
-          color: FluentTheme.of(context).micaBackgroundColor,
-          border: Border(bottom: BorderSide(color: Colors.grey[30])),
-        ),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final compact = constraints.maxWidth < 650;
-            final identity = Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _header(Color accent, String model) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < 650;
+        final identity = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'FICHE VÉHICULE',
+              style: TextStyle(
+                color: accent,
+                fontSize: 10,
+                letterSpacing: 1.1,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              v.matricule,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: compact ? 21 : 25,
+                fontWeight: FontWeight.w800,
+                letterSpacing: .2,
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              model.isEmpty ? 'Modèle non renseigné' : model,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Colors.grey[100],
+                fontSize: 13,
+                height: 1.3,
+              ),
+            ),
+          ],
+        );
+
+        final actions = widget.onEdit == null
+            ? const SizedBox.shrink()
+            : FilledButton(
+                onPressed: widget.onEdit,
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(FluentIcons.edit, size: 14),
+                    SizedBox(width: 7),
+                    Text('Modifier'),
+                  ],
+                ),
+              );
+
+        final statusChips = <Widget>[
+          if (v.etat?.trim().isNotEmpty == true) _chip(v.etat!.trim(), accent),
+          if (v.service) _chip('Véhicule de service', accent),
+          if (v.lourd) _chip('Poids lourd', accent),
+        ];
+
+        final quickStats = <Widget>[
+          if (v.currentMileage != null)
+            _headerStat('KILOMÉTRAGE', n(v.currentMileage, ' km')),
+          if (v.fleetNumber?.trim().isNotEmpty == true)
+            _headerStat('N° DE PARC', v.fleetNumber!.trim()),
+          if (v.numeroSerie?.trim().isNotEmpty == true)
+            _headerStat('VIN / CHÂSSIS', v.numeroSerie!.trim()),
+        ];
+
+        return Container(
+          padding: EdgeInsets.fromLTRB(
+            compact ? 14 : 22,
+            compact ? 14 : 18,
+            compact ? 14 : 22,
+            compact ? 15 : 18,
+          ),
+          decoration: BoxDecoration(
+            color: FluentTheme.of(context).micaBackgroundColor,
+            border: Border(bottom: BorderSide(color: Colors.grey[30])),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    v.matricule,
-                    style: const TextStyle(
-                        fontSize: 23, fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(model,
-                      style:
-                          TextStyle(color: Colors.grey[100], fontSize: 13)),
-                  const SizedBox(height: 9),
-                  Wrap(
-                    spacing: 7,
-                    runSpacing: 6,
-                    children: [
-                      _chip(val(v.etat), accent),
-                      if (v.fleetNumber?.isNotEmpty == true)
-                        _chip('Flotte ${v.fleetNumber!}', accent),
-                      if (v.service) _chip('Véhicule de service', accent),
-                    ],
-                  ),
+                  _vehicleAvatar(accent, compact: compact),
+                  SizedBox(width: compact ? 12 : 18),
+                  Expanded(child: identity),
+                  if (!compact) ...[
+                    const SizedBox(width: 14),
+                    actions,
+                  ],
                 ],
               ),
-            );
-            final actions = widget.onEdit == null
-                ? const SizedBox.shrink()
-                : Button(
-                    onPressed: widget.onEdit,
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(FluentIcons.edit, size: 14),
-                        SizedBox(width: 7),
-                        Text('Modifier'),
-                      ],
-                    ),
-                  );
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _vehicleAvatar(accent),
-                const SizedBox(width: 16),
-                if (compact)
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [identity, const SizedBox(height: 10), actions],
-                    ),
-                  )
-                else ...[
-                  identity,
-                  const SizedBox(width: 14),
-                  actions,
-                ],
+              if (compact && widget.onEdit != null) ...[
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: actions,
+                ),
               ],
-            );
-          },
-        ),
-      );
+              if (statusChips.isNotEmpty) ...[
+                const SizedBox(height: 13),
+                Wrap(
+                  spacing: 7,
+                  runSpacing: 7,
+                  children: statusChips,
+                ),
+              ],
+              if (quickStats.isNotEmpty) ...[
+                const SizedBox(height: 14),
+                Wrap(
+                  spacing: 9,
+                  runSpacing: 9,
+                  children: quickStats,
+                ),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
 
-  Widget _vehicleAvatar(Color accent) {
+  Widget _vehicleAvatar(Color accent, {required bool compact}) {
     final imageUrl = v.imageUrl?.trim();
+    final width = compact ? 88.0 : 148.0;
+    final height = compact ? 82.0 : 104.0;
+
     return ClipRRect(
-      borderRadius: BorderRadius.circular(13),
+      borderRadius: BorderRadius.circular(14),
       child: Container(
-        width: 76,
-        height: 76,
-        color: accent.withValues(alpha: .10),
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: accent.withValues(alpha: .10),
+          border: Border.all(color: accent.withValues(alpha: .12)),
+          borderRadius: BorderRadius.circular(14),
+        ),
         child: imageUrl != null && imageUrl.isNotEmpty
             ? Image.network(
                 imageUrl,
                 fit: BoxFit.cover,
                 errorBuilder: (_, _, _) =>
-                    Icon(FluentIcons.car, size: 34, color: accent),
+                    Icon(FluentIcons.car, size: 36, color: accent),
               )
-            : Icon(FluentIcons.car, size: 34, color: accent),
+            : Icon(FluentIcons.car, size: 36, color: accent),
       ),
     );
   }
 
+  Widget _headerStat(String label, String value) => Container(
+        constraints: const BoxConstraints(minWidth: 112, maxWidth: 260),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+        decoration: BoxDecoration(
+          color: FluentTheme.of(context).micaBackgroundColor,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.grey[30]),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: Colors.grey[100],
+                fontSize: 9,
+                letterSpacing: .7,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+      );
+  
   String _date(Object? value) {
     if (value == null) return 'Non renseigné';
     final date =
