@@ -610,6 +610,7 @@ class _DashboardState extends State<Dashboard>
 
     if (!VehicleProvider.downloadedVehicles ||
         !DriverProvider.downloadedConducteurs ||
+        !DriverProvider.downloadedDocuments ||
         !PlanningProvider.downloadedPlanning ||
         !LogProvider.downloadedActivities ||
         !RepairProvider.downloadedReparations ||
@@ -879,6 +880,7 @@ class _DashboardState extends State<Dashboard>
       onMission: onMission,
       absent: absent,
       inactive: inactive,
+      verified: DriverProvider.downloadedConducteurs,
     );
   }
 
@@ -916,6 +918,7 @@ class _DashboardState extends State<Dashboard>
       inProgress: inProgress,
       completed: completed,
       activeAmount: activeAmount,
+      verified: RepairProvider.downloadedReparations,
       activeRepairs: active.take(8).toList(growable: false),
     );
   }
