@@ -35,6 +35,14 @@ class _ModuleDashboardMetricState extends State<ModuleDashboardMetric> {
 
   Future<int> _load() => Future<int>.sync(widget.loadValue);
 
+  @override
+  void didUpdateWidget(covariant ModuleDashboardMetric oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.loadValue != widget.loadValue) {
+      _value = _load();
+    }
+  }
+
   void _retry() {
     setState(() => _value = _load());
   }
