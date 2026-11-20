@@ -110,15 +110,20 @@ class _DashboardState extends State<Dashboard>
         builder: (context, constraints) {
           // Use the width available inside the navigation shell. MediaQuery
           // also includes the desktop sidebar and can overestimate this area.
-          final contentWidth = constraints.maxWidth;
+          final compact = constraints.maxWidth < 680;
+          final horizontalPadding = compact
+              ? ParcotoTokens.space4
+              : constraints.maxWidth >= 1500
+                  ? ParcotoTokens.space6
+                  : ParcotoTokens.space5;
+          final contentWidth = (constraints.maxWidth - horizontalPadding * 2)
+              .clamp(0.0, constraints.maxWidth)
+              .toDouble();
           final wide = contentWidth >= 1500;
-          final compact = contentWidth < 680;
 
           return ListView(
             padding: EdgeInsets.symmetric(
-              horizontal: compact
-                  ? ParcotoTokens.space4
-                  : (wide ? ParcotoTokens.space6 : ParcotoTokens.space5),
+              horizontal: horizontalPadding,
               vertical: compact ? ParcotoTokens.space4 : ParcotoTokens.space6,
             ),
             children: [
