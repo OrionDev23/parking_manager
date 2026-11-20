@@ -47,9 +47,15 @@ class EtatManagerState extends State<EtatManager> {
       context: context,
       barrierDismissible: true,
       builder: (c) {
+        final screenSize = MediaQuery.sizeOf(c);
         return ContentDialog(
           title: const Text("nouvetat").tr(),
-          constraints: BoxConstraints.loose(Size(800.px, 500.px)),
+          constraints: BoxConstraints.tight(
+            Size(
+              (screenSize.width - 32).clamp(260.0, 800.0).toDouble(),
+              (screenSize.height - 80).clamp(320.0, 500.0).toDouble(),
+            ),
+          ),
           content: const StateForm(),
         );
       },
