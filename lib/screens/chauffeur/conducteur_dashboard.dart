@@ -157,7 +157,7 @@ class ConducteurDashboard extends StatelessWidget {
                   ModuleDashboardMetric(
                     label: 'Absents',
                     detail: 'Statut absent / congé',
-                    icon: FluentIcons.calendar,
+                    icon: FluentIcons.event,
                     loadValue: () => DatabaseCounters().countChauffeur(etat: 2),
                   ),
                   ModuleDashboardMetric(
