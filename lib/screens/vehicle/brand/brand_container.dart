@@ -56,8 +56,8 @@ class _BrandContainerState extends State<BrandContainer> {
     var appTheme = context.watch<AppTheme>();
     return OnTapScaleAndFade(
       child: Container(
-        width: 10.w,
-        height: 10.h,
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           color: appTheme.backGroundColor,
           boxShadow: kElevationToShadow[2],
