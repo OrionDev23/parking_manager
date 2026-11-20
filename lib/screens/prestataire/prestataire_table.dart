@@ -195,64 +195,69 @@ class PrestataireTableState extends State<PrestataireTable> {
           filterNow = false;
         }
         return DataTableParc(
-          header: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(
-                  width: 350.px,
-                  height: 45.px,
-                  child: ParcotoTextBox(
-                    onChanged: (s) {
-                      if (s.isEmpty) {
-                        notEmpty = false;
-                        prestataireDataSource.search('');
-                      } else {
-                        notEmpty = true;
-                      }
-                      setState(() {});
-                    },
-                    controller: searchController,
-                    placeholder: 'search'.tr(),
-                    style: appTheme.writingStyle,
-                    cursorColor: appTheme.color.darker,
-                    placeholderStyle: placeStyle,
-                    prefix: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8),
-                      child: Icon(FluentIcons.search, size: 14),
-                    ),
-                    onSubmitted: (s) {
-                      if (s.isNotEmpty) {
-                        prestataireDataSource.search(s);
-                        if (!notEmpty) {
-                          setState(() {
-                            notEmpty = true;
-                          });
+          header: LayoutBuilder(
+            builder: (context, constraints) {
+              final searchWidth = (constraints.maxWidth - 20)
+                  .clamp(140.0, 350.0)
+                  .toDouble();
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 5.0,
+                  horizontal: 10,
+                ),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: SizedBox(
+                    width: searchWidth,
+                    height: 45.px,
+                    child: ParcotoTextBox(
+                      onChanged: (s) {
+                        if (s.isEmpty) {
+                          notEmpty = false;
+                          prestataireDataSource.search('');
+                        } else {
+                          notEmpty = true;
                         }
-                      } else {
-                        if (notEmpty) {
-                          setState(() {
-                            notEmpty = false;
-                          });
-                        }
-                      }
-                    },
-                    suffix: notEmpty
-                        ? IconButton(
-                            icon: const Icon(FluentIcons.cancel),
-                            onPressed: () {
-                              searchController.text = "";
+                        setState(() {});
+                      },
+                      controller: searchController,
+                      placeholder: 'search'.tr(),
+                      style: appTheme.writingStyle,
+                      cursorColor: appTheme.color.darker,
+                      placeholderStyle: placeStyle,
+                      onSubmitted: (s) {
+                        if (s.isNotEmpty) {
+                          prestataireDataSource.search(s);
+                          if (!notEmpty) {
+                            setState(() {
+                              notEmpty = true;
+                            });
+                          }
+                        } else {
+                          if (notEmpty) {
+                            setState(() {
                               notEmpty = false;
-                              setState(() {});
-                              prestataireDataSource.search('');
-                            },
-                          )
-                        : null,
+                            });
+                          }
+                        }
+                      },
+                      suffix: notEmpty
+                          ? IconButton(
+                              icon: const Icon(FluentIcons.cancel),
+                              onPressed: () {
+                                searchController.text = "";
+                                notEmpty = false;
+                                setState(() {});
+                                prestataireDataSource.search('');
+                              },
+                            )
+                          : null,
+                    ),
                   ),
                 ),
-              ],
-            ),
+              );
+            },
           ),
           sortAscending: assending,
           sortColumnIndex: sortColumn,
