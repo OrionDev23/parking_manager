@@ -26,14 +26,7 @@ class ChaufDocumentsDataSource extends ParcOtoDatasource<DocumentChauffeur> {
 
   void showMyChauffeur(String? chauffeur) {
     if (chauffeur != null) {
-      PanesListState.index.value =
-          PaneItemsAndFooters.originalItems.indexOf(
-            PaneItemsAndFooters.chauffeurs,
-          ) +
-          PaneItemsAndFooters.vehicles.items.length +
-          PaneItemsAndFooters.reparations.items.length +
-          (showAtelier ? PaneItemsAndFooters.atelier.items.length : 0) -
-          1;
+      PaneItemsAndFooters.selectPane('driver-manager');
       ChauffeurTabsState.currentIndex.value = 0;
 
       ChauffeurTableState.filterNow = true;

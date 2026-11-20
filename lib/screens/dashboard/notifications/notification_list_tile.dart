@@ -155,32 +155,13 @@ class _NotificationTileState extends State<NotificationTile> {
   void goThere() {
     switch (widget.pNotification.type) {
       case 0:
-        PanesListState.index.value =
-            PaneItemsAndFooters.originalItems.indexOf(
-              PaneItemsAndFooters.vehicles,
-            ) +
-            PaneItemsAndFooters.vehicles.items.length;
+        PaneItemsAndFooters.selectPane('vehicle-documents');
         break;
       case 1:
-        PanesListState.index.value =
-            PaneItemsAndFooters.originalItems.indexOf(
-              PaneItemsAndFooters.chauffeurs,
-            ) +
-            PaneItemsAndFooters.vehicles.items.length +
-            PaneItemsAndFooters.reparations.items.length +
-            (showAtelier ? PaneItemsAndFooters.atelier.items.length : 0) +
-            1;
+        PaneItemsAndFooters.selectPane('driver-documents');
         break;
       case 2:
-        PanesListState.index.value =
-            PaneItemsAndFooters.originalItems.indexOf(
-              PaneItemsAndFooters.planner,
-            ) +
-            PaneItemsAndFooters.vehicles.items.length +
-            PaneItemsAndFooters.reparations.items.length +
-            (showAtelier ? PaneItemsAndFooters.atelier.items.length : 0) +
-            PaneItemsAndFooters.chauffeurs.items.length -
-            2;
+        PaneItemsAndFooters.selectPane('planner');
         break;
     }
     Navigator.of(context).pop();

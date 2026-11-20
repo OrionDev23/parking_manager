@@ -27,6 +27,7 @@ class VehicleManagement extends StatefulWidget {
 class VehicleManagementState extends State<VehicleManagement>
     with AutomaticKeepAliveClientMixin<VehicleManagement> {
   static ValueNotifier<int> stateChanges = ValueNotifier(0);
+  static final ValueNotifier<int?> brandFilterRequest = ValueNotifier<int?>(null);
 
   final TextEditingController searchController = TextEditingController();
   String searchQuery = '';
@@ -36,6 +37,9 @@ class VehicleManagementState extends State<VehicleManagement>
   @override
   void initState() {
     super.initState();
+    selectedBrand = brandFilterRequest.value;
+    brandFilterRequest.value = null;
+    brandFilterRequest.addListener(_handleExternalBrandFilter);
     VehicleTabsState.currentIndex.addListener(_handleEditorTabChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -46,6 +50,13 @@ class VehicleManagementState extends State<VehicleManagement>
     });
   }
 
+  void _handleExternalBrandFilter() {
+    final requestedBrand = brandFilterRequest.value;
+    if (!mounted || requestedBrand == null) return;
+    setState(() => selectedBrand = requestedBrand);
+    brandFilterRequest.value = null;
+  }
+
   void _handleEditorTabChanged() {
     if (!mounted || VehicleTabsState.currentIndex.value != 0) return;
     context.read<VehicleProvider>().refreshVehicles();
@@ -53,6 +64,7 @@ class VehicleManagementState extends State<VehicleManagement>
 
   @override
   void dispose() {
+    brandFilterRequest.removeListener(_handleExternalBrandFilter);
     VehicleTabsState.currentIndex.removeListener(_handleEditorTabChanged);
     searchController.dispose();
     super.dispose();
@@ -442,7 +454,10 @@ class VehicleManagementState extends State<VehicleManagement>
                     ),
                   ),
                 ],
-                onChanged: (value) => setState(() => selectedBrand = value),
+                onChanged: (value) => setState(() {
+                  selectedBrand = value;
+                  brandFilterRequest.value = null;
+                }),
               ),
             ),
             if (selectedState != null || selectedBrand != null)
@@ -450,6 +465,7 @@ class VehicleManagementState extends State<VehicleManagement>
                 onPressed: () => setState(() {
                   selectedState = null;
                   selectedBrand = null;
+                  brandFilterRequest.value = null;
                 }),
                 child: const Text('Effacer les filtres'),
               ),
@@ -558,6 +574,7 @@ class VehicleManagementState extends State<VehicleManagement>
                       searchQuery = '';
                       selectedState = null;
                       selectedBrand = null;
+                      brandFilterRequest.value = null;
                     }),
                     child: const Text('Réinitialiser'),
                   )

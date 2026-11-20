@@ -10,7 +10,6 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import '../../../theme.dart';
 import '../../sidemenu/pane_items.dart';
 import '../../sidemenu/sidemenu.dart';
-import '../manager/vehicles_table.dart';
 
 class BrandContainer extends StatefulWidget {
   final int? id;
@@ -87,15 +86,9 @@ class _BrandContainerState extends State<BrandContainer> {
         ),
       ),
       onTap: () {
-        PanesListState.index.value =
-            PaneItemsAndFooters.originalItems.indexOf(
-              PaneItemsAndFooters.vehicles,
-            ) +
-            1;
+        PaneItemsAndFooters.selectPane('vehicle-manager');
         VehicleTabsState.currentIndex.value = 0;
-
-        VehicleTableState.filterNow = true;
-        VehicleTableState.filterMarque.value = widget.id;
+        VehicleManagementState.brandFilterRequest.value = widget.id;
       },
     );
   }
