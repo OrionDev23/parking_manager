@@ -87,6 +87,13 @@ class PrestataireFormState extends State<PrestataireForm> {
         ),
       );
     }
+    final screenSize = MediaQuery.sizeOf(context);
+    final formHeight = (screenSize.height - 180)
+        .clamp(320.0, 720.0)
+        .toDouble();
+    final formWidth = (screenSize.width - 32)
+        .clamp(260.0, 720.0)
+        .toDouble();
     return Container(
       color: appTheme.backGroundColor,
       child: Column(
@@ -96,10 +103,8 @@ class PrestataireFormState extends State<PrestataireForm> {
             child: Column(
               children: [
                 SizedBox(
-                  height: (MediaQuery.sizeOf(context).height - 180)
-                      .clamp(420.0, 720.0),
-                  width: (MediaQuery.sizeOf(context).width - 32)
-                      .clamp(320.0, 720.0),
+                  height: formHeight,
+                  width: formWidth,
                   child: Column(
                     children: [
                       Flexible(
@@ -295,8 +300,7 @@ class PrestataireFormState extends State<PrestataireForm> {
           ),
           Container(
             padding: const EdgeInsets.all(10),
-            width: (MediaQuery.sizeOf(context).width - 32)
-                .clamp(320.0, 720.0),
+            width: formWidth,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.center,
