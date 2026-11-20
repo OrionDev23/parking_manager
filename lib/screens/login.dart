@@ -30,6 +30,7 @@ class _LoginScreenState extends State<LoginScreen>
   bool checking = false;
 
   bool validEmail = false;
+  bool _emailHasContent = false;
 
   @override
   void initState() {
@@ -133,7 +134,20 @@ class _LoginScreenState extends State<LoginScreen>
           decoration: BoxDecoration(color: field, borderRadius: BorderRadius.circular(12), border: Border.all(color: dark ? Colors.white.withValues(alpha: .08) : const Color(0xFFE2E9EB))),
           child: TextBox(
             controller: email, placeholder: 'vous@entreprise.com', keyboardType: TextInputType.emailAddress,
-            onChanged: (value) => setState(() { validEmail = FormValidators.isEmail(value); if (error.isNotEmpty) error = ''; }),
+            onChanged: (value) {
+              final nextValid = FormValidators.isEmail(value);
+              final hasContent = value.isNotEmpty;
+              final shouldClearError = error.isNotEmpty;
+              if (nextValid != validEmail ||
+                  hasContent != _emailHasContent ||
+                  shouldClearError) {
+                setState(() {
+                  validEmail = nextValid;
+                  _emailHasContent = hasContent;
+                  if (shouldClearError) error = '';
+                });
+              }
+            },
             prefix: Padding(padding: const EdgeInsets.symmetric(horizontal: 13), child: Icon(FluentIcons.mail, size: 15, color: muted)),
             style: TextStyle(color: foreground, fontSize: 13),
           ),
