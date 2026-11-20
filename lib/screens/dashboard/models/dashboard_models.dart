@@ -122,6 +122,38 @@ class DashboardInventorySummary {
   });
 }
 
+class DashboardDocumentAlert {
+  final String title;
+  final String subtitle;
+  final String tag;
+  final DashboardAlertSeverity severity;
+  final DateTime dueDate;
+  final IconData icon;
+
+  const DashboardDocumentAlert({
+    required this.title,
+    required this.subtitle,
+    required this.tag,
+    required this.severity,
+    required this.dueDate,
+    required this.icon,
+  });
+}
+
+class DashboardDocumentSummary {
+  final int expiredCount;
+  final int expiringCount;
+  final bool verified;
+  final List<DashboardDocumentAlert> alerts;
+
+  const DashboardDocumentSummary({
+    this.expiredCount = 0,
+    this.expiringCount = 0,
+    this.verified = false,
+    this.alerts = const [],
+  });
+}
+
 class DashboardSnapshot {
   final int vehicleCount;
   final int driverCount;
@@ -137,6 +169,7 @@ class DashboardSnapshot {
   final DashboardDriverStatusSummary driverStatus;
   final DashboardRepairSummary repairPipeline;
   final DashboardInventorySummary inventory;
+  final DashboardDocumentSummary documents;
 
   const DashboardSnapshot({
     this.vehicleCount = 0,
@@ -153,5 +186,6 @@ class DashboardSnapshot {
     this.driverStatus = const DashboardDriverStatusSummary(),
     this.repairPipeline = const DashboardRepairSummary(),
     this.inventory = const DashboardInventorySummary(),
+    this.documents = const DashboardDocumentSummary(),
   });
 }
