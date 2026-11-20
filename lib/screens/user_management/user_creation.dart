@@ -99,7 +99,13 @@ class _UserFormState extends State<UserForm> {
 
   @override
   Widget build(BuildContext context) {
-    var appTheme = context.watch<AppTheme>();
+    final appTheme = context.watch<AppTheme>();
+    final screenSize = MediaQuery.sizeOf(context);
+    final avatarSize = screenSize.width < 640 ? 72.0 : 96.0;
+    final countryDialogSize = Size(
+      (screenSize.width - 32).clamp(280.0, 480.0).toDouble(),
+      (screenSize.height - 80).clamp(320.0, 600.0).toDouble(),
+    );
     return ContentDialog(
       title: Text(
         widget.user != null
@@ -119,8 +125,8 @@ class _UserFormState extends State<UserForm> {
               Hero(
                 tag: 'myprofil',
                 child: Container(
-                  width: 15.h,
-                  height: 15.h,
+                  width: avatarSize,
+                  height: avatarSize,
                   decoration: BoxDecoration(
                     color: appTheme.color,
                     shape: BoxShape.circle,
@@ -290,7 +296,7 @@ class _UserFormState extends State<UserForm> {
                   color: appTheme.backGroundColor,
                   boxShadow: kElevationToShadow[2],
                 ),
-                dialogSize: Size(40.w, 45.h),
+                dialogSize: countryDialogSize,
               ),
               const SizedBox(width: 5),
               Expanded(
