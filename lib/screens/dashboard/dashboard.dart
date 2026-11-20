@@ -97,9 +97,6 @@ class _DashboardState extends State<Dashboard>
       });
     }
 
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    final wide = screenWidth >= 1500;
-    final compact = screenWidth < 680;
     final sessionName = authService.session?.displayName?.trim();
     final firstName = sessionName == null || sessionName.isEmpty
         ? 'votre espace'
@@ -109,107 +106,121 @@ class _DashboardState extends State<Dashboard>
 
     return ScaffoldPage(
       padding: EdgeInsets.zero,
-      content: ListView(
-        padding: EdgeInsets.symmetric(
-          horizontal: compact
-              ? ParcotoTokens.space4
-              : (wide ? ParcotoTokens.space6 : ParcotoTokens.space5),
-          vertical: compact ? ParcotoTokens.space4 : ParcotoTokens.space6,
-        ),
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Bonjour $firstName',
-                      style: TextStyle(
-                        color: theme.textColor,
-                        fontSize: compact ? 23 : 27,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: ParcotoTokens.space2),
-                    Text(
-                      'Voici la situation de votre parc aujourd’hui.',
-                      style: TextStyle(
-                        color: theme.mutedTextColor,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (!compact)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: ParcotoTokens.space3,
-                    vertical: ParcotoTokens.space2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.surfaceColor,
-                    borderRadius: BorderRadius.circular(theme.controlRadius),
-                    border: Border.all(color: theme.borderColor),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        FluentIcons.event,
-                        size: 15,
-                        color: theme.mutedTextColor,
-                      ),
-                      const SizedBox(width: ParcotoTokens.space2),
-                      Text(
-                        dateLabel,
-                        style: TextStyle(
-                          color: theme.textColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              const SizedBox(width: 8),
-              Tooltip(
-                message: 'Actualiser les données',
-                child: IconButton(
-                  icon: _refreshing
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: ProgressRing(),
-                        )
-                      : const Icon(FluentIcons.refresh),
-                  onPressed: _refreshing ? null : _refreshDashboard,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          _buildMetricGrid(compact: compact),
-          const SizedBox(height: 18),
-          _buildAnalyticsLayout(wide: wide),
-          const SizedBox(height: 18),
-          _buildOperationsLayout(wide: wide),
-          const SizedBox(height: 18),
-          _buildBusinessWidgetsLayout(),
-          const SizedBox(height: 18),
-          _buildQuickActions(compact: compact),
-          if (_loadMessage != null) ...[
-            const SizedBox(height: 12),
-            InfoBar(
-              title: const Text('Certaines données sont indisponibles'),
-              content: Text(_loadMessage!),
-              severity: InfoBarSeverity.warning,
+      content: LayoutBuilder(
+        builder: (context, constraints) {
+          // Use the width available inside the navigation shell. MediaQuery
+          // also includes the desktop sidebar and can overestimate this area.
+          final contentWidth = constraints.maxWidth;
+          final wide = contentWidth >= 1500;
+          final compact = contentWidth < 680;
+
+          return ListView(
+            padding: EdgeInsets.symmetric(
+              horizontal: compact
+                  ? ParcotoTokens.space4
+                  : (wide ? ParcotoTokens.space6 : ParcotoTokens.space5),
+              vertical: compact ? ParcotoTokens.space4 : ParcotoTokens.space6,
             ),
-          ],
-          const SizedBox(height: 8),
-        ],
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Bonjour $firstName',
+                          style: TextStyle(
+                            color: theme.textColor,
+                            fontSize: compact ? 23 : 27,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: ParcotoTokens.space2),
+                        Text(
+                          'Voici la situation de votre parc aujourd’hui.',
+                          style: TextStyle(
+                            color: theme.mutedTextColor,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (!compact)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: ParcotoTokens.space3,
+                        vertical: ParcotoTokens.space2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.surfaceColor,
+                        borderRadius:
+                            BorderRadius.circular(theme.controlRadius),
+                        border: Border.all(color: theme.borderColor),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            FluentIcons.event,
+                            size: 15,
+                            color: theme.mutedTextColor,
+                          ),
+                          const SizedBox(width: ParcotoTokens.space2),
+                          Text(
+                            dateLabel,
+                            style: TextStyle(
+                              color: theme.textColor,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  const SizedBox(width: ParcotoTokens.space2),
+                  Tooltip(
+                    message: 'Actualiser les données',
+                    child: IconButton(
+                      icon: _refreshing
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: ProgressRing(),
+                            )
+                          : const Icon(FluentIcons.refresh),
+                      onPressed: _refreshing ? null : _refreshDashboard,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: ParcotoTokens.space5),
+              _buildMetricGrid(compact: compact),
+              const SizedBox(height: ParcotoTokens.space4),
+              _buildAnalyticsLayout(
+                wide: wide,
+                availableWidth: contentWidth,
+              ),
+              const SizedBox(height: ParcotoTokens.space4),
+              _buildOperationsLayout(wide: wide),
+              const SizedBox(height: ParcotoTokens.space4),
+              _buildBusinessWidgetsLayout(),
+              const SizedBox(height: ParcotoTokens.space4),
+              _buildQuickActions(compact: compact),
+              if (_loadMessage != null) ...[
+                const SizedBox(height: ParcotoTokens.space3),
+                InfoBar(
+                  title: const Text('Certaines données sont indisponibles'),
+                  content: Text(_loadMessage!),
+                  severity: InfoBarSeverity.warning,
+                ),
+              ],
+              const SizedBox(height: ParcotoTokens.space2),
+            ],
+          );
+        },
       ),
     );
   }
@@ -309,7 +320,10 @@ class _DashboardState extends State<Dashboard>
     );
   }
 
-  Widget _buildAnalyticsLayout({required bool wide}) {
+  Widget _buildAnalyticsLayout({
+    required bool wide,
+    required double availableWidth,
+  }) {
     final activity = DashboardPanel(
       title: 'Évolution de l’activité',
       icon: FluentIcons.chart,
@@ -349,7 +363,7 @@ class _DashboardState extends State<Dashboard>
       );
     }
 
-    if (MediaQuery.sizeOf(context).width >= 760) {
+    if (availableWidth >= 760) {
       return Column(
         children: [
           Row(
