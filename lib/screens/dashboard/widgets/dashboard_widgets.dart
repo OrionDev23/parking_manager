@@ -120,48 +120,72 @@ class DashboardPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.watch<AppTheme>();
 
-    return SizedBox(
-      height: height,
-      child: ParcotoSurface(
-        padding: padding,
-        radius: theme.cardRadius,
-        elevated: true,
-        child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: theme.color.withValues(alpha: .14),
-                  borderRadius: BorderRadius.circular(theme.controlRadius),
-                ),
-                alignment: Alignment.center,
-                child: Icon(icon, color: theme.color, size: 17),
+    Widget titleContent() => Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: theme.color.withValues(alpha: .14),
+                borderRadius: BorderRadius.circular(theme.controlRadius),
               ),
-              const SizedBox(width: ParcotoTokens.space2),
-              Expanded(
-                child: Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: theme.textColor,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
+              alignment: Alignment.center,
+              child: Icon(icon, color: theme.color, size: 17),
+            ),
+            const SizedBox(width: ParcotoTokens.space2),
+            Expanded(
+              child: Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: theme.textColor,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final stackTrailing =
+            trailing != null && constraints.maxWidth < 420;
+
+        return SizedBox(
+          height: height,
+          child: ParcotoSurface(
+            padding: padding,
+            radius: theme.cardRadius,
+            elevated: true,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (stackTrailing) ...[
+                  titleContent(),
+                  const SizedBox(height: ParcotoTokens.space2),
+                  Align(
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: trailing!,
                   ),
-                ),
-              ),
-              ?trailing,
-            ],
+                ] else
+                  Row(
+                    children: [
+                      Expanded(child: titleContent()),
+                      if (trailing != null) ...[
+                        const SizedBox(width: ParcotoTokens.space2),
+                        trailing!,
+                      ],
+                    ],
+                  ),
+                const SizedBox(height: ParcotoTokens.space3),
+                Expanded(child: child),
+              ],
+            ),
           ),
-          const SizedBox(height: 13),
-          Expanded(child: child),
-        ],
-        ),
-      ),
+        );
+      },
     );
   }
 }
