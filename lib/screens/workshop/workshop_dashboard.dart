@@ -8,6 +8,7 @@ import '../../providers/client_database.dart';
 import '../../providers/counters.dart';
 import '../../providers/parts_provider.dart';
 import '../../theme.dart';
+import '../../ui/design_system/parcoto_tokens.dart';
 import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
 import '../../widgets/module_dashboard_metric.dart';
@@ -95,7 +96,7 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
           padding: EdgeInsets.zero,
           content: LayoutBuilder(
             builder: (context, constraints) {
-              final compact = constraints.maxWidth < 760;
+              final compact = constraints.maxWidth < ParcotoTokens.tabletBreakpoint;
               final columns = constraints.maxWidth >= 1250
                   ? 4
                   : constraints.maxWidth >= 850
@@ -107,8 +108,8 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                   (constraints.maxWidth - 12.0 * (columns - 1)) / columns;
               return ListView(
                 padding: EdgeInsets.symmetric(
-                  horizontal: compact ? 16 : 28,
-                  vertical: 24,
+                  horizontal: compact ? ParcotoTokens.space4 : ParcotoTokens.space8,
+                  vertical: ParcotoTokens.space6,
                 ),
                 children: [
                   ModuleDashboardHeader(
@@ -141,8 +142,8 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                     crossAxisCount: columns,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
+                    mainAxisSpacing: ParcotoTokens.space3,
+                    crossAxisSpacing: ParcotoTokens.space3,
                     childAspectRatio: compact ? 2.7 : 2.5,
                     children: [
                       ModuleDashboardMetric(
