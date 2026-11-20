@@ -1152,7 +1152,7 @@ class InventoryExpiryWidget extends StatelessWidget {
             child: Row(
               children: [
                 Icon(
-                  FluentIcons.info,
+                  FluentIcons.health,
                   size: 12,
                   color: theme.mutedTextColor,
                 ),
