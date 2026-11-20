@@ -16,7 +16,7 @@ import '../device/shared_preferences_device_identity.dart';
 import '../sync/sqlite_sync_queue.dart';
 import '../tenancy/company_context.dart';
 import '../../providers/client_database.dart'
-    show databaseId, vehiculeid, endpoint;
+    show appwriteProjectId, databaseId, vehiculeid, endpoint;
 
 class VehicleServices {
   final LocalDatabase localDatabase;
@@ -59,7 +59,9 @@ class VehicleServices {
       BackendConfig(
         type: BackendType.appwrite,
         endpoint: endpoint,
-        projectId: preferences.getString('project') ?? 'essais',
+        // The legacy `project` preference is a company selector, not an
+        // Appwrite project ID. Keep all platform backends on the fixed project.
+        projectId: appwriteProjectId,
       ),
     );
     await backend.initialize();
