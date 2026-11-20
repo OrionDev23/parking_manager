@@ -15,6 +15,7 @@ import '../../providers/repair_provider.dart';
 import '../../providers/vehicle_provider.dart';
 import '../../core/sync/sync_operation.dart';
 import '../../serializables/activity.dart';
+import '../../serializables/conducteur/conducteur.dart';
 import '../../serializables/reparation/reparation.dart';
 import '../../theme.dart';
 import '../sidemenu/pane_items.dart';
@@ -1099,7 +1100,8 @@ class _DashboardState extends State<Dashboard>
       }
 
       for (final variation in variations) {
-        final expiration = parseDate(variation['expirationDate']);
+        final expiration = parseDate(variation['expirationDate']) ??
+            parseDate(data['expirationDate']);
         if (expiration == null) continue;
         final variationName = variation['name']?.toString().trim() ?? '';
         addExpiryAlert(
