@@ -140,7 +140,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                   'Audit en lecture seule : aucune permission ni donnée n’a été modifiée.',
                   style: FluentTheme.of(context).typography.bodyStrong,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: ParcotoTokens.space2),
                 Text(
                   '${summary['tables'] ?? 0} tables • '
                   '${summary['tenantScopedTables'] ?? 0} avec companyId • '
@@ -318,15 +318,19 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
         builder: (context, constraints) {
           final compact = constraints.maxWidth < 680;
           final veryNarrow = constraints.maxWidth < 390;
-          final horizontalPadding = veryNarrow ? 12.0 : compact ? 16.0 : 28.0;
+          final horizontalPadding = veryNarrow
+              ? ParcotoTokens.space3
+              : compact
+                  ? ParcotoTokens.space4
+                  : ParcotoTokens.space7;
           final visibleCompanies = _visibleCompanies;
 
           final header = Padding(
             padding: EdgeInsets.fromLTRB(
               horizontalPadding,
-              compact ? 14 : 22,
+              compact ? ParcotoTokens.space3 : ParcotoTokens.space5,
               horizontalPadding,
-              compact ? 10 : 12,
+              compact ? ParcotoTokens.space2 : ParcotoTokens.space3,
             ),
             child: compact
                 ? Column(
@@ -371,8 +375,8 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: compact
                 ? Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
+                    spacing: ParcotoTokens.space2,
+                    runSpacing: ParcotoTokens.space2,
                     children: [
                       SizedBox(
                         width: veryNarrow
@@ -410,7 +414,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
                 : Row(
                     children: [
                       Expanded(child: _MetricCard(label: 'Entreprises', value: _companies.length.toString(), icon: FluentIcons.company_directory)),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: ParcotoTokens.space3),
                       Expanded(child: _MetricCard(label: 'Actives', value: active.toString(), icon: FluentIcons.check_mark)),
                       const SizedBox(width: 10),
                       Expanded(child: _MetricCard(label: 'Licences expirées', value: expired.toString(), icon: FluentIcons.warning)),
@@ -461,7 +465,7 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
               : Row(
                   children: [
                     Expanded(child: refreshButton),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: ParcotoTokens.space2),
                     Expanded(child: createButton),
                   ],
                 );
@@ -478,7 +482,12 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
               : const SizedBox.shrink();
 
           final controls = Padding(
-            padding: EdgeInsets.fromLTRB(horizontalPadding, 18, horizontalPadding, 10),
+            padding: EdgeInsets.fromLTRB(
+              horizontalPadding,
+              ParcotoTokens.space5,
+              horizontalPadding,
+              ParcotoTokens.space2,
+            ),
             child: compact
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
