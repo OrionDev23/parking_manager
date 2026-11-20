@@ -2,6 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../theme.dart';
+import '../ui/design_system/parcoto_tokens.dart';
 
 /// Compact quick-action tile shared by all top-level module dashboards.
 class ModuleDashboardAction extends StatelessWidget {
@@ -29,13 +30,16 @@ class ModuleDashboardAction extends StatelessWidget {
         onPressed: onPressed,
         style: ButtonStyle(
           padding: WidgetStatePropertyAll(
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+            const EdgeInsets.symmetric(
+              horizontal: ParcotoTokens.space4,
+              vertical: ParcotoTokens.space3,
+            ),
           ),
         ),
         child: Row(
           children: [
             Icon(icon, color: theme.color, size: 20),
-            const SizedBox(width: 12),
+            const SizedBox(width: ParcotoTokens.space3),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,12 +51,12 @@ class ModuleDashboardAction extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: ParcotoTokens.space2),
                   Text(
                     detail,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Colors.grey[100], fontSize: 10),
+                    style: TextStyle(color: theme.mutedTextColor, fontSize: 11),
                   ),
                 ],
               ),
