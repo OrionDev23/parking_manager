@@ -425,13 +425,12 @@ class MyApp extends StatelessWidget {
           create: (_) => AppTheme(),
           builder: (context, _) {
             final appTheme = context.watch<AppTheme>();
-            bool portrait =
-                MediaQuery.of(context).orientation == Orientation.portrait;
-            if (portrait) {
-              tstyle = tstyle.copyWith(fontSize: 13.sp);
-            } else {
-              tstyle = tstyle.copyWith(fontSize: 10.sp);
-            }
+            // The virtual keyboard changes the available viewport height on
+            // mobile browsers. Do not derive the app-wide text scale from the
+            // current orientation, otherwise opening the keyboard can switch
+            // responsive layouts while a field is focused.
+            final compactViewport = MediaQuery.sizeOf(context).width < 640;
+            tstyle = tstyle.copyWith(fontSize: compactViewport ? 13 : 10);
             return FluentApp.router(
               key: navigatorKey,
               title: appTitle,
