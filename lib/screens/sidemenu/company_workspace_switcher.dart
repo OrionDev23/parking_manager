@@ -7,6 +7,7 @@ import '../../core/tenancy/company_membership_resolver.dart';
 import '../../core/tenancy/platform_companies_repository.dart';
 import '../../main.dart' show authService, companyService, startBackgroundInitialization;
 import '../../theme.dart';
+import '../../ui/design_system/parcoto_tokens.dart';
 import '../entreprise/entreprise.dart' show MyEntrepriseState;
 import 'pane_items.dart';
 
@@ -272,7 +273,7 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
                                 color: theme.textColor,
                               ),
                             ),
-                            const SizedBox(height: 3),
+                            const SizedBox(height: ParcotoTokens.space2),
                             Text(
                               '${membership.role} • ${membership.companySlug}',
                               maxLines: 1,
@@ -285,7 +286,7 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: ParcotoTokens.space2),
                       if (active)
                         Icon(
                           FluentIcons.check_mark,
@@ -420,12 +421,16 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
         onTap: interactive ? _openSwitcher : null,
         child: Container(
           padding: EdgeInsets.symmetric(
-            horizontal: widget.compact ? 12 : 10,
-            vertical: widget.compact ? 12 : 8,
+            horizontal: widget.compact
+                ? ParcotoTokens.space3
+                : ParcotoTokens.space2,
+            vertical: widget.compact
+                ? ParcotoTokens.space3
+                : ParcotoTokens.space2,
           ),
           decoration: BoxDecoration(
             color: theme.fillColor,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(theme.controlRadius),
             border: Border.all(color: theme.borderColor),
           ),
           child: Row(
@@ -437,7 +442,7 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
                 color: theme.color,
                 size: widget.compact ? 22 : 20,
               ),
-              const SizedBox(width: 11),
+              const SizedBox(width: ParcotoTokens.space3),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
