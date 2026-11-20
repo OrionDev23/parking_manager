@@ -836,7 +836,9 @@ class _DashboardStatusMeter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = context.watch<AppTheme>();
-    final fraction = total <= 0 ? 0.0 : (value / total).clamp(0.0, 1.0);
+    final fraction = total <= 0
+        ? 0.0
+        : (value / total).clamp(0.0, 1.0).toDouble();
 
     return Row(
       children: [
@@ -1128,7 +1130,18 @@ class InventoryExpiryWidget extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
+        Text(
+          '${summary.expiredLots} lots échus • ${summary.expiringLots} à échéance sous 30 jours',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: theme.mutedTextColor,
+            fontSize: 9,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 7),
         if (!summary.verified)
           Padding(
             padding: const EdgeInsets.only(bottom: 7),
