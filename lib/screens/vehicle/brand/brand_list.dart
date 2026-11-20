@@ -40,32 +40,31 @@ class _BrandListState extends State<BrandList> {
                     width: searchWidth,
                     height: 45.px,
                     child: ParcotoTextBox(
-                    controller: searchController,
-                    placeholder: 'search'.tr(),
-                    style: appTheme.writingStyle,
-                    cursorColor: appTheme.color.darker,
-                    placeholderStyle: placeStyle,
-                    onChanged: (s) {
-                      if (s.isNotEmpty) {
-                        notEmpty = true;
-                      } else {
-                        if (notEmpty) {
-                          notEmpty = false;
+                      controller: searchController,
+                      placeholder: 'search'.tr(),
+                      style: appTheme.writingStyle,
+                      cursorColor: appTheme.color.darker,
+                      placeholderStyle: placeStyle,
+                      onChanged: (s) {
+                        if (s.isNotEmpty) {
+                          notEmpty = true;
+                        } else {
+                          if (notEmpty) {
+                            notEmpty = false;
+                          }
                         }
-                      }
-                      setState(() {});
-                    },
-                    suffix: notEmpty
-                        ? IconButton(
-                            icon: const Icon(FluentIcons.cancel),
-                            onPressed: () {
-                              searchController.text = "";
-                              notEmpty = false;
-                              setState(() {});
-                            },
-                          )
-                        : null,
-                  ),
+                        setState(() {});
+                      },
+                      suffix: notEmpty
+                          ? IconButton(
+                              icon: const Icon(FluentIcons.cancel),
+                              onPressed: () {
+                                searchController.text = "";
+                                notEmpty = false;
+                                setState(() {});
+                              },
+                            )
+                          : null,
                     ),
                   ),
                 ),
