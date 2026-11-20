@@ -2,6 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../theme.dart';
+import '../ui/design_system/parcoto_surface.dart';
 import '../ui/design_system/parcoto_tokens.dart';
 
 /// Shared bordered surface for analytics and activity blocks on module dashboards.
@@ -20,29 +21,27 @@ class ModuleDashboardPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = context.watch<AppTheme>();
-    return Container(
+    return SizedBox(
       height: height,
-      padding: const EdgeInsets.all(ParcotoTokens.space4),
-      decoration: BoxDecoration(
-        color: theme.surfaceColor,
-        borderRadius: BorderRadius.circular(theme.cardRadius),
-        border: Border.all(color: theme.borderColor),
-        boxShadow: [theme.surfaceShadow],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: theme.writingStyle.color,
+      child: ParcotoSurface(
+        padding: const EdgeInsets.all(ParcotoTokens.space4),
+        radius: theme.cardRadius,
+        elevated: true,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: theme.writingStyle.color,
+              ),
             ),
-          ),
-          const SizedBox(height: ParcotoTokens.space3),
-          Expanded(child: child),
-        ],
+            const SizedBox(height: ParcotoTokens.space3),
+            Expanded(child: child),
+          ],
+        ),
       ),
     );
   }
