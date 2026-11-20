@@ -338,7 +338,7 @@ class _LoginScreenState extends State<LoginScreen>
                 ),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                    minHeight: (availableHeight - 24).clamp(0.0, double.infinity),
+                    minHeight: (availableHeight - 24).clamp(0.0, double.infinity).toDouble(),
                   ),
                   child: mobileContent,
                 ),
