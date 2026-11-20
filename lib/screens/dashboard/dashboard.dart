@@ -807,25 +807,36 @@ class _DashboardState extends State<Dashboard>
     var broken = 0;
     var repairing = 0;
     var onMission = 0;
+    var reformed = 0;
     var otherState = 0;
     var maintenance = 0;
 
     for (final vehicle in vehicles) {
       final state = vehicle.etatactuel ?? 0;
       switch (state) {
+        // The legacy fleet has two equivalent status ranges: 0–4 and 5–8.
+        // Normalize them so both generations appear in the same dashboard
+        // categories instead of treating 0–4 as an unknown state.
+        case 0:
         case 5:
           available++;
           break;
+        case 1:
         case 6:
           broken++;
           maintenance++;
           break;
+        case 2:
         case 7:
           repairing++;
           maintenance++;
           break;
+        case 3:
         case 8:
           onMission++;
+          break;
+        case 4:
+          reformed++;
           break;
         default:
           otherState++;
@@ -834,7 +845,7 @@ class _DashboardState extends State<Dashboard>
 
     final fleetStatus = <DashboardStatusSegment>[
       DashboardStatusSegment(
-        label: 'Disponible',
+        label: 'Libre / disponible',
         value: available,
         color: const Color(0xFF19C997),
       ),
@@ -844,14 +855,19 @@ class _DashboardState extends State<Dashboard>
         color: const Color(0xFFF05D76),
       ),
       DashboardStatusSegment(
-        label: 'En réparation',
+        label: 'Garage / réparation',
         value: repairing,
         color: const Color(0xFFE6A23C),
       ),
       DashboardStatusSegment(
-        label: 'En mission',
+        label: 'En marche / mission',
         value: onMission,
         color: const Color(0xFF279BFA),
+      ),
+      DashboardStatusSegment(
+        label: 'Réformé',
+        value: reformed,
+        color: const Color(0xFF8B7CB8),
       ),
       DashboardStatusSegment(
         label: 'Autre état',
@@ -1346,15 +1362,18 @@ class _DashboardState extends State<Dashboard>
         }
       }
 
-      if (vehicle.etatactuel == 6 || vehicle.etatactuel == 7) {
+      final state = vehicle.etatactuel ?? 0;
+      final isBroken = state == 1 || state == 6;
+      final isInWorkshop = state == 2 || state == 7;
+      if (isBroken || isInWorkshop) {
         alerts.add(
           DashboardAlert(
             title: vehicle.matricule,
-            subtitle: vehicle.etatactuel == 6
+            subtitle: isBroken
                 ? 'Véhicule signalé en panne'
-                : 'Véhicule actuellement en réparation',
-            tag: vehicle.etatactuel == 6 ? 'Panne' : 'Atelier',
-            severity: vehicle.etatactuel == 6
+                : 'Véhicule actuellement au garage / en réparation',
+            tag: isBroken ? 'Panne' : 'Atelier',
+            severity: isBroken
                 ? DashboardAlertSeverity.danger
                 : DashboardAlertSeverity.warning,
           ),
