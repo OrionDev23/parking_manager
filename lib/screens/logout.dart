@@ -3,7 +3,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/screens/sidemenu/sidemenu.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../widgets/page_header.dart';
 import '../main.dart';
@@ -20,80 +19,79 @@ class _LogoutScreenState extends State<LogoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var appTheme = context.watch<AppTheme>();
+    final appTheme = context.watch<AppTheme>();
     return ScaffoldPage(
       header: PageTitle(text: 'deconnexion'.tr()),
-      content: Center(
-        child: Column(
-          children: [
-            SizedBox(height: 20.h),
-            Container(
-              padding: const EdgeInsets.all(10),
-              alignment: Alignment.center,
-              width: 25.w,
-              height: 25.h,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: appTheme.mode == ThemeMode.dark
-                    ? Colors.grey
-                    : appTheme.mode == ThemeMode.light
-                    ? Colors.white
-                    : ThemeMode.system == ThemeMode.light
-                    ? Colors.white
-                    : Colors.grey,
-                boxShadow: kElevationToShadow[2],
+      content: LayoutBuilder(
+        builder: (context, constraints) {
+          final cardWidth =
+              (constraints.maxWidth - 32).clamp(280.0, 440.0).toDouble();
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: (constraints.maxHeight - 32)
+                    .clamp(0.0, double.infinity),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'disconnectconfirm',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14.sp,
+              child: Center(
+                child: SizedBox(
+                  width: cardWidth,
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(14),
+                      color: appTheme.surfaceColor,
+                      border: Border.all(color: appTheme.borderColor),
+                      boxShadow: [appTheme.surfaceShadow],
                     ),
-                  ).tr(),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Button(
-                          onPressed: loginOut ? null : logout,
-                          child: loginOut
-                              ? const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                  ),
-                                  child: ProgressRing(),
-                                )
-                              : Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8.0,
-                                  ),
-                                  child: const Text('oui').tr(),
-                                ),
+                        Icon(
+                          FluentIcons.sign_out,
+                          size: 34,
+                          color: appTheme.color,
                         ),
-                        FilledButton(
-                          onPressed: loginOut ? null : cancel,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                            ),
-                            child: const Text('non').tr(),
+                        const SizedBox(height: 18),
+                        Text(
+                          'disconnectconfirm',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
+                        ).tr(),
+                        const SizedBox(height: 20),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 12,
+                          runSpacing: 10,
+                          children: [
+                            Button(
+                              onPressed: loginOut ? null : cancel,
+                              child: const Text('non').tr(),
+                            ),
+                            FilledButton(
+                              onPressed: loginOut ? null : logout,
+                              child: loginOut
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: ProgressRing(strokeWidth: 2),
+                                    )
+                                  : const Text('oui').tr(),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                ],
+                ),
               ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
