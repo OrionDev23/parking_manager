@@ -37,6 +37,14 @@ import '../../reparation/reparation_order_form/entreprise_placement.dart';
 import 'vehicle_damage.dart';
 import 'vehicle_damage_gts.dart';
 
+Size _responsiveSelectionDialogSize(BuildContext context) {
+  final screenSize = MediaQuery.sizeOf(context);
+  return Size(
+    (screenSize.width - 32).clamp(0.0, 700.0).toDouble(),
+    (screenSize.height - 80).clamp(0.0, 550.0).toDouble(),
+  );
+}
+
 class FicheReceptionForm extends StatefulWidget {
   final FicheReception? fiche;
 
@@ -539,7 +547,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                               builder: (context) {
                                 return ContentDialog(
                                   constraints: BoxConstraints.tight(
-                                    Size(700.px, 550.px),
+                                    _responsiveSelectionDialogSize(context),
                                   ),
                                   title: const Text('selectvehicle').tr(),
                                   style: ContentDialogThemeData(
@@ -594,7 +602,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                               builder: (context) {
                                 return ContentDialog(
                                   constraints: BoxConstraints.tight(
-                                    Size(700.px, 550.px),
+                                    _responsiveSelectionDialogSize(context),
                                   ),
                                   title: const Text('selectreparation').tr(),
                                   style: ContentDialogThemeData(
@@ -647,7 +655,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                               builder: (context) {
                                 return ContentDialog(
                                   constraints: BoxConstraints.tight(
-                                    Size(700.px, 550.px),
+                                    _responsiveSelectionDialogSize(context),
                                   ),
                                   title: const Text('selectchauffeur').tr(),
                                   style: ContentDialogThemeData(
@@ -813,7 +821,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
               ),
             ),
             if (assigningFicheNumber)
-              Positioned(top: 40.h, left: 40.w, child: const ProgressBar()),
+              const Center(child: ProgressBar()),
           ],
         ),
       ),
