@@ -1111,7 +1111,7 @@ class InventoryExpiryWidget extends StatelessWidget {
           children: [
             Expanded(
               child: _InventoryCount(
-                label: 'Références',
+                label: 'Pièces en stock',
                 value: summary.referenceCount,
                 color: const Color(0xFF279BFA),
               ),
@@ -1136,7 +1136,7 @@ class InventoryExpiryWidget extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          '${summary.expiredLots} lots échus • ${summary.expiringLots} à échéance sous 30 jours',
+          '${summary.expiredLots} échéances échues • ${summary.expiringLots} à venir sous 30 jours',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
@@ -1285,6 +1285,135 @@ class _InventoryCount extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class ExpiringDocumentsWidget extends StatelessWidget {
+  final DashboardDocumentSummary summary;
+
+  const ExpiringDocumentsWidget({super.key, required this.summary});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.watch<AppTheme>();
+    if (summary.alerts.isEmpty) {
+      return _DashboardEmptyState(
+        icon: FluentIcons.document_set,
+        message: summary.verified
+            ? 'Aucun document véhicule ou conducteur à renouveler dans les 45 jours.'
+            : 'Les échéances administratives ne sont pas entièrement synchronisées.',
+      );
+    }
+
+    final visible = summary.alerts.take(5).toList(growable: false);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _InventoryCount(
+                label: 'Échus',
+                value: summary.expiredCount,
+                color: const Color(0xFFE85D75),
+              ),
+            ),
+            const SizedBox(width: 9),
+            Expanded(
+              child: _InventoryCount(
+                label: 'À renouveler',
+                value: summary.expiringCount,
+                color: const Color(0xFFE6A23C),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 9),
+        if (!summary.verified)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 7),
+            child: Text(
+              'Synchronisation incomplète : certaines échéances peuvent manquer.',
+              style: TextStyle(
+                color: theme.mutedTextColor,
+                fontSize: 9,
+              ),
+            ),
+          ),
+        Expanded(
+          child: ListView.separated(
+            itemCount: visible.length,
+            separatorBuilder: (_, _) => Divider(
+              style: DividerThemeData(
+                decoration: BoxDecoration(color: theme.borderColor),
+              ),
+            ),
+            itemBuilder: (context, index) {
+              final alert = visible[index];
+              final color = alert.severity == DashboardAlertSeverity.danger
+                  ? const Color(0xFFE85D75)
+                  : const Color(0xFFE6A23C);
+              final date = DateFormat('dd MMM yyyy', 'fr')
+                  .format(alert.dueDate);
+              return Row(
+                children: [
+                  Container(
+                    width: 29,
+                    height: 29,
+                    decoration: BoxDecoration(
+                      color: theme.fillColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      alert.icon,
+                      color: theme.mutedTextColor,
+                      size: 14,
+                    ),
+                  ),
+                  const SizedBox(width: 9),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          alert.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: theme.textColor,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          '${alert.subtitle} • $date',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: theme.mutedTextColor,
+                            fontSize: 9,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 7),
+                  Text(
+                    alert.tag,
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
