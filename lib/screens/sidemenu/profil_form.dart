@@ -89,6 +89,7 @@ class _ProfilFormState extends State<ProfilForm> {
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
     final screenSize = MediaQuery.sizeOf(context);
+    final avatarSize = screenSize.width < 640 ? 72.0 : 96.0;
     final countryDialogSize = Size(
       (screenSize.width - 32).clamp(280.0, 520.0).toDouble(),
       (screenSize.height - 80).clamp(320.0, 600.0).toDouble(),
@@ -110,8 +111,8 @@ class _ProfilFormState extends State<ProfilForm> {
               Hero(
                 tag: 'myprofil',
                 child: Container(
-                  width: 15.h,
-                  height: 15.h,
+                  width: avatarSize,
+                  height: avatarSize,
                   decoration: BoxDecoration(
                     color: appTheme.color,
                     shape: BoxShape.circle,
