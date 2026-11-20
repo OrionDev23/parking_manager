@@ -217,8 +217,10 @@ class SelectDialogState<T> extends State<SelectDialog<T>> {
     bloc.dispose();
   }
 
-  bool get isWeb =>
-      MediaQuery.of(context).size.width > MediaQuery.of(context).size.height;
+  // Use a width breakpoint instead of width > height. On mobile web the
+  // virtual keyboard reduces viewport height and can make a portrait phone
+  // look like a landscape screen, changing dialog constraints mid-edit.
+  bool get isWideLayout => MediaQuery.sizeOf(context).width >= 700;
 
   bool get isMultipleItems => widget.onMultipleItemsChange != null;
 
@@ -249,7 +251,7 @@ class SelectDialogState<T> extends State<SelectDialog<T>> {
       height: MediaQuery.of(context).size.height * 0.7,
       constraints:
           widget.constraints ??
-          (isWeb ? webDefaultConstraints : mobileDefaultConstraints),
+          (isWideLayout ? webDefaultConstraints : mobileDefaultConstraints),
       child: Column(
         children: <Widget>[
           if (widget.showSearchBox)
