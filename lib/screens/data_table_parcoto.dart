@@ -61,15 +61,20 @@ class _DataTableParcState extends State<DataTableParc> {
     // The package's table controls inherit the material_ui theme at the app root.
     // This local Flutter theme remains for legacy Material widgets in the table subtree.
     final materialTheme = appTheme.materialTheme;
-    final compact = MediaQuery.sizeOf(context).width < 760;
-    final effectiveRowHeight = widget.autoRowHeight
-        ? (compact ? 56.0 : kMinInteractiveDimension)
-        : widget.rowHeight ??
-            (widget.numberOfRows == null ? rowHeight : rowHeight * 2);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Use the width allocated to this table, not the whole application
+        // window. A desktop sidebar can make the available table area much
+        // narrower than MediaQuery.sizeOf(context).width suggests.
+        final compact = constraints.maxWidth < 760;
+        final effectiveRowHeight = widget.autoRowHeight
+            ? (compact ? 56.0 : kMinInteractiveDimension)
+            : widget.rowHeight ??
+                (widget.numberOfRows == null ? rowHeight : rowHeight * 2);
 
-    return Theme(
-      data: materialTheme,
-      child: Container(
+        return Theme(
+          data: materialTheme,
+          child: Container(
         decoration: BoxDecoration(
           color: surfaceColor,
           borderRadius: BorderRadius.circular(appTheme.tableRadius),
@@ -160,6 +165,8 @@ class _DataTableParcState extends State<DataTableParc> {
           ),
         ),
       ),
+        );
+      },
     );
   }
 }
