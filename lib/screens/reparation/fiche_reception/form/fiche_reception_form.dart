@@ -230,6 +230,59 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
     }
   }
 
+  Future<bool> _validateFicheNumberBeforeSave() async {
+    if (widget.fiche != null) return int.tryParse(numOrdre.text.trim()) != null;
+
+    final value = numOrdre.text.trim();
+    final number = int.tryParse(value);
+    if (number == null) {
+      if (mounted && !errorNumFiche) {
+        setState(() => errorNumFiche = true);
+      }
+      return false;
+    }
+
+    _ficheNumberValidationTimer?.cancel();
+    final revision = ++_ficheNumberValidationRevision;
+    var duplicated = testIfReservedContainedFiches(number);
+
+    if (!duplicated) {
+      try {
+        final result = await DatabaseGetter.database!.listRows(
+          databaseId: databaseId,
+          tableId: fichesreceptionId,
+          queries: [
+            Query.orderDesc('numero'),
+            Query.equal('numero', number),
+            Query.limit(1),
+          ],
+        );
+        duplicated = result.rows.isNotEmpty;
+      } catch (error, stackTrace) {
+        // Keep the existing offline behavior: a transient lookup failure
+        // must not prevent a save that was previously allowed.
+        debugPrint(
+          '[ParcOto Reception] save-time number validation failed: '
+          '$error\\n$stackTrace',
+        );
+      }
+    }
+
+    if (!mounted ||
+        revision != _ficheNumberValidationRevision ||
+        numOrdre.text.trim() != value) {
+      return false;
+    }
+
+    if (!duplicated) {
+      reservedFiches[widget.key!] = number;
+    }
+    if (errorNumFiche != duplicated) {
+      setState(() => errorNumFiche = duplicated);
+    }
+    return !duplicated;
+  }
+
   /// Debounces the remote uniqueness check so typing never causes one
   /// Appwrite request and a parent rebuild per character.
   void _scheduleFicheNumberValidation(String text) {
@@ -1390,6 +1443,10 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
   }
 
   void uploadForm() async {
+    if (uploading) return;
+    if (!await _validateFicheNumberBeforeSave()) return;
+    if (!mounted) return;
+
     setState(() {
       uploading = true;
     });
