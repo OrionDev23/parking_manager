@@ -345,6 +345,12 @@ Future<void> launchApp() async {
   EasyLocalization.logger.enableBuildModes = [];
   await EasyLocalization.ensureInitialized();
 
+  // Keep the app root key stable across ResponsiveSizer rebuilds. On mobile
+  // web, opening the virtual keyboard changes the viewport metrics and can
+  // rebuild this builder. Creating a new key here would remount FluentApp.router,
+  // dispose the active route and immediately drop the focused text field.
+  final appRootKey = GlobalKey<NavigatorState>();
+
   runApp(
     ResponsiveSizer(
       builder: (context, orientation, deviceType) {
@@ -353,7 +359,7 @@ Future<void> launchApp() async {
           path: 'assets/translations',
           fallbackLocale: const Locale('fr'),
           useOnlyLangCode: true,
-          child: MyApp(navigatorKey: GlobalKey<NavigatorState>()),
+          child: MyApp(navigatorKey: appRootKey),
         );
       },
     ),
