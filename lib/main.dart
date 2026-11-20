@@ -346,12 +346,16 @@ Future<void> launchApp() async {
   await EasyLocalization.ensureInitialized();
 
   runApp(
-    EasyLocalization(
-      supportedLocales: const [Locale('fr'), Locale('ar'), Locale('en')],
-      path: 'assets/translations',
-      fallbackLocale: const Locale('fr'),
-      useOnlyLangCode: true,
-      child: MyApp(navigatorKey: GlobalKey<NavigatorState>()),
+    ResponsiveSizer(
+      builder: (context, orientation, deviceType) {
+        return EasyLocalization(
+          supportedLocales: const [Locale('fr'), Locale('ar'), Locale('en')],
+          path: 'assets/translations',
+          fallbackLocale: const Locale('fr'),
+          useOnlyLangCode: true,
+          child: MyApp(navigatorKey: GlobalKey<NavigatorState>()),
+        );
+      },
     ),
   );
 
@@ -442,64 +446,60 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveSizer(
-      builder: (context, orientation, deviceType) {
-        return ChangeNotifierProvider<AppTheme>.value(
-          value: _appTheme,
-          child: Builder(
-            builder: (context) {
-              final appTheme = context.watch<AppTheme>();
-              // The virtual keyboard changes the available viewport height on
-              // mobile browsers. Base this legacy table style on width instead
-              // of orientation, which can flip while the keyboard is visible.
-              final compactViewport = MediaQuery.sizeOf(context).width < 640;
-              tstyle = tstyle.copyWith(fontSize: compactViewport ? 13 : 10);
+    return ChangeNotifierProvider<AppTheme>.value(
+      value: _appTheme,
+      child: Builder(
+        builder: (context) {
+          final appTheme = context.watch<AppTheme>();
+          // The virtual keyboard changes the available viewport height on
+          // mobile browsers. Base this legacy table style on width instead
+          // of orientation, which can flip while the keyboard is visible.
+          final compactViewport = MediaQuery.sizeOf(context).width < 640;
+          tstyle = tstyle.copyWith(fontSize: compactViewport ? 13 : 10);
 
-              return FluentApp.router(
-                key: widget.navigatorKey,
-                title: appTitle,
-                themeMode: appTheme.mode,
-                debugShowCheckedModeBanner: false,
-                color: appTheme.color,
-                localizationsDelegates: getDelegates(context),
-                localeResolutionCallback: (locale, supportedLocales) {
-                  for (var supportedLocale in supportedLocales) {
-                    if (supportedLocale.languageCode == locale!.languageCode &&
-                        supportedLocale.countryCode == locale.countryCode) {
-                      return supportedLocale;
-                    }
-                  }
+          return FluentApp.router(
+            key: widget.navigatorKey,
+            title: appTitle,
+            themeMode: appTheme.mode,
+            debugShowCheckedModeBanner: false,
+            color: appTheme.color,
+            localizationsDelegates: getDelegates(context),
+            localeResolutionCallback: (locale, supportedLocales) {
+              for (var supportedLocale in supportedLocales) {
+                if (supportedLocale.languageCode == locale!.languageCode &&
+                    supportedLocale.countryCode == locale.countryCode) {
+                  return supportedLocale;
+                }
+              }
 
-                  return supportedLocales.first;
-                },
-                darkTheme: appTheme.fluentTheme(Brightness.dark),
-                theme: appTheme.fluentTheme(Brightness.light),
-                supportedLocales: const [
-                  Locale('fr'),
-                  Locale('en'),
-                  Locale('ar'),
-                ],
-                locale: appTheme.locale,
-                builder: (context, child) {
-                  return mui.Theme(
-                    data: appTheme.materialUiTheme,
-                    child: m.Theme(
-                      data: appTheme.materialTheme,
-                      child: NavigationPaneTheme(
-                        data: NavigationPaneThemeData(
-                          backgroundColor: appTheme.backGroundColor,
-                        ),
-                        child: ConnectivityStatusBanner(child: child!),
-                      ),
+              return supportedLocales.first;
+            },
+            darkTheme: appTheme.fluentTheme(Brightness.dark),
+            theme: appTheme.fluentTheme(Brightness.light),
+            supportedLocales: const [
+              Locale('fr'),
+              Locale('en'),
+              Locale('ar'),
+            ],
+            locale: appTheme.locale,
+            builder: (context, child) {
+              return mui.Theme(
+                data: appTheme.materialUiTheme,
+                child: m.Theme(
+                  data: appTheme.materialTheme,
+                  child: NavigationPaneTheme(
+                    data: NavigationPaneThemeData(
+                      backgroundColor: appTheme.backGroundColor,
                     ),
-                  );
-                },
-                routerConfig: _routes.router,
+                    child: ConnectivityStatusBanner(child: child!),
+                  ),
+                ),
               );
             },
-          ),
-        );
-      },
+            routerConfig: _routes.router,
+          );
+        },
+      ),
     );
   }
 }
