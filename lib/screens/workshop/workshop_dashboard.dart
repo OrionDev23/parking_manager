@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 import '../../providers/parts_provider.dart';
 import '../../providers/counters.dart';
+import '../../providers/client_database.dart';
 import '../../theme.dart';
 import '../../widgets/module_dashboard_header.dart';
 import '../../widgets/module_dashboard_action.dart';
@@ -19,6 +22,7 @@ class WorkshopDashboard extends StatefulWidget {
 
 class _WorkshopDashboardState extends State<WorkshopDashboard> {
   late final PartsProvider _partsProvider;
+  late final VoidCallback _companyRevisionListener;
   late final Future<int> Function() _stockCountLoader =
       () => DatabaseCounters().countStockEntries();
   int _stockMetricRevision = 0;
@@ -28,6 +32,14 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
   void initState() {
     super.initState();
     _partsProvider = PartsProvider();
+    _companyRevisionListener = () {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_refreshCatalog());
+      });
+    };
+    DatabaseGetter.companyRevisionListenable.addListener(
+      _companyRevisionListener,
+    );
     _refreshCatalog();
   }
 
@@ -56,6 +68,9 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
 
   @override
   void dispose() {
+    DatabaseGetter.companyRevisionListenable.removeListener(
+      _companyRevisionListener,
+    );
     _partsProvider.dispose();
     super.dispose();
   }
