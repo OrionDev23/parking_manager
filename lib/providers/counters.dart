@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:appwrite/appwrite.dart';
+import 'package:parc_oto/core/business/fleet_dashboard_status.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
 import 'package:parc_oto/serializables/vehicle/vehicle.dart';
@@ -112,6 +113,8 @@ class DatabaseCounters {
   Future<int> countVehiclesByDashboardStatus({
     required int etat,
   }) async {
+    final expectedStatus =
+        FleetDashboardStatusMapper.fromMetricIndex(etat);
     final cacheKey = _cacheKey('vehicles-dashboard-status|$etat');
     final now = DateTime.now();
     final cached = _countCache[cacheKey];
@@ -124,18 +127,15 @@ class DatabaseCounters {
     future = () async {
       try {
         final vehicles = await _loadActiveCompanyVehicles();
-        return vehicles.where((vehicle) {
-          final state = vehicle.etatactuel ?? 0;
-          return switch (etat) {
-            // The two legacy status ranges share their dashboard meaning.
-            0 => state == 0 || state == 5,
-            1 => state == 1 || state == 6,
-            2 => state == 2 || state == 7,
-            3 => state == 3 || state == 8,
-            4 => state == 4,
-            _ => false,
-          };
-        }).length;
+        return vehicles
+            .where(
+              (vehicle) =>
+                  FleetDashboardStatusMapper.fromLegacyCode(
+                    vehicle.etatactuel,
+                  ) ==
+                  expectedStatus,
+            )
+            .length;
       } catch (_) {
         if (identical(_countCache[cacheKey]?.future, future)) {
           _countCache.remove(cacheKey);
