@@ -226,7 +226,9 @@ class PanesListState extends State<PanesList>
                       child: DragToMoveArea(
                         child: Padding(
                           padding: EdgeInsets.symmetric(
-                            horizontal: compact ? 12 : 18,
+                            horizontal: compact
+                                ? ParcotoTokens.space3
+                                : ParcotoTokens.space5,
                           ),
                           child: Row(
                             children: [
@@ -237,7 +239,7 @@ class PanesListState extends State<PanesList>
                                       compact: true,
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: ParcotoTokens.space2),
                                   const GlobalSearchLauncher(compact: true),
                                 ] else ...[
                                   Image.asset(
@@ -253,7 +255,7 @@ class PanesListState extends State<PanesList>
                                   width: 230,
                                   child: CompanyWorkspaceSwitcher(),
                                 ),
-                                const SizedBox(width: 16),
+                                const SizedBox(width: ParcotoTokens.space4),
                                 const Expanded(
                                   child: GlobalSearchLauncher(),
                                 ),
@@ -299,14 +301,22 @@ class PanesListState extends State<PanesList>
                                   signedIn.value &&
                                   !isPlatformHome &&
                                   DatabaseGetter.trialDate != null)
-                                SizedBox(width: compact ? 6 : 14),
+                                SizedBox(
+                                  width: compact
+                                      ? ParcotoTokens.space2
+                                      : ParcotoTokens.space3,
+                                ),
                               if (!loading && signedIn.value)
                                 const ProfilNameTopBar(),
                               if (!kIsWeb &&
                                   (Platform.isMacOS ||
                                       Platform.isLinux ||
                                       Platform.isWindows)) ...[
-                                SizedBox(width: compact ? 4 : 12),
+                                SizedBox(
+                                  width: compact
+                                      ? ParcotoTokens.space2
+                                      : ParcotoTokens.space3,
+                                ),
                                 const WindowButtons(),
                               ],
                             ],
@@ -318,7 +328,9 @@ class PanesListState extends State<PanesList>
                       Container(
                         height: compact ? 38 : 42,
                         padding: EdgeInsets.symmetric(
-                          horizontal: compact ? 10 : 18,
+                          horizontal: compact
+                              ? ParcotoTokens.space3
+                              : ParcotoTokens.space5,
                         ),
                         color: widget.appTheme.mode == ThemeMode.dark
                             ? const Color(0xFF493515)
@@ -332,7 +344,7 @@ class PanesListState extends State<PanesList>
                                   ? const Color(0xFFFFD27A)
                                   : const Color(0xFF8A5700),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: ParcotoTokens.space2),
                             Expanded(
                               child: Text(
                                 compact
@@ -349,7 +361,7 @@ class PanesListState extends State<PanesList>
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: ParcotoTokens.space2),
                             Button(
                               onPressed: () async {
                                 try {
