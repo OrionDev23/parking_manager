@@ -290,9 +290,8 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                           flex: 2,
                           child: ZoneBox(
                             label: 'birthday'.tr(),
-                            child: Container(
-                              height: 5.h,
-                              padding: const EdgeInsets.all(10),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
                               child: ParcotoFieldSurface(child: DatePicker(
                                 selected: birthDay,
                                 onChanged: (d) {
