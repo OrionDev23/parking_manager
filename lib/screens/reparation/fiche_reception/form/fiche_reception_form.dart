@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:appwrite/appwrite.dart' hide Client;
 import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -190,6 +192,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
 
   bool errorNumFiche = false;
   bool changedPics = false;
+  Timer? _ficheNumberValidationTimer;
+  int _ficheNumberValidationRevision = 0;
 
   void assignFicheNumber() async {
     assigningFicheNumber = true;
@@ -226,44 +230,64 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
     }
   }
 
-  Future<bool> testIfFichesNumberExists() async {
-    bool result = false;
+  /// Debounces the remote uniqueness check so typing never causes one
+  /// Appwrite request and a parent rebuild per character.
+  void _scheduleFicheNumberValidation(String text) {
+    _ficheNumberValidationTimer?.cancel();
+    final revision = ++_ficheNumberValidationRevision;
+    final number = int.tryParse(text);
 
-    if (testIfReservedContainedFiches(int.parse(numOrdre.text))) {
-      setState(() {
-        errorNumFiche = true;
-      });
-      result = true;
-    } else {
-      result = await DatabaseGetter.database!
-          .listRows(
+    if (number == null) {
+      reservedFiches.remove(widget.key);
+      if (errorNumFiche) {
+        setState(() => errorNumFiche = false);
+      }
+      return;
+    }
+
+    _ficheNumberValidationTimer = Timer(
+      const Duration(milliseconds: 350),
+      () async {
+        final duplicatedLocally = testIfReservedContainedFiches(number);
+        if (duplicatedLocally) {
+          if (!mounted || revision != _ficheNumberValidationRevision) return;
+          if (!errorNumFiche) setState(() => errorNumFiche = true);
+          return;
+        }
+
+        bool duplicatedRemotely = false;
+        try {
+          final result = await DatabaseGetter.database!.listRows(
             databaseId: databaseId,
             tableId: fichesreceptionId,
             queries: [
               Query.orderDesc('numero'),
-              Query.equal('numero', int.parse(numOrdre.text)),
+              Query.equal('numero', number),
               Query.limit(1),
             ],
-          )
-          .then((value) {
-            if (value.rows.length == 1) {
-              setState(() {
-                errorNumFiche = true;
-              });
-              return true;
-            } else {
-              setState(() {
-                errorNumFiche = false;
-              });
-              return false;
-            }
-          })
-          .onError((error, stackTrace) {
-            return Future.value(false);
-          });
-    }
+          );
+          duplicatedRemotely = result.rows.isNotEmpty;
+        } catch (error, stackTrace) {
+          debugPrint('[ParcOto Reception] number validation failed: $error\\n$stackTrace');
+          // Preserve the previous behavior: a temporary network error must
+          // not make a valid form impossible to save.
+        }
 
-    return result;
+        if (!mounted ||
+            revision != _ficheNumberValidationRevision ||
+            numOrdre.text != text) {
+          return;
+        }
+
+        if (!duplicatedRemotely) {
+          reservedFiches[widget.key!] = number;
+        }
+
+        if (errorNumFiche != duplicatedRemotely) {
+          setState(() => errorNumFiche = duplicatedRemotely);
+        }
+      },
+    );
   }
 
   bool testIfReservedContainedFiches(int value) {
@@ -376,15 +400,7 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                                             FilteringTextInputFormatter
                                                 .digitsOnly,
                                           ],
-                                          onChanged: (s) async {
-                                            if (s.isNotEmpty) {
-                                              if (!await testIfFichesNumberExists()) {
-                                                reservedFiches[widget.key!] =
-                                                    int.parse(s);
-                                                setState(() {});
-                                              }
-                                            }
-                                          },
+                                          onChanged: _scheduleFicheNumberValidation,
                                         ),
                                       ),
                                     ],
@@ -734,23 +750,20 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                             textAlignVertical: TextAlignVertical.top,
                             suffix: Padding(
                               padding: const EdgeInsets.all(5.0),
-                              child:
-                                  Text(
-                                    'charactersremaining',
-                                    style: placeStyle,
-                                  ).tr(
-                                    namedArgs: {
-                                      'nbr':
-                                          (100 - remarqueEntretien.text.length)
-                                              .toString(),
-                                    },
-                                  ),
+                              child: ValueListenableBuilder<TextEditingValue>(
+                                valueListenable: remarqueEntretien,
+                                builder: (context, value, _) => Text(
+                                  'charactersremaining',
+                                  style: placeStyle,
+                                ).tr(
+                                  namedArgs: {
+                                    'nbr': (100 - value.text.length).toString(),
+                                  },
+                                ),
+                              ),
                             ),
                             maxLines: 4,
                             maxLength: 100,
-                            onChanged: (s) {
-                              setState(() {});
-                            },
                           ),
                         ),
                       ],
@@ -1319,6 +1332,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
 
   @override
   void dispose() {
+    _ficheNumberValidationTimer?.cancel();
+    _ficheNumberValidationRevision++;
     reservedFiches.remove(widget.key);
     super.dispose();
   }
