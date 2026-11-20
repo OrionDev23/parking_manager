@@ -193,6 +193,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final compact = width < ParcotoTokens.tabletBreakpoint;
+    final keyboardVisible = MediaQuery.viewInsetsOf(context).bottom > 0;
     final theme = widget.appTheme;
 
     return ValueListenableBuilder<int>(
@@ -235,11 +236,12 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                                 ),
                               ),
                         ),
-                        _mobileBottomBar(
-                          theme,
-                          _mobileDestinations(),
-                          selected,
-                        ),
+                        if (!keyboardVisible)
+                          _mobileBottomBar(
+                            theme,
+                            _mobileDestinations(),
+                            selected,
+                          ),
                       ],
                     )
                   : Row(
