@@ -62,35 +62,21 @@ class _UserFormState extends State<UserForm> {
   }
 
   void testIfSomethingChanged() {
-    if (email.text != widget.user?.email) {
-      setState(() {
-        somethingChanged = true;
-      });
-      return;
-    } else if (name.text != widget.user?.name) {
-      setState(() {
-        somethingChanged = true;
-      });
-      return;
-    } else if (password.text != widget.user?.password) {
-      setState(() {
-        somethingChanged = true;
-      });
-      return;
-    } else if (countrySelected !=
-        Countries.getCountryCodeFromPhone(widget.user?.phone)) {
-      setState(() {
-        somethingChanged = true;
-      });
-    } else if (widget.user?.phone.substring(4, widget.user?.phone.length) !=
-        phone.text) {
-      setState(() {
-        somethingChanged = true;
-      });
-    } else if (somethingChanged) {
-      setState(() {
-        somethingChanged = false;
-      });
+    final originalPhone = widget.user?.phone;
+    final originalLocalPhone =
+        originalPhone != null && originalPhone.length > 3
+        ? originalPhone.substring(4)
+        : '';
+
+    final hasChanges =
+        email.text != widget.user?.email ||
+        name.text != widget.user?.name ||
+        password.text != widget.user?.password ||
+        countrySelected != Countries.getCountryCodeFromPhone(originalPhone) ||
+        phone.text != originalLocalPhone;
+
+    if (hasChanges != somethingChanged && mounted) {
+      setState(() => somethingChanged = hasChanges);
     }
   }
 
@@ -169,13 +155,11 @@ class _UserFormState extends State<UserForm> {
                     placeholder: 'email'.tr(),
                     enabled: widget.user == null,
                     onChanged: (s) {
-                      if (FormValidators.isEmail(s)) {
-                        validEmail = true;
-                      } else {
-                        validEmail = false;
+                      final nextValid = FormValidators.isEmail(s);
+                      if (nextValid != validEmail) {
+                        setState(() => validEmail = nextValid);
                       }
-                      setState(() {});
-                      if (validEmail) {
+                      if (nextValid) {
                         testIfSomethingChanged();
                       }
                     },
