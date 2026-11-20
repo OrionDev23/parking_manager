@@ -176,11 +176,23 @@ class ChauffeurTableState extends State<ChauffeurTable> {
           filterNow = false;
         }
         return DataTableParc(
-          header: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
+          header: LayoutBuilder(
+            builder: (context, constraints) {
+              final searchWidth = (constraints.maxWidth - 200)
+                  .clamp(140.0, 350.0)
+                  .toDouble();
+
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 5.0,
+                  horizontal: 10,
+                ),
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
                 SizedBox(
                   width: 80.px,
                   child: Stack(
@@ -211,9 +223,20 @@ class ChauffeurTableState extends State<ChauffeurTable> {
                                     color: appTheme.backGroundColor,
                                     child: StatefulBuilder(
                                       builder: (context, setS) {
+                                        final screenSize =
+                                            MediaQuery.sizeOf(context);
+                                        final filterWidth =
+                                            (screenSize.width - 24)
+                                                .clamp(220.0, 380.0)
+                                                .toDouble();
+                                        final filterHeight =
+                                            (screenSize.height - 160)
+                                                .clamp(220.0, 440.0)
+                                                .toDouble();
+
                                         return SizedBox(
-                                          width: 30.w,
-                                          height: 42.h,
+                                          width: filterWidth,
+                                          height: filterHeight,
                                           child: Column(
                                             children: [
                                               Flexible(
@@ -444,7 +467,7 @@ class ChauffeurTableState extends State<ChauffeurTable> {
                 ),
                 smallSpace,
                 SizedBox(
-                  width: 350.px,
+                  width: searchWidth,
                   height: 45.px,
                   child: TextBox(
                     onChanged: (s) {
@@ -490,8 +513,10 @@ class ChauffeurTableState extends State<ChauffeurTable> {
                         : null,
                   ),
                 ),
-              ],
-            ),
+                  ],
+                ),
+              );
+            },
           ),
           sortAscending: assending,
           sortColumnIndex: sortColumn,
