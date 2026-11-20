@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import '../../widgets/module_dashboard_metric.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -155,6 +156,54 @@ class VehicleDashboard extends StatelessWidget {
                     'Accédez aux véhicules, aux états et aux documents administratifs.',
                 icon: FluentIcons.car,
               ),
+              ModuleDashboardSectionHeader(
+                title: 'Indicateurs du parc',
+                subtitle:
+                    'Consultez les volumes du parc et la répartition des principaux états.',
+              ),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  ModuleDashboardMetric(
+                    label: 'Véhicules',
+                    detail: 'Parc total',
+                    icon: FluentIcons.car,
+                    loadValue: () => DatabaseCounters().countVehicles(),
+                  ),
+                  ModuleDashboardMetric(
+                    label: 'Libres',
+                    detail: 'État libre',
+                    icon: FluentIcons.check_mark,
+                    loadValue: () => DatabaseCounters().countVehicles(etat: 0),
+                  ),
+                  ModuleDashboardMetric(
+                    label: 'En panne',
+                    detail: 'État panne',
+                    icon: FluentIcons.warning,
+                    loadValue: () => DatabaseCounters().countVehicles(etat: 1),
+                  ),
+                  ModuleDashboardMetric(
+                    label: 'Au garage',
+                    detail: 'État garage',
+                    icon: FluentIcons.repair,
+                    loadValue: () => DatabaseCounters().countVehicles(etat: 2),
+                  ),
+                  ModuleDashboardMetric(
+                    label: 'En marche',
+                    detail: 'État en marche',
+                    icon: FluentIcons.speed_high,
+                    loadValue: () => DatabaseCounters().countVehicles(etat: 3),
+                  ),
+                  ModuleDashboardMetric(
+                    label: 'Documents',
+                    detail: 'Documents véhicules',
+                    icon: FluentIcons.document_set,
+                    loadValue: () => DatabaseCounters().countVdocs(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 26),
               ModuleDashboardSectionHeader(
                 title: 'Gérer le parc automobile',
                 subtitle:
