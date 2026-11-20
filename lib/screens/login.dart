@@ -331,9 +331,17 @@ class _LoginScreenState extends State<LoginScreen>
                 maxWidth: 500,
                 maxHeight: availableHeight,
               ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                child: mobileContent,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 12,
+                ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: (availableHeight - 24).clamp(0.0, double.infinity),
+                  ),
+                  child: mobileContent,
+                ),
               ),
             ),
           ),
