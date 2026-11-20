@@ -97,7 +97,14 @@ class _VehicleDamageState extends State<VehicleDamage> {
             ],
           ),
         ),
-        Center(child: vehicleDamage(appTheme)),
+        Center(
+          child: compact
+              ? FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: vehicleDamage(appTheme),
+                )
+              : vehicleDamage(appTheme),
+        ),
         const SizedBox(height: 12),
         Wrap(
           alignment: WrapAlignment.center,
