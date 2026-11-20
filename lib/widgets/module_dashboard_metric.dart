@@ -164,7 +164,7 @@ class _ModuleDashboardMetricState extends State<ModuleDashboardMetric> {
                     message: failed ? 'Réessayer' : 'Actualiser',
                     child: IconButton(
                       icon: const Icon(FluentIcons.refresh, size: 13),
-                      onPressed: _retry,
+                      onPressed: loading ? null : _retry,
                     ),
                   ),
               ],
