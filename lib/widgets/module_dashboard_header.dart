@@ -2,6 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../theme.dart';
+import '../ui/design_system/parcoto_tokens.dart';
 
 /// Shared visual header for every ParcOto top-level module dashboard.
 class ModuleDashboardHeader extends StatelessWidget {
@@ -30,7 +31,7 @@ class ModuleDashboardHeader extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final compact = constraints.maxWidth < 760;
+        final compact = constraints.maxWidth < ParcotoTokens.tabletBreakpoint;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -49,11 +50,11 @@ class ModuleDashboardHeader extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 5),
+                      const SizedBox(height: ParcotoTokens.space2),
                       Text(
                         subtitle,
                         style: TextStyle(
-                          color: theme.writingStyle.color?.withValues(alpha: .62),
+                          color: theme.mutedTextColor,
                           fontSize: 13,
                         ),
                       ),
@@ -66,17 +67,19 @@ class ModuleDashboardHeader extends StatelessWidget {
                 ],
               ],
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: ParcotoTokens.space6),
             Container(
               width: double.infinity,
-              padding: EdgeInsets.all(compact ? 18 : 24),
+              padding: EdgeInsets.all(
+                compact ? ParcotoTokens.space4 : ParcotoTokens.space6,
+              ),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [theme.color.dark, theme.color, theme.color.light],
                   begin: AlignmentDirectional.centerStart,
                   end: AlignmentDirectional.centerEnd,
                 ),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(theme.cardRadius),
               ),
               child: Row(
                 children: [
@@ -93,7 +96,7 @@ class ModuleDashboardHeader extends StatelessWidget {
                             letterSpacing: 1.5,
                           ),
                         ),
-                        const SizedBox(height: 9),
+                        const SizedBox(height: ParcotoTokens.space2),
                         Text(
                           heroTitle,
                           style: TextStyle(
@@ -102,7 +105,7 @@ class ModuleDashboardHeader extends StatelessWidget {
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: ParcotoTokens.space2),
                         Text(
                           heroDescription,
                           style: TextStyle(
