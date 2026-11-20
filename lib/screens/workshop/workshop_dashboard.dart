@@ -1,13 +1,12 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:provider/provider.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 import '../../providers/parts_provider.dart';
 import '../../providers/counters.dart';
-import '../../theme.dart';
 import '../../widgets/module_dashboard_header.dart';
 import '../../widgets/module_dashboard_metric.dart';
 import '../../widgets/module_dashboard_action.dart';
+import '../../widgets/module_dashboard_metric.dart';
 import '../sidemenu/pane_items.dart';
 
 class WorkshopDashboard extends StatefulWidget {
@@ -32,8 +31,13 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
   }
 
   Future<void> _refreshCatalog() async {
-    // Recreate the async stock KPI after explicit refreshes and tenant changes.
-    _stockMetricRevision++;
+    // Recreate all asynchronous KPIs after explicit refreshes.
+    if (mounted) {
+      setState(() => _stockMetricRevision++);
+    } else {
+      _stockMetricRevision++;
+    }
+    DatabaseCounters.invalidateCache();
     try {
       final hasInternet = await InternetConnection().hasInternetAccess;
       if (mounted) setState(() => _hasInternet = hasInternet);
@@ -57,7 +61,6 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.watch<AppTheme>();
     return AnimatedBuilder(
       animation: _partsProvider,
       builder: (context, _) {
@@ -123,29 +126,37 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                     crossAxisSpacing: 12,
                     childAspectRatio: compact ? 2.7 : 2.5,
                     children: [
-                      _WorkshopMetric(
+                      ModuleDashboardMetric(
+                        key: ValueKey('workshop-parts-$_stockMetricRevision'),
+                        width: metricWidth,
                         label: 'Pièces référencées',
-                        value: PartsProvider.parts.length,
+                        detail: 'Catalogue de l’entreprise',
                         icon: FluentIcons.list,
-                        accent: theme.color,
+                        loadValue: () => DatabaseCounters().countParts(),
                       ),
-                      _WorkshopMetric(
+                      ModuleDashboardMetric(
+                        key: ValueKey('workshop-categories-$_stockMetricRevision'),
+                        width: metricWidth,
                         label: 'Catégories',
-                        value: PartsProvider.categories.length,
+                        detail: 'Catégories de pièces',
                         icon: FluentIcons.category_classification,
-                        accent: theme.color,
+                        loadValue: () => DatabaseCounters().countCategories(),
                       ),
-                      _WorkshopMetric(
+                      ModuleDashboardMetric(
+                        key: ValueKey('workshop-brands-$_stockMetricRevision'),
+                        width: metricWidth,
                         label: 'Marques',
-                        value: PartsProvider.brands.length,
+                        detail: 'Marques référencées',
                         icon: FluentIcons.verified_brand,
-                        accent: theme.color,
+                        loadValue: () => DatabaseCounters().countBrands(),
                       ),
-                      _WorkshopMetric(
+                      ModuleDashboardMetric(
+                        key: ValueKey('workshop-suppliers-$_stockMetricRevision'),
+                        width: metricWidth,
                         label: 'Fournisseurs',
-                        value: PartsProvider.fournisseurs.length,
+                        detail: 'Partenaires d’approvisionnement',
                         icon: FluentIcons.people,
-                        accent: theme.color,
+                        loadValue: () => DatabaseCounters().countSuppliers(),
                       ),
                       ModuleDashboardMetric(
                         key: ValueKey('workshop-stock-$_stockMetricRevision'),
@@ -262,71 +273,6 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
           ),
         );
       },
-    );
-  }
-}
-
-class _WorkshopMetric extends StatelessWidget {
-  final String label;
-  final int value;
-  final IconData icon;
-  final Color accent;
-
-  const _WorkshopMetric({
-    required this.label,
-    required this.value,
-    required this.icon,
-    required this.accent,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = context.watch<AppTheme>();
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.backGroundColor,
-        borderRadius: BorderRadius.circular(13),
-        border: Border.all(
-          color: theme.writingStyle.color!.withValues(alpha: .10),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: .13),
-              borderRadius: BorderRadius.circular(11),
-            ),
-            child: Icon(icon, color: accent, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  value.toString(),
-                  style: TextStyle(
-                    color: theme.writingStyle.color,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.grey[100], fontSize: 11),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
