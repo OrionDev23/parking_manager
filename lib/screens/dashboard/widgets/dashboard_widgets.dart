@@ -736,9 +736,11 @@ class DriverAvailabilityWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.watch<AppTheme>();
     if (summary.total == 0) {
-      return const _DashboardEmptyState(
+      return _DashboardEmptyState(
         icon: FluentIcons.people,
-        message: 'Aucun conducteur enregistré.',
+        message: summary.verified
+            ? 'Aucun conducteur enregistré.'
+            : 'Les données des conducteurs ne sont pas disponibles.',
       );
     }
 
@@ -901,9 +903,11 @@ class RepairPipelineWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.watch<AppTheme>();
     if (summary.total == 0) {
-      return const _DashboardEmptyState(
+      return _DashboardEmptyState(
         icon: FluentIcons.repair,
-        message: 'Aucun ordre de réparation enregistré.',
+        message: summary.verified
+            ? 'Aucun ordre de réparation enregistré.'
+            : 'Les données des réparations ne sont pas disponibles.',
       );
     }
 
