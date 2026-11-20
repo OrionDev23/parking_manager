@@ -328,7 +328,7 @@ class _VehicleFormState extends State<VehicleForm>
                 final message = errorUploading
                     ? Text(
                         'errupld',
-                        style: const TextStyle(color: Colors.red),
+                        style: TextStyle(color: Colors.red),
                       ).tr()
                     : const Text(
                         'Les modifications ne sont enregistrées qu’après confirmation.',
@@ -715,7 +715,7 @@ class _VehicleFormState extends State<VehicleForm>
   }
   Widget _buildVehicleIdentitySection(AppTheme appTheme) {
     return StaggeredGridTile.fit(
-      crossAxisCellCount: 12,
+      crossAxisCellCount: _isCompactViewport ? 12 : 12,
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(18),
@@ -1132,7 +1132,7 @@ class _VehicleFormState extends State<VehicleForm>
     }
 
     return StaggeredGridTile.fit(
-      crossAxisCellCount: 12,
+      crossAxisCellCount: _isCompactViewport ? 12 : 12,
       child: Container(
         margin: const EdgeInsets.only(top: 14, bottom: 8),
         padding: const EdgeInsets.all(18),
@@ -1236,7 +1236,7 @@ class _VehicleFormState extends State<VehicleForm>
     String description,
   ) {
     return StaggeredGridTile.fit(
-      crossAxisCellCount: 12,
+      crossAxisCellCount: _isCompactViewport ? 12 : 12,
       child: Container(
         margin: const EdgeInsets.only(top: 14, bottom: 6),
         padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
@@ -1275,7 +1275,7 @@ class _VehicleFormState extends State<VehicleForm>
     return [
       if (chassisKey) getChassisWidget(appTheme),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 6,
+        crossAxisCellCount: _isCompactViewport ? 12 : 6,
         child: Container(
           decoration: BoxDecoration(
             border: Border(
@@ -1443,7 +1443,7 @@ class _VehicleFormState extends State<VehicleForm>
   List<Widget> getWilayaCommuneWidget(AppTheme appTheme) {
     return [
       StaggeredGridTile.fit(
-        crossAxisCellCount: 6,
+        crossAxisCellCount: _isCompactViewport ? 12 : 6,
         child: Container(
           height: heightFirst,
 
@@ -1526,7 +1526,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 6,
+        crossAxisCellCount: _isCompactViewport ? 12 : 6,
         child: Container(
           decoration: BoxDecoration(
             border: Border(
@@ -1615,7 +1615,7 @@ class _VehicleFormState extends State<VehicleForm>
   List<Widget> secondLine(AppTheme appTheme) {
     return [
       StaggeredGridTile.fit(
-        crossAxisCellCount: 4,
+        crossAxisCellCount: _isCompactViewport ? 12 : 4,
         child: Container(
           decoration: BoxDecoration(
             border: Border(
@@ -1647,7 +1647,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 4,
+        crossAxisCellCount: _isCompactViewport ? 12 : 4,
         child: Container(
           decoration: BoxDecoration(
             border: _isCompactViewport
@@ -1680,11 +1680,11 @@ class _VehicleFormState extends State<VehicleForm>
       ),
       if (!_isCompactViewport)
         StaggeredGridTile.fit(
-          crossAxisCellCount: 2,
+          crossAxisCellCount: _isCompactViewport ? 12 : 2,
           child: SizedBox(height: height),
         ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
           height: height,
           decoration: BoxDecoration(
@@ -1725,7 +1725,7 @@ class _VehicleFormState extends State<VehicleForm>
   List<Widget> thirdLine(AppTheme appTheme) {
     return [
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
           decoration: BoxDecoration(
             border: Border(
@@ -1756,7 +1756,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
           decoration: BoxDecoration(
             border: _isCompactViewport
@@ -1791,7 +1791,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
           decoration: BoxDecoration(
             border: _isCompactViewport
@@ -1825,8 +1825,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
-
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
@@ -1860,7 +1859,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 4,
+        crossAxisCellCount: _isCompactViewport ? 12 : 4,
         child: Container(
           decoration: BoxDecoration(
             border: Border(
@@ -1903,7 +1902,7 @@ class _VehicleFormState extends State<VehicleForm>
   List<Widget> forthLine(AppTheme appTheme) {
     return [
       StaggeredGridTile.fit(
-        crossAxisCellCount: 3,
+        crossAxisCellCount: _isCompactViewport ? 12 : 3,
         child: Container(
           decoration: BoxDecoration(
             border: Border(
@@ -1948,7 +1947,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 6,
+        crossAxisCellCount: _isCompactViewport ? 12 : 6,
         child: Container(
           decoration: BoxDecoration(
             border: _isCompactViewport
@@ -1986,7 +1985,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 3,
+        crossAxisCellCount: _isCompactViewport ? 12 : 3,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2030,7 +2029,7 @@ class _VehicleFormState extends State<VehicleForm>
   List<Widget> fifthLine(AppTheme appTheme) {
     return [
       StaggeredGridTile.fit(
-        crossAxisCellCount: 3,
+        crossAxisCellCount: _isCompactViewport ? 12 : 3,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2068,7 +2067,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 3,
+        crossAxisCellCount: _isCompactViewport ? 12 : 3,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2106,7 +2105,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 3,
+        crossAxisCellCount: _isCompactViewport ? 12 : 3,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2144,7 +2143,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 3,
+        crossAxisCellCount: _isCompactViewport ? 12 : 3,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2187,7 +2186,7 @@ class _VehicleFormState extends State<VehicleForm>
   List<Widget> sixthLine(AppTheme appTheme) {
     return [
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2277,7 +2276,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2362,7 +2361,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2392,7 +2391,7 @@ class _VehicleFormState extends State<VehicleForm>
 
   Widget getChassisWidget(AppTheme appTheme) {
     return StaggeredGridTile.fit(
-      crossAxisCellCount: 6,
+      crossAxisCellCount: _isCompactViewport ? 12 : 6,
       child: Container(
         height: chassisKey ? heightFirst : height,
         padding: EdgeInsets.zero,
@@ -2445,7 +2444,7 @@ class _VehicleFormState extends State<VehicleForm>
   List<Widget> seventhLine(AppTheme appTheme) {
     return [
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2470,7 +2469,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2495,7 +2494,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2522,7 +2521,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2543,7 +2542,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2564,7 +2563,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2591,7 +2590,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2617,7 +2616,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2649,7 +2648,7 @@ class _VehicleFormState extends State<VehicleForm>
   List<Widget> eightLine(AppTheme appTheme) {
     return [
       StaggeredGridTile.fit(
-        crossAxisCellCount: 2,
+        crossAxisCellCount: _isCompactViewport ? 12 : 2,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2675,7 +2674,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 4,
+        crossAxisCellCount: _isCompactViewport ? 12 : 4,
         child: Container(
           height: height,
           padding: EdgeInsets.zero,
@@ -2705,7 +2704,7 @@ class _VehicleFormState extends State<VehicleForm>
         ),
       ),
       StaggeredGridTile.fit(
-        crossAxisCellCount: 12,
+        crossAxisCellCount: _isCompactViewport ? 12 : 12,
         child: Container(
           height: heightFirst,
           padding: EdgeInsets.zero,

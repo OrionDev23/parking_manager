@@ -236,41 +236,6 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     );
   }
 
-  Widget _headerStat(String label, String value) => Container(
-        constraints: const BoxConstraints(minWidth: 112, maxWidth: 260),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-        decoration: BoxDecoration(
-          color: FluentTheme.of(context).micaBackgroundColor,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.grey[30]),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: Colors.grey[100],
-                fontSize: 9,
-                letterSpacing: .7,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ),
-      );
-  
   String _date(Object? value) {
     if (value == null) return 'Non renseigné';
     final date =
