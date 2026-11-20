@@ -81,6 +81,8 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                   : constraints.maxWidth >= 540
                   ? 2
                   : 1;
+              final metricWidth =
+                  (constraints.maxWidth - 12.0 * (columns - 1)) / columns;
               return ListView(
                 padding: EdgeInsets.symmetric(
                   horizontal: compact ? 16 : 28,
@@ -147,7 +149,7 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                       ),
                       ModuleDashboardMetric(
                         key: ValueKey('workshop-stock-$_stockMetricRevision'),
-                        width: double.infinity,
+                        width: metricWidth,
                         label: 'Entrées de stock',
                         detail: 'Enregistrements de stock de l’entreprise',
                         icon: FluentIcons.database,
