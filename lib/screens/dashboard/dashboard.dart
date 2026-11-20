@@ -13,6 +13,7 @@ import '../../providers/log_provider.dart';
 import '../../providers/planning_provider.dart';
 import '../../providers/repair_provider.dart';
 import '../../providers/vehicle_provider.dart';
+import '../../core/business/fleet_dashboard_status.dart';
 import '../../core/sync/sync_operation.dart';
 import '../../serializables/activity.dart';
 import '../../serializables/conducteur/conducteur.dart';
@@ -812,34 +813,27 @@ class _DashboardState extends State<Dashboard>
     var maintenance = 0;
 
     for (final vehicle in vehicles) {
-      final state = vehicle.etatactuel ?? 0;
-      switch (state) {
-        // The legacy fleet has two equivalent status ranges: 0–4 and 5–8.
-        // Normalize them so both generations appear in the same dashboard
-        // categories instead of treating 0–4 as an unknown state.
-        case 0:
-        case 5:
+      switch (FleetDashboardStatusMapper.fromLegacyCode(vehicle.etatactuel)) {
+        case FleetDashboardStatus.available:
           available++;
           break;
-        case 1:
-        case 6:
+        case FleetDashboardStatus.broken:
           broken++;
           maintenance++;
           break;
-        case 2:
-        case 7:
+        case FleetDashboardStatus.workshop:
           repairing++;
           maintenance++;
           break;
-        case 3:
-        case 8:
+        case FleetDashboardStatus.onMission:
           onMission++;
           break;
-        case 4:
+        case FleetDashboardStatus.reformed:
           reformed++;
           break;
-        default:
+        case FleetDashboardStatus.other:
           otherState++;
+          break;
       }
     }
 
