@@ -1,15 +1,15 @@
 import 'dart:async';
 
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:provider/provider.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:provider/provider.dart';
 
-import '../../providers/parts_provider.dart';
-import '../../providers/counters.dart';
 import '../../providers/client_database.dart';
+import '../../providers/counters.dart';
+import '../../providers/parts_provider.dart';
 import '../../theme.dart';
-import '../../widgets/module_dashboard_header.dart';
 import '../../widgets/module_dashboard_action.dart';
+import '../../widgets/module_dashboard_header.dart';
 import '../../widgets/module_dashboard_metric.dart';
 import '../sidemenu/pane_items.dart';
 
@@ -45,7 +45,9 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
 
   Future<void> _refreshCatalog() async {
     // Recreate all asynchronous KPIs after explicit refreshes.
-    if (mounted) {
+    if (_stockMetricRevision == 0) {
+      _stockMetricRevision = 1;
+    } else if (mounted) {
       setState(() => _stockMetricRevision++);
     } else {
       _stockMetricRevision++;
