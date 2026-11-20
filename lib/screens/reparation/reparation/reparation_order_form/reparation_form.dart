@@ -189,6 +189,57 @@ class ReparationFormState extends State<ReparationForm>
     }
   }
 
+  Future<bool> _validateOrderNumberBeforeSave() async {
+    if (widget.reparation != null) return int.tryParse(numOrdre.text.trim()) != null;
+
+    final value = numOrdre.text.trim();
+    final number = int.tryParse(value);
+    if (number == null) {
+      if (mounted && !errorNumOrder) {
+        setState(() => errorNumOrder = true);
+      }
+      return false;
+    }
+
+    _orderNumberValidationTimer?.cancel();
+    final revision = ++_orderNumberValidationRevision;
+    var duplicated = testIfReservedContained(number);
+
+    if (!duplicated) {
+      try {
+        final result = await DatabaseGetter.database!.listRows(
+          databaseId: databaseId,
+          tableId: reparationId,
+          queries: [
+            Query.orderDesc('numero'),
+            Query.equal('numero', number),
+            Query.limit(1),
+          ],
+        );
+        duplicated = result.rows.isNotEmpty;
+      } catch (error, stackTrace) {
+        debugPrint(
+          '[ParcOto Repair] save-time number validation failed: '
+          '$error\\n$stackTrace',
+        );
+      }
+    }
+
+    if (!mounted ||
+        revision != _orderNumberValidationRevision ||
+        numOrdre.text.trim() != value) {
+      return false;
+    }
+
+    if (!duplicated) {
+      reservedOrders[widget.key!] = number;
+    }
+    if (errorNumOrder != duplicated) {
+      setState(() => errorNumOrder = duplicated);
+    }
+    return !duplicated;
+  }
+
   /// Debounces the uniqueness query. The input stays focused while the
   /// user types, and stale Appwrite responses cannot overwrite newer input.
   void _scheduleOrderNumberValidation(String text) {
@@ -821,6 +872,9 @@ class ReparationFormState extends State<ReparationForm>
   }
 
   void uploadForm() async {
+    if (!await _validateOrderNumberBeforeSave()) return;
+    if (!mounted || uploading) return;
+
     if (selectedFicheReception == null) {
       displayInfoBar(
         context,
