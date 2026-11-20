@@ -36,7 +36,9 @@ class MesFillialesState extends State<MesFilliales> {
   double height = 400.px;
   @override
   Widget build(BuildContext context) {
-    var appTheme = context.watch<AppTheme>();
+    final appTheme = context.watch<AppTheme>();
+    // Keyboard resize must not change grid orientation while the search field is focused.
+    final compactViewport = MediaQuery.sizeOf(context).width < 640;
     return ScaffoldPage(
       header: PageTitle(
         text: widget.type == 1
@@ -101,7 +103,7 @@ class MesFillialesState extends State<MesFilliales> {
                     children: [
                       StaggeredGrid.count(
                         crossAxisCount:
-                            Device.orientation == Orientation.portrait ? 2 : 4,
+                            compactViewport ? 2 : 4,
                         mainAxisSpacing: 5,
                         crossAxisSpacing: 5,
                         children: directionsSearched()
@@ -119,7 +121,7 @@ class MesFillialesState extends State<MesFilliales> {
                       smallSpace,
                       StaggeredGrid.count(
                         crossAxisCount:
-                            Device.orientation == Orientation.landscape ? 2 : 1,
+                            compactViewport ? 1 : 2,
                         mainAxisSpacing: 5,
                         crossAxisSpacing: 5,
                         children: [
@@ -248,7 +250,7 @@ class MesFillialesState extends State<MesFilliales> {
                     children: [
                       StaggeredGrid.count(
                         crossAxisCount:
-                            Device.orientation == Orientation.portrait ? 2 : 4,
+                            compactViewport ? 2 : 4,
                         mainAxisSpacing: 5,
                         crossAxisSpacing: 5,
                         children: directionsSearched()
@@ -266,7 +268,7 @@ class MesFillialesState extends State<MesFilliales> {
                       smallSpace,
                       StaggeredGrid.count(
                         crossAxisCount:
-                            Device.orientation == Orientation.landscape ? 2 : 1,
+                            compactViewport ? 1 : 2,
                         mainAxisSpacing: 5,
                         crossAxisSpacing: 5,
                         children: [
@@ -313,7 +315,7 @@ class MesFillialesState extends State<MesFilliales> {
                     children: [
                       StaggeredGrid.count(
                         crossAxisCount:
-                            Device.orientation == Orientation.portrait ? 2 : 4,
+                            compactViewport ? 2 : 4,
                         mainAxisSpacing: 5,
                         crossAxisSpacing: 5,
                         children: directionsSearched()
@@ -331,7 +333,7 @@ class MesFillialesState extends State<MesFilliales> {
                       smallSpace,
                       StaggeredGrid.count(
                         crossAxisCount:
-                            Device.orientation == Orientation.landscape ? 2 : 1,
+                            compactViewport ? 1 : 2,
                         mainAxisSpacing: 5,
                         crossAxisSpacing: 5,
                         children: [
