@@ -27,6 +27,14 @@ import '../../../../utilities/vehicle_util.dart';
 import '../../../../widgets/empty_table_widget.dart';
 import '../reparation_order_form/entreprise_placement.dart';
 
+Size _responsiveSelectionDialogSize(BuildContext context) {
+  final screenSize = MediaQuery.sizeOf(context);
+  return Size(
+    (screenSize.width - 32).clamp(0.0, 700.0).toDouble(),
+    (screenSize.height - 80).clamp(0.0, 550.0).toDouble(),
+  );
+}
+
 class ReparationFormGts extends StatefulWidget {
   final Reparation? reparation;
 
@@ -380,7 +388,7 @@ class ReparationFormGtsState extends State<ReparationFormGts>
                                   builder: (context) {
                                     return ContentDialog(
                                       constraints: BoxConstraints.tight(
-                                        Size(700.px, 550.px),
+                                        _responsiveSelectionDialogSize(context),
                                       ),
                                       title: const Text('selectedfiche').tr(),
                                       style: ContentDialogThemeData(
@@ -430,7 +438,7 @@ class ReparationFormGtsState extends State<ReparationFormGts>
                               builder: (context) {
                                 return ContentDialog(
                                   constraints: BoxConstraints.tight(
-                                    Size(700.px, 550.px),
+                                    _responsiveSelectionDialogSize(context),
                                   ),
                                   title: const Text('selectprestataire').tr(),
                                   style: ContentDialogThemeData(
@@ -468,7 +476,7 @@ class ReparationFormGtsState extends State<ReparationFormGts>
               ),
             ),
             if (assigningOrederNumber)
-              Positioned(top: 40.h, left: 40.w, child: const ProgressBar()),
+              const Center(child: ProgressBar()),
           ],
         ),
       ),
