@@ -109,6 +109,44 @@ class DatabaseCounters {
     }
   }
 
+  Future<int> countVehiclesByDashboardStatus({
+    required int etat,
+  }) async {
+    final cacheKey = _cacheKey('vehicles-dashboard-status|$etat');
+    final now = DateTime.now();
+    final cached = _countCache[cacheKey];
+    if (cached != null && now.difference(cached.createdAt) < _cacheTtl) {
+      return cached.future;
+    }
+    _countCache.remove(cacheKey);
+
+    late final Future<int> future;
+    future = () async {
+      try {
+        final vehicles = await _loadActiveCompanyVehicles();
+        return vehicles.where((vehicle) {
+          final state = vehicle.etatactuel ?? 0;
+          return switch (etat) {
+            // The two legacy status ranges share their dashboard meaning.
+            0 => state == 0 || state == 5,
+            1 => state == 1 || state == 6,
+            2 => state == 2 || state == 7,
+            3 => state == 3 || state == 8,
+            4 => state == 4,
+            _ => false,
+          };
+        }).length;
+      } catch (_) {
+        if (identical(_countCache[cacheKey]?.future, future)) {
+          _countCache.remove(cacheKey);
+        }
+        rethrow;
+      }
+    }();
+    _countCache[cacheKey] = _CachedCount(now, future);
+    return future;
+  }
+
   Future<int> countVehicles({int etat = -1}) async {
     final cacheKey = _cacheKey('vehicles|$etat');
     final now = DateTime.now();
@@ -246,8 +284,18 @@ class DatabaseCounters {
     return _countRows(
       tableId: chauffeurid,
       filters: [
-        if (etat != -1) Query.equal('etat', etat),
-        if (etat == -1) Query.notEqual('etat', 3),
+        if (etat == 0)
+          Query.or([
+            Query.isNull('etat'),
+            Query.equal('etat', 0),
+          ])
+        else if (etat == -1)
+          Query.or([
+            Query.isNull('etat'),
+            Query.notEqual('etat', 3),
+          ])
+        else if (etat != -1)
+          Query.equal('etat', etat),
       ],
     );
   }
@@ -266,7 +314,13 @@ class DatabaseCounters {
     return _countRows(
       tableId: reparationId,
       filters: [
-        if (etat != -1) Query.equal('etat', etat),
+        if (etat == 0)
+          Query.or([
+            Query.isNull('etat'),
+            Query.equal('etat', 0),
+          ])
+        else if (etat != -1)
+          Query.equal('etat', etat),
       ],
     );
   }
