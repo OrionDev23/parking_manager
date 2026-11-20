@@ -3,6 +3,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/tenancy/tenant_members_repository.dart';
 
+BoxConstraints _memberDialogConstraints(BuildContext context) {
+  final screenSize = MediaQuery.sizeOf(context);
+  return BoxConstraints(
+    maxWidth: (screenSize.width - 32).clamp(260.0, 520.0).toDouble(),
+    maxHeight: (screenSize.height - 48).clamp(240.0, 720.0).toDouble(),
+  );
+}
+
 class TenantMembersScreen extends StatefulWidget {
   const TenantMembersScreen({super.key});
 
@@ -70,8 +78,11 @@ class _TenantMembersScreenState extends State<TenantMembersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width < 640;
     return ScaffoldPage(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+      padding: compact
+          ? const EdgeInsets.fromLTRB(12, 12, 12, 12)
+          : const EdgeInsets.fromLTRB(24, 20, 24, 16),
       header: PageHeader(
         title: const Text('Utilisateurs de l’entreprise'),
         commandBar: CommandBar(
@@ -129,50 +140,92 @@ class _TenantMembersScreenState extends State<TenantMembersScreen> {
                 separatorBuilder: (_, _) => const SizedBox(height: 8),
                 itemBuilder: (context, index) {
                   final member = visibleMembers[index];
-                  return Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        children: [
-                          const Icon(FluentIcons.contact, size: 24),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  member.name.isEmpty ? member.email : member.name,
-                                  style: const TextStyle(fontWeight: FontWeight.w600),
-                                ),
-                                Text(
-                                  member.email,
-                                  style: const TextStyle(fontSize: 12),
-                                ),
-                                Text(
-                                  'ID: ${member.userId} • ${member.role}',
-                                  style: const TextStyle(fontSize: 11),
-                                ),
-                              ],
+                  final canManage = member.role != 'owner' &&
+                      !member.isCurrentUser &&
+                      member.role != 'admin';
+                  final identity = Row(
+                    children: [
+                      const Icon(FluentIcons.contact, size: 24),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              member.name.isEmpty ? member.email : member.name,
+                              style: const TextStyle(fontWeight: FontWeight.w600),
                             ),
-                          ),
-                          if (member.role != 'owner' && !member.isCurrentUser && member.role != 'admin')
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Button(
-                                  child: const Text('Rôle'),
-                                  onPressed: () => _changeRole(member),
-                                ),
-                                const SizedBox(height: 4),
-                                Button(
-                                  child: const Text('Retirer'),
-                                  onPressed: () => _revoke(member),
-                                ),
-                              ],
+                            Text(
+                              member.email,
+                              style: const TextStyle(fontSize: 12),
                             ),
-                        ],
+                            Text(
+                              'ID: ${member.userId} • ${member.role}',
+                              style: const TextStyle(fontSize: 11),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
+                  );
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      final compact = constraints.maxWidth < 520;
+                      final actions = Wrap(
+                        alignment: WrapAlignment.end,
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: [
+                          Button(
+                            child: const Text('Rôle'),
+                            onPressed: () => _changeRole(member),
+                          ),
+                          Button(
+                            child: const Text('Retirer'),
+                            onPressed: () => _revoke(member),
+                          ),
+                        ],
+                      );
+                      return Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: compact
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    identity,
+                                    if (canManage) ...[
+                                      const SizedBox(height: 10),
+                                      Align(
+                                        alignment: AlignmentDirectional.centerEnd,
+                                        child: actions,
+                                      ),
+                                    ],
+                                  ],
+                                )
+                              : Row(
+                                  children: [
+                                    Expanded(child: identity),
+                                    if (canManage)
+                                      Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Button(
+                                            child: const Text('Rôle'),
+                                            onPressed: () => _changeRole(member),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Button(
+                                            child: const Text('Retirer'),
+                                            onPressed: () => _revoke(member),
+                                          ),
+                                        ],
+                                      ),
+                                  ],
+                                ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),
@@ -188,6 +241,7 @@ class _TenantMembersScreenState extends State<TenantMembersScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => ContentDialog(
+        constraints: _memberDialogConstraints(dialogContext),
         title: const Text('Ajouter un membre'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -253,6 +307,7 @@ class _TenantMembersScreenState extends State<TenantMembersScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => ContentDialog(
+        constraints: _memberDialogConstraints(dialogContext),
         title: Text('Rôle de ${member.email}'),
         content: StatefulBuilder(
           builder: (context, setDialogState) => ComboBox<String>(
@@ -297,6 +352,7 @@ class _TenantMembersScreenState extends State<TenantMembersScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => ContentDialog(
+        constraints: _memberDialogConstraints(dialogContext),
         title: const Text('Retirer cet utilisateur ?'),
         content: Text(
           '${member.email} perdra l’accès à cette entreprise. Son compte Parcoto ne sera pas supprimé.',
