@@ -90,7 +90,8 @@ class _ProfilFormState extends State<ProfilForm> {
         maxHeight: (screenSize.height - 48).clamp(320.0, 720.0).toDouble(),
       ),
       title: const Text('Profil'),
-      content: Column(
+      content: SingleChildScrollView(
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -209,6 +210,7 @@ class _ProfilFormState extends State<ProfilForm> {
             ],
           ),
         ],
+        ),
       ),
       actions: [
         Button(
