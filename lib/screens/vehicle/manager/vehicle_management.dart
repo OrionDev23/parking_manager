@@ -28,6 +28,8 @@ class VehicleManagementState extends State<VehicleManagement>
     with AutomaticKeepAliveClientMixin<VehicleManagement> {
   static ValueNotifier<int> stateChanges = ValueNotifier(0);
   static final ValueNotifier<int?> brandFilterRequest = ValueNotifier<int?>(null);
+  static final ValueNotifier<String?> externalSearchRequest =
+      ValueNotifier<String?>(null);
 
   final TextEditingController searchController = TextEditingController();
   String searchQuery = '';
@@ -39,6 +41,13 @@ class VehicleManagementState extends State<VehicleManagement>
     super.initState();
     selectedBrand = brandFilterRequest.value;
     brandFilterRequest.value = null;
+    final initialSearch = externalSearchRequest.value;
+    if (initialSearch != null && initialSearch.trim().isNotEmpty) {
+      searchQuery = initialSearch.replaceAll('"', '').trim();
+      searchController.text = searchQuery;
+    }
+    externalSearchRequest.value = null;
+    externalSearchRequest.addListener(_handleExternalSearchRequest);
     brandFilterRequest.addListener(_handleExternalBrandFilter);
     VehicleTabsState.currentIndex.addListener(_handleEditorTabChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -48,6 +57,17 @@ class VehicleManagementState extends State<VehicleManagement>
         context.read<VehicleProvider>().refreshVehicles();
       }
     });
+  }
+
+  void _handleExternalSearchRequest() {
+    final request = externalSearchRequest.value;
+    if (!mounted || request == null || request.trim().isEmpty) return;
+    final normalized = request.replaceAll('"', '').trim();
+    setState(() {
+      searchQuery = normalized;
+      searchController.text = normalized;
+    });
+    externalSearchRequest.value = null;
   }
 
   void _handleExternalBrandFilter() {
@@ -64,6 +84,7 @@ class VehicleManagementState extends State<VehicleManagement>
 
   @override
   void dispose() {
+    externalSearchRequest.removeListener(_handleExternalSearchRequest);
     brandFilterRequest.removeListener(_handleExternalBrandFilter);
     VehicleTabsState.currentIndex.removeListener(_handleEditorTabChanged);
     searchController.dispose();
@@ -466,6 +487,7 @@ class VehicleManagementState extends State<VehicleManagement>
                   selectedState = null;
                   selectedBrand = null;
                   brandFilterRequest.value = null;
+                  externalSearchRequest.value = null;
                 }),
                 child: const Text('Effacer les filtres'),
               ),
@@ -575,6 +597,7 @@ class VehicleManagementState extends State<VehicleManagement>
                       selectedState = null;
                       selectedBrand = null;
                       brandFilterRequest.value = null;
+                      externalSearchRequest.value = null;
                     }),
                     child: const Text('Réinitialiser'),
                   )

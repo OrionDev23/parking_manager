@@ -4,6 +4,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/driver_provider.dart';
 import 'package:parc_oto/screens/vehicle/manager/vehicles_table.dart';
+import 'package:parc_oto/screens/vehicle/manager/vehicle_management.dart';
 import 'package:parc_oto/serializables/conducteur/conducteur.dart';
 import 'package:parc_oto/serializables/conducteur/disponibilite_chauffeur.dart';
 import 'package:parc_oto/utilities/vehicle_util.dart';
@@ -683,15 +684,9 @@ class ChauffeurFormState extends State<ChauffeurForm> {
 
   void showMyVehicule(String? matricule) {
     if (matricule != null) {
-      PanesListState.index.value =
-          PaneItemsAndFooters.originalItems.indexOf(
-            PaneItemsAndFooters.vehicles,
-          ) +
-          1;
+      PaneItemsAndFooters.selectPane('vehicle-manager');
       VehicleTabsState.currentIndex.value = 0;
-      VehicleTableState.filterVehicule.value = '"$matricule"';
-
-      VehicleTableState.filterNow = true;
+      VehicleManagementState.externalSearchRequest.value = matricule;
     }
   }
 

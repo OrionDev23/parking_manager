@@ -9,9 +9,8 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/client_database.dart';
 import '../../screens/sidemenu/pane_items.dart';
-import '../../screens/sidemenu/sidemenu.dart';
 import '../../screens/vehicle/manager/vehicle_tabs.dart';
-import '../../screens/vehicle/manager/vehicles_table.dart';
+import '../../screens/vehicle/manager/vehicle_management.dart';
 import '../../screens/vehicle/states/state_form.dart';
 import '../../serializables/vehicle/state.dart';
 import '../../utilities/vehicle_util.dart';
@@ -131,15 +130,9 @@ class VStatesDatasource extends ParcOtoDatasource<Etat> {
 
   void showMyVehicule(String? matricule) {
     if (matricule != null) {
-      PanesListState.index.value =
-          PaneItemsAndFooters.originalItems.indexOf(
-            PaneItemsAndFooters.vehicles,
-          ) +
-          1;
+      PaneItemsAndFooters.selectPane('vehicle-manager');
       VehicleTabsState.currentIndex.value = 0;
-      VehicleTableState.filterVehicule.value = '"$matricule"';
-
-      VehicleTableState.filterNow = true;
+      VehicleManagementState.externalSearchRequest.value = matricule;
     }
   }
 

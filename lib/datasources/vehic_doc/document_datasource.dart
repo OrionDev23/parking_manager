@@ -5,11 +5,10 @@ import 'package:parc_oto/datasources/parcoto_datasource.dart';
 import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/screens/vehicle/documents/document_form.dart';
 import 'package:parc_oto/screens/vehicle/documents/document_tabs.dart';
+import 'package:parc_oto/screens/vehicle/manager/vehicle_management.dart';
 
 import '../../providers/client_database.dart';
-import '../../screens/sidemenu/sidemenu.dart';
 import '../../screens/vehicle/manager/vehicle_tabs.dart';
-import '../../screens/vehicle/manager/vehicles_table.dart';
 import '../../serializables/vehicle/document_vehicle.dart';
 import '../../widgets/on_tap_scale.dart';
 import 'document_webservice.dart';
@@ -25,14 +24,9 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
 
   void showMyVehicule(String? matricule) {
     if (matricule != null) {
-      PanesListState.index.value =
-          PaneItemsAndFooters.originalItems.indexOf(
-            PaneItemsAndFooters.vehicles,
-          ) +
-          1;
+      PaneItemsAndFooters.selectPane('vehicle-manager');
       VehicleTabsState.currentIndex.value = 0;
-      VehicleTableState.filterNow = true;
-      VehicleTableState.filterVehicule.value = matricule;
+      VehicleManagementState.externalSearchRequest.value = matricule;
     }
   }
 

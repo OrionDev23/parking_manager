@@ -15,11 +15,11 @@ import '../dashboard/charts/pie_chart.dart';
 import '../dashboard/charts/state_bars.dart';
 import '../dashboard/table_stats.dart';
 import '../sidemenu/pane_items.dart';
-import '../sidemenu/sidemenu.dart';
 import 'appartenanceContainer.dart';
 import 'entreprise.dart';
 import '../../providers/client_database.dart';
 import '../../main.dart';
+import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
 
 class MesFilliales extends StatefulWidget {
   final int type;
@@ -154,11 +154,8 @@ class MesFillialesState extends State<MesFilliales> {
                                 ),
                               ),
                               onTap: () {
-                                PanesListState.index.value =
-                                    PaneItemsAndFooters.originalItems.indexOf(
-                                      PaneItemsAndFooters.vehicles,
-                                    ) +
-                                    1;
+                                PaneItemsAndFooters.selectPane('vehicle-manager');
+                                VehicleTabsState.currentIndex.value = 0;
                               },
                             ),
                           ),
@@ -191,11 +188,8 @@ class MesFillialesState extends State<MesFilliales> {
                                 ),
                               ),
                               onTap: () {
-                                PanesListState.index.value =
-                                    PaneItemsAndFooters.originalItems.indexOf(
-                                      PaneItemsAndFooters.vehicles,
-                                    ) +
-                                    1;
+                                PaneItemsAndFooters.selectPane('vehicle-manager');
+                                VehicleTabsState.currentIndex.value = 0;
                               },
                             ),
                           ),
@@ -230,11 +224,8 @@ class MesFillialesState extends State<MesFilliales> {
                                 ),
                               ),
                               onTap: () {
-                                PanesListState.index.value =
-                                    PaneItemsAndFooters.originalItems.indexOf(
-                                      PaneItemsAndFooters.vehicles,
-                                    ) +
-                                    1;
+                                PaneItemsAndFooters.selectPane('vehicle-manager');
+                                VehicleTabsState.currentIndex.value = 0;
                               },
                             ),
                           ),
