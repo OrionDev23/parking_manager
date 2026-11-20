@@ -12,7 +12,6 @@ import '../../../admin_parameters.dart';
 import '../../../main.dart';
 import '../../../serializables/notification.dart';
 import '../../sidemenu/pane_items.dart';
-import '../../sidemenu/sidemenu.dart';
 
 class NotificationTile extends StatefulWidget {
   final PNotification pNotification;
