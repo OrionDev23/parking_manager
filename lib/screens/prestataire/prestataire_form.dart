@@ -88,13 +88,16 @@ class PrestataireFormState extends State<PrestataireForm> {
       );
     }
     final screenSize = MediaQuery.sizeOf(context);
-    final formHeight = (screenSize.height - 180)
-        .clamp(320.0, 720.0)
-        .toDouble();
+    final compact = screenSize.width < 640;
+    // Preserve field geometry while the mobile keyboard reduces the viewport.
+    // The scroll view, not the form's flex children, absorbs that height change.
+    final formHeight = compact
+        ? 720.0
+        : (screenSize.height - 180).clamp(320.0, 720.0).toDouble();
     final formWidth = (screenSize.width - 32)
         .clamp(260.0, 720.0)
         .toDouble();
-    return Container(
+    final content = Container(
       color: appTheme.backGroundColor,
       child: Column(
         children: [
@@ -316,6 +319,12 @@ class PrestataireFormState extends State<PrestataireForm> {
         ],
       ),
     );
+    return compact
+        ? SingleChildScrollView(
+            padding: const EdgeInsets.all(8),
+            child: content,
+          )
+        : content;
   }
 
   bool changes = false;
