@@ -181,14 +181,19 @@ class LogTableState extends State<LogTable> {
     logDatasource.appTheme = appTheme;
     return DataTableParc(
       header: widget.statTable == false
-          ? Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 5.0,
-                horizontal: 10,
-              ),
-              child: SizedBox(
-                width: 350.px,
-                child: Row(
+          ? LayoutBuilder(
+              builder: (context, constraints) {
+                final toolbarWidth = (constraints.maxWidth - 20)
+                    .clamp(240.0, 350.0)
+                    .toDouble();
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 5.0,
+                    horizontal: 10,
+                  ),
+                  child: SizedBox(
+                    width: toolbarWidth,
+                    child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     SizedBox(
@@ -296,9 +301,11 @@ class LogTableState extends State<LogTable> {
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ),
+                    ],
+                    ),
+                  ),
+                );
+              },
             )
           : null,
       horizontalScroll: true,
@@ -317,9 +324,17 @@ class LogTableState extends State<LogTable> {
       color: appTheme.backGroundColor,
       child: StatefulBuilder(
         builder: (context, setS) {
+          final screenSize = MediaQuery.sizeOf(context);
+          final desiredHeight = widget.typelist != null ? 200.0 : 276.0;
+          final filterWidth = (screenSize.width - 24)
+              .clamp(240.0, 340.0)
+              .toDouble();
+          final filterHeight = (screenSize.height - 140)
+              .clamp(200.0, desiredHeight)
+              .toDouble();
           return SizedBox(
-            width: 340.px,
-            height: widget.typelist != null ? 200.px : 276.px,
+            width: filterWidth,
+            height: filterHeight,
             child: Column(
               children: [
                 SizedBox(
@@ -448,8 +463,10 @@ class LogTableState extends State<LogTable> {
                 smallSpace,
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  child: Wrap(
+                    alignment: WrapAlignment.end,
+                    spacing: 6,
+                    runSpacing: 6,
                     children: [
                       FilledButton(
                         style: ButtonStyle(
@@ -472,15 +489,12 @@ class LogTableState extends State<LogTable> {
                             : null,
                         child: const Text('clear').tr(),
                       ),
-                      const Spacer(),
                       Button(
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
                         child: const Text('annuler').tr(),
                       ),
-                      smallSpace,
-                      smallSpace,
                       FilledButton(
                         style: ButtonStyle(
                           backgroundColor: WidgetStatePropertyAll<Color>(
