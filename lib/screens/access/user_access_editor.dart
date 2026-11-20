@@ -99,15 +99,20 @@ class _UserAccessEditorState extends State<UserAccessEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.sizeOf(context);
+    final dialogWidth = (screenSize.width - 32).clamp(240.0, 850.0).toDouble();
+    final dialogHeight = (screenSize.height - 80).clamp(280.0, 650.0).toDouble();
+
     if (_loading) {
       return const ContentDialog(content: Center(child: ProgressRing()));
     }
 
     return ContentDialog(
+      constraints: BoxConstraints.tight(Size(dialogWidth, dialogHeight)),
       title: Text('Accès — ${widget.userName}'),
       content: SizedBox(
-        width: 850,
-        height: 650,
+        width: dialogWidth,
+        height: dialogHeight,
         child: _error != null
             ? Text(_error!)
             : Column(
@@ -160,60 +165,75 @@ class _UserAccessEditorState extends State<UserAccessEditor> {
                               final granted = _granted.contains(permission.id);
                               final denied = _denied.contains(permission.id);
 
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 5,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(permission.label),
-                                          if (fromTeam)
-                                            const Text(
-                                              'Accordé par une équipe',
-                                              style: TextStyle(fontSize: 11),
-                                            ),
-                                        ],
-                                      ),
+                              final permissionDescription = Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(permission.label),
+                                  if (fromTeam)
+                                    const Text(
+                                      'Accordé par une équipe',
+                                      style: TextStyle(fontSize: 11),
                                     ),
-                                    ToggleSwitch(
-                                      checked: granted,
-                                      onChanged: denied
-                                          ? null
-                                          : (value) {
-                                              setState(() {
-                                                if (value) {
-                                                  _granted.add(permission.id);
-                                                } else {
-                                                  _granted.remove(
-                                                    permission.id,
-                                                  );
-                                                }
-                                              });
-                                            },
-                                      content: const Text('Autoriser'),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    ToggleSwitch(
-                                      checked: denied,
-                                      onChanged: (value) {
+                                ],
+                              );
+                              final allowToggle = ToggleSwitch(
+                                checked: granted,
+                                onChanged: denied
+                                    ? null
+                                    : (value) {
                                         setState(() {
                                           if (value) {
-                                            _denied.add(permission.id);
-                                            _granted.remove(permission.id);
+                                            _granted.add(permission.id);
                                           } else {
-                                            _denied.remove(permission.id);
+                                            _granted.remove(permission.id);
                                           }
                                         });
                                       },
-                                      content: const Text('Refuser'),
-                                    ),
-                                  ],
-                                ),
+                                content: const Text('Autoriser'),
+                              );
+                              final denyToggle = ToggleSwitch(
+                                checked: denied,
+                                onChanged: (value) {
+                                  setState(() {
+                                    if (value) {
+                                      _denied.add(permission.id);
+                                      _granted.remove(permission.id);
+                                    } else {
+                                      _denied.remove(permission.id);
+                                    }
+                                  });
+                                },
+                                content: const Text('Refuser'),
+                              );
+
+                              return LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final compact = constraints.maxWidth < 560;
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 5),
+                                    child: compact
+                                        ? Column(
+                                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                                            children: [
+                                              permissionDescription,
+                                              const SizedBox(height: 6),
+                                              Wrap(
+                                                spacing: 8,
+                                                runSpacing: 4,
+                                                children: [allowToggle, denyToggle],
+                                              ),
+                                            ],
+                                          )
+                                        : Row(
+                                            children: [
+                                              Expanded(child: permissionDescription),
+                                              allowToggle,
+                                              const SizedBox(width: 8),
+                                              denyToggle,
+                                            ],
+                                          ),
+                                  );
+                                },
                               );
                             }).toList(),
                           ),
