@@ -88,7 +88,16 @@ class _ProfilFormState extends State<ProfilForm> {
   @override
   Widget build(BuildContext context) {
     var appTheme = context.watch<AppTheme>();
+    final screenSize = MediaQuery.sizeOf(context);
+    final countryDialogSize = Size(
+      (screenSize.width - 32).clamp(280.0, 520.0).toDouble(),
+      (screenSize.height - 80).clamp(320.0, 600.0).toDouble(),
+    );
     return ContentDialog(
+      constraints: BoxConstraints(
+        maxWidth: (screenSize.width - 32).clamp(280.0, 520.0).toDouble(),
+        maxHeight: (screenSize.height - 48).clamp(320.0, 720.0).toDouble(),
+      ),
       title: const Text('Profil'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
@@ -191,7 +200,7 @@ class _ProfilFormState extends State<ProfilForm> {
                   color: appTheme.backGroundColor,
                   boxShadow: kElevationToShadow[2],
                 ),
-                dialogSize: Size(40.w, 45.h),
+                dialogSize: countryDialogSize,
               ),
               const SizedBox(width: 5),
               Expanded(
