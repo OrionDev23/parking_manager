@@ -54,7 +54,7 @@ class BigTitleForm extends StatelessWidget {
                 fontSize: 12,
               ),
             ).tr(),
-          if (trailing != null) trailing!,
+          ?trailing,
         ],
       ),
     );
