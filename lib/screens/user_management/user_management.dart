@@ -10,6 +10,8 @@ class UserManagement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final compact = MediaQuery.sizeOf(context).width < 640;
+    final horizontalPadding = compact ? 12.0 : 28.0;
     if (archive) {
       return const ScaffoldPage(
         content: Center(
@@ -25,7 +27,10 @@ class UserManagement extends StatelessWidget {
       content: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 22),
+            padding: EdgeInsets.symmetric(
+              horizontal: horizontalPadding,
+              vertical: compact ? 12 : 22,
+            ),
             child: ModuleDashboardHeader(
               title: 'Utilisateurs',
               subtitle: 'Gérez les membres et leurs accès à cette entreprise.',
@@ -36,10 +41,10 @@ class UserManagement extends StatelessWidget {
               icon: FluentIcons.people,
             ),
           ),
-          const Expanded(
+          Expanded(
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 28),
-              child: TenantMembersScreen(),
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: const TenantMembersScreen(),
             ),
           ),
         ],
