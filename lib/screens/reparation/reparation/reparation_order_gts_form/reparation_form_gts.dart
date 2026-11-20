@@ -363,13 +363,16 @@ class ReparationFormGtsState extends State<ReparationFormGts>
                               style: TextStyle(color: Colors.red),
                             ).tr(),
                           if (errorNumOrder) smallSpace,
-                          Row(
+                          Wrap(
+                            alignment: WrapAlignment.end,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 8,
+                            runSpacing: 8,
                             children: [
                               Text(
                                 'ordrereparation'.tr().toUpperCase(),
                                 style: headerStyle,
                               ),
-                              smallSpace,
                               Container(
                                 width: 200.px,
                                 height: 40.px,
