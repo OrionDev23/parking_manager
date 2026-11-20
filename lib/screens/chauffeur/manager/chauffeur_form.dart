@@ -105,9 +105,11 @@ class ChauffeurFormState extends State<ChauffeurForm> {
     }
     final screenSize = MediaQuery.sizeOf(context);
     final compact = screenSize.width < 680;
-    final formHeight = (screenSize.height - (compact ? 160 : 180))
-        .clamp(320.0, 700.0)
-        .toDouble();
+    // Keep form fields at a stable height while the mobile browser keyboard
+    // changes the viewport. The surrounding ListView handles scrolling.
+    final formHeight = compact
+        ? 720.0
+        : (screenSize.height - 180).clamp(480.0, 700.0).toDouble();
     return Container(
       color: appTheme.backGroundColor,
       child: Column(
