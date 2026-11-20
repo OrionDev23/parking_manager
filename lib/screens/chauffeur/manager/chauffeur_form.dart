@@ -103,8 +103,11 @@ class ChauffeurFormState extends State<ChauffeurForm> {
         ),
       );
     }
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    final compact = screenWidth < 680;
+    final screenSize = MediaQuery.sizeOf(context);
+    final compact = screenSize.width < 680;
+    final formHeight = (screenSize.height - (compact ? 160 : 180))
+        .clamp(320.0, 700.0)
+        .toDouble();
     return Container(
       color: appTheme.backGroundColor,
       child: Column(
@@ -121,7 +124,7 @@ class ChauffeurFormState extends State<ChauffeurForm> {
                 shrinkWrap: true,
                 children: [
                   SizedBox(
-                    height: 700.px,
+                    height: formHeight,
                     width: double.infinity,
                     child: Column(
                       children: [
