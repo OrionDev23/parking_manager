@@ -436,7 +436,6 @@ class ChauffeurTableState extends State<ChauffeurTable> {
                     ],
                   ),
                 ),
-                smallSpace,
                 FlyoutTarget(
                   controller: export,
                   child: SizedBox(
@@ -465,7 +464,6 @@ class ChauffeurTableState extends State<ChauffeurTable> {
                     ),
                   ),
                 ),
-                smallSpace,
                 SizedBox(
                   width: searchWidth,
                   height: 45.px,
