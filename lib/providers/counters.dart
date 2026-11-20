@@ -22,7 +22,7 @@ class DatabaseCounters {
   }
 
   String _cacheKey(String source) {
-    final revision = DatabaseGetter.tenantRevision;
+    final revision = DatabaseGetter.companyRevision;
     if (_cacheTenantRevision != revision) {
       _countCache.clear();
       _cacheTenantRevision = revision;
