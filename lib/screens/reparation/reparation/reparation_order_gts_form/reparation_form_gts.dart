@@ -261,6 +261,7 @@ class ReparationFormGtsState extends State<ReparationFormGts>
   Widget build(BuildContext context) {
     super.build(context);
     var appTheme = context.watch<AppTheme>();
+    final compact = MediaQuery.sizeOf(context).width < 760;
     return ScaffoldPage(
       content: Container(
         padding: const EdgeInsets.all(10),
@@ -272,11 +273,13 @@ class ReparationFormGtsState extends State<ReparationFormGts>
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
-                  Row(
+                  Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    runSpacing: 12,
                     children: [
                       if (MyEntrepriseState.p != null)
                         const EntreprisePlacement(),
-                      const Spacer(),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
@@ -341,8 +344,11 @@ class ReparationFormGtsState extends State<ReparationFormGts>
                       ),
                     ],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  Wrap(
+                    alignment: WrapAlignment.end,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
                       Text('date', style: boldStyle).tr(),
                       smallSpace,
@@ -361,11 +367,18 @@ class ReparationFormGtsState extends State<ReparationFormGts>
                     ],
                   ),
                   smallSpace,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  Wrap(
+                    alignment: WrapAlignment.end,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
                       SizedBox(
-                        width: 350.px,
+                        width: compact
+                            ? (MediaQuery.sizeOf(context).width - 56)
+                                .clamp(220.0, 350.0)
+                                .toDouble()
+                            : 350.px,
                         height: 50.px,
                         child: ListTile(
                           leading: Text(
@@ -424,7 +437,6 @@ class ReparationFormGtsState extends State<ReparationFormGts>
                             setVehicleValues();
                           },
                         ),
-                      const Spacer(),
                       SizedBox(
                         width: 250.px,
                         height: 50.px,
@@ -483,8 +495,10 @@ class ReparationFormGtsState extends State<ReparationFormGts>
       bottomBar: Container(
         decoration: BoxDecoration(color: appTheme.backGroundColor),
         padding: const EdgeInsets.all(10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+        child: Wrap(
+          alignment: WrapAlignment.end,
+          spacing: 8,
+          runSpacing: 8,
           children: [
             FilledButton(
               style: ButtonStyle(
