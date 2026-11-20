@@ -32,7 +32,8 @@ class _LogoutScreenState extends State<LogoutScreen> {
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 minHeight: (constraints.maxHeight - 32)
-                    .clamp(0.0, double.infinity),
+                    .clamp(0.0, double.infinity)
+                    .toDouble(),
               ),
               child: Center(
                 child: SizedBox(
