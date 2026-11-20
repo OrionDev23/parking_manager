@@ -206,6 +206,8 @@ class DatabaseGetter {
     // from one project into another.
     if (_configuredProjectId != requestedProject) {
       _projectGeneration++;
+      _companyGeneration++;
+      companyRevisionListenable.value = _companyGeneration;
       _configuredProjectId = requestedProject;
       project = requestedProject;
       user = null;
