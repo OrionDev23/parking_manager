@@ -154,8 +154,15 @@ class DatabaseCounters {
     return _countRows(tableId: activityId);
   }
 
-  Future<int> countReparation() {
-    return _countRows(tableId: reparationId);
+  Future<int> countReparation() => countReparations();
+
+  Future<int> countReparations({int etat = -1}) {
+    return _countRows(
+      tableId: reparationId,
+      filters: [
+        if (etat != -1) Query.equal('etat', etat),
+      ],
+    );
   }
 
   Future<int> countPrestataire() {
