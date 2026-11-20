@@ -2952,39 +2952,47 @@ class _VehicleFormState extends State<VehicleForm>
   }
 
   void updateOverMatricule(AppTheme appTheme) {
-    if (!autreMat) {
-      if (matr3.text.isNotEmpty) {
-        wilaya = matr3.text;
-        wilayaCont.text = AlgeriaList().getWilayaByNum(matr3.text) ?? '';
-        dairaCont.text =
-            AlgeriaList()
-                .getDairas(wilayaCont.text)
-                .firstOrNull
-                ?.getDairaName(
-                  appTheme.locale?.languageCode.toUpperCase() == "AR"
-                      ? Language.AR
-                      : Language.FR,
-                ) ??
-            '';
-        communeCont.text =
-            AlgeriaList()
-                .getCommune(wilayaCont.text)
-                .firstOrNull
-                ?.getDairaName(
-                  appTheme.locale?.languageCode.toUpperCase() == "AR"
-                      ? Language.AR
-                      : Language.FR,
-                ) ??
-            '';
-        setState(() {});
-      }
-      if (matr2.text.isNotEmpty) {
-        genre = (int.tryParse(matr2.text) ?? 100) ~/ 100;
-        selectedAnnee = DateTime(
-          VehiclesUtilities.getAnneeFromMatricule('0000-${matr2.text}-00'),
-        );
-        setState(() {});
-      }
+    if (autreMat) return;
+
+    var derivedValuesChanged = false;
+    if (matr3.text.isNotEmpty) {
+      wilaya = matr3.text;
+      wilayaCont.text = AlgeriaList().getWilayaByNum(matr3.text) ?? '';
+      dairaCont.text =
+          AlgeriaList()
+              .getDairas(wilayaCont.text)
+              .firstOrNull
+              ?.getDairaName(
+                appTheme.locale?.languageCode.toUpperCase() == "AR"
+                    ? Language.AR
+                    : Language.FR,
+              ) ??
+          '';
+      communeCont.text =
+          AlgeriaList()
+              .getCommune(wilayaCont.text)
+              .firstOrNull
+              ?.getDairaName(
+                appTheme.locale?.languageCode.toUpperCase() == "AR"
+                    ? Language.AR
+                    : Language.FR,
+              ) ??
+          '';
+      derivedValuesChanged = true;
+    }
+
+    if (matr2.text.isNotEmpty) {
+      genre = (int.tryParse(matr2.text) ?? 100) ~/ 100;
+      selectedAnnee = DateTime(
+        VehiclesUtilities.getAnneeFromMatricule('0000-${matr2.text}-00'),
+      );
+      derivedValuesChanged = true;
+    }
+
+    // Both parts are typed independently, but their derived state only needs
+    // one parent rebuild per key event.
+    if (derivedValuesChanged && mounted) {
+      setState(() {});
     }
   }
 
