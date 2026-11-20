@@ -1743,22 +1743,19 @@ class _CreateCompanyDialogState extends State<_CreateCompanyDialog> {
   }
 
   Widget _section(String title, String description, List<Widget> children) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(title, style: FluentTheme.of(context).typography.subtitle),
-            const SizedBox(height: 4),
-            Text(
-              description,
-              style: FluentTheme.of(context).typography.caption,
-            ),
-            const SizedBox(height: 14),
-            ...children,
-          ],
-        ),
+    return ParcotoSurface(
+      padding: const EdgeInsets.all(ParcotoTokens.space4),
+      radius: ParcotoTokens.radiusLarge,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ParcotoSectionHeader(
+            title: title,
+            description: description,
+          ),
+          const SizedBox(height: ParcotoTokens.space4),
+          ...children,
+        ],
       ),
     );
   }
