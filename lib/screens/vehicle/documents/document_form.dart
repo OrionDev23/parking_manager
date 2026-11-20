@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../providers/client_database.dart';
 import '../../../serializables/vehicle/document_vehicle.dart';
