@@ -226,6 +226,10 @@ class PrestataireTableState extends State<PrestataireTable> {
                       style: appTheme.writingStyle,
                       cursorColor: appTheme.color.darker,
                       placeholderStyle: placeStyle,
+                      prefix: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        child: Icon(FluentIcons.search, size: 14),
+                      ),
                       onSubmitted: (s) {
                         if (s.isNotEmpty) {
                           prestataireDataSource.search(s);
