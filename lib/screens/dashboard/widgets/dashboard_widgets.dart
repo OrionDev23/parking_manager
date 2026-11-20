@@ -53,7 +53,7 @@ class DashboardMetricCard extends StatelessWidget {
               const Spacer(),
             ],
           ),
-          const SizedBox(height: 13),
+          const SizedBox(height: ParcotoTokens.space3),
           Text(
             label,
             maxLines: 1,
@@ -113,7 +113,7 @@ class DashboardPanel extends StatelessWidget {
     required this.child,
     this.trailing,
     this.height,
-    this.padding = const EdgeInsets.all(16),
+    this.padding = const EdgeInsets.all(ParcotoTokens.space4),
   });
 
   @override
@@ -136,12 +136,12 @@ class DashboardPanel extends StatelessWidget {
                 height: 32,
                 decoration: BoxDecoration(
                   color: theme.color.withValues(alpha: .14),
-                  borderRadius: BorderRadius.circular(9),
+                  borderRadius: BorderRadius.circular(theme.controlRadius),
                 ),
                 alignment: Alignment.center,
                 child: Icon(icon, color: theme.color, size: 17),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: ParcotoTokens.space2),
               Expanded(
                 child: Text(
                   title,
@@ -484,7 +484,7 @@ class RecentActivityTimeline extends StatelessWidget {
                 size: 14,
               ),
             ),
-            const SizedBox(width: 9),
+            const SizedBox(width: ParcotoTokens.space2),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1434,7 +1434,10 @@ class DashboardQuickActionTile extends StatelessWidget {
       onPressed: onPressed,
       style: ButtonStyle(
         padding: WidgetStatePropertyAll(
-          const EdgeInsets.symmetric(horizontal: 11, vertical: 12),
+          const EdgeInsets.symmetric(
+            horizontal: ParcotoTokens.space3,
+            vertical: ParcotoTokens.space3,
+          ),
         ),
       ),
       child: Row(
