@@ -876,6 +876,11 @@ class _DashboardState extends State<Dashboard>
         case 3:
           inactive++;
           break;
+        default:
+          // Match the legacy DriverProvider.getEtat fallback: unknown or
+          // missing statuses are treated as available, not silently omitted.
+          available++;
+          break;
       }
     }
 
