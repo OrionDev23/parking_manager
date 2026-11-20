@@ -13,6 +13,14 @@ import '../../../widgets/zone_box.dart';
 import '../../data_table_parcoto.dart';
 import '../manager/vehicles_table.dart';
 
+Size _responsiveDocumentDialogSize(BuildContext context) {
+  final screenSize = MediaQuery.sizeOf(context);
+  return Size(
+    (screenSize.width - 32).clamp(0.0, 700.0).toDouble(),
+    (screenSize.height - 80).clamp(0.0, 550.0).toDouble(),
+  );
+}
+
 class DocumentTable extends StatefulWidget {
   final bool selectD;
 
@@ -126,11 +134,19 @@ class DocumentTableState extends State<DocumentTable> {
     var appTheme = context.watch<AppTheme>();
     documentsDataSource.appTheme = appTheme;
     return DataTableParc(
-      header: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
+      header: LayoutBuilder(
+        builder: (context, constraints) {
+          final searchWidth = (constraints.maxWidth - 105)
+              .clamp(140.0, 350.0)
+              .toDouble();
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+            child: Wrap(
+              alignment: WrapAlignment.end,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 10,
+              runSpacing: 8,
+              children: [
             SizedBox(
               width: 75.px,
               child: Stack(
@@ -162,8 +178,12 @@ class DocumentTableState extends State<DocumentTable> {
                                 child: StatefulBuilder(
                                   builder: (context, setS) {
                                     return SizedBox(
-                                      width: 30.w,
-                                      height: 42.h,
+                                      width: (MediaQuery.sizeOf(context).width - 24)
+                                          .clamp(220.0, 380.0)
+                                          .toDouble(),
+                                      height: (MediaQuery.sizeOf(context).height - 160)
+                                          .clamp(220.0, 440.0)
+                                          .toDouble(),
                                       child: Column(
                                         children: [
                                           Flexible(
@@ -178,7 +198,7 @@ class DocumentTableState extends State<DocumentTable> {
                                                     Row(
                                                       children: [
                                                         SizedBox(
-                                                          width: 5.w,
+                                                          width: 44.px,
                                                           child: const Text(
                                                             'min',
                                                           ).tr(),
@@ -202,7 +222,7 @@ class DocumentTableState extends State<DocumentTable> {
                                                     Row(
                                                       children: [
                                                         SizedBox(
-                                                          width: 5.w,
+                                                          width: 44.px,
                                                           child: const Text(
                                                             'max',
                                                           ).tr(),
@@ -249,10 +269,7 @@ class DocumentTableState extends State<DocumentTable> {
                                                         return ContentDialog(
                                                           constraints:
                                                               BoxConstraints.tight(
-                                                                Size(
-                                                                  700.px,
-                                                                  550.px,
-                                                                ),
+                                                                _responsiveDocumentDialogSize(context),
                                                               ),
                                                           title: const Text(
                                                             'selectvehicle',
@@ -296,9 +313,10 @@ class DocumentTableState extends State<DocumentTable> {
                                           smallSpace,
                                           Padding(
                                             padding: const EdgeInsets.all(8.0),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
+                                            child: Wrap(
+                                              alignment: WrapAlignment.end,
+                                              spacing: 6,
+                                              runSpacing: 6,
                                               children: [
                                                 FilledButton(
                                                   style: ButtonStyle(
@@ -330,7 +348,6 @@ class DocumentTableState extends State<DocumentTable> {
                                                   child: const Text('clear')
                                                       .tr(),
                                                 ),
-                                                const Spacer(),
                                                 Button(
                                                   onPressed: () {
                                                     Navigator.of(context).pop();
@@ -433,9 +450,8 @@ class DocumentTableState extends State<DocumentTable> {
                 ],
               ),
             ),
-            const SizedBox(width: 10),
             SizedBox(
-              width: 350.px,
+              width: searchWidth,
               height: 45.px,
               child: ParcotoTextBox(
                 onChanged: (s) {
@@ -481,8 +497,10 @@ class DocumentTableState extends State<DocumentTable> {
                     : null,
               ),
             ),
-          ],
-        ),
+              ],
+            ),
+          );
+        },
       ),
       sortAscending: assending,
       sortColumnIndex: sortColumn,
