@@ -169,11 +169,11 @@ class ConducteurDashboard extends StatelessWidget {
                             DatabaseCounters().countChauffeur(etat: 0),
                           ),
                           MapEntry(
-                            'absent',
+                            'mission',
                             DatabaseCounters().countChauffeur(etat: 1),
                           ),
                           MapEntry(
-                            'mission',
+                            'absent',
                             DatabaseCounters().countChauffeur(etat: 2),
                           ),
                           MapEntry(
