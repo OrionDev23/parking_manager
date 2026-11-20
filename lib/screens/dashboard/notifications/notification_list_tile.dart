@@ -8,7 +8,6 @@ import 'package:parc_oto/screens/dashboard/notifications/notif_list.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
 
-import '../../../admin_parameters.dart';
 import '../../../main.dart';
 import '../../../serializables/notification.dart';
 import '../../sidemenu/pane_items.dart';

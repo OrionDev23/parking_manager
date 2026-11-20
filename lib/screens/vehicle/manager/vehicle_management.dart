@@ -492,7 +492,7 @@ class VehicleManagementState extends State<VehicleManagement>
                 child: const Text('Effacer les filtres'),
               ),
             Text(
-              _visibleVehicles().length.toString() + ' véhicule(s)',
+              '${_visibleVehicles().length} véhicule(s)',
               style: TextStyle(
                 color: theme.mutedTextColor,
                 fontSize: 11,
@@ -625,11 +625,11 @@ class VehicleManagementState extends State<VehicleManagement>
     tab = Tab(
       key: UniqueKey(),
       text: Text(
-        vehicle == null ? 'Nouveau véhicule' : 'Modifier ' + vehicle.matricule,
+        vehicle == null ? 'Nouveau véhicule' : 'Modifier ${vehicle.matricule}',
       ),
       semanticLabel: vehicle == null
           ? 'Nouveau véhicule'
-          : 'Modifier ' + vehicle.matricule,
+          : 'Modifier ${vehicle.matricule}',
       icon: Icon(vehicle == null ? FluentIcons.add : FluentIcons.edit),
       body: VehicleForm(vehicle: vehicle),
       onClosed: () {
@@ -848,7 +848,7 @@ class _VehicleCard extends StatelessWidget {
                           child: Text(
                             vehicle.currentMileage == null
                                 ? 'Kilométrage non renseigné'
-                                : vehicle.currentMileage.toString() + ' km',
+                                : '${vehicle.currentMileage} km',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -881,7 +881,7 @@ class _VehicleCard extends StatelessWidget {
                     if (vehicle.fleetNumber?.trim().isNotEmpty == true) ...[
                       const SizedBox(height: 6),
                       Text(
-                        'Parc ' + vehicle.fleetNumber!,
+                        'Parc ${vehicle.fleetNumber}',
                         style: TextStyle(
                           color: theme.mutedTextColor,
                           fontSize: 10,

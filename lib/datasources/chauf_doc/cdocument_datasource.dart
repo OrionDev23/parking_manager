@@ -7,7 +7,6 @@ import 'package:parc_oto/screens/chauffeur/manager/chauffeur_tabs.dart';
 import 'package:parc_oto/screens/sidemenu/pane_items.dart';
 import 'package:parc_oto/serializables/conducteur/document_chauffeur.dart';
 
-import '../../admin_parameters.dart';
 import '../../providers/client_database.dart';
 import '../../screens/chauffeur/document/chauf_document_form.dart';
 import '../../screens/chauffeur/document/chauf_document_tabs.dart';
