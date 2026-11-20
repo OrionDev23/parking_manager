@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import '../../widgets/module_dashboard_metric.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
@@ -126,6 +127,48 @@ class ConducteurDashboard extends StatelessWidget {
                 icon: FluentIcons.people,
               ),
               const SizedBox(height: 24),
+              ModuleDashboardSectionHeader(
+                title: 'Indicateurs de l’équipe',
+                subtitle:
+                    'Suivez les effectifs et les statuts de disponibilité enregistrés.',
+              ),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  ModuleDashboardMetric(
+                    label: 'Conducteurs actifs',
+                    detail: 'Hors conducteurs quittés',
+                    icon: FluentIcons.people,
+                    loadValue: () => DatabaseCounters().countChauffeur(),
+                  ),
+                  ModuleDashboardMetric(
+                    label: 'Disponibles',
+                    detail: 'Statut disponible',
+                    icon: FluentIcons.check_mark,
+                    loadValue: () => DatabaseCounters().countChauffeur(etat: 0),
+                  ),
+                  ModuleDashboardMetric(
+                    label: 'En mission',
+                    detail: 'Statut mission',
+                    icon: FluentIcons.car,
+                    loadValue: () => DatabaseCounters().countChauffeur(etat: 1),
+                  ),
+                  ModuleDashboardMetric(
+                    label: 'Absents',
+                    detail: 'Statut absent / congé',
+                    icon: FluentIcons.calendar,
+                    loadValue: () => DatabaseCounters().countChauffeur(etat: 2),
+                  ),
+                  ModuleDashboardMetric(
+                    label: 'Documents',
+                    detail: 'Dossiers conducteurs',
+                    icon: FluentIcons.document_set,
+                    loadValue: () => DatabaseCounters().countCDocs(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 26),
               ModuleDashboardSectionHeader(
                 title: 'Gestion de votre équipe',
                 subtitle:
