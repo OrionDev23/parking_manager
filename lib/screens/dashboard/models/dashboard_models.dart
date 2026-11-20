@@ -53,12 +53,14 @@ class DashboardDriverStatusSummary {
   final int onMission;
   final int absent;
   final int inactive;
+  final bool verified;
 
   const DashboardDriverStatusSummary({
     this.available = 0,
     this.onMission = 0,
     this.absent = 0,
     this.inactive = 0,
+    this.verified = false,
   });
 
   int get total => available + onMission + absent + inactive;
@@ -70,6 +72,7 @@ class DashboardRepairSummary {
   final int inProgress;
   final int completed;
   final double activeAmount;
+  final bool verified;
   final List<Reparation> activeRepairs;
 
   const DashboardRepairSummary({
@@ -77,6 +80,7 @@ class DashboardRepairSummary {
     this.inProgress = 0,
     this.completed = 0,
     this.activeAmount = 0,
+    this.verified = false,
     this.activeRepairs = const [],
   });
 
