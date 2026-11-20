@@ -2,6 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../theme.dart';
+import '../ui/design_system/parcoto_tokens.dart';
 
 /// Shared bordered surface for analytics and activity blocks on module dashboards.
 class ModuleDashboardPanel extends StatelessWidget {
@@ -21,7 +22,7 @@ class ModuleDashboardPanel extends StatelessWidget {
     final theme = context.watch<AppTheme>();
     return Container(
       height: height,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(ParcotoTokens.space4),
       decoration: BoxDecoration(
         color: theme.surfaceColor,
         borderRadius: BorderRadius.circular(theme.cardRadius),
@@ -39,7 +40,7 @@ class ModuleDashboardPanel extends StatelessWidget {
               color: theme.writingStyle.color,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: ParcotoTokens.space3),
           Expanded(child: child),
         ],
       ),
