@@ -396,11 +396,37 @@ Future<void> initWindow() async {
   await windowManager.waitUntilReadyToShow(windowOptions, () async {});
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key, required this.navigatorKey});
 
+  final GlobalKey<NavigatorState> navigatorKey;
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late final AppTheme _appTheme;
+  late final Routes _routes;
+
+  @override
+  void initState() {
+    super.initState();
+    // Keep both objects stable when ResponsiveSizer rebuilds after viewport
+    // changes. On mobile web, the virtual keyboard changes the available
+    // height; recreating the router here would discard the focused form field.
+    _appTheme = AppTheme();
+    _routes = Routes(_appTheme);
+  }
+
+  @override
+  void dispose() {
+    _appTheme.dispose();
+    super.dispose();
+  }
+
   List<LocalizationsDelegate<dynamic>> getDelegates(BuildContext context) {
-    List<LocalizationsDelegate> results = List.from(
+    final results = List<LocalizationsDelegate>.from(
       context.localizationDelegates,
     );
     results.addAll([
@@ -414,65 +440,64 @@ class MyApp extends StatelessWidget {
     return results;
   }
 
-  // This is the root widget of the application.
-  final GlobalKey<NavigatorState> navigatorKey;
-
   @override
   Widget build(BuildContext context) {
     return ResponsiveSizer(
       builder: (context, orientation, deviceType) {
-        return ChangeNotifierProvider(
-          create: (_) => AppTheme(),
-          builder: (context, _) {
-            final appTheme = context.watch<AppTheme>();
-            // The virtual keyboard changes the available viewport height on
-            // mobile browsers. Do not derive the app-wide text scale from the
-            // current orientation, otherwise opening the keyboard can switch
-            // responsive layouts while a field is focused.
-            final compactViewport = MediaQuery.sizeOf(context).width < 640;
-            tstyle = tstyle.copyWith(fontSize: compactViewport ? 13 : 10);
-            return FluentApp.router(
-              key: navigatorKey,
-              title: appTitle,
-              themeMode: appTheme.mode,
-              debugShowCheckedModeBanner: false,
-              color: appTheme.color,
-              localizationsDelegates: getDelegates(context),
-              localeResolutionCallback: (locale, supportedLocales) {
-                for (var supportedLocale in supportedLocales) {
-                  if (supportedLocale.languageCode == locale!.languageCode &&
-                      supportedLocale.countryCode == locale.countryCode) {
-                    return supportedLocale;
-                  }
-                }
+        return ChangeNotifierProvider<AppTheme>.value(
+          value: _appTheme,
+          child: Builder(
+            builder: (context) {
+              final appTheme = context.watch<AppTheme>();
+              // The virtual keyboard changes the available viewport height on
+              // mobile browsers. Base this legacy table style on width instead
+              // of orientation, which can flip while the keyboard is visible.
+              final compactViewport = MediaQuery.sizeOf(context).width < 640;
+              tstyle = tstyle.copyWith(fontSize: compactViewport ? 13 : 10);
 
-                return supportedLocales.first;
-              },
-              darkTheme: appTheme.fluentTheme(Brightness.dark),
-              theme: appTheme.fluentTheme(Brightness.light),
-              supportedLocales: const [
-                Locale('fr'),
-                Locale('en'),
-                Locale('ar'),
-              ],
-              locale: appTheme.locale,
-              builder: (context, child) {
-                return mui.Theme(
-                  data: appTheme.materialUiTheme,
-                  child: m.Theme(
-                    data: appTheme.materialTheme,
-                    child: NavigationPaneTheme(
-                      data: NavigationPaneThemeData(
-                        backgroundColor: appTheme.backGroundColor,
+              return FluentApp.router(
+                key: widget.navigatorKey,
+                title: appTitle,
+                themeMode: appTheme.mode,
+                debugShowCheckedModeBanner: false,
+                color: appTheme.color,
+                localizationsDelegates: getDelegates(context),
+                localeResolutionCallback: (locale, supportedLocales) {
+                  for (var supportedLocale in supportedLocales) {
+                    if (supportedLocale.languageCode == locale!.languageCode &&
+                        supportedLocale.countryCode == locale.countryCode) {
+                      return supportedLocale;
+                    }
+                  }
+
+                  return supportedLocales.first;
+                },
+                darkTheme: appTheme.fluentTheme(Brightness.dark),
+                theme: appTheme.fluentTheme(Brightness.light),
+                supportedLocales: const [
+                  Locale('fr'),
+                  Locale('en'),
+                  Locale('ar'),
+                ],
+                locale: appTheme.locale,
+                builder: (context, child) {
+                  return mui.Theme(
+                    data: appTheme.materialUiTheme,
+                    child: m.Theme(
+                      data: appTheme.materialTheme,
+                      child: NavigationPaneTheme(
+                        data: NavigationPaneThemeData(
+                          backgroundColor: appTheme.backGroundColor,
+                        ),
+                        child: ConnectivityStatusBanner(child: child!),
                       ),
-                      child: ConnectivityStatusBanner(child: child!),
                     ),
-                  ),
-                );
-              },
-              routerConfig: Routes(appTheme).router,
-            );
-          },
+                  );
+                },
+                routerConfig: _routes.router,
+              );
+            },
+          ),
         );
       },
     );
