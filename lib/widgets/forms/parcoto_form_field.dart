@@ -176,7 +176,6 @@ class ParcotoFieldSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = FluentTheme.of(context);
     final appTheme = context.watch<AppTheme>();
     return ConstrainedBox(
       constraints: BoxConstraints(minHeight: minHeight ?? 0),
