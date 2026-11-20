@@ -207,7 +207,6 @@ class DatabaseGetter {
     if (_configuredProjectId != requestedProject) {
       _projectGeneration++;
       _companyGeneration++;
-      companyRevisionListenable.value = _companyGeneration;
       _configuredProjectId = requestedProject;
       project = requestedProject;
       user = null;
@@ -237,6 +236,7 @@ class DatabaseGetter {
       account = Account(client!);
       database = TablesDB(client!);
       storage = Storage(client!);
+      companyRevisionListenable.value = _companyGeneration;
     }
 
     getLimits();
