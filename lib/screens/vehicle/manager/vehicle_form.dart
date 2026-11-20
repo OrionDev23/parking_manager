@@ -122,6 +122,10 @@ class _VehicleFormState extends State<VehicleForm>
   final double height = 72.px;
   final double heightFirst = 118.px;
 
+  // Responsive layout is width-based: the mobile browser viewport height can
+  // shrink when the virtual keyboard opens and must not change form geometry.
+  bool get _isCompactViewport => MediaQuery.sizeOf(context).width < 640;
+
   String wilaya = "16";
 
   DateTime selectedDate = DateTime.now();
@@ -1437,13 +1441,13 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           decoration: BoxDecoration(
             border: Border(
-              top: Device.orientation == Orientation.portrait
+              top: _isCompactViewport
                   ? BorderSide.none
                   : BorderSide(color: appTheme.color),
-              right: Device.orientation == Orientation.portrait
+              right: _isCompactViewport
                   ? BorderSide(color: appTheme.color)
                   : BorderSide.none,
-              left: Device.orientation == Orientation.portrait
+              left: _isCompactViewport
                   ? BorderSide(color: appTheme.color)
                   : BorderSide.none,
             ),
@@ -1609,7 +1613,7 @@ class _VehicleFormState extends State<VehicleForm>
             border: Border(
               top: BorderSide(color: appTheme.color),
               left: BorderSide(color: appTheme.color),
-              right: Device.orientation == Orientation.portrait
+              right: _isCompactViewport
                   ? BorderSide(color: appTheme.color)
                   : BorderSide.none,
             ),
@@ -1641,7 +1645,7 @@ class _VehicleFormState extends State<VehicleForm>
               ),
               Text('wilaya', style: formHintStyle).tr(),
               SizedBox(
-                height: 5.h,
+                height: 44,
                 child: ParcotoFieldSurface(child: AutoSuggestBox<String>(
                   enabled: !widget.readOnly,
                   controller: wilayaCont,
@@ -1693,11 +1697,11 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           decoration: BoxDecoration(
             border: Border(
-              top: Device.orientation == Orientation.portrait
+              top: _isCompactViewport
                   ? BorderSide.none
                   : BorderSide(color: appTheme.color),
               right: BorderSide(color: appTheme.color),
-              left: Device.orientation == Orientation.portrait
+              left: _isCompactViewport
                   ? BorderSide(color: appTheme.color)
                   : BorderSide.none,
             ),
@@ -1709,7 +1713,7 @@ class _VehicleFormState extends State<VehicleForm>
             children: [
               Text('daira', style: formHintStyle).tr(),
               SizedBox(
-                height: 5.h,
+                height: 44,
                 child: ParcotoFieldSurface(child: AutoSuggestBox<String>(
                   enabled: !widget.readOnly,
                   controller: dairaCont,
@@ -1741,7 +1745,7 @@ class _VehicleFormState extends State<VehicleForm>
               ),
               Text('commune', style: formHintStyle).tr(),
               SizedBox(
-                height: 5.h,
+                height: 44,
                 child: ParcotoFieldSurface(child: AutoSuggestBox<String>(
                   enabled: !widget.readOnly,
                   controller: communeCont,
@@ -1793,7 +1797,7 @@ class _VehicleFormState extends State<VehicleForm>
           decoration: BoxDecoration(
             border: Border(
               left: BorderSide(color: appTheme.color),
-              right: Device.orientation == Orientation.portrait
+              right: _isCompactViewport
                   ? BorderSide(color: appTheme.color)
                   : BorderSide.none,
             ),
@@ -1823,7 +1827,7 @@ class _VehicleFormState extends State<VehicleForm>
         crossAxisCellCount: 4,
         child: Container(
           decoration: BoxDecoration(
-            border: Device.orientation == Orientation.portrait
+            border: _isCompactViewport
                 ? Border(
                     left: BorderSide(color: appTheme.color),
                     right: BorderSide(color: appTheme.color),
@@ -1851,7 +1855,7 @@ class _VehicleFormState extends State<VehicleForm>
           ),
         ),
       ),
-      if (MediaQuery.of(context).orientation == Orientation.landscape)
+      if (!_isCompactViewport)
         StaggeredGridTile.fit(
           crossAxisCellCount: 2,
           child: SizedBox(height: height),
@@ -1863,7 +1867,7 @@ class _VehicleFormState extends State<VehicleForm>
           decoration: BoxDecoration(
             border: Border(
               right: BorderSide(color: appTheme.color),
-              left: Device.orientation == Orientation.portrait
+              left: _isCompactViewport
                   ? BorderSide(color: appTheme.color)
                   : BorderSide.none,
             ),
@@ -1904,7 +1908,7 @@ class _VehicleFormState extends State<VehicleForm>
             border: Border(
               top: BorderSide(color: appTheme.color),
               left: BorderSide(color: appTheme.color),
-              right: Device.orientation == Orientation.portrait
+              right: _isCompactViewport
                   ? BorderSide(color: appTheme.color)
                   : BorderSide.none,
             ),
@@ -1932,7 +1936,7 @@ class _VehicleFormState extends State<VehicleForm>
         crossAxisCellCount: 2,
         child: Container(
           decoration: BoxDecoration(
-            border: Device.orientation == Orientation.portrait
+            border: _isCompactViewport
                 ? Border(
                     left: BorderSide(color: appTheme.color),
                     right: BorderSide(color: appTheme.color),
@@ -1948,7 +1952,7 @@ class _VehicleFormState extends State<VehicleForm>
             children: [
               Text('matriculeemploye', style: formHintStyle).tr(),
               SizedBox(
-                height: 5.h,
+                height: 44,
                 child: ParcotoTextBox(
                   enabled: !widget.readOnly,
                   controller: matempl,
@@ -1967,7 +1971,7 @@ class _VehicleFormState extends State<VehicleForm>
         crossAxisCellCount: 2,
         child: Container(
           decoration: BoxDecoration(
-            border: Device.orientation == Orientation.portrait
+            border: _isCompactViewport
                 ? Border(
                     left: BorderSide(color: appTheme.color),
                     right: BorderSide(color: appTheme.color),
@@ -1982,7 +1986,7 @@ class _VehicleFormState extends State<VehicleForm>
             children: [
               Text('nomf', style: formHintStyle).tr(),
               SizedBox(
-                height: 5.h,
+                height: 44,
                 child: ParcotoTextBox(
                   enabled: !widget.readOnly,
                   controller: lname,
@@ -2003,7 +2007,7 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
-            border: Device.orientation == Orientation.portrait
+            border: _isCompactViewport
                 ? Border(
                     left: BorderSide(color: appTheme.color),
                     right: BorderSide(color: appTheme.color),
@@ -2017,7 +2021,7 @@ class _VehicleFormState extends State<VehicleForm>
             children: [
               Text('prenom', style: formHintStyle).tr(),
               SizedBox(
-                height: 5.h,
+                height: 44,
                 child: ParcotoTextBox(
                   enabled: !widget.readOnly,
                   controller: fname,
@@ -2037,11 +2041,11 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           decoration: BoxDecoration(
             border: Border(
-              top: Device.orientation == Orientation.portrait
+              top: _isCompactViewport
                   ? BorderSide.none
                   : BorderSide(color: appTheme.color),
               right: BorderSide(color: appTheme.color),
-              left: Device.orientation == Orientation.portrait
+              left: _isCompactViewport
                   ? BorderSide(color: appTheme.color)
                   : BorderSide.none,
             ),
@@ -2055,7 +2059,7 @@ class _VehicleFormState extends State<VehicleForm>
             children: [
               Text('poste', style: formHintStyle).tr(),
               SizedBox(
-                height: 5.h,
+                height: 44,
                 child: ParcotoTextBox(
                   enabled: !widget.readOnly,
                   controller: profession,
@@ -2080,11 +2084,11 @@ class _VehicleFormState extends State<VehicleForm>
         child: Container(
           decoration: BoxDecoration(
             border: Border(
-              bottom: Device.orientation == Orientation.portrait
+              bottom: _isCompactViewport
                   ? BorderSide.none
                   : BorderSide(color: appTheme.color),
               left: BorderSide(color: appTheme.color),
-              right: Device.orientation == Orientation.portrait
+              right: _isCompactViewport
                   ? BorderSide(color: appTheme.color)
                   : BorderSide.none,
             ),
@@ -2098,7 +2102,7 @@ class _VehicleFormState extends State<VehicleForm>
             children: [
               Text('servicefonction', style: formHintStyle).tr(),
               SizedBox(
-                height: 5.h,
+                height: 44,
                 child: Row(
                   children: [
                     const Text('fonction').tr(),
@@ -2124,9 +2128,9 @@ class _VehicleFormState extends State<VehicleForm>
         crossAxisCellCount: 6,
         child: Container(
           decoration: BoxDecoration(
-            border: Device.orientation == Orientation.portrait
+            border: _isCompactViewport
                 ? Border(
-                    bottom: Device.orientation == Orientation.portrait
+                    bottom: _isCompactViewport
                         ? BorderSide.none
                         : BorderSide(color: appTheme.color),
                     left: BorderSide(color: appTheme.color),
@@ -2143,7 +2147,7 @@ class _VehicleFormState extends State<VehicleForm>
             children: [
               Text('adresse', style: formHintStyle).tr(),
               SizedBox(
-                height: 5.h,
+                height: 44,
                 child: ParcotoTextBox(
                   enabled: !widget.readOnly,
                   controller: adresse,
@@ -2167,7 +2171,7 @@ class _VehicleFormState extends State<VehicleForm>
             border: Border(
               bottom: BorderSide(color: appTheme.color),
               right: BorderSide(color: appTheme.color),
-              left: Device.orientation == Orientation.portrait
+              left: _isCompactViewport
                   ? BorderSide(color: appTheme.color)
                   : BorderSide.none,
             ),
@@ -2210,7 +2214,7 @@ class _VehicleFormState extends State<VehicleForm>
           decoration: BoxDecoration(
             border: Border(
               left: BorderSide(color: appTheme.color),
-              right: Device.orientation == Orientation.portrait
+              right: _isCompactViewport
                   ? BorderSide(color: appTheme.color)
                   : BorderSide.none,
             ),
@@ -2246,7 +2250,7 @@ class _VehicleFormState extends State<VehicleForm>
           height: height,
           padding: EdgeInsets.zero,
           decoration: BoxDecoration(
-            border: Device.orientation == Orientation.portrait
+            border: _isCompactViewport
                 ? Border(
                     left: BorderSide(color: appTheme.color),
                     right: BorderSide(color: appTheme.color),
@@ -2284,7 +2288,7 @@ class _VehicleFormState extends State<VehicleForm>
           height: height,
           padding: EdgeInsets.zero,
           decoration: BoxDecoration(
-            border: Device.orientation == Orientation.portrait
+            border: _isCompactViewport
                 ? Border(
                     left: BorderSide(color: appTheme.color),
                     right: BorderSide(color: appTheme.color),
@@ -2324,7 +2328,7 @@ class _VehicleFormState extends State<VehicleForm>
           decoration: BoxDecoration(
             border: Border(
               right: BorderSide(color: appTheme.color),
-              left: Device.orientation == Orientation.portrait
+              left: _isCompactViewport
                   ? BorderSide(color: appTheme.color)
                   : BorderSide.none,
             ),
@@ -2464,8 +2468,8 @@ class _VehicleFormState extends State<VehicleForm>
                   child: ListTile(
                     leading: Image.asset(
                       'assets/images/marques/${marque == null || marque! <= 0 ? 'default' : marque!}.webp',
-                      width: 4.h,
-                      height: 4.h,
+                      width: 32,
+                      height: 32,
                     ),
                     title: AutoSizeText(
                       VehiclesUtilities.marques![marque == null || marque! <= 0
