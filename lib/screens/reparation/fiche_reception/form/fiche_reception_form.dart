@@ -316,7 +316,9 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
   Widget build(BuildContext context) {
     super.build(context);
     var appTheme = context.watch<AppTheme>();
-    bool portrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final screenSize = MediaQuery.sizeOf(context);
+    final compact = screenSize.width < 760;
+    final portrait = screenSize.height >= screenSize.width;
     return ScaffoldPage(
       content: Container(
         padding: const EdgeInsets.all(10),
@@ -328,11 +330,13 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 children: [
-                  Row(
+                  Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    runSpacing: 12,
                     children: [
                       if (MyEntrepriseState.p != null)
                         const EntreprisePlacement(),
-                      const Spacer(),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
@@ -392,8 +396,11 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                       ),
                     ],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  Wrap(
+                    alignment: WrapAlignment.end,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
                       Text('dateentre', style: boldStyle).tr(),
                       bigSpace,
@@ -456,8 +463,11 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                     ],
                   ),
                   smallSpace,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  Wrap(
+                    alignment: WrapAlignment.end,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
                       Text('datesortie', style: boldStyle).tr(),
                       bigSpace,
@@ -529,8 +539,11 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                     ],
                   ),
                   smallSpace,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  Wrap(
+                    alignment: WrapAlignment.end,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
                       SizedBox(
                         width: 250.px,
@@ -580,9 +593,12 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                             setVehicleValues();
                           },
                         ),
-                      const Spacer(),
                       SizedBox(
-                        width: 545.px,
+                        width: compact
+                            ? (screenSize.width - 56)
+                                .clamp(220.0, 545.0)
+                                .toDouble()
+                            : 545.px,
                         height: 50.px,
                         child: ListTile(
                           leading: Text(
@@ -637,8 +653,11 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
                     ],
                   ),
                   smallSpace,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                  Wrap(
+                    alignment: WrapAlignment.start,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
                       SizedBox(
                         width: 250.px,
@@ -828,8 +847,10 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
       bottomBar: Container(
         decoration: BoxDecoration(color: appTheme.backGroundColor),
         padding: const EdgeInsets.all(10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+        child: Wrap(
+          alignment: WrapAlignment.end,
+          spacing: 8,
+          runSpacing: 8,
           children: [
             FilledButton(
               style: ButtonStyle(
