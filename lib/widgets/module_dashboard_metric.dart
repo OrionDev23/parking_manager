@@ -92,7 +92,7 @@ class _ModuleDashboardMetricState extends State<ModuleDashboardMetric> {
                         const SizedBox(
                           width: 18,
                           height: 18,
-                          child: ProgressRing(strokeWidth: 2),
+                          child: ProgressRing(),
                         )
                       else
                         Text(
