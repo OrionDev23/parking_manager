@@ -787,9 +787,17 @@ class VehicleTableState extends State<VehicleTable> {
           color: appTheme.backGroundColor,
           child: StatefulBuilder(
             builder: (context, setS) {
+              final screenSize = MediaQuery.sizeOf(context);
+              final filterWidth = (screenSize.width - 24)
+                  .clamp(220.0, 380.0)
+                  .toDouble();
+              final filterHeight = (screenSize.height - 160)
+                  .clamp(240.0, 460.0)
+                  .toDouble();
+
               return SizedBox(
-                width: 30.w,
-                height: 45.h,
+                width: filterWidth,
+                height: filterHeight,
                 child: Column(
                   children: [
                     Flexible(
