@@ -1,17 +1,19 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../../serializables/vehicle/vehicle.dart' as legacy;
-import '../../main.dart' show authService;
+import '../../main.dart' show authService, vehicleServices;
 import '../../providers/client_database.dart';
 import '../../providers/driver_provider.dart';
 import '../../providers/log_provider.dart';
 import '../../providers/planning_provider.dart';
 import '../../providers/repair_provider.dart';
 import '../../providers/vehicle_provider.dart';
+import '../../core/sync/sync_operation.dart';
 import '../../serializables/activity.dart';
 import '../../serializables/reparation/reparation.dart';
 import '../../theme.dart';
@@ -189,6 +191,8 @@ class _DashboardState extends State<Dashboard>
           _buildAnalyticsLayout(wide: wide),
           const SizedBox(height: 18),
           _buildOperationsLayout(wide: wide),
+          const SizedBox(height: 18),
+          _buildBusinessWidgetsLayout(),
           const SizedBox(height: 18),
           _buildQuickActions(compact: compact),
           if (_loadMessage != null) ...[
@@ -377,7 +381,7 @@ class _DashboardState extends State<Dashboard>
       child: UpcomingInterventions(items: _snapshot.upcoming),
     );
     final watchlist = DashboardPanel(
-      title: 'Véhicules à surveiller',
+      title: 'Alertes du parc et des conducteurs',
       icon: FluentIcons.health,
       height: 270,
       trailing: _viewAllButton('vehicle-manager'),
@@ -401,6 +405,64 @@ class _DashboardState extends State<Dashboard>
         const SizedBox(height: 14),
         watchlist,
       ],
+    );
+  }
+
+  Widget _buildBusinessWidgetsLayout() {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = constraints.maxWidth >= 1180
+            ? 3
+            : constraints.maxWidth >= 760
+                ? 2
+                : 1;
+        const gap = 14.0;
+        final width =
+            (constraints.maxWidth - gap * (columns - 1)) / columns;
+
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: [
+            SizedBox(
+              width: width,
+              child: DashboardPanel(
+                title: 'Disponibilité des conducteurs',
+                icon: FluentIcons.people,
+                height: 292,
+                trailing: _viewAllButton('driver-manager'),
+                child: DriverAvailabilityWidget(
+                  summary: _snapshot.driverStatus,
+                ),
+              ),
+            ),
+            SizedBox(
+              width: width,
+              child: DashboardPanel(
+                title: 'Suivi des réparations',
+                icon: FluentIcons.repair,
+                height: 292,
+                trailing: _viewAllButton('repair-orders'),
+                child: RepairPipelineWidget(
+                  summary: _snapshot.repairPipeline,
+                ),
+              ),
+            ),
+            SizedBox(
+              width: width,
+              child: DashboardPanel(
+                title: 'Stock & échéances',
+                icon: FluentIcons.database_activity,
+                height: 292,
+                trailing: _viewAllButton('workshop-stock'),
+                child: InventoryExpiryWidget(
+                  summary: _snapshot.inventory,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -555,6 +617,19 @@ class _DashboardState extends State<Dashboard>
           'Certaines données du tableau de bord ne sont pas synchronisées.';
     }
 
+    var inventory = const DashboardInventorySummary();
+    try {
+      inventory = await _loadInventorySnapshot(companyId)
+          .timeout(const Duration(seconds: 25));
+      if (!inventory.verified) {
+        _loadMessage ??=
+            'Le stock affiché provient du cache local et peut être incomplet.';
+      }
+    } catch (error) {
+      _loadMessage ??= 'Les données du stock ne sont pas disponibles.';
+      debugPrint('[ParcOto Dashboard] inventory snapshot failed: $error');
+    }
+
     final now = DateTime.now();
     final historyStart = now.subtract(const Duration(days: 180));
 
@@ -605,6 +680,7 @@ class _DashboardState extends State<Dashboard>
       snapshot = _createSnapshot(
         history: history,
         costsVerified: costsVerified,
+        inventory: inventory,
         now: now,
       );
     } catch (error, stackTrace) {
@@ -653,6 +729,7 @@ class _DashboardState extends State<Dashboard>
   DashboardSnapshot _createSnapshot({
     required List<Reparation> history,
     required bool costsVerified,
+    required DashboardInventorySummary inventory,
     required DateTime now,
   }) {
     final vehicles = VehicleProvider.vehicles.values.toList(growable: false);
@@ -685,6 +762,9 @@ class _DashboardState extends State<Dashboard>
         return a.startTime.compareTo(b.startTime);
       });
     final upcomingItems = upcoming.take(4).toList(growable: false);
+
+    final driverStatus = _buildDriverStatus(drivers);
+    final repairPipeline = _buildRepairPipeline();
 
     var available = 0;
     var broken = 0;
@@ -762,6 +842,286 @@ class _DashboardState extends State<Dashboard>
       upcoming: upcomingItems,
       recentActivities: recentActivities.take(6).toList(growable: false),
       alerts: alerts,
+      driverStatus: driverStatus,
+      repairPipeline: repairPipeline,
+      inventory: inventory,
+    );
+  }
+
+  DashboardDriverStatusSummary _buildDriverStatus(
+    List<Conducteur> drivers,
+  ) {
+    var available = 0;
+    var onMission = 0;
+    var absent = 0;
+    var inactive = 0;
+
+    for (final driver in drivers) {
+      switch (driver.etat ?? 0) {
+        case 0:
+          available++;
+          break;
+        case 1:
+          onMission++;
+          break;
+        case 2:
+          absent++;
+          break;
+        case 3:
+          inactive++;
+          break;
+      }
+    }
+
+    return DashboardDriverStatusSummary(
+      available: available,
+      onMission: onMission,
+      absent: absent,
+      inactive: inactive,
+    );
+  }
+
+  DashboardRepairSummary _buildRepairPipeline() {
+    final repairs = RepairProvider.reparations.values.toList(
+      growable: false,
+    );
+    var waiting = 0;
+    var inProgress = 0;
+    var completed = 0;
+    var activeAmount = 0.0;
+    final active = <Reparation>[];
+
+    for (final repair in repairs) {
+      switch (repair.etat ?? 0) {
+        case 0:
+          waiting++;
+          active.add(repair);
+          activeAmount += repair.getPrixTTC();
+          break;
+        case 1:
+          inProgress++;
+          active.add(repair);
+          activeAmount += repair.getPrixTTC();
+          break;
+        case 2:
+          completed++;
+          break;
+      }
+    }
+
+    active.sort((a, b) => a.date.compareTo(b.date));
+    return DashboardRepairSummary(
+      waiting: waiting,
+      inProgress: inProgress,
+      completed: completed,
+      activeAmount: activeAmount,
+      activeRepairs: active.take(8).toList(growable: false),
+    );
+  }
+
+  Future<DashboardInventorySummary> _loadInventorySnapshot(
+    String companyId,
+  ) async {
+    final records = <String, Map<String, dynamic>>{};
+    var verified = false;
+
+    // Hydrate from the company-partitioned cache first. It remains useful
+    // when the device is offline or the stock table cannot be reached.
+    try {
+      final cached = vehicleServices.localDatabase.readLegacyCache(
+        companyId: companyId,
+        entity: 'storage',
+      );
+      for (final row in cached) {
+        final id = row[r'$id']?.toString();
+        if (id == null || id.isEmpty) continue;
+        records[id] = Map<String, dynamic>.from(row);
+      }
+    } catch (error) {
+      debugPrint('[ParcOto Dashboard] local stock cache read failed: $error');
+    }
+
+    try {
+      final rows = await DatabaseGetter().listDocuments(storageId);
+      if (companyId != DatabaseGetter.activeCompanyId) {
+        return const DashboardInventorySummary();
+      }
+      records.clear();
+      for (final row in rows) {
+        final payload = <String, dynamic>{
+          ...Map<String, dynamic>.from(row.data),
+          r'$id': row.$id,
+          r'$createdAt': row.$createdAt,
+          r'$updatedAt': row.$updatedAt,
+        };
+        records[row.$id] = payload;
+        try {
+          vehicleServices.localDatabase.cacheLegacyRow(
+            companyId: companyId,
+            entity: 'storage',
+            entityId: row.$id,
+            payload: payload,
+          );
+        } catch (error) {
+          debugPrint('[ParcOto Dashboard] stock cache write failed: $error');
+        }
+      }
+      verified = true;
+    } catch (error) {
+      debugPrint('[ParcOto Dashboard] remote stock read failed: $error');
+    }
+
+    // Apply the local outbox last so pending creates, edits and deletions are
+    // reflected immediately without waiting for the next synchronization.
+    try {
+      final pending = await vehicleServices.syncQueue.pending(
+        limit: 5000,
+        companyId: companyId,
+      );
+      for (final operation in pending) {
+        if (operation.entity != 'storage') continue;
+        switch (operation.type) {
+          case SyncOperationType.create:
+          case SyncOperationType.update:
+            records[operation.entityId] = <String, dynamic>{
+              ...operation.payload,
+              r'$id': operation.entityId,
+            };
+            break;
+          case SyncOperationType.delete:
+            records.remove(operation.entityId);
+            break;
+        }
+      }
+    } catch (error) {
+      debugPrint('[ParcOto Dashboard] pending stock operations failed: $error');
+    }
+
+    if (companyId != DatabaseGetter.activeCompanyId) {
+      return const DashboardInventorySummary();
+    }
+
+    final references = <String>{};
+    final alerts = <DashboardStockAlert>[];
+    final today = DateTime.now();
+    final startOfToday = DateTime(today.year, today.month, today.day);
+    final horizon = startOfToday.add(const Duration(days: 30));
+
+    DateTime? parseDate(dynamic raw) {
+      if (raw is DateTime) return raw;
+      if (raw is num) {
+        return DateTime.fromMillisecondsSinceEpoch(raw.toInt());
+      }
+      final value = raw?.toString().trim();
+      if (value == null || value.isEmpty || value == 'null') return null;
+      return DateTime.tryParse(value);
+    }
+
+    List<Map<String, dynamic>> decodeVariations(dynamic raw) {
+      dynamic decoded = raw;
+      if (decoded is String) {
+        if (decoded.trim().isEmpty || decoded.trim() == 'null') return [];
+        try {
+          decoded = jsonDecode(decoded);
+        } catch (_) {
+          return [];
+        }
+      }
+      if (decoded is! List) return [];
+
+      final result = <Map<String, dynamic>>[];
+      for (final item in decoded) {
+        dynamic value = item;
+        if (value is String) {
+          try {
+            value = jsonDecode(value);
+          } catch (_) {
+            continue;
+          }
+        }
+        if (value is Map) {
+          result.add(Map<String, dynamic>.from(value));
+        }
+      }
+      return result;
+    }
+
+    void addExpiryAlert({
+      required String partName,
+      required String detail,
+      required DateTime expiration,
+    }) {
+      final date = DateTime(
+        expiration.year,
+        expiration.month,
+        expiration.day,
+      );
+      if (date.isAfter(horizon)) return;
+      final days = date.difference(startOfToday).inDays;
+      alerts.add(
+        DashboardStockAlert(
+          title: partName,
+          subtitle: detail,
+          tag: days < 0
+              ? 'Échu'
+              : days == 0
+                  ? 'Aujourd’hui'
+                  : 'J-$days',
+          severity: days < 0
+              ? DashboardAlertSeverity.danger
+              : DashboardAlertSeverity.warning,
+          dueDate: date,
+        ),
+      );
+    }
+
+    var lotCount = 0;
+    for (final entry in records.entries) {
+      final data = entry.value;
+      final partId = data['partID']?.toString().trim() ?? '';
+      final partName = data['pieceName']?.toString().trim();
+      final displayName =
+          partName != null && partName.isNotEmpty ? partName : 'Pièce sans nom';
+      if (partId.isNotEmpty) references.add(partId);
+      lotCount++;
+
+      final variations = decodeVariations(data['variations']);
+      if (variations.isEmpty) {
+        final expiration = parseDate(data['expirationDate']);
+        if (expiration != null) {
+          addExpiryAlert(
+            partName: displayName,
+            detail: 'Lot de stock',
+            expiration: expiration,
+          );
+        }
+        continue;
+      }
+
+      for (final variation in variations) {
+        final expiration = parseDate(variation['expirationDate']);
+        if (expiration == null) continue;
+        final variationName = variation['name']?.toString().trim() ?? '';
+        addExpiryAlert(
+          partName: displayName,
+          detail: variationName.isEmpty
+              ? 'Variante en stock'
+              : variationName,
+          expiration: expiration,
+        );
+      }
+    }
+
+    alerts.sort((a, b) => a.dueDate.compareTo(b.dueDate));
+    return DashboardInventorySummary(
+      referenceCount: references.length,
+      lotCount: lotCount,
+      expiredLots: alerts.where((alert) =>
+          alert.severity == DashboardAlertSeverity.danger).length,
+      expiringLots: alerts.where((alert) =>
+          alert.severity == DashboardAlertSeverity.warning).length,
+      verified: verified,
+      alerts: alerts.take(8).toList(growable: false),
     );
   }
 
@@ -869,6 +1229,38 @@ class _DashboardState extends State<Dashboard>
       );
     }
 
+    for (final document in DriverProvider.documentConducteurs.values) {
+      final expiration = document.dateExpiration;
+      if (expiration == null) continue;
+      final expirationDate = DateTime(
+        expiration.year,
+        expiration.month,
+        expiration.day,
+      );
+      if (expirationDate.isAfter(horizon)) continue;
+
+      final driver = DriverProvider.conducteurs[document.chauffeur];
+      final days = expirationDate.difference(today).inDays;
+      alerts.add(
+        DashboardAlert(
+          title: driver?.getName() ??
+              document.chauffeurNom ??
+              'Conducteur',
+          subtitle: document.nom,
+          tag: days < 0
+              ? 'Échu'
+              : days == 0
+                  ? 'Aujourd’hui'
+                  : 'J-$days',
+          severity: days < 0
+              ? DashboardAlertSeverity.danger
+              : DashboardAlertSeverity.warning,
+          dueDate: expirationDate,
+          icon: FluentIcons.people,
+        ),
+      );
+    }
+
     for (final vehicle in vehicles) {
       final currentMileage = vehicle.currentMileage;
       final nextService = vehicle.nextServiceMileage;
@@ -910,7 +1302,7 @@ class _DashboardState extends State<Dashboard>
       return (a.dueDate ?? DateTime(9999))
           .compareTo(b.dueDate ?? DateTime(9999));
     });
-    return alerts.take(6).toList(growable: false);
+    return alerts.take(8).toList(growable: false);
   }
 
   legacy.Vehicle? _findVehicle(
