@@ -332,41 +332,16 @@ class _PlatformCompaniesScreenState extends State<PlatformCompaniesScreen> {
               horizontalPadding,
               compact ? ParcotoTokens.space2 : ParcotoTokens.space3,
             ),
-            child: compact
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'PARCOTO  /  ADMINISTRATION',
-                        style: FluentTheme.of(context).typography.caption?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.1,
-                              color: FluentTheme.of(context).inactiveColor,
-                            ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        'Gestion des entreprises',
-                        style: FluentTheme.of(context).typography.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Entreprises clientes, administrateurs et licences.',
-                        style: FluentTheme.of(context).typography.caption,
-                      ),
-                    ],
-                  )
-                : ModuleDashboardHeader(
-                    title: 'Plateforme Parcoto',
-                    subtitle: 'Provisionnement et suivi commercial des entreprises clientes.',
-                    eyebrow: 'Parcoto / Platform administration',
-                    heroTitle: 'Gestion des entreprises',
-                    heroDescription:
-                        'Créez les entreprises, provisionnez leur premier administrateur et définissez les limites contractuelles de chaque licence.',
-                    icon: FluentIcons.cloud,
-                  ),
+            child: ModuleDashboardHeader(
+              title: 'Plateforme Parcoto',
+              subtitle:
+                  'Provisionnement et suivi commercial des entreprises clientes.',
+              eyebrow: 'Parcoto / Platform administration',
+              heroTitle: 'Gestion des entreprises',
+              heroDescription:
+                  'Créez les entreprises, provisionnez leur premier administrateur et définissez les limites contractuelles de chaque licence.',
+              icon: FluentIcons.cloud,
+            ),
           );
 
           final metricWidth =
