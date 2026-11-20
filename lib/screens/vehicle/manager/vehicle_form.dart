@@ -1681,11 +1681,6 @@ class _VehicleFormState extends State<VehicleForm>
                           '';
                     });
                   },
-                  onChanged: (s, r) {
-                    if (r == TextChangedReason.userInput) {
-                      setState(() => wilayaCont.text = s);
-                    }
-                  },
                 )),
               ),
             ],
@@ -1736,11 +1731,6 @@ class _VehicleFormState extends State<VehicleForm>
                   onSelected: (item) {
                     setState(() => dairaCont.text = item.value ?? "");
                   },
-                  onChanged: (s, r) {
-                    if (r == TextChangedReason.userInput) {
-                      setState(() => dairaCont.text = s);
-                    }
-                  },
                 )),
               ),
               Text('commune', style: formHintStyle).tr(),
@@ -1774,11 +1764,6 @@ class _VehicleFormState extends State<VehicleForm>
                   }).toList(),
                   onSelected: (item) {
                     setState(() => communeCont.text = item.value ?? "");
-                  },
-                  onChanged: (s, r) {
-                    if (r == TextChangedReason.userInput) {
-                      setState(() => communeCont.text = s);
-                    }
                   },
                 )),
               ),
