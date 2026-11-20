@@ -52,6 +52,8 @@ class StateFormState extends State<StateForm> {
   int type = 0;
   double valeur = 0;
   String remarque = '';
+  late final TextEditingController remarqueController;
+  late final TextEditingController valeurController;
 
   DateTime date = DateTime.now();
   Reparation? selectedReparation;
@@ -64,8 +66,17 @@ class StateFormState extends State<StateForm> {
 
   @override
   void initState() {
-    initValues();
     super.initState();
+    initValues();
+    remarqueController = TextEditingController(text: remarque);
+    valeurController = TextEditingController(text: valeur.toStringAsFixed(2));
+  }
+
+  @override
+  void dispose() {
+    remarqueController.dispose();
+    valeurController.dispose();
+    super.dispose();
   }
 
   void initValues() {
@@ -282,7 +293,7 @@ class StateFormState extends State<StateForm> {
                     color: appTheme.color.lightest,
                   ),
                   title: ParcotoTextBox(
-                    controller: TextEditingController(text: remarque),
+                    controller: remarqueController,
                     onChanged: (String value) {
                       remarque = value;
                     },
@@ -341,10 +352,19 @@ class StateFormState extends State<StateForm> {
                               },
                             );
 
-                            setState(() {
-                              valeur =
-                                  selectedReparation?.getPrixTTC() ?? valeur;
-                            });
+                            final repairAmount =
+                                selectedReparation?.getPrixTTC();
+                            if (repairAmount != null) {
+                              valeur = repairAmount;
+                              final text = valeur.toStringAsFixed(2);
+                              valeurController.value = TextEditingValue(
+                                text: text,
+                                selection: TextSelection.collapsed(
+                                  offset: text.length,
+                                ),
+                              );
+                            }
+                            setState(() {});
                           },
                   ),
                 if (type == 2) const Divider(),
@@ -356,9 +376,7 @@ class StateFormState extends State<StateForm> {
                       color: appTheme.color.lightest,
                     ),
                     title: ParcotoTextBox(
-                      controller: TextEditingController(
-                        text: valeur.toStringAsFixed(2),
-                      ),
+                      controller: valeurController,
                       onChanged: (String value) {
                         valeur = double.tryParse(value) ?? 0;
                       },
