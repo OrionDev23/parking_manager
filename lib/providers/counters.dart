@@ -105,6 +105,14 @@ class DatabaseCounters {
       }
       return List<Vehicle>.unmodifiable(VehicleProvider.vehicles.values);
     } finally {
+      // VehicleProvider starts the document refresh in its constructor too.
+      // Wait for that task before disposing this short-lived provider so its
+      // completion callback cannot notify a disposed ChangeNotifier.
+      try {
+        await provider.getVehicleDocsCount();
+      } catch (_) {
+        // Vehicle document failures do not invalidate the vehicle snapshot.
+      }
       provider.dispose();
     }
   }
