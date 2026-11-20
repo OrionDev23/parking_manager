@@ -5,7 +5,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../widgets/empty_table_widget.dart';
 
@@ -154,7 +153,7 @@ class _ResetScreenState extends State<ResetScreen> {
                     ),
                     const SizedBox(height: 12),
                     if (!signedIn && error.isNotEmpty)
-                      Text(error, style: const TextStyle(color: Colors.red)),
+                      Text(error, style: TextStyle(color: Colors.red)),
                 ],
               ),
             ),
