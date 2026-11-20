@@ -1,10 +1,8 @@
-import 'dart:io';
 import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 
 import 'package:appwrite/appwrite.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/foundation.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -32,29 +30,6 @@ class _ResetScreenState extends State<ResetScreen> {
 
   bool validPassword = false;
 
-  @override
-  void initState() {
-    adjustSize();
-    super.initState();
-  }
-
-  void adjustSize() {
-    if (kIsWeb) {
-      pheight = 80.h;
-    } else {
-      if (Platform.isAndroid || Platform.isIOS) {
-        pwidth = 80.w;
-        pheight = 50.h;
-      } else {
-        pwidth = 20.w;
-        pheight = 35.h;
-      }
-    }
-  }
-
-  double pwidth = 20.w;
-  double pheight = 35.h;
-
   String get userId => Uri.base.queryParameters['userId'] ?? '';
 
   String get projectId => Uri.base.queryParameters['projectid'] ?? '';
@@ -65,11 +40,9 @@ class _ResetScreenState extends State<ResetScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (MediaQuery.of(context).orientation == Orientation.portrait) {
-      pwidth = 60.w;
-    } else {
-      pwidth = 30.w;
-    }
+    final screenSize = MediaQuery.sizeOf(context);
+    final formWidth = (screenSize.width - 32).clamp(280.0, 460.0).toDouble();
+    final formHeight = (screenSize.height - 160).clamp(320.0, 480.0).toDouble();
     var appTheme = context.watch<AppTheme>();
     if (done) {
       return NoDataWidget(
@@ -89,8 +62,8 @@ class _ResetScreenState extends State<ResetScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               alignment: Alignment.center,
-              width: pwidth,
-              height: pheight,
+              width: formWidth,
+              height: formHeight,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: appTheme.mode == ThemeMode.dark
@@ -108,7 +81,7 @@ class _ResetScreenState extends State<ResetScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(
-                    width: pwidth,
+                    width: double.infinity,
                     child: ParcotoTextBox(
                       controller: password,
                       placeholder: 'motdepasse'.tr(),
@@ -145,7 +118,7 @@ class _ResetScreenState extends State<ResetScreen> {
                   ),
                   SizedBox(height: 2.h),
                   SizedBox(
-                    width: pwidth,
+                    width: double.infinity,
                     child: ParcotoTextBox(
                       controller: passwordConfirmation,
                       placeholder: 'confirmation'.tr(),
