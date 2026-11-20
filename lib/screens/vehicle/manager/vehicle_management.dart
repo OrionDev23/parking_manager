@@ -36,6 +36,7 @@ class VehicleManagementState extends State<VehicleManagement>
   @override
   void initState() {
     super.initState();
+    VehicleTabsState.currentIndex.addListener(_handleEditorTabChanged);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (!VehicleProvider.downloadedVehicles &&
@@ -45,8 +46,14 @@ class VehicleManagementState extends State<VehicleManagement>
     });
   }
 
+  void _handleEditorTabChanged() {
+    if (!mounted || VehicleTabsState.currentIndex.value != 0) return;
+    context.read<VehicleProvider>().refreshVehicles();
+  }
+
   @override
   void dispose() {
+    VehicleTabsState.currentIndex.removeListener(_handleEditorTabChanged);
     searchController.dispose();
     super.dispose();
   }
@@ -230,7 +237,7 @@ class VehicleManagementState extends State<VehicleManagement>
     final availableState = conducteurEmploye ? 0 : 5;
     final issueStates = conducteurEmploye ? const [1, 2] : const [6, 7];
     final available = vehicles
-        .where((vehicle) => (vehicle.etatactuel ?? 0) == availableState)
+        .where((vehicle) => (vehicle.etatactuel ?? (conducteurEmploye ? 0 : 5)) == availableState)
         .length;
     final attention = vehicles
         .where((vehicle) => issueStates.contains(vehicle.etatactuel))
@@ -464,7 +471,7 @@ class VehicleManagementState extends State<VehicleManagement>
     final query = searchQuery.trim().toLowerCase();
     return VehicleProvider.vehicles.values.where((vehicle) {
       if (selectedState != null &&
-          (vehicle.etatactuel ?? 0) != selectedState) {
+          (vehicle.etatactuel ?? (conducteurEmploye ? 0 : 5)) != selectedState) {
         return false;
       }
       if (selectedBrand != null &&
@@ -676,7 +683,7 @@ class _VehicleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = context.watch<AppTheme>();
-    final status = vehicle.etatactuel ?? 0;
+    final status = vehicle.etatactuel ?? (conducteurEmploye ? 0 : 5);
     final statusColor = _statusColor(status);
     final brand = VehiclesUtilities.getMarqueName(vehicle.marque);
     final model = vehicle.type?.trim().isNotEmpty == true
@@ -813,7 +820,7 @@ class _VehicleCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Icon(
-                          FluentIcons.contact,
+                          FluentIcons.people,
                           size: 14,
                           color: theme.mutedTextColor,
                         ),

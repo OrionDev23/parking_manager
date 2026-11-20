@@ -48,7 +48,7 @@ class VehicleDashboard extends StatelessWidget {
             child: ValueListenableBuilder<int>(
               valueListenable: selectedSection,
               builder: (context, section, _) => IndexedStack(
-                index: section.clamp(0, 2),
+                index: section.clamp(0, 2).toInt(),
                 children: const [
                   VehicleTabs(),
                   DocumentTabs(),
@@ -259,7 +259,7 @@ class _VehicleReferencesWorkspace extends StatelessWidget {
           child: ValueListenableBuilder<int>(
             valueListenable: VehicleDashboard.selectedReference,
             builder: (context, selected, _) => IndexedStack(
-              index: selected.clamp(0, 1),
+              index: selected.clamp(0, 1).toInt(),
               children: const [
                 BrandList(),
                 StateTabs(),
