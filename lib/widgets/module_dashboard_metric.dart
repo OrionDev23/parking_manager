@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/client_database.dart';
 import '../theme.dart';
+import '../ui/design_system/parcoto_tokens.dart';
 
 /// A compact business KPI card with explicit loading, failure and retry states.
 class ModuleDashboardMetric extends StatefulWidget {
@@ -76,11 +77,11 @@ class _ModuleDashboardMetricState extends State<ModuleDashboardMetric> {
     return SizedBox(
       width: widget.width,
       child: Container(
-        constraints: const BoxConstraints(minHeight: 94),
-        padding: const EdgeInsets.all(15),
+        constraints: const BoxConstraints(minHeight: 96),
+        padding: const EdgeInsets.all(ParcotoTokens.space4),
         decoration: BoxDecoration(
           color: theme.surfaceColor,
-          borderRadius: BorderRadius.circular(13),
+          borderRadius: BorderRadius.circular(theme.cardRadius),
           border: Border.all(color: theme.borderColor),
           boxShadow: [theme.surfaceShadow],
         ),
@@ -103,7 +104,7 @@ class _ModuleDashboardMetricState extends State<ModuleDashboardMetric> {
                   height: 42,
                   decoration: BoxDecoration(
                     color: theme.color.withValues(alpha: .13),
-                    borderRadius: BorderRadius.circular(11),
+                    borderRadius: BorderRadius.circular(theme.controlRadius),
                   ),
                   alignment: Alignment.center,
                   child: Icon(
@@ -112,7 +113,7 @@ class _ModuleDashboardMetricState extends State<ModuleDashboardMetric> {
                     size: 20,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: ParcotoTokens.space3),
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -133,7 +134,7 @@ class _ModuleDashboardMetricState extends State<ModuleDashboardMetric> {
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: ParcotoTokens.space2),
                       Text(
                         widget.label,
                         maxLines: 1,
@@ -144,7 +145,7 @@ class _ModuleDashboardMetricState extends State<ModuleDashboardMetric> {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 1),
                       Text(
                         failed ? 'Données indisponibles' : widget.detail,
                         maxLines: 1,
