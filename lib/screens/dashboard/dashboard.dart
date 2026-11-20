@@ -412,8 +412,8 @@ class _DashboardState extends State<Dashboard>
   Widget _buildBusinessWidgetsLayout() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final columns = constraints.maxWidth >= 1180
-            ? 3
+        final columns = constraints.maxWidth >= 1500
+            ? 4
             : constraints.maxWidth >= 760
                 ? 2
                 : 1;
@@ -458,6 +458,17 @@ class _DashboardState extends State<Dashboard>
                 trailing: _viewAllButton('workshop-stock'),
                 child: InventoryExpiryWidget(
                   summary: _snapshot.inventory,
+                ),
+              ),
+            ),
+            SizedBox(
+              width: width,
+              child: DashboardPanel(
+                title: 'Documents à renouveler',
+                icon: FluentIcons.document_set,
+                height: 292,
+                child: ExpiringDocumentsWidget(
+                  summary: _snapshot.documents,
                 ),
               ),
             ),
@@ -835,6 +846,7 @@ class _DashboardState extends State<Dashboard>
           ..sort((a, b) => _activityDate(b).compareTo(_activityDate(a)));
 
     final alerts = _buildAlerts(vehicles, now);
+    final documents = _buildDocumentSummary(vehicles, now);
 
     return DashboardSnapshot(
       vehicleCount: vehicles.length,
@@ -851,6 +863,7 @@ class _DashboardState extends State<Dashboard>
       driverStatus: driverStatus,
       repairPipeline: repairPipeline,
       inventory: inventory,
+      documents: documents,
     );
   }
 
@@ -1197,70 +1210,33 @@ class _DashboardState extends State<Dashboard>
     });
   }
 
-  List<DashboardAlert> _buildAlerts(
+  DashboardDocumentSummary _buildDocumentSummary(
     List<legacy.Vehicle> vehicles,
     DateTime now,
   ) {
-    final alerts = <DashboardAlert>[];
     final today = DateTime(now.year, now.month, now.day);
     final horizon = today.add(const Duration(days: 45));
+    final alerts = <DashboardDocumentAlert>[];
 
-    for (final document in VehicleProvider.documentsVehicules.values) {
-      final expiration = document.dateExpiration;
-      if (expiration == null) continue;
-      // Expiration dates are calendar dates. A document expiring today must
-      // not be marked overdue merely because its stored time is midnight.
-      final expirationDate = DateTime(
+    void addAlert({
+      required String owner,
+      required String documentName,
+      required DateTime expiration,
+      required IconData icon,
+    }) {
+      final date = DateTime(
         expiration.year,
         expiration.month,
         expiration.day,
       );
-      if (expirationDate.isAfter(horizon)) continue;
-
-      final vehicle = _findVehicle(
-        vehicles,
-        id: document.vehicle,
-        registration: document.vehiclemat,
-      );
-      final days = expirationDate.difference(today).inDays;
-      final overdue = days < 0;
+      if (date.isAfter(horizon)) return;
+      final days = date.difference(today).inDays;
       alerts.add(
-        DashboardAlert(
-          title: vehicle?.matricule ??
-              document.vehiclemat ??
-              document.nom,
-          subtitle: document.nom,
-          tag: overdue
-              ? 'Échu'
-              : days == 0
-                  ? 'Aujourd’hui'
-                  : 'J-$days',
-          severity: overdue
-              ? DashboardAlertSeverity.danger
-              : DashboardAlertSeverity.warning,
-          dueDate: expirationDate,
-        ),
-      );
-    }
-
-    for (final document in DriverProvider.documentConducteurs.values) {
-      final expiration = document.dateExpiration;
-      if (expiration == null) continue;
-      final expirationDate = DateTime(
-        expiration.year,
-        expiration.month,
-        expiration.day,
-      );
-      if (expirationDate.isAfter(horizon)) continue;
-
-      final driver = DriverProvider.conducteurs[document.chauffeur];
-      final days = expirationDate.difference(today).inDays;
-      alerts.add(
-        DashboardAlert(
-          title: driver?.getName() ??
-              document.chauffeurNom ??
-              'Conducteur',
-          subtitle: document.nom,
+        DashboardDocumentAlert(
+          title: owner.trim().isEmpty ? 'Document sans titulaire' : owner,
+          subtitle: documentName.trim().isEmpty
+              ? 'Document administratif'
+              : documentName,
           tag: days < 0
               ? 'Échu'
               : days == 0
@@ -1269,11 +1245,70 @@ class _DashboardState extends State<Dashboard>
           severity: days < 0
               ? DashboardAlertSeverity.danger
               : DashboardAlertSeverity.warning,
-          dueDate: expirationDate,
-          icon: FluentIcons.people,
+          dueDate: date,
+          icon: icon,
         ),
       );
     }
+
+    for (final document in VehicleProvider.documentsVehicules.values) {
+      final expiration = document.dateExpiration;
+      if (expiration == null) continue;
+      final vehicle = _findVehicle(
+        vehicles,
+        id: document.vehicle,
+        registration: document.vehiclemat,
+      );
+      addAlert(
+        owner: vehicle?.matricule ??
+            document.vehiclemat ??
+            document.nom,
+        documentName: document.nom,
+        expiration: expiration,
+        icon: FluentIcons.car,
+      );
+    }
+
+    for (final document in DriverProvider.documentConducteurs.values) {
+      final expiration = document.dateExpiration;
+      if (expiration == null) continue;
+      final driver = DriverProvider.conducteurs[document.chauffeur];
+      addAlert(
+        owner: driver?.getName() ??
+            document.chauffeurNom ??
+            'Conducteur',
+        documentName: document.nom,
+        expiration: expiration,
+        icon: FluentIcons.people,
+      );
+    }
+
+    alerts.sort((a, b) {
+      final severity = a.severity.index.compareTo(b.severity.index);
+      if (severity != 0) return severity;
+      return a.dueDate.compareTo(b.dueDate);
+    });
+
+    return DashboardDocumentSummary(
+      expiredCount: alerts.where(
+        (alert) => alert.severity == DashboardAlertSeverity.danger,
+      ).length,
+      expiringCount: alerts.where(
+        (alert) => alert.severity == DashboardAlertSeverity.warning,
+      ).length,
+      verified: VehicleProvider.downloadedDocuments &&
+          DriverProvider.downloadedDocuments,
+      alerts: alerts.take(12).toList(growable: false),
+    );
+  }
+
+  List<DashboardAlert> _buildAlerts(
+    List<legacy.Vehicle> vehicles,
+    DateTime now,
+  ) {
+    final alerts = <DashboardAlert>[];
+    final today = DateTime(now.year, now.month, now.day);
+    final horizon = today.add(const Duration(days: 45));
 
     for (final vehicle in vehicles) {
       final currentMileage = vehicle.currentMileage;
