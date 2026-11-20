@@ -318,7 +318,8 @@ class FicheReceptionFormState extends State<FicheReceptionForm>
     var appTheme = context.watch<AppTheme>();
     final screenSize = MediaQuery.sizeOf(context);
     final compact = screenSize.width < 760;
-    final portrait = screenSize.height >= screenSize.width;
+    // Keep image layout width-driven; the mobile keyboard reduces viewport height.
+    final portrait = screenSize.width < 640;
     return ScaffoldPage(
       content: Container(
         padding: const EdgeInsets.all(10),
