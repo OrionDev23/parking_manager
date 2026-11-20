@@ -1,5 +1,8 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
+import '../../theme.dart';
 
 /// Shared Parcoto field layout. Use this wrapper for text inputs, selectors,
 /// date pickers and other form controls so labels and spacing stay consistent.
@@ -118,7 +121,8 @@ class ParcotoTextBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = FluentTheme.of(context);
-    final border = theme.inactiveColor.withValues(alpha: .30);
+    final appTheme = context.watch<AppTheme>();
+    final border = appTheme.borderColor.withValues(alpha: .65);
     return SizedBox(
       height: maxLines == 1 ? 44 : null,
       child: TextBox(
@@ -147,8 +151,8 @@ class ParcotoTextBox extends StatelessWidget {
         suffix: suffix,
         obscureText: obscureText,
         decoration: WidgetStatePropertyAll(BoxDecoration(
-          color: theme.inactiveBackgroundColor,
-          borderRadius: BorderRadius.circular(9),
+          color: appTheme.fillColor,
+          borderRadius: BorderRadius.circular(appTheme.controlRadius),
           border: Border.all(color: border),
         )),
       ),
@@ -173,14 +177,15 @@ class ParcotoFieldSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = FluentTheme.of(context);
+    final appTheme = context.watch<AppTheme>();
     return ConstrainedBox(
       constraints: BoxConstraints(minHeight: minHeight ?? 0),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: theme.inactiveBackgroundColor,
-          borderRadius: BorderRadius.circular(9),
+          color: appTheme.fillColor,
+          borderRadius: BorderRadius.circular(appTheme.controlRadius),
           border: Border.all(
-            color: theme.inactiveColor.withValues(alpha: .30),
+            color: appTheme.borderColor.withValues(alpha: .65),
           ),
         ),
         child: Padding(
