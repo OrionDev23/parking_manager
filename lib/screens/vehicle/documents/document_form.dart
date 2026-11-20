@@ -84,9 +84,16 @@ class DocumentFormState extends State<DocumentForm>
     var appTheme = context.watch<AppTheme>();
     final screenSize = MediaQuery.sizeOf(context);
     final formWidth = (screenSize.width - 32).clamp(0.0, 420.0).toDouble();
-    final formHeight = (screenSize.height - 100).clamp(320.0, 500.0).toDouble();
-    final panelHeight = (formHeight - 80).clamp(240.0, 300.0).toDouble();
-    return SizedBox(
+    final compact = screenSize.width < 640;
+    // Keep the form's internal geometry stable. On mobile, the scroll
+    // viewport shrinks when the virtual keyboard opens; the fields must not.
+    final formHeight = compact
+        ? 500.0
+        : (screenSize.height - 100).clamp(320.0, 500.0).toDouble();
+    final panelHeight = compact
+        ? 300.0
+        : (formHeight - 80).clamp(240.0, 300.0).toDouble();
+    final content = SizedBox(
       width: formWidth,
       height: formHeight,
       child: Column(
@@ -219,6 +226,12 @@ class DocumentFormState extends State<DocumentForm>
         ],
       ),
     );
+    return compact
+        ? SingleChildScrollView(
+            padding: const EdgeInsets.all(8),
+            child: content,
+          )
+        : content;
   }
 
   @override
