@@ -219,12 +219,22 @@ class _CompanyWorkspaceSwitcherState extends State<CompanyWorkspaceSwitcher> {
       builder: (dialogContext) {
         final theme = context.read<AppTheme>();
         final currentCompanyId = authService.session?.company.companyId;
+        final screenSize = MediaQuery.sizeOf(dialogContext);
+        final contentWidth =
+            (screenSize.width - 64).clamp(220.0, 380.0).toDouble();
+        final contentHeight =
+            (screenSize.height - 180).clamp(180.0, 408.0).toDouble();
+
         return ContentDialog(
           title: const Text('Changer d’entreprise'),
+          constraints: BoxConstraints(
+            maxWidth: contentWidth + 40,
+            maxHeight: contentHeight + 120,
+          ),
           content: SizedBox(
-            width: 380,
+            width: contentWidth,
             height: (memberships.length * 68.0)
-                .clamp(76.0, 408.0)
+                .clamp(76.0, contentHeight)
                 .toDouble(),
             child: ListView.separated(
               shrinkWrap: true,
