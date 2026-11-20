@@ -27,15 +27,19 @@ class _BrandListState extends State<BrandList> {
       header: PageTitle(text: 'brandlist'.tr()),
       content: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SizedBox(
-                  width: 350.px,
-                  height: 45.px,
-                  child: ParcotoTextBox(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final searchWidth = (constraints.maxWidth - 20)
+                  .clamp(140.0, 350.0)
+                  .toDouble();
+              return Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: SizedBox(
+                    width: searchWidth,
+                    height: 45.px,
+                    child: ParcotoTextBox(
                     controller: searchController,
                     placeholder: 'search'.tr(),
                     style: appTheme.writingStyle,
@@ -62,24 +66,32 @@ class _BrandListState extends State<BrandList> {
                           )
                         : null,
                   ),
+                    ),
+                  ),
                 ),
-              ],
-            ),
+              );
+            },
           ),
           Flexible(
-            child: GridView(
-              padding: const EdgeInsets.all(10),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount:
-                    MediaQuery.of(context).orientation == Orientation.portrait
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final crossAxisCount = constraints.maxWidth < 520
                     ? 2
-                    : 4,
-                crossAxisSpacing: 5,
-                mainAxisSpacing: 5,
-              ),
-              children: marquesSearched()
-                  .map((e) => BrandContainer(key: ValueKey(e), id: e))
-                  .toList(),
+                    : constraints.maxWidth < 900
+                    ? 3
+                    : 4;
+                return GridView(
+                  padding: const EdgeInsets.all(10),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  children: marquesSearched()
+                      .map((e) => BrandContainer(key: ValueKey(e), id: e))
+                      .toList(),
+                );
+              },
             ),
           ),
         ],
