@@ -11,6 +11,14 @@ import '../../../theme.dart';
 import '../../../widgets/zone_box.dart';
 import '../manager/vehicles_table.dart';
 
+Size _responsiveDocumentSelectorSize(BuildContext context) {
+  final screenSize = MediaQuery.sizeOf(context);
+  return Size(
+    (screenSize.width - 32).clamp(0.0, 700.0).toDouble(),
+    (screenSize.height - 80).clamp(0.0, 550.0).toDouble(),
+  );
+}
+
 class DocumentForm extends StatefulWidget {
   final DocumentVehicle? vd;
   final Vehicle? vehicle;
@@ -75,9 +83,13 @@ class DocumentFormState extends State<DocumentForm>
   Widget build(BuildContext context) {
     super.build(context);
     var appTheme = context.watch<AppTheme>();
+    final screenSize = MediaQuery.sizeOf(context);
+    final formWidth = (screenSize.width - 32).clamp(0.0, 420.0).toDouble();
+    final formHeight = (screenSize.height - 100).clamp(320.0, 500.0).toDouble();
+    final panelHeight = (formHeight - 80).clamp(240.0, 300.0).toDouble();
     return SizedBox(
-      width: 420.px,
-      height: 500.px,
+      width: formWidth,
+      height: formHeight,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -89,8 +101,8 @@ class DocumentFormState extends State<DocumentForm>
               borderRadius: BorderRadius.circular(10),
             ),
             padding: const EdgeInsets.all(5),
-            width: 420.px,
-            height: 300.px,
+            width: formWidth,
+            height: panelHeight,
             child: Column(
               children: [
                 Flexible(
@@ -117,7 +129,7 @@ class DocumentFormState extends State<DocumentForm>
                                   builder: (context) {
                                     return ContentDialog(
                                       constraints: BoxConstraints.tight(
-                                        Size(700.px, 550.px),
+                                        _responsiveDocumentSelectorSize(context),
                                       ),
                                       title: const Text('selectvehicle').tr(),
                                       style: ContentDialogThemeData(
