@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/client_database.dart';
 import '../theme.dart';
+import '../ui/design_system/parcoto_surface.dart';
 import '../ui/design_system/parcoto_tokens.dart';
 
 /// A compact business KPI card with explicit loading, failure and retry states.
@@ -76,101 +77,99 @@ class _ModuleDashboardMetricState extends State<ModuleDashboardMetric> {
 
     return SizedBox(
       width: widget.width,
-      child: Container(
+      child: ConstrainedBox(
         constraints: const BoxConstraints(minHeight: 96),
-        padding: const EdgeInsets.all(ParcotoTokens.space4),
-        decoration: BoxDecoration(
-          color: theme.surfaceColor,
-          borderRadius: BorderRadius.circular(theme.cardRadius),
-          border: Border.all(color: theme.borderColor),
-          boxShadow: [theme.surfaceShadow],
-        ),
-        child: FutureBuilder<int>(
-          future: _value,
-          builder: (context, snapshot) {
-            final failed = snapshot.hasError;
-            final loading =
-                snapshot.connectionState == ConnectionState.waiting;
-            final value = loading
-                ? null
-                : failed
-                    ? null
-                    : snapshot.data;
+        child: ParcotoSurface(
+          padding: const EdgeInsets.all(ParcotoTokens.space4),
+          radius: theme.cardRadius,
+          elevated: true,
+          child: FutureBuilder<int>(
+            future: _value,
+            builder: (context, snapshot) {
+              final failed = snapshot.hasError;
+              final loading =
+                  snapshot.connectionState == ConnectionState.waiting;
+              final value = loading
+                  ? null
+                  : failed
+                      ? null
+                      : snapshot.data;
 
-            return Row(
-              children: [
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: theme.color.withValues(alpha: .13),
-                    borderRadius: BorderRadius.circular(theme.controlRadius),
-                  ),
-                  alignment: Alignment.center,
-                  child: Icon(
-                    widget.icon,
-                    color: theme.color,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: ParcotoTokens.space3),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (loading)
-                        const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: ProgressRing(),
-                        )
-                      else
-                        Text(
-                          value?.toString() ?? '—',
-                          style: TextStyle(
-                            color: theme.textColor,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      const SizedBox(height: ParcotoTokens.space2),
-                      Text(
-                        widget.label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: theme.textColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 1),
-                      Text(
-                        failed ? 'Données indisponibles' : widget.detail,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: failed
-                              ? const Color(0xFFE6A23C)
-                              : theme.mutedTextColor,
-                          fontSize: 9,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (failed || widget.onRefresh != null)
-                  Tooltip(
-                    message: failed ? 'Réessayer' : 'Actualiser',
-                    child: IconButton(
-                      icon: const Icon(FluentIcons.refresh, size: 13),
-                      onPressed: loading ? null : _retry,
+              return Row(
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: theme.color.withValues(alpha: .13),
+                      borderRadius: BorderRadius.circular(theme.controlRadius),
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      widget.icon,
+                      color: theme.color,
+                      size: 20,
                     ),
                   ),
-              ],
-            );
-          },
+                  const SizedBox(width: ParcotoTokens.space3),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (loading)
+                          const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: ProgressRing(),
+                          )
+                        else
+                          Text(
+                            value?.toString() ?? '—',
+                            style: TextStyle(
+                              color: theme.textColor,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        const SizedBox(height: ParcotoTokens.space2),
+                        Text(
+                          widget.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: theme.textColor,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 1),
+                        Text(
+                          failed ? 'Données indisponibles' : widget.detail,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: failed
+                                ? const Color(0xFFE6A23C)
+                                : theme.mutedTextColor,
+                            fontSize: 9,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (failed || widget.onRefresh != null)
+                    Tooltip(
+                      message: failed ? 'Réessayer' : 'Actualiser',
+                      child: IconButton(
+                        icon: const Icon(FluentIcons.refresh, size: 13),
+                        onPressed: loading ? null : _retry,
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
