@@ -3,6 +3,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import '../../providers/counters.dart';
+import '../../ui/design_system/parcoto_tokens.dart';
 import '../../widgets/module_dashboard_action.dart';
 import '../../widgets/module_dashboard_header.dart';
 import '../../widgets/module_dashboard_metric.dart';
@@ -94,7 +95,7 @@ class VehicleDashboard extends StatelessWidget {
       padding: EdgeInsets.zero,
       content: LayoutBuilder(
         builder: (context, constraints) {
-          final compact = constraints.maxWidth < 760;
+          final compact = constraints.maxWidth < ParcotoTokens.tabletBreakpoint;
           final moduleActions = <Widget>[
             ModuleDashboardAction(
               label: 'gestionvehicles'.tr(),
@@ -142,8 +143,8 @@ class VehicleDashboard extends StatelessWidget {
 
           return ListView(
             padding: EdgeInsets.symmetric(
-              horizontal: compact ? 14 : 28,
-              vertical: 22,
+              horizontal: compact ? ParcotoTokens.space4 : ParcotoTokens.space8,
+              vertical: ParcotoTokens.space6,
             ),
             children: [
               ModuleDashboardHeader(
@@ -235,8 +236,8 @@ class VehicleDashboard extends StatelessWidget {
               ),
               StaggeredGrid.count(
                 crossAxisCount: compact ? 1 : 2,
-                mainAxisSpacing: 14,
-                crossAxisSpacing: 14,
+                mainAxisSpacing: ParcotoTokens.space3,
+                crossAxisSpacing: ParcotoTokens.space3,
                 children: [
                   ModuleDashboardPanel(
                     title: 'Activité récente',
