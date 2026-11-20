@@ -27,7 +27,65 @@ class VehicleDamageGts extends StatefulWidget {
 class _VehicleDamageState extends State<VehicleDamageGts> {
   @override
   Widget build(BuildContext context) {
-    var appTheme = context.watch<AppTheme>();
+    final appTheme = context.watch<AppTheme>();
+    final compact = MediaQuery.sizeOf(context).width < 760;
+
+    if (compact) {
+      // Stack the three comment panels and the diagram vertically. The old
+      // side-by-side 60.w + 222px layout overflowed on phones and its 65.h
+      // height collapsed whenever the mobile browser keyboard opened.
+      return Container(
+        width: double.infinity,
+        decoration: BoxDecoration(border: Border.all()),
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildCompactCommentRow(
+              table: firstTable(appTheme),
+              controller: widget.etatVehicle.cabineController,
+              onChanged: (value) => widget.etatVehicle.cabineCom = value,
+              maxLines: 4,
+            ),
+            const SizedBox(height: 12),
+            _buildCompactCommentRow(
+              table: secondTable(appTheme),
+              controller: widget.etatVehicle.extAvController,
+              onChanged: (value) =>
+                  widget.etatVehicle.exterieurAvCom = value,
+              maxLines: 6,
+            ),
+            const SizedBox(height: 12),
+            _buildCompactCommentRow(
+              table: thirdTable(appTheme),
+              controller: widget.etatVehicle.extArController,
+              onChanged: (value) =>
+                  widget.etatVehicle.exterieurArCom = value,
+              maxLines: 6,
+            ),
+            const SizedBox(height: 20),
+            Center(child: vehicleDamage(appTheme)),
+            const SizedBox(height: 12),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                Button(
+                  onPressed: () => selectAllVehicleDamage(false),
+                  child: const Text('clear').tr(),
+                ),
+                FilledButton(
+                  onPressed: () => selectAllVehicleDamage(true),
+                  child: const Text('selectall').tr(),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
     return Container(
       decoration: BoxDecoration(border: Border.all()),
       width: 80.w,
@@ -135,6 +193,34 @@ class _VehicleDamageState extends State<VehicleDamageGts> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCompactCommentRow({
+    required Widget table,
+    required TextEditingController controller,
+    required ValueChanged<String> onChanged,
+    required int maxLines,
+  }) {
+    final fieldHeight = maxLines == 4 ? 120.0 : 160.0;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        table,
+        const SizedBox(width: 8),
+        Expanded(
+          child: SizedBox(
+            height: fieldHeight,
+            child: TextBox(
+              controller: controller,
+              placeholder: 'commentaires'.tr(),
+              maxLength: 300,
+              maxLines: maxLines,
+              onChanged: onChanged,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
