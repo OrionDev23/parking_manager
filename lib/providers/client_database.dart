@@ -90,6 +90,7 @@ class DatabaseGetter {
   static String? _activeCompanyProfileRowId;
   static int _projectGeneration = 0;
   static int _companyGeneration = 0;
+  static final ValueNotifier<int> companyRevisionListenable = ValueNotifier(0);
   static Map<String, int> _defaultLimits = {};
   static DateTime? companyLicenseStartsAt;
   static DateTime? companyLicenseExpiresAt;
@@ -105,6 +106,7 @@ class DatabaseGetter {
   static String? get activeCompanyId => _activeCompanyId;
   static String? get activeCompanyTeamId => _activeCompanyTeamId;
   static String? get activeCompanyProfileRowId => _activeCompanyProfileRowId;
+  static int get companyRevision => _companyGeneration;
 
   static bool _isCurrentCompany(String companyId, int generation) =>
       _activeCompanyId == companyId && _companyGeneration == generation;
@@ -149,6 +151,7 @@ class DatabaseGetter {
     _activeCompanyTeamId = teamId;
     _activeCompanyProfileRowId = profileRowId;
     _companyGeneration++;
+    companyRevisionListenable.value = _companyGeneration;
     MyEntrepriseState.p = null;
     MyEntrepriseState.logo = null;
     MyEntrepriseState.imageFile = null;
@@ -186,6 +189,7 @@ class DatabaseGetter {
   static void invalidatePendingRequests() {
     _projectGeneration++;
     _companyGeneration++;
+    companyRevisionListenable.value = _companyGeneration;
     gettingUser = false;
     settingSecretKey = false;
     MyEntrepriseState.downloading = false;
