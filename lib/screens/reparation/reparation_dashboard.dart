@@ -1,4 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import '../../providers/counters.dart';
+import '../../widgets/module_dashboard_metric.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -109,6 +111,48 @@ class ReparationDashboard extends StatelessWidget {
                 icon: FluentIcons.repair,
               ),
               const SizedBox(height: 24),
+              ModuleDashboardSectionHeader(
+                title: 'Indicateurs de maintenance',
+                subtitle:
+                    'Suivez le volume et la progression des ordres de réparation.',
+              ),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  ModuleDashboardMetric(
+                    label: 'Ordres de réparation',
+                    detail: 'Total enregistré',
+                    icon: FluentIcons.repair,
+                    loadValue: () => DatabaseCounters().countReparation(),
+                  ),
+                  ModuleDashboardMetric(
+                    label: 'En attente',
+                    detail: 'Ordres en attente',
+                    icon: FluentIcons.clock,
+                    loadValue: () => DatabaseCounters().countReparations(etat: 0),
+                  ),
+                  ModuleDashboardMetric(
+                    label: 'En cours',
+                    detail: 'Ordres en traitement',
+                    icon: FluentIcons.processing,
+                    loadValue: () => DatabaseCounters().countReparations(etat: 1),
+                  ),
+                  ModuleDashboardMetric(
+                    label: 'Terminés',
+                    detail: 'Ordres terminés',
+                    icon: FluentIcons.check_mark,
+                    loadValue: () => DatabaseCounters().countReparations(etat: 2),
+                  ),
+                  ModuleDashboardMetric(
+                    label: 'Prestataires',
+                    detail: 'Partenaires enregistrés',
+                    icon: FluentIcons.service_activity,
+                    loadValue: () => DatabaseCounters().countPrestataire(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 26),
               ModuleDashboardSectionHeader(
                 title: 'Actions de maintenance',
                 subtitle:
