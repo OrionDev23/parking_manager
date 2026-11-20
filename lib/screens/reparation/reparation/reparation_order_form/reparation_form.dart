@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:appwrite/appwrite.dart' hide Client;
 import 'package:parc_oto/widgets/forms/parcoto_form_field.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -52,6 +54,8 @@ class ReparationForm extends StatefulWidget {
 class ReparationFormState extends State<ReparationForm>
     with AutomaticKeepAliveClientMixin<ReparationForm> {
   static Map<Key, int> reservedOrders = {};
+  Timer? _orderNumberValidationTimer;
+  int _orderNumberValidationRevision = 0;
 
   EntretienVehicle entretienVehicle = EntretienVehicle();
   EtatVehicle etatVehicle = EtatVehicle();
@@ -185,44 +189,63 @@ class ReparationFormState extends State<ReparationForm>
     }
   }
 
-  Future<bool> testIfOrderNumberExists() async {
-    bool result = false;
+  /// Debounces the uniqueness query. The input stays focused while the
+  /// user types, and stale Appwrite responses cannot overwrite newer input.
+  void _scheduleOrderNumberValidation(String text) {
+    _orderNumberValidationTimer?.cancel();
+    final revision = ++_orderNumberValidationRevision;
+    final number = int.tryParse(text);
 
-    if (testIfReservedContained(int.parse(numOrdre.text))) {
-      setState(() {
-        errorNumOrder = true;
-      });
-      result = true;
-    } else {
-      result = await DatabaseGetter.database!
-          .listRows(
+    if (number == null) {
+      reservedOrders.remove(widget.key);
+      if (errorNumOrder) {
+        setState(() => errorNumOrder = false);
+      }
+      return;
+    }
+
+    _orderNumberValidationTimer = Timer(
+      const Duration(milliseconds: 350),
+      () async {
+        if (testIfReservedContained(number)) {
+          if (!mounted || revision != _orderNumberValidationRevision) return;
+          if (!errorNumOrder) {
+            setState(() => errorNumOrder = true);
+          }
+          return;
+        }
+
+        var duplicated = false;
+        try {
+          final result = await DatabaseGetter.database!.listRows(
             databaseId: databaseId,
             tableId: reparationId,
             queries: [
               Query.orderDesc('numero'),
-              Query.equal('numero', int.parse(numOrdre.text)),
+              Query.equal('numero', number),
               Query.limit(1),
             ],
-          )
-          .then((value) {
-            if (value.rows.length == 1) {
-              setState(() {
-                errorNumOrder = true;
-              });
-              return true;
-            } else {
-              setState(() {
-                errorNumOrder = false;
-              });
-              return false;
-            }
-          })
-          .onError((error, stackTrace) {
-            return Future.value(false);
-          });
-    }
+          );
+          duplicated = result.rows.isNotEmpty;
+        } catch (_) {
+          // A temporary network failure must not block the form, matching
+          // the previous behavior.
+        }
 
-    return result;
+        if (!mounted ||
+            revision != _orderNumberValidationRevision ||
+            numOrdre.text != text) {
+          return;
+        }
+
+        if (!duplicated) {
+          reservedOrders[widget.key!] = number;
+        }
+        if (errorNumOrder != duplicated) {
+          setState(() => errorNumOrder = duplicated);
+        }
+      },
+    );
   }
 
   bool testIfReservedContained(int value) {
@@ -334,15 +357,7 @@ class ReparationFormState extends State<ReparationForm>
                                             FilteringTextInputFormatter
                                                 .digitsOnly,
                                           ],
-                                          onChanged: (s) async {
-                                            if (s.isNotEmpty) {
-                                              if (!await testIfOrderNumberExists()) {
-                                                reservedOrders[widget.key!] =
-                                                    int.parse(s);
-                                                setState(() {});
-                                              }
-                                            }
-                                          },
+                                          onChanged: _scheduleOrderNumberValidation,
                                         ),
                                       ),
                                     ],
@@ -608,6 +623,8 @@ class ReparationFormState extends State<ReparationForm>
 
   @override
   void dispose() {
+    _orderNumberValidationTimer?.cancel();
+    _orderNumberValidationRevision++;
     reservedOrders.remove(widget.key);
     super.dispose();
   }
