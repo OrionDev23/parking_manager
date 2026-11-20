@@ -4,6 +4,8 @@ import '../../main.dart';
 
 import '../../core/tenancy/platform_companies_repository.dart';
 import '../../widgets/module_dashboard_header.dart';
+import '../../ui/design_system/parcoto_surface.dart';
+import '../../ui/design_system/parcoto_tokens.dart';
 
 class PlatformCompaniesScreen extends StatefulWidget {
   const PlatformCompaniesScreen({super.key});
@@ -622,10 +624,13 @@ class _MetricCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => Card(
-    child: Padding(
-      padding: EdgeInsets.all(compact ? 13 : 14),
-      child: Row(
+  Widget build(BuildContext context) => ParcotoSurface(
+    padding: EdgeInsets.all(
+      compact ? ParcotoTokens.space3 : ParcotoTokens.space4,
+    ),
+    radius: ParcotoTokens.radiusLarge,
+    elevated: true,
+    child: Row(
         children: [
           Icon(icon, size: 22),
           const SizedBox(width: 12),
@@ -640,7 +645,6 @@ class _MetricCard extends StatelessWidget {
           ),
         ],
       ),
-    ),
   );
 }
 
@@ -678,10 +682,11 @@ class _CompanyCard extends StatelessWidget {
     final maxEmployees = quotaValue('maxEmployees');
     final maxDrivers = quotaValue('maxDrivers');
     final maxSites = quotaValue('maxSites');
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    return ParcotoSurface(
+      padding: const EdgeInsets.all(ParcotoTokens.space4),
+      radius: ParcotoTokens.radiusLarge,
+      elevated: true,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             const Icon(FluentIcons.company_directory, size: 24),
             const SizedBox(width: 10),
@@ -779,7 +784,6 @@ class _CompanyCard extends StatelessWidget {
             Text(entitlement['notes'].toString()),
           ],
         ]),
-      ),
     );
   }
 }
