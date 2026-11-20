@@ -845,7 +845,7 @@ class _DashboardState extends State<Dashboard>
         LogProvider.activities.values.where((item) => item.createdAt != null || item.updatedAt != null).toList()
           ..sort((a, b) => _activityDate(b).compareTo(_activityDate(a)));
 
-    final alerts = _buildAlerts(vehicles, now);
+    final alerts = _buildAlerts(vehicles);
     final documents = _buildDocumentSummary(vehicles, now);
 
     return DashboardSnapshot(
@@ -1304,11 +1304,8 @@ class _DashboardState extends State<Dashboard>
 
   List<DashboardAlert> _buildAlerts(
     List<legacy.Vehicle> vehicles,
-    DateTime now,
   ) {
     final alerts = <DashboardAlert>[];
-    final today = DateTime(now.year, now.month, now.day);
-    final horizon = today.add(const Duration(days: 45));
 
     for (final vehicle in vehicles) {
       final currentMileage = vehicle.currentMileage;
