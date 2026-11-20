@@ -131,6 +131,7 @@ class PartsProvider extends ChangeNotifier {
     required void Function(bool) setError,
     required void Function(bool) setDownloading,
   }) async {
+    _ensureCompanyCache();
     final companyId = vehicleServices.companyId;
     final generation = _cacheGeneration;
     bool isCurrent() => _isCurrentCompany(companyId, generation);
@@ -319,6 +320,7 @@ class PartsProvider extends ChangeNotifier {
     required String id,
     required T Function(Map<String, dynamic>) decode,
   }) async {
+    _ensureCompanyCache();
     final companyId = vehicleServices.companyId;
     final generation = _cacheGeneration;
     // A queued deletion is a local tombstone: do not resurrect the remote
