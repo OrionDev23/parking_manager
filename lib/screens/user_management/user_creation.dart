@@ -93,6 +93,10 @@ class _UserFormState extends State<UserForm> {
       (screenSize.height - 80).clamp(320.0, 600.0).toDouble(),
     );
     return ContentDialog(
+      constraints: BoxConstraints(
+        maxWidth: (screenSize.width - 32).clamp(280.0, 480.0).toDouble(),
+        maxHeight: (screenSize.height - 48).clamp(320.0, 720.0).toDouble(),
+      ),
       title: Text(
         widget.user != null
             ? widget.user!.name.isNotEmpty
@@ -100,7 +104,8 @@ class _UserFormState extends State<UserForm> {
                   : widget.user!.email
             : 'newuser'.tr(),
       ),
-      content: Column(
+      content: SingleChildScrollView(
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -300,6 +305,7 @@ class _UserFormState extends State<UserForm> {
             ],
           ),
         ],
+        ),
       ),
       actions: [
         Button(
