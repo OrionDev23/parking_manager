@@ -1119,7 +1119,7 @@ class InventoryExpiryWidget extends StatelessWidget {
             const SizedBox(width: 7),
             Expanded(
               child: _InventoryCount(
-                label: 'Lots',
+                label: 'Entrées',
                 value: summary.lotCount,
                 color: const Color(0xFF19C997),
               ),
