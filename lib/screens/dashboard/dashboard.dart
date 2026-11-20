@@ -19,6 +19,7 @@ import '../../serializables/activity.dart';
 import '../../serializables/conducteur/conducteur.dart';
 import '../../serializables/reparation/reparation.dart';
 import '../../theme.dart';
+import '../../ui/design_system/parcoto_tokens.dart';
 import '../sidemenu/pane_items.dart';
 import 'models/dashboard_models.dart';
 import 'widgets/dashboard_widgets.dart';
@@ -110,8 +111,10 @@ class _DashboardState extends State<Dashboard>
       padding: EdgeInsets.zero,
       content: ListView(
         padding: EdgeInsets.symmetric(
-          horizontal: compact ? 14 : (wide ? 26 : 20),
-          vertical: compact ? 16 : 22,
+          horizontal: compact
+              ? ParcotoTokens.space4
+              : (wide ? ParcotoTokens.space6 : ParcotoTokens.space5),
+          vertical: compact ? ParcotoTokens.space4 : ParcotoTokens.space6,
         ),
         children: [
           Row(
@@ -129,7 +132,7 @@ class _DashboardState extends State<Dashboard>
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: ParcotoTokens.space2),
                     Text(
                       'Voici la situation de votre parc aujourd’hui.',
                       style: TextStyle(
@@ -143,12 +146,12 @@ class _DashboardState extends State<Dashboard>
               if (!compact)
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 9,
+                    horizontal: ParcotoTokens.space3,
+                    vertical: ParcotoTokens.space2,
                   ),
                   decoration: BoxDecoration(
                     color: theme.surfaceColor,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(theme.controlRadius),
                     border: Border.all(color: theme.borderColor),
                   ),
                   child: Row(
@@ -159,7 +162,7 @@ class _DashboardState extends State<Dashboard>
                         size: 15,
                         color: theme.mutedTextColor,
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: ParcotoTokens.space2),
                       Text(
                         dateLabel,
                         style: TextStyle(
