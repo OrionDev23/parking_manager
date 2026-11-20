@@ -24,8 +24,8 @@ class WorkshopDashboard extends StatefulWidget {
 class _WorkshopDashboardState extends State<WorkshopDashboard> {
   late final PartsProvider _partsProvider;
   late final VoidCallback _companyRevisionListener;
-  late final Future<int> Function() _stockCountLoader =
-      () => DatabaseCounters().countStockEntries();
+  Future<int> _loadStockCount() =>
+      DatabaseCounters().countStockEntries();
   int _stockMetricRevision = 0;
   bool? _hasInternet;
 
@@ -184,7 +184,7 @@ class _WorkshopDashboardState extends State<WorkshopDashboard> {
                         label: 'Entrées de stock',
                         detail: 'Enregistrements de stock de l’entreprise',
                         icon: FluentIcons.database,
-                        loadValue: _stockCountLoader,
+                        loadValue: _loadStockCount,
                       ),
                     ],
                   ),
