@@ -25,6 +25,14 @@ import '../../../utilities/algeria_lists.dart';
 import '../../../widgets/select_dialog/select_dialog.dart';
 import '../../../widgets/forms/parcoto_form_field.dart';
 
+Size _responsiveVehicleCountryDialogSize(BuildContext context) {
+  final screenSize = MediaQuery.sizeOf(context);
+  return Size(
+    (screenSize.width - 32).clamp(280.0, 520.0).toDouble(),
+    (screenSize.height - 80).clamp(320.0, 600.0).toDouble(),
+  );
+}
+
 BoxConstraints _responsiveVehiclePickerConstraints(
   BuildContext context, {
   required double maxWidth,
@@ -1619,7 +1627,7 @@ class _VehicleFormState extends State<VehicleForm>
                 ),
                 padding: const EdgeInsets.all(3),
                 searchDecoration: appTheme.inputDecoration,
-                dialogSize: Size(40.w, 60.h),
+                dialogSize: _responsiveVehicleCountryDialogSize(context),
                 initialSelection: pays,
                 showCountryOnly: true,
                 showDropDownButton: true,
@@ -2427,8 +2435,10 @@ class _VehicleFormState extends State<VehicleForm>
                                   ),
                               searchTextStyle: appTheme.writingStyle,
                               searchCursorColor: appTheme.color,
-                              constraints: BoxConstraints.loose(
-                                Size(400.px, 400.px),
+                              constraints: _responsiveVehiclePickerConstraints(
+                                context,
+                                maxWidth: 400,
+                                maxHeight: 400,
                               ),
                             );
                           },
@@ -2474,8 +2484,10 @@ class _VehicleFormState extends State<VehicleForm>
                               backgroundColor: appTheme.backGroundColor,
                               gridView: true,
                               numberOfGridCross: 3,
-                              constraints: BoxConstraints.loose(
-                                Size(60.w, 70.h),
+                              constraints: _responsiveVehiclePickerConstraints(
+                                context,
+                                maxWidth: 700,
+                                maxHeight: 600,
                               ),
                               items: VehiclesUtilities.marques!.keys.toList(),
                               itemBuilder: (c, v, e) {
@@ -2911,7 +2923,13 @@ class _VehicleFormState extends State<VehicleForm>
       barrierDismissible: true,
       builder: (context) {
         return ContentDialog(
-          constraints: BoxConstraints.tight(Size(700.px, 550.px)),
+          constraints: BoxConstraints.tight(
+            _responsiveVehiclePickerConstraints(
+              context,
+              maxWidth: 700,
+              maxHeight: 550,
+            ).biggest,
+          ),
           title: const Text('selectchauffeur').tr(),
           style: ContentDialogThemeData(
             titleStyle: appTheme.writingStyle.copyWith(
