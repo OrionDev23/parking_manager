@@ -53,18 +53,16 @@ class _ResetScreenState extends State<ResetScreen> {
     }
 
     return ScaffoldPage(
-      content: LayoutBuilder(
-        builder: (context, constraints) {
-          return SingleChildScrollView(
+      content: SingleChildScrollView(
             padding: EdgeInsets.symmetric(
               horizontal: 16,
               vertical: compact ? 20 : 36,
             ),
-            child: Center(
-              child: SizedBox(
+          child: Center(
+            child: SizedBox(
                 width: formWidth,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                   children: [
                     Image.asset(
                       'assets/images/favIcon.webp',
@@ -77,9 +75,7 @@ class _ResetScreenState extends State<ResetScreen> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        color: appTheme.mode == ThemeMode.dark
-                            ? Colors.grey
-                            : Colors.white,
+                        color: appTheme.surfaceColor,
                         boxShadow: kElevationToShadow[2],
                       ),
                       child: Column(
@@ -159,12 +155,10 @@ class _ResetScreenState extends State<ResetScreen> {
                     const SizedBox(height: 12),
                     if (!signedIn && error.isNotEmpty)
                       Text(error, style: const TextStyle(color: Colors.red)),
-                  ],
-                ),
+                ],
               ),
             ),
-          );
-        },
+          ),
       ),
     );
   }
