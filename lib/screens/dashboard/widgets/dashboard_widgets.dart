@@ -7,6 +7,8 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../../../providers/client_database.dart';
 import '../../../theme.dart';
+import '../../../ui/design_system/parcoto_surface.dart';
+import '../../../ui/design_system/parcoto_tokens.dart';
 import '../models/dashboard_models.dart';
 
 class DashboardMetricCard extends StatelessWidget {
@@ -29,14 +31,10 @@ class DashboardMetricCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = context.watch<AppTheme>();
 
-    return Container(
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: appTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: appTheme.borderColor),
-        boxShadow: [appTheme.surfaceShadow],
-      ),
+    return ParcotoSurface(
+      padding: const EdgeInsets.all(ParcotoTokens.space4),
+      radius: appTheme.cardRadius,
+      elevated: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -48,7 +46,7 @@ class DashboardMetricCard extends StatelessWidget {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: tone.withValues(alpha: .16),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(appTheme.controlRadius),
                 ),
                 child: Icon(icon, color: tone, size: 21),
               ),
@@ -122,16 +120,13 @@ class DashboardPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.watch<AppTheme>();
 
-    return Container(
+    return SizedBox(
       height: height,
-      padding: padding,
-      decoration: BoxDecoration(
-        color: theme.surfaceColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.borderColor),
-        boxShadow: [theme.surfaceShadow],
-      ),
-      child: Column(
+      child: ParcotoSurface(
+        padding: padding,
+        radius: theme.cardRadius,
+        elevated: true,
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
@@ -165,6 +160,7 @@ class DashboardPanel extends StatelessWidget {
           const SizedBox(height: 13),
           Expanded(child: child),
         ],
+        ),
       ),
     );
   }
