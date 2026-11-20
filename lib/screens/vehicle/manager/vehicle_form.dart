@@ -25,6 +25,20 @@ import '../../../utilities/algeria_lists.dart';
 import '../../../widgets/select_dialog/select_dialog.dart';
 import '../../../widgets/forms/parcoto_form_field.dart';
 
+BoxConstraints _responsiveVehiclePickerConstraints(
+  BuildContext context, {
+  required double maxWidth,
+  required double maxHeight,
+}) {
+  final screenSize = MediaQuery.sizeOf(context);
+  return BoxConstraints.loose(
+    Size(
+      (screenSize.width - 32).clamp(260.0, maxWidth).toDouble(),
+      (screenSize.height - 80).clamp(280.0, maxHeight).toDouble(),
+    ),
+  );
+}
+
 class VehicleForm extends StatefulWidget {
   final Vehicle? vehicle;
   final Tab? tab;
@@ -929,8 +943,10 @@ class _VehicleFormState extends State<VehicleForm>
                                   backgroundColor: appTheme.backGroundColor,
                                   gridView: true,
                                   numberOfGridCross: 3,
-                                  constraints: BoxConstraints.loose(
-                                    Size(600.px, 650.px),
+                                  constraints: _responsiveVehiclePickerConstraints(
+                                    context,
+                                    maxWidth: 600,
+                                    maxHeight: 650,
                                   ),
                                   items: VehiclesUtilities.marques!.keys.toList(),
                                   itemBuilder: (c, v, e) => Card(
@@ -1031,8 +1047,10 @@ class _VehicleFormState extends State<VehicleForm>
                                   ),
                                   searchTextStyle: appTheme.writingStyle,
                                   searchCursorColor: appTheme.color,
-                                  constraints: BoxConstraints.loose(
-                                    Size(400.px, 450.px),
+                                  constraints: _responsiveVehiclePickerConstraints(
+                                    context,
+                                    maxWidth: 400,
+                                    maxHeight: 450,
                                   ),
                                 );
                               },
