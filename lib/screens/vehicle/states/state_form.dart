@@ -20,6 +20,14 @@ import '../../../theme.dart';
 import '../../../utilities/vehicle_util.dart';
 import '../manager/vehicles_table.dart';
 
+Size _responsiveStateSelectionSize(BuildContext context) {
+  final screenSize = MediaQuery.sizeOf(context);
+  return Size(
+    (screenSize.width - 32).clamp(0.0, 700.0).toDouble(),
+    (screenSize.height - 80).clamp(0.0, 550.0).toDouble(),
+  );
+}
+
 class StateForm extends StatefulWidget {
   final Etat? etat;
   final Vehicle? vehicle;
@@ -150,7 +158,7 @@ class StateFormState extends State<StateForm> {
                             builder: (context) {
                               return ContentDialog(
                                 constraints: BoxConstraints.tight(
-                                  Size(700.px, 550.px),
+                                  _responsiveStateSelectionSize(context),
                                 ),
                                 title: const Text('selectvehicle').tr(),
                                 style: ContentDialogThemeData(
@@ -312,7 +320,7 @@ class StateFormState extends State<StateForm> {
                               builder: (context) {
                                 return ContentDialog(
                                   constraints: BoxConstraints.tight(
-                                    Size(700.px, 550.px),
+                                    _responsiveStateSelectionSize(context),
                                   ),
                                   title: const Text('selectreparation').tr(),
                                   style: ContentDialogThemeData(
@@ -404,8 +412,10 @@ class StateFormState extends State<StateForm> {
             ),
           ),
           bigSpace,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+          Wrap(
+            alignment: WrapAlignment.end,
+            spacing: 8,
+            runSpacing: 8,
             children: [
               Button(
                 child: const Text('fermer').tr(),
@@ -413,7 +423,6 @@ class StateFormState extends State<StateForm> {
                   Navigator.of(context).pop();
                 },
               ),
-              bigSpace,
               FilledButton(
                 onPressed: sumbmiting ? null : submit,
                 child: sumbmiting
