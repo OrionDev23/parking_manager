@@ -9,6 +9,7 @@ class ModuleDashboardMetric extends StatefulWidget {
   final String detail;
   final IconData icon;
   final Future<int> Function() loadValue;
+  final VoidCallback? onRefresh;
   final double width;
 
   const ModuleDashboardMetric({
@@ -17,6 +18,7 @@ class ModuleDashboardMetric extends StatefulWidget {
     required this.detail,
     required this.icon,
     required this.loadValue,
+    this.onRefresh,
     this.width = 225,
   });
 
@@ -44,6 +46,7 @@ class _ModuleDashboardMetricState extends State<ModuleDashboardMetric> {
   }
 
   void _retry() {
+    widget.onRefresh?.call();
     setState(() => _value = _load());
   }
 
@@ -137,9 +140,9 @@ class _ModuleDashboardMetricState extends State<ModuleDashboardMetric> {
                     ],
                   ),
                 ),
-                if (failed)
+                if (failed || widget.onRefresh != null)
                   Tooltip(
-                    message: 'Réessayer',
+                    message: failed ? 'Réessayer' : 'Actualiser',
                     child: IconButton(
                       icon: const Icon(FluentIcons.refresh, size: 13),
                       onPressed: _retry,
