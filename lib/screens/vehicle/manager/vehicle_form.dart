@@ -279,8 +279,6 @@ class _VehicleFormState extends State<VehicleForm>
                         children: gridChildren(appTheme),
                       ),
                     ),
-                    const SizedBox(height: 28),
-                    _buildComingNextPanel(appTheme),
                   ]),
                 )),
               )),
@@ -480,11 +478,12 @@ class _VehicleFormState extends State<VehicleForm>
       Expanded(child: ListView(children: List.generate(_formSections.length, (index) {
         final active = selectedFormSection == index;
         const descriptions = [
-          'Identité et immatriculation', 'Carte grise et localisation',
-          'Conducteur et organisation', 'Motorisation et dimensions',
-          'Acquisition et exploitation', 'Anciens numéros connus',
-          'Positions et trajets', 'Entretiens et réparations',
-          'Pièces et justificatifs', 'Événements du véhicule',
+          'Identité et immatriculation',
+          'Carte grise et localisation',
+          'Conducteur et organisation',
+          'Motorisation et dimensions',
+          'Acquisition et exploitation',
+          'Anciens numéros connus',
         ];
         return Padding(
           padding: const EdgeInsets.only(bottom: 5),
@@ -529,16 +528,12 @@ class _VehicleFormState extends State<VehicleForm>
 
   Widget _buildActiveSectionHeading(AppTheme appTheme) {
     const subtitles = [
-      'Définissez l’identité visuelle et administrative du véhicule.',
+      'Définissez l’identité du véhicule et son immatriculation.',
       'Renseignez les informations de carte grise et son adresse administrative.',
       'Décrivez le rattachement organisationnel et le conducteur associé.',
       'Configurez les caractéristiques mécaniques et physiques.',
-      'Centralisez les informations d’acquisition, de garantie et de kilométrage.',
+      'Centralisez l’acquisition, la garantie et le suivi kilométrique.',
       'Conservez la traçabilité des anciennes immatriculations.',
-      'Consultez la dernière position et les relevés GPS disponibles.',
-      'Suivez les entretiens, réparations et prochaines échéances.',
-      'Centralisez les pièces administratives et leurs dates de validité.',
-      'Retrouvez les événements qui composent la vie du véhicule.',
     ];
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -555,59 +550,151 @@ class _VehicleFormState extends State<VehicleForm>
   }
 
   Widget _buildEditorSummary(AppTheme appTheme) {
-    final registration = widget.vehicle?.matricule ?? 'À définir';
-    final vehicleName = [
-      widget.vehicle?.marque ?? marque?.toString(),
-      widget.vehicle?.type ?? type.text,
-    ].where((value) => value != null && value.trim().isNotEmpty).join(' ');
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Container(
-        padding: const EdgeInsets.all(15),
-        decoration: BoxDecoration(
-          color: FluentTheme.of(context).micaBackgroundColor,
-          border: Border.all(color: Colors.grey[30]), borderRadius: BorderRadius.circular(15)),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            const Expanded(child: Text('APERÇU DU VÉHICULE',
-              style: TextStyle(fontSize: 10, letterSpacing: .8, fontWeight: FontWeight.w700))),
-            Icon(FluentIcons.car, size: 14, color: Colors.grey[100]),
-          ]),
-          const SizedBox(height: 14),
-          Container(
-            height: 118, width: double.infinity,
-            decoration: BoxDecoration(color: appTheme.color.withValues(alpha: .08), borderRadius: BorderRadius.circular(11)),
-            child: widget.vehicle?.imageUrl?.isNotEmpty == true
-                ? ClipRRect(borderRadius: BorderRadius.circular(11),
-                    child: Image.network(widget.vehicle!.imageUrl!, fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => Icon(FluentIcons.car, size: 42, color: appTheme.color)))
-                : Icon(FluentIcons.car, size: 42, color: appTheme.color),
-          ),
-          const SizedBox(height: 13),
-          Text(vehicleName.isEmpty ? 'Marque et modèle à renseigner' : vehicleName,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 5),
-          Text(registration, style: TextStyle(fontSize: 12, color: Colors.grey[100])),
-          const SizedBox(height: 12),
-          _summaryLine(FluentIcons.document, 'N° de parc',
-            fleetNumberController.text.isEmpty ? 'Non défini' : fleetNumberController.text),
-          _summaryLine(FluentIcons.car, 'Kilométrage',
-            mileageController.text.isEmpty ? 'Non renseigné' : '${mileageController.text} km'),
-        ]),
-      ),
-      const SizedBox(height: 12),
-      _summaryCard('AFFECTATION', [
-        ('Conducteur', widget.vehicle?.matriculeConducteur ?? 'À associer'),
-        ('Filiale', widget.vehicle?.filliale ?? 'À renseigner'),
-        ('Direction', widget.vehicle?.direction ?? 'À renseigner'),
-      ]),
-      const SizedBox(height: 12),
-      _summaryCard('À CONNECTER ENSUITE', [
-        ('GPS', 'Position en attente'),
-        ('Documents', 'Espace documentaire'),
-        ('Maintenance', 'Échéances et interventions'),
-        ('Historique', 'Journal des événements'),
-      ]),
+    final previewListenable = Listenable.merge([
+      matriculeEtr,
+      matr1,
+      matr2,
+      matr3,
+      type,
+      modelYearController,
+      fleetNumberController,
+      mileageController,
+      matempl,
+      selectedFiliale,
+      selectedDirection,
     ]);
+
+    return AnimatedBuilder(
+      animation: previewListenable,
+      builder: (context, _) {
+        final typedRegistration = autreMat
+            ? matriculeEtr.text.trim()
+            : [matr1.text, matr2.text, matr3.text]
+                .map((part) => part.trim())
+                .where((part) => part.isNotEmpty)
+                .join('-');
+        final registration = typedRegistration.isNotEmpty
+            ? typedRegistration
+            : widget.vehicle?.matricule ?? 'À définir';
+        final brandName = marque == null
+            ? widget.vehicle?.marque
+            : VehiclesUtilities.marques?[marque] ?? widget.vehicle?.marque;
+        final modelName = type.text.trim().isNotEmpty
+            ? type.text.trim()
+            : widget.vehicle?.type;
+        final modelYear = modelYearController.text.trim().isNotEmpty
+            ? modelYearController.text.trim()
+            : widget.vehicle?.modelYear?.toString();
+        final vehicleName = [
+          brandName,
+          modelName,
+          modelYear,
+        ].where((value) => value != null && value.trim().isNotEmpty).join(' ');
+        final fleetNumber = fleetNumberController.text.trim();
+        final mileage = mileageController.text.trim();
+        final driver = matempl.text.trim().isNotEmpty
+            ? matempl.text.trim()
+            : widget.vehicle?.matriculeConducteur ?? 'À associer';
+        final branch = selectedFiliale.text.trim().isNotEmpty
+            ? selectedFiliale.text.trim()
+            : widget.vehicle?.filliale ?? 'À renseigner';
+        final direction = selectedDirection.text.trim().isNotEmpty
+            ? selectedDirection.text.trim()
+            : widget.vehicle?.direction ?? 'À renseigner';
+        final imageUrl = widget.vehicle?.imageUrl?.trim();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: FluentTheme.of(context).micaBackgroundColor,
+                border: Border.all(color: Colors.grey[30]),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(children: [
+                    const Expanded(
+                      child: Text(
+                        'APERÇU DU VÉHICULE',
+                        style: TextStyle(
+                          fontSize: 10,
+                          letterSpacing: .8,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    Icon(FluentIcons.car, size: 14, color: Colors.grey[100]),
+                  ]),
+                  const SizedBox(height: 14),
+                  Container(
+                    height: 118,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: appTheme.color.withValues(alpha: .08),
+                      borderRadius: BorderRadius.circular(11),
+                    ),
+                    child: imageUrl != null && imageUrl.isNotEmpty
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(11),
+                            child: Image.network(
+                              imageUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, _, _) => Icon(
+                                FluentIcons.car,
+                                size: 42,
+                                color: appTheme.color,
+                              ),
+                            ),
+                          )
+                        : Icon(
+                            FluentIcons.car,
+                            size: 42,
+                            color: appTheme.color,
+                          ),
+                  ),
+                  const SizedBox(height: 13),
+                  Text(
+                    vehicleName.isEmpty
+                        ? 'Marque et modèle à renseigner'
+                        : vehicleName,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    registration,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[100]),
+                  ),
+                  const SizedBox(height: 12),
+                  _summaryLine(
+                    FluentIcons.document,
+                    'N° de parc',
+                    fleetNumber.isEmpty ? 'Non défini' : fleetNumber,
+                  ),
+                  _summaryLine(
+                    FluentIcons.car,
+                    'Kilométrage',
+                    mileage.isEmpty ? 'Non renseigné' : '$mileage km',
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            _summaryCard('AFFECTATION', [
+              ('Conducteur', driver),
+              ('Filiale', branch),
+              ('Direction', direction),
+            ]),
+          ],
+        );
+      },
+    );
   }
 
   Widget _summaryCard(String title, List<(String, String)> rows) => Container(
@@ -635,24 +722,6 @@ class _VehicleFormState extends State<VehicleForm>
     ]),
   );
 
-  Widget _buildComingNextPanel(AppTheme appTheme) => Container(
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: appTheme.color.withValues(alpha: .06),
-      borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: appTheme.color.withValues(alpha: .16))),
-    child: Row(children: [
-      Icon(FluentIcons.document, color: appTheme.color, size: 20), const SizedBox(width: 12),
-      const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Évolution de la fiche véhicule', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-        SizedBox(height: 4),
-        Text('Les prochains lots intégreront les documents, la galerie photo, les alertes de conformité, le suivi GPS et le journal de vie du véhicule.',
-          style: TextStyle(fontSize: 11, height: 1.4)),
-      ])),
-      const SizedBox(width: 8), const Icon(FluentIcons.chevron_right, size: 14),
-    ]),
-  );
-
   static const _formSections = [
     ('Identification', FluentIcons.car),
     ('Administratif', FluentIcons.document),
@@ -660,10 +729,6 @@ class _VehicleFormState extends State<VehicleForm>
     ('Technique', FluentIcons.repair),
     ('Exploitation & finances', FluentIcons.money),
     ('Immatriculations', FluentIcons.document),
-    ('GPS & localisation', FluentIcons.car),
-    ('Maintenance', FluentIcons.repair),
-    ('Documents', FluentIcons.document),
-    ('Historique', FluentIcons.info),
   ];
 
   Widget _buildFormSectionNavigation(AppTheme appTheme) {
@@ -718,73 +783,54 @@ class _VehicleFormState extends State<VehicleForm>
         return [_buildVehicleIdentitySection(appTheme)];
       case 1:
         return [
-          _sectionHeader(appTheme, 'Localisation et documents administratifs',
-            'Pays, wilaya, commune et informations de la carte grise'),
+          _sectionHeader(
+            appTheme,
+            'Localisation et documents administratifs',
+            'Pays, wilaya, commune et informations de la carte grise',
+          ),
           ...getWilayaCommuneWidget(appTheme),
           ...secondLine(appTheme),
         ];
       case 2:
         return [
           if (conducteurEmploye) ...[
-            _sectionHeader(appTheme, 'Propriétaire et conducteur',
-              'Informations sur le propriétaire et le conducteur associé'),
+            _sectionHeader(
+              appTheme,
+              'Propriétaire et conducteur',
+              'Informations sur le propriétaire et le conducteur associé',
+            ),
             ...thirdLine(appTheme),
             ...forthLine(appTheme),
           ],
-          _sectionHeader(appTheme, 'Organisation et rattachement',
-            'Appartenance, filiale, direction et département'),
+          _sectionHeader(
+            appTheme,
+            'Organisation et rattachement',
+            'Appartenance, filiale, direction et département',
+          ),
           ...fifthLine(appTheme),
         ];
       case 3:
         return [
-          _sectionHeader(appTheme, 'Caractéristiques techniques',
-            'Configuration, motorisation, capacité et caractéristiques du véhicule'),
+          _sectionHeader(
+            appTheme,
+            'Caractéristiques techniques',
+            'Configuration, motorisation, capacité et caractéristiques du véhicule',
+          ),
           ...seventhLine(appTheme),
         ];
       case 4:
         return [_buildProfessionalDetailsSection(appTheme)];
       case 5:
         return [
-          _sectionHeader(appTheme, 'Historique des immatriculations',
-            'Anciennes immatriculations connues pour ce véhicule'),
+          _sectionHeader(
+            appTheme,
+            'Historique des immatriculations',
+            'Anciennes immatriculations connues pour ce véhicule',
+          ),
           ...eightLine(appTheme),
         ];
-      case 6:
-        return [_buildModulePlaceholder(
-          FluentIcons.car,
-          'GPS & localisation',
-          'Visualisez la dernière position connue du véhicule et consultez ses déplacements lorsque le suivi sera activé.',
-          ['Dernière position connue', 'Date et précision du relevé', 'Carte et historique des positions', 'Source du relevé et conducteur associé'],
-          'Collecte GPS non connectée',
-          appTheme,
-        )];
-      case 7:
-        return [_buildModulePlaceholder(
-          FluentIcons.repair,
-          'Maintenance & interventions',
-          'Centralisez le cycle de maintenance, les entretiens préventifs et les réparations effectuées sur ce véhicule.',
-          ['Prochaine échéance kilométrique ou temporelle', 'Planning des entretiens', 'Ordres de réparation', 'Coûts et prestataires'],
-          'Module maintenance à connecter',
-          appTheme,
-        )];
-      case 8:
-        return [_buildModulePlaceholder(
-          FluentIcons.document,
-          'Documents du véhicule',
-          'Retrouvez les documents administratifs et opérationnels dans un espace unique, avec leurs dates de validité.',
-          ['Carte grise et assurance', 'Contrôle technique', 'Factures et justificatifs', 'Alertes avant expiration'],
-          'Stockage documentaire à connecter',
-          appTheme,
-        )];
       default:
-        return [_buildModulePlaceholder(
-          FluentIcons.info,
-          'Historique & journal de vie',
-          'Consultez les événements importants qui modifient la vie du véhicule et son utilisation.',
-          ['Changements d’affectation', 'Relevés kilométriques', 'Changements de statut', 'Interventions et modifications de la fiche'],
-          'Journal d’événements à structurer',
-          appTheme,
-        )];
+        return const [];
     }
   }
 
@@ -1139,93 +1185,6 @@ class _VehicleFormState extends State<VehicleForm>
               ],
             );
           },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildModulePlaceholder(
-    IconData icon,
-    String title,
-    String description,
-    List<String> features,
-    String status,
-    AppTheme appTheme,
-  ) {
-    return StaggeredGridTile.fit(
-      crossAxisCellCount: 12,
-      child: Container(
-        padding: const EdgeInsets.all(22),
-        decoration: BoxDecoration(
-          color: FluentTheme.of(context).micaBackgroundColor,
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: Colors.grey[30]),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  color: appTheme.color.withValues(alpha: .11),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: appTheme.color, size: 21),
-              ),
-              const SizedBox(width: 13),
-              Expanded(child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 4),
-                  Text(description, style: TextStyle(fontSize: 11, color: Colors.grey[100], height: 1.4)),
-                ],
-              )),
-            ]),
-            const SizedBox(height: 22),
-            Text('CE QUE CONTIENDRA CE MODULE',
-              style: TextStyle(fontSize: 10, letterSpacing: .8, color: Colors.grey[100], fontWeight: FontWeight.w700)),
-            const SizedBox(height: 12),
-            LayoutBuilder(builder: (context, constraints) {
-              final columns = constraints.maxWidth >= 720 ? 2 : 1;
-              final width = (constraints.maxWidth - (columns - 1) * 10) / columns;
-              return Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: features.map((feature) => SizedBox(
-                  width: width,
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: appTheme.backGroundColor,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.grey[30]),
-                    ),
-                    child: Row(children: [
-                      Icon(FluentIcons.check_mark, size: 13, color: appTheme.color),
-                      const SizedBox(width: 9),
-                      Expanded(child: Text(feature, style: const TextStyle(fontSize: 11))),
-                    ]),
-                  ),
-                )).toList(),
-              );
-            }),
-            const SizedBox(height: 18),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.grey[20],
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(FluentIcons.info, size: 12, color: Colors.grey[100]),
-                const SizedBox(width: 7),
-                Text(status, style: TextStyle(fontSize: 10, color: Colors.grey[100], fontWeight: FontWeight.w600)),
-              ]),
-            ),
-          ],
         ),
       ),
     );
