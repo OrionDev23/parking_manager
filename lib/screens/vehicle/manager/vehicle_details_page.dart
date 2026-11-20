@@ -426,12 +426,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   Widget _overview(Color accent) {
     final documents = VehicleProvider.documentsVehicules.values.where((doc) =>
         doc.vehicle == v.id || doc.vehiclemat == v.matricule).toList();
-    final expiring = documents.where((doc) {
-      final date = doc.dateExpiration;
-      if (date == null) return false;
-      final today = DateTime.now();
-      return !date.isBefore(DateTime(today.year, today.month, today.day));
-    }).length;
+    final expiring =
+        documents.where((doc) => doc.dateExpiration != null).length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
