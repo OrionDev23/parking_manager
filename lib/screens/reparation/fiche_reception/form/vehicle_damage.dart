@@ -23,7 +23,31 @@ class VehicleDamage extends StatefulWidget {
 class _VehicleDamageState extends State<VehicleDamage> {
   @override
   Widget build(BuildContext context) {
-    var appTheme = context.watch<AppTheme>();
+    final appTheme = context.watch<AppTheme>();
+    final compact = MediaQuery.sizeOf(context).width < 760;
+
+    if (compact) {
+      // Mobile: keep the inspection matrix horizontally scrollable and place
+      // the vehicle diagram below it. No dimensions depend on viewport height,
+      // so opening the browser keyboard cannot collapse this section.
+      return Container(
+        width: double.infinity,
+        decoration: BoxDecoration(border: Border.all()),
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: topTable(appTheme, compact: true),
+            ),
+            const SizedBox(height: 16),
+            _buildDamageControls(appTheme, compact: true),
+          ],
+        ),
+      );
+    }
+
     return Container(
       decoration: BoxDecoration(border: Border.all()),
       width: 80.w,
@@ -39,46 +63,58 @@ class _VehicleDamageState extends State<VehicleDamage> {
           bigSpace,
           bigSpace,
           bigSpace,
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          _buildDamageControls(appTheme, compact: false),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDamageControls(
+    AppTheme appTheme, {
+    required bool compact,
+  }) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment:
+          compact ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: compact ? 160 : 90.px,
+          height: 40.px,
+          child: Row(
+            mainAxisAlignment:
+                compact ? MainAxisAlignment.center : MainAxisAlignment.start,
             children: [
-              SizedBox(
-                width: 90.px,
-                height: 40.px,
-                child: Row(
-                  children: [
-                    const Text("repare").tr(),
-                    const Spacer(),
-                    Checkbox(
-                      checked: widget.etatVehicle.showOnList,
-                      onChanged: (s) {
-                        widget.etatVehicle.showOnList = s ?? false;
-                        setState(() {});
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              vehicleDamage(appTheme),
-              bigSpace,
-              Row(
-                children: [
-                  Button(
-                    onPressed: () => selectAllVehicleDamage(false),
-                    child: const Text('clear').tr(),
-                  ),
-                  smallSpace,
-                  FilledButton(
-                    onPressed: () => selectAllVehicleDamage(true),
-                    child: const Text('selectall').tr(),
-                  ),
-                ],
+              const Text("repare").tr(),
+              if (!compact) const Spacer(),
+              Checkbox(
+                checked: widget.etatVehicle.showOnList,
+                onChanged: (s) {
+                  widget.etatVehicle.showOnList = s ?? false;
+                  setState(() {});
+                },
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        Center(child: vehicleDamage(appTheme)),
+        const SizedBox(height: 12),
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            Button(
+              onPressed: () => selectAllVehicleDamage(false),
+              child: const Text('clear').tr(),
+            ),
+            FilledButton(
+              onPressed: () => selectAllVehicleDamage(true),
+              child: const Text('selectall').tr(),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -124,20 +160,23 @@ class _VehicleDamageState extends State<VehicleDamage> {
     setState(() {});
   }
 
-  Widget topTable(AppTheme appTheme) {
+  Widget topTable(AppTheme appTheme, {bool compact = false}) {
     return SizedBox(
-      width: 40.w,
-      height: 45.h,
+      width: compact ? 520 : 40.w,
+      height: compact ? 420 : 45.h,
       child: Table(
         border: TableBorder.all(borderRadius: BorderRadius.circular(5)),
         columnWidths: {
-          0: FixedColumnWidth(6.w),
-          1: FixedColumnWidth(6.w),
-          2: FixedColumnWidth(4.w),
-          3: FixedColumnWidth(4.w),
-          4: FixedColumnWidth(11.w),
+          0: FixedColumnWidth(compact ? 112 : 6.w),
+          1: FixedColumnWidth(compact ? 112 : 6.w),
+          2: FixedColumnWidth(compact ? 58 : 4.w),
+          3: FixedColumnWidth(compact ? 58 : 4.w),
+          4: FixedColumnWidth(compact ? 180 : 11.w),
         },
-        children: [...getTopRow(appTheme), ...getBottomRows(appTheme)],
+        children: [
+          ...getTopRow(appTheme),
+          ...getBottomRows(appTheme, compact: compact),
+        ],
       ),
     );
   }
@@ -295,7 +334,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   smallSpace,
                   smallSpace,
                   SizedBox(
-                    width: 5.w,
+                    width: compact ? 56.0 : 5.w,
                     child: Slider(
                       value: widget.etatVehicle.avdp,
                       onChanged: (s) {
@@ -419,7 +458,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   smallSpace,
                   smallSpace,
                   SizedBox(
-                    width: 5.w,
+                    width: compact ? 56.0 : 5.w,
                     child: Slider(
                       value: widget.etatVehicle.avgp,
                       onChanged: (s) {
@@ -522,7 +561,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   smallSpace,
                   smallSpace,
                   SizedBox(
-                    width: 5.w,
+                    width: compact ? 56.0 : 5.w,
                     child: Slider(
                       value: widget.etatVehicle.ardp,
                       onChanged: (s) {
@@ -578,7 +617,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
                   smallSpace,
                   smallSpace,
                   SizedBox(
-                    width: 5.w,
+                    width: compact ? 56.0 : 5.w,
                     child: Slider(
                       value: widget.etatVehicle.argp,
                       onChanged: (s) {
@@ -604,7 +643,10 @@ class _VehicleDamageState extends State<VehicleDamage> {
     ];
   }
 
-  List<TableRow> getBottomRows(AppTheme appTheme) {
+  List<TableRow> getBottomRows(
+    AppTheme appTheme, {
+    bool compact = false,
+  }) {
     return [
       TableRow(
         children: [
@@ -1177,7 +1219,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
         top: 0.px,
         child: SizedBox(
           width: lightWidth,
-          height: 30.h,
+          height: 200.px,
           child: Column(
             children: [
               OnTapScaleAndFade(
@@ -1222,7 +1264,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
         top: 0.px,
         child: SizedBox(
           width: lightWidth,
-          height: 30.h,
+          height: 200.px,
           child: Column(
             children: [
               OnTapScaleAndFade(
@@ -1301,7 +1343,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
         top: 60.px,
         child: SizedBox(
           width: lightWidth,
-          height: 30.h,
+          height: 200.px,
           child: Column(
             children: [
               OnTapScaleAndFade(
@@ -1335,7 +1377,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
         top: widget.vehicleType == 2 ? 10.px : 3.px,
         child: SizedBox(
           width: lightWidth,
-          height: 30.h,
+          height: 200.px,
           child: Column(
             children: [
               OnTapScaleAndFade(
@@ -1381,7 +1423,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
           top: 35.px,
           child: SizedBox(
             width: lightWidth,
-            height: 30.h,
+            height: 200.px,
             child: Column(
               children: [
                 OnTapScaleAndFade(
@@ -1429,7 +1471,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
           top: 35.px,
           child: SizedBox(
             width: lightWidth,
-            height: 30.h,
+            height: 200.px,
             child: Column(
               children: [
                 OnTapScaleAndFade(
@@ -1477,7 +1519,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
           top: 3.px,
           child: SizedBox(
             width: lightWidth,
-            height: 30.h,
+            height: 200.px,
             child: Column(
               children: [
                 OnTapScaleAndFade(
@@ -1528,7 +1570,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
         top: 23.px,
         child: SizedBox(
           width: lightWidth,
-          height: 30.h,
+          height: 200.px,
           child: Column(
             children: [
               OnTapScaleAndFade(
@@ -1573,7 +1615,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
         top: 5.px,
         child: SizedBox(
           width: lightWidth,
-          height: 30.h,
+          height: 200.px,
           child: Column(
             children: [
               OnTapScaleAndFade(
@@ -1618,7 +1660,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
         top: 15.px,
         child: SizedBox(
           width: lightWidth,
-          height: 30.h,
+          height: 200.px,
           child: Column(
             children: [
               OnTapScaleAndFade(
@@ -1717,7 +1759,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
           top: 60.px,
           child: SizedBox(
             width: lightWidth,
-            height: 30.h,
+            height: 200.px,
             child: Column(
               children: [
                 OnTapScaleAndFade(
@@ -1770,7 +1812,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
         top: -2.px,
         child: SizedBox(
           width: lightWidth,
-          height: 30.h,
+          height: 200.px,
           child: Column(
             children: [
               OnTapScaleAndFade(
@@ -1845,7 +1887,7 @@ class _VehicleDamageState extends State<VehicleDamage> {
         top: -2.px,
         child: SizedBox(
           width: lightWidth,
-          height: 30.h,
+          height: 200.px,
           child: Column(
             children: [
               OnTapScaleAndFade(
