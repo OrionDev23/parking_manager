@@ -187,6 +187,7 @@ class SelectDialogState<T> extends State<SelectDialog<T>> {
   late SelectOneBloc<T> bloc;
   late MultipleItemsBloc<T> multipleItemsBloc;
   void Function(T)? onChange;
+  bool _autofocusRequested = false;
 
   SelectDialogState(
     List<T>? itemsList,
@@ -203,12 +204,29 @@ class SelectDialogState<T> extends State<SelectDialog<T>> {
     );
   }
 
+  void _requestSearchFocusOnce() {
+    if (!widget.autofocus || _autofocusRequested) return;
+    _autofocusRequested = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || bloc.focusNode.hasFocus) return;
+      FocusScope.of(context).requestFocus(bloc.focusNode);
+    });
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (widget.autofocus) {
-      FocusScope.of(context).requestFocus(bloc.focusNode);
+    _requestSearchFocusOnce();
+  }
+
+  @override
+  void didUpdateWidget(covariant SelectDialog<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!oldWidget.autofocus && widget.autofocus) {
+      _autofocusRequested = false;
     }
+    _requestSearchFocusOnce();
   }
 
   @override
