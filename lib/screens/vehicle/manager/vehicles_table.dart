@@ -411,12 +411,7 @@ class VehicleTableState extends State<VehicleTable> {
 
   @override
   Widget build(BuildContext context) {
-    var appTheme = context.watch<AppTheme>();
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    final compactToolbar = screenWidth < 760;
-    final searchWidth = compactToolbar
-        ? (screenWidth - 64).clamp(180.0, 320.0).toDouble()
-        : 300.0;
+    final appTheme = context.watch<AppTheme>();
     vehicleDataSource.appTheme = appTheme;
     return ValueListenableBuilder(
       valueListenable: filterMarque,
@@ -440,17 +435,28 @@ class VehicleTableState extends State<VehicleTable> {
             }
             return DataTableParc(
               horizontalScroll: true,
-              header: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: appTheme.backGroundColor,
-                  border: Border(bottom: BorderSide(color: Colors.grey[30])),
-                ),
-                child: Wrap(
+              header: LayoutBuilder(
+                builder: (context, constraints) {
+                  final compactToolbar = constraints.maxWidth < 760;
+                  final searchWidth = compactToolbar
+                      ? (constraints.maxWidth - 48)
+                          .clamp(180.0, 320.0)
+                          .toDouble()
+                      : 300.0;
+
+                  return Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: appTheme.backGroundColor,
+                      border: Border(
+                        bottom: BorderSide(color: Colors.grey[30]),
+                      ),
+                    ),
+                    child: Wrap(
                   alignment: WrapAlignment.end,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   spacing: 10,
@@ -590,8 +596,10 @@ class VehicleTableState extends State<VehicleTable> {
                         onPressed: vehicleDataSource.refreshDatasource,
                       ),
                     ),
-                  ],
-                ),
+                    ],
+                  ),
+                );
+                },
               ),
               sortAscending: assending,
               sortColumnIndex: sortColumn,
