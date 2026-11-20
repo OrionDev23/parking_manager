@@ -196,6 +196,12 @@ class VehicleDashboard extends StatelessWidget {
                     loadValue: () => DatabaseCounters().countVehicles(etat: 3),
                   ),
                   ModuleDashboardMetric(
+                    label: 'En réforme',
+                    detail: 'Véhicules réformés',
+                    icon: FluentIcons.document,
+                    loadValue: () => DatabaseCounters().countVehicles(etat: 4),
+                  ),
+                  ModuleDashboardMetric(
                     label: 'Documents',
                     detail: 'Documents véhicules',
                     icon: FluentIcons.document_set,
