@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/serializables/activity.dart';
 import 'package:parc_oto/serializables/planning.dart';
+import 'package:parc_oto/serializables/reparation/reparation.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -673,7 +674,7 @@ class VehiclesWatchlist extends StatelessWidget {
         };
         return Row(
           children: [
-            Icon(FluentIcons.car, color: theme.mutedTextColor, size: 17),
+            Icon(alert.icon, color: theme.mutedTextColor, size: 17),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -722,6 +723,551 @@ class VehiclesWatchlist extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+class DriverAvailabilityWidget extends StatelessWidget {
+  final DashboardDriverStatusSummary summary;
+
+  const DriverAvailabilityWidget({super.key, required this.summary});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.watch<AppTheme>();
+    if (summary.total == 0) {
+      return const _DashboardEmptyState(
+        icon: FluentIcons.people,
+        message: 'Aucun conducteur enregistré.',
+      );
+    }
+
+    final rows = <({String label, int value, Color color})>[
+      (
+        label: 'Disponible',
+        value: summary.available,
+        color: const Color(0xFF19C997),
+      ),
+      (
+        label: 'En mission',
+        value: summary.onMission,
+        color: const Color(0xFF279BFA),
+      ),
+      (
+        label: 'Absent',
+        value: summary.absent,
+        color: const Color(0xFFE6A23C),
+      ),
+      (
+        label: 'Inactif',
+        value: summary.inactive,
+        color: const Color(0xFF929CB7),
+      ),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Text(
+              summary.active.toString(),
+              style: TextStyle(
+                color: theme.textColor,
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'conducteurs actifs sur ${summary.total}',
+                style: TextStyle(
+                  color: theme.mutedTextColor,
+                  fontSize: 11,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 15),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (final row in rows)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 13),
+                  child: _DashboardStatusMeter(
+                    label: row.label,
+                    value: row.value,
+                    total: summary.total,
+                    color: row.color,
+                  ),
+                ),
+            ],
+          ),
+        ),
+        Text(
+          'Répartition selon le statut des fiches conducteurs.',
+          style: TextStyle(
+            color: theme.mutedTextColor,
+            fontSize: 10,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DashboardStatusMeter extends StatelessWidget {
+  final String label;
+  final int value;
+  final int total;
+  final Color color;
+
+  const _DashboardStatusMeter({
+    required this.label,
+    required this.value,
+    required this.total,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.watch<AppTheme>();
+    final fraction = total <= 0 ? 0.0 : (value / total).clamp(0.0, 1.0);
+
+    return Row(
+      children: [
+        SizedBox(
+          width: 84,
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: theme.mutedTextColor,
+              fontSize: 10,
+            ),
+          ),
+        ),
+        const SizedBox(width: 9),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              height: 8,
+              color: theme.fillColor,
+              alignment: Alignment.centerLeft,
+              child: FractionallySizedBox(
+                widthFactor: fraction,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 9),
+        SizedBox(
+          width: 24,
+          child: Text(
+            value.toString(),
+            textAlign: TextAlign.end,
+            style: TextStyle(
+              color: theme.textColor,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class RepairPipelineWidget extends StatelessWidget {
+  final DashboardRepairSummary summary;
+
+  const RepairPipelineWidget({super.key, required this.summary});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.watch<AppTheme>();
+    if (summary.total == 0) {
+      return const _DashboardEmptyState(
+        icon: FluentIcons.repair,
+        message: 'Aucun ordre de réparation enregistré.',
+      );
+    }
+
+    final active = summary.activeRepairs.take(4).toList(growable: false);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _RepairStatusCount(
+                label: 'Attente',
+                value: summary.waiting,
+                color: const Color(0xFFE6A23C),
+              ),
+            ),
+            const SizedBox(width: 7),
+            Expanded(
+              child: _RepairStatusCount(
+                label: 'En cours',
+                value: summary.inProgress,
+                color: const Color(0xFF279BFA),
+              ),
+            ),
+            const SizedBox(width: 7),
+            Expanded(
+              child: _RepairStatusCount(
+                label: 'Terminés',
+                value: summary.completed,
+                color: const Color(0xFF19C997),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 11),
+        Text(
+          'Montant TTC des ordres ouverts : ${NumberFormat('#,##0', 'fr').format(summary.activeAmount)} DA',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: theme.textColor,
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: active.isEmpty
+              ? const _DashboardEmptyState(
+                  icon: FluentIcons.repair,
+                  message: 'Aucun ordre en attente ou en cours.',
+                )
+              : ListView.separated(
+                  itemCount: active.length,
+                  separatorBuilder: (_, _) => Divider(
+                    style: DividerThemeData(
+                      decoration: BoxDecoration(color: theme.borderColor),
+                    ),
+                  ),
+                  itemBuilder: (context, index) {
+                    final repair = active[index];
+                    final waiting = (repair.etat ?? 0) == 0;
+                    final statusColor = waiting
+                        ? const Color(0xFFE6A23C)
+                        : const Color(0xFF279BFA);
+                    final date = DateFormat('dd MMM yyyy', 'fr')
+                        .format(repair.date.toLocal());
+                    return Row(
+                      children: [
+                        Container(
+                          width: 29,
+                          height: 29,
+                          decoration: BoxDecoration(
+                            color: statusColor.withValues(alpha: .14),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          alignment: Alignment.center,
+                          child: Icon(
+                            FluentIcons.repair,
+                            color: statusColor,
+                            size: 14,
+                          ),
+                        ),
+                        const SizedBox(width: 9),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${repair.vehiculemat?.trim().isNotEmpty == true ? repair.vehiculemat : 'Véhicule'} • OR #${repair.numero}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: theme.textColor,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${waiting ? 'En attente' : 'En cours'} • $date',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: theme.mutedTextColor,
+                                  fontSize: 9,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${NumberFormat('#,##0', 'fr').format(repair.getPrixTTC())} DA',
+                          style: TextStyle(
+                            color: theme.textColor,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+}
+
+class _RepairStatusCount extends StatelessWidget {
+  final String label;
+  final int value;
+  final Color color;
+
+  const _RepairStatusCount({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.watch<AppTheme>();
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 9),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: .10),
+        borderRadius: BorderRadius.circular(9),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            value.toString(),
+            style: TextStyle(
+              color: color,
+              fontSize: 17,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 1),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: theme.mutedTextColor,
+              fontSize: 9,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class InventoryExpiryWidget extends StatelessWidget {
+  final DashboardInventorySummary summary;
+
+  const InventoryExpiryWidget({super.key, required this.summary});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.watch<AppTheme>();
+    if (summary.lotCount == 0) {
+      return _DashboardEmptyState(
+        icon: FluentIcons.database_activity,
+        message: summary.verified
+            ? 'Aucun lot de stock enregistré.'
+            : 'Les données de stock ne sont pas disponibles.',
+      );
+    }
+
+    final visibleAlerts = summary.alerts.take(4).toList(growable: false);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _InventoryCount(
+                label: 'Références',
+                value: summary.referenceCount,
+                color: const Color(0xFF279BFA),
+              ),
+            ),
+            const SizedBox(width: 7),
+            Expanded(
+              child: _InventoryCount(
+                label: 'Lots',
+                value: summary.lotCount,
+                color: const Color(0xFF19C997),
+              ),
+            ),
+            const SizedBox(width: 7),
+            Expanded(
+              child: _InventoryCount(
+                label: 'Échus',
+                value: summary.expiredLots,
+                color: const Color(0xFFE85D75),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        if (!summary.verified)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 7),
+            child: Row(
+              children: [
+                Icon(
+                  FluentIcons.info,
+                  size: 12,
+                  color: theme.mutedTextColor,
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: Text(
+                    'Données issues du cache local ; synchronisation à vérifier.',
+                    style: TextStyle(
+                      color: theme.mutedTextColor,
+                      fontSize: 9,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        Expanded(
+          child: visibleAlerts.isEmpty
+              ? const _DashboardEmptyState(
+                  icon: FluentIcons.check_mark,
+                  message: 'Aucune échéance de stock à signaler.',
+                )
+              : ListView.separated(
+                  itemCount: visibleAlerts.length,
+                  separatorBuilder: (_, _) => Divider(
+                    style: DividerThemeData(
+                      decoration: BoxDecoration(color: theme.borderColor),
+                    ),
+                  ),
+                  itemBuilder: (context, index) {
+                    final alert = visibleAlerts[index];
+                    final color = alert.severity ==
+                            DashboardAlertSeverity.danger
+                        ? const Color(0xFFE85D75)
+                        : const Color(0xFFE6A23C);
+                    return Row(
+                      children: [
+                        Icon(
+                          FluentIcons.database_activity,
+                          size: 15,
+                          color: theme.mutedTextColor,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                alert.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: theme.textColor,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Text(
+                                alert.subtitle,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: theme.mutedTextColor,
+                                  fontSize: 9,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 7),
+                        Text(
+                          alert.tag,
+                          style: TextStyle(
+                            color: color,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+}
+
+class _InventoryCount extends StatelessWidget {
+  final String label;
+  final int value;
+  final Color color;
+
+  const _InventoryCount({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.watch<AppTheme>();
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: .10),
+        borderRadius: BorderRadius.circular(9),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            value.toString(),
+            style: TextStyle(
+              color: color,
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 1),
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: theme.mutedTextColor,
+              fontSize: 9,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
