@@ -56,7 +56,6 @@ class _VehicleDamageState extends State<VehicleDamageGts> {
                           maxLines: 4,
                           onChanged: (s) {
                             widget.etatVehicle.cabineCom = s;
-                            setState(() {});
                           },
                         ),
                       ),
@@ -80,7 +79,6 @@ class _VehicleDamageState extends State<VehicleDamageGts> {
                           maxLines: 6,
                           onChanged: (s) {
                             widget.etatVehicle.exterieurAvCom = s;
-                            setState(() {});
                           },
                         ),
                       ),
@@ -104,7 +102,6 @@ class _VehicleDamageState extends State<VehicleDamageGts> {
                           maxLines: 6,
                           onChanged: (s) {
                             widget.etatVehicle.exterieurArCom = s;
-                            setState(() {});
                           },
                         ),
                       ),
