@@ -2720,6 +2720,7 @@ class _VehicleFormState extends State<VehicleForm>
                             minFontSize: 5,
                             maxLines: 1,
                           ),
+                        ),
                         const Icon(FluentIcons.chevron_down, size: 12),
                       ],
                     ),
