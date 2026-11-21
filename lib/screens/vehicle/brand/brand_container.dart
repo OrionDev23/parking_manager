@@ -1,95 +1,86 @@
-import 'package:appwrite/appwrite.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:parc_oto/providers/client_database.dart';
-import 'package:parc_oto/screens/vehicle/manager/vehicle_tabs.dart';
-import 'package:parc_oto/screens/vehicle/manager/vehicle_management.dart';
-import 'package:parc_oto/widgets/on_tap_scale.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 
+import '../../../core/services/vehicle_make_service.dart';
+import '../../../providers/vehicle_provider.dart';
 import '../../../theme.dart';
+import '../../../widgets/on_tap_scale.dart';
 import '../../sidemenu/pane_items.dart';
+import '../manager/vehicle_management.dart';
+import '../manager/vehicle_tabs.dart';
 
-class BrandContainer extends StatefulWidget {
-  final int? id;
+class BrandContainer extends StatelessWidget {
+  final VehicleMake make;
 
-  const BrandContainer({super.key, this.id});
-
-  @override
-  State<BrandContainer> createState() => _BrandContainerState();
-}
-
-class _BrandContainerState extends State<BrandContainer> {
-  bool loading = true;
-  int? vCount;
-
-  @override
-  void initState() {
-    getCount();
-    super.initState();
-  }
-
-  void getCount() async {
-    await DatabaseGetter.database!
-        .listRows(
-          databaseId: databaseId,
-          tableId: vehiculeid,
-          queries: [
-            Query.equal('marque', widget.id.toString()),
-            Query.limit(1),
-          ],
-        )
-        .then((value) {
-          vCount = value.total;
-        });
-    if (mounted) {
-      setState(() {
-        loading = false;
-      });
-    }
-  }
+  const BrandContainer({super.key, required this.make});
 
   @override
   Widget build(BuildContext context) {
-    var appTheme = context.watch<AppTheme>();
+    final theme = context.watch<AppTheme>();
+    final vehicleCount = VehicleProvider.vehicles.values
+        .where((vehicle) =>
+            VehicleMakeService.canonicalId(vehicle.marque) == make.id)
+        .length;
+
     return OnTapScaleAndFade(
+      onTap: () {
+        PaneItemsAndFooters.selectPane('vehicle-manager');
+        VehicleTabsState.currentIndex.value = 0;
+        VehicleManagementState.brandFilterRequest.value = make.id;
+      },
       child: Container(
-        width: double.infinity,
-        height: double.infinity,
         decoration: BoxDecoration(
-          color: appTheme.backGroundColor,
-          boxShadow: kElevationToShadow[2],
+          color: theme.backGroundColor,
+          borderRadius: BorderRadius.circular(13),
+          border: Border.all(color: theme.borderColor),
         ),
-        child: Stack(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Positioned.fill(
-              child: Image.asset(
-                'assets/images/marques/${widget.id ?? 'default'}.webp',
-                fit: BoxFit.scaleDown,
+            Expanded(
+              child: Center(
+                child: VehicleMakeLogo(makeId: make.id, size: 62),
               ),
             ),
-            Positioned(
-              bottom: 1.h,
-              right: 1.w,
-              child: Container(
-                padding: const EdgeInsets.all(5),
-                child: loading
-                    ? const Text('')
-                    : Text(
-                        '$vCount ${'vehicules'.tr()}',
-                        style: appTheme.writingStyle,
-                      ),
+            const SizedBox(height: 10),
+            Text(
+              make.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: theme.textColor,
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
               ),
+            ),
+            const SizedBox(height: 3),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    make.category,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: theme.mutedTextColor,
+                      fontSize: 10,
+                    ),
+                  ),
+                ),
+                Text(
+                  '$vehicleCount véhicule(s)',
+                  style: TextStyle(
+                    color: theme.mutedTextColor,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
       ),
-      onTap: () {
-        PaneItemsAndFooters.selectPane('vehicle-manager');
-        VehicleTabsState.currentIndex.value = 0;
-        VehicleManagementState.brandFilterRequest.value = widget.id;
-      },
     );
   }
 }
