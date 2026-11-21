@@ -1046,12 +1046,12 @@ const VEHICLE_MAKE_CATEGORIES = new Set([
 
 function normalizeVehicleMakeName(value) {
   return String(value || '').normalize('NFKD')
-    .replace(/[\\u0300-\\u036f]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/&/g, ' and ')
     .replace(/[^a-z0-9]+/g, ' ')
     .trim()
-    .replace(/\\s+/g, ' ');
+    .replace(/\s+/g, ' ');
 }
 
 async function createSharedVehicleMake({ userId, input }) {
@@ -1060,7 +1060,7 @@ async function createSharedVehicleMake({ userId, input }) {
     await requireCompanyAdmin(userId, companyId);
   }
 
-  const name = String(input.name || '').trim().replace(/\\s+/g, ' ');
+  const name = String(input.name || '').trim().replace(/\s+/g, ' ');
   const category = String(input.category || 'passenger').trim().toLowerCase();
   const normalizedName = normalizeVehicleMakeName(name);
   if (name.length < 2 || name.length > 100 ||
@@ -1161,7 +1161,7 @@ async function updateSharedVehicleMake({ userId, input }) {
   }
   const patch = {};
   if (input.name !== undefined) {
-    const name = String(input.name || '').trim().replace(/\\s+/g, ' ');
+    const name = String(input.name || '').trim().replace(/\s+/g, ' ');
     const normalizedName = normalizeVehicleMakeName(name);
     if (name.length < 2 || name.length > 100 || !normalizedName) {
       const failure = new Error('Nom de marque invalide.');
