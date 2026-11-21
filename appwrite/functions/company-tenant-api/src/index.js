@@ -1190,11 +1190,16 @@ function vehicleImageCandidateMatches(candidate, { make, model, year, color }) {
   const generationRange = vehicleImageGenerationRange(make, model);
   const sourceModel = normalizeImageSearchText(candidate.model || '');
   const sourceYear = Number.parseInt(candidate.modelYear, 10);
+  const sourceYearMatches = Number.isInteger(sourceYear)
+    ? sourceYear === year
+    : candidate.source === 'trustcar' &&
+      generationRange !== null &&
+      year >= generationRange[0] &&
+      year <= generationRange[1];
   const sourceGenerationMatches = Boolean(
     requestedBase &&
     sourceModel === requestedBase &&
-    Number.isInteger(sourceYear) &&
-    sourceYear === year &&
+    sourceYearMatches &&
     generationRange !== null &&
     year >= generationRange[0] &&
     year <= generationRange[1]
@@ -1206,10 +1211,14 @@ function vehicleImageCandidateMatches(candidate, { make, model, year, color }) {
   const yearText = String(year);
   const yearMatches = Number.isInteger(sourceYear)
     ? sourceYear === year
-    : descriptiveText.includes(yearText) ||
-      (generationRange !== null &&
+    : candidate.source === 'trustcar'
+      ? generationRange !== null &&
         year >= generationRange[0] &&
-        year <= generationRange[1]);
+        year <= generationRange[1]
+      : descriptiveText.includes(yearText) ||
+        (generationRange !== null &&
+          year >= generationRange[0] &&
+          year <= generationRange[1]);
 
   const colorTerms = VEHICLE_IMAGE_COLOR_TERMS[color] || [];
   const colorMatches = color === 'original' ||
@@ -1549,7 +1558,9 @@ async function persistVehicleImage({
 function createVehicleImageCandidateToken({
   candidate, criteria, companyId, userId, forceRefresh,
 }) {
-  const signingSecret = requestContext.getStore()?.apiKey;
+  const signingSecret =
+    process.env.VEHICLE_IMAGE_CANDIDATE_SIGNING_SECRET ||
+    process.env.APPWRITE_FUNCTION_API_KEY;
   if (!signingSecret) throw new Error('Image candidate signing key is unavailable.');
   const payload = Buffer.from(JSON.stringify({
     version: 1, candidate, criteria, companyId, userId,
@@ -1569,7 +1580,9 @@ function verifyVehicleImageCandidateToken(token, {
     failure.status = 400;
     throw failure;
   }
-  const signingSecret = requestContext.getStore()?.apiKey;
+  const signingSecret =
+    process.env.VEHICLE_IMAGE_CANDIDATE_SIGNING_SECRET ||
+    process.env.APPWRITE_FUNCTION_API_KEY;
   if (!signingSecret) throw new Error('Image candidate signing key is unavailable.');
   const expected = createHmac('sha256', signingSecret).update(parts[0]).digest();
   const provided = Buffer.from(parts[1], 'base64url');
