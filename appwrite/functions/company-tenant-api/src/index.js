@@ -2416,6 +2416,34 @@ export default async (context) => requestContext.run(
       }
     }
 
+    if (action === 'vehicle_make_capabilities') {
+      const companyId = String(input.companyId || '').trim();
+      if (isPlatformSuperAdmin(userId)) {
+        return json(res, 200, {
+          ok: true,
+          canAdd: true,
+          canManage: true,
+          isPlatformSuperAdmin: true,
+        });
+      }
+      if (!companyId) {
+        const failure = new Error('companyId is required.');
+        failure.status = 400;
+        throw failure;
+      }
+      const membership = await activeMembership(userId, companyId);
+      const role = membership?.data?.role || '';
+      return json(res, 200, {
+        ok: true,
+        canAdd: Boolean(
+          membership &&
+          membership.data?.status === 'active' &&
+          ['owner', 'admin'].includes(role)
+        ),
+        canManage: false,
+        isPlatformSuperAdmin: false,
+      });
+    }
     if (action === 'vehicle_make_create') {
       const result = await createSharedVehicleMake({ userId, input });
       return json(res, 201, result);
