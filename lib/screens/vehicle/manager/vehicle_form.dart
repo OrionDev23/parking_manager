@@ -831,10 +831,9 @@ class _VehicleFormState extends State<VehicleForm>
                                 color: appTheme.color,
                               ),
                       );
-                      final controls = Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+                      final controls = Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                             const Text(
                               'IMAGE DU VÉHICULE',
                               style: TextStyle(
@@ -878,8 +877,7 @@ class _VehicleFormState extends State<VehicleForm>
                                         ],
                                       ),
                               ),
-                          ],
-                        ),
+                        ],
                       );
                       return compactImage
                           ? Column(
@@ -895,7 +893,7 @@ class _VehicleFormState extends State<VehicleForm>
                               children: [
                                 image,
                                 const SizedBox(width: 14),
-                                controls,
+                                Expanded(child: controls),
                               ],
                             );
                     },
