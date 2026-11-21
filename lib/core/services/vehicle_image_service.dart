@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:appwrite/appwrite.dart';
 
@@ -11,6 +12,10 @@ class VehicleImageResolution {
   final String source;
   final String? reason;
   final bool colorFallback;
+  final bool replacementFound;
+  final String? license;
+  final String? attribution;
+  final String? sourceUrl;
 
   const VehicleImageResolution({
     required this.found,
@@ -19,6 +24,10 @@ class VehicleImageResolution {
     this.fileId,
     this.reason,
     this.colorFallback = false,
+    this.replacementFound = false,
+    this.license,
+    this.attribution,
+    this.sourceUrl,
   });
 
   factory VehicleImageResolution.fromJson(Map<String, dynamic> json) {
@@ -29,6 +38,30 @@ class VehicleImageResolution {
       fileId: json['fileId']?.toString(),
       reason: json['reason']?.toString(),
       colorFallback: json['colorFallback'] == true,
+      replacementFound: json['replacementFound'] == true,
+      license: json['license']?.toString(),
+      attribution: json['attribution']?.toString(),
+      sourceUrl: json['sourceUrl']?.toString(),
+    );
+  }
+}
+
+class VehicleImageCapabilities {
+  final bool canUpload;
+  final bool canForceRefresh;
+  final bool isPlatformSuperAdmin;
+
+  const VehicleImageCapabilities({
+    this.canUpload = false,
+    this.canForceRefresh = false,
+    this.isPlatformSuperAdmin = false,
+  });
+
+  factory VehicleImageCapabilities.fromJson(Map<String, dynamic> json) {
+    return VehicleImageCapabilities(
+      canUpload: json['canUpload'] == true,
+      canForceRefresh: json['canForceRefresh'] == true,
+      isPlatformSuperAdmin: json['isPlatformSuperAdmin'] == true,
     );
   }
 }
@@ -36,12 +69,8 @@ class VehicleImageResolution {
 class VehicleImageService {
   static const String functionId = 'company-tenant-api';
 
-  static Future<VehicleImageResolution> resolve({
-    required String companyId,
-    required String make,
-    required String model,
-    required int year,
-    required String color,
+  static Future<Map<String, dynamic>> _execute({
+    required Map<String, dynamic> body,
   }) async {
     final client = DatabaseGetter.client;
     if (client == null) {
@@ -50,14 +79,7 @@ class VehicleImageService {
 
     final execution = await Functions(client).createExecution(
       functionId: functionId,
-      body: jsonEncode({
-        'action': 'vehicle_image_resolve',
-        'companyId': companyId,
-        'make': make,
-        'model': model,
-        'year': year,
-        'color': color,
-      }),
+      body: jsonEncode(body),
       xasync: false,
     );
 
@@ -65,7 +87,8 @@ class VehicleImageService {
         execution.responseStatusCode >= 300) {
       Map<String, dynamic> failure = {};
       try {
-        failure = jsonDecode(execution.responseBody) as Map<String, dynamic>;
+        final decoded = jsonDecode(execution.responseBody);
+        if (decoded is Map<String, dynamic>) failure = decoded;
       } catch (_) {}
       throw StateError(
         failure['message']?.toString() ??
@@ -77,6 +100,66 @@ class VehicleImageService {
     if (decoded is! Map<String, dynamic> || decoded['ok'] != true) {
       throw StateError('Réponse invalide du service d’images.');
     }
-    return VehicleImageResolution.fromJson(decoded);
+    return decoded;
+  }
+
+  static Future<VehicleImageCapabilities> capabilities({
+    required String companyId,
+  }) async {
+    final result = await _execute(
+      body: {
+        'action': 'vehicle_image_capabilities',
+        'companyId': companyId,
+      },
+    );
+    return VehicleImageCapabilities.fromJson(result);
+  }
+
+  static Future<VehicleImageResolution> resolve({
+    required String companyId,
+    required String make,
+    required String model,
+    required int year,
+    required String color,
+    bool forceRefresh = false,
+  }) async {
+    final result = await _execute(
+      body: {
+        'action': 'vehicle_image_resolve',
+        'companyId': companyId,
+        'make': make,
+        'model': model,
+        'year': year,
+        'color': color,
+        if (forceRefresh) 'forceRefresh': true,
+      },
+    );
+    return VehicleImageResolution.fromJson(result);
+  }
+
+  static Future<VehicleImageResolution> uploadCustom({
+    required String companyId,
+    required String make,
+    required String model,
+    required int year,
+    required String color,
+    required Uint8List bytes,
+    required String mimeType,
+    String? fileName,
+  }) async {
+    final result = await _execute(
+      body: {
+        'action': 'vehicle_image_upload',
+        'companyId': companyId,
+        'make': make,
+        'model': model,
+        'year': year,
+        'color': color,
+        'mimeType': mimeType,
+        'fileName': fileName,
+        'imageBase64': base64Encode(bytes),
+      },
+    );
+    return VehicleImageResolution.fromJson(result);
   }
 }
