@@ -48,6 +48,78 @@ BoxConstraints _responsiveVehiclePickerConstraints(
   );
 }
 
+
+const List<Map<String, String>> _vehiclePaintOptions = [
+  {'value': 'original', 'label': 'Peinture d’origine'},
+  {'value': 'white', 'label': 'Blanc'},
+  {'value': 'black', 'label': 'Noir'},
+  {'value': 'silver', 'label': 'Argent'},
+  {'value': 'grey', 'label': 'Gris foncé'},
+  {'value': 'blue', 'label': 'Bleu'},
+  {'value': 'red', 'label': 'Rouge'},
+];
+
+const Map<String, Color> _vehiclePaintSwatches = {
+  'original': Color(0xFF8A8A8A),
+  'white': Color(0xFFF3F3F3),
+  'black': Color(0xFF202124),
+  'silver': Color(0xFFB9BEC5),
+  'grey': Color(0xFF62676D),
+  'blue': Color(0xFF2563B8),
+  'red': Color(0xFFCC3636),
+};
+
+String _normalizeVehiclePaint(String? value) {
+  final normalized = (value ?? '')
+      .trim()
+      .toLowerCase()
+      .replaceAll('_', ' ')
+      .replaceAll('-', ' ');
+
+  switch (normalized) {
+    case '':
+    case 'original':
+    case 'origine':
+    case 'peinture d origine':
+    case 'couleur d origine':
+    case 'original paint':
+    case 'default':
+      return 'original';
+    case 'white':
+    case 'blanc':
+    case 'blanche':
+      return 'white';
+    case 'black':
+    case 'noir':
+    case 'noire':
+      return 'black';
+    case 'silver':
+    case 'argent':
+    case 'argente':
+    case 'argenté':
+    case 'gris clair':
+    case 'gris metallise':
+    case 'gris métallisé':
+      return 'silver';
+    case 'grey':
+    case 'gray':
+    case 'gris':
+    case 'gris fonce':
+    case 'gris foncé':
+    case 'anthracite':
+      return 'grey';
+    case 'blue':
+    case 'bleu':
+    case 'bleue':
+      return 'blue';
+    case 'red':
+    case 'rouge':
+      return 'red';
+    default:
+      return 'original';
+  }
+}
+
 class VehicleForm extends StatefulWidget {
   final Vehicle? vehicle;
   final Tab? tab;
@@ -164,6 +236,7 @@ class _VehicleFormState extends State<VehicleForm>
   void initValues() {
     _resolvedImageUrl = widget.vehicle?.imageUrl;
     _resolvedImageFileId = widget.vehicle?.imageFileId;
+    colorController.text = _normalizeVehiclePaint(widget.vehicle?.color);
     AlgeriaList();
     if (widget.vehicle != null) {
       documentID = widget.vehicle!.id;
@@ -231,7 +304,7 @@ class _VehicleFormState extends State<VehicleForm>
       );
       trimController.text = widget.vehicle!.trim ?? '';
       modelYearController.text = widget.vehicle!.modelYear?.toString() ?? '';
-      colorController.text = widget.vehicle!.color ?? '';
+      colorController.text = _normalizeVehiclePaint(widget.vehicle!.color);
       engineDisplacementController.text =
           widget.vehicle!.engineDisplacement?.toString() ?? '';
       enginePowerHpController.text = widget.vehicle!.enginePowerHp?.toString() ?? '';
@@ -843,7 +916,7 @@ class _VehicleFormState extends State<VehicleForm>
                             const SizedBox(height: 5),
                             Text(
                               _vehicleImageMessage ??
-                                  'L’image sera recherchée par marque, modèle, année et couleur.',
+                                  'L’année choisie sert à retrouver la génération la plus proche. Choisissez aussi la couleur souhaitée.',
                               style: TextStyle(
                                 fontSize: 11,
                                 height: 1.35,
@@ -1290,7 +1363,48 @@ class _VehicleFormState extends State<VehicleForm>
                 field('Version / finition', trimController),
                 field('Année modèle', modelYearController,
                     hint: 'Ex. 2022', numeric: true),
-                field('Couleur', colorController),
+                _identityField(
+                  appTheme,
+                  width: fieldWidth,
+                  label: 'Couleur',
+                  child: ParcotoFieldSurface(
+                    child: ComboBox<String>(
+                      value: _normalizeVehiclePaint(colorController.text),
+                      isExpanded: true,
+                      items: _vehiclePaintOptions.map((option) {
+                        final value = option['value']!;
+                        return ComboBoxItem<String>(
+                          value: value,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 13,
+                                height: 13,
+                                decoration: BoxDecoration(
+                                  color: _vehiclePaintSwatches[value],
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.grey[100],
+                                    width: value == 'white' ? 1 : 0.5,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 9),
+                              Text(option['label']!),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: widget.readOnly
+                          ? null
+                          : (value) {
+                              if (value == null) return;
+                              setState(() => colorController.text = value);
+                            },
+                    ),
+                  ),
+                ),
                 field('Cylindrée (cm³)', engineDisplacementController,
                     numeric: true),
                 field('Code moteur', engineCodeController),
@@ -2975,7 +3089,7 @@ class _VehicleFormState extends State<VehicleForm>
         make: make,
         model: model,
         year: year,
-        color: colorController.text.trim(),
+        color: _normalizeVehiclePaint(colorController.text),
       );
       if (!mounted) return;
       setState(() {
@@ -3079,8 +3193,8 @@ class _VehicleFormState extends State<VehicleForm>
             type.text.trim() != (widget.vehicle?.type ?? '').trim() ||
             int.tryParse(modelYearController.text.trim()) !=
                 widget.vehicle?.modelYear ||
-            colorController.text.trim().toLowerCase() !=
-                (widget.vehicle?.color ?? '').trim().toLowerCase());
+            _normalizeVehiclePaint(colorController.text) !=
+                _normalizeVehiclePaint(widget.vehicle?.color));
 
     if (!widget.readOnly &&
         type.text.trim().isNotEmpty &&
@@ -3112,7 +3226,7 @@ class _VehicleFormState extends State<VehicleForm>
         // Preserve extended data while editing a vehicle in the legacy form.
         trim: _nullableText(trimController.text),
         modelYear: int.tryParse(modelYearController.text.trim()),
-        color: _nullableText(colorController.text),
+        color: _normalizeVehiclePaint(colorController.text),
         engineDisplacement: int.tryParse(engineDisplacementController.text.trim()),
         enginePowerHp: double.tryParse(enginePowerHpController.text.trim().replaceAll(',', '.')),
         enginePowerKw: double.tryParse(enginePowerKwController.text.trim().replaceAll(',', '.')),
