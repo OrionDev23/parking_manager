@@ -185,6 +185,12 @@ class VehicleMakeService {
         numeric < vehiculeBrands.length) {
       return vehiculeBrands[numeric];
     }
+
+    // When the network catalogue is still loading, keep the historical
+    // display names for slugs derived from the original numeric brand list.
+    for (var index = 1; index < vehiculeBrands.length; index++) {
+      if (_slug(vehiculeBrands[index]) == id) return vehiculeBrands[index];
+    }
     return value?.trim() ?? '';
   }
 
@@ -195,7 +201,16 @@ class VehicleMakeService {
   }
 
   static String? legacyLogoAssetFor(String? value) {
-    final make = byId(canonicalId(value));
+    final id = canonicalId(value);
+    if (id == null) return null;
+
+    for (var index = 1; index < vehiculeBrands.length; index++) {
+      if (_slug(vehiculeBrands[index]) == id) {
+        return 'assets/images/marques/$index.webp';
+      }
+    }
+
+    final make = byId(id);
     if (make == null) return null;
     final candidates = <String>[make.name, ...make.aliases]
         .map(normalize)
