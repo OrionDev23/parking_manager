@@ -66,7 +66,7 @@ class BrandContainer extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        make.category,
+                        VehicleMakeService.categoryLabel(make.category),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
