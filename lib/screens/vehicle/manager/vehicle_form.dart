@@ -2726,7 +2726,6 @@ class _VehicleFormState extends State<VehicleForm>
                     ),
                   ),
                 ),
-                ),
               ],
             ),
           ),
