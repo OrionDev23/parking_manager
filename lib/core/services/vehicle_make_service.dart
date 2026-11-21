@@ -58,51 +58,59 @@ class VehicleMakeService {
 
   static List<VehicleMake> _cache = const [];
   static DateTime? _loadedAt;
-  static bool _loading = false;
+  static Future<List<VehicleMake>>? _pendingLoad;
 
   static List<VehicleMake> get cached => List.unmodifiable(_cache);
 
   static Future<List<VehicleMake>> load({bool forceRefresh = false}) async {
     final loadedAt = _loadedAt;
     if (!forceRefresh &&
-        _cache.isNotEmpty &&
         loadedAt != null &&
         DateTime.now().difference(loadedAt) < const Duration(minutes: 15)) {
       return cached;
     }
-    if (_loading) return cached;
 
+    final pending = _pendingLoad;
+    if (pending != null) return pending;
+
+    final future = _loadFromDatabase();
+    _pendingLoad = future;
+    try {
+      return await future;
+    } finally {
+      if (identical(_pendingLoad, future)) {
+        _pendingLoad = null;
+      }
+    }
+  }
+
+  static Future<List<VehicleMake>> _loadFromDatabase() async {
     final database = DatabaseGetter.database;
     if (database == null) {
       throw StateError('La base Appwrite n’est pas initialisée.');
     }
 
-    _loading = true;
-    try {
-      final result = await database.listRows(
-        databaseId: databaseId,
-        tableId: tableId,
-        queries: [
-          Query.equal('isActive', true),
-          Query.orderAsc('name'),
-          Query.limit(500),
-        ],
-      );
-      final makes = result.rows
-          .map(
-            (row) => VehicleMake.fromRow(
-              id: row.$id,
-              data: Map<String, dynamic>.from(row.data),
-            ),
-          )
-          .where((make) => make.name.trim().isNotEmpty)
-          .toList(growable: false);
-      _cache = makes;
-      _loadedAt = DateTime.now();
-      return cached;
-    } finally {
-      _loading = false;
-    }
+    final result = await database.listRows(
+      databaseId: databaseId,
+      tableId: tableId,
+      queries: [
+        Query.equal('isActive', true),
+        Query.orderAsc('name'),
+        Query.limit(500),
+      ],
+    );
+    final makes = result.rows
+        .map(
+          (row) => VehicleMake.fromRow(
+            id: row.$id,
+            data: Map<String, dynamic>.from(row.data),
+          ),
+        )
+        .where((make) => make.name.trim().isNotEmpty)
+        .toList(growable: false);
+    _cache = makes;
+    _loadedAt = DateTime.now();
+    return cached;
   }
 
   static Future<void> invalidate() async {
@@ -200,6 +208,37 @@ class VehicleMakeService {
 
   static Future<List<String>> searchIds(String query) async {
     return search(query).map((make) => make.id).toList(growable: false);
+  }
+
+  static Future<Map<String, dynamic>> capabilities({
+    required String companyId,
+  }) async {
+    final client = DatabaseGetter.client;
+    if (client == null) {
+      throw StateError('Le client Appwrite n’est pas initialisé.');
+    }
+    final execution = await Functions(client).createExecution(
+      functionId: functionId,
+      body: jsonEncode({
+        'action': 'vehicle_make_capabilities',
+        'companyId': companyId,
+      }),
+      xasync: false,
+    );
+    Map<String, dynamic> response = {};
+    try {
+      final decoded = jsonDecode(execution.responseBody);
+      if (decoded is Map) response = Map<String, dynamic>.from(decoded);
+    } catch (_) {}
+    if (execution.responseStatusCode < 200 ||
+        execution.responseStatusCode >= 300 ||
+        response['ok'] != true) {
+      throw StateError(
+        response['message']?.toString() ??
+            'Impossible de vérifier les droits sur le catalogue des marques.',
+      );
+    }
+    return response;
   }
 
   static Future<Map<String, dynamic>> create({
