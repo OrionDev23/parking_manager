@@ -1,6 +1,5 @@
 import '../admin_parameters.dart';
 import '../screens/entreprise/entreprise.dart';
-import 'vehicle_brands.dart';
 import '../core/services/vehicle_make_service.dart';
 
 const marqueMax = 71;
