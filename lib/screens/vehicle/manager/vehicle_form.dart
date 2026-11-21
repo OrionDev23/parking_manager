@@ -3275,7 +3275,9 @@ class _VehicleFormState extends State<VehicleForm>
           final sourceLabel = _vehicleImageSourceLabel(result.source);
           _vehicleImageMessage = result.colorFallback
               ? 'Image disponible, mais la couleur demandée est indisponible : peinture d’origine affichée ($sourceLabel).'
-              : 'Image disponible — source : $sourceLabel.';
+              : result.fromSharedCache
+                  ? 'Image réutilisée depuis le catalogue partagé — source : $sourceLabel.'
+                  : 'Image récupérée et ajoutée au catalogue partagé — source : $sourceLabel.';
         } else {
           _vehicleImageMessage =
               'Aucune image correspondant au modèle, à l’année et à la couleur n’a été trouvée. Un administrateur peut ajouter une photo.';
