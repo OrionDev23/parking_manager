@@ -985,7 +985,7 @@ class _VehicleFormState extends State<VehicleForm>
                                             children: [
                                               Icon(FluentIcons.search, size: 13),
                                               SizedBox(width: 7),
-                                              Text('Comparer 2 sources'),
+                                              Text('Comparer les images'),
                                             ],
                                           ),
                                   ),
@@ -3316,8 +3316,8 @@ class _VehicleFormState extends State<VehicleForm>
       _resolvingVehicleImage = true;
       _vehicleImageCandidates = [];
       _vehicleImageMessage = forceRefresh
-          ? 'Recherche de deux alternatives. L’image actuelle sera remplacée uniquement après ton choix…'
-          : 'Recherche de deux propositions auprès de sources différentes…';
+          ? 'Recherche de nouvelles alternatives. L’image actuelle sera remplacée uniquement après ton choix…'
+          : 'Recherche de plusieurs propositions auprès de sources différentes…';
       if (!imageMatchesCurrentIdentity && !forceRefresh) {
         _resolvedImageUrl = null;
         _resolvedImageFileId = null;
@@ -3361,7 +3361,7 @@ class _VehicleFormState extends State<VehicleForm>
               'Image déjà disponible dans le catalogue partagé.';
         } else if (result.candidates.isNotEmpty) {
           _vehicleImageMessage = result.candidates.length >= 2
-              ? 'Deux propositions trouvées auprès de sources différentes. Choisissez celle qui représente réellement ce véhicule.'
+              ? '${result.candidates.length} propositions trouvées auprès de sources différentes. Vérifiez laquelle représente réellement ce véhicule.'
               : 'Une seule source a fourni une image exploitable. Vérifiez-la avant de la sélectionner.';
           _resolvedImageMake = make;
           _resolvedImageModel = model;
