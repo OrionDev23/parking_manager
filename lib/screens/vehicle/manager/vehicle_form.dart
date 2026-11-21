@@ -3211,6 +3211,8 @@ class _VehicleFormState extends State<VehicleForm>
     switch (source) {
       case 'wikimedia_commons':
         return 'Wikimedia Commons';
+      case 'trustcar':
+        return 'CarAPI TrustCar';
       case 'openverse':
         return 'Openverse';
       case 'carimages':
@@ -3265,7 +3267,7 @@ class _VehicleFormState extends State<VehicleForm>
       _resolvingVehicleImage = true;
       _vehicleImageMessage = forceRefresh
           ? 'Nouvelle recherche en cours. L’image actuelle sera conservée si aucun meilleur résultat n’est trouvé…'
-          : 'Recherche dans Wikimedia Commons, Openverse puis CarImagesAPI…';
+          : 'Recherche dans Wikimedia Commons, CarAPI TrustCar, Openverse puis CarImagesAPI…';
     });
 
     try {
