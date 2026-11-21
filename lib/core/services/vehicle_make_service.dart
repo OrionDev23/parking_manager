@@ -71,7 +71,10 @@ class VehicleMakeService {
     }
 
     final pending = _pendingLoad;
-    if (pending != null) return pending;
+    if (pending != null) {
+      final current = await pending;
+      return forceRefresh ? load(forceRefresh: true) : current;
+    }
 
     final future = _loadFromDatabase();
     _pendingLoad = future;
