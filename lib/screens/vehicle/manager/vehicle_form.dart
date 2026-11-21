@@ -3432,6 +3432,7 @@ class _VehicleFormState extends State<VehicleForm>
       }
 
       final bytes = await picked.readAsBytes();
+      if (!mounted) return;
       if (bytes.isEmpty || bytes.length > 5 * 1024 * 1024) {
         displayInfoBar(
           context,
