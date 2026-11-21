@@ -1080,7 +1080,7 @@ class _VehicleFormState extends State<VehicleForm>
                                                         height: 82,
                                                         color: appTheme.backGroundColor,
                                                         alignment: Alignment.center,
-                                                        child: const Icon(FluentIcons.image),
+                                                        child: const Icon(FluentIcons.car),
                                                       ),
                                                     ),
                                                   ),
