@@ -53,7 +53,7 @@ class VehicleMapper {
       nextServiceMileage: vehicle.nextServiceMileage,
       customFields: vehicle.customFields ?? const {},
       type: vehicle.type,
-      brand: VehicleMakeService.canonicalId(vehicle.marque) ?? vehicle.marque,
+      brand: VehicleMakeService.canonicalId(vehicle.marque),
       genre: vehicle.genre,
       usefulLoad: vehicle.charegeUtile,
       totalWeight: vehicle.poidsTotal,
