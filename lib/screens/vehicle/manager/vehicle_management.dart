@@ -11,6 +11,7 @@ import '../../../theme.dart';
 import '../../../ui/design_system/parcoto_surface.dart';
 import '../../../ui/design_system/parcoto_tokens.dart';
 import '../../../serializables/vehicle/vehicle.dart';
+import '../../../core/services/vehicle_make_service.dart';
 import '../../../utilities/vehicle_util.dart';
 import '../../../widgets/forms/parcoto_form_field.dart';
 import 'vehicle_details_page.dart';
@@ -28,14 +29,14 @@ class VehicleManagement extends StatefulWidget {
 class VehicleManagementState extends State<VehicleManagement>
     with AutomaticKeepAliveClientMixin<VehicleManagement> {
   static ValueNotifier<int> stateChanges = ValueNotifier(0);
-  static final ValueNotifier<int?> brandFilterRequest = ValueNotifier<int?>(null);
+  static final ValueNotifier<String?> brandFilterRequest = ValueNotifier<String?>(null);
   static final ValueNotifier<String?> externalSearchRequest =
       ValueNotifier<String?>(null);
 
   final TextEditingController searchController = TextEditingController();
   String searchQuery = '';
   int? selectedState;
-  int? selectedBrand;
+  String? selectedBrand;
   _VehicleWorkspaceView _workspaceView = _VehicleWorkspaceView.fleet;
   Vehicle? _selectedVehicle;
   Vehicle? _editingVehicle;
@@ -53,6 +54,9 @@ class VehicleManagementState extends State<VehicleManagement>
     externalSearchRequest.value = null;
     externalSearchRequest.addListener(_handleExternalSearchRequest);
     brandFilterRequest.addListener(_handleExternalBrandFilter);
+    VehicleMakeService.load().then((_) {
+      if (mounted) setState(() {});
+    }).catchError((_) {});
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (!VehicleProvider.downloadedVehicles &&
@@ -404,12 +408,12 @@ class VehicleManagementState extends State<VehicleManagement>
 
   Widget _buildFilters(AppTheme theme, List<Vehicle> vehicles) {
     final brandIds = vehicles
-        .map((vehicle) => int.tryParse(vehicle.marque ?? ''))
-        .whereType<int>()
-        .where((id) => id > 0)
+        .map((vehicle) => VehicleMakeService.canonicalId(vehicle.marque))
+        .whereType<String>()
         .toSet()
         .toList()
-      ..sort();
+      ..sort((a, b) => VehicleMakeService.nameFor(a)
+          .compareTo(VehicleMakeService.nameFor(b)));
 
     final stateIds = conducteurEmploye
         ? List<int>.generate(5, (index) => index)
@@ -468,20 +472,20 @@ class VehicleManagementState extends State<VehicleManagement>
             ),
             SizedBox(
               width: compact ? (constraints.maxWidth - 10) / 2 : 190,
-              child: ComboBox<int?>(
+              child: ComboBox<String?>(
                 isExpanded: true,
                 value: selectedBrand,
                 placeholder: const Text('Toutes les marques'),
                 items: [
-                  const ComboBoxItem<int?>(
+                  const ComboBoxItem<String?>(
                     value: null,
                     child: Text('Toutes les marques'),
                   ),
                   ...brandIds.map(
-                    (id) => ComboBoxItem<int?>(
+                    (id) => ComboBoxItem<String?>(
                       value: id,
                       child: Text(
-                        VehiclesUtilities.getMarqueName(id.toString()),
+                        VehicleMakeService.nameFor(id),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -525,7 +529,7 @@ class VehicleManagementState extends State<VehicleManagement>
         return false;
       }
       if (selectedBrand != null &&
-          int.tryParse(vehicle.marque ?? '') != selectedBrand) {
+          VehicleMakeService.canonicalId(vehicle.marque) != selectedBrand) {
         return false;
       }
       if (query.isEmpty) return true;
