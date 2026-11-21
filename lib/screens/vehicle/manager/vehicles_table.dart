@@ -83,6 +83,9 @@ class VehicleTableState extends State<VehicleTable> {
     sortColumn = columns.length - 1;
 
     super.initState();
+    VehicleMakeService.load().then((_) {
+      if (mounted) setState(() {});
+    }).catchError((_) {});
   }
 
   int sortColumn = conducteurEmploye ? 11 : 6;
