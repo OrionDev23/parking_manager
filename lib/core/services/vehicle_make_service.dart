@@ -197,6 +197,18 @@ class VehicleMakeService {
     return url == null || url.isEmpty ? null : url;
   }
 
+  static String? legacyLogoAssetFor(String? value) {
+    final make = byId(canonicalId(value));
+    if (make == null) return null;
+    final candidates = <String>[make.name, ...make.aliases]
+        .map(normalize)
+        .toSet();
+    final index = vehiculeBrands.indexWhere(
+      (legacyName) => candidates.contains(normalize(legacyName)),
+    );
+    return index > 0 ? 'assets/images/marques/$index.webp' : null;
+  }
+
   static List<VehicleMake> search(String query) {
     final normalized = normalize(query);
     if (normalized.isEmpty) return cached;
@@ -369,11 +381,23 @@ class VehicleMakeLogo extends StatelessWidget {
           width: size,
           height: size,
           fit: BoxFit.contain,
-          errorBuilder: (_, _, _) => _fallback(context, make?.name),
+          errorBuilder: (_, _, _) => _legacyOrFallback(context, make?.name),
         ),
       );
     }
-    return _fallback(context, make?.name);
+    return _legacyOrFallback(context, make?.name);
+  }
+
+  Widget _legacyOrFallback(BuildContext context, String? name) {
+    final asset = VehicleMakeService.legacyLogoAssetFor(makeId);
+    if (asset == null) return _fallback(context, name);
+    return Image.asset(
+      asset,
+      width: size,
+      height: size,
+      fit: BoxFit.contain,
+      errorBuilder: (_, _, _) => _fallback(context, name),
+    );
   }
 
   Widget _fallback(BuildContext context, String? name) {
