@@ -845,6 +845,43 @@ const VEHICLE_IMAGE_CATALOG = 'vehicle_image_catalog';
 const VEHICLE_IMAGE_BUCKET = 'images';
 const CARIMAGES_BASE_URL = 'https://carimagesapi.com';
 const VEHICLE_IMAGE_NEGATIVE_TTL_MS = 6 * 60 * 60 * 1000;
+let openverseAccessToken = '';
+let openverseAccessTokenExpiresAt = 0;
+
+async function getOpenverseAuthorizationHeaders() {
+  const clientId = process.env.OPENVERSE_CLIENT_ID;
+  const clientSecret = process.env.OPENVERSE_CLIENT_SECRET;
+  if (!clientId || !clientSecret) return {};
+
+  if (openverseAccessToken && Date.now() + 60_000 < openverseAccessTokenExpiresAt) {
+    return { Authorization: `Bearer ${openverseAccessToken}` };
+  }
+
+  const tokenResponse = await fetch(
+    'https://api.openverse.org/v1/auth_tokens/token/',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: clientId,
+        client_secret: clientSecret,
+      }),
+      signal: AbortSignal.timeout(12000),
+    },
+  );
+  if (!tokenResponse.ok) {
+    throw new Error(`Openverse authentication failed (${tokenResponse.status}).`);
+  }
+
+  const tokenPayload = await tokenResponse.json();
+  const accessToken = String(tokenPayload.access_token || '');
+  if (!accessToken) throw new Error('Openverse did not return an access token.');
+  openverseAccessToken = accessToken;
+  openverseAccessTokenExpiresAt =
+    Date.now() + Math.max(60, Number(tokenPayload.expires_in) || 36000) * 1000;
+  return { Authorization: `Bearer ${openverseAccessToken}` };
+}
 
 function normalizeVehicleImageColor(value) {
   const color = String(value || '').normalize('NFKD')
@@ -1290,6 +1327,86 @@ async function searchWikimediaVehicleImage(criteria) {
   }
   return candidates.slice(0, 5);
 }
+async function searchTrustCarVehicleImage(criteria) {
+  // TrustCar accepts make/model/year but has no paint-color parameter.
+  // Never use its result when a specific color was requested.
+  if (criteria.color !== 'original') return [];
+
+  const aliases = vehicleImageModelAliases(criteria.model);
+  const generationRange = vehicleImageGenerationRange(criteria.make, criteria.model);
+  const candidates = [];
+
+  for (const alias of aliases.slice(0, 2)) {
+    const params = new URLSearchParams({
+      make: criteria.make,
+      model: alias,
+      year: String(criteria.year),
+      format: 'json',
+    });
+    const response = await fetch(
+      `https://carapi.trustcar.info/getImage?${params}`,
+      {
+        signal: AbortSignal.timeout(12000),
+        headers: { 'User-Agent': 'Parcoto Vehicle Image Service/1.0 (https://parcoto.com)' },
+      },
+    );
+    if (response.status === 404) continue;
+    if (!response.ok) throw new Error(`CarAPI TrustCar search failed (${response.status}).`);
+
+    const payload = await response.json();
+    if (payload.found !== true) continue;
+
+    const resultMake = String(payload.make || '');
+    const resultModel = String(payload.model || '');
+    const resultModelText = normalizeImageSearchText(resultModel);
+    const modelMatches = aliases.some(alias => resultModelText.includes(alias));
+    const resultMakeText = normalizeImageSearchText(resultMake);
+    const requestedMakeText = normalizeImageSearchText(criteria.make);
+    const makeMatches = requestedMakeText.split(' ').filter(Boolean)
+      .every(token => resultMakeText.includes(token));
+    const resultYear = Number.parseInt(payload.year, 10);
+    const yearMatches = Number.isInteger(resultYear)
+      ? resultYear === criteria.year
+      : generationRange !== null &&
+        criteria.year >= generationRange[0] &&
+        criteria.year <= generationRange[1];
+    if (!makeMatches || !modelMatches || !yearMatches) continue;
+
+    const license = String(payload.license || '').trim();
+    if (!isAllowedCommercialImageLicense(license)) continue;
+
+    const imageUrl = String(payload.image_url || '').trim();
+    if (!imageUrl || !isSafeExternalHttpsUrl(imageUrl)) continue;
+    const imageHost = new URL(imageUrl).hostname.toLowerCase();
+    if (!['cdn.trustcar.info', 'carapi.trustcar.info'].includes(imageHost)) continue;
+
+    const title = String(payload.title || `${resultMake} ${resultModel}`).trim();
+    const author = String(payload.author || '').trim();
+    const reference = String(payload.reference || '').trim();
+    const candidate = {
+      title,
+      description: '',
+      tags: [resultMake, resultModel, Number.isInteger(resultYear) ? resultYear : ''].join(' '),
+      imageUrl,
+      sourceUrl: /^Q\\d+$/.test(reference)
+        ? `https://www.wikidata.org/wiki/${reference}`
+        : '',
+      license,
+      licenseUrl: String(payload.license_url || ''),
+      attribution: String(
+        payload.attribution ||
+        `${title} — © ${author || 'Auteur non indiqué'} (${license}), via Wikimedia Commons`
+      ).slice(0, 1000),
+      source: 'trustcar',
+    };
+    if (vehicleImageCandidateMatches(candidate, criteria)) {
+      candidates.push(candidate);
+      break;
+    }
+  }
+  return candidates;
+}
+
 async function searchOpenverseVehicleImage(criteria) {
   const aliases = vehicleImageModelAliases(criteria.model);
   const colourTerms = VEHICLE_IMAGE_COLOR_TERMS[criteria.color] || [];
@@ -1310,7 +1427,10 @@ async function searchOpenverseVehicleImage(criteria) {
     });
     const response = await fetch(`https://api.openverse.org/v1/images/?${params}`, {
       signal: AbortSignal.timeout(15000),
-      headers: { 'User-Agent': 'Parcoto Vehicle Image Service/1.0' },
+      headers: {
+        'User-Agent': 'Parcoto Vehicle Image Service/1.0',
+        ...(await getOpenverseAuthorizationHeaders()),
+      },
     });
     if (!response.ok) throw new Error(`Openverse search failed (${response.status}).`);
     const payload = await response.json();
@@ -1385,6 +1505,7 @@ async function persistVehicleImage({
 async function searchFreeVehicleImageSources(criteria, log) {
   const providers = [
     ['wikimedia_commons', searchWikimediaVehicleImage],
+    ['trustcar', searchTrustCarVehicleImage],
     ['openverse', searchOpenverseVehicleImage],
   ];
   for (const [name, search] of providers) {
