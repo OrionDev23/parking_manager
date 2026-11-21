@@ -1075,7 +1075,7 @@ function fromRomanNumeral(value) {
 function vehicleImageModelAliases(model) {
   const aliases = new Set([normalizeImageSearchText(model)]);
   const text = String(model).trim();
-  const numericMatch = text.match(/^(.*?)[\\s-]+(\\d{1,2})$/);
+  const numericMatch = text.match(/^(.*?)[\s-]+(\d{1,2})$/);
   if (numericMatch) {
     const roman = toRomanNumeral(Number(numericMatch[2]));
     if (roman) {
@@ -1083,7 +1083,7 @@ function vehicleImageModelAliases(model) {
       aliases.add(normalizeImageSearchText(`${numericMatch[1]} generation ${numericMatch[2]}`));
     }
   }
-  const romanMatch = text.match(/^(.*?)[\\s-]+(i{1,3}|iv|v|vi|vii|viii|ix|x)$/i);
+  const romanMatch = text.match(/^(.*?)[\s-]+(i{1,3}|iv|v|vi|vii|viii|ix|x)$/i);
   if (romanMatch) {
     const number = fromRomanNumeral(romanMatch[2]);
     if (number) {
