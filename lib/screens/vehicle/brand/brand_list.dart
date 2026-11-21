@@ -10,7 +10,7 @@ import '../../../widgets/page_header.dart';
 import 'brand_container.dart';
 
 List<String> _parseMakeAliases(String? raw) => (raw ?? '')
-    .split(RegExp(r'[,;\\n]'))
+    .split(RegExp(r'[,;\n]'))
     .map((value) => value.trim())
     .where((value) => value.length > 1)
     .toSet()
@@ -427,17 +427,6 @@ class _EditVehicleMakeDialogState extends State<_EditVehicleMakeDialog> {
               placeholder: 'URL du logo (https://...)',
             ),
             const SizedBox(height: 12),
-            TextBox(
-              controller: _aliasesController,
-              maxLines: 2,
-              placeholder: 'Alias (séparés par des virgules)',
-            ),
-            const SizedBox(height: 12),
-            TextBox(
-              controller: _logoUrlController,
-              placeholder: 'URL du logo (https://...)',
-            ),
-            const SizedBox(height: 12),
             ComboBox<String>(
               isExpanded: true,
               value: _category,
@@ -524,6 +513,17 @@ class _AddVehicleMakeDialogState extends State<_AddVehicleMakeDialog> {
               placeholder: 'Nom officiel de la marque',
               maxLength: 100,
               onChanged: (_) => setState(() {}),
+            ),
+            const SizedBox(height: 12),
+            TextBox(
+              controller: _aliasesController,
+              maxLines: 2,
+              placeholder: 'Alias (séparés par des virgules)',
+            ),
+            const SizedBox(height: 12),
+            TextBox(
+              controller: _logoUrlController,
+              placeholder: 'URL du logo (https://...)',
             ),
             const SizedBox(height: 12),
             ComboBox<String>(
