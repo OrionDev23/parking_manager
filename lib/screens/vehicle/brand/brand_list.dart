@@ -23,6 +23,7 @@ class _BrandListState extends State<BrandList> {
   bool _loading = true;
   bool _adding = false;
   bool _canAddMake = false;
+  bool _canManageMakes = false;
   String? _error;
 
   @override
@@ -55,7 +56,12 @@ class _BrandListState extends State<BrandList> {
     final isPlatformSuperAdmin = DatabaseGetter.user?.$id == '999';
     final companyId = DatabaseGetter.activeCompanyId ?? '';
     if (!isPlatformSuperAdmin && companyId.isEmpty) {
-      if (mounted) setState(() => _canAddMake = false);
+      if (mounted) {
+        setState(() {
+          _canAddMake = false;
+          _canManageMakes = false;
+        });
+      }
       return;
     }
     try {
@@ -63,10 +69,55 @@ class _BrandListState extends State<BrandList> {
         companyId: companyId,
       );
       if (mounted) {
-        setState(() => _canAddMake = capabilities['canAdd'] == true);
+        setState(() {
+          _canAddMake = capabilities['canAdd'] == true;
+          _canManageMakes = capabilities['canManage'] == true;
+        });
       }
     } catch (_) {
-      if (mounted) setState(() => _canAddMake = false);
+      if (mounted) {
+        setState(() {
+          _canAddMake = false;
+          _canManageMakes = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _editMake(VehicleMake make) async {
+    final values = await showDialog<Map<String, String>>(
+      context: context,
+      builder: (context) => _EditVehicleMakeDialog(make: make),
+    );
+    if (values == null || !mounted) return;
+
+    try {
+      await VehicleMakeService.update(
+        makeId: make.id,
+        name: values['name'],
+        category: values['category'],
+      );
+      await _loadMakes(forceRefresh: true);
+      if (!mounted) return;
+      displayInfoBar(
+        context,
+        builder: (context, close) => const InfoBar(
+          title: Text('Marque mise à jour dans le catalogue mondial.'),
+          severity: InfoBarSeverity.success,
+        ),
+        duration: const Duration(seconds: 4),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: const Text('Impossible de modifier cette marque.'),
+          content: Text(error.toString()),
+          severity: InfoBarSeverity.error,
+        ),
+        duration: const Duration(seconds: 5),
+      );
     }
   }
 
@@ -287,6 +338,9 @@ class _BrandListState extends State<BrandList> {
                                       BrandContainer(
                                     key: ValueKey(makes[index].id),
                                     make: makes[index],
+                                    onEdit: _canManageMakes
+                                        ? () => _editMake(makes[index])
+                                        : null,
                                   ),
                                 );
                               },
@@ -295,6 +349,95 @@ class _BrandListState extends State<BrandList> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _EditVehicleMakeDialog extends StatefulWidget {
+  final VehicleMake make;
+
+  const _EditVehicleMakeDialog({required this.make});
+
+  @override
+  State<_EditVehicleMakeDialog> createState() => _EditVehicleMakeDialogState();
+}
+
+class _EditVehicleMakeDialogState extends State<_EditVehicleMakeDialog> {
+  late final TextEditingController _nameController;
+  late String _category;
+
+  static const categories = _AddVehicleMakeDialogState.categories;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.make.name);
+    _category = categories.containsKey(widget.make.category)
+        ? widget.make.category
+        : 'other';
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ContentDialog(
+      title: Text('Modifier ${widget.make.name}'),
+      content: SizedBox(
+        width: 440,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextBox(
+              controller: _nameController,
+              placeholder: 'Nom officiel de la marque',
+              maxLength: 100,
+              onChanged: (_) => setState(() {}),
+            ),
+            const SizedBox(height: 12),
+            ComboBox<String>(
+              isExpanded: true,
+              value: _category,
+              items: categories.entries
+                  .map(
+                    (entry) => ComboBoxItem<String>(
+                      value: entry.key,
+                      child: Text(entry.value),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) {
+                if (value != null) setState(() => _category = value);
+              },
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Identifiant stable : ${widget.make.id}',
+              style: const TextStyle(fontSize: 10),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Annuler'),
+        ),
+        FilledButton(
+          onPressed: _nameController.text.trim().length < 2
+              ? null
+              : () => Navigator.of(context).pop({
+                    'name': _nameController.text.trim(),
+                    'category': _category,
+                  }),
+          child: const Text('Enregistrer'),
+        ),
+      ],
     );
   }
 }
