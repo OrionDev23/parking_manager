@@ -1280,6 +1280,7 @@ async function searchOpenverseVehicleImage(criteria) {
       imageUrl: item.url || '',
       sourceUrl: item.foreign_landing_url || item.detail_url || '',
       license: `${license.toUpperCase()}${item.license_version ? ` ${item.license_version}` : ''}`,
+      licenseUrl: String(item.license_url || ''),
       attribution: String(item.attribution || `${item.title || 'Image'} — ${item.creator || 'Auteur non indiqué'} — ${license}`).slice(0, 1000),
       source: 'openverse',
     };
@@ -1308,6 +1309,7 @@ async function persistVehicleImage({
       source: candidate.source,
       sourceUrl: String(candidate.sourceUrl || '').slice(0, 2048),
       license: String(candidate.license || 'Unspecified').slice(0, 100),
+      licenseUrl: String(candidate.licenseUrl || '').slice(0, 2048),
       attribution: String(candidate.attribution || '').slice(0, 1000),
       uploadedBy: candidate.source === 'manual_upload' ? userId : '',
       generation: null,
@@ -1395,6 +1397,7 @@ async function resolveVehicleImage({ userId, input, log }) {
       colorFallback: color !== 'original' && cached.data.color === 'original',
       generation: cached.data.generation || null,
       license: cached.data.license || null,
+      licenseUrl: cached.data.licenseUrl || null,
       attribution: cached.data.attribution || null,
       sourceUrl: cached.data.sourceUrl || null,
     };
@@ -1576,6 +1579,7 @@ async function uploadCustomVehicleImage({ userId, input }) {
     source: 'manual_upload',
     sourceUrl: '',
     license: 'Uploaded by Parcoto company administrator',
+    licenseUrl: '',
     attribution: String(input.attribution || 'Photo fournie par l’administrateur de l’entreprise').slice(0, 1000),
   };
   return persistVehicleImage({
