@@ -250,7 +250,11 @@ class _VehicleFormState extends State<VehicleForm>
     initValues();
     unawaited(
       VehicleMakeService.load().then((_) {
-        if (mounted) setState(() {});
+        if (!mounted) return;
+        if (widget.vehicle?.imageUrl?.isNotEmpty == true) {
+          _resolvedImageMake = VehicleMakeService.nameFor(marque);
+        }
+        setState(() {});
       }),
     );
     unawaited(_loadVehicleImageCapabilities());
@@ -3683,6 +3687,13 @@ class _VehicleFormState extends State<VehicleForm>
 
     // Do not persist an incomplete vehicle record.
     if (!matriculeIsValid || !chassisIsValid) return;
+
+    try {
+      await VehicleMakeService.load();
+    } catch (_) {
+      // Legacy brand indexes remain resolvable while offline.
+    }
+    if (!mounted) return;
 
     final currentMake = VehicleMakeService.nameFor(marque);
     final currentModel = type.text.trim();
