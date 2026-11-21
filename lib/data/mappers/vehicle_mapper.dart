@@ -1,3 +1,4 @@
+import '../../core/services/vehicle_make_service.dart';
 import '../../domain/entities/vehicle.dart' as domain;
 import '../../serializables/vehicle/vehicle.dart' as legacy;
 
@@ -52,7 +53,7 @@ class VehicleMapper {
       nextServiceMileage: vehicle.nextServiceMileage,
       customFields: vehicle.customFields ?? const {},
       type: vehicle.type,
-      brand: vehicle.marque,
+      brand: VehicleMakeService.canonicalId(vehicle.marque) ?? vehicle.marque,
       genre: vehicle.genre,
       usefulLoad: vehicle.charegeUtile,
       totalWeight: vehicle.poidsTotal,
