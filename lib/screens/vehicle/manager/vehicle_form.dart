@@ -3976,10 +3976,10 @@ class _VehicleMakePickerDialogState extends State<_VehicleMakePickerDialog> {
                   ? const Center(child: Text('Aucune marque trouvée.'))
                   : ListView.separated(
                       itemCount: makes.length,
-                      separatorBuilder: (_, _) =>
-                          Divider(size: 1, style: DividerThemeData(
-                            decoration: BoxDecoration(color: Colors.grey[30]),
-                          )),
+                      separatorBuilder: (_, _) => Container(
+                        height: 1,
+                        color: Colors.grey[30],
+                      ),
                       itemBuilder: (context, index) {
                         final make = makes[index];
                         final selected = make.id == widget.selectedMakeId;
