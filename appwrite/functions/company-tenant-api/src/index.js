@@ -1038,6 +1038,174 @@ async function requireVehicleImageAccess(userId, companyId) {
   return { membership, platformExploration, company };
 }
 
+const VEHICLE_MAKES_TABLE = 'vehicle_makes';
+const VEHICLE_MAKE_CATEGORIES = new Set([
+  'passenger', 'commercial', 'bus', 'motorcycle',
+  'agricultural', 'construction', 'industrial', 'other',
+]);
+
+function normalizeVehicleMakeName(value) {
+  return String(value || '').normalize('NFKD')
+    .replace(/[\\u0300-\\u036f]/g, '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+    .replace(/\\s+/g, ' ');
+}
+
+async function createSharedVehicleMake({ userId, input }) {
+  const companyId = String(input.companyId || '').trim();
+  await requireCompanyAdmin(userId, companyId);
+
+  const name = String(input.name || '').trim().replace(/\\s+/g, ' ');
+  const category = String(input.category || 'passenger').trim().toLowerCase();
+  const normalizedName = normalizeVehicleMakeName(name);
+  if (name.length < 2 || name.length > 100 ||
+      !VEHICLE_MAKE_CATEGORIES.has(category) || !normalizedName) {
+    const failure = new Error('Nom de marque ou catégorie invalide.');
+    failure.status = 400;
+    throw failure;
+  }
+
+  const aliases = Array.isArray(input.aliases)
+    ? [...new Set(input.aliases.map(value => String(value || '').trim())
+        .filter(value => value.length > 1 && value.length <= 100))]
+    : [];
+  if (aliases.length > 20) {
+    const failure = new Error('Une marque ne peut pas avoir plus de 20 alias.');
+    failure.status = 400;
+    throw failure;
+  }
+
+  const existing = await listRows(VEHICLE_MAKES_TABLE, {
+    method: 'equal', attribute: 'normalizedName', values: [normalizedName],
+  });
+  if (existing.length) {
+    const failure = new Error(
+      `La marque "${existing[0].data?.name || name}" existe déjà dans le catalogue partagé.`
+    );
+    failure.status = 409;
+    throw failure;
+  }
+
+  const id = slugify(name).slice(0, 36);
+  if (!id) {
+    const failure = new Error('Impossible de créer un identifiant stable pour cette marque.');
+    failure.status = 400;
+    throw failure;
+  }
+  try {
+    await createRow(VEHICLE_MAKES_TABLE, id, {
+      name,
+      normalizedName,
+      category,
+      aliases,
+      isActive: true,
+      source: 'community',
+      createdBy: userId,
+      updatedBy: userId,
+    }, []);
+  } catch (failure) {
+    if (failure.status === 409) {
+      const conflict = new Error('Une marque avec un identifiant similaire existe déjà.');
+      conflict.status = 409;
+      throw conflict;
+    }
+    throw failure;
+  }
+
+  return {
+    ok: true,
+    make: {
+      id, name, normalizedName, category, aliases,
+      isActive: true, source: 'community',
+    },
+  };
+}
+
+async function updateSharedVehicleMake({ userId, input }) {
+  requirePlatformSuperAdmin(userId);
+  const id = String(input.makeId || '').trim();
+  if (!id) {
+    const failure = new Error('makeId est obligatoire.');
+    failure.status = 400;
+    throw failure;
+  }
+  let row;
+  try {
+    row = normalizeRow(await appwrite(
+      `/tablesdb/${DATABASE_ID}/tables/${VEHICLE_MAKES_TABLE}/rows/${encodeURIComponent(id)}`
+    ));
+  } catch (failure) {
+    if (failure.status === 404) {
+      const missing = new Error('Marque introuvable.');
+      missing.status = 404;
+      throw missing;
+    }
+    throw failure;
+  }
+  const patch = {};
+  if (input.name !== undefined) {
+    const name = String(input.name || '').trim().replace(/\\s+/g, ' ');
+    const normalizedName = normalizeVehicleMakeName(name);
+    if (name.length < 2 || name.length > 100 || !normalizedName) {
+      const failure = new Error('Nom de marque invalide.');
+      failure.status = 400;
+      throw failure;
+    }
+    const duplicates = await listRows(VEHICLE_MAKES_TABLE, {
+      method: 'equal', attribute: 'normalizedName', values: [normalizedName],
+    });
+    if (duplicates.some(item => item.$id !== id)) {
+      const failure = new Error('Une autre marque utilise déjà ce nom.');
+      failure.status = 409;
+      throw failure;
+    }
+    patch.name = name;
+    patch.normalizedName = normalizedName;
+  }
+  if (input.category !== undefined) {
+    const category = String(input.category || '').trim().toLowerCase();
+    if (!VEHICLE_MAKE_CATEGORIES.has(category)) {
+      const failure = new Error('Catégorie invalide.');
+      failure.status = 400;
+      throw failure;
+    }
+    patch.category = category;
+  }
+  if (input.aliases !== undefined) {
+    if (!Array.isArray(input.aliases) || input.aliases.length > 20) {
+      const failure = new Error('Liste d’alias invalide.');
+      failure.status = 400;
+      throw failure;
+    }
+    patch.aliases = [...new Set(input.aliases.map(value => String(value || '').trim())
+      .filter(value => value.length > 1 && value.length <= 100))];
+  }
+  if (input.isActive !== undefined) patch.isActive = input.isActive === true;
+  if (input.logoUrl !== undefined) {
+    const logoUrl = String(input.logoUrl || '').trim();
+    if (logoUrl && !isSafeExternalHttpsUrl(logoUrl)) {
+      const failure = new Error('URL du logo invalide.');
+      failure.status = 400;
+      throw failure;
+    }
+    patch.logoUrl = logoUrl;
+  }
+  if (!Object.keys(patch).length) {
+    const failure = new Error('Aucune modification à enregistrer.');
+    failure.status = 400;
+    throw failure;
+  }
+  patch.updatedBy = userId;
+  await appwrite(
+    `/tablesdb/${DATABASE_ID}/tables/${VEHICLE_MAKES_TABLE}/rows/${encodeURIComponent(id)}`,
+    { method: 'PATCH', body: { data: patch } },
+  );
+  return { ok: true, makeId: id, updated: patch };
+}
+
 async function requireVehicleImageAdmin(userId, companyId) {
   const access = await requireVehicleImageAccess(userId, companyId);
   const platformSuperAdmin = isPlatformSuperAdmin(userId);
@@ -2246,6 +2414,15 @@ export default async (context) => requestContext.run(
       }
     }
 
+    if (action === 'vehicle_make_create') {
+      const result = await createSharedVehicleMake({ userId, input });
+      return json(res, 201, result);
+    }
+    if (action === 'vehicle_make_update') {
+      const result = await updateSharedVehicleMake({ userId, input });
+      return json(res, 200, result);
+    }
+
     if (action === 'vehicle_image_search_candidates') {
       const result = await searchVehicleImageCandidates({ userId, input, log });
       return json(res, 200, result);
@@ -2854,6 +3031,7 @@ export default async (context) => requestContext.run(
         // profiles, and the remaining tables are legacy/platform settings.
         const platformGlobal = [
           '6537960246d5b0e1ab77', 'users', 'trialdate', 'admin_keys', 'limits',
+          'vehicle_makes',
         ].includes(table.$id);
         const scope = serverManaged
           ? 'platform_managed'
