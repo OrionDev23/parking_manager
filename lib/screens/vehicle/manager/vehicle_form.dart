@@ -248,7 +248,11 @@ class _VehicleFormState extends State<VehicleForm>
   void initState() {
     super.initState();
     initValues();
-    unawaited(VehicleMakeService.load());
+    unawaited(
+      VehicleMakeService.load().then((_) {
+        if (mounted) setState(() {});
+      }),
+    );
     unawaited(_loadVehicleImageCapabilities());
   }
 
@@ -3268,6 +3272,12 @@ class _VehicleFormState extends State<VehicleForm>
     bool forceRefresh = false,
   }) async {
     if (widget.readOnly || _resolvingVehicleImage) return;
+    try {
+      await VehicleMakeService.load();
+    } catch (_) {
+      // The legacy brand list can still resolve numeric values while offline.
+    }
+    if (!mounted) return;
     if (forceRefresh && !_canForceRefreshVehicleImage) return;
 
     final make = VehicleMakeService.nameFor(marque);
