@@ -729,14 +729,15 @@ class _VehicleCard extends StatelessWidget {
       vehicle.nom,
     ].where((value) => value?.trim().isNotEmpty == true).join(' ');
     final imageUrl = vehicle.imageUrl?.trim();
+    final imageMetadata = vehicle.customFields ?? const <String, dynamic>{};
     final imageAttribution =
-        vehicle.customFields['_vehicleImageAttribution']?.toString().trim();
+        imageMetadata['_vehicleImageAttribution']?.toString().trim();
     final imageLicense =
-        vehicle.customFields['_vehicleImageLicense']?.toString().trim();
+        imageMetadata['_vehicleImageLicense']?.toString().trim();
     final imageSourceUrl =
-        vehicle.customFields['_vehicleImageSourceUrl']?.toString().trim();
+        imageMetadata['_vehicleImageSourceUrl']?.toString().trim();
     final imageLicenseUrl =
-        vehicle.customFields['_vehicleImageLicenseUrl']?.toString().trim();
+        imageMetadata['_vehicleImageLicenseUrl']?.toString().trim();
 
     return ParcotoSurface(
       padding: EdgeInsets.zero,
@@ -803,7 +804,7 @@ class _VehicleCard extends StatelessWidget {
                               const SizedBox(width: 4),
                               Flexible(
                                 child: Text(
-                                  imageAttribution,
+                                  imageAttribution ?? '',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
