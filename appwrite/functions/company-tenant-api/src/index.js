@@ -1,4 +1,5 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
+import { createHash, createHmac } from 'node:crypto';
 
 const requestContext = new AsyncLocalStorage();
 const DATABASE_ID = '6531ad112080ae3b14a7';
@@ -840,6 +841,316 @@ function slugify(value) {
     .toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 64);
 }
 
+const VEHICLE_IMAGE_CATALOG = 'vehicle_image_catalog';
+const VEHICLE_IMAGE_BUCKET = 'images';
+const CARIMAGES_BASE_URL = 'https://carimagesapi.com';
+const VEHICLE_IMAGE_NEGATIVE_TTL_MS = 6 * 60 * 60 * 1000;
+
+function normalizeVehicleImageColor(value) {
+  const color = String(value || '').normalize('NFKD')
+    .replace(/[\\u0300-\\u036f]/g, '').trim().toLowerCase();
+  if (!color) return 'original';
+  if (/^(noir|black|noire)$/.test(color)) return 'black';
+  if (/^(blanc|white|blanche)$/.test(color)) return 'white';
+  if (/^(argent|silver|argente|gris clair|gris metallise)$/.test(color)) return 'silver';
+  if (/^(gris|grey|gray|anthracite|gris fonce)$/.test(color)) return 'grey';
+  if (/^(bleu|blue|bleue)$/.test(color)) return 'blue';
+  if (/^(rouge|red)$/.test(color)) return 'red';
+  return 'original';
+}
+
+function vehicleImageCacheKey(make, model, year, color) {
+  const canonical = [
+    make.normalize('NFKD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(),
+    model.normalize('NFKD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(),
+    String(year),
+    color,
+  ].join('|');
+  return createHash('sha256').update(canonical).digest('hex');
+}
+
+function rfc3986(value) {
+  return encodeURIComponent(String(value)).replace(/[!'()*]/g, character =>
+    '%' + character.charCodeAt(0).toString(16).toUpperCase()
+  );
+}
+
+function createCarImagesSignedUrl({ make, model, year, color, apiKey, apiSecret }) {
+  const expires = String(Math.floor(Date.now() / 1000) + 60 * 60);
+  const params = {
+    api_key: apiKey,
+    make,
+    model,
+    year: String(year),
+    width: '800',
+    format: 'webp',
+    view: 'front34',
+    ...(color !== 'original' ? { color } : {}),
+    expires,
+  };
+  const canonical = Object.keys(params).sort()
+    .map(key => `${key}=${rfc3986(params[key])}`)
+    .join('&');
+  const signature = createHmac('sha256', apiSecret)
+    .update(canonical)
+    .digest('hex');
+  const query = Object.keys({ ...params, sig: signature }).sort()
+    .map(key => `${rfc3986(key)}=${rfc3986(key === 'sig' ? signature : params[key])}`)
+    .join('&');
+  return `${CARIMAGES_BASE_URL}/image?${query}`;
+}
+
+async function getVehicleImageCacheRow(rowId) {
+  try {
+    return normalizeRow(await appwrite(
+      `/tablesdb/${DATABASE_ID}/tables/${VEHICLE_IMAGE_CATALOG}/rows/${encodeURIComponent(rowId)}`
+    ));
+  } catch (failure) {
+    if (failure.status === 404) return null;
+    throw failure;
+  }
+}
+
+async function saveVehicleImageCacheRow(rowId, data) {
+  try {
+    await createRow(VEHICLE_IMAGE_CATALOG, rowId, data, []);
+  } catch (failure) {
+    // Concurrent requests can race on the unique cache key. The first row wins.
+    if (failure.status !== 409) throw failure;
+  }
+  return getVehicleImageCacheRow(rowId);
+}
+
+async function uploadVehicleImage(fileId, fileName, bytes) {
+  const form = new FormData();
+  form.append('fileId', fileId);
+  form.append('file', new Blob([bytes], { type: 'image/webp' }), fileName);
+  form.append('permissions[]', 'read("any")');
+
+  const executionKey = requestContext.getStore()?.apiKey;
+  if (!executionKey) throw new Error('Appwrite function execution key is unavailable.');
+  const response = await fetch(
+    `${endpoint}/storage/buckets/${VEHICLE_IMAGE_BUCKET}/files`,
+    {
+      method: 'POST',
+      headers: {
+        'X-Appwrite-Project': projectId,
+        'X-Appwrite-Key': executionKey,
+      },
+      body: form,
+    },
+  );
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok && response.status !== 409) {
+    const failure = new Error(payload.message || `Appwrite image upload failed (${response.status})`);
+    failure.status = response.status;
+    throw failure;
+  }
+  return payload;
+}
+
+async function requireVehicleImageAccess(userId, companyId) {
+  if (!companyId) {
+    const failure = new Error('companyId is required.');
+    failure.status = 400;
+    throw failure;
+  }
+  const membership = await activeMembership(userId, companyId);
+  let platformExploration = false;
+  if (isPlatformSuperAdmin(userId)) {
+    const prefs = await readUserPrefs(userId);
+    platformExploration =
+      prefs.parcotoPlatformExploration?.companyId === companyId;
+  }
+  if (!platformExploration && (!membership || membership.data?.status !== 'active')) {
+    const failure = new Error('You do not have access to this company.');
+    failure.status = 403;
+    throw failure;
+  }
+  const company = await getCompany(companyId);
+  if (!company || company.data?.status !== 'active') {
+    const failure = new Error('Company is unavailable.');
+    failure.status = 404;
+    throw failure;
+  }
+}
+
+async function resolveVehicleImage({ userId, input, log }) {
+  const companyId = String(input.companyId || '').trim();
+  await requireVehicleImageAccess(userId, companyId);
+
+  const make = String(input.make || '').trim().slice(0, 100);
+  const model = String(input.model || '').trim().slice(0, 120);
+  const year = Number.parseInt(input.year, 10);
+  const currentYear = new Date().getUTCFullYear();
+  if (!make || !model || !Number.isInteger(year) || year < 1886 || year > currentYear + 2) {
+    const failure = new Error('Valid make, model and model year are required.');
+    failure.status = 400;
+    throw failure;
+  }
+
+  const color = normalizeVehicleImageColor(input.color);
+  const cacheKey = vehicleImageCacheKey(make, model, year, color);
+  const rowId = cacheKey.slice(0, 32);
+  const now = new Date();
+  const cached = await getVehicleImageCacheRow(rowId);
+  if (cached?.data?.cacheKey === cacheKey) {
+    if (cached.data.status === 'found' && cached.data.imageUrl) {
+      return {
+        ok: true,
+        found: true,
+        source: 'shared_cache',
+        imageUrl: cached.data.imageUrl,
+        make: cached.data.make,
+        model: cached.data.model,
+        year: cached.data.modelYear,
+        color: cached.data.color,
+        generation: cached.data.generation || null,
+      };
+    }
+    const checkedAt = Date.parse(cached.data.lastCheckedAt || '');
+    if (cached.data.status === 'not_found' &&
+        Number.isFinite(checkedAt) &&
+        now.getTime() - checkedAt < VEHICLE_IMAGE_NEGATIVE_TTL_MS) {
+      return { ok: true, found: false, source: 'shared_cache', reason: 'not_found' };
+    }
+  }
+
+  const apiKey = process.env.CARIMAGES_API_KEY;
+  const apiSecret = process.env.CARIMAGES_API_SECRET;
+  if (!apiKey || !apiSecret) {
+    const failure = new Error('CarImagesAPI credentials are not configured on the server.');
+    failure.status = 503;
+    throw failure;
+  }
+
+  const makeSlug = slugify(make);
+  const modelSlug = slugify(model);
+  const catalogUrl = new URL(
+    `/api/v1/makes/${encodeURIComponent(makeSlug)}/models/${encodeURIComponent(modelSlug)}`,
+    CARIMAGES_BASE_URL,
+  );
+  catalogUrl.searchParams.set('api_key', apiKey);
+
+  const catalogResponse = await fetch(catalogUrl, {
+    headers: { 'X-Api-Secret': apiSecret, Accept: 'application/json' },
+    signal: AbortSignal.timeout(20000),
+  });
+
+  if (catalogResponse.status === 404) {
+    await saveVehicleImageCacheRow(rowId, {
+      cacheKey, make, model, modelYear: year, color,
+      status: 'not_found', lastCheckedAt: now.toISOString(),
+    });
+    return { ok: true, found: false, source: 'carimages', reason: 'model_not_found' };
+  }
+  if (!catalogResponse.ok) {
+    const failureBody = await catalogResponse.json().catch(() => ({}));
+    log(`CarImages catalog request failed status=${catalogResponse.status} message=${failureBody.error || ''}`);
+    const failure = new Error(
+      catalogResponse.status === 429
+        ? 'CarImagesAPI monthly quota or rate limit reached.'
+        : `CarImagesAPI catalog request failed (${catalogResponse.status}).`
+    );
+    failure.status = catalogResponse.status === 429 ? 429 : 502;
+    throw failure;
+  }
+
+  const catalog = await catalogResponse.json();
+  const generations = Array.isArray(catalog.generations) ? catalog.generations : [];
+  const generation = generations
+    .filter(item => {
+      const start = Number(item.year_start);
+      const end = item.year_end == null ? currentYear + 2 : Number(item.year_end);
+      return item.images && Number.isFinite(start) && start <= year && end >= year;
+    })
+    .sort((a, b) => Number(b.year_start) - Number(a.year_start))[0];
+
+  if (!generation) {
+    await saveVehicleImageCacheRow(rowId, {
+      cacheKey, make, model, modelYear: year, color,
+      status: 'not_found', lastCheckedAt: now.toISOString(),
+    });
+    return { ok: true, found: false, source: 'carimages', reason: 'generation_or_image_not_found' };
+  }
+
+  const signedUrl = createCarImagesSignedUrl({
+    make, model, year, color, apiKey, apiSecret,
+  });
+  const imageResponse = await fetch(signedUrl, {
+    redirect: 'manual',
+    signal: AbortSignal.timeout(20000),
+  });
+  const actualColor = String(imageResponse.headers.get('x-ci-color') || color).toLowerCase();
+  if (imageResponse.status !== 302 || actualColor === 'original' && color !== 'original') {
+    if (imageResponse.status === 429) {
+      const failure = new Error('CarImagesAPI monthly quota or rate limit reached.');
+      failure.status = 429;
+      throw failure;
+    }
+    if (imageResponse.status === 302 && actualColor === 'original' && color !== 'original') {
+      await saveVehicleImageCacheRow(rowId, {
+        cacheKey, make, model, modelYear: year, color,
+        status: 'not_found', lastCheckedAt: now.toISOString(),
+      });
+      return { ok: true, found: false, source: 'carimages', reason: 'requested_color_unavailable' };
+    }
+    const failure = new Error(`CarImagesAPI image request failed (${imageResponse.status}).`);
+    failure.status = 502;
+    throw failure;
+  }
+
+  const location = imageResponse.headers.get('location');
+  if (!location || !location.startsWith('https://cdn.carimagesapi.com/')) {
+    const failure = new Error('CarImagesAPI returned an unexpected image CDN location.');
+    failure.status = 502;
+    throw failure;
+  }
+
+  const cdnResponse = await fetch(location, {
+    signal: AbortSignal.timeout(30000),
+  });
+  if (!cdnResponse.ok) {
+    const failure = new Error(`CarImages image CDN download failed (${cdnResponse.status}).`);
+    failure.status = 502;
+    throw failure;
+  }
+  const contentType = String(cdnResponse.headers.get('content-type') || '').toLowerCase();
+  if (!contentType.startsWith('image/')) {
+    const failure = new Error('CarImagesAPI CDN did not return an image.');
+    failure.status = 502;
+    throw failure;
+  }
+  const bytes = new Uint8Array(await cdnResponse.arrayBuffer());
+  if (!bytes.length || bytes.length > 5 * 1024 * 1024) {
+    const failure = new Error('Vehicle image is empty or exceeds the 5 MB storage limit.');
+    failure.status = 413;
+    throw failure;
+  }
+
+  await uploadVehicleImage(rowId, `${makeSlug}-${modelSlug}-${year}-${color}.webp`, bytes);
+  const imageUrl = `${endpoint}/storage/buckets/${VEHICLE_IMAGE_BUCKET}/files/${rowId}/view?project=${encodeURIComponent(projectId)}`;
+  const saved = await saveVehicleImageCacheRow(rowId, {
+    cacheKey, make, model, modelYear: year, color,
+    imageUrl,
+    generation: String(generation.slug || generation.name || '').slice(0, 100),
+    status: 'found',
+    lastCheckedAt: new Date().toISOString(),
+  });
+
+  return {
+    ok: true,
+    found: true,
+    source: saved?.data?.imageUrl === imageUrl ? 'carimages_download' : 'shared_cache',
+    imageUrl: saved?.data?.imageUrl || imageUrl,
+    make,
+    model,
+    year,
+    color,
+    generation: String(generation.slug || generation.name || ''),
+  };
+}
+
 export default async (context) => requestContext.run(
   { apiKey: context.req.headers['x-appwrite-key'] },
   async () => {
@@ -970,6 +1281,11 @@ export default async (context) => requestContext.run(
         await restorePlatformExploration(userId);
         throw failure;
       }
+    }
+
+    if (action === 'vehicle_image_resolve') {
+      const result = await resolveVehicleImage({ userId, input, log });
+      return json(res, 200, result);
     }
 
     if (action === 'resolve') {
