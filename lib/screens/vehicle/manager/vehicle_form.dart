@@ -3114,9 +3114,11 @@ class _VehicleFormState extends State<VehicleForm>
         _resolvedImageYear = year;
         _resolvedImageColor = _normalizeVehiclePaint(colorController.text);
         _vehicleImageMessage = result.found
-            ? result.source == 'shared_cache'
-                ? 'Image réutilisée depuis le catalogue partagé.'
-                : 'Image récupérée et ajoutée au catalogue partagé.'
+            ? result.colorFallback
+                ? 'Image disponible, mais la teinte demandée est indisponible : peinture d’origine affichée.'
+                : result.source == 'shared_cache'
+                    ? 'Image réutilisée depuis le catalogue partagé.'
+                    : 'Image récupérée et ajoutée au catalogue partagé.'
             : 'Aucune image correspondante trouvée pour cette configuration.';
       });
       if (showInfo && mounted) {
@@ -3125,7 +3127,9 @@ class _VehicleFormState extends State<VehicleForm>
           builder: (context, close) => InfoBar(
             title: Text(
               result.found
-                  ? 'Image du véhicule disponible.'
+                  ? result.colorFallback
+                      ? 'Image disponible — peinture d’origine affichée.'
+                      : 'Image du véhicule disponible.'
                   : 'Aucune image correspondante disponible.',
             ),
             severity: result.found

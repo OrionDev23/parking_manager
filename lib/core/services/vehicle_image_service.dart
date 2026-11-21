@@ -10,6 +10,7 @@ class VehicleImageResolution {
   final String? fileId;
   final String source;
   final String? reason;
+  final bool colorFallback;
 
   const VehicleImageResolution({
     required this.found,
@@ -17,6 +18,7 @@ class VehicleImageResolution {
     this.imageUrl,
     this.fileId,
     this.reason,
+    this.colorFallback = false,
   });
 
   factory VehicleImageResolution.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class VehicleImageResolution {
       imageUrl: json['imageUrl']?.toString(),
       fileId: json['fileId']?.toString(),
       reason: json['reason']?.toString(),
+      colorFallback: json['colorFallback'] == true,
     );
   }
 }

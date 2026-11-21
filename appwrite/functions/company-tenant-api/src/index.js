@@ -863,6 +863,7 @@ function normalizeVehicleImageColor(value) {
 
 function vehicleImageCacheKey(make, model, year, color) {
   const canonical = [
+    'carimages-direct-image-v2',
     make.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(),
     model.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(),
     String(year),
@@ -887,6 +888,7 @@ function createCarImagesSignedUrl({ make, model, year, color, apiKey, apiSecret 
     width: '800',
     format: 'webp',
     view: 'front34',
+    type: 'car',
     ...(color !== 'original' ? { color } : {}),
     expires,
   };
@@ -1015,7 +1017,9 @@ async function resolveVehicleImage({ userId, input, log }) {
         make: cached.data.make,
         model: cached.data.model,
         year: cached.data.modelYear,
-        color: cached.data.color,
+        color: cached.data.color || color,
+        requestedColor: color,
+        colorFallback: color !== 'original' && cached.data.color === 'original',
         generation: cached.data.generation || null,
       };
     }
@@ -1035,68 +1039,9 @@ async function resolveVehicleImage({ userId, input, log }) {
     throw failure;
   }
 
-  const makeSlug = slugify(make);
-  const modelSlug = slugify(model);
-  const catalogUrl = new URL(
-    `/api/v1/makes/${encodeURIComponent(makeSlug)}/models/${encodeURIComponent(modelSlug)}`,
-    CARIMAGES_BASE_URL,
-  );
-  catalogUrl.searchParams.set('api_key', apiKey);
-
-  const catalogResponse = await fetch(catalogUrl, {
-    headers: { 'X-Api-Secret': apiSecret, Accept: 'application/json' },
-    signal: AbortSignal.timeout(20000),
-  });
-
-  if (catalogResponse.status === 404) {
-    await saveVehicleImageCacheRow(rowId, {
-      cacheKey, make, model, modelYear: year, color,
-      status: 'not_found', lastCheckedAt: now.toISOString(),
-    });
-    return { ok: true, found: false, source: 'carimages', reason: 'model_not_found' };
-  }
-  if (!catalogResponse.ok) {
-    const failureBody = await catalogResponse.json().catch(() => ({}));
-    log(`CarImages catalog request failed status=${catalogResponse.status} message=${failureBody.error || ''}`);
-    const failure = new Error(
-      catalogResponse.status === 429
-        ? 'CarImagesAPI monthly quota or rate limit reached.'
-        : `CarImagesAPI catalog request failed (${catalogResponse.status}).`
-    );
-    failure.status = catalogResponse.status === 429 ? 429 : 502;
-    throw failure;
-  }
-
-  const catalog = await catalogResponse.json();
-  const generations = Array.isArray(catalog.generations) ? catalog.generations : [];
-  // CarImagesAPI resolves the closest available generation from the requested
-  // model year. Do not require the supplied year to fall inside a generation's
-  // published year_start/year_end interval: for example, a 2022 Clio 5 can
-  // legitimately use the 2019–2022 generation render.
-  const imageGenerations = generations.filter(item =>
-    item.images && typeof item.images === 'object' &&
-    Object.keys(item.images).length > 0
-  );
-  const generation = imageGenerations
-    .map(item => {
-      const start = Number(item.year_start);
-      const end = item.year_end == null ? currentYear + 2 : Number(item.year_end);
-      const distance = year < start
-        ? start - year
-        : year > end
-          ? year - end
-          : 0;
-      return { item, distance, start: Number.isFinite(start) ? start : 0 };
-    })
-    .sort((a, b) => a.distance - b.distance || b.start - a.start)[0]?.item;
-
-  if (!generation) {
-    await saveVehicleImageCacheRow(rowId, {
-      cacheKey, make, model, modelYear: year, color,
-      status: 'not_found', lastCheckedAt: now.toISOString(),
-    });
-    return { ok: true, found: false, source: 'carimages', reason: 'generation_or_image_not_found' };
-  }
+  // /image already performs fuzzy make/model matching and nearest-generation
+  // selection for the requested year. Do not reject a model based on the
+  // separate catalog endpoint: its generation image metadata can be incomplete.
 
   const signedUrl = createCarImagesSignedUrl({
     make, model, year, color, apiKey, apiSecret,
@@ -1105,27 +1050,42 @@ async function resolveVehicleImage({ userId, input, log }) {
     redirect: 'manual',
     signal: AbortSignal.timeout(20000),
   });
-  const actualColor = String(imageResponse.headers.get('x-ci-color') || color).toLowerCase();
-  if (imageResponse.status !== 302 || actualColor === 'original' && color !== 'original') {
+  if (imageResponse.status === 404) {
+    await saveVehicleImageCacheRow(rowId, {
+      cacheKey, make, model, modelYear: year, color,
+      status: 'not_found', lastCheckedAt: new Date().toISOString(),
+    });
+    return { ok: true, found: false, source: 'carimages', reason: 'image_not_found' };
+  }
+  if (imageResponse.status !== 302) {
+    const responseText = await imageResponse.text().catch(() => '');
+    log(`CarImages image request failed status=${imageResponse.status} body=${responseText.slice(0, 300)}`);
     if (imageResponse.status === 429) {
       const failure = new Error('CarImagesAPI monthly quota or rate limit reached.');
       failure.status = 429;
       throw failure;
-    }
-    if (imageResponse.status === 302 && actualColor === 'original' && color !== 'original') {
-      await saveVehicleImageCacheRow(rowId, {
-        cacheKey, make, model, modelYear: year, color,
-        status: 'not_found', lastCheckedAt: now.toISOString(),
-      });
-      return { ok: true, found: false, source: 'carimages', reason: 'requested_color_unavailable' };
     }
     const failure = new Error(`CarImagesAPI image request failed (${imageResponse.status}).`);
     failure.status = 502;
     throw failure;
   }
 
+  // When a paint cannot be generated, CarImagesAPI may return the original
+  // paint with X-CI-Color: original. Keep the usable image and report fallback.
+  const actualColor = String(
+    imageResponse.headers.get('x-ci-color') || color
+  ).toLowerCase();
+  const colorFallback = color !== 'original' && actualColor === 'original';
+  log(`CarImages redirect accepted requestedColor=${color} actualColor=${actualColor}`);
+
   const location = imageResponse.headers.get('location');
-  if (!location || !location.startsWith('https://cdn.carimagesapi.com/')) {
+  let cdnUrl;
+  try {
+    cdnUrl = new URL(location || '');
+  } catch (_) {
+    cdnUrl = null;
+  }
+  if (!cdnUrl || cdnUrl.protocol !== 'https:' || cdnUrl.hostname !== 'cdn.carimagesapi.com') {
     const failure = new Error('CarImagesAPI returned an unexpected image CDN location.');
     failure.status = 502;
     throw failure;
@@ -1152,12 +1112,14 @@ async function resolveVehicleImage({ userId, input, log }) {
     throw failure;
   }
 
-  await uploadVehicleImage(rowId, `${makeSlug}-${modelSlug}-${year}-${color}.webp`, bytes);
+  const makeSlug = slugify(make);
+  const modelSlug = slugify(model);
+  await uploadVehicleImage(rowId, `${makeSlug}-${modelSlug}-${year}-${actualColor}.webp`, bytes);
   const imageUrl = `${endpoint}/storage/buckets/${VEHICLE_IMAGE_BUCKET}/files/${rowId}/view?project=${encodeURIComponent(projectId)}`;
   const saved = await saveVehicleImageCacheRow(rowId, {
-    cacheKey, make, model, modelYear: year, color,
+    cacheKey, make, model, modelYear: year, color: actualColor,
     imageUrl,
-    generation: String(generation.slug || generation.name || '').slice(0, 100),
+    generation: null,
     status: 'found',
     lastCheckedAt: new Date().toISOString(),
   });
@@ -1171,8 +1133,10 @@ async function resolveVehicleImage({ userId, input, log }) {
     make,
     model,
     year,
-    color,
-    generation: String(generation.slug || generation.name || ''),
+    color: actualColor,
+    requestedColor: color,
+    colorFallback,
+    generation: null,
   };
 }
 
