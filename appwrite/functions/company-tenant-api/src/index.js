@@ -1174,8 +1174,12 @@ function vehicleImageCandidateMatches(candidate, { make, model, year, color }) {
 
   const irrelevantVehicleTerms = [
     'car transporter', 'vehicle transporter', 'auto transporter',
+    'car transport', 'vehicle transport', 'transport truck',
     'car carrier', 'vehicle carrier', 'truck', 'lorry', 'camion',
-    'transporteur', 'remorque porte voiture', 'tow truck', 'towing',
+    'transporteur', 'transporter', 'remorque porte voiture',
+    'tow truck', 'towing', 'vehicle recovery', 'car recovery',
+    'breakdown recovery', 'roadside assistance', 'loading cars',
+    'loaded cars', 'automobile logistics', 'vehicle logistics',
   ];
   if (irrelevantVehicleTerms.some(term =>
     metadataText.includes(normalizeImageSearchText(term))
@@ -1378,9 +1382,11 @@ async function searchWikimediaVehicleImage(criteria) {
 }
 async function searchTrustCarVehicleImage(criteria) {
   // TrustCar accepts make/model/year but has no paint-color parameter.
-  // Never use its result when a specific color was requested.
+  // For a requested paint color, do not silently pretend its image matches.
   if (criteria.color !== 'original') return [];
 
+  const aliases = vehicleImageModelAliases(criteria.model);
+  const generationRange = vehicleImageGenerationRange(criteria.make, criteria.model);
   const requestedModel = String(criteria.model || '').trim();
   const baseModel = vehicleImageModelBase(requestedModel);
   const modelQueries = [...new Set([requestedModel, baseModel].filter(Boolean))];
@@ -1763,20 +1769,9 @@ async function searchVehicleImageCandidates({ userId, input, log }) {
     }
   }
 
-  // CarImagesAPI is a last resort and only fills the comparison if a free
-  // source could not provide a second usable candidate.
-  if (candidates.length < 2) {
-    const fallback = await searchCarImagesCandidate(criteria, log);
-    if (fallback?.candidate) {
-      try {
-        const downloaded = await downloadExternalVehicleImage(fallback.candidate.imageUrl);
-        const contentHash = createHash('sha256').update(downloaded.bytes).digest('hex');
-        if (!seenImages.has(contentHash)) candidates.push(fallback.candidate);
-      } catch (failure) {
-        log(`CarImagesAPI comparison image rejected reason=${failure.message}`);
-      }
-    }
-  }
+  // Keep the comparison genuinely free and watermark-free. CarImagesAPI
+  // remains available only through the legacy last-resort resolver; it must
+  // never occupy one of the user's free-source comparison slots.
 
   if (!candidates.length && !cachedFound) {
     await saveVehicleImageCacheRow(rowId, {
