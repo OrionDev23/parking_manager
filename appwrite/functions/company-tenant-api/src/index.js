@@ -1056,7 +1056,9 @@ function normalizeVehicleMakeName(value) {
 
 async function createSharedVehicleMake({ userId, input }) {
   const companyId = String(input.companyId || '').trim();
-  await requireCompanyAdmin(userId, companyId);
+  if (!isPlatformSuperAdmin(userId)) {
+    await requireCompanyAdmin(userId, companyId);
+  }
 
   const name = String(input.name || '').trim().replace(/\\s+/g, ' ');
   const category = String(input.category || 'passenger').trim().toLowerCase();
