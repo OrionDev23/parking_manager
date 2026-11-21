@@ -1166,7 +1166,7 @@ function vehicleImageModelBase(model) {
 
 function vehicleImageCandidateMatches(candidate, { make, model, year, color }) {
   const descriptiveText = normalizeImageSearchText([
-    candidate.title, candidate.description,
+    candidate.title, candidate.description, candidate.make, candidate.model,
   ].filter(Boolean).join(' '));
   const metadataText = normalizeImageSearchText([
     descriptiveText, candidate.tags,
@@ -1441,7 +1441,7 @@ async function searchTrustCarVehicleImage(criteria) {
       modelYear: Number.isInteger(resultYear) ? resultYear : null,
       tags: [resultMake, resultModel, Number.isInteger(resultYear) ? resultYear : ''].join(' '),
       imageUrl,
-      sourceUrl: /^Q\\d+$/.test(reference)
+      sourceUrl: /^Q\d+$/.test(reference)
         ? `https://www.wikidata.org/wiki/${reference}`
         : '',
       license,
