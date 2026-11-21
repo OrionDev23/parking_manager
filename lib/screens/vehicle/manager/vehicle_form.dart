@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:appwrite/appwrite.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:dzair_data_usage/langs.dart';
@@ -18,6 +21,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../serializables/vehicle/vehicle.dart';
+import '../../../core/services/vehicle_image_service.dart';
 import '../../../data/mappers/vehicle_mapper.dart';
 import '../../../main.dart';
 import '../../../theme.dart';
@@ -118,6 +122,11 @@ class _VehicleFormState extends State<VehicleForm>
   final mileageController = TextEditingController();
   final nextServiceMileageController = TextEditingController();
   DateTime? selectedAnnee = DateTime(2023);
+
+  String? _resolvedImageUrl;
+  String? _resolvedImageFileId;
+  String? _vehicleImageMessage;
+  bool _resolvingVehicleImage = false;
   bool autreMat = false;
   int? marque;
 
@@ -155,6 +164,8 @@ class _VehicleFormState extends State<VehicleForm>
   }
 
   void initValues() {
+    _resolvedImageUrl = widget.vehicle?.imageUrl;
+    _resolvedImageFileId = widget.vehicle?.imageFileId;
     AlgeriaList();
     if (widget.vehicle != null) {
       documentID = widget.vehicle!.id;
@@ -782,7 +793,115 @@ class _VehicleFormState extends State<VehicleForm>
                       ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 18),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: appTheme.color.withValues(alpha: .055),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: appTheme.color.withValues(alpha: .16),
+                    ),
+                  ),
+                  child: LayoutBuilder(
+                    builder: (context, imageConstraints) {
+                      final compactImage = imageConstraints.maxWidth < 520;
+                      final image = Container(
+                        width: compactImage ? double.infinity : 176,
+                        height: 112,
+                        decoration: BoxDecoration(
+                          color: appTheme.backGroundColor,
+                          borderRadius: BorderRadius.circular(9),
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: _resolvedImageUrl != null &&
+                                _resolvedImageUrl!.isNotEmpty
+                            ? Image.network(
+                                _resolvedImageUrl!,
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, _, _) => Icon(
+                                  FluentIcons.car,
+                                  size: 38,
+                                  color: appTheme.color,
+                                ),
+                              )
+                            : Icon(
+                                FluentIcons.car,
+                                size: 38,
+                                color: appTheme.color,
+                              ),
+                      );
+                      final controls = Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'IMAGE DU VÉHICULE',
+                              style: TextStyle(
+                                fontSize: 10,
+                                letterSpacing: .8,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              _vehicleImageMessage ??
+                                  'L’image sera recherchée par marque, modèle, année et couleur.',
+                              style: TextStyle(
+                                fontSize: 11,
+                                height: 1.35,
+                                color: appTheme.writingStyle.color
+                                    ?.withValues(alpha: .72),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            if (!widget.readOnly)
+                              FilledButton(
+                                onPressed: _resolvingVehicleImage
+                                    ? null
+                                    : _resolveVehicleImage,
+                                child: _resolvingVehicleImage
+                                    ? const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          ProgressRing(strokeWidth: 2),
+                                          SizedBox(width: 8),
+                                          Text('Recherche…'),
+                                        ],
+                                      )
+                                    : const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(FluentIcons.search, size: 13),
+                                          SizedBox(width: 7),
+                                          Text('Rechercher l’image'),
+                                        ],
+                                      ),
+                              ),
+                          ],
+                        ),
+                      );
+                      return compactImage
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                image,
+                                const SizedBox(height: 10),
+                                controls,
+                              ],
+                            )
+                          : Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                image,
+                                const SizedBox(width: 14),
+                                controls,
+                              ],
+                            );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 18),
                 Wrap(
                   spacing: spacing,
                   runSpacing: 14,
@@ -2833,6 +2952,85 @@ class _VehicleFormState extends State<VehicleForm>
     }
   }
 
+  Future<void> _resolveVehicleImage({bool showInfo = true}) async {
+    if (widget.readOnly || _resolvingVehicleImage) return;
+
+    final make = VehiclesUtilities.marques?[marque] ?? '';
+    final model = type.text.trim();
+    final year = int.tryParse(modelYearController.text.trim());
+    if (make.trim().isEmpty || model.isEmpty || year == null) {
+      if (mounted) {
+        setState(() {
+          _vehicleImageMessage =
+              'Renseignez la marque, le modèle et l’année modèle.';
+        });
+      }
+      return;
+    }
+
+    setState(() {
+      _resolvingVehicleImage = true;
+      _vehicleImageMessage = 'Recherche dans le catalogue partagé…';
+    });
+
+    try {
+      final result = await VehicleImageService.resolve(
+        companyId: vehicleServices.companyId,
+        make: make,
+        model: model,
+        year: year,
+        color: colorController.text.trim(),
+      );
+      if (!mounted) return;
+      setState(() {
+        _resolvedImageUrl = result.imageUrl;
+        _resolvedImageFileId = result.fileId;
+        _vehicleImageMessage = result.found
+            ? result.source == 'shared_cache'
+                ? 'Image réutilisée depuis le catalogue partagé.'
+                : 'Image récupérée et ajoutée au catalogue partagé.'
+            : 'Aucune image correspondante trouvée pour cette configuration.';
+      });
+      if (showInfo && mounted) {
+        displayInfoBar(
+          context,
+          builder: (context, close) => InfoBar(
+            title: Text(
+              result.found
+                  ? 'Image du véhicule disponible.'
+                  : 'Aucune image correspondante disponible.',
+            ),
+            severity: result.found
+                ? InfoBarSeverity.success
+                : InfoBarSeverity.warning,
+          ),
+          duration: snackbarShortDuration,
+        );
+      }
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _vehicleImageMessage =
+            'Impossible de récupérer l’image : ${error.toString()}';
+      });
+      if (showInfo) {
+        displayInfoBar(
+          context,
+          builder: (context, close) => InfoBar(
+            title: const Text('La recherche d’image a échoué.'),
+            content: Text(error.toString()),
+            severity: InfoBarSeverity.error,
+          ),
+          duration: snackbarShortDuration,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _resolvingVehicleImage = false);
+      }
+    }
+  }
+
   String? documentID;
   bool uploading = false;
   bool errorUploading = false;
@@ -2873,6 +3071,14 @@ class _VehicleFormState extends State<VehicleForm>
 
     // Do not persist an incomplete vehicle record.
     if (!matriculeIsValid || !chassisIsValid) return;
+
+    if ((_resolvedImageUrl == null || _resolvedImageUrl!.isEmpty) &&
+        !widget.readOnly &&
+        type.text.trim().isNotEmpty &&
+        modelYearController.text.trim().isNotEmpty &&
+        marque != null) {
+      await _resolveVehicleImage(showInfo: false);
+    }
 
     if (mounted) {
       setState(() {
@@ -2918,9 +3124,11 @@ class _VehicleFormState extends State<VehicleForm>
         currentMileage: int.tryParse(mileageController.text.trim()),
         nextServiceMileage: int.tryParse(nextServiceMileageController.text.trim()),
         // Image and custom metadata are preserved until their dedicated editors exist.
-        imageFileId: widget.vehicle?.imageFileId,
-        imageUrl: widget.vehicle?.imageUrl,
-        imageSource: widget.vehicle?.imageSource,
+        imageFileId: _resolvedImageFileId ?? widget.vehicle?.imageFileId,
+        imageUrl: _resolvedImageUrl ?? widget.vehicle?.imageUrl,
+        imageSource: _resolvedImageFileId != null
+            ? 'carimages-api'
+            : widget.vehicle?.imageSource,
         customFields: widget.vehicle?.customFields,
         anneeUtil: selectedAnnee?.year,
         energie: energie.text,
