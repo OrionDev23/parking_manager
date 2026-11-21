@@ -204,6 +204,8 @@ class _VehicleFormState extends State<VehicleForm>
   String? _vehicleImageMessage;
   String? _resolvedImageSource;
   String? _resolvedImageLicense;
+  String? _resolvedImageLicenseUrl;
+  String? _resolvedImageSourceUrl;
   String? _resolvedImageAttribution;
   bool _resolvingVehicleImage = false;
   bool _vehicleImageLookupCompleted = false;
@@ -1033,16 +1035,41 @@ class _VehicleFormState extends State<VehicleForm>
                             if (_resolvedImageAttribution?.isNotEmpty == true)
                               Padding(
                                 padding: const EdgeInsets.only(top: 8),
-                                child: Text(
-                                  'Crédit : $_resolvedImageAttribution'
-                                  '${_resolvedImageLicense?.isNotEmpty == true ? ' · $_resolvedImageLicense' : ''}',
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: appTheme.writingStyle.color
-                                        ?.withValues(alpha: .65),
-                                  ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        'Crédit : $_resolvedImageAttribution'
+                                        '${_resolvedImageLicense?.isNotEmpty == true ? ' · $_resolvedImageLicense' : ''}',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: appTheme.writingStyle.color
+                                              ?.withValues(alpha: .65),
+                                        ),
+                                      ),
+                                    ),
+                                    if (_resolvedImageSourceUrl?.isNotEmpty == true ||
+                                        _resolvedImageLicenseUrl?.isNotEmpty == true)
+                                      Tooltip(
+                                        message: [
+                                          if (_resolvedImageSourceUrl?.isNotEmpty == true)
+                                            'Source : $_resolvedImageSourceUrl',
+                                          if (_resolvedImageLicenseUrl?.isNotEmpty == true)
+                                            'Licence : $_resolvedImageLicenseUrl',
+                                        ].join('\\n'),
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(left: 6),
+                                          child: Icon(
+                                            FluentIcons.info,
+                                            size: 13,
+                                            color: appTheme.writingStyle.color
+                                                ?.withValues(alpha: .65),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
                         ],
@@ -3218,11 +3245,21 @@ class _VehicleFormState extends State<VehicleForm>
       return;
     }
 
+    final loadedVehicleImageMatchesIdentity =
+        (widget.vehicle?.imageUrl?.trim().isNotEmpty ?? false) &&
+        (VehiclesUtilities.marques?[
+                  int.tryParse(widget.vehicle?.marque ?? '')] ??
+              '') ==
+            make &&
+        widget.vehicle?.type?.trim() == model &&
+        widget.vehicle?.modelYear == year &&
+        _normalizeVehiclePaint(widget.vehicle?.color) == color;
     final imageMatchesCurrentIdentity =
-        _resolvedImageMake == make &&
-        _resolvedImageModel == model &&
-        _resolvedImageYear == year &&
-        _resolvedImageColor == color;
+        (_resolvedImageMake == make &&
+            _resolvedImageModel == model &&
+            _resolvedImageYear == year &&
+            _resolvedImageColor == color) ||
+        loadedVehicleImageMatchesIdentity;
 
     setState(() {
       _resolvingVehicleImage = true;
@@ -3249,6 +3286,8 @@ class _VehicleFormState extends State<VehicleForm>
           _resolvedImageFileId = result.fileId;
           _resolvedImageSource = result.source;
           _resolvedImageLicense = result.license;
+          _resolvedImageLicenseUrl = result.licenseUrl;
+          _resolvedImageSourceUrl = result.sourceUrl;
           _resolvedImageAttribution = result.attribution;
           _resolvedImageMake = make;
           _resolvedImageModel = model;
@@ -3261,6 +3300,8 @@ class _VehicleFormState extends State<VehicleForm>
           _resolvedImageFileId = null;
           _resolvedImageSource = null;
           _resolvedImageLicense = null;
+          _resolvedImageLicenseUrl = null;
+          _resolvedImageSourceUrl = null;
           _resolvedImageAttribution = null;
           _resolvedImageMake = make;
           _resolvedImageModel = model;
@@ -3312,6 +3353,8 @@ class _VehicleFormState extends State<VehicleForm>
           _resolvedImageFileId = null;
           _resolvedImageSource = null;
           _resolvedImageLicense = null;
+          _resolvedImageLicenseUrl = null;
+          _resolvedImageSourceUrl = null;
           _resolvedImageAttribution = null;
           _vehicleImageLookupCompleted = false;
         }
@@ -3424,6 +3467,8 @@ class _VehicleFormState extends State<VehicleForm>
         _resolvedImageFileId = result.fileId;
         _resolvedImageSource = result.source;
         _resolvedImageLicense = result.license;
+        _resolvedImageLicenseUrl = result.licenseUrl;
+        _resolvedImageSourceUrl = result.sourceUrl;
         _resolvedImageAttribution = result.attribution;
         _resolvedImageMake = make;
         _resolvedImageModel = model;
