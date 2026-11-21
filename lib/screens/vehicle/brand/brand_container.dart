@@ -11,8 +11,13 @@ import '../manager/vehicle_tabs.dart';
 
 class BrandContainer extends StatelessWidget {
   final VehicleMake make;
+  final VoidCallback? onEdit;
 
-  const BrandContainer({super.key, required this.make});
+  const BrandContainer({
+    super.key,
+    required this.make,
+    this.onEdit,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,49 +40,62 @@ class BrandContainer extends StatelessWidget {
           border: Border.all(color: theme.borderColor),
         ),
         padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            Expanded(
-              child: Center(
-                child: VehicleMakeLogo(makeId: make.id, size: 62),
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              make.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: theme.textColor,
-                fontWeight: FontWeight.w700,
-                fontSize: 13,
-              ),
-            ),
-            const SizedBox(height: 3),
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Text(
-                    make.category,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: theme.mutedTextColor,
-                      fontSize: 10,
-                    ),
+                  child: Center(
+                    child: VehicleMakeLogo(makeId: make.id, size: 62),
                   ),
                 ),
+                const SizedBox(height: 10),
                 Text(
-                  '$vehicleCount véhicule(s)',
+                  make.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: theme.mutedTextColor,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
+                    color: theme.textColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
                   ),
+                ),
+                const SizedBox(height: 3),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        make.category,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: theme.mutedTextColor,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      '$vehicleCount véhicule(s)',
+                      style: TextStyle(
+                        color: theme.mutedTextColor,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
+            if (onEdit != null)
+              Positioned(
+                top: 0,
+                right: 0,
+                child: IconButton(
+                  icon: const Icon(FluentIcons.edit, size: 13),
+                  onPressed: onEdit,
+                ),
+              ),
           ],
         ),
       ),
