@@ -1327,6 +1327,7 @@ async function persistVehicleImage({
     make, model, year, color,
     requestedColor: color, colorFallback: false,
     license: candidate.license || null,
+    licenseUrl: candidate.licenseUrl || null,
     attribution: candidate.attribution || null,
     sourceUrl: candidate.sourceUrl || null,
   };
@@ -1502,6 +1503,7 @@ async function resolveVehicleImage({ userId, input, log }) {
       colorFallback: color !== 'original' && cached.data.color === 'original',
       replacementFound: false,
       license: cached.data.license || null,
+      licenseUrl: cached.data.licenseUrl || null,
       attribution: cached.data.attribution || null,
       sourceUrl: cached.data.sourceUrl || null,
       reason: 'replacement_not_found',
