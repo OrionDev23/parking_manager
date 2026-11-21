@@ -15,6 +15,7 @@ class VehicleImageResolution {
   final bool replacementFound;
   final bool fromSharedCache;
   final String? license;
+  final String? licenseUrl;
   final String? attribution;
   final String? sourceUrl;
 
@@ -28,6 +29,7 @@ class VehicleImageResolution {
     this.replacementFound = false,
     this.fromSharedCache = false,
     this.license,
+    this.licenseUrl,
     this.attribution,
     this.sourceUrl,
   });
@@ -43,6 +45,7 @@ class VehicleImageResolution {
       replacementFound: json['replacementFound'] == true,
       fromSharedCache: json['fromSharedCache'] == true,
       license: json['license']?.toString(),
+      licenseUrl: json['licenseUrl']?.toString(),
       attribution: json['attribution']?.toString(),
       sourceUrl: json['sourceUrl']?.toString(),
     );
