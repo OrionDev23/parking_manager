@@ -1064,19 +1064,53 @@ function toRomanNumeral(value) {
   return result;
 }
 
+function fromRomanNumeral(value) {
+  const numerals = {
+    i: 1, ii: 2, iii: 3, iv: 4, v: 5,
+    vi: 6, vii: 7, viii: 8, ix: 9, x: 10,
+  };
+  return numerals[String(value || '').toLowerCase()] || 0;
+}
+
 function vehicleImageModelAliases(model) {
   const aliases = new Set([normalizeImageSearchText(model)]);
-  const match = String(model).trim().match(/^(.*?)[\s-]+(\d{1,2})$/);
-  if (match) {
-    const roman = toRomanNumeral(Number(match[2]));
+  const text = String(model).trim();
+  const numericMatch = text.match(/^(.*?)[\\s-]+(\\d{1,2})$/);
+  if (numericMatch) {
+    const roman = toRomanNumeral(Number(numericMatch[2]));
     if (roman) {
-      aliases.add(normalizeImageSearchText(`${match[1]} ${roman}`));
-      aliases.add(normalizeImageSearchText(`${match[1]} generation ${match[2]}`));
+      aliases.add(normalizeImageSearchText(`${numericMatch[1]} ${roman}`));
+      aliases.add(normalizeImageSearchText(`${numericMatch[1]} generation ${numericMatch[2]}`));
+    }
+  }
+  const romanMatch = text.match(/^(.*?)[\\s-]+(i{1,3}|iv|v|vi|vii|viii|ix|x)$/i);
+  if (romanMatch) {
+    const number = fromRomanNumeral(romanMatch[2]);
+    if (number) {
+      aliases.add(normalizeImageSearchText(`${romanMatch[1]} ${number}`));
+      aliases.add(normalizeImageSearchText(`${romanMatch[1]} generation ${number}`));
     }
   }
   return [...aliases].filter(Boolean);
 }
 
+const VEHICLE_IMAGE_MODEL_YEAR_RANGES = {
+  'renault clio 5': [2019, 2025],
+  'peugeot 208 ii': [2019, 2026],
+  'dacia sandero iii': [2020, 2026],
+  'volkswagen golf 8': [2019, 2026],
+  'hyundai i20 iii': [2020, 2026],
+};
+
+function vehicleImageGenerationRange(make, model) {
+  const normalizedMake = normalizeImageSearchText(make);
+  const aliases = vehicleImageModelAliases(model);
+  for (const alias of aliases) {
+    const range = VEHICLE_IMAGE_MODEL_YEAR_RANGES[`${normalizedMake} ${alias}`];
+    if (range) return range;
+  }
+  return null;
+}
 const VEHICLE_IMAGE_COLOR_TERMS = {
   white: ['white', 'blanc', 'blanche', 'blanco'],
   black: ['black', 'noir', 'noire', 'negro'],
@@ -1096,18 +1130,16 @@ function vehicleImageCandidateMatches(candidate, { make, model, year, color }) {
   const aliases = vehicleImageModelAliases(model);
   const modelMatches = aliases.some(alias => text.includes(alias));
   const yearText = String(year);
-  // A generation-specific model alias (for example Clio 5 / Clio V) is a
-  // valid model-year proxy. Otherwise the requested year must be present in
-  // the indexed metadata. The year is also part of the provider query.
-  const hasGenerationAlias = aliases.length > 1 &&
-    aliases.slice(1).some(alias => text.includes(alias));
-  const yearMatches = text.includes(yearText) || hasGenerationAlias;
+  const generationRange = vehicleImageGenerationRange(make, model);
+  const yearMatches = text.includes(yearText) ||
+    (generationRange !== null &&
+      year >= generationRange[0] &&
+      year <= generationRange[1]);
   const colorTerms = VEHICLE_IMAGE_COLOR_TERMS[color] || [];
   const colorMatches = color === 'original' ||
     colorTerms.some(term => text.includes(normalizeImageSearchText(term)));
   return makeMatches && modelMatches && yearMatches && colorMatches;
 }
-
 function isAllowedCommercialImageLicense(value) {
   const license = normalizeImageSearchText(value);
   return [
@@ -1191,112 +1223,125 @@ async function downloadExternalVehicleImage(url) {
 async function searchWikimediaVehicleImage(criteria) {
   const aliases = vehicleImageModelAliases(criteria.model);
   const colourTerms = VEHICLE_IMAGE_COLOR_TERMS[criteria.color] || [];
-  const query = [
-    criteria.make,
-    aliases[0],
-    colourTerms[0] || '',
-    'car',
-  ].filter(Boolean).join(' ');
-  const params = new URLSearchParams({
-    action: 'query',
-    generator: 'search',
-    gsrsearch: query,
-    gsrnamespace: '6',
-    gsrlimit: '30',
-    prop: 'imageinfo|categories',
-    iiprop: 'url|extmetadata',
-    iiurlwidth: '1200',
-    cllimit: 'max',
-    format: 'json',
-    formatversion: '2',
-  });
-  const response = await fetch(`https://commons.wikimedia.org/w/api.php?${params}`, {
-    signal: AbortSignal.timeout(15000),
-    headers: { 'User-Agent': 'Parcoto Vehicle Image Service/1.0 (https://parcoto.com)' },
-  });
-  if (!response.ok) throw new Error(`Wikimedia Commons search failed (${response.status}).`);
-  const payload = await response.json();
-  const pages = payload.query?.pages || [];
+  const queryVariants = aliases.slice(0, 2).map(alias => [
+    criteria.make, alias, colourTerms[0] || '', 'car',
+  ].filter(Boolean).join(' '));
   const candidates = [];
-  for (const page of pages) {
-    const image = page.imageinfo?.[0];
-    if (!image) continue;
-    const metadata = image.extmetadata || {};
-    const license = cleanImageMetadata(metadata.LicenseShortName?.value || '');
-    if (!isAllowedCommercialImageLicense(license)) continue;
-    const description = cleanImageMetadata(metadata.ImageDescription?.value || '');
-    const title = cleanImageMetadata(metadata.ObjectName?.value || page.title || '');
-    const candidate = {
-      title: `${page.title || ''} ${title}`,
-      description,
-      tags: [
-        ...(page.categories || []).map(category => category.title || ''),
-        cleanImageMetadata(metadata.DateTimeOriginal?.value || ''),
-        cleanImageMetadata(metadata.DateTime?.value || ''),
-      ].join(' '),
-      imageUrl: image.thumburl || image.url,
-      sourceUrl: image.descriptionurl || `https://commons.wikimedia.org/wiki/${encodeURIComponent(page.title || '')}`,
-      license,
-      attribution: cleanImageMetadata(
-        metadata.Attribution?.value ||
-        metadata.Credit?.value ||
-        `${cleanImageMetadata(metadata.Artist?.value || 'Auteur non indiqué')} — ${license}`
-      ).slice(0, 1000),
-      source: 'wikimedia_commons',
-    };
-    if (!candidate.imageUrl || !isSafeExternalHttpsUrl(candidate.imageUrl)) continue;
-    if (vehicleImageCandidateMatches(candidate, criteria)) candidates.push(candidate);
+  const seen = new Set();
+
+  for (const query of queryVariants) {
+    const params = new URLSearchParams({
+      action: 'query',
+      generator: 'search',
+      gsrsearch: query,
+      gsrnamespace: '6',
+      gsrlimit: '30',
+      prop: 'imageinfo|categories',
+      iiprop: 'url|extmetadata',
+      iiurlwidth: '1200',
+      cllimit: 'max',
+      format: 'json',
+      formatversion: '2',
+    });
+    const response = await fetch(`https://commons.wikimedia.org/w/api.php?${params}`, {
+      signal: AbortSignal.timeout(15000),
+      headers: { 'User-Agent': 'Parcoto Vehicle Image Service/1.0 (https://parcoto.com)' },
+    });
+    if (!response.ok) throw new Error(`Wikimedia Commons search failed (${response.status}).`);
+    const payload = await response.json();
+    const pages = payload.query?.pages || [];
+    for (const page of pages) {
+      const image = page.imageinfo?.[0];
+      if (!image) continue;
+      const metadata = image.extmetadata || {};
+      const license = cleanImageMetadata(metadata.LicenseShortName?.value || '');
+      if (!isAllowedCommercialImageLicense(license)) continue;
+      const description = cleanImageMetadata(metadata.ImageDescription?.value || '');
+      const title = cleanImageMetadata(metadata.ObjectName?.value || page.title || '');
+      const candidate = {
+        title: `${page.title || ''} ${title}`,
+        description,
+        tags: [
+          ...(page.categories || []).map(category => category.title || ''),
+          cleanImageMetadata(metadata.DateTimeOriginal?.value || ''),
+          cleanImageMetadata(metadata.DateTime?.value || ''),
+        ].join(' '),
+        imageUrl: image.thumburl || image.url,
+        sourceUrl: image.descriptionurl || `https://commons.wikimedia.org/wiki/${encodeURIComponent(page.title || '')}`,
+        license,
+        licenseUrl: cleanImageMetadata(metadata.LicenseUrl?.value || ''),
+        attribution: cleanImageMetadata(
+          metadata.Attribution?.value ||
+          metadata.Credit?.value ||
+          `${cleanImageMetadata(metadata.Artist?.value || 'Auteur non indiqué')} — ${license}`
+        ).slice(0, 1000),
+        source: 'wikimedia_commons',
+      };
+      if (!candidate.imageUrl || !isSafeExternalHttpsUrl(candidate.imageUrl)) continue;
+      if (
+        !seen.has(candidate.imageUrl) &&
+        vehicleImageCandidateMatches(candidate, criteria)
+      ) {
+        seen.add(candidate.imageUrl);
+        candidates.push(candidate);
+      }
+    }
+    if (candidates.length >= 5) break;
   }
   return candidates.slice(0, 5);
 }
-
 async function searchOpenverseVehicleImage(criteria) {
   const aliases = vehicleImageModelAliases(criteria.model);
   const colourTerms = VEHICLE_IMAGE_COLOR_TERMS[criteria.color] || [];
-  const query = [
-    criteria.make,
-    aliases[0],
-    String(criteria.year),
-    colourTerms[0] || '',
-    'car',
-  ].filter(Boolean).join(' ');
-  const params = new URLSearchParams({
-    q: query,
-    license_type: 'commercial,modification',
-    extension: 'jpg,jpeg,png,webp',
-    page_size: '20',
-    mature: 'false',
-  });
-  const response = await fetch(`https://api.openverse.org/v1/images/?${params}`, {
-    signal: AbortSignal.timeout(15000),
-    headers: { 'User-Agent': 'Parcoto Vehicle Image Service/1.0' },
-  });
-  if (!response.ok) throw new Error(`Openverse search failed (${response.status}).`);
-  const payload = await response.json();
+  const queryVariants = aliases.slice(0, 2).map(alias => [
+    criteria.make, alias, String(criteria.year),
+    colourTerms[0] || '', 'car',
+  ].filter(Boolean).join(' '));
   const candidates = [];
-  for (const item of payload.results || []) {
-    const license = String(item.license || '').toLowerCase();
-    if (!['cc0', 'pdm', 'by', 'by-sa'].includes(license)) continue;
-    const candidate = {
-      title: item.title || '',
-      description: item.description || '',
-      tags: (item.tags || []).map(tag => tag.name || '').join(' '),
-      imageUrl: item.url || '',
-      sourceUrl: item.foreign_landing_url || item.detail_url || '',
-      license: `${license.toUpperCase()}${item.license_version ? ` ${item.license_version}` : ''}`,
-      licenseUrl: String(item.license_url || ''),
-      attribution: String(item.attribution || `${item.title || 'Image'} — ${item.creator || 'Auteur non indiqué'} — ${license}`).slice(0, 1000),
-      source: 'openverse',
-    };
-    if (
-      candidate.imageUrl &&
-      isSafeExternalHttpsUrl(candidate.imageUrl) &&
-      vehicleImageCandidateMatches(candidate, criteria)
-    ) candidates.push(candidate);
+  const seen = new Set();
+
+  for (const query of queryVariants) {
+    const params = new URLSearchParams({
+      q: query,
+      license_type: 'commercial,modification',
+      extension: 'jpg,jpeg,png,webp',
+      page_size: '20',
+      mature: 'false',
+    });
+    const response = await fetch(`https://api.openverse.org/v1/images/?${params}`, {
+      signal: AbortSignal.timeout(15000),
+      headers: { 'User-Agent': 'Parcoto Vehicle Image Service/1.0' },
+    });
+    if (!response.ok) throw new Error(`Openverse search failed (${response.status}).`);
+    const payload = await response.json();
+    for (const item of payload.results || []) {
+      const license = String(item.license || '').toLowerCase();
+      if (!['cc0', 'pdm', 'by', 'by-sa'].includes(license)) continue;
+      const candidate = {
+        title: item.title || '',
+        description: item.description || '',
+        tags: (item.tags || []).map(tag => tag.name || '').join(' '),
+        imageUrl: item.url || '',
+        sourceUrl: item.foreign_landing_url || item.detail_url || '',
+        license: `${license.toUpperCase()}${item.license_version ? ` ${item.license_version}` : ''}`,
+        licenseUrl: String(item.license_url || ''),
+        attribution: String(item.attribution || `${item.title || 'Image'} — ${item.creator || 'Auteur non indiqué'} — ${license}`).slice(0, 1000),
+        source: 'openverse',
+      };
+      if (
+        candidate.imageUrl &&
+        !seen.has(candidate.imageUrl) &&
+        isSafeExternalHttpsUrl(candidate.imageUrl) &&
+        vehicleImageCandidateMatches(candidate, criteria)
+      ) {
+        seen.add(candidate.imageUrl);
+        candidates.push(candidate);
+      }
+    }
+    if (candidates.length >= 5) break;
   }
   return candidates.slice(0, 5);
 }
-
 async function persistVehicleImage({
   rowId, cacheKey, make, model, year, color, candidate, bytes, mimeType,
   extension, userId,
