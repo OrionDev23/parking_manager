@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../datasources/vehicle/vehicules_datasource.dart';
+import '../../../core/services/vehicle_make_service.dart';
 import '../../../excel_generation/generate_list_excel.dart';
 import '../../../pdf_generation/pdf_preview_listing.dart';
 import '../../../theme.dart';
@@ -33,7 +34,7 @@ class VehicleTableState extends State<VehicleTable> {
   late VehiculeDataSource vehicleDataSource;
   late final bool startedWithFiltersOn;
 
-  static ValueNotifier<int?> filterMarque = ValueNotifier(null);
+  static ValueNotifier<String?> filterMarque = ValueNotifier(null);
   static ValueNotifier<String?> filterVehicule = ValueNotifier(null);
 
   static bool filterNow = false;
@@ -401,7 +402,7 @@ class VehicleTableState extends State<VehicleTable> {
   bool notEmpty = false;
 
   FlyoutController filterFlyout = FlyoutController();
-  int? marque;
+  String? marque;
   int? genre;
   TextEditingController yearMin = TextEditingController();
   TextEditingController yearMax = TextEditingController();
@@ -845,94 +846,33 @@ class VehicleTableState extends State<VehicleTable> {
                         label: 'marque'.tr(),
                         child: Padding(
                           padding: const EdgeInsets.all(10.0),
-                          child: Row(
-                            children: [
-                              Flexible(
-                                child: ListTile(
-                                  leading: Image.asset(
-                                    'assets/images/marques/${marque ?? 'default'}.webp',
-                                    width: 4.h,
-                                    height: 4.h,
+                          child: ComboBox<String?>(
+                            isExpanded: true,
+                            value: marque,
+                            placeholder: const Text('Toutes les marques'),
+                            items: [
+                              const ComboBoxItem<String?>(
+                                value: null,
+                                child: Text('Toutes les marques'),
+                              ),
+                              ...VehicleMakeService.cached.map(
+                                (make) => ComboBoxItem<String?>(
+                                  value: make.id,
+                                  child: Row(
+                                    children: [
+                                      VehicleMakeLogo(makeId: make.id, size: 24),
+                                      const SizedBox(width: 8),
+                                      Expanded(child: Text(make.name)),
+                                    ],
                                   ),
-                                  title: AutoSizeText(
-                                    VehiclesUtilities.marques![marque ?? 0] ??
-                                        'nonind'.tr(),
-                                    minFontSize: 5,
-                                    maxLines: 1,
-                                  ),
-                                  onPressed: () {
-                                    SelectDialog.showModal<int?>(
-                                      context,
-                                      selectedValue: marque,
-                                      backgroundColor: appTheme.backGroundColor,
-                                      gridView: true,
-                                      numberOfGridCross: 3,
-                                      constraints: BoxConstraints.loose(
-                                        Size(60.w, 70.h),
-                                      ),
-                                      items: VehiclesUtilities.marques!.keys
-                                          .toList(),
-                                      itemBuilder: (c, v, e) {
-                                        return Card(
-                                          child: Image.asset(
-                                            'assets/images/marques/${v ?? 'default'}.webp',
-                                          ),
-                                        );
-                                      },
-                                      onChange: (s) {
-                                        marque = s;
-                                        setState(() {});
-                                        setS(() {});
-                                      },
-                                      onFind: VehiclesUtilities.findMarque,
-                                      emptyBuilder: (s) {
-                                        return Center(
-                                          child: Text(
-                                            'lvide',
-                                            style: TextStyle(
-                                              color: Colors.grey[100],
-                                            ),
-                                          ).tr(),
-                                        );
-                                      },
-                                      loadingBuilder: (s) {
-                                        return Center(
-                                          child: Text(
-                                            'telechargement',
-                                            style: TextStyle(
-                                              color: Colors.grey[100],
-                                            ),
-                                          ).tr(),
-                                        );
-                                      },
-                                      searchBoxDecoration: appTheme
-                                          .materialUiInputDecoration
-                                          .copyWith(
-                                            labelText: 'search'.tr(),
-                                            labelStyle: placeStyle,
-                                          ),
-                                      searchTextStyle: appTheme.writingStyle,
-                                      searchCursorColor: appTheme.color,
-                                    );
-                                  },
                                 ),
                               ),
-                              smallSpace,
-                              smallSpace,
-                              if (marque != null)
-                                IconButton(
-                                  icon: Icon(
-                                    FluentIcons.cancel,
-                                    color: appTheme.color,
-                                  ),
-                                  onPressed: () {
-                                    marque = null;
-
-                                    setState(() {});
-                                    setS(() {});
-                                  },
-                                ),
                             ],
+                            onChanged: (value) {
+                              marque = value;
+                              setState(() {});
+                              setS(() {});
+                            },
                           ),
                         ),
                       ),
