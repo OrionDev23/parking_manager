@@ -729,6 +729,14 @@ class _VehicleCard extends StatelessWidget {
       vehicle.nom,
     ].where((value) => value?.trim().isNotEmpty == true).join(' ');
     final imageUrl = vehicle.imageUrl?.trim();
+    final imageAttribution =
+        vehicle.customFields['_vehicleImageAttribution']?.toString().trim();
+    final imageLicense =
+        vehicle.customFields['_vehicleImageLicense']?.toString().trim();
+    final imageSourceUrl =
+        vehicle.customFields['_vehicleImageSourceUrl']?.toString().trim();
+    final imageLicenseUrl =
+        vehicle.customFields['_vehicleImageLicenseUrl']?.toString().trim();
 
     return ParcotoSurface(
       padding: EdgeInsets.zero,
@@ -760,6 +768,56 @@ class _VehicleCard extends StatelessWidget {
                       color: statusColor,
                     ),
                   ),
+                  if (imageAttribution?.isNotEmpty == true)
+                    Positioned(
+                      left: 12,
+                      bottom: 10,
+                      child: Tooltip(
+                        message: [
+                          'Crédit : $imageAttribution',
+                          if (imageLicense?.isNotEmpty == true)
+                            'Licence : $imageLicense',
+                          if (imageSourceUrl?.isNotEmpty == true)
+                            'Source : $imageSourceUrl',
+                          if (imageLicenseUrl?.isNotEmpty == true)
+                            'Licence : $imageLicenseUrl',
+                        ].join('\\n'),
+                        child: Container(
+                          constraints: const BoxConstraints(maxWidth: 190),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 7,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: .62),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                FluentIcons.info,
+                                size: 10,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  imageAttribution,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   Positioned(
                     right: 8,
                     top: 8,
