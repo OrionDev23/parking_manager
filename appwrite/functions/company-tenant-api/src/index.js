@@ -1,5 +1,5 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { createHash, createHmac, randomUUID } from 'node:crypto';
+import { createHash, createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
 
 const requestContext = new AsyncLocalStorage();
 const DATABASE_ID = '6531ad112080ae3b14a7';
@@ -1157,24 +1157,64 @@ const VEHICLE_IMAGE_COLOR_TERMS = {
   red: ['red', 'rouge', 'rojo'],
 };
 
+function vehicleImageModelBase(model) {
+  return String(model || '').trim().replace(
+    /[\s-]+(?:generation[\s-]+)?(?:\d{1,2}|i{1,3}|iv|v|vi|vii|viii|ix|x)$/i,
+    '',
+  ).trim();
+}
+
 function vehicleImageCandidateMatches(candidate, { make, model, year, color }) {
-  const text = normalizeImageSearchText([
-    candidate.title, candidate.description, candidate.tags,
+  const descriptiveText = normalizeImageSearchText([
+    candidate.title, candidate.description,
   ].filter(Boolean).join(' '));
+  const metadataText = normalizeImageSearchText([
+    descriptiveText, candidate.tags,
+  ].filter(Boolean).join(' '));
+
+  const irrelevantVehicleTerms = [
+    'car transporter', 'vehicle transporter', 'auto transporter',
+    'car carrier', 'vehicle carrier', 'truck', 'lorry', 'camion',
+    'transporteur', 'remorque porte voiture', 'tow truck', 'towing',
+  ];
+  if (irrelevantVehicleTerms.some(term =>
+    metadataText.includes(normalizeImageSearchText(term))
+  )) return false;
+
   const normalizedMake = normalizeImageSearchText(make);
   const makeMatches = normalizedMake.split(' ').filter(Boolean)
-    .every(token => text.includes(token));
+    .every(token => descriptiveText.includes(token));
+
   const aliases = vehicleImageModelAliases(model);
-  const modelMatches = aliases.some(alias => text.includes(alias));
-  const yearText = String(year);
+  const requestedBase = normalizeImageSearchText(vehicleImageModelBase(model));
   const generationRange = vehicleImageGenerationRange(make, model);
-  const yearMatches = text.includes(yearText) ||
-    (generationRange !== null &&
-      year >= generationRange[0] &&
-      year <= generationRange[1]);
+  const sourceModel = normalizeImageSearchText(candidate.model || '');
+  const sourceYear = Number.parseInt(candidate.modelYear, 10);
+  const sourceGenerationMatches = Boolean(
+    requestedBase &&
+    sourceModel === requestedBase &&
+    Number.isInteger(sourceYear) &&
+    sourceYear === year &&
+    generationRange !== null &&
+    year >= generationRange[0] &&
+    year <= generationRange[1]
+  );
+  const modelMatches = aliases.some(alias => descriptiveText.includes(alias)) ||
+    sourceGenerationMatches;
+
+  // EXIF capture dates are deliberately not treated as model years.
+  const yearText = String(year);
+  const yearMatches = Number.isInteger(sourceYear)
+    ? sourceYear === year
+    : descriptiveText.includes(yearText) ||
+      (generationRange !== null &&
+        year >= generationRange[0] &&
+        year <= generationRange[1]);
+
   const colorTerms = VEHICLE_IMAGE_COLOR_TERMS[color] || [];
   const colorMatches = color === 'original' ||
-    colorTerms.some(term => text.includes(normalizeImageSearchText(term)));
+    colorTerms.some(term => metadataText.includes(normalizeImageSearchText(term)));
+
   return makeMatches && modelMatches && yearMatches && colorMatches;
 }
 function isAllowedCommercialImageLicense(value) {
@@ -1332,14 +1372,15 @@ async function searchTrustCarVehicleImage(criteria) {
   // Never use its result when a specific color was requested.
   if (criteria.color !== 'original') return [];
 
-  const aliases = vehicleImageModelAliases(criteria.model);
-  const generationRange = vehicleImageGenerationRange(criteria.make, criteria.model);
+  const requestedModel = String(criteria.model || '').trim();
+  const baseModel = vehicleImageModelBase(requestedModel);
+  const modelQueries = [...new Set([requestedModel, baseModel].filter(Boolean))];
   const candidates = [];
 
-  for (const alias of aliases.slice(0, 2)) {
+  for (const modelQuery of modelQueries) {
     const params = new URLSearchParams({
       make: criteria.make,
-      model: alias,
+      model: modelQuery,
       year: String(criteria.year),
       format: 'json',
     });
@@ -1386,6 +1427,9 @@ async function searchTrustCarVehicleImage(criteria) {
     const candidate = {
       title,
       description: '',
+      make: resultMake,
+      model: resultModel,
+      modelYear: Number.isInteger(resultYear) ? resultYear : null,
       tags: [resultMake, resultModel, Number.isInteger(resultYear) ? resultYear : ''].join(' '),
       imageUrl,
       sourceUrl: /^Q\\d+$/.test(reference)
@@ -1499,6 +1543,306 @@ async function persistVehicleImage({
     licenseUrl: candidate.licenseUrl || null,
     attribution: candidate.attribution || null,
     sourceUrl: candidate.sourceUrl || null,
+  };
+}
+
+function createVehicleImageCandidateToken({
+  candidate, criteria, companyId, userId, forceRefresh,
+}) {
+  const signingSecret = requestContext.getStore()?.apiKey;
+  if (!signingSecret) throw new Error('Image candidate signing key is unavailable.');
+  const payload = Buffer.from(JSON.stringify({
+    version: 1, candidate, criteria, companyId, userId,
+    forceRefresh: forceRefresh === true,
+    expiresAt: Date.now() + 10 * 60 * 1000,
+  })).toString('base64url');
+  const signature = createHmac('sha256', signingSecret).update(payload).digest('base64url');
+  return `${payload}.${signature}`;
+}
+
+function verifyVehicleImageCandidateToken(token, {
+  criteria, companyId, userId, forceRefresh,
+}) {
+  const parts = String(token || '').split('.');
+  if (parts.length !== 2 || !parts[0] || !parts[1]) {
+    const failure = new Error('Invalid image selection token.');
+    failure.status = 400;
+    throw failure;
+  }
+  const signingSecret = requestContext.getStore()?.apiKey;
+  if (!signingSecret) throw new Error('Image candidate signing key is unavailable.');
+  const expected = createHmac('sha256', signingSecret).update(parts[0]).digest();
+  const provided = Buffer.from(parts[1], 'base64url');
+  if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
+    const failure = new Error('Image selection token could not be verified.');
+    failure.status = 403;
+    throw failure;
+  }
+
+  let payload;
+  try {
+    payload = JSON.parse(Buffer.from(parts[0], 'base64url').toString('utf8'));
+  } catch (_) {
+    const failure = new Error('Image selection token is malformed.');
+    failure.status = 400;
+    throw failure;
+  }
+  if (payload.version !== 1 || payload.expiresAt < Date.now()) {
+    const failure = new Error('Image selection expired. Run the search again.');
+    failure.status = 410;
+    throw failure;
+  }
+  if (
+    payload.userId !== userId ||
+    payload.companyId !== companyId ||
+    payload.forceRefresh !== (forceRefresh === true) ||
+    JSON.stringify(payload.criteria) !== JSON.stringify(criteria)
+  ) {
+    const failure = new Error('Image selection does not match the current vehicle or account.');
+    failure.status = 409;
+    throw failure;
+  }
+  return payload.candidate;
+}
+
+function vehicleImageCandidateResponse(candidate, token, forceRefresh) {
+  return {
+    token,
+    source: candidate.source,
+    title: String(candidate.title || '').slice(0, 240),
+    imageUrl: candidate.imageUrl,
+    license: candidate.license || null,
+    licenseUrl: candidate.licenseUrl || null,
+    attribution: candidate.attribution || null,
+    sourceUrl: candidate.sourceUrl || null,
+    colorFallback: candidate.colorFallback === true,
+    matchedColor: candidate.actualColor || null,
+    forceRefresh: forceRefresh === true,
+  };
+}
+
+async function searchCarImagesCandidate(criteria, log) {
+  const apiKey = process.env.CARIMAGES_API_KEY;
+  const apiSecret = process.env.CARIMAGES_API_SECRET;
+  if (!apiKey || !apiSecret) return null;
+  try {
+    const signedUrl = createCarImagesSignedUrl({
+      make: criteria.make, model: criteria.model, year: criteria.year,
+      color: criteria.color, apiKey, apiSecret,
+    });
+    const response = await fetch(signedUrl, {
+      redirect: 'manual',
+      signal: AbortSignal.timeout(20000),
+    });
+    if (response.status !== 302) {
+      log(`CarImagesAPI comparison fallback returned status=${response.status}`);
+      return null;
+    }
+    const actualColor = String(
+      response.headers.get('x-ci-color') || criteria.color
+    ).toLowerCase();
+    const location = response.headers.get('location');
+    let cdnUrl;
+    try { cdnUrl = new URL(location || ''); } catch (_) { cdnUrl = null; }
+    if (!cdnUrl || cdnUrl.protocol !== 'https:' ||
+        cdnUrl.hostname !== 'cdn.carimagesapi.com') {
+      throw new Error('CarImagesAPI returned an unexpected image CDN location.');
+    }
+    return {
+      candidate: {
+        source: 'carimages',
+        title: `${criteria.make} ${criteria.model} ${criteria.year}`,
+        description: '',
+        tags: '',
+        imageUrl: location,
+        sourceUrl: '',
+        license: 'CarImagesAPI terms',
+        licenseUrl: '',
+        attribution: 'CarImagesAPI (image fournie avec filigrane sur le forfait gratuit)',
+        actualColor,
+        colorFallback: criteria.color !== 'original' && actualColor === 'original',
+      },
+    };
+  } catch (failure) {
+    log(`CarImagesAPI comparison fallback failed: ${failure.message}`);
+    return null;
+  }
+}
+
+async function searchVehicleImageCandidates({ userId, input, log }) {
+  const companyId = String(input.companyId || '').trim();
+  await requireVehicleImageAccess(userId, companyId);
+  const forceRefresh = input.forceRefresh === true;
+  if (forceRefresh) requirePlatformSuperAdmin(userId);
+
+  const make = String(input.make || '').trim().slice(0, 100);
+  const model = String(input.model || '').trim().slice(0, 120);
+  const year = Number.parseInt(input.year, 10);
+  const currentYear = new Date().getUTCFullYear();
+  if (!make || !model || !Number.isInteger(year) ||
+      year < 1886 || year > currentYear + 2) {
+    const failure = new Error('Valid make, model and model year are required.');
+    failure.status = 400;
+    throw failure;
+  }
+
+  const color = normalizeVehicleImageColor(input.color);
+  const criteria = { make, model, year, color };
+  const cacheKey = vehicleImageCacheKey(make, model, year, color);
+  const rowId = cacheKey.slice(0, 32);
+  const cached = await getVehicleImageCacheRow(rowId);
+  const cachedFound = cached?.data?.cacheKey === cacheKey &&
+    cached.data.status === 'found' && cached.data.imageUrl;
+
+  if (!forceRefresh && cachedFound) {
+    return {
+      ok: true,
+      found: true,
+      fromSharedCache: true,
+      cachedImage: {
+        found: true,
+        source: cached.data.source || 'shared_cache',
+        fromSharedCache: true,
+        imageUrl: cached.data.imageUrl,
+        fileId: cached.data.fileId || rowId,
+        license: cached.data.license || null,
+        licenseUrl: cached.data.licenseUrl || null,
+        attribution: cached.data.attribution || null,
+        sourceUrl: cached.data.sourceUrl || null,
+        colorFallback: color !== 'original' && cached.data.color === 'original',
+      },
+      candidates: [],
+    };
+  }
+
+  const providers = [
+    ['wikimedia_commons', searchWikimediaVehicleImage],
+    ['openverse', searchOpenverseVehicleImage],
+    ['trustcar', searchTrustCarVehicleImage],
+  ];
+  const candidates = [];
+  const seenImages = new Set();
+
+  for (const [providerName, search] of providers) {
+    try {
+      const providerResults = await search(criteria);
+      for (const candidate of providerResults || []) {
+        if (!candidate.imageUrl || seenImages.has(candidate.imageUrl)) continue;
+        try {
+          const downloaded = await downloadExternalVehicleImage(candidate.imageUrl);
+          const contentHash = createHash('sha256').update(downloaded.bytes).digest('hex');
+          if (seenImages.has(contentHash)) continue;
+          seenImages.add(candidate.imageUrl);
+          seenImages.add(contentHash);
+          candidates.push({
+            ...candidate,
+            actualColor: candidate.actualColor || color,
+            colorFallback: candidate.colorFallback === true,
+          });
+          break;
+        } catch (failure) {
+          log(`Vehicle image preview rejected provider=${providerName} reason=${failure.message}`);
+        }
+      }
+      if (candidates.length >= 2) break;
+    } catch (failure) {
+      log(`Vehicle image provider unavailable provider=${providerName} reason=${failure.message}`);
+    }
+  }
+
+  // CarImagesAPI is a last resort and only fills the comparison if a free
+  // source could not provide a second usable candidate.
+  if (candidates.length < 2) {
+    const fallback = await searchCarImagesCandidate(criteria, log);
+    if (fallback?.candidate) {
+      try {
+        const downloaded = await downloadExternalVehicleImage(fallback.candidate.imageUrl);
+        const contentHash = createHash('sha256').update(downloaded.bytes).digest('hex');
+        if (!seenImages.has(contentHash)) candidates.push(fallback.candidate);
+      } catch (failure) {
+        log(`CarImagesAPI comparison image rejected reason=${failure.message}`);
+      }
+    }
+  }
+
+  if (!candidates.length && !cachedFound) {
+    await saveVehicleImageCacheRow(rowId, {
+      cacheKey, make, model, modelYear: year, color,
+      status: 'not_found',
+      lastCheckedAt: new Date().toISOString(),
+    });
+  }
+
+  const responses = candidates.slice(0, 2).map(candidate => {
+    const token = createVehicleImageCandidateToken({
+      candidate, criteria, companyId, userId, forceRefresh,
+    });
+    return vehicleImageCandidateResponse(candidate, token, forceRefresh);
+  });
+
+  return {
+    ok: true,
+    found: responses.length > 0,
+    fromSharedCache: false,
+    forceRefresh,
+    candidates: responses,
+    reason: responses.length ? null : 'no_matching_licensed_image',
+  };
+}
+
+async function selectVehicleImageCandidate({ userId, input }) {
+  const companyId = String(input.companyId || '').trim();
+  await requireVehicleImageAccess(userId, companyId);
+  const make = String(input.make || '').trim().slice(0, 100);
+  const model = String(input.model || '').trim().slice(0, 120);
+  const year = Number.parseInt(input.year, 10);
+  const color = normalizeVehicleImageColor(input.color);
+  const forceRefresh = input.forceRefresh === true;
+  if (forceRefresh) requirePlatformSuperAdmin(userId);
+  const criteria = { make, model, year, color };
+  const candidate = verifyVehicleImageCandidateToken(input.candidateToken, {
+    criteria, companyId, userId, forceRefresh,
+  });
+
+  if (!candidate ||
+      !['wikimedia_commons', 'openverse', 'trustcar', 'carimages'].includes(candidate.source) ||
+      !isSafeExternalHttpsUrl(candidate.imageUrl)) {
+    const failure = new Error('Selected vehicle image candidate is invalid.');
+    failure.status = 400;
+    throw failure;
+  }
+  if (candidate.source !== 'carimages' &&
+      !isAllowedCommercialImageLicense(candidate.license)) {
+    const failure = new Error('Selected image does not have an accepted commercial-use license.');
+    failure.status = 403;
+    throw failure;
+  }
+
+  const cacheKey = vehicleImageCacheKey(make, model, year, color);
+  const rowId = cacheKey.slice(0, 32);
+  const cached = await getVehicleImageCacheRow(rowId);
+  const cachedFound = cached?.data?.cacheKey === cacheKey &&
+    cached.data.status === 'found' && cached.data.imageUrl;
+  if (cachedFound && !forceRefresh) {
+    const failure = new Error('An image is already registered. Only the platform Super Admin can replace it.');
+    failure.status = 409;
+    throw failure;
+  }
+
+  const downloaded = await downloadExternalVehicleImage(candidate.imageUrl);
+  const actualColor = candidate.actualColor || color;
+  const saved = await persistVehicleImage({
+    rowId, cacheKey, make, model, year, color: actualColor,
+    candidate, bytes: downloaded.bytes,
+    mimeType: downloaded.mimeType,
+    extension: downloaded.extension,
+    userId,
+  });
+  return {
+    ...saved,
+    requestedColor: color,
+    colorFallback: candidate.colorFallback === true,
+    replacementFound: forceRefresh,
   };
 }
 
@@ -1892,6 +2236,16 @@ export default async (context) => requestContext.run(
         await restorePlatformExploration(userId);
         throw failure;
       }
+    }
+
+    if (action === 'vehicle_image_search_candidates') {
+      const result = await searchVehicleImageCandidates({ userId, input, log });
+      return json(res, 200, result);
+    }
+
+    if (action === 'vehicle_image_select_candidate') {
+      const result = await selectVehicleImageCandidate({ userId, input });
+      return json(res, 200, result);
     }
 
     if (action === 'vehicle_image_resolve') {
