@@ -9,6 +9,13 @@ import '../../../widgets/forms/parcoto_form_field.dart';
 import '../../../widgets/page_header.dart';
 import 'brand_container.dart';
 
+List<String> _parseMakeAliases(String? raw) => (raw ?? '')
+    .split(RegExp(r'[,;\\n]'))
+    .map((value) => value.trim())
+    .where((value) => value.length > 1)
+    .toSet()
+    .toList(growable: false);
+
 class BrandList extends StatefulWidget {
   const BrandList({super.key});
 
@@ -95,6 +102,8 @@ class _BrandListState extends State<BrandList> {
         makeId: make.id,
         name: values['name'],
         category: values['category'],
+        aliases: _parseMakeAliases(values['aliases']),
+        logoUrl: values['logoUrl'] ?? '',
       );
       await _loadMakes(forceRefresh: true);
       if (!mounted) return;
@@ -147,6 +156,8 @@ class _BrandListState extends State<BrandList> {
         companyId: companyId,
         name: values['name']!,
         category: values['category']!,
+        aliases: _parseMakeAliases(values['aliases']),
+        logoUrl: values['logoUrl'],
       );
       await _loadMakes(forceRefresh: true);
       if (!mounted) return;
@@ -363,6 +374,8 @@ class _EditVehicleMakeDialog extends StatefulWidget {
 
 class _EditVehicleMakeDialogState extends State<_EditVehicleMakeDialog> {
   late final TextEditingController _nameController;
+  late final TextEditingController _aliasesController;
+  late final TextEditingController _logoUrlController;
   late String _category;
 
   static const categories = _AddVehicleMakeDialogState.categories;
@@ -371,6 +384,8 @@ class _EditVehicleMakeDialogState extends State<_EditVehicleMakeDialog> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.make.name);
+    _aliasesController = TextEditingController(text: widget.make.aliases.join(', '));
+    _logoUrlController = TextEditingController(text: widget.make.logoUrl ?? '');
     _category = categories.containsKey(widget.make.category)
         ? widget.make.category
         : 'other';
@@ -379,6 +394,8 @@ class _EditVehicleMakeDialogState extends State<_EditVehicleMakeDialog> {
   @override
   void dispose() {
     _nameController.dispose();
+    _aliasesController.dispose();
+    _logoUrlController.dispose();
     super.dispose();
   }
 
@@ -397,6 +414,28 @@ class _EditVehicleMakeDialogState extends State<_EditVehicleMakeDialog> {
               placeholder: 'Nom officiel de la marque',
               maxLength: 100,
               onChanged: (_) => setState(() {}),
+            ),
+            const SizedBox(height: 12),
+            TextBox(
+              controller: _aliasesController,
+              maxLines: 2,
+              placeholder: 'Alias (séparés par des virgules)',
+            ),
+            const SizedBox(height: 12),
+            TextBox(
+              controller: _logoUrlController,
+              placeholder: 'URL du logo (https://...)',
+            ),
+            const SizedBox(height: 12),
+            TextBox(
+              controller: _aliasesController,
+              maxLines: 2,
+              placeholder: 'Alias (séparés par des virgules)',
+            ),
+            const SizedBox(height: 12),
+            TextBox(
+              controller: _logoUrlController,
+              placeholder: 'URL du logo (https://...)',
             ),
             const SizedBox(height: 12),
             ComboBox<String>(
@@ -433,6 +472,8 @@ class _EditVehicleMakeDialogState extends State<_EditVehicleMakeDialog> {
               : () => Navigator.of(context).pop({
                     'name': _nameController.text.trim(),
                     'category': _category,
+                    'aliases': _aliasesController.text,
+                    'logoUrl': _logoUrlController.text.trim(),
                   }),
           child: const Text('Enregistrer'),
         ),
@@ -450,22 +491,17 @@ class _AddVehicleMakeDialog extends StatefulWidget {
 
 class _AddVehicleMakeDialogState extends State<_AddVehicleMakeDialog> {
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _aliasesController = TextEditingController();
+  final TextEditingController _logoUrlController = TextEditingController();
   String _category = 'passenger';
 
-  static const categories = <String, String>{
-    'passenger': 'Voiture particulière',
-    'commercial': 'Utilitaire / poids lourd',
-    'bus': 'Autobus / autocar',
-    'motorcycle': 'Moto / scooter',
-    'agricultural': 'Matériel agricole',
-    'construction': 'Engin de chantier',
-    'industrial': 'Matériel industriel',
-    'other': 'Autre',
-  };
+  static const categories = VehicleMakeService.categoryLabels;
 
   @override
   void dispose() {
     _nameController.dispose();
+    _aliasesController.dispose();
+    _logoUrlController.dispose();
     super.dispose();
   }
 
@@ -519,6 +555,8 @@ class _AddVehicleMakeDialogState extends State<_AddVehicleMakeDialog> {
               : () => Navigator.of(context).pop({
                     'name': _nameController.text.trim(),
                     'category': _category,
+                    'aliases': _aliasesController.text,
+                    'logoUrl': _logoUrlController.text.trim(),
                   }),
           child: const Text('Ajouter au catalogue'),
         ),
