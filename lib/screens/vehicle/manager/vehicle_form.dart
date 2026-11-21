@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:dzair_data_usage/langs.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -199,8 +202,14 @@ class _VehicleFormState extends State<VehicleForm>
   int? _resolvedImageYear;
   String? _resolvedImageColor;
   String? _vehicleImageMessage;
+  String? _resolvedImageSource;
+  String? _resolvedImageLicense;
+  String? _resolvedImageAttribution;
   bool _resolvingVehicleImage = false;
   bool _vehicleImageLookupCompleted = false;
+  bool _canUploadVehicleImage = false;
+  bool _canForceRefreshVehicleImage = false;
+  final ImagePicker _vehicleImagePicker = ImagePicker();
   bool autreMat = false;
   int? marque;
 
@@ -233,13 +242,15 @@ class _VehicleFormState extends State<VehicleForm>
 
   @override
   void initState() {
-    initValues();
     super.initState();
+    initValues();
+    unawaited(_loadVehicleImageCapabilities());
   }
 
   void initValues() {
     _resolvedImageUrl = widget.vehicle?.imageUrl;
     _resolvedImageFileId = widget.vehicle?.imageFileId;
+    _resolvedImageSource = widget.vehicle?.imageSource;
     colorController.text = _normalizeVehiclePaint(widget.vehicle?.color);
     AlgeriaList();
     if (widget.vehicle != null) {
@@ -647,7 +658,7 @@ class _VehicleFormState extends State<VehicleForm>
         final direction = selectedDirection.text.trim().isNotEmpty
             ? selectedDirection.text.trim()
             : widget.vehicle?.direction ?? 'À renseigner';
-        final imageUrl = widget.vehicle?.imageUrl?.trim();
+        final imageUrl = _resolvedImageUrl?.trim();
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -939,27 +950,100 @@ class _VehicleFormState extends State<VehicleForm>
                             ),
                             const SizedBox(height: 10),
                             if (!widget.readOnly)
-                              FilledButton(
-                                onPressed: _resolvingVehicleImage
-                                    ? null
-                                    : _resolveVehicleImage,
-                                child: _resolvingVehicleImage
-                                    ? const Row(
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: [
+                                  FilledButton(
+                                    onPressed: _resolvingVehicleImage
+                                        ? null
+                                        : () => _resolveVehicleImage(),
+                                    child: _resolvingVehicleImage
+                                        ? const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              ProgressRing(strokeWidth: 2),
+                                              SizedBox(width: 8),
+                                              Text('Recherche…'),
+                                            ],
+                                          )
+                                        : const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(FluentIcons.search, size: 13),
+                                              SizedBox(width: 7),
+                                              Text('Rechercher l’image'),
+                                            ],
+                                          ),
+                                  ),
+                                  if (_canForceRefreshVehicleImage)
+                                    Button(
+                                      onPressed: _resolvingVehicleImage
+                                          ? null
+                                          : () => _resolveVehicleImage(
+                                                forceRefresh: true,
+                                              ),
+                                      child: const Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          ProgressRing(strokeWidth: 2),
-                                          SizedBox(width: 8),
-                                          Text('Recherche…'),
-                                        ],
-                                      )
-                                    : const Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(FluentIcons.search, size: 13),
+                                          Icon(FluentIcons.refresh, size: 13),
                                           SizedBox(width: 7),
-                                          Text('Rechercher l’image'),
+                                          Text('Rechercher et remplacer'),
                                         ],
                                       ),
+                                    ),
+                                  if (_canUploadVehicleImage &&
+                                      _vehicleImageLookupCompleted &&
+                                      !(_resolvedImageUrl?.isNotEmpty ?? false))
+                                    FilledButton(
+                                      onPressed: _resolvingVehicleImage
+                                          ? null
+                                          : () => _pickAndUploadVehicleImage(
+                                                ImageSource.gallery,
+                                              ),
+                                      child: const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(FluentIcons.upload, size: 13),
+                                          SizedBox(width: 7),
+                                          Text('Importer une photo'),
+                                        ],
+                                      ),
+                                    ),
+                                  if (_canUploadVehicleImage &&
+                                      _vehicleImageLookupCompleted &&
+                                      !(_resolvedImageUrl?.isNotEmpty ?? false))
+                                    Button(
+                                      onPressed: _resolvingVehicleImage
+                                          ? null
+                                          : () => _pickAndUploadVehicleImage(
+                                                ImageSource.camera,
+                                              ),
+                                      child: const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(FluentIcons.camera, size: 13),
+                                          SizedBox(width: 7),
+                                          Text('Prendre une photo'),
+                                        ],
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            if (_resolvedImageAttribution?.isNotEmpty == true)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: Text(
+                                  'Crédit : $_resolvedImageAttribution'
+                                  '${_resolvedImageLicense?.isNotEmpty == true ? ' · $_resolvedImageLicense' : ''}',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: appTheme.writingStyle.color
+                                        ?.withValues(alpha: .65),
+                                  ),
+                                ),
                               ),
                         ],
                       );
@@ -3075,12 +3159,55 @@ class _VehicleFormState extends State<VehicleForm>
     }
   }
 
-  Future<void> _resolveVehicleImage({bool showInfo = true}) async {
+  Future<void> _loadVehicleImageCapabilities() async {
+    try {
+      final capabilities = await VehicleImageService.capabilities(
+        companyId: vehicleServices.companyId,
+      );
+      if (!mounted) return;
+      setState(() {
+        _canUploadVehicleImage = capabilities.canUpload;
+        _canForceRefreshVehicleImage = capabilities.canForceRefresh;
+      });
+    } catch (_) {
+      // Fail closed: if the server cannot validate the caller's role, hide
+      // privileged actions rather than guessing from client-side state.
+      if (!mounted) return;
+      setState(() {
+        _canUploadVehicleImage = false;
+        _canForceRefreshVehicleImage = false;
+      });
+    }
+  }
+
+  String _vehicleImageSourceLabel(String source) {
+    switch (source) {
+      case 'wikimedia_commons':
+        return 'Wikimedia Commons';
+      case 'openverse':
+        return 'Openverse';
+      case 'carimages':
+        return 'CarImagesAPI';
+      case 'manual_upload':
+        return 'Photo ajoutée par un administrateur';
+      case 'shared_cache':
+        return 'Catalogue partagé';
+      default:
+        return source;
+    }
+  }
+
+  Future<void> _resolveVehicleImage({
+    bool showInfo = true,
+    bool forceRefresh = false,
+  }) async {
     if (widget.readOnly || _resolvingVehicleImage) return;
+    if (forceRefresh && !_canForceRefreshVehicleImage) return;
 
     final make = VehiclesUtilities.marques?[marque] ?? '';
     final model = type.text.trim();
     final year = int.tryParse(modelYearController.text.trim());
+    final color = _normalizeVehiclePaint(colorController.text);
     if (make.trim().isEmpty || model.isEmpty || year == null) {
       if (mounted) {
         setState(() {
@@ -3091,9 +3218,17 @@ class _VehicleFormState extends State<VehicleForm>
       return;
     }
 
+    final imageMatchesCurrentIdentity =
+        _resolvedImageMake == make &&
+        _resolvedImageModel == model &&
+        _resolvedImageYear == year &&
+        _resolvedImageColor == color;
+
     setState(() {
       _resolvingVehicleImage = true;
-      _vehicleImageMessage = 'Recherche dans le catalogue partagé…';
+      _vehicleImageMessage = forceRefresh
+          ? 'Nouvelle recherche en cours. L’image actuelle sera conservée si aucun meilleur résultat n’est trouvé…'
+          : 'Recherche dans Wikimedia Commons, Openverse puis CarImagesAPI…';
     });
 
     try {
@@ -3102,35 +3237,61 @@ class _VehicleFormState extends State<VehicleForm>
         make: make,
         model: model,
         year: year,
-        color: _normalizeVehiclePaint(colorController.text),
+        color: color,
+        forceRefresh: forceRefresh,
       );
       if (!mounted) return;
+
       setState(() {
         _vehicleImageLookupCompleted = true;
-        _resolvedImageUrl = result.imageUrl;
-        _resolvedImageFileId = result.fileId;
-        _resolvedImageMake = make;
-        _resolvedImageModel = model;
-        _resolvedImageYear = year;
-        _resolvedImageColor = _normalizeVehiclePaint(colorController.text);
-        _vehicleImageMessage = result.found
-            ? result.colorFallback
-                ? 'Image disponible, mais la teinte demandée est indisponible : peinture d’origine affichée.'
-                : result.source == 'shared_cache'
-                    ? 'Image réutilisée depuis le catalogue partagé.'
-                    : 'Image récupérée et ajoutée au catalogue partagé.'
-            : 'Aucune image correspondante trouvée pour cette configuration.';
+        if (result.found) {
+          _resolvedImageUrl = result.imageUrl;
+          _resolvedImageFileId = result.fileId;
+          _resolvedImageSource = result.source;
+          _resolvedImageLicense = result.license;
+          _resolvedImageAttribution = result.attribution;
+          _resolvedImageMake = make;
+          _resolvedImageModel = model;
+          _resolvedImageYear = year;
+          _resolvedImageColor = color;
+        } else if (!imageMatchesCurrentIdentity) {
+          // Never keep showing an old vehicle's image after the identity
+          // (make/model/year/color) has changed.
+          _resolvedImageUrl = null;
+          _resolvedImageFileId = null;
+          _resolvedImageSource = null;
+          _resolvedImageLicense = null;
+          _resolvedImageAttribution = null;
+          _resolvedImageMake = make;
+          _resolvedImageModel = model;
+          _resolvedImageYear = year;
+          _resolvedImageColor = color;
+        }
+
+        if (forceRefresh && result.found && !result.replacementFound) {
+          _vehicleImageMessage =
+              'Aucune nouvelle image pertinente trouvée. L’image actuelle a été conservée.';
+        } else if (result.found) {
+          final sourceLabel = _vehicleImageSourceLabel(result.source);
+          _vehicleImageMessage = result.colorFallback
+              ? 'Image disponible, mais la couleur demandée est indisponible : peinture d’origine affichée ($sourceLabel).'
+              : 'Image disponible — source : $sourceLabel.';
+        } else {
+          _vehicleImageMessage =
+              'Aucune image correspondant au modèle, à l’année et à la couleur n’a été trouvée. Un administrateur peut ajouter une photo.';
+        }
       });
+
       if (showInfo && mounted) {
         displayInfoBar(
           context,
           builder: (context, close) => InfoBar(
             title: Text(
-              result.found
-                  ? result.colorFallback
-                      ? 'Image disponible — peinture d’origine affichée.'
-                      : 'Image du véhicule disponible.'
-                  : 'Aucune image correspondante disponible.',
+              forceRefresh && result.found && !result.replacementFound
+                  ? 'Image actuelle conservée.'
+                  : result.found
+                      ? 'Image du véhicule disponible.'
+                      : 'Aucune image correspondante disponible.',
             ),
             severity: result.found
                 ? InfoBarSeverity.success
@@ -3143,7 +3304,15 @@ class _VehicleFormState extends State<VehicleForm>
       if (!mounted) return;
       setState(() {
         _vehicleImageMessage =
-            'Impossible de récupérer l’image : ${error.toString()}';
+            'La recherche d’image a échoué : ${error.toString()}';
+        if (!imageMatchesCurrentIdentity) {
+          _resolvedImageUrl = null;
+          _resolvedImageFileId = null;
+          _resolvedImageSource = null;
+          _resolvedImageLicense = null;
+          _resolvedImageAttribution = null;
+          _vehicleImageLookupCompleted = false;
+        }
       });
       if (showInfo) {
         displayInfoBar(
@@ -3156,6 +3325,137 @@ class _VehicleFormState extends State<VehicleForm>
           duration: snackbarShortDuration,
         );
       }
+    } finally {
+      if (mounted) {
+        setState(() => _resolvingVehicleImage = false);
+      }
+    }
+  }
+
+  Future<void> _pickAndUploadVehicleImage(ImageSource source) async {
+    if (widget.readOnly ||
+        !_canUploadVehicleImage ||
+        !_vehicleImageLookupCompleted ||
+        _resolvingVehicleImage ||
+        (_resolvedImageUrl?.isNotEmpty ?? false)) {
+      return;
+    }
+
+    final make = VehiclesUtilities.marques?[marque] ?? '';
+    final model = type.text.trim();
+    final year = int.tryParse(modelYearController.text.trim());
+    final color = _normalizeVehiclePaint(colorController.text);
+    if (make.trim().isEmpty || model.isEmpty || year == null) {
+      displayInfoBar(
+        context,
+        builder: (context, close) => const InfoBar(
+          title: Text('Renseignez d’abord la marque, le modèle et l’année.'),
+          severity: InfoBarSeverity.warning,
+        ),
+        duration: snackbarShortDuration,
+      );
+      return;
+    }
+
+    try {
+      final picked = await _vehicleImagePicker.pickImage(
+        source: source,
+        preferredCameraDevice: CameraDevice.rear,
+        imageQuality: 82,
+        maxWidth: 1600,
+        maxHeight: 1200,
+      );
+      if (picked == null || !mounted) return;
+
+      final extension = picked.name.split('.').last.toLowerCase();
+      final mimeType = switch (extension) {
+        'png' => 'image/png',
+        'webp' => 'image/webp',
+        'jpg' || 'jpeg' => 'image/jpeg',
+        _ => '',
+      };
+      if (mimeType.isEmpty) {
+        displayInfoBar(
+          context,
+          builder: (context, close) => const InfoBar(
+            title: Text('Format non pris en charge. Utilisez JPG, PNG ou WebP.'),
+            severity: InfoBarSeverity.error,
+          ),
+          duration: snackbarShortDuration,
+        );
+        return;
+      }
+
+      final bytes = await picked.readAsBytes();
+      if (bytes.isEmpty || bytes.length > 5 * 1024 * 1024) {
+        displayInfoBar(
+          context,
+          builder: (context, close) => const InfoBar(
+            title: Text('La photo doit faire 5 Mo maximum.'),
+            severity: InfoBarSeverity.error,
+          ),
+          duration: snackbarShortDuration,
+        );
+        return;
+      }
+
+      setState(() {
+        _resolvingVehicleImage = true;
+        _vehicleImageMessage = 'Envoi de la photo et ajout au catalogue partagé…';
+      });
+
+      final result = await VehicleImageService.uploadCustom(
+        companyId: vehicleServices.companyId,
+        make: make,
+        model: model,
+        year: year,
+        color: color,
+        bytes: bytes,
+        mimeType: mimeType,
+        fileName: picked.name,
+      );
+      if (!mounted) return;
+
+      setState(() {
+        _vehicleImageLookupCompleted = result.found;
+        _resolvedImageUrl = result.imageUrl;
+        _resolvedImageFileId = result.fileId;
+        _resolvedImageSource = result.source;
+        _resolvedImageLicense = result.license;
+        _resolvedImageAttribution = result.attribution;
+        _resolvedImageMake = make;
+        _resolvedImageModel = model;
+        _resolvedImageYear = year;
+        _resolvedImageColor = color;
+        _vehicleImageMessage = result.found
+            ? 'Photo ajoutée au catalogue partagé pour ce modèle, cette année et cette couleur.'
+            : 'La photo n’a pas pu être ajoutée au catalogue partagé.';
+      });
+
+      if (result.found) {
+        displayInfoBar(
+          context,
+          builder: (context, close) => const InfoBar(
+            title: Text('Photo ajoutée au catalogue partagé.'),
+            severity: InfoBarSeverity.success,
+          ),
+          duration: snackbarShortDuration,
+        );
+      }
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _vehicleImageMessage = 'Échec de l’ajout de la photo : ${error.toString()}';
+      });
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: const Text('Impossible d’ajouter cette photo.'),
+          content: Text(error.toString()),
+          severity: InfoBarSeverity.error,
+        ),
+        duration: snackbarShortDuration,
+      );
     } finally {
       if (mounted) {
         setState(() => _resolvingVehicleImage = false);
@@ -3275,7 +3575,7 @@ class _VehicleFormState extends State<VehicleForm>
             ? _resolvedImageUrl
             : widget.vehicle?.imageUrl,
         imageSource: _vehicleImageLookupCompleted
-            ? (_resolvedImageFileId != null ? 'carimages-api' : null)
+            ? _resolvedImageSource
             : widget.vehicle?.imageSource,
         customFields: widget.vehicle?.customFields,
         anneeUtil: selectedAnnee?.year,
