@@ -4033,7 +4033,7 @@ class _VehicleMakePickerDialogState extends State<_VehicleMakePickerDialog> {
                                   ),
                                 ),
                                 if (selected)
-                                  const Icon(
+                                   Icon(
                                     FluentIcons.check_mark,
                                     color: Colors.green,
                                     size: 16,
