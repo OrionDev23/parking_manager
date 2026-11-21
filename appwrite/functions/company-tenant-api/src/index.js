@@ -1074,6 +1074,12 @@ async function createSharedVehicleMake({ userId, input }) {
     ? [...new Set(input.aliases.map(value => String(value || '').trim())
         .filter(value => value.length > 1 && value.length <= 100))]
     : [];
+  const logoUrl = String(input.logoUrl || '').trim();
+  if (logoUrl && !isSafeExternalHttpsUrl(logoUrl)) {
+    const failure = new Error('URL du logo invalide.');
+    failure.status = 400;
+    throw failure;
+  }
   if (aliases.length > 20) {
     const failure = new Error('Une marque ne peut pas avoir plus de 20 alias.');
     failure.status = 400;
@@ -1115,6 +1121,8 @@ async function createSharedVehicleMake({ userId, input }) {
       normalizedName,
       category,
       aliases,
+      logoUrl: logoUrl || null,
+      logoFileId: null,
       isActive: true,
       source: 'community',
       createdBy: userId,
@@ -1133,6 +1141,7 @@ async function createSharedVehicleMake({ userId, input }) {
     ok: true,
     make: {
       id, name, normalizedName, category, aliases,
+      logoUrl: logoUrl || null,
       isActive: true, source: 'community',
     },
   };
@@ -1206,6 +1215,33 @@ async function updateSharedVehicleMake({ userId, input }) {
       throw failure;
     }
     patch.logoUrl = logoUrl;
+  }
+  if (input.name !== undefined || input.aliases !== undefined) {
+    const finalName = patch.normalizedName || row.data?.normalizedName ||
+      normalizeVehicleMakeName(row.data?.name);
+    const finalAliases = patch.aliases ||
+      (Array.isArray(row.data?.aliases) ? row.data.aliases : []);
+    const requestedNames = new Set([
+      finalName,
+      ...finalAliases.map(normalizeVehicleMakeName).filter(Boolean),
+    ]);
+    const allMakes = await listAllRows(VEHICLE_MAKES_TABLE);
+    const duplicate = allMakes.find(item => {
+      if (item.$id === id) return false;
+      const names = [
+        normalizeVehicleMakeName(item.data?.name),
+        ...(Array.isArray(item.data?.aliases) ? item.data.aliases : [])
+          .map(normalizeVehicleMakeName),
+      ];
+      return names.some(value => requestedNames.has(value));
+    });
+    if (duplicate) {
+      const failure = new Error(
+        `Le nom ou un alias est déjà utilisé par la marque "${duplicate.data?.name || duplicate.$id}".`
+      );
+      failure.status = 409;
+      throw failure;
+    }
   }
   if (!Object.keys(patch).length) {
     const failure = new Error('Aucune modification à enregistrer.');
