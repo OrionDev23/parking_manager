@@ -119,8 +119,13 @@ class VehicleMakeService {
   }
 
   static VehicleMake? byId(String? id) {
-    if (id == null || id.trim().isEmpty) return null;
-    return _cache.where((make) => make.id == id.trim()).firstOrNull;
+  static VehicleMake? byId(String? id) {
+    final value = id?.trim() ?? '';
+    if (value.isEmpty) return null;
+    for (final make in _cache) {
+      if (make.id == value) return make;
+    }
+    return null;
   }
 
   static VehicleMake? _findByNameOrAlias(String value) {
@@ -153,8 +158,14 @@ class VehicleMakeService {
       return matched?.id ?? _slug(legacyName);
     }
 
-    final matched = _cache.where((make) => make.id == raw).firstOrNull ??
-        _findByNameOrAlias(raw);
+    VehicleMake? matched;
+    for (final make in _cache) {
+      if (make.id == raw) {
+        matched = make;
+        break;
+      }
+    }
+    matched ??= _findByNameOrAlias(raw);
     return matched?.id ?? _slug(raw);
   }
 
@@ -292,7 +303,7 @@ extension on String {
         .replaceAll('&', ' and ')
         .replaceAll(RegExp(r'[^a-z0-9]+'), ' ')
         .trim()
-        .replaceAll(RegExp(r'\\s+'), ' ');
+        .replaceAll(RegExp(r'\s+'), ' ');
   }
 }
 
@@ -320,14 +331,14 @@ class VehicleMakeLogo extends StatelessWidget {
           width: size,
           height: size,
           fit: BoxFit.contain,
-          errorBuilder: (_, _, _) => _fallback(make?.name),
+          errorBuilder: (_, _, _) => _fallback(context, make?.name),
         ),
       );
     }
-    return _fallback(make?.name);
+    return _fallback(context, make?.name);
   }
 
-  Widget _fallback(String? name) {
+  Widget _fallback(BuildContext context, String? name) {
     final label = name?.trim().isNotEmpty == true
         ? name!.trim().substring(0, 1).toUpperCase()
         : null;
