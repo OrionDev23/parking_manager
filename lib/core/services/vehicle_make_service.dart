@@ -119,7 +119,6 @@ class VehicleMakeService {
   }
 
   static VehicleMake? byId(String? id) {
-  static VehicleMake? byId(String? id) {
     final value = id?.trim() ?? '';
     if (value.isEmpty) return null;
     for (final make in _cache) {
