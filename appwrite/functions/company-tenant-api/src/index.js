@@ -849,7 +849,9 @@ const VEHICLE_IMAGE_NEGATIVE_TTL_MS = 6 * 60 * 60 * 1000;
 function normalizeVehicleImageColor(value) {
   const color = String(value || '').normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
-  if (!color) return 'original';
+  if (/^(|original|origine|peinture d origine|original paint|default|par defaut)$/.test(color)) {
+    return 'original';
+  }
   if (/^(noir|black|noire)$/.test(color)) return 'black';
   if (/^(blanc|white|blanche)$/.test(color)) return 'white';
   if (/^(argent|silver|argente|gris clair|gris metallise)$/.test(color)) return 'silver';
@@ -1067,13 +1069,26 @@ async function resolveVehicleImage({ userId, input, log }) {
 
   const catalog = await catalogResponse.json();
   const generations = Array.isArray(catalog.generations) ? catalog.generations : [];
-  const generation = generations
-    .filter(item => {
+  // CarImagesAPI resolves the closest available generation from the requested
+  // model year. Do not require the supplied year to fall inside a generation's
+  // published year_start/year_end interval: for example, a 2022 Clio 5 can
+  // legitimately use the 2019–2022 generation render.
+  const imageGenerations = generations.filter(item =>
+    item.images && typeof item.images === 'object' &&
+    Object.keys(item.images).length > 0
+  );
+  const generation = imageGenerations
+    .map(item => {
       const start = Number(item.year_start);
       const end = item.year_end == null ? currentYear + 2 : Number(item.year_end);
-      return item.images && Number.isFinite(start) && start <= year && end >= year;
+      const distance = year < start
+        ? start - year
+        : year > end
+          ? year - end
+          : 0;
+      return { item, distance, start: Number.isFinite(start) ? start : 0 };
     })
-    .sort((a, b) => Number(b.year_start) - Number(a.year_start))[0];
+    .sort((a, b) => a.distance - b.distance || b.start - a.start)[0]?.item;
 
   if (!generation) {
     await saveVehicleImageCacheRow(rowId, {
