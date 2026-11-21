@@ -127,6 +127,7 @@ class _VehicleFormState extends State<VehicleForm>
   String? _resolvedImageFileId;
   String? _vehicleImageMessage;
   bool _resolvingVehicleImage = false;
+  bool _vehicleImageLookupCompleted = false;
   bool autreMat = false;
   int? marque;
 
@@ -2981,6 +2982,7 @@ class _VehicleFormState extends State<VehicleForm>
       );
       if (!mounted) return;
       setState(() {
+        _vehicleImageLookupCompleted = true;
         _resolvedImageUrl = result.imageUrl;
         _resolvedImageFileId = result.fileId;
         _vehicleImageMessage = result.found
@@ -3070,11 +3072,25 @@ class _VehicleFormState extends State<VehicleForm>
     // Do not persist an incomplete vehicle record.
     if (!matriculeIsValid || !chassisIsValid) return;
 
-    if ((_resolvedImageUrl == null || _resolvedImageUrl!.isEmpty) &&
-        !widget.readOnly &&
+    final currentMake = VehiclesUtilities.marques?[marque] ?? '';
+    final previousMake = VehiclesUtilities.marques?[
+          int.tryParse(widget.vehicle?.marque ?? '')
+        ] ??
+        '';
+    final imageIdentityChanged = widget.vehicle != null &&
+        (currentMake != previousMake ||
+            type.text.trim() != (widget.vehicle?.type ?? '').trim() ||
+            int.tryParse(modelYearController.text.trim()) !=
+                widget.vehicle?.modelYear ||
+            colorController.text.trim().toLowerCase() !=
+                (widget.vehicle?.color ?? '').trim().toLowerCase());
+
+    if (!widget.readOnly &&
         type.text.trim().isNotEmpty &&
         modelYearController.text.trim().isNotEmpty &&
-        marque != null) {
+        marque != null &&
+        ((_resolvedImageUrl == null || _resolvedImageUrl!.isEmpty) ||
+            imageIdentityChanged)) {
       await _resolveVehicleImage(showInfo: false);
     }
 
@@ -3122,10 +3138,14 @@ class _VehicleFormState extends State<VehicleForm>
         currentMileage: int.tryParse(mileageController.text.trim()),
         nextServiceMileage: int.tryParse(nextServiceMileageController.text.trim()),
         // Image and custom metadata are preserved until their dedicated editors exist.
-        imageFileId: _resolvedImageFileId ?? widget.vehicle?.imageFileId,
-        imageUrl: _resolvedImageUrl ?? widget.vehicle?.imageUrl,
-        imageSource: _resolvedImageFileId != null
-            ? 'carimages-api'
+        imageFileId: _vehicleImageLookupCompleted
+            ? _resolvedImageFileId
+            : widget.vehicle?.imageFileId,
+        imageUrl: _vehicleImageLookupCompleted
+            ? _resolvedImageUrl
+            : widget.vehicle?.imageUrl,
+        imageSource: _vehicleImageLookupCompleted
+            ? (_resolvedImageFileId != null ? 'carimages-api' : null)
             : widget.vehicle?.imageSource,
         customFields: widget.vehicle?.customFields,
         anneeUtil: selectedAnnee?.year,
