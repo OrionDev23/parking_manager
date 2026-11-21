@@ -22,6 +22,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../serializables/vehicle/vehicle.dart';
 import '../../../core/services/vehicle_image_service.dart';
+import '../../../core/services/vehicle_make_service.dart';
 import '../../../data/mappers/vehicle_mapper.dart';
 import '../../../main.dart';
 import '../../../theme.dart';
@@ -214,7 +215,7 @@ class _VehicleFormState extends State<VehicleForm>
   bool _canForceRefreshVehicleImage = false;
   final ImagePicker _vehicleImagePicker = ImagePicker();
   bool autreMat = false;
-  int? marque;
+  String? marque;
 
   bool erreurMatricule = false;
 
@@ -247,6 +248,7 @@ class _VehicleFormState extends State<VehicleForm>
   void initState() {
     super.initState();
     initValues();
+    unawaited(VehicleMakeService.load());
     unawaited(_loadVehicleImageCapabilities());
   }
 
@@ -287,7 +289,7 @@ class _VehicleFormState extends State<VehicleForm>
       profession.text = widget.vehicle!.profession ?? '';
       adresse.text = widget.vehicle!.adresse ?? '';
       genre = int.tryParse(widget.vehicle!.genre ?? '-1');
-      marque = int.tryParse(widget.vehicle!.marque ?? '-1');
+      marque = VehicleMakeService.canonicalId(widget.vehicle!.marque);
       type.text = widget.vehicle!.type ?? '';
       numSer.text = widget.vehicle!.numeroSerie ?? '';
       caross.text = widget.vehicle!.carrosserie ?? '';
@@ -348,7 +350,7 @@ class _VehicleFormState extends State<VehicleForm>
     // Treat an existing image as resolved for the vehicle's current identity.
     // New or image-less vehicles will be looked up when saved.
     if (widget.vehicle?.imageUrl?.isNotEmpty == true) {
-      _resolvedImageMake = VehiclesUtilities.marques?[marque] ?? '';
+      _resolvedImageMake = VehicleMakeService.nameFor(marque);
       _resolvedImageModel = type.text.trim();
       _resolvedImageYear = int.tryParse(modelYearController.text.trim());
       _resolvedImageColor = _normalizeVehiclePaint(colorController.text);
@@ -637,8 +639,8 @@ class _VehicleFormState extends State<VehicleForm>
             ? typedRegistration
             : widget.vehicle?.matricule ?? 'À définir';
         final brandName = marque == null
-            ? widget.vehicle?.marque
-            : VehiclesUtilities.marques?[marque] ?? widget.vehicle?.marque;
+            ? VehiclesUtilities.getMarqueName(widget.vehicle?.marque)
+            : VehicleMakeService.nameFor(marque);
         final modelName = type.text.trim().isNotEmpty
             ? type.text.trim()
             : widget.vehicle?.type;
@@ -1286,63 +1288,16 @@ class _VehicleFormState extends State<VehicleForm>
                       width: fieldWidth,
                       label: 'Marque',
                       child: Button(
-                        onPressed: widget.readOnly
-                            ? null
-                            : () {
-                                SelectDialog.showModal<int?>(
-                                  context,
-                                  selectedValue: marque,
-                                  backgroundColor: appTheme.backGroundColor,
-                                  gridView: true,
-                                  numberOfGridCross: 3,
-                                  constraints: _responsiveVehiclePickerConstraints(
-                                    context,
-                                    maxWidth: 600,
-                                    maxHeight: 650,
-                                  ),
-                                  items: VehiclesUtilities.marques!.keys.toList(),
-                                  itemBuilder: (c, v, e) => Card(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8),
-                                      child: Image.asset(
-                                        'assets/images/marques/${v ?? 'default'}.webp',
-                                        fit: BoxFit.contain,
-                                      ),
-                                    ),
-                                  ),
-                                  onChange: (value) => setState(() => marque = value),
-                                  onFind: VehiclesUtilities.findMarque,
-                                  emptyBuilder: (_) => const Center(
-                                    child: Text('Aucune marque trouvée'),
-                                  ),
-                                  loadingBuilder: (_) => const Center(
-                                    child: ProgressRing(),
-                                  ),
-                                  searchBoxDecoration:
-                                      appTheme.materialUiInputDecoration.copyWith(
-                                    labelText: 'search'.tr(),
-                                    labelStyle: placeStyle,
-                                  ),
-                                  searchTextStyle: appTheme.writingStyle,
-                                  searchCursorColor: appTheme.color,
-                                );
-                              },
+                        onPressed: widget.readOnly ? null : _selectVehicleMake,
                         child: Row(
                           children: [
-                            Image.asset(
-                              'assets/images/marques/${marque == null || marque! <= 0 ? 'default' : marque!}.webp',
-                              width: 28,
-                              height: 28,
-                              errorBuilder: (_, _, _) =>
-                                  const Icon(FluentIcons.car),
-                            ),
+                            VehicleMakeLogo(makeId: marque, size: 28),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                VehiclesUtilities.marques?[
-                                      marque == null || marque! <= 0 ? 0 : marque!
-                                    ] ??
-                                    'nonind'.tr(),
+                                VehicleMakeService.nameFor(marque).isEmpty
+                                    ? 'Choisir une marque'
+                                    : VehicleMakeService.nameFor(marque),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -2743,74 +2698,27 @@ class _VehicleFormState extends State<VehicleForm>
               children: [
                 Text('marque', style: formHintStyle).tr(),
                 Flexible(
-                  child: ListTile(
-                    leading: Image.asset(
-                      'assets/images/marques/${marque == null || marque! <= 0 ? 'default' : marque!}.webp',
-                      width: 32,
-                      height: 32,
+                  child: Button(
+                    onPressed: widget.readOnly ? null : _selectVehicleMake,
+                    child: Row(
+                      children: [
+                        VehicleMakeLogo(makeId: marque, size: 30),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: AutoSizeText(
+                            VehicleMakeService.nameFor(marque).isEmpty
+                                ? 'nonind'.tr()
+                                : VehicleMakeService.nameFor(marque),
+                            minFontSize: 5,
+                            maxLines: 1,
+                          ),
+                        ),
+                        const Icon(FluentIcons.chevron_down, size: 12),
+                      ],
                     ),
-                    title: AutoSizeText(
-                      VehiclesUtilities.marques![marque == null || marque! <= 0
-                              ? 0
-                              : marque!] ??
-                          'nonind'.tr(),
-                      minFontSize: 5,
-                      maxLines: 1,
-                    ),
-                    onPressed: widget.readOnly
-                        ? null
-                        : () {
-                            SelectDialog.showModal<int?>(
-                              context,
-                              selectedValue: marque,
-                              backgroundColor: appTheme.backGroundColor,
-                              gridView: true,
-                              numberOfGridCross: 3,
-                              constraints: _responsiveVehiclePickerConstraints(
-                                context,
-                                maxWidth: 700,
-                                maxHeight: 600,
-                              ),
-                              items: VehiclesUtilities.marques!.keys.toList(),
-                              itemBuilder: (c, v, e) {
-                                return Card(
-                                  child: Image.asset(
-                                    'assets/images/marques/${v ?? 'default'}.webp',
-                                  ),
-                                );
-                              },
-                              onChange: (s) {
-                                setState(() {
-                                  marque = s;
-                                });
-                              },
-                              onFind: VehiclesUtilities.findMarque,
-                              emptyBuilder: (s) {
-                                return Center(
-                                  child: Text(
-                                    'lvide',
-                                    style: TextStyle(color: Colors.grey[100]),
-                                  ).tr(),
-                                );
-                              },
-                              loadingBuilder: (s) {
-                                return Center(
-                                  child: Text(
-                                    'telechargement',
-                                    style: TextStyle(color: Colors.grey[100]),
-                                  ).tr(),
-                                );
-                              },
-                              searchBoxDecoration: appTheme.materialUiInputDecoration
-                                  .copyWith(
-                                    labelText: 'search'.tr(),
-                                    labelStyle: placeStyle,
-                                  ),
-                              searchTextStyle: appTheme.writingStyle,
-                              searchCursorColor: appTheme.color,
-                            );
-                          },
-                  ),                ),
+                  ),
+                ),
+                ),
               ],
             ),
           ),
@@ -3289,6 +3197,33 @@ class _VehicleFormState extends State<VehicleForm>
     }
   }
 
+  Future<void> _selectVehicleMake() async {
+    try {
+      await VehicleMakeService.load();
+      if (!mounted) return;
+      final selected = await showDialog<String>(
+        context: context,
+        builder: (dialogContext) => _VehicleMakePickerDialog(
+          selectedMakeId: marque,
+        ),
+      );
+      if (selected != null && mounted) {
+        setState(() => marque = selected);
+      }
+    } catch (error) {
+      if (!mounted) return;
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: const Text('Impossible de charger le catalogue des marques.'),
+          content: Text(error.toString()),
+          severity: InfoBarSeverity.error,
+        ),
+        duration: snackbarShortDuration,
+      );
+    }
+  }
+
   Future<void> _loadVehicleImageCapabilities() async {
     try {
       final capabilities = await VehicleImageService.capabilities(
@@ -3336,7 +3271,7 @@ class _VehicleFormState extends State<VehicleForm>
     if (widget.readOnly || _resolvingVehicleImage) return;
     if (forceRefresh && !_canForceRefreshVehicleImage) return;
 
-    final make = VehiclesUtilities.marques?[marque] ?? '';
+    final make = VehicleMakeService.nameFor(marque);
     final model = type.text.trim();
     final year = int.tryParse(modelYearController.text.trim());
     final color = _normalizeVehiclePaint(colorController.text);
@@ -3352,9 +3287,7 @@ class _VehicleFormState extends State<VehicleForm>
 
     final loadedVehicleImageMatchesIdentity =
         (widget.vehicle?.imageUrl?.trim().isNotEmpty ?? false) &&
-        (VehiclesUtilities.marques?[
-                  int.tryParse(widget.vehicle?.marque ?? '')] ??
-              '') ==
+        VehicleMakeService.nameFor(widget.vehicle?.marque) ==
             make &&
         widget.vehicle?.type?.trim() == model &&
         widget.vehicle?.modelYear == year &&
@@ -3495,7 +3428,7 @@ class _VehicleFormState extends State<VehicleForm>
   ) async {
     if (widget.readOnly || _resolvingVehicleImage) return;
 
-    final make = VehiclesUtilities.marques?[marque] ?? '';
+    final make = VehicleMakeService.nameFor(marque);
     final model = type.text.trim();
     final year = int.tryParse(modelYearController.text.trim());
     final color = _normalizeVehiclePaint(colorController.text);
@@ -3575,7 +3508,7 @@ class _VehicleFormState extends State<VehicleForm>
       return;
     }
 
-    final make = VehiclesUtilities.marques?[marque] ?? '';
+    final make = VehicleMakeService.nameFor(marque);
     final model = type.text.trim();
     final year = int.tryParse(modelYearController.text.trim());
     final color = _normalizeVehiclePaint(colorController.text);
@@ -3742,7 +3675,7 @@ class _VehicleFormState extends State<VehicleForm>
     // Do not persist an incomplete vehicle record.
     if (!matriculeIsValid || !chassisIsValid) return;
 
-    final currentMake = VehiclesUtilities.marques?[marque] ?? '';
+    final currentMake = VehicleMakeService.nameFor(marque);
     final currentModel = type.text.trim();
     final currentYear = int.tryParse(modelYearController.text.trim());
     final currentColor = _normalizeVehiclePaint(colorController.text);
@@ -3767,7 +3700,7 @@ class _VehicleFormState extends State<VehicleForm>
         uploading = true;
         errorUploading = false;
       });
-      final selectedImageMake = VehiclesUtilities.marques?[marque] ?? '';
+      final selectedImageMake = VehicleMakeService.nameFor(marque);
       final selectedImageModel = type.text.trim();
       final selectedImageYear = int.tryParse(modelYearController.text.trim());
       final selectedImageColor = _normalizeVehiclePaint(colorController.text);
@@ -3776,9 +3709,8 @@ class _VehicleFormState extends State<VehicleForm>
           _resolvedImageModel == selectedImageModel &&
           _resolvedImageYear == selectedImageYear &&
           _resolvedImageColor == selectedImageColor;
-      final originalImageMake = VehiclesUtilities.marques?[
-              int.tryParse(widget.vehicle?.marque ?? '')] ??
-          '';
+      final originalImageMake =
+          VehicleMakeService.nameFor(widget.vehicle?.marque);
       final existingImageMatchesCurrentCriteria =
           (widget.vehicle?.imageUrl?.trim().isNotEmpty ?? false) &&
           originalImageMake == selectedImageMake &&
@@ -3877,7 +3809,7 @@ class _VehicleFormState extends State<VehicleForm>
         puissance: int.tryParse(puissance.text),
         daira: dairaCont.text,
         genre: genre?.toString(),
-        marque: marque?.toString(),
+        marque: marque,
         matriculePrec: matriculesPrec,
         carrosserie: caross.text,
         charegeUtile: int.tryParse(charg.text),
@@ -3998,3 +3930,111 @@ class _VehicleFormState extends State<VehicleForm>
   @override
   bool get wantKeepAlive => true;
 }
+
+class _VehicleMakePickerDialog extends StatefulWidget {
+  final String? selectedMakeId;
+
+  const _VehicleMakePickerDialog({this.selectedMakeId});
+
+  @override
+  State<_VehicleMakePickerDialog> createState() =>
+      _VehicleMakePickerDialogState();
+}
+
+class _VehicleMakePickerDialogState extends State<_VehicleMakePickerDialog> {
+  final TextEditingController _searchController = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final makes = VehicleMakeService.search(_query);
+    return ContentDialog(
+      title: const Text('Choisir une marque'),
+      content: SizedBox(
+        width: 520,
+        height: 540,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextBox(
+              controller: _searchController,
+              placeholder: 'Rechercher une marque…',
+              prefix: const Padding(
+                padding: EdgeInsetsDirectional.only(start: 8),
+                child: Icon(FluentIcons.search, size: 14),
+              ),
+              onChanged: (value) => setState(() => _query = value),
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: makes.isEmpty
+                  ? const Center(child: Text('Aucune marque trouvée.'))
+                  : ListView.separated(
+                      itemCount: makes.length,
+                      separatorBuilder: (_, _) =>
+                          Divider(size: 1, style: DividerThemeData(
+                            decoration: BoxDecoration(color: Colors.grey[30]),
+                          )),
+                      itemBuilder: (context, index) {
+                        final make = makes[index];
+                        final selected = make.id == widget.selectedMakeId;
+                        return Button(
+                          onPressed: () => Navigator.of(context).pop(make.id),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 7),
+                            child: Row(
+                              children: [
+                                VehicleMakeLogo(makeId: make.id, size: 34),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        make.name,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      Text(
+                                        make.category,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.grey[100],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (selected)
+                                  const Icon(
+                                    FluentIcons.check_mark,
+                                    color: Colors.green,
+                                    size: 16,
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Annuler'),
+        ),
+      ],
+    );
+  }
+}
+
