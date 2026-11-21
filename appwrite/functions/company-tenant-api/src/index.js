@@ -1142,7 +1142,7 @@ function isSafeExternalHttpsUrl(value) {
       hostname.endsWith('.local') ||
       hostname.endsWith('.internal') ||
       hostname.startsWith('[') ||
-      /^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$/.test(hostname) ||
+      /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname) ||
       /^127\./.test(hostname) ||
       /^10\./.test(hostname) ||
       /^192\.168\./.test(hostname) ||
