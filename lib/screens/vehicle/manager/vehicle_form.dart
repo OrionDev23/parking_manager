@@ -194,6 +194,10 @@ class _VehicleFormState extends State<VehicleForm>
 
   String? _resolvedImageUrl;
   String? _resolvedImageFileId;
+  String? _resolvedImageMake;
+  String? _resolvedImageModel;
+  int? _resolvedImageYear;
+  String? _resolvedImageColor;
   String? _vehicleImageMessage;
   bool _resolvingVehicleImage = false;
   bool _vehicleImageLookupCompleted = false;
@@ -327,6 +331,15 @@ class _VehicleFormState extends State<VehicleForm>
       nextServiceMileageController.text =
           widget.vehicle!.nextServiceMileage?.toString() ?? '';
     }
+    // Treat an existing image as resolved for the vehicle's current identity.
+    // New or image-less vehicles will be looked up when saved.
+    if (widget.vehicle?.imageUrl?.isNotEmpty == true) {
+      _resolvedImageMake = VehiclesUtilities.marques?[marque] ?? '';
+      _resolvedImageModel = type.text.trim();
+      _resolvedImageYear = int.tryParse(modelYearController.text.trim());
+      _resolvedImageColor = _normalizeVehiclePaint(colorController.text);
+    }
+
     documentID ??= DatabaseGetter.ref
         .difference(DateTime.now())
         .inMilliseconds
@@ -3096,6 +3109,10 @@ class _VehicleFormState extends State<VehicleForm>
         _vehicleImageLookupCompleted = true;
         _resolvedImageUrl = result.imageUrl;
         _resolvedImageFileId = result.fileId;
+        _resolvedImageMake = make;
+        _resolvedImageModel = model;
+        _resolvedImageYear = year;
+        _resolvedImageColor = _normalizeVehiclePaint(colorController.text);
         _vehicleImageMessage = result.found
             ? result.source == 'shared_cache'
                 ? 'Image réutilisée depuis le catalogue partagé.'
@@ -3184,22 +3201,20 @@ class _VehicleFormState extends State<VehicleForm>
     if (!matriculeIsValid || !chassisIsValid) return;
 
     final currentMake = VehiclesUtilities.marques?[marque] ?? '';
-    final previousMake = VehiclesUtilities.marques?[
-          int.tryParse(widget.vehicle?.marque ?? '')
-        ] ??
-        '';
-    final imageIdentityChanged = widget.vehicle != null &&
-        (currentMake != previousMake ||
-            type.text.trim() != (widget.vehicle?.type ?? '').trim() ||
-            int.tryParse(modelYearController.text.trim()) !=
-                widget.vehicle?.modelYear ||
-            _normalizeVehiclePaint(colorController.text) !=
-                _normalizeVehiclePaint(widget.vehicle?.color));
+    final currentModel = type.text.trim();
+    final currentYear = int.tryParse(modelYearController.text.trim());
+    final currentColor = _normalizeVehiclePaint(colorController.text);
+    final imageIdentityChanged = currentMake != (_resolvedImageMake ?? '') ||
+        currentModel != (_resolvedImageModel ?? '') ||
+        currentYear != _resolvedImageYear ||
+        currentColor != (_resolvedImageColor ?? '');
 
     if (!widget.readOnly &&
-        type.text.trim().isNotEmpty &&
-        modelYearController.text.trim().isNotEmpty &&
-        marque != null &&
+        currentMake.isNotEmpty &&
+        currentModel.isNotEmpty &&
+        currentYear != null &&
+        !(_vehicleImageLookupCompleted && !imageIdentityChanged &&
+            (_resolvedImageUrl == null || _resolvedImageUrl!.isEmpty)) &&
         ((_resolvedImageUrl == null || _resolvedImageUrl!.isEmpty) ||
             imageIdentityChanged)) {
       await _resolveVehicleImage(showInfo: false);
