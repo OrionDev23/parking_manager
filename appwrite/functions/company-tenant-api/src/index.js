@@ -1923,8 +1923,11 @@ async function searchVehicleImageCandidates({ userId, input, log }) {
   ];
   const candidates = [];
   const seenImages = new Set();
+  const maxCandidates = 5;
+  const maxCandidatesPerProvider = 2;
 
   for (const [providerName, search] of providers) {
+    let acceptedFromProvider = 0;
     try {
       const providerResults = await search(criteria);
       for (const candidate of providerResults || []) {
@@ -1940,12 +1943,14 @@ async function searchVehicleImageCandidates({ userId, input, log }) {
             actualColor: candidate.actualColor || color,
             colorFallback: candidate.colorFallback === true,
           });
-          break;
+          acceptedFromProvider += 1;
+          if (acceptedFromProvider >= maxCandidatesPerProvider ||
+              candidates.length >= maxCandidates) break;
         } catch (failure) {
           log(`Vehicle image preview rejected provider=${providerName} reason=${failure.message}`);
         }
       }
-      if (candidates.length >= 2) break;
+      if (candidates.length >= maxCandidates) break;
     } catch (failure) {
       log(`Vehicle image provider unavailable provider=${providerName} reason=${failure.message}`);
     }
@@ -1963,7 +1968,7 @@ async function searchVehicleImageCandidates({ userId, input, log }) {
     });
   }
 
-  const responses = candidates.slice(0, 2).map(candidate => {
+  const responses = candidates.slice(0, maxCandidates).map(candidate => {
     const token = createVehicleImageCandidateToken({
       candidate, criteria, companyId, userId, forceRefresh,
     });
