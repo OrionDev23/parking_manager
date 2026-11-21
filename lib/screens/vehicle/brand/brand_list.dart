@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -58,8 +59,9 @@ class _BrandListState extends State<BrandList> {
     );
     if (values == null || !mounted) return;
 
-    final companyId = DatabaseGetter.activeCompanyId;
-    if (companyId == null || companyId.isEmpty) {
+    final isPlatformSuperAdmin = DatabaseGetter.user?.$id == '999';
+    final companyId = DatabaseGetter.activeCompanyId ?? '';
+    if (!isPlatformSuperAdmin && companyId.isEmpty) {
       displayInfoBar(
         context,
         builder: (context, close) => const InfoBar(
@@ -325,6 +327,7 @@ class _AddVehicleMakeDialogState extends State<_AddVehicleMakeDialog> {
               controller: _nameController,
               placeholder: 'Nom officiel de la marque',
               maxLength: 100,
+              onChanged: (_) => setState(() {}),
             ),
             const SizedBox(height: 12),
             ComboBox<String>(
