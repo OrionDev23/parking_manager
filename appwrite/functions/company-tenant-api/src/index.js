@@ -1194,7 +1194,6 @@ async function searchWikimediaVehicleImage(criteria) {
   const query = [
     criteria.make,
     aliases[0],
-    String(criteria.year),
     colourTerms[0] || '',
     'car',
   ].filter(Boolean).join(' ');
@@ -1204,9 +1203,10 @@ async function searchWikimediaVehicleImage(criteria) {
     gsrsearch: query,
     gsrnamespace: '6',
     gsrlimit: '30',
-    prop: 'imageinfo',
+    prop: 'imageinfo|categories',
     iiprop: 'url|extmetadata',
     iiurlwidth: '1200',
+    cllimit: 'max',
     format: 'json',
     formatversion: '2',
   });
@@ -1229,7 +1229,11 @@ async function searchWikimediaVehicleImage(criteria) {
     const candidate = {
       title: `${page.title || ''} ${title}`,
       description,
-      tags: '',
+      tags: [
+        ...(page.categories || []).map(category => category.title || ''),
+        cleanImageMetadata(metadata.DateTimeOriginal?.value || ''),
+        cleanImageMetadata(metadata.DateTime?.value || ''),
+      ].join(' '),
       imageUrl: image.thumburl || image.url,
       sourceUrl: image.descriptionurl || `https://commons.wikimedia.org/wiki/${encodeURIComponent(page.title || '')}`,
       license,
