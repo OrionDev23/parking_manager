@@ -1114,6 +1114,7 @@ function isAllowedCommercialImageLicense(value) {
     'cc0', 'pdm', 'public domain', 'public domain mark',
     'cc by', 'cc by sa', 'by', 'by sa',
   ].includes(license) ||
+    license.startsWith('cc0 ') ||
     license.startsWith('cc by ') ||
     license.startsWith('cc by sa ');
 }
@@ -1382,7 +1383,8 @@ async function resolveVehicleImage({ userId, input, log }) {
     return {
       ok: true,
       found: true,
-      source: 'shared_cache',
+      source: cached.data.source || 'shared_cache',
+      fromSharedCache: true,
       imageUrl: cached.data.imageUrl,
       fileId: cached.data.fileId || rowId,
       make: cached.data.make,
@@ -1426,7 +1428,10 @@ async function resolveVehicleImage({ userId, input, log }) {
   // in development, and do not make it a mandatory dependency.
   const apiKey = process.env.CARIMAGES_API_KEY;
   const apiSecret = process.env.CARIMAGES_API_SECRET;
-  if (apiKey && apiSecret) {
+  const currentSource = String(cached?.data?.source || '');
+  const shouldTryCarImages = !forceRefresh || !cachedFound ||
+    currentSource === '' || currentSource === 'carimages';
+  if (apiKey && apiSecret && shouldTryCarImages) {
     try {
       const signedUrl = createCarImagesSignedUrl({
         make, model, year, color, apiKey, apiSecret,
@@ -1482,7 +1487,8 @@ async function resolveVehicleImage({ userId, input, log }) {
     return {
       ok: true,
       found: true,
-      source: 'shared_cache',
+      source: cached.data.source || 'shared_cache',
+      fromSharedCache: true,
       imageUrl: cached.data.imageUrl,
       fileId: cached.data.fileId || rowId,
       make: cached.data.make,
@@ -1537,6 +1543,11 @@ async function uploadCustomVehicleImage({ userId, input }) {
   if (cached?.data?.cacheKey === cacheKey &&
       cached.data.status === 'found' && cached.data.imageUrl) {
     const failure = new Error('An image already exists for this model, year and color.');
+    failure.status = 409;
+    throw failure;
+  }
+  if (cached?.data?.cacheKey !== cacheKey || cached.data?.status !== 'not_found') {
+    const failure = new Error('Run the automatic image search before adding a manual photo.');
     failure.status = 409;
     throw failure;
   }
