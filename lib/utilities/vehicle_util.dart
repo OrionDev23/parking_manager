@@ -1,6 +1,7 @@
 import '../admin_parameters.dart';
 import '../screens/entreprise/entreprise.dart';
 import 'vehicle_brands.dart';
+import '../core/services/vehicle_make_service.dart';
 
 const marqueMax = 71;
 const genreMax = 10;
@@ -70,12 +71,7 @@ class VehiclesUtilities {
   }
 
   static String getMarqueName(String? marque) {
-    int m = marque == null ? 0 : int.tryParse(marque) ?? 0;
-
-    if (vehiculeBrands.length > m) {
-      return vehiculeBrands[m];
-    }
-    return "";
+    return VehicleMakeService.nameFor(marque);
   }
 
   static int getGenreNumber(String? matricule) {
