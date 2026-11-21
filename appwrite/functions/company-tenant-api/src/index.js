@@ -1127,7 +1127,7 @@ function cleanImageMetadata(value) {
     .replace(/&amp;/gi, '&')
     .replace(/&quot;/gi, '"')
     .replace(/&#39;/gi, "'")
-    .replace(/\\s+/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
@@ -1141,6 +1141,8 @@ function isSafeExternalHttpsUrl(value) {
       hostname.endsWith('.localhost') ||
       hostname.endsWith('.local') ||
       hostname.endsWith('.internal') ||
+      hostname.startsWith('[') ||
+      /^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$/.test(hostname) ||
       /^127\./.test(hostname) ||
       /^10\./.test(hostname) ||
       /^192\.168\./.test(hostname) ||
