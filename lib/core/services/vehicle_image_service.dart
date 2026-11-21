@@ -13,6 +13,7 @@ class VehicleImageResolution {
   final String? reason;
   final bool colorFallback;
   final bool replacementFound;
+  final bool fromSharedCache;
   final String? license;
   final String? attribution;
   final String? sourceUrl;
@@ -25,6 +26,7 @@ class VehicleImageResolution {
     this.reason,
     this.colorFallback = false,
     this.replacementFound = false,
+    this.fromSharedCache = false,
     this.license,
     this.attribution,
     this.sourceUrl,
@@ -39,6 +41,7 @@ class VehicleImageResolution {
       reason: json['reason']?.toString(),
       colorFallback: json['colorFallback'] == true,
       replacementFound: json['replacementFound'] == true,
+      fromSharedCache: json['fromSharedCache'] == true,
       license: json['license']?.toString(),
       attribution: json['attribution']?.toString(),
       sourceUrl: json['sourceUrl']?.toString(),
