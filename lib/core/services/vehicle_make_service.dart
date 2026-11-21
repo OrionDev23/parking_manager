@@ -330,11 +330,11 @@ class VehicleMakeService {
       body: jsonEncode({
         'action': 'vehicle_make_update',
         'makeId': makeId,
-        if (name != null) 'name': name,
-        if (category != null) 'category': category,
-        if (aliases != null) 'aliases': aliases,
-        if (isActive != null) 'isActive': isActive,
-        if (logoUrl != null) 'logoUrl': logoUrl,
+        'name': ?name,
+        'category': ?category,
+        'aliases': ?aliases,
+        'isActive': ?isActive,
+        'logoUrl': ?logoUrl,
       }),
       xasync: false,
     );
