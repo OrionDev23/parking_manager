@@ -969,9 +969,8 @@ async function deleteVehicleImageFile(fileId) {
       { method: 'DELETE' },
     );
   } catch (failure) {
-    if (failure.status !== 404) {
-      log(`Vehicle image cleanup failed for fileId=${fileId}: ${failure.message}`);
-    }
+    // Cleanup is best-effort: the catalog already points to the newly saved file.
+    // A stale orphan is preferable to failing a successful image replacement.
   }
 }
 
@@ -1042,11 +1041,11 @@ function vehicleImageMimeInfo(contentType, urlOrName = '') {
 
 function normalizeImageSearchText(value) {
   return String(value || '').normalize('NFKD')
-    .replace(/[\\u0300-\\u036f]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, ' ')
     .trim()
-    .replace(/\\s+/g, ' ');
+    .replace(/\s+/g, ' ');
 }
 
 function toRomanNumeral(value) {
@@ -1067,7 +1066,7 @@ function toRomanNumeral(value) {
 
 function vehicleImageModelAliases(model) {
   const aliases = new Set([normalizeImageSearchText(model)]);
-  const match = String(model).trim().match(/^(.*?)[\\s-]+(\\d{1,2})$/);
+  const match = String(model).trim().match(/^(.*?)[\s-]+(\d{1,2})$/);
   if (match) {
     const roman = toRomanNumeral(Number(match[2]));
     if (roman) {
@@ -1121,8 +1120,8 @@ function isAllowedCommercialImageLicense(value) {
 
 function cleanImageMetadata(value) {
   return String(value || '')
-    .replace(/<script[\\s\\S]*?<\\/script>/gi, ' ')
-    .replace(/<style[\\s\\S]*?<\\/style>/gi, ' ')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
     .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/gi, ' ')
     .replace(/&amp;/gi, '&')
@@ -1142,10 +1141,10 @@ function isSafeExternalHttpsUrl(value) {
       hostname.endsWith('.localhost') ||
       hostname.endsWith('.local') ||
       hostname.endsWith('.internal') ||
-      /^127\\./.test(hostname) ||
-      /^10\\./.test(hostname) ||
-      /^192\\.168\\./.test(hostname) ||
-      /^169\\.254\\./.test(hostname) ||
+      /^127\./.test(hostname) ||
+      /^10\./.test(hostname) ||
+      /^192\.168\./.test(hostname) ||
+      /^169\.254\./.test(hostname) ||
       hostname === '[::1]' ||
       hostname === 'metadata.google.internal'
     ) return false;
@@ -1547,7 +1546,7 @@ async function uploadCustomVehicleImage({ userId, input }) {
     failure.status = 415;
     throw failure;
   }
-  const encoded = String(input.imageBase64 || '').replace(/^data:image\\/[a-z0-9.+-]+;base64,/i, '');
+  const encoded = String(input.imageBase64 || '').replace(/^data:image\/[a-z0-9.+-]+;base64,/i, '');
   if (!encoded || encoded.length > 7 * 1024 * 1024) {
     const failure = new Error('Image payload is empty or too large.');
     failure.status = 413;
