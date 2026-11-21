@@ -3577,6 +3577,28 @@ class _VehicleFormState extends State<VehicleForm>
         uploading = true;
         errorUploading = false;
       });
+      final selectedImageMake = VehiclesUtilities.marques?[marque] ?? '';
+      final selectedImageModel = type.text.trim();
+      final selectedImageYear = int.tryParse(modelYearController.text.trim());
+      final selectedImageColor = _normalizeVehiclePaint(colorController.text);
+      final resolvedImageMatchesCurrentCriteria =
+          _resolvedImageMake == selectedImageMake &&
+          _resolvedImageModel == selectedImageModel &&
+          _resolvedImageYear == selectedImageYear &&
+          _resolvedImageColor == selectedImageColor;
+      final originalImageMake = VehiclesUtilities.marques?[
+              int.tryParse(widget.vehicle?.marque ?? '')] ??
+          '';
+      final existingImageMatchesCurrentCriteria =
+          (widget.vehicle?.imageUrl?.trim().isNotEmpty ?? false) &&
+          originalImageMake == selectedImageMake &&
+          widget.vehicle?.type?.trim() == selectedImageModel &&
+          widget.vehicle?.modelYear == selectedImageYear &&
+          _normalizeVehiclePaint(widget.vehicle?.color) == selectedImageColor;
+      final useResolvedVehicleImage = resolvedImageMatchesCurrentCriteria;
+      final useExistingVehicleImage =
+          !useResolvedVehicleImage && existingImageMatchesCurrentCriteria;
+
       Vehicle vehicle = Vehicle(
         id: documentID!,
         matricule: autreMat
@@ -3616,15 +3638,21 @@ class _VehicleFormState extends State<VehicleForm>
         currentMileage: int.tryParse(mileageController.text.trim()),
         nextServiceMileage: int.tryParse(nextServiceMileageController.text.trim()),
         // Image and custom metadata are preserved until their dedicated editors exist.
-        imageFileId: _vehicleImageLookupCompleted
+        imageFileId: useResolvedVehicleImage
             ? _resolvedImageFileId
-            : widget.vehicle?.imageFileId,
-        imageUrl: _vehicleImageLookupCompleted
+            : useExistingVehicleImage
+                ? widget.vehicle?.imageFileId
+                : null,
+        imageUrl: useResolvedVehicleImage
             ? _resolvedImageUrl
-            : widget.vehicle?.imageUrl,
-        imageSource: _vehicleImageLookupCompleted
+            : useExistingVehicleImage
+                ? widget.vehicle?.imageUrl
+                : null,
+        imageSource: useResolvedVehicleImage
             ? _resolvedImageSource
-            : widget.vehicle?.imageSource,
+            : useExistingVehicleImage
+                ? widget.vehicle?.imageSource
+                : null,
         customFields: widget.vehicle?.customFields,
         anneeUtil: selectedAnnee?.year,
         energie: energie.text,
