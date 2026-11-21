@@ -22,15 +22,14 @@ class _BrandListState extends State<BrandList> {
   String _query = '';
   bool _loading = true;
   bool _adding = false;
+  bool _canAddMake = false;
   String? _error;
-
-  bool get _canAddMake =>
-      DatabaseGetter().isAdmin() || DatabaseGetter.user?.$id == '999';
 
   @override
   void initState() {
     super.initState();
     _loadMakes();
+    _loadMakeCapabilities();
   }
 
   @override
@@ -50,6 +49,25 @@ class _BrandListState extends State<BrandList> {
       _error = error.toString();
     }
     if (mounted) setState(() => _loading = false);
+  }
+
+  Future<void> _loadMakeCapabilities() async {
+    final isPlatformSuperAdmin = DatabaseGetter.user?.$id == '999';
+    final companyId = DatabaseGetter.activeCompanyId ?? '';
+    if (!isPlatformSuperAdmin && companyId.isEmpty) {
+      if (mounted) setState(() => _canAddMake = false);
+      return;
+    }
+    try {
+      final capabilities = await VehicleMakeService.capabilities(
+        companyId: companyId,
+      );
+      if (mounted) {
+        setState(() => _canAddMake = capabilities['canAdd'] == true);
+      }
+    } catch (_) {
+      if (mounted) setState(() => _canAddMake = false);
+    }
   }
 
   Future<void> _addMake() async {
