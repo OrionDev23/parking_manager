@@ -52,6 +52,84 @@ class VehicleImageResolution {
   }
 }
 
+class VehicleImageCandidate {
+  final String token;
+  final String source;
+  final String imageUrl;
+  final String? title;
+  final String? license;
+  final String? licenseUrl;
+  final String? attribution;
+  final String? sourceUrl;
+  final bool colorFallback;
+  final String? matchedColor;
+  final bool forceRefresh;
+
+  const VehicleImageCandidate({
+    required this.token,
+    required this.source,
+    required this.imageUrl,
+    this.title,
+    this.license,
+    this.licenseUrl,
+    this.attribution,
+    this.sourceUrl,
+    this.colorFallback = false,
+    this.matchedColor,
+    this.forceRefresh = false,
+  });
+
+  factory VehicleImageCandidate.fromJson(Map<String, dynamic> json) {
+    return VehicleImageCandidate(
+      token: json['token']?.toString() ?? '',
+      source: json['source']?.toString() ?? 'unknown',
+      imageUrl: json['imageUrl']?.toString() ?? '',
+      title: json['title']?.toString(),
+      license: json['license']?.toString(),
+      licenseUrl: json['licenseUrl']?.toString(),
+      attribution: json['attribution']?.toString(),
+      sourceUrl: json['sourceUrl']?.toString(),
+      colorFallback: json['colorFallback'] == true,
+      matchedColor: json['matchedColor']?.toString(),
+      forceRefresh: json['forceRefresh'] == true,
+    );
+  }
+}
+
+class VehicleImageSearchResult {
+  final List<VehicleImageCandidate> candidates;
+  final VehicleImageResolution? cachedImage;
+  final String? reason;
+
+  const VehicleImageSearchResult({
+    this.candidates = const [],
+    this.cachedImage,
+    this.reason,
+  });
+
+  factory VehicleImageSearchResult.fromJson(Map<String, dynamic> json) {
+    final raw = json['candidates'];
+    final candidates = raw is List
+        ? raw
+            .whereType<Map>()
+            .map((item) => VehicleImageCandidate.fromJson(
+                  Map<String, dynamic>.from(item),
+                ))
+            .where((item) => item.imageUrl.isNotEmpty && item.token.isNotEmpty)
+            .toList(growable: false)
+        : const <VehicleImageCandidate>[];
+    return VehicleImageSearchResult(
+      candidates: candidates,
+      cachedImage: json['cachedImage'] is Map
+          ? VehicleImageResolution.fromJson(
+              Map<String, dynamic>.from(json['cachedImage'] as Map),
+            )
+          : null,
+      reason: json['reason']?.toString(),
+    );
+  }
+}
+
 class VehicleImageCapabilities {
   final bool canUpload;
   final bool canForceRefresh;
@@ -119,6 +197,51 @@ class VehicleImageService {
       },
     );
     return VehicleImageCapabilities.fromJson(result);
+  }
+
+  static Future<VehicleImageSearchResult> searchCandidates({
+    required String companyId,
+    required String make,
+    required String model,
+    required int year,
+    required String color,
+    bool forceRefresh = false,
+  }) async {
+    final result = await _execute(
+      body: {
+        'action': 'vehicle_image_search_candidates',
+        'companyId': companyId,
+        'make': make,
+        'model': model,
+        'year': year,
+        'color': color,
+        if (forceRefresh) 'forceRefresh': true,
+      },
+    );
+    return VehicleImageSearchResult.fromJson(result);
+  }
+
+  static Future<VehicleImageResolution> selectCandidate({
+    required String companyId,
+    required String make,
+    required String model,
+    required int year,
+    required String color,
+    required VehicleImageCandidate candidate,
+  }) async {
+    final result = await _execute(
+      body: {
+        'action': 'vehicle_image_select_candidate',
+        'companyId': companyId,
+        'make': make,
+        'model': model,
+        'year': year,
+        'color': color,
+        'candidateToken': candidate.token,
+        if (candidate.forceRefresh) 'forceRefresh': true,
+      },
+    );
+    return VehicleImageResolution.fromJson(result);
   }
 
   static Future<VehicleImageResolution> resolve({
