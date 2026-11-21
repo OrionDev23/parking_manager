@@ -1,4 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/vehicle_provider.dart';
 
 import 'brand/brand_list.dart';
 import 'documents/document_tabs.dart';
@@ -34,22 +37,25 @@ class VehicleDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<int>(
-      valueListenable: selectedSection,
-      builder: (context, section, _) {
-        switch (section) {
-          case 1:
-            return const DocumentTabs();
-          case 2:
-            return ValueListenableBuilder<int>(
-              valueListenable: selectedReference,
-              builder: (context, reference, _) =>
-                  reference == 1 ? const StateTabs() : const BrandList(),
-            );
-          default:
-            return const VehicleManagement();
-        }
-      },
+    return ChangeNotifierProvider<VehicleProvider>(
+      create: (_) => VehicleProvider(),
+      child: ValueListenableBuilder<int>(
+        valueListenable: selectedSection,
+        builder: (context, section, _) {
+          switch (section) {
+            case 1:
+              return const DocumentTabs();
+            case 2:
+              return ValueListenableBuilder<int>(
+                valueListenable: selectedReference,
+                builder: (context, reference, _) =>
+                    reference == 1 ? const StateTabs() : const BrandList(),
+              );
+            default:
+              return const VehicleManagement();
+          }
+        },
+      ),
     );
   }
 }
