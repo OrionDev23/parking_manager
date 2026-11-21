@@ -3598,6 +3598,27 @@ class _VehicleFormState extends State<VehicleForm>
       final useResolvedVehicleImage = resolvedImageMatchesCurrentCriteria;
       final useExistingVehicleImage =
           !useResolvedVehicleImage && existingImageMatchesCurrentCriteria;
+      final vehicleCustomFields = Map<String, dynamic>.from(
+        widget.vehicle?.customFields ?? const <String, dynamic>{},
+      );
+      const imageMetadataKeys = [
+        '_vehicleImageSource',
+        '_vehicleImageSourceUrl',
+        '_vehicleImageLicense',
+        '_vehicleImageLicenseUrl',
+        '_vehicleImageAttribution',
+      ];
+      if (useResolvedVehicleImage && _resolvedImageUrl?.isNotEmpty == true) {
+        vehicleCustomFields['_vehicleImageSource'] = _resolvedImageSource;
+        vehicleCustomFields['_vehicleImageSourceUrl'] = _resolvedImageSourceUrl;
+        vehicleCustomFields['_vehicleImageLicense'] = _resolvedImageLicense;
+        vehicleCustomFields['_vehicleImageLicenseUrl'] = _resolvedImageLicenseUrl;
+        vehicleCustomFields['_vehicleImageAttribution'] = _resolvedImageAttribution;
+      } else if (!useExistingVehicleImage) {
+        for (final key in imageMetadataKeys) {
+          vehicleCustomFields.remove(key);
+        }
+      }
 
       Vehicle vehicle = Vehicle(
         id: documentID!,
@@ -3653,7 +3674,7 @@ class _VehicleFormState extends State<VehicleForm>
             : useExistingVehicleImage
                 ? widget.vehicle?.imageSource
                 : null,
-        customFields: widget.vehicle?.customFields,
+        customFields: vehicleCustomFields,
         anneeUtil: selectedAnnee?.year,
         energie: energie.text,
         pays: pays,
