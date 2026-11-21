@@ -9,6 +9,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../providers/client_database.dart';
 import '../../data/mappers/vehicle_mapper.dart';
+import '../../core/services/vehicle_make_service.dart';
 import '../../main.dart';
 import '../../screens/vehicle/documents/document_form.dart';
 import '../../screens/vehicle/manager/vehicle_form.dart';
@@ -51,7 +52,11 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
       if (genre != null && vehicle.genre != genre) {
         return false;
       }
-      if (marque != null && vehicle.brand != marque) return false;
+      if (marque != null &&
+          VehicleMakeService.canonicalId(vehicle.brand) !=
+              VehicleMakeService.canonicalId(marque)) {
+        return false;
+      }
       return true;
     }).toList();
 
@@ -108,22 +113,19 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
       ),
       DataCell(Row(
         children: [
-          Image.asset(
-            element.value.marque == null ||
-                element.value.marque!.isEmpty ||
-                element.value.marque!.contains('null') || element.value
-                .marque=='-1'
-                ? 'assets/images/marques/default.webp'
-                : 'assets/images/marques/${element.value.marque ?? 'default'}.webp',
-            width: 3.5.h,
-            height: 3.5.h,
+          VehicleMakeLogo(
+            makeId: element.value.marque,
+            size: 3.5.h,
           ),
           const SizedBox(
             width: 2,
           ),
           Expanded(
               child: Text(
-                element.value.type ?? '',
+                [
+                  VehiclesUtilities.getMarqueName(element.value.marque),
+                  element.value.type ?? '',
+                ].where((value) => value.trim().isNotEmpty).join(' '),
                 style: rowTextStyle,
                 softWrap: true,
                 overflow: TextOverflow.ellipsis,
@@ -239,22 +241,19 @@ class VehiculeDataSource extends ParcOtoDatasource<Vehicle> {
       ),
       DataCell(Row(
         children: [
-          Image.asset(
-            element.value.marque == null ||
-                element.value.marque!.isEmpty ||
-                element.value.marque!.contains('null') || element.value
-                .marque=='-1'
-                ? 'assets/images/marques/default.webp'
-                : 'assets/images/marques/${element.value.marque ?? 'default'}.webp',
-            width: 3.5.h,
-            height: 3.5.h,
+          VehicleMakeLogo(
+            makeId: element.value.marque,
+            size: 3.5.h,
           ),
           const SizedBox(
             width: 2,
           ),
           Expanded(
               child: Text(
-                element.value.type ?? '',
+                [
+                  VehiclesUtilities.getMarqueName(element.value.marque),
+                  element.value.type ?? '',
+                ].where((value) => value.trim().isNotEmpty).join(' '),
                 style: rowTextStyle,
                 softWrap: true,
                 overflow: TextOverflow.ellipsis,
