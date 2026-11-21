@@ -151,7 +151,13 @@ class VehicleMakeService {
   /// Unknown legacy values are retained as slugs instead of being lost.
   static String? canonicalId(String? value) {
     final raw = value?.trim() ?? '';
-    if (raw.isEmpty || raw == '-1' || raw.toLowerCase() == 'nonind') {
+    final normalizedRaw = raw.toLowerCase();
+    if (raw.isEmpty ||
+        raw == '-1' ||
+        normalizedRaw == '0' ||
+        normalizedRaw == 'null' ||
+        normalizedRaw == 'undefined' ||
+        normalizedRaw == 'nonind') {
       return null;
     }
 
