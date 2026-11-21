@@ -848,7 +848,7 @@ const VEHICLE_IMAGE_NEGATIVE_TTL_MS = 6 * 60 * 60 * 1000;
 
 function normalizeVehicleImageColor(value) {
   const color = String(value || '').normalize('NFKD')
-    .replace(/[\\u0300-\\u036f]/g, '').trim().toLowerCase();
+    .replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
   if (!color) return 'original';
   if (/^(noir|black|noire)$/.test(color)) return 'black';
   if (/^(blanc|white|blanche)$/.test(color)) return 'white';
@@ -861,8 +861,8 @@ function normalizeVehicleImageColor(value) {
 
 function vehicleImageCacheKey(make, model, year, color) {
   const canonical = [
-    make.normalize('NFKD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(),
-    model.normalize('NFKD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(),
+    make.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(),
+    model.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(),
     String(year),
     color,
   ].join('|');
@@ -912,6 +912,14 @@ async function getVehicleImageCacheRow(rowId) {
 }
 
 async function saveVehicleImageCacheRow(rowId, data) {
+  const existing = await getVehicleImageCacheRow(rowId);
+  if (existing) {
+    await appwrite(
+      `/tablesdb/${DATABASE_ID}/tables/${VEHICLE_IMAGE_CATALOG}/rows/${encodeURIComponent(rowId)}`,
+      { method: 'PATCH', body: { data } },
+    );
+    return getVehicleImageCacheRow(rowId);
+  }
   try {
     await createRow(VEHICLE_IMAGE_CATALOG, rowId, data, []);
   } catch (failure) {
