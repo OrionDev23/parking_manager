@@ -1080,18 +1080,30 @@ async function createSharedVehicleMake({ userId, input }) {
     throw failure;
   }
 
-  const existing = await listRows(VEHICLE_MAKES_TABLE, {
-    method: 'equal', attribute: 'normalizedName', values: [normalizedName],
+  const existingMakes = await listAllRows(VEHICLE_MAKES_TABLE);
+  const requestedNames = new Set([
+    normalizedName,
+    ...aliases.map(normalizeVehicleMakeName).filter(Boolean),
+  ]);
+  const duplicate = existingMakes.find(row => {
+    const existingNames = [
+      normalizeVehicleMakeName(row.data?.name),
+      ...(Array.isArray(row.data?.aliases) ? row.data.aliases : [])
+        .map(normalizeVehicleMakeName),
+    ];
+    return existingNames.some(value => requestedNames.has(value));
   });
-  if (existing.length) {
+  if (duplicate) {
     const failure = new Error(
-      `La marque "${existing[0].data?.name || name}" existe déjà dans le catalogue partagé.`
+      `La marque ou l’un de ses alias existe déjà dans le catalogue partagé : "${duplicate.data?.name || duplicate.$id}".`
     );
     failure.status = 409;
     throw failure;
   }
 
-  const id = slugify(name).slice(0, 36);
+  const idPrefix = slugify(name).slice(0, 24);
+  const idSuffix = createHash('sha256').update(normalizedName).digest('hex').slice(0, 10);
+  const id = `${idPrefix}-${idSuffix}`;
   if (!id) {
     const failure = new Error('Impossible de créer un identifiant stable pour cette marque.');
     failure.status = 400;
