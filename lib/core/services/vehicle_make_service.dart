@@ -93,11 +93,7 @@ class VehicleMakeService {
     final result = await database.listRows(
       databaseId: databaseId,
       tableId: tableId,
-      queries: [
-        Query.equal('isActive', true),
-        Query.orderAsc('name'),
-        Query.limit(500),
-      ],
+      queries: [Query.limit(500)],
     );
     final makes = result.rows
         .map(
@@ -106,8 +102,9 @@ class VehicleMakeService {
             data: Map<String, dynamic>.from(row.data),
           ),
         )
-        .where((make) => make.name.trim().isNotEmpty)
-        .toList(growable: false);
+        .where((make) => make.isActive && make.name.trim().isNotEmpty)
+        .toList()
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     _cache = makes;
     _loadedAt = DateTime.now();
     return cached;
