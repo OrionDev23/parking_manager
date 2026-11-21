@@ -56,6 +56,20 @@ class VehicleMakeService {
   static const String tableId = 'vehicle_makes';
   static const String functionId = 'company-tenant-api';
 
+  static const Map<String, String> categoryLabels = {
+    'passenger': 'Voiture particulière',
+    'commercial': 'Utilitaire / poids lourd',
+    'bus': 'Autobus / autocar',
+    'motorcycle': 'Moto / scooter',
+    'agricultural': 'Matériel agricole',
+    'construction': 'Engin de chantier',
+    'industrial': 'Matériel industriel',
+    'other': 'Autre',
+  };
+
+  static String categoryLabel(String? category) =>
+      categoryLabels[category] ?? category ?? 'Autre';
+
   static List<VehicleMake> _cache = const [];
   static DateTime? _loadedAt;
   static Future<List<VehicleMake>>? _pendingLoad;
@@ -279,6 +293,7 @@ class VehicleMakeService {
     required String name,
     required String category,
     List<String> aliases = const [],
+    String? logoUrl,
   }) async {
     final client = DatabaseGetter.client;
     if (client == null) {
@@ -292,6 +307,7 @@ class VehicleMakeService {
         'name': name,
         'category': category,
         'aliases': aliases,
+        'logoUrl': ?logoUrl,
       }),
       xasync: false,
     );
