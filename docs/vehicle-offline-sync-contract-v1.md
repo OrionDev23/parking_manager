@@ -24,35 +24,28 @@ Tables actuelles :
 
 Migrations versionnées 1 à 11 déjà présentes. Toute nouvelle migration doit commencer à **version 12**. Ne jamais modifier rétroactivement une migration déjà exécutée sur les postes utilisateurs.
 
-### 1.2 Écriture véhicule actuelle : défaut identifié et correctif implémenté
+### 1.2 Défaut d'atomicité et périmètre corrigé
 
-L'audit initial a confirmé que `VehicleRepositoryImpl.createVehicle()` exécutait l'ajout dans l'outbox puis l'upsert local via deux opérations SQLite séparées. Cette séquence pouvait diverger si le deuxième write échouait ou si le processus s'arrêtait entre les deux.
+L'audit initial a trouvé le même défaut dans trois chemins natifs :
+- `VehicleRepositoryImpl` : le repository écrivait l'outbox puis le cache véhicule dans deux opérations SQLite distinctes.
+- `DriverRepositoryImpl` : même séquence pour les chauffeurs.
+- `LegacyStockSyncService` : même séquence entre `sync_operations` et `legacy_module_cache`.
 
-**Correctif maintenant implémenté sur `refactor/foundation-v1` :**
-- ajout du contrat `AtomicSyncQueue` ;
-- méthode native `enqueueWithLocalMutation()` qui ouvre `BEGIN IMMEDIATE`, applique la coalescence/écriture outbox, exécute une mutation locale synchrone sur la même connexion, puis commit ;
-- rollback commun si la mutation locale ou l'écriture outbox échoue ;
-- repository véhicule create/update/delete branché sur ce chemin ;
-- source SQLite véhicule disposant de méthodes synchrones dédiées aux mutations dans une transaction existante ;
-- l'implémentation Web échoue explicitement si cette API native est appelée, car le Web reste online-only et ne doit pas simuler une atomicité locale inexistante.
+**Correctif implémenté sur `refactor/foundation-v1` :**
 
-Les objets `SqliteVehicleSource` et `SqliteSyncQueue` sont construits avec la même instance `LocalDatabase` dans `VehicleServices.create()`. C'est cette identité de connexion qui rend la transaction réellement commune.
+- Contrat `AtomicSyncQueue.enqueueWithLocalMutation()`.
+- Implémentation native : un seul `BEGIN IMMEDIATE`, écriture/coalescence de l'outbox, callback local synchrone sur la même connexion SQLite, puis `COMMIT`.
+- En cas d'erreur, rollback de l'outbox et du cache ensemble.
+- Repository véhicule : create/update/delete.
+- Repository chauffeur : create/update/delete.
+- Catalogue Stock legacy : save/delete, avec conservation de son payload et de sa partition `companyId`.
+- Sources locales véhicule et chauffeur : méthodes de mutation transactionnelle, avec garde tenant sur la source chauffeur et véhicule.
+- Runtime : véhicule, chauffeur et stock utilisent la même instance `LocalDatabase` et le même moteur/file d'outbox.
+- Le handler de l'entité `storage`, déjà déclarée dans le registre Stock, est maintenant aussi enregistré dans le moteur de sync.
 
-Des tests de régression ont été ajoutés pour commit conjoint, rollback conjoint, coalescence create → update et annulation create → delete. **Ils sont écrits mais n'ont pas encore été exécutés dans un environnement Flutter/Dart** ; leur réussite ne doit pas être présumée avant exécution locale/CI.
+L'implémentation Web reste online-only : le chemin atomique SQLite n'est pas utilisé côté Web et l'appel de cette API native y échoue explicitement.
 
-Le correctif atomique est maintenant appliqué aux véhicules et aux chauffeurs. Les autres repositories local-first (pièces, catégories, marques, options, fournisseurs et autres ressources de stock) devront être audités et migrés avant d'étendre massivement le modèle.
-
-
-Les chemins historiques de `VehicleRepositoryImpl.createVehicle()` et `DriverRepositoryImpl.createDriver()` exécutaient :
-
-1. `_enqueue(vehicle, create)` ;
-2. `local.upsertVehicle(vehicle)`.
-
-Ces deux méthodes ouvrent leurs propres opérations SQLite ; elles ne partagent pas une transaction unique. L'outbox et la fiche peuvent donc diverger si le second écrit échoue ou si le processus est interrompu entre les deux.
-
-Le chemin update suit le même modèle. Le delete insère d'abord un tombstone puis supprime la ligne locale, mais les deux étapes ne sont pas atomiques.
-
-**Exigence v1 implémentée pour le domaine véhicule :** mutation locale + opération outbox dans une même transaction SQLite. Après commit, les deux existent ; avant commit, aucune des deux n'existe. Le contrat `AtomicSyncQueue` et `enqueueWithLocalMutation()` exécutent l'upsert/delete local synchrone et l'écriture outbox dans le même `BEGIN IMMEDIATE` / `COMMIT`, avec rollback commun. Les autres repositories local-first restent à migrer.
+**Tests ajoutés :** migration v11→v12, schéma v12, commit/rollback, coalescence create/update/delete, backoff retry, isolation tenant des chauffeurs et atomicité du cache Stock. Le résultat CI final doit être contrôlé après les derniers commits ; un run précédent a identifié un import manquant dans le nouveau test Stock, corrigé depuis.
 
 ### 1.3 Différence Web / natif
 
