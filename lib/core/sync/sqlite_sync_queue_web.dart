@@ -8,6 +8,7 @@ import 'sync_queue.dart';
 class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
   final List<SyncOperation> _operations = [];
   final Map<String, String> _leases = {};
+  final Map<String, DateTime> _retryAt = {};
 
   SqliteSyncQueue([dynamic _]);
 
@@ -67,8 +68,10 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
   Future<List<SyncOperation>> pending({int limit = 50, String? companyId}) async =>
       _operations.where((item) =>
         item.status == SyncOperationStatus.pending ||
-        item.status == SyncOperationStatus.failed ||
-        item.status == SyncOperationStatus.conflict)
+        item.status == SyncOperationStatus.conflict ||
+        (item.status == SyncOperationStatus.failed &&
+          (_retryAt[item.id] == null ||
+            !_retryAt[item.id]!.isAfter(DateTime.now().toUtc()))))
       .where((item) => companyId == null || item.companyId == companyId)
       .take(limit).toList(growable: false);
 
@@ -88,13 +91,26 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
     }
   }
   @override
-  Future<void> markCompleted(String id) async => _operations.removeWhere((item) => item.id == id);
+  Future<void> markCompleted(String id) async {
+    _retryAt.remove(id);
+    _operations.removeWhere((item) => item.id == id);
+  }
   @override
-  Future<void> markFailed(String id) async {
+  Future<void> markFailed(
+    String id, {
+    required String errorCode,
+    required String errorMessage,
+    required DateTime nextAttemptAt,
+  }) async {
     final i = _operations.indexWhere((item) => item.id == id);
     if (i >= 0) {
       final item = _operations[i];
-      _operations[i] = _replace(item, status: SyncOperationStatus.failed, attempts: item.attempts + 1);
+      _operations[i] = _replace(
+        item,
+        status: SyncOperationStatus.failed,
+        attempts: item.attempts + 1,
+      );
+      _retryAt[id] = nextAttemptAt.toUtc();
     }
   }
   @override
@@ -152,6 +168,7 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
       .take(limit).toList(growable: false);
   @override
   Future<void> retryConflict(String id) async {
+    _retryAt.remove(id);
     final i = _operations.indexWhere((item) => item.id == id);
     if (i >= 0) {
       _operations[i] = _replace(
