@@ -4,6 +4,8 @@ enum SyncOperationStatus { pending, processing, completed, failed, conflict }
 
 class SyncOperation {
   final String id;
+  final String idempotencyKey;
+  final int payloadVersion;
   final String companyId;
   final String deviceId;
   final String entity;
@@ -18,6 +20,8 @@ class SyncOperation {
 
   const SyncOperation({
     required this.id,
+    String? idempotencyKey,
+    this.payloadVersion = 1,
     required this.companyId,
     required this.deviceId,
     required this.entity,
@@ -29,5 +33,5 @@ class SyncOperation {
     this.attempts = 0,
     this.conflictReason,
     this.conflictedAt,
-  });
+  }) : idempotencyKey = idempotencyKey ?? id;
 }
