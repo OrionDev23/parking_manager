@@ -15,6 +15,7 @@ import '../database/local_database.dart';
 import '../device/shared_preferences_device_identity.dart';
 import '../sync/sqlite_sync_queue.dart';
 import '../tenancy/company_context.dart';
+import '../../providers/client_database.dart' show DatabaseGetter;
 
 class DriverServices {
   final LocalDatabase localDatabase;
@@ -54,6 +55,8 @@ class DriverServices {
         endpoint: 'https://fra.cloud.appwrite.io/v1',
         projectId: appwriteProjectId,
       ),
+      // Share the authenticated Appwrite session with every remote source.
+      client: DatabaseGetter.client,
     );
     await backend.initialize();
     final remoteSource = AppwriteDriverSource(
