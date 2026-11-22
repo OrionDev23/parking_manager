@@ -40,10 +40,10 @@ Les objets `SqliteVehicleSource` et `SqliteSyncQueue` sont construits avec la m�
 
 Des tests de régression ont été ajoutés pour commit conjoint, rollback conjoint, coalescence create → update et annulation create → delete. **Ils sont écrits mais n'ont pas encore été exécutés dans un environnement Flutter/Dart** ; leur réussite ne doit pas être présumée avant exécution locale/CI.
 
-Le correctif ne migre pas encore les autres repositories (chauffeurs, pièces, fournisseurs). Le contrat atomique devra être appliqué à chaque domaine local-first avant d'étendre massivement le modèle.
+Le correctif atomique est maintenant appliqué aux véhicules et aux chauffeurs. Les autres repositories local-first (pièces, catégories, marques, options, fournisseurs et autres ressources de stock) devront être audités et migrés avant d'étendre massivement le modèle.
 
 
-Le chemin actuel de `VehicleRepositoryImpl.createVehicle()` exécute :
+Les chemins historiques de `VehicleRepositoryImpl.createVehicle()` et `DriverRepositoryImpl.createDriver()` exécutaient :
 
 1. `_enqueue(vehicle, create)` ;
 2. `local.upsertVehicle(vehicle)`.
