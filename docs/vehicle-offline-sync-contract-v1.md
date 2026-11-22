@@ -1,7 +1,7 @@
 # Parcoto — Contrat SQLite et synchronisation offline-first v1
 
 **Statut :** spécification technique cible  
-**Référence :** \`docs/vehicle-domain-model-v1.md\` et \`docs/vehicle-appwrite-schema-v1.md\`  
+**Référence :** `docs/vehicle-domain-model-v1.md` et `docs/vehicle-appwrite-schema-v1.md`  
 **Plateformes :** SQLite natif (Windows / Android / iOS) ; Web online-only dans l'architecture auditée le 22/11/2026.
 
 > Ce contrat décrit le comportement attendu avant implémentation. Les migrations SQLite de cette spécification ne sont pas appliquées automatiquement par ce document.
@@ -12,24 +12,24 @@
 
 ### 1.1 SQLite actuel
 
-La base locale se trouve dans \`parcoto.db\` et son système de migration est actuellement à la version 11.
+La base locale se trouve dans `parcoto.db` et son système de migration est actuellement à la version 11.
 
 Tables actuelles :
-- \`vehicles\` : ID, company_id, site_id, registration, brand, model, color, status, created_at, updated_at, payload.
-- \`drivers\` : table de cache conducteur.
-- \`sync_operations\` : outbox générique.
-- \`sync_engine_leases\` : lease de moteur par entreprise.
-- \`legacy_module_cache\` : cache des anciens modules.
-- \`sync_conflict_resolutions\`, \`sync_cursors\`, \`sync_reconciliation\`, \`sync_remote_snapshot\`, \`startup_migrations\`.
+- `vehicles` : ID, company_id, site_id, registration, brand, model, color, status, created_at, updated_at, payload.
+- `drivers` : table de cache conducteur.
+- `sync_operations` : outbox générique.
+- `sync_engine_leases` : lease de moteur par entreprise.
+- `legacy_module_cache` : cache des anciens modules.
+- `sync_conflict_resolutions`, `sync_cursors`, `sync_reconciliation`, `sync_remote_snapshot`, `startup_migrations`.
 
 Migrations versionnées 1 à 11 déjà présentes. Toute nouvelle migration doit commencer à **version 12**. Ne jamais modifier rétroactivement une migration déjà exécutée sur les postes utilisateurs.
 
 ### 1.2 Écriture véhicule actuelle : défaut à traiter
 
-Le chemin actuel de \`VehicleRepositoryImpl.createVehicle()\` exécute :
+Le chemin actuel de `VehicleRepositoryImpl.createVehicle()` exécute :
 
-1. \`_enqueue(vehicle, create)\` ;
-2. \`local.upsertVehicle(vehicle)\`.
+1. `_enqueue(vehicle, create)` ;
+2. `local.upsertVehicle(vehicle)`.
 
 Ces deux méthodes ouvrent leurs propres opérations SQLite ; elles ne partagent pas une transaction unique. L'outbox et la fiche peuvent donc diverger si le second écrit échoue ou si le processus est interrompu entre les deux.
 
@@ -52,13 +52,13 @@ Donc :
 
 ### 2.1 Règle de partition
 
-Toutes les lignes métier tenant-scoped contiennent \`company_id\`. La clé primaire doit protéger contre les collisions entre tenants. Recommandation : clé composite \`PRIMARY KEY(company_id, id)\` ou identifiant global stable avec \`company_id\` obligatoire et contrôle systématique sur chaque requête.
+Toutes les lignes métier tenant-scoped contiennent `company_id`. La clé primaire doit protéger contre les collisions entre tenants. Recommandation : clé composite `PRIMARY KEY(company_id, id)` ou identifiant global stable avec `company_id` obligatoire et contrôle systématique sur chaque requête.
 
-Toutes les requêtes locales doivent inclure \`company_id = activeCompanyId\`. Aucun chargement global de cache opérationnel sans partition explicite.
+Toutes les requêtes locales doivent inclure `company_id = activeCompanyId`. Aucun chargement global de cache opérationnel sans partition explicite.
 
 ### 2.2 Tables de cache locales proposées
 
-Les données détaillées peuvent rester dans un \`payload\` JSON versionné, mais les champs qui pilotent les relations et les recherches doivent être indexés en colonnes typed.
+Les données détaillées peuvent rester dans un `payload` JSON versionné, mais les champs qui pilotent les relations et les recherches doivent être indexés en colonnes typed.
 
 | Table SQLite | Colonnes typed minimales | Payload |
 |---|---|---|
@@ -81,13 +81,13 @@ Les données détaillées peuvent rester dans un \`payload\` JSON versionné, ma
 | vehicle_expenses | id, company_id, vehicle_id, expense_type, occurred_at, amount_minor, currency | JSON |
 | vehicle_events | id, company_id, vehicle_id, event_type, occurred_at, recorded_at | JSON |
 
-Les tables enfants possèdent des indexes sur \`(company_id, parent_id, timestamp/status)\`. Les fixes GPS nécessitent une stratégie spécifique de volume et de rétention ; leur cache SQLite n'est pas un historique infini.
+Les tables enfants possèdent des indexes sur `(company_id, parent_id, timestamp/status)`. Les fixes GPS nécessitent une stratégie spécifique de volume et de rétention ; leur cache SQLite n'est pas un historique infini.
 
 ### 2.3 DDL cible de l'outbox
 
-Conserver le nom existant \`sync_operations\` et faire évoluer sa structure par migration. Le DDL logique cible :
+Conserver le nom existant `sync_operations` et faire évoluer sa structure par migration. Le DDL logique cible :
 
-\`\`\`sql
+```sql
 CREATE TABLE sync_operations (
   id TEXT PRIMARY KEY,
   company_id TEXT NOT NULL,
@@ -125,20 +125,20 @@ CREATE INDEX ix_sync_entity_order
 
 CREATE INDEX ix_sync_operation_dependency
   ON sync_operations(depends_on_operation_id);
-\`\`\`
+```
 
 Précisions :
 - La table actuelle possède déjà plusieurs de ces champs. La migration 12 doit ajouter uniquement les colonnes/index absents, sans recréer la table.
 - Avant d'ajouter l'index unique d'idempotence, auditer les doublons. Initialiser idempotency_key depuis id pour les anciennes opérations.
-- Les anciens IDs operationId doivent rester inchangés ; ils sont référencés dans \`sync_conflict_resolutions\`.
-- \`base_revision\` est null pour create et porte la version serveur vue lors d'un update/delete.
-- \`depends_on_operation_id\` empêche un enfant d'être envoyé avant l'ack du parent.
-- \`last_error_message\` doit être nettoyé des données personnelles et limité en taille.
+- Les anciens IDs operationId doivent rester inchangés ; ils sont référencés dans `sync_conflict_resolutions`.
+- `base_revision` est null pour create et porte la version serveur vue lors d'un update/delete.
+- `depends_on_operation_id` empêche un enfant d'être envoyé avant l'ack du parent.
+- `last_error_message` doit être nettoyé des données personnelles et limité en taille.
 - Les opérations completed sont conservées pour une période de diagnostic définie puis purgées selon une règle documentée ; les conflits ne sont jamais purgés automatiquement.
 
 ### 2.4 Table de réception / idempotence distante
 
-Prévoir une table Appwrite server-only \`sync_operation_receipts\` pour les mutations qui ne se dédupliquent pas par l'ID de la ressource :
+Prévoir une table Appwrite server-only `sync_operation_receipts` pour les mutations qui ne se dédupliquent pas par l'ID de la ressource :
 
 | Clé | Type | Requis |
 |---|---|---:|
@@ -151,7 +151,7 @@ Prévoir une table Appwrite server-only \`sync_operation_receipts\` pour les mut
 | appliedAt | datetime | Oui |
 | resultRevision | integer | Non |
 
-Index unique \`(companyId, operationId)\`, index \`(companyId, entity, entityId)\`.
+Index unique `(companyId, operationId)`, index `(companyId, entity, entityId)`.
 
 La création et l'ack receipt sont atomiques avec la mutation métier dans une transaction Appwrite lorsque l'opération produit plusieurs lignes ou événements. Les lignes véhicule/driver existantes utilisent déjà des IDs stables et une logique idempotente ; le receipt complète ce modèle pour les relations et mutations append-only.
 
@@ -161,11 +161,11 @@ La création et l'ack receipt sont atomiques avec la mutation métier dans une t
 
 ### 3.1 Transaction unique
 
-Le repository ne doit plus appeler successivement \`queue.enqueue()\` puis \`local.upsert()\` avec deux transactions séparées.
+Le repository ne doit plus appeler successivement `queue.enqueue()` puis `local.upsert()` avec deux transactions séparées.
 
-Introduire une abstraction de mutation, par exemple \`LocalMutationCoordinator\`, qui utilise **la même instance SQLite** :
+Introduire une abstraction de mutation, par exemple `LocalMutationCoordinator`, qui utilise **la même instance SQLite** :
 
-\`\`\`text
+```text
 BEGIN IMMEDIATE
   validate active company
   read previous local entity
@@ -173,15 +173,15 @@ BEGIN IMMEDIATE
   coalesce/insert outbox operation
   assign sequence_no and dependency
 COMMIT
-\`\`\`
+```
 
-Si une étape échoue : \`ROLLBACK\` et l'entité locale/outbox restent dans leur état précédent.
+Si une étape échoue : `ROLLBACK` et l'entité locale/outbox restent dans leur état précédent.
 
 Pour un create, écrire la ligne locale et outbox dans le même commit.  
 Pour un update, enregistrer la nouvelle version locale et son mutation.  
 Pour un delete, enregistrer un tombstone dans l'outbox et supprimer/masquer la ligne locale dans le même commit.
 
-La coalescence actuelle dans \`SqliteSyncQueue.enqueue()\` doit être extraite en méthode \`enqueueInTransaction()\` ou remplacée par un service de repository transactionnel. Elle ne doit pas démarrer une seconde transaction imbriquée.
+La coalescence actuelle dans `SqliteSyncQueue.enqueue()` doit être extraite en méthode `enqueueInTransaction()` ou remplacée par un service de repository transactionnel. Elle ne doit pas démarrer une seconde transaction imbriquée.
 
 ### 3.2 Coalescence des opérations
 
@@ -208,7 +208,7 @@ Ordre obligatoire :
 - tracking device → tracking session → location fixes ;
 - parking space + vehicle → parking assignment.
 
-Une opération enfant référence son parent par ID et son depends_on_operation_id. Le moteur ne traite l'enfant que lorsque la dépendance est completed. Si le parent est en conflit, l'enfant reste bloqué avec la raison \`dependency_blocked\`.
+Une opération enfant référence son parent par ID et son depends_on_operation_id. Le moteur ne traite l'enfant que lorsque la dépendance est completed. Si le parent est en conflit, l'enfant reste bloqué avec la raison `dependency_blocked`.
 
 ---
 
@@ -216,14 +216,14 @@ Une opération enfant référence son parent par ID et son depends_on_operation_
 
 ### 4.1 Cycle d'une opération
 
-\`\`\`text
+```text
 Local mutation
   -> pending
   -> claim/processing (après lease)
   -> request serveur idempotente
   -> response vérifiée (status + code + body)
   -> completed + server revision
-\`\`\`
+```
 
 Erreurs :
 - Réseau / timeout / 5xx / 429 : failed + exponential backoff avec jitter.
@@ -231,9 +231,9 @@ Erreurs :
 - 400 validation métier : conflict/permanent avec un code machine précis et indication du champ.
 - 404 parent absent : conflict uniquement si la relation ne peut pas être résolue/recréée.
 - 409 revision mismatch / doublon : conflict et procédure de résolution ; ne pas réessayer en boucle.
-- Unknown action / deployment mismatch : erreur de protocole/configuration. Ne pas marquer la donnée métier comme définitivement invalide ; générer un code \`api_contract_mismatch\`, arrêter les retries automatiques globaux et alerter le diagnostic.
+- Unknown action / deployment mismatch : erreur de protocole/configuration. Ne pas marquer la donnée métier comme définitivement invalide ; générer un code `api_contract_mismatch`, arrêter les retries automatiques globaux et alerter le diagnostic.
 
-Ne jamais analyser uniquement une chaîne de message. Utiliser un champ serveur stable \`code\`, \`retryable\` et \`details\`.
+Ne jamais analyser uniquement une chaîne de message. Utiliser un champ serveur stable `code`, `retryable` et `details`.
 
 ### 4.2 Idempotence
 
@@ -246,9 +246,9 @@ Ne jamais analyser uniquement une chaîne de message. Utiliser un champ serveur 
 
 ### 4.3 Révisions et mise à jour offline
 
-Toutes les entités modifiables exposent une propriété \`revision\` entière, initialisée à 1 et incrémentée côté serveur.
+Toutes les entités modifiables exposent une propriété `revision` entière, initialisée à 1 et incrémentée côté serveur.
 
-À chaque pull, enregistrer la revision et \`$updatedAt\`. Chaque mutation update transmet \`baseRevision\` et un \`changeSet\` des champs modifiés.
+À chaque pull, enregistrer la revision et `$updatedAt`. Chaque mutation update transmet `baseRevision` et un `changeSet` des champs modifiés.
 
 Si baseRevision = currentRevision : appliquer et incrémenter.
 
@@ -262,17 +262,17 @@ Pour la première version, privilégier un conflit explicite plutôt qu'un merge
 
 ### 4.4 Lease et multi-instance
 
-- Un seul moteur actif par companyId et base locale, via \`sync_engine_leases\`.
+- Un seul moteur actif par companyId et base locale, via `sync_engine_leases`.
 - Une lease est renouvelée pendant une requête longue.
 - Si la lease est perdue, ne pas ack l'opération ; le prochain propriétaire la récupère.
-- \`recoverInterrupted\` ne réinitialise que les processing de l'entreprise après acquisition de sa lease.
+- `recoverInterrupted` ne réinitialise que les processing de l'entreprise après acquisition de sa lease.
 - Une session d'entreprise ne doit jamais drainer l'outbox d'une autre entreprise.
 - Au changement de companyId : arrêter l'ancien moteur, attendre/abandonner proprement la lease, reconstruire les services, puis démarrer le nouveau contexte.
 
 ### 4.5 Pull et curseurs
 
 Pour chaque entité :
-- utiliser \`$updatedAt\`/cursor serveur et un tie-breaker stable \`$id\` ;
+- utiliser `$updatedAt`/cursor serveur et un tie-breaker stable `$id` ;
 - conserver une petite fenêtre de recouvrement pour éviter de manquer les écritures ayant le même timestamp ;
 - upsert local uniquement si aucune mutation locale non résolue ne protège la ressource ;
 - ne pas supprimer une ligne locale simplement parce qu'elle manque dans une page partielle ;
@@ -306,7 +306,7 @@ Un retry automatique ne concerne que les erreurs identifiées comme transitoires
 ### 5.1 Collecte et tampon local
 
 - Le smartphone génère un fixId UUID stable à chaque échantillon.
-- \`observedAt\` vient de l'appareil ; \`receivedAt\` est défini côté serveur.
+- `observedAt` vient de l'appareil ; `receivedAt` est défini côté serveur.
 - Conserver latitude/longitude, accuracy et source ; ne pas transformer une position approximative en position exacte.
 - Le suivi est limité à une tracking_session explicitement démarrée et autorisée.
 - Quand le réseau manque, tampon local borné par durée et volume configurés.
