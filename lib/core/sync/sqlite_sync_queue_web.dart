@@ -115,6 +115,7 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
   }
   @override
   Future<void> markConflict(String id, {required String reason}) async {
+    _retryAt.remove(id);
     final i = _operations.indexWhere((item) => item.id == id);
     if (i >= 0) {
       _operations[i] = _replace(
