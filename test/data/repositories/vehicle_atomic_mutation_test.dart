@@ -1,9 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:parc_oto/core/database/local_database.dart';
+import 'package:parc_oto/core/device/device_identity.dart';
 import 'package:parc_oto/core/sync/sqlite_sync_queue.dart';
 import 'package:parc_oto/core/sync/sync_operation.dart';
+import 'package:parc_oto/core/tenancy/company_context.dart';
 import 'package:parc_oto/data/local/vehicles/sqlite_vehicle_source.dart';
+import 'package:parc_oto/data/repositories/vehicle_repository_impl.dart';
 import 'package:parc_oto/domain/entities/vehicle.dart';
 
 void main() {
@@ -82,10 +85,16 @@ void main() {
     test('commits the vehicle row and outbox operation together', () async {
       final value = vehicle();
 
-      await queue.enqueueWithLocalMutation(
-        operation(value, SyncOperationType.create),
-        localMutation: () => local.upsertVehicleInTransaction(value),
+      final repository = VehicleRepositoryImpl(
+        local: local,
+        atomicSyncQueue: queue,
+        deviceIdentity: PersistentDeviceIdentity(
+          idFactory: () => 'device-test',
+        ),
+        companyContext: const CompanyContext(companyId: companyId),
       );
+
+      await repository.createVehicle(value);
 
       final cached = await local.getVehicle(value.id);
       final pending = await queue.pending(companyId: companyId);
