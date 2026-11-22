@@ -58,12 +58,10 @@ class LegacyStockSyncService {
   }) async {
     final tenantScoped = _isTenantScoped(entity);
     final rowData = tenantScoped ? {...data, 'companyId': companyId} : data;
-    final payload = <String, dynamic>{...rowData, r'$id': id};
     final deviceId = await deviceIdentity.getDeviceId();
     final now = DateTime.now().toUtc();
-    // The outbox is the source of truth. Queue first so a cache write failure
-    // can never leave a visible local row with no operation to synchronize.
-    await queue.enqueue(
+
+    await queue.enqueueWithLocalMutation(
       SyncOperation(
         id: '${deviceId}_${entity}_${id}_${now.microsecondsSinceEpoch}',
         companyId: companyId,
@@ -74,20 +72,20 @@ class LegacyStockSyncService {
         payload: rowData,
         createdAt: now,
       ),
-    );
-    localDatabase.cacheLegacyRow(
-      companyId: companyId,
-      entity: entity,
-      entityId: id,
-      payload: payload,
+      localMutation: () => localDatabase.cacheLegacyRow(
+        companyId: companyId,
+        entity: entity,
+        entityId: id,
+        payload: {...rowData, r'$id': id},
+      ),
     );
   }
 
   Future<void> delete({required String entity, required String id}) async {
     final deviceId = await deviceIdentity.getDeviceId();
     final now = DateTime.now().toUtc();
-    // Queue first: never discard the only local copy of a pending deletion.
-    await queue.enqueue(
+
+    await queue.enqueueWithLocalMutation(
       SyncOperation(
         id: '${deviceId}_${entity}_${id}_${now.microsecondsSinceEpoch}',
         companyId: companyId,
@@ -98,13 +96,14 @@ class LegacyStockSyncService {
         payload: <String, dynamic>{r'$id': id},
         createdAt: now,
       ),
-    );
-    localDatabase.deleteLegacyRow(
-      companyId: companyId,
-      entity: entity,
-      entityId: id,
+      localMutation: () => localDatabase.deleteLegacyRow(
+        companyId: companyId,
+        entity: entity,
+        entityId: id,
+      ),
     );
   }
+
 
   /// Pulls the legacy stock catalogue into the company-scoped SQLite
   /// cache. These Appwrite tables are installation-scoped and do not expose
