@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:sqlite3/sqlite3.dart';
 
-import 'sync_operation.dart';
-import 'atomic_sync_queue.dart';
 import '../database/local_database.dart';
+import 'atomic_sync_queue.dart';
+import 'sync_operation.dart';
 import 'sync_queue.dart';
 
 class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
