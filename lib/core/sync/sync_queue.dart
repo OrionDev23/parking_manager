@@ -6,7 +6,12 @@ abstract class SyncQueue {
   Future<void> markProcessing(String operationId);
   Future<void> recoverInterrupted({String? companyId});
   Future<void> markCompleted(String operationId);
-  Future<void> markFailed(String operationId);
+  Future<void> markFailed(
+    String operationId, {
+    required String errorCode,
+    required String errorMessage,
+    required DateTime nextAttemptAt,
+  });
   Future<void> markConflict(String operationId, {required String reason});
   Future<List<SyncOperation>> conflicts({String? companyId, int limit = 100});
   Future<void> retryConflict(String operationId);
