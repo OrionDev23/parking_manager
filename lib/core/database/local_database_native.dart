@@ -213,7 +213,6 @@ class LocalDatabase {
         "INSERT INTO schema_migrations(version, applied_at) VALUES (11, datetime('now'))",
       );
     }
-  }
 
     if (version < 12) {
       db.execute('BEGIN IMMEDIATE');
@@ -272,6 +271,7 @@ class LocalDatabase {
         rethrow;
       }
     }
+  }
 
   bool isStartupMigrationComplete({
     required String companyId,
