@@ -215,6 +215,64 @@ class LocalDatabase {
     }
   }
 
+    if (version < 12) {
+      db.execute('BEGIN IMMEDIATE');
+      try {
+        bool hasColumn(String table, String column) {
+          return db
+              .select('PRAGMA table_info($table)')
+              .any((row) => row['name'] == column);
+        }
+
+        void addColumnIfMissing(String table, String column, String definition) {
+          if (!hasColumn(table, column)) {
+            db.execute('ALTER TABLE $table ADD COLUMN $column $definition');
+          }
+        }
+
+        // Additive and restart-safe: if the process is interrupted midway,
+        // rerunning this migration checks each column before adding it.
+        addColumnIfMissing(
+          'sync_operations',
+          'payload_version',
+          'INTEGER NOT NULL DEFAULT 1',
+        );
+        addColumnIfMissing(
+          'sync_operations',
+          'idempotency_key',
+          "TEXT NOT NULL DEFAULT ''",
+        );
+        addColumnIfMissing('sync_operations', 'next_attempt_at', 'TEXT');
+        addColumnIfMissing('sync_operations', 'last_error_code', 'TEXT');
+        addColumnIfMissing('sync_operations', 'last_error_message', 'TEXT');
+        addColumnIfMissing('sync_operations', 'completed_at', 'TEXT');
+
+        // Existing operations keep their original IDs; those IDs become
+        // their stable idempotency keys so queued work remains replayable.
+        db.execute(
+          "UPDATE sync_operations SET idempotency_key = id "
+          "WHERE idempotency_key IS NULL OR idempotency_key = ''",
+        );
+        db.execute(
+          'CREATE UNIQUE INDEX IF NOT EXISTS '
+          'ux_sync_operations_idempotency '
+          'ON sync_operations(company_id, idempotency_key)',
+        );
+        db.execute(
+          'CREATE INDEX IF NOT EXISTS idx_sync_operations_due '
+          'ON sync_operations(company_id, status, next_attempt_at, created_at)',
+        );
+        db.execute(
+          "INSERT INTO schema_migrations(version, applied_at) "
+          "VALUES (12, datetime('now'))",
+        );
+        db.execute('COMMIT');
+      } catch (_) {
+        db.execute('ROLLBACK');
+        rethrow;
+      }
+    }
+
   bool isStartupMigrationComplete({
     required String companyId,
     required String migrationKey,
