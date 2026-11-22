@@ -7,7 +7,8 @@
 ## Statut
 
 **Phase 1 — conception et contrats techniques : terminée.**  
-**Déploiement du nouveau schéma : non commencé volontairement.**
+**Premier sprint d'implémentation locale : partiellement réalisé sur la branche de travail.**  
+**Déploiement du nouveau schéma Appwrite : non commencé volontairement.**
 
 Les modèles, relations, contrats Appwrite/SQLite, règles de synchronisation et stratégie de migration sont écrits et versionnés. Aucune nouvelle table n'a été créée dans la base de production, aucune donnée métier n'a été modifiée et aucune migration locale n'a été appliquée.
 
@@ -53,6 +54,10 @@ Le défaut d'atomicité de `VehicleRepositoryImpl` a été corrigé sur la branc
 - test de commit, rollback, coalescence create/update et create/delete ajouté.
 
 Les tests ne sont pas encore exécutés car aucun environnement Flutter/Dart n'est disponible dans cette session. Il faut lancer `flutter analyze` et `flutter test test/data/repositories/vehicle_atomic_mutation_test.dart` sur le poste de développement avant de considérer le correctif validé.
+
+- La migration SQLite v12 ajoute les colonnes `payload_version`, `idempotency_key`, `next_attempt_at`, `last_error_code`, `last_error_message` et `completed_at`, avec backfill de l'idempotency key depuis l'ancien `id` et indexes de file/unique.
+- `SyncOperation` transporte maintenant `idempotencyKey` et `payloadVersion` ; les anciennes opérations utilisent leur `id` comme clé stable.
+- Un test vérifie la présence du schéma v12 dans la base SQLite de test.
 
 Le correctif couvre pour l'instant les véhicules natifs Windows/Android/iOS. Le Web reste online-only. Les autres repositories local-first n'ont pas encore été migrés vers cette abstraction.
 
