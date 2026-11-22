@@ -175,7 +175,23 @@ class AppwriteSyncEngine implements SyncEngine {
         final recordKey =
             '${operation.companyId}:${operation.entity}:${operation.entityId}';
         if (blockedRecords.contains(recordKey)) continue;
-        if (operation.status == SyncOperationStatus.conflict) {
+        final isRecoveredUnknownAction =
+            operation.status == SyncOperationStatus.conflict &&
+            operation.entity == 'vehicle' &&
+            operation.type == SyncOperationType.create &&
+            (operation.conflictReason ?? '').contains('Unknown action');
+        if (isRecoveredUnknownAction) {
+          // This exact permanent rejection was caused by the old tenant API
+          // deployment not recognizing the create action. The server hotfix
+          // is now active; retry this existing idempotent vehicle create
+          // instead of leaving it blocked forever in SQLite.
+          await queue.retryConflict(operation.id);
+          debugPrint(
+            '[ParcOto Sync] retrying legacy unknown-action vehicle create '
+            'after tenant API deployment fix: operationId=${operation.id} '
+            'entityId=${operation.entityId}',
+          );
+        } else if (operation.status == SyncOperationStatus.conflict) {
           blockedRecords.add(recordKey);
           debugPrint(
             '[ParcOto Sync] unresolved conflict: '
