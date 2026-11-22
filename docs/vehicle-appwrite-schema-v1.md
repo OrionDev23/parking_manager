@@ -609,6 +609,12 @@ Index unique `(companyId, operationId)`, index `(companyId, entity, entityId)`. 
 
 ---
 
+## 6. Prérequis d'environnement
+
+Le projet Appwrite inspecté pendant la phase 1 est `essais` (nom du projet : Parcoto, statut actif, région `fra`). Le contexte Appwrite ne déclare aucun environnement isolé pour ce projet (`environments: []`). Il ne peut donc pas être traité comme un staging au seul motif que son ID contient le mot « essais ».
+
+**Règle de déploiement :** ne pas créer les tables de ce contrat dans le projet actif pour les tester. Préparer d'abord un projet Appwrite de staging distinct et y reproduire les éléments nécessaires (TablesDB, teams, Function tenant API, bucket si test des fichiers). Les IDs de projet/base/table/team devront venir de cette configuration de staging et ne seront jamais copiés en dur depuis la production.
+
 ## 6. Ordre de mise en place — aucun changement de production dans cette phase
 
 1. Créer les tables/sites dans un environnement de validation, pas dans la base live.
