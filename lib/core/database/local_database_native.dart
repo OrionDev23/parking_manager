@@ -43,6 +43,11 @@ class LocalDatabase {
     }
   }
 
+  @visibleForTesting
+  static void migrateForTesting(Database database) {
+    LocalDatabase._()._migrate(database);
+  }
+
   void _migrate(Database db) {
     db.execute('PRAGMA foreign_keys = ON');
     db.execute('PRAGMA journal_mode = WAL');
