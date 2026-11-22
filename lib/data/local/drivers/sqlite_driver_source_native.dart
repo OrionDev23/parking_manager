@@ -78,6 +78,14 @@ class SqliteDriverSource implements LocalDriverSource {
 
   @override
   Future<void> upsertDriver(Driver driver) async {
+    upsertDriverInTransaction(driver);
+  }
+
+  @override
+  void upsertDriverInTransaction(Driver driver) {
+    if (driver.companyId != companyId) {
+      throw StateError('Driver company does not match the local company.');
+    }
     final payload = jsonEncode(driver.toMap());
     _db.execute(
       '''INSERT INTO drivers
@@ -108,6 +116,11 @@ class SqliteDriverSource implements LocalDriverSource {
 
   @override
   Future<void> deleteDriver(String id) async {
+    deleteDriverInTransaction(id);
+  }
+
+  @override
+  void deleteDriverInTransaction(String id) {
     _db.execute('DELETE FROM drivers WHERE id = ? AND company_id = ?', [
       id,
       companyId,
