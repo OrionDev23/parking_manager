@@ -21,6 +21,8 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
 
   SyncOperation _fromRow(Row row) => SyncOperation(
     id: row['id'] as String,
+    idempotencyKey: row['idempotency_key'] as String? ?? row['id'] as String,
+    payloadVersion: row['payload_version'] as int? ?? 1,
     companyId: row['company_id'] as String,
     deviceId: row['device_id'] as String,
     entity: row['entity'] as String,
@@ -126,8 +128,8 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
     _db.execute(
       '''INSERT INTO sync_operations
         (id, company_id, device_id, entity, entity_id, operation,
-         payload, created_at, status, attempts)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         payload, created_at, status, attempts, idempotency_key, payload_version)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(id) DO NOTHING''',
       [
         operation.id,
@@ -140,6 +142,8 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
         operation.createdAt.toIso8601String(),
         operation.status.name,
         operation.attempts,
+        operation.idempotencyKey,
+        operation.payloadVersion,
       ],
     );
   }
@@ -257,8 +261,8 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
 
   @override
   Future<void> markCompleted(String operationId) async => _db.execute(
-    "UPDATE sync_operations SET status='completed' WHERE id=?",
-    [operationId],
+    "UPDATE sync_operations SET status='completed', completed_at=? WHERE id=?",
+    [DateTime.now().toUtc().toIso8601String(), operationId],
   );
 
   @override
