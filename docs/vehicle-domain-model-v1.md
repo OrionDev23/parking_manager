@@ -347,47 +347,68 @@ Les contrôles d'unicité sont tenant-scoped et validés côté serveur. La stra
 
 ## 9. Confidentialité et contraintes algériennes du GPS
 
-### 9.1 Situation réglementaire à vérifier
+### 9.1 Équipements GPS : qualification à faire confirmer
 
-Les textes officiels consultés ne permettent pas de conclure que « tous les GPS sont simplement interdits ». Ils montrent en revanche un régime réglementaire sérieux :
+Le décret exécutif n° 09-410 du 10 décembre 2009 classe, dans son annexe I, section A, sous-section 2, paragraphe 2, les équipements de radio-positionnement et/ou radiolocalisation par satellite, les systèmes de géolocalisation par radio et les dispositifs de positionnement par satellite fonctionnant à travers les réseaux de téléphonie mobile.
 
-- Le décret exécutif 09-410 du 10 décembre 2009 classe dans les équipements sensibles les équipements de radio-positionnement/radiolocalisation par satellite, les systèmes de géolocalisation par radio et les dispositifs de positionnement par satellite via les réseaux mobiles (annexe I, section A, sous-section 2, paragraphe 2).
-- L'ARPCE publie une procédure de géolocalisation par radio demandant notamment une architecture technique, les marques/types d'équipements, les fiches techniques des balises et, selon le service, des agréments/autorisations.
-- Les textes de 2011 et leurs modifications encadrent l'acquisition, la détention, l'exploitation, l'utilisation et la cession des équipements sensibles.
-- Il faut distinguer l'achat d'un appareil, son importation, sa détention, son usage interne par une entreprise et la fourniture d'un service de géolocalisation à des tiers. Les obligations peuvent différer.
+Le décret prévoit notamment :
+- à l'article 4, un agrément préalable pour les opérateurs exerçant des activités de commercialisation ou de prestation de services portant sur des équipements sensibles ;
+- aux articles 13 et 17, des autorisations concernant certaines acquisitions/détentions ;
+- à l'article 20, une autorisation préalable d'exploitation pour les équipements sensibles de la sous-section 2 de la section A.
+
+L'ARPCE publie une procédure de géolocalisation par radio qui demande, pour le service concerné, une architecture technique, le mode de connexion, les marques/types d'équipements et logiciels, les fiches techniques des balises, ainsi que les agréments/autorisations applicables. Cette procédure ne suffit pas à elle seule pour déterminer si une application interne de suivi de flotte par smartphone relève exactement du même régime.
+
+**Conclusion juridique prudente :**
+- Il n'est pas exact d'affirmer sans nuance que tout GPS est « interdit ».
+- Il n'est pas davantage possible de conclure, sur les seuls textes consultés, qu'un smartphone standard utilisé pour transmettre sa position est automatiquement exempté.
+- La mention des dispositifs de positionnement par satellite via les réseaux de téléphonie mobile rend la qualification d'un suivi smartphone suffisamment incertaine pour exiger une réponse écrite avant activation.
+- L'acquisition d'un appareil, son importation, sa détention, son exploitation interne et la fourniture commerciale d'un service de géolocalisation sont des actes différents et peuvent relever de formalités différentes.
+
+**Décision d'architecture :** Parcoto reste smartphone-first techniquement et provider-agnostic, mais aucun suivi de flotte en production ne sera activé avant d'avoir obtenu une confirmation écrite sur le cas précis : application mobile ordinaire, GNSS intégré, transmission des positions au serveur de l'employeur, finalité de gestion de flotte, appareils utilisés et rôle de l'éditeur Parcoto. Une intégration de traceur dédié restera désactivée tant que le matériel et son usage ne seront pas qualifiés.
 
 Sources officielles :
-- Décret 09-410, Journal officiel n°73 du 13/12/2009 : https://www.joradp.dz/FTP/jo-francais/2009/F2009073.pdf
-- ARPCE — Géolocalisation par radio : https://www.arpce.dz/fr/service/gps
-- ARPCE — Homologation : https://www.arpce.dz/fr/service/agr
-- Loi 18-07 : https://www.aece.dz/static/docs/Loi_n_18-07.pdf
+- Décret exécutif 09-410 (JO n°73 du 13/12/2009), notamment articles 4, 13, 17, 20 et annexe I, section A, sous-section 2, paragraphe 2 : https://www.mpt.gov.dz/wp-content/uploads/2023/12/DE-09-410-V-FR.pdf
+- ARPCE — Géolocalisation par radio et dossier technique : https://www.arpce.dz/fr/service/gps
+- Agence nationale des fréquences — Autorisations d'exploitation des équipements sensibles radioélectriques : https://anf.dz/services/octroi-des-autorisations-exploitation-equipements-sensibles-radioelectriques
+- ARPCE — actualisation de la liste des équipements sensibles (arrêté du 13/10/2024) : https://www.arpce.dz/fr/pub/n8x1d6
 
-**Décision provisoire :** ne pas acheter, importer, distribuer ou installer un tracker dédié dans Parcoto tant que la situation de l'appareil et de l'usage projeté n'a pas été confirmée par écrit auprès des autorités compétentes (ARPCE et services concernés de la wilaya).
+### 9.2 Données personnelles et suivi des conducteurs
 
-Le smartphone constitue la première source technique à étudier, mais il ne faut pas le considérer automatiquement comme une exemption juridique. Il utilise un terminal mobile ordinaire, son GNSS intégré et une application ; la qualification de la collecte et de l'exploitation des positions doit également être confirmée.
+La loi n° 25-11 du 24 juillet 2025 modifie et complète la loi n° 18-07.
 
-### 9.2 Protection des données personnelles
+La loi 25-11 :
+- ajoute explicitement la localisation et les déplacements d'une personne dans la définition du profilage (article 2 de la loi modificative) ;
+- introduit un registre général des activités de traitement (article 41 bis 2) ;
+- introduit un carnet automatisé des opérations de traitement (article 41 bis 3), avec motif, date/heure et, dans la mesure du possible, identité de l'utilisateur et des destinataires.
 
-Une position liée à un conducteur peut permettre de localiser une personne. La loi 25-11 du 24 juillet 2025, qui modifie la loi 18-07, ajoute explicitement la localisation et les déplacements dans la définition du profilage. Elle introduit aussi, dans le régime général, des obligations de registre des activités de traitement et de journalisation des opérations. La même loi prévoit une étude d'impact pour les traitements à risque élevé dans son nouveau Titre V bis, consacré aux traitements réalisés par les autorités compétentes à des fins de prévention/détection des infractions et de procédures pénales : il ne faut pas extrapoler automatiquement cette disposition spéciale à tout traitement privé de flotte. Pour Parcoto, une analyse de risques reste nécessaire et l'obligation exacte d'une étude d'impact doit être confirmée auprès du conseil compétent et de l'autorité nationale.
+La loi 18-07, notamment :
+- article 9 : traitement licite et loyal, finalités déterminées, minimisation, exactitude et conservation limitée ;
+- articles 38 et 39 : sécurité des traitements et encadrement contractuel du sous-traitant ;
+- article 44 : encadrement du transfert de données personnelles vers un État étranger, avec autorisation de l'autorité nationale et appréciation du niveau de protection ;
+- article 45 : dérogations au transfert sous les conditions qu'il prévoit.
 
-La loi 18-07 prévoit des principes de finalité déterminée, minimisation, exactitude et durée de conservation nécessaire. Son article 44 encadre les transferts de données personnelles vers l'étranger et son article 45 prévoit des dérogations sous conditions. Le projet Parcoto utilise actuellement un endpoint Appwrite en région FRA ; le transfert des positions liées aux conducteurs doit donc être validé avant activation en production.
+**Conséquence concrète pour Parcoto :** l'endpoint Appwrite actuellement configuré en région `fra` signifie que des données hébergées hors d'Algérie sont susceptibles d'être transférées à l'étranger. Le sujet ne concerne pas uniquement le GPS : il faut inventorier les données personnelles déjà envoyées (utilisateurs, conducteurs, documents, positions éventuelles), le rôle des parties, la localisation réelle et les sous-traitants, puis faire valider la base juridique et les formalités de transfert avant tout traitement GPS. Ne pas supposer qu'un simple consentement dans l'application suffit à régulariser le transfert.
 
-Sources :
-- Loi 25-11 du 24/07/2025, Journal officiel n°48 : https://www.douane.gov.dz/IMG/pdf/loi_18-07_du_24_07_2025_fr_dz.pdf
-- Loi 18-07, articles 9, 44 et 45 : https://www.aece.dz/static/docs/Loi_n_18-07.pdf
+L'étude d'impact de l'article 45 bis 6 de la loi 18-07 telle que modifiée par la loi 25-11 se trouve dans le nouveau Titre V bis, consacré aux traitements effectués par les autorités compétentes à des fins de prévention/détection des infractions et de procédures pénales. Il ne faut pas présenter cet article comme une obligation générale automatiquement applicable à tout suivi privé de flotte. Une analyse de risques reste une bonne pratique d'architecture ; l'obligation juridique précise doit être confirmée par un conseil compétent et l'autorité nationale.
+
+Sources officielles :
+- Loi n° 25-11 du 24/07/2025, JO n°48 : https://douane.gov.dz/IMG/pdf/loi_18-07_du_24_07_2025_fr_dz.pdf
+- Loi n° 18-07 du 10/06/2018, JO n°34 : https://www.joradp.dz/FTP/jo-francais/2018/F2018034.pdf
 - Portail du ministère de la Justice — loi 18-07 modifiée par loi 25-11 : https://droit.mjustice.gov.dz/fr/content/protection-des-personnes-physiques-dans-le-traitement-des-donn%C3%A9es-%C3%A0-caract%C3%A8re-personnel
 
-Principes de conception :
-- finalité claire (sécurité/gestion de flotte) et information transparente du conducteur ;
-- tracking activé sur une session professionnelle explicite, pas en continu sur le temps privé ;
-- permission système et état de suivi visibles dans Parcoto Connect ;
-- arrêt de la session à la fin de mission/service et mécanisme de révocation ;
-- accès aux positions limité par rôle ;
-- chiffrement, journal d'accès, durée de conservation configurable et purge contrôlée ;
-- séparation des données du conducteur et de celles du véhicule ;
-- étude d'impact et validation du transfert international avant lancement réel.
+### 9.3 Exigences de conception liées à la confidentialité
 
-Ce document est une analyse technique, pas un avis juridique. La conformité du traitement doit être confirmée par un conseil compétent et l'autorité nationale de protection des données lorsque nécessaire.
+- Finalité explicite et information compréhensible du conducteur.
+- Collecte active uniquement pendant une session professionnelle prévue et autorisée ; pas de localisation cachée ou permanente en dehors des périodes de travail.
+- État des permissions OS et de la collecte visible dans Parcoto Connect.
+- Arrêt de session à la fin de mission/service, révocation et traitement des interruptions.
+- Accès aux positions limité par rôle et journalisé.
+- Chiffrement en transit et au repos, minimisation des métadonnées et purge contrôlée.
+- Séparation entre l'identité du conducteur, le smartphone et le véhicule ; le téléphone n'est pas supposé appartenir au véhicule.
+- Durée de conservation décidée avant le pilote, pas définie arbitrairement par le développeur.
+- Le registre des traitements, le carnet automatisé et les contrats de sous-traitance doivent être préparés avec les responsables concernés.
+
+Ce document est une analyse d'architecture et une synthèse de textes publics, pas un avis juridique. Le démarrage de la collecte réelle dépend d'une validation juridique adaptée au service exact, au rôle des entreprises clientes et au transfert des données.
 
 ---
 
@@ -450,3 +471,14 @@ Aucune donnée actuelle ne doit être purgée pendant les phases A à C.
 - Aucune donnée de véhicule existante n'est convertie en masse.
 
 **Sortie attendue de la phase 1 :** un modèle métier stable, un contrat Appwrite/SQLite vérifiable, une stratégie de migration et des décisions explicites sur le GPS smartphone et la confidentialité. La phase 2 pourra alors refaire l'interface sans devoir réinventer les données en cours de route.
+
+
+## 12. Contrats techniques de la phase 1
+
+Les trois documents ci-dessous complètent ce modèle de domaine et constituent ensemble le dossier de conception à faire valider avant toute migration :
+
+1. [Contrat de schéma Appwrite v1](vehicle-appwrite-schema-v1.md) — tables, colonnes, types, indexes, ACL et transactions.
+2. [Contrat SQLite et synchronisation v1](vehicle-offline-sync-contract-v1.md) — cache local, outbox, atomicité, idempotence, dépendances, conflits et tests.
+3. [Matrice de migration legacy v1](vehicle-legacy-migration-map-v1.md) — correspondance des champs, ambiguïtés et exécution non destructive.
+
+Aucun de ces documents n'autorise à lui seul une modification de la base de production. Le feu vert de migration exige un dry-run, la revue des ACL, les tests de synchronisation et la validation des points juridiques GPS/transfert.
