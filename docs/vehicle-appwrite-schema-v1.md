@@ -22,6 +22,7 @@ Sauf indication contraire, chaque table opérationnelle tenant-scoped comporte :
 | updatedAt | datetime | Oui | UTC |
 | createdBy | string | Oui | 36 ; Appwrite user ID ou actor service ID |
 | updatedBy | string | Non | 36 |
+| revision | integer | Oui | Départ à 1 ; incrément serveur à chaque mutation acceptée |
 
 Les valeurs d'identité de lignes sont portées par `$id` Appwrite (36 caractères maximum) ; ne pas dupliquer un champ `id` sauf besoin d'interopérabilité documenté.
 
@@ -366,9 +367,35 @@ Le dernier relevé accepté est une projection affichée. Un GPS estimé ne remp
 
 Indexes : key (companyId, vehicleId, documentType), key (companyId, expiresAt, status).
 
+### 3.12 `vehicle_registration_records`
+
+Snapshot historisé des informations portées sur le document d'immatriculation. Les données du titulaire ne doivent pas être mélangées aux caractéristiques stables du véhicule.
+
+| Clé | Type | Requis | Description |
+|---|---|---:|---|
+| vehicleId | string(36) | Oui | Véhicule |
+| documentId | string(36) | Non | Fichier source dans vehicle_documents |
+| registrationNumber | string(40) | Oui | Immatriculation inscrite sur le document |
+| registrationCountry | string(2) | Oui | ISO 3166-1 alpha-2 |
+| recordType | string(24) | Oui | initial, renewal, ownership_change, plate_change, correction |
+| issuedAt | datetime | Non | Date d'émission du document |
+| validFrom | datetime | Non | Début de validité s'il est documenté |
+| validTo | datetime | Non | Fin de validité si applicable |
+| ownerLastName | string(100) | Non | Titulaire — donnée personnelle |
+| ownerFirstName | string(100) | Non | Titulaire — donnée personnelle |
+| ownerProfession | string(120) | Non | Profession inscrite — donnée personnelle |
+| receiptNumber | string(80) | Non | Référence de quittance |
+| receiptAmountMinor | bigint | Non | Montant en unité mineure après validation de devise/unité |
+| currency | string(3) | Non | ISO 4217 |
+| sourceType | string(16) | Oui | manual, ocr, imported, legacy |
+| isCurrent | boolean | Oui | Projection de l'enregistrement actuel |
+| rawLegacyJson | longtext | Non | Conservation temporaire de champs historiques ambigus, accès limité |
+
+Indexes : key (companyId, vehicleId, isCurrent), key (companyId, registrationNumber). L'unicité d'un seul record current par véhicule est vérifiée transactionnellement par le serveur ; ne pas supposer un index partiel.
+
 Les fichiers restent dans un bucket privé ; la table ne contient pas de URL publique permanente. Vérifier l'ACL du fichier au même niveau que l'ACL de la ligne.
 
-### 3.12 `vehicle_media`
+### 3.13 `vehicle_media`
 
 | Clé | Type | Requis | Description |
 |---|---|---:|---|
@@ -388,7 +415,7 @@ Indexes : key (companyId, vehicleId, mediaType, sortOrder).
 
 La photo principale est référencée via vehicles.primaryMediaId. Vérifier côté serveur que le mediaId appartient au même véhicule/tenant. Éviter le booléen `isPrimary` dupliqué sans contrainte d'unicité.
 
-### 3.13 `vehicle_maintenance_plans`
+### 3.14 `vehicle_maintenance_plans`
 
 | Clé | Type | Requis | Description |
 |---|---|---:|---|
@@ -408,7 +435,7 @@ La photo principale est référencée via vehicles.primaryMediaId. Vérifier cô
 
 Indexes : key (companyId, vehicleId, status), key (companyId, nextDueAt, status).
 
-### 3.14 `maintenance_work_orders`
+### 3.15 `maintenance_work_orders`
 
 | Clé | Type | Requis | Description |
 |---|---|---:|---|
@@ -431,7 +458,7 @@ Indexes : key (companyId, vehicleId, status), key (companyId, nextDueAt, status)
 
 Indexes : key (companyId, vehicleId, status), key (companyId, scheduledAt, status), key (companyId, reference).
 
-### 3.15 `vehicle_expenses`
+### 3.16 `vehicle_expenses`
 
 | Clé | Type | Requis | Description |
 |---|---|---:|---|
@@ -450,7 +477,7 @@ Indexes : key (companyId, vehicleId, occurredAt), key (companyId, expenseType, o
 
 Les achats de pièces/consommables provenant du module Stock doivent créer une référence vers leur transaction source, pas dupliquer la quantité de stock dans vehicle_expenses.
 
-### 3.16 `vehicle_events`
+### 3.17 `vehicle_events`
 
 Journal append-only de l'historique métier.
 
@@ -500,6 +527,7 @@ Les indexes sont créés après contrôle de doublons et de la capacité de l'in
 | vehicle_parking_assignments | space_status | key | companyId, parkingSpaceId, status |
 | vehicle_meter_readings | vehicle_time | key | companyId, vehicleId, readingType, measuredAt |
 | vehicle_documents | vehicle_expiry | key | companyId, expiresAt, status |
+| vehicle_registration_records | vehicle_registration | key | companyId, vehicleId, isCurrent |
 | vehicle_media | vehicle_media_order | key | companyId, vehicleId, mediaType, sortOrder |
 | vehicle_maintenance_plans | vehicle_due | key | companyId, status, nextDueAt |
 | maintenance_work_orders | vehicle_status | key | companyId, vehicleId, status |
@@ -558,6 +586,24 @@ Les validations de parent/tenant et les droits sont exécutés avant staging. Le
 - Rendre toutes les créations idempotentes : rejouer un même `operationId`/rowId doit retourner l'état déjà créé sans consommer à nouveau un quota ni dupliquer un événement.
 - Les créations enfants vérifient que le parent existe dans le même tenant.
 - Les mutations append-only ne sont pas modifiées après leur acceptation ; corriger par un nouvel événement.
+
+
+### 5.4 Table système `sync_operation_receipts`
+
+Cette table est **server-only** : aucune lecture ou écriture directe par Flutter.
+
+| Clé | Type | Requis | Description |
+|---|---|---:|---|
+| companyId | string(36) | Oui | Tenant |
+| operationId | string(36) | Oui | Identifiant stable de mutation client |
+| entity | string(40) | Oui | Ressource |
+| entityId | string(36) | Oui | ID de ligne visé |
+| operationType | string(12) | Oui | create, update, delete, append |
+| resultCode | string(24) | Oui | applied, already_applied, rejected |
+| resultRevision | integer | Non | Revision après application |
+| appliedAt | datetime | Oui | Horodatage serveur |
+
+Index unique `(companyId, operationId)`, index `(companyId, entity, entityId)`. Row Security activé, permissions table et ligne vides pour les clients. L'API serveur utilise sa clé de fonction pour lire/écrire. Si la mutation et le receipt sont inséparables, ils doivent être staged dans la même transaction TablesDB.
 
 ---
 
