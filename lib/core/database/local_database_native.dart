@@ -16,8 +16,13 @@ class LocalDatabase {
   @visibleForTesting
   LocalDatabase.inMemoryForTesting() {
     final opened = sqlite3.openInMemory();
-    _database = opened;
-    _migrate(opened);
+    try {
+      _migrate(opened);
+      _database = opened;
+    } catch (_) {
+      opened.close();
+      rethrow;
+    }
   }
   Database get database =>
       _database ??
@@ -29,8 +34,13 @@ class LocalDatabase {
     await Directory(directory.path).create(recursive: true);
     final file = File('${directory.path}${Platform.pathSeparator}parcoto.db');
     final opened = sqlite3.open(file.path);
-    _database = opened;
-    _migrate(opened);
+    try {
+      _migrate(opened);
+      _database = opened;
+    } catch (_) {
+      opened.close();
+      rethrow;
+    }
   }
 
   void _migrate(Database db) {
