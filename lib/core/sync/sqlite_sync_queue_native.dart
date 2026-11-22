@@ -153,14 +153,25 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
     int limit = 50,
     String? companyId,
   }) async {
+    final now = DateTime.now().toUtc().toIso8601String();
     final rows = companyId == null
         ? _db.select(
-            "SELECT * FROM sync_operations WHERE status IN ('pending','failed','conflict') ORDER BY created_at, rowid LIMIT ?",
-            [limit],
+            """SELECT * FROM sync_operations
+               WHERE status IN ('pending','conflict')
+                  OR (status='failed' AND
+                      (next_attempt_at IS NULL OR next_attempt_at <= ?))
+               ORDER BY created_at, rowid LIMIT ?""",
+            [now, limit],
           )
         : _db.select(
-            "SELECT * FROM sync_operations WHERE status IN ('pending','failed','conflict') AND company_id = ? ORDER BY created_at, rowid LIMIT ?",
-            [companyId, limit],
+            """SELECT * FROM sync_operations
+               WHERE company_id = ? AND (
+                 status IN ('pending','conflict')
+                 OR (status='failed' AND
+                     (next_attempt_at IS NULL OR next_attempt_at <= ?))
+               )
+               ORDER BY created_at, rowid LIMIT ?""",
+            [companyId, now, limit],
           );
     return rows.map(_fromRow).toList(growable: false);
   }
@@ -261,14 +272,36 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
 
   @override
   Future<void> markCompleted(String operationId) async => _db.execute(
-    "UPDATE sync_operations SET status='completed', completed_at=? WHERE id=?",
+    """UPDATE sync_operations
+       SET status='completed',
+           completed_at=?,
+           next_attempt_at=NULL,
+           last_error_code=NULL,
+           last_error_message=NULL
+       WHERE id=?""",
     [DateTime.now().toUtc().toIso8601String(), operationId],
   );
 
   @override
-  Future<void> markFailed(String operationId) async => _db.execute(
-    "UPDATE sync_operations SET status='failed', attempts=attempts+1 WHERE id=?",
-    [operationId],
+  Future<void> markFailed(
+    String operationId, {
+    required String errorCode,
+    required String errorMessage,
+    required DateTime nextAttemptAt,
+  }) async => _db.execute(
+    """UPDATE sync_operations
+       SET status='failed',
+           attempts=attempts+1,
+           next_attempt_at=?,
+           last_error_code=?,
+           last_error_message=?
+       WHERE id=?""",
+    [
+      nextAttemptAt.toUtc().toIso8601String(),
+      errorCode,
+      errorMessage.length > 500 ? errorMessage.substring(0, 500) : errorMessage,
+      operationId,
+    ],
   );
 
   @override
@@ -315,7 +348,7 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
       final row = rows.first;
       _db.execute(
         """UPDATE sync_operations
-           SET status='pending', conflict_reason=NULL, conflicted_at=NULL
+           SET status='pending', conflict_reason=NULL, conflicted_at=NULL, next_attempt_at=NULL, last_error_code=NULL, last_error_message=NULL
            WHERE id=? AND status='conflict'""",
         [operationId],
       );
