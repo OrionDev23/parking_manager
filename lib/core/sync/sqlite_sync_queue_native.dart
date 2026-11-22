@@ -3,10 +3,11 @@ import 'dart:convert';
 import 'package:sqlite3/sqlite3.dart';
 
 import 'sync_operation.dart';
+import 'atomic_sync_queue.dart';
 import '../database/local_database.dart';
 import 'sync_queue.dart';
 
-class SqliteSyncQueue implements SyncQueue {
+class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
   final LocalDatabase localDatabase;
   SqliteSyncQueue(this.localDatabase);
   Database get _db => localDatabase.database;
@@ -42,83 +43,105 @@ class SqliteSyncQueue implements SyncQueue {
 
   @override
   Future<void> enqueue(SyncOperation operation) async {
-    // Only coalesce operations that have not started syncing. Failed
-    // operations are deliberately left untouched because the remote write
-    // may have succeeded before a network error was returned.
     _db.execute('BEGIN IMMEDIATE');
     try {
-      final rows = _db.select(
-        '''SELECT * FROM sync_operations
-           WHERE company_id = ? AND entity = ? AND entity_id = ?
-             AND status = 'pending'
-           ORDER BY created_at DESC LIMIT 1''',
-        [operation.companyId, operation.entity, operation.entityId],
-      );
-
-      if (rows.isNotEmpty) {
-        final previous = _fromRow(rows.first);
-
-        // A local create followed by a local delete never needs to reach
-        // Appwrite, provided the create was still pending.
-        if (previous.type == SyncOperationType.create &&
-            operation.type == SyncOperationType.delete) {
-          _db.execute('DELETE FROM sync_operations WHERE id = ?', [
-            previous.id,
-          ]);
-          _db.execute('COMMIT');
-          return;
-        }
-
-        // Keep create semantics when edits happen before the first sync.
-        // Otherwise the newest operation determines whether this is an
-        // update or a delete. Delete -> recreate is intentionally not merged.
-        final mergedType = previous.type == SyncOperationType.create
-            ? SyncOperationType.create
-            : (previous.type == SyncOperationType.delete
-                  ? null
-                  : operation.type);
-
-        if (mergedType != null) {
-          _db.execute(
-            '''UPDATE sync_operations
-               SET operation = ?, payload = ?, device_id = ?
-               WHERE id = ?''',
-            [
-              _type(mergedType),
-              jsonEncode(operation.payload),
-              operation.deviceId,
-              previous.id,
-            ],
-          );
-          _db.execute('COMMIT');
-          return;
-        }
-      }
-
-      _db.execute(
-        '''INSERT INTO sync_operations
-          (id, company_id, device_id, entity, entity_id, operation,
-           payload, created_at, status, attempts)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-          ON CONFLICT(id) DO NOTHING''',
-        [
-          operation.id,
-          operation.companyId,
-          operation.deviceId,
-          operation.entity,
-          operation.entityId,
-          _type(operation.type),
-          jsonEncode(operation.payload),
-          operation.createdAt.toIso8601String(),
-          operation.status.name,
-          operation.attempts,
-        ],
-      );
+      _enqueueInTransaction(operation);
       _db.execute('COMMIT');
     } catch (_) {
       _db.execute('ROLLBACK');
       rethrow;
     }
+  }
+
+  @override
+  Future<void> enqueueWithLocalMutation(
+    SyncOperation operation, {
+    required void Function() localMutation,
+  }) async {
+    // The vehicle cache write and outbox mutation must share this exact
+    // SQLite transaction. The callback is deliberately synchronous: no
+    // network or other asynchronous work is allowed while the write lock is
+    // held.
+    _db.execute('BEGIN IMMEDIATE');
+    try {
+      _enqueueInTransaction(operation);
+      localMutation();
+      _db.execute('COMMIT');
+    } catch (_) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    }
+  }
+
+  void _enqueueInTransaction(SyncOperation operation) {
+    // Only coalesce operations that have not started syncing. Failed
+    // operations are deliberately left untouched because the remote write
+    // may have succeeded before a network error was returned.
+    final rows = _db.select(
+      '''SELECT * FROM sync_operations
+         WHERE company_id = ? AND entity = ? AND entity_id = ?
+           AND status = 'pending'
+         ORDER BY created_at DESC LIMIT 1''',
+      [operation.companyId, operation.entity, operation.entityId],
+    );
+
+    if (rows.isNotEmpty) {
+      final previous = _fromRow(rows.first);
+
+      // A local create followed by a local delete never needs to reach
+      // Appwrite, provided the create was still pending.
+      if (previous.type == SyncOperationType.create &&
+          operation.type == SyncOperationType.delete) {
+        _db.execute('DELETE FROM sync_operations WHERE id = ?', [
+          previous.id,
+        ]);
+        return;
+      }
+
+      // Keep create semantics when edits happen before the first sync.
+      // Otherwise the newest operation determines whether this is an
+      // update or a delete. Delete -> recreate is intentionally not merged.
+      final mergedType = previous.type == SyncOperationType.create
+          ? SyncOperationType.create
+          : (previous.type == SyncOperationType.delete
+                ? null
+                : operation.type);
+
+      if (mergedType != null) {
+        _db.execute(
+          '''UPDATE sync_operations
+             SET operation = ?, payload = ?, device_id = ?
+             WHERE id = ?''',
+          [
+            _type(mergedType),
+            jsonEncode(operation.payload),
+            operation.deviceId,
+            previous.id,
+          ],
+        );
+        return;
+      }
+    }
+
+    _db.execute(
+      '''INSERT INTO sync_operations
+        (id, company_id, device_id, entity, entity_id, operation,
+         payload, created_at, status, attempts)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO NOTHING''',
+      [
+        operation.id,
+        operation.companyId,
+        operation.deviceId,
+        operation.entity,
+        operation.entityId,
+        _type(operation.type),
+        jsonEncode(operation.payload),
+        operation.createdAt.toIso8601String(),
+        operation.status.name,
+        operation.attempts,
+      ],
+    );
   }
 
   @override
