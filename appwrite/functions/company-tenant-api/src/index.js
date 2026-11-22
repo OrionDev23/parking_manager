@@ -2337,6 +2337,48 @@ async function uploadCustomVehicleImage({ userId, input }) {
     userId,
   });
 }
+function parseExecutionInput(req, log) {
+  const bodyJson = req.bodyJson;
+  if (bodyJson && typeof bodyJson === 'object' && !Array.isArray(bodyJson)) {
+    return bodyJson;
+  }
+
+  // Appwrite's Node runtime exposes bodyText as the decoded raw request body.
+  // Some SDK/runtime combinations leave bodyJson empty when the execution
+  // body is forwarded without the expected content type. Parse the text as a
+  // safe fallback rather than silently turning every request into
+  // "Unknown action".
+  const candidates = [
+    typeof bodyJson === 'string' ? bodyJson : '',
+    typeof req.bodyText === 'string' ? req.bodyText : '',
+    typeof req.body === 'string' ? req.body : '',
+  ];
+  for (const candidate of candidates) {
+    if (!candidate.trim()) continue;
+    try {
+      const parsed = JSON.parse(candidate);
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        log('[tenant-api] Parsed execution input using raw-body JSON fallback.');
+        return parsed;
+      }
+    } catch (_) {
+      // Try the next supported body representation.
+    }
+  }
+
+  const rawText = typeof req.bodyText === 'string' ? req.bodyText : '';
+  log('[tenant-api] Unable to parse execution input: ' + JSON.stringify({
+    method: req.method || null,
+    path: req.path || null,
+    contentType: req.headers?.['content-type'] || null,
+    bodyJsonType: typeof bodyJson,
+    bodyJsonPresent: bodyJson !== undefined && bodyJson !== null,
+    bodyTextLength: rawText.length,
+    bodyTextPresent: rawText.length > 0,
+  }));
+  return {};
+}
+
 export default async (context) => requestContext.run(
   { apiKey: context.req.headers['x-appwrite-key'] },
   async () => {
@@ -2346,8 +2388,15 @@ export default async (context) => requestContext.run(
       return json(res, 500, { ok: false, message: 'Function configuration is incomplete.' });
     }
     const { userId } = await authenticate(req);
-    const input = req.bodyJson || {};
-    const action = input.action;
+    const input = parseExecutionInput(req, log);
+    const action = typeof input.action === 'string' ? input.action.trim() : '';
+    if (!action) {
+      return json(res, 400, {
+        ok: false,
+        code: 'missing_action',
+        message: 'Request body is missing a valid action.',
+      });
+    }
     const now = new Date().toISOString();
 
     if (action === 'platform_resolve') {
