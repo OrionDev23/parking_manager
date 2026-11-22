@@ -58,6 +58,8 @@ Les tests ne sont pas encore exécutés car aucun environnement Flutter/Dart n'e
 - La migration SQLite v12 ajoute les colonnes `payload_version`, `idempotency_key`, `next_attempt_at`, `last_error_code`, `last_error_message` et `completed_at`, avec backfill de l'idempotency key depuis l'ancien `id` et indexes de file/unique.
 - `SyncOperation` transporte maintenant `idempotencyKey` et `payloadVersion` ; les anciennes opérations utilisent leur `id` comme clé stable.
 - Un test vérifie la présence du schéma v12 dans la base SQLite de test.
+- La migration v12 a aussi été simulée isolément avec une ancienne opération `pending` : l'ID, le payload et le statut restent intacts, la clé d'idempotence est backfillée depuis l'ID et les indexes sont créés.
+- Cette simulation SQL ne remplace pas l'exécution du test Dart/Flutter, qui reste à faire sur le poste de développement.
 
 Le correctif couvre pour l'instant les véhicules natifs Windows/Android/iOS. Le Web reste online-only. Les autres repositories local-first n'ont pas encore été migrés vers cette abstraction.
 
