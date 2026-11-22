@@ -225,7 +225,30 @@ Aucun write lors du dry-run. Le rapport contient les IDs et le code d'anomalie, 
 
 ---
 
-## 6. Cas à ne pas automatiser
+## 6. Résultat du dry-run Appwrite (lecture seule, 22/11/2026)
+
+Un premier passage de migration à blanc a été effectué sur toutes les lignes retournées par la table Appwrite `vehicle` dans le projet audité, sans write.
+
+| Contrôle | Résultat |
+|---|---:|
+| Lignes Appwrite `vehicle` retournées | 1 |
+| Lignes avec payload JSON | 1 |
+| Immatriculation présente | 1 |
+| Numéro de châssis présent | 1 |
+| Ancienne marque numérique résolue | 1 |
+| Résolution de `marque = "3"` | `makeId = "renault"` |
+| Groupes de doublons immatriculation normalisée | 0 |
+| Groupes de doublons VIN normalisé | 0 |
+| siteId présent | 0 |
+| Champ revision canonique présent | 0 |
+
+Ce résultat vérifie uniquement le jeu de données Appwrite actuellement accessible à cet instant. Il ne prouve pas que les caches SQLite locaux de tous les postes ne contiennent pas d'autres véhicules ni que toutes les lignes historiques d'autres environnements sont déjà migrées. Les bases SQLite des postes ne sont pas accessibles depuis cette session et doivent faire l'objet d'un export/audit local avant tout backfill.
+
+Aucune ligne n'a été modifiée, aucun quota n'a été touché, aucune marque n'a été réécrite.
+
+---
+
+## 7. Cas à ne pas automatiser
 
 - `matriculeConducteur` sans chauffeur unique dans le même tenant.
 - `emplacement` libre sans site/parking/zone/place identifiée.
@@ -245,7 +268,7 @@ Chaque cas doit rester lisible, être associé à un code `needs_review` et êtr
 
 ---
 
-## 7. Critères d'acceptation
+## 8. Critères d'acceptation
 
 - 100 % des véhicules legacy restent lisibles pendant et après les phases A à D.
 - Aucun ID de véhicule ni companyId n'est modifié.
