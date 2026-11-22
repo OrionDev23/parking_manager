@@ -178,7 +178,12 @@ class AppwriteSyncEngine implements SyncEngine {
         if (operation.status == SyncOperationStatus.conflict) {
           blockedRecords.add(recordKey);
           debugPrint(
-            '[ParcOto Sync] blocked by unresolved conflict: ${operation.entity} id=${operation.entityId}',
+            '[ParcOto Sync] unresolved conflict: '
+            'entity=${operation.entity} type=${operation.type.name} '
+            'entityId=${operation.entityId} operationId=${operation.id} '
+            'attempts=${operation.attempts} '
+            'conflictedAt=${operation.conflictedAt?.toIso8601String() ?? 'unknown'} '
+            'reason=${operation.conflictReason ?? 'not recorded'}',
           );
           continue;
         }
