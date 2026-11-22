@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import '../../core/device/device_identity.dart';
-import '../../core/sync/sync_operation.dart';
 import '../../core/sync/atomic_sync_queue.dart';
+import '../../core/sync/sync_operation.dart';
 import '../../core/tenancy/company_context.dart';
 import '../../domain/entities/vehicle.dart';
 import '../../domain/repositories/repository_exception.dart';
@@ -144,4 +144,5 @@ class VehicleRepositoryImpl implements VehicleRepository {
           jsonDecode(jsonEncode(vehicle.toMap())) as Map<String, dynamic>,
       createdAt: DateTime.now().toUtc(),
     );
-  }}
+  }
+}
