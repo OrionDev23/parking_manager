@@ -214,6 +214,18 @@ void main() {
         nextAttemptAt: now.add(const Duration(minutes: 5)),
       );
 
+      final failedRow = database.database
+          .select(
+            "SELECT * FROM sync_operations WHERE id='device-${value.id}-create'",
+          )
+          .single;
+      expect(failedRow['attempts'], 1);
+      expect(failedRow['last_error_code'], 'temporary_network_error');
+      expect(
+        failedRow['last_error_message'],
+        'Connection temporarily unavailable.',
+      );
+      expect(failedRow['next_attempt_at'], isNotNull);
       expect(await queue.pending(companyId: companyId), isEmpty);
 
       database.database.execute(
