@@ -2,9 +2,10 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 
 import 'sync_operation.dart';
 import 'sync_queue.dart';
+import 'atomic_sync_queue.dart';
 
 /// In-memory queue for Web only. It never persists work while offline.
-class SqliteSyncQueue implements SyncQueue {
+class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
   final List<SyncOperation> _operations = [];
   final Map<String, String> _leases = {};
 
@@ -46,6 +47,18 @@ class SqliteSyncQueue implements SyncQueue {
         item.status == SyncOperationStatus.pending);
     if (index >= 0) _operations.removeAt(index);
     _operations.add(operation);
+  }
+
+  @override
+  Future<void> enqueueWithLocalMutation(
+    SyncOperation operation, {
+    required void Function() localMutation,
+  }) async {
+    // The Web vehicle repository is online-only and does not use the local
+    // outbox. Fail closed if this native-only transaction API is ever called.
+    throw UnsupportedError(
+      'Atomic SQLite mutations are not available on Parcoto Web.',
+    );
   }
 
   @override
