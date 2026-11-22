@@ -1,8 +1,8 @@
 # Parcoto — Contrat de schéma Appwrite des véhicules v1
 
 **Statut :** spécification cible, prête pour revue technique  
-**Référence :** \`docs/vehicle-domain-model-v1.md\`  
-**Base auditée :** \`Parking\` / \`6531ad112080ae3b14a7\`  
+**Référence :** `docs/vehicle-domain-model-v1.md`  
+**Base auditée :** `Parking` / `6531ad112080ae3b14a7`  
 **Périmètre :** véhicule, sites, affectations, télématique smartphone, parking, compteurs, documents, maintenance et coûts.
 
 > Ce fichier est un contrat de schéma, pas un script d'exécution. Il ne faut pas appliquer ses tables en production avant la migration dry-run, la validation des ACL et la revue des clés/index. Les noms de tables proposés sont les IDs TablesDB.
@@ -23,38 +23,38 @@ Sauf indication contraire, chaque table opérationnelle tenant-scoped comporte :
 | createdBy | string | Oui | 36 ; Appwrite user ID ou actor service ID |
 | updatedBy | string | Non | 36 |
 
-Les valeurs d'identité de lignes sont portées par \`$id\` Appwrite (36 caractères maximum) ; ne pas dupliquer un champ \`id\` sauf besoin d'interopérabilité documenté.
+Les valeurs d'identité de lignes sont portées par `$id` Appwrite (36 caractères maximum) ; ne pas dupliquer un champ `id` sauf besoin d'interopérabilité documenté.
 
-Les références (\`vehicleId\`, \`driverId\`, \`siteId\`, etc.) sont des string de 36 caractères, sans relation TablesDB obligatoire dans cette première version. Le service serveur valide leur existence et leur appartenance au même \`companyId\` avant chaque mutation. Cette validation tenant est obligatoire même si l'interface filtre déjà les données.
+Les références (`vehicleId`, `driverId`, `siteId`, etc.) sont des string de 36 caractères, sans relation TablesDB obligatoire dans cette première version. Le service serveur valide leur existence et leur appartenance au même `companyId` avant chaque mutation. Cette validation tenant est obligatoire même si l'interface filtre déjà les données.
 
 Types utilisés :
-- \`string(size)\` pour identifiants, statuts, codes et petites valeurs.
-- \`datetime\` pour instants UTC.
-- \`integer\` pour valeurs entières et compteurs bornés.
-- \`bigint\` pour montant en unités mineures et valeurs de compteur susceptibles de dépasser 32 bits.
-- \`double\` pour coordonnées GNSS, précision, vitesse, dimensions décimales et relevés avec fraction.
-- \`boolean\` pour drapeaux.
-- \`longtext\` uniquement pour JSON documenté, notes ou contenu textuel qui ne sert pas de clé d'index.
+- `string(size)` pour identifiants, statuts, codes et petites valeurs.
+- `datetime` pour instants UTC.
+- `integer` pour valeurs entières et compteurs bornés.
+- `bigint` pour montant en unités mineures et valeurs de compteur susceptibles de dépasser 32 bits.
+- `double` pour coordonnées GNSS, précision, vitesse, dimensions décimales et relevés avec fraction.
+- `boolean` pour drapeaux.
+- `longtext` uniquement pour JSON documenté, notes ou contenu textuel qui ne sert pas de clé d'index.
 
-Ne pas utiliser \`longtext\` comme substitut à une relation ou à un champ recherchable.
+Ne pas utiliser `longtext` comme substitut à une relation ou à un champ recherchable.
 
 ### 1.2 Règles d'identifiants et de normalisation
 
-- \`companyId\` est l'identifiant de l'entreprise, jamais son slug.
-- \`siteId\`, \`vehicleId\`, \`driverId\`, \`trackingDeviceId\` et \`parkingSpaceId\` sont des IDs de lignes, jamais des libellés.
-- Immatriculation : conserver \`registrationNumber\` affichable et \`registrationNormalized\` calculé côté domaine (uppercase, espaces/tirets normalisés, pays pris en compte). Conserver la valeur saisie brute si l'audit métier l'exige.
-- VIN : conserver \`vin\` et \`vinNormalized\` en uppercase sans espaces. Ne pas inventer un VIN lorsque la plaque ou l'OCR ne le fournit pas.
-- Montants : stocker \`amountMinor\` (bigint) + \`currency\` ISO 4217. Ne pas stocker des montants financiers en float.
+- `companyId` est l'identifiant de l'entreprise, jamais son slug.
+- `siteId`, `vehicleId`, `driverId`, `trackingDeviceId` et `parkingSpaceId` sont des IDs de lignes, jamais des libellés.
+- Immatriculation : conserver `registrationNumber` affichable et `registrationNormalized` calculé côté domaine (uppercase, espaces/tirets normalisés, pays pris en compte). Conserver la valeur saisie brute si l'audit métier l'exige.
+- VIN : conserver `vin` et `vinNormalized` en uppercase sans espaces. Ne pas inventer un VIN lorsque la plaque ou l'OCR ne le fournit pas.
+- Montants : stocker `amountMinor` (bigint) + `currency` ISO 4217. Ne pas stocker des montants financiers en float.
 - Latitude/longitude : WGS84 en double. Conserver accuracy et timestamp de mesure.
 - États et catégories : string contrôlé côté domaine/serveur. Les valeurs permises sont versionnées dans le contrat et testées ; éviter une enum Appwrite trop rigide pendant les premiers déploiements/migrations.
 
 ### 1.3 Autorisations
 
 Pour chaque table tenant-scoped :
-- \`rowSecurity=true\`.
-- Aucune permission table-level \`read\`, \`update\` ou \`delete\` globale.
+- `rowSecurity=true`.
+- Aucune permission table-level `read`, `update` ou `delete` globale.
 - Les lignes sont écrites par la Function tenant API avec validation du rôle et de la cohérence des relations.
-- Permission de lecture de ligne : \`read("team:<companyTeamId>")\`.
+- Permission de lecture de ligne : `read("team:<companyTeamId>")`.
 - Permission d'update : admin/manager si l'entité est modifiable.
 - Permission de delete : admin seulement ; les événements, positions et journaux sont append-only et ne sont pas supprimables depuis le client.
 - Le compte Super Admin agit via le contexte de plateforme/supervision déjà prévu par la Function ; il ne reçoit pas de permission globale table.
@@ -66,11 +66,11 @@ Le serveur doit rejeter toute mutation pour laquelle le companyId du corps, le c
 
 ## 2. Tables existantes à conserver / faire évoluer
 
-### 2.1 \`vehicle\` — table actuelle à conserver
+### 2.1 `vehicle` — table actuelle à conserver
 
-ID actuel : \`6531ad22153b2a49ca2c\`  
+ID actuel : `6531ad22153b2a49ca2c`  
 Row Security : activé ; permissions au niveau table : aucune.  
-Index observés : \`companyId_idx\`, \`company_matricule_unique\`, \`dateIndex\`, \`SearchIndex\`. L'index unique historique sur \`numero_serie\` est en échec et ne doit pas être considéré comme une garantie.
+Index observés : `companyId_idx`, `company_matricule_unique`, `dateIndex`, `SearchIndex`. L'index unique historique sur `numero_serie` est en échec et ne doit pas être considéré comme une garantie.
 
 Les colonnes legacy sont conservées pendant la transition. Ajouter progressivement les colonnes canoniques ci-dessous :
 
@@ -83,8 +83,8 @@ Les colonnes legacy sont conservées pendant la transition. Ajouter progressivem
 | registrationKind | string(20) | Non | national, foreign, temporary, none |
 | vin | string(40) | Non | Numéro de châssis/VIN affichable |
 | vinNormalized | string(40) | Non | Valeur normalisée ; null si absent |
-| makeId | string(36) | Non au brouillon | ID stable de \`vehicle_makes\` |
-| modelId | string(36) | Non | ID de \`vehicle_models\` si disponible |
+| makeId | string(36) | Non au brouillon | ID stable de `vehicle_makes` |
+| modelId | string(36) | Non | ID de `vehicle_models` si disponible |
 | modelName | string(100) | Non | Repli pour modèle non catalogué |
 | modelVariant | string(100) | Non | Finition/version commerciale |
 | modelYear | integer | Non | Année-modèle |
@@ -118,36 +118,36 @@ Les colonnes legacy sont conservées pendant la transition. Ajouter progressivem
 | updatedBy | string(36) | Non | Dernier acteur |
 
 **Compatibilité obligatoire :**
-- Garder \`matricule\`, \`martricule_etrang\`, \`numero_serie\`, \`marque\`, \`genre\`, \`type\`, \`energie\`, \`carrosserie\`, \`charge_utile\`, \`poids_total\`, \`place_assises\`, \`puissance\`, \`annee_util\`, \`emplacement\`, \`matriculeConducteur\` et les autres colonnes legacy durant la migration.
-- La colonne \`marque\` a été portée à 64 caractères. Elle est transitoire ; la valeur canonique sera \`makeId\`.
-- La colonne \`matricule\` est encore requise et doit rester renseignée par les anciens clients. Elle ne pourra devenir facultative qu'après migration de toutes les écritures et lecteurs et après une validation sur les actifs sans immatriculation.
-- \`registrationNormalized\` et \`vinNormalized\` sont nuls plutôt que chaînes vides quand absents.
+- Garder `matricule`, `martricule_etrang`, `numero_serie`, `marque`, `genre`, `type`, `energie`, `carrosserie`, `charge_utile`, `poids_total`, `place_assises`, `puissance`, `annee_util`, `emplacement`, `matriculeConducteur` et les autres colonnes legacy durant la migration.
+- La colonne `marque` a été portée à 64 caractères. Elle est transitoire ; la valeur canonique sera `makeId`.
+- La colonne `matricule` est encore requise et doit rester renseignée par les anciens clients. Elle ne pourra devenir facultative qu'après migration de toutes les écritures et lecteurs et après une validation sur les actifs sans immatriculation.
+- `registrationNormalized` et `vinNormalized` sont nuls plutôt que chaînes vides quand absents.
 - Le serveur applique l'unicité tenant de l'immatriculation et du VIN. Créer les index unique composés uniquement après dry-run de doublons et test de valeurs nulles sur un environnement de validation.
 
-### 2.2 \`chauffeur\` — référentiel actuel à conserver
+### 2.2 `chauffeur` — référentiel actuel à conserver
 
-ID actuel : \`6537d87b492c80f255e8\`.  
-Conserver les colonnes legacy. Le champ \`vehicules\` et les immatriculations conducteur ne doivent plus représenter l'affectation courante source de vérité. La source canonique devient \`vehicle_assignments\`. Le payload historique reste lisible pendant la migration.
+ID actuel : `6537d87b492c80f255e8`.  
+Conserver les colonnes legacy. Le champ `vehicules` et les immatriculations conducteur ne doivent plus représenter l'affectation courante source de vérité. La source canonique devient `vehicle_assignments`. Le payload historique reste lisible pendant la migration.
 
 ### 2.3 Catalogue de marques
 
-\`vehicle_makes\` est partagé globalement, sans \`companyId\`, rowSecurity actuellement désactivé avec lecture \`users\`. Garder ce choix pour un référentiel plateforme public en lecture.
+`vehicle_makes` est partagé globalement, sans `companyId`, rowSecurity actuellement désactivé avec lecture `users`. Garder ce choix pour un référentiel plateforme public en lecture.
 
-Un futur \`vehicle_models\` global est proposé :
-- \`$id\` stable, \`makeId\` string(36), \`name\` string(100), \`normalizedName\` string(120), \`aliasesJson\` longtext optionnel, \`generation\` string(80), \`startYear\` integer, \`endYear\` integer, \`isActive\` boolean, \`source\` string(30), \`createdAt\`, \`updatedAt\`.
-- Index non-unique \`makeId_active\` sur (makeId, isActive).
-- Index unique \`make_generation_year\` sur (makeId, normalizedName, generation) uniquement si les variantes sont précisément définies et les doublons audités.
+Un futur `vehicle_models` global est proposé :
+- `$id` stable, `makeId` string(36), `name` string(100), `normalizedName` string(120), `aliasesJson` longtext optionnel, `generation` string(80), `startYear` integer, `endYear` integer, `isActive` boolean, `source` string(30), `createdAt`, `updatedAt`.
+- Index non-unique `makeId_active` sur (makeId, isActive).
+- Index unique `make_generation_year` sur (makeId, normalizedName, generation) uniquement si les variantes sont précisément définies et les doublons audités.
 - Lecture utilisateur, mutations réservées à l'administration plateforme.
 
-Ne pas lancer \`vehicle_models\` tant que la stratégie de génération/variant et la qualité des 211 marques ne sont pas validées.
+Ne pas lancer `vehicle_models` tant que la stratégie de génération/variant et la qualité des 211 marques ne sont pas validées.
 
 ---
 
 ## 3. Tables opérationnelles nouvelles
 
-Toutes les tables ci-dessous sont tenant-scoped, sauf \`vehicle_models\`. Toutes utilisent les colonnes communes définies en §1.1. Pour les champs non mentionnés, ne pas les ajouter « au cas où ».
+Toutes les tables ci-dessous sont tenant-scoped, sauf `vehicle_models`. Toutes utilisent les colonnes communes définies en §1.1. Pour les champs non mentionnés, ne pas les ajouter « au cas où ».
 
-### 3.1 \`sites\`
+### 3.1 `sites`
 
 Un site est une implantation d'entreprise ; il n'est ni un parking ni une place.
 
@@ -166,7 +166,7 @@ Un site est une implantation d'entreprise ; il n'est ni un parking ni une place.
 
 Indexes : unique (companyId, code), key (companyId, status), key (companyId, name).
 
-### 3.2 \`vehicle_assignments\`
+### 3.2 `vehicle_assignments`
 
 Une affectation est une période historisée. Un changement termine l'affectation active précédente puis crée un nouvel enregistrement.
 
@@ -189,7 +189,7 @@ Indexes : key (companyId, vehicleId, status), key (companyId, driverId, status),
 
 Contrainte active : une seule affectation principale active par véhicule. TablesDB ne fournit pas ici un index partiel garanti ; effectuer le contrôle dans une mutation serveur transactionnelle et traiter les conflits concurrents. Les affectations temporaires/missions doivent utiliser une politique explicite, pas contourner le contrôle.
 
-### 3.3 \`tracking_devices\`
+### 3.3 `tracking_devices`
 
 Un téléphone est d'abord un appareil utilisateur/conducteur. Il n'est pas considéré comme physiquement attaché à un véhicule.
 
@@ -215,7 +215,7 @@ Indexes : unique (companyId, appInstanceId), key (companyId, driverId, trackingS
 
 Ne pas collecter IMEI, IMSI, contacts, identifiants publicitaires ou autres identifiants matériels superflus.
 
-### 3.4 \`tracking_sessions\`
+### 3.4 `tracking_sessions`
 
 La session représente une période de suivi autorisée et annoncée.
 
@@ -238,7 +238,7 @@ Indexes : key (companyId, vehicleId, status), key (companyId, driverId, startedA
 
 La session ne peut démarrer que si l'utilisateur a été informé, que les permissions OS nécessaires sont actives et que le rôle/finalité le permettent. La fin de mission/service arrête le suivi. Pas de suivi caché ou permanent par défaut.
 
-### 3.5 \`vehicle_location_fixes\`
+### 3.5 `vehicle_location_fixes`
 
 Table potentiellement volumineuse. Append-only ; aucune modification de coordonnées par un client.
 
@@ -264,7 +264,7 @@ Indexes : unique (companyId, fixId), key (companyId, vehicleId, observedAt), key
 
 Prévoir un partitionnement/archivage ou une stratégie de purge adaptée à la volumétrie. Ne pas créer d'index de recherche fulltext sur les coordonnées. Les lots mobiles utilisent un endpoint batch, valident chaque fix et dédupliquent par fixId.
 
-### 3.6 \`parking_lots\`
+### 3.6 `parking_lots`
 
 | Clé | Type | Requis | Description |
 |---|---|---:|---|
@@ -280,7 +280,7 @@ Prévoir un partitionnement/archivage ou une stratégie de purge adaptée à la 
 
 Indexes : unique (companyId, code), key (companyId, siteId, status).
 
-### 3.7 \`parking_zones\`
+### 3.7 `parking_zones`
 
 | Clé | Type | Requis | Description |
 |---|---|---:|---|
@@ -293,7 +293,7 @@ Indexes : unique (companyId, code), key (companyId, siteId, status).
 
 Indexes : unique (companyId, parkingLotId, code), key (companyId, parkingLotId, status).
 
-### 3.8 \`parking_spaces\`
+### 3.8 `parking_spaces`
 
 | Clé | Type | Requis | Description |
 |---|---|---:|---|
@@ -309,7 +309,7 @@ Indexes : unique (companyId, parkingLotId, code), key (companyId, parkingLotId, 
 
 Indexes : unique (companyId, parkingZoneId, code), key (companyId, parkingZoneId, status).
 
-### 3.9 \`vehicle_parking_assignments\`
+### 3.9 `vehicle_parking_assignments`
 
 | Clé | Type | Requis | Description |
 |---|---|---:|---|
@@ -326,7 +326,7 @@ Indexes : key (companyId, vehicleId, status), key (companyId, parkingSpaceId, st
 
 Contrôles transactionnels : une place ne peut avoir deux affectations actives incompatibles ; un véhicule ne peut avoir deux places principales actives. Vérifier la capacité/compatibilité du type de véhicule. Le GPS ne détermine pas automatiquement une place exacte.
 
-### 3.10 \`vehicle_meter_readings\`
+### 3.10 `vehicle_meter_readings`
 
 | Clé | Type | Requis | Description |
 |---|---|---:|---|
@@ -346,7 +346,7 @@ Indexes : key (companyId, vehicleId, readingType, measuredAt), key (companyId, v
 
 Le dernier relevé accepté est une projection affichée. Un GPS estimé ne remplace pas automatiquement un compteur manuel/OBD vérifié. Rejeter ou signaler les valeurs qui régressent sans justification.
 
-### 3.11 \`vehicle_documents\`
+### 3.11 `vehicle_documents`
 
 | Clé | Type | Requis | Description |
 |---|---|---:|---|
@@ -368,7 +368,7 @@ Indexes : key (companyId, vehicleId, documentType), key (companyId, expiresAt, s
 
 Les fichiers restent dans un bucket privé ; la table ne contient pas de URL publique permanente. Vérifier l'ACL du fichier au même niveau que l'ACL de la ligne.
 
-### 3.12 \`vehicle_media\`
+### 3.12 `vehicle_media`
 
 | Clé | Type | Requis | Description |
 |---|---|---:|---|
@@ -386,9 +386,9 @@ Les fichiers restent dans un bucket privé ; la table ne contient pas de URL pub
 
 Indexes : key (companyId, vehicleId, mediaType, sortOrder).
 
-La photo principale est référencée via vehicles.primaryMediaId. Vérifier côté serveur que le mediaId appartient au même véhicule/tenant. Éviter le booléen \`isPrimary\` dupliqué sans contrainte d'unicité.
+La photo principale est référencée via vehicles.primaryMediaId. Vérifier côté serveur que le mediaId appartient au même véhicule/tenant. Éviter le booléen `isPrimary` dupliqué sans contrainte d'unicité.
 
-### 3.13 \`vehicle_maintenance_plans\`
+### 3.13 `vehicle_maintenance_plans`
 
 | Clé | Type | Requis | Description |
 |---|---|---:|---|
@@ -408,7 +408,7 @@ La photo principale est référencée via vehicles.primaryMediaId. Vérifier cô
 
 Indexes : key (companyId, vehicleId, status), key (companyId, nextDueAt, status).
 
-### 3.14 \`maintenance_work_orders\`
+### 3.14 `maintenance_work_orders`
 
 | Clé | Type | Requis | Description |
 |---|---|---:|---|
@@ -431,7 +431,7 @@ Indexes : key (companyId, vehicleId, status), key (companyId, nextDueAt, status)
 
 Indexes : key (companyId, vehicleId, status), key (companyId, scheduledAt, status), key (companyId, reference).
 
-### 3.15 \`vehicle_expenses\`
+### 3.15 `vehicle_expenses`
 
 | Clé | Type | Requis | Description |
 |---|---|---:|---|
@@ -450,7 +450,7 @@ Indexes : key (companyId, vehicleId, occurredAt), key (companyId, expenseType, o
 
 Les achats de pièces/consommables provenant du module Stock doivent créer une référence vers leur transaction source, pas dupliquer la quantité de stock dans vehicle_expenses.
 
-### 3.16 \`vehicle_events\`
+### 3.16 `vehicle_events`
 
 Journal append-only de l'historique métier.
 
@@ -514,9 +514,9 @@ Les indexes sont créés après contrôle de doublons et de la capacité de l'in
 
 ### 5.1 Mutation explicitement autorisée
 
-Ne jamais exposer un endpoint générique où le client peut choisir librement \`tableId\`, \`column\` ou \`permissions\`.
+Ne jamais exposer un endpoint générique où le client peut choisir librement `tableId`, `column` ou `permissions`.
 
-La Function \`company-tenant-api\` doit avoir une registry serveur explicite de ressources et d'actions. Chaque handler déclare :
+La Function `company-tenant-api` doit avoir une registry serveur explicite de ressources et d'actions. Chaque handler déclare :
 - table ID autorisé ;
 - champs inscriptibles ;
 - champs calculés/interdits au client ;
@@ -555,7 +555,7 @@ Les validations de parent/tenant et les droits sont exécutés avant staging. Le
 
 - Le serveur vérifie les invariants dans la transaction ; une lecture UI préalable ne suffit pas.
 - Réserver les codes internes, immatriculations et places avec des indexes si possible et une validation transactionnelle dans tous les cas.
-- Rendre toutes les créations idempotentes : rejouer un même \`operationId\`/rowId doit retourner l'état déjà créé sans consommer à nouveau un quota ni dupliquer un événement.
+- Rendre toutes les créations idempotentes : rejouer un même `operationId`/rowId doit retourner l'état déjà créé sans consommer à nouveau un quota ni dupliquer un événement.
 - Les créations enfants vérifient que le parent existe dans le même tenant.
 - Les mutations append-only ne sont pas modifiées après leur acceptation ; corriger par un nouvel événement.
 
