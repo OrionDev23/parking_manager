@@ -51,20 +51,20 @@ Le défaut d'atomicité de `VehicleRepositoryImpl` a été corrigé sur la branc
 - mutation véhicule + opération outbox dans une transaction SQLite unique ;
 - `BEGIN IMMEDIATE` et rollback conjoint ;
 - méthodes locales synchrones dédiées à une transaction déjà ouverte ;
-- test de commit, rollback, coalescence create/update et create/delete ajouté.
+- tests de commit, rollback, coalescence create/update et create/delete ajoutés pour les véhicules et les chauffeurs ;
 
-Les tests ne sont pas encore exécutés car aucun environnement Flutter/Dart n'est disponible dans cette session. Il faut lancer `flutter analyze` et `flutter test test/data/repositories/vehicle_atomic_mutation_test.dart` sur le poste de développement avant de considérer le correctif validé.
+Une exécution GitHub Actions sur le commit `a29e0d9` a déjà validé `flutter test` et `flutter analyze` pour la première version du correctif véhicule. Les tests chauffeurs ont été ajoutés après ce commit : ils doivent être validés par la prochaine exécution CI. Le build Web et la vérification Node de cette exécution initiale sont également à confirmer.
 
 - La migration SQLite v12 ajoute les colonnes `payload_version`, `idempotency_key`, `next_attempt_at`, `last_error_code`, `last_error_message` et `completed_at`, avec backfill de l'idempotency key depuis l'ancien `id` et indexes de file/unique.
 - `SyncOperation` transporte maintenant `idempotencyKey` et `payloadVersion` ; les anciennes opérations utilisent leur `id` comme clé stable.
-- Un test vérifie la présence du schéma v12 dans la base SQLite de test.
+- Des tests vérifient la présence du schéma v12 dans la base SQLite de test et l'atomicité des opérations véhicules/chauffeurs.
 - Un test de mise à niveau depuis une structure v11 vérifie la conservation d'une opération pending (ID, payload, statut, tentatives) et son backfill d'idempotency key.
 - Le retry du moteur utilise maintenant `next_attempt_at`, un backoff exponentiel avec jitter et un plafond d'une heure ; les messages persistés sont génériques et ne recopient pas le contenu brut des exceptions.
 - Un test vérifie qu'une opération en échec reste hors de la file avant son échéance et redevient éligible une fois l'échéance passée.
 - La migration v12 a aussi été simulée isolément avec une ancienne opération `pending` : l'ID, le payload et le statut restent intacts, la clé d'idempotence est backfillée depuis l'ID et les indexes sont créés.
 - Cette simulation SQL ne remplace pas l'exécution du test Dart/Flutter, qui reste à faire sur le poste de développement.
 
-Le correctif couvre pour l'instant les véhicules natifs Windows/Android/iOS. Le Web reste online-only. Les autres repositories local-first n'ont pas encore été migrés vers cette abstraction.
+Le correctif couvre maintenant les véhicules et les chauffeurs natifs Windows/Android/iOS. Le Web reste online-only. Les autres repositories local-first n'ont pas encore été migrés vers cette abstraction.
 
 
 Autres règles formalisées :
