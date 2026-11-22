@@ -65,6 +65,9 @@ class TenantResourceApi {
     final execution = await Functions(client).createExecution(
       functionId: functionId,
       body: jsonEncode(payload),
+      // This API returns a structured success/error body that the outbox
+      // must inspect before acknowledging the local operation.
+      xasync: false,
     );
 
     Map<String, dynamic> response = {};
