@@ -127,7 +127,7 @@ void main() {
         expect(row['idempotency_key'], 'legacy-operation-001');
         expect(row['payload_version'], 1);
       } finally {
-        legacyDatabase.dispose();
+        legacyDatabase.close();
       }
     });
 
