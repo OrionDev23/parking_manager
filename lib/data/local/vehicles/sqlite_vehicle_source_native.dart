@@ -125,3 +125,4 @@ class SqliteVehicleSource implements LocalVehicleSource {
       companyId,
     ]);
   }
+}
