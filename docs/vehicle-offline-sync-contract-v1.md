@@ -24,7 +24,24 @@ Tables actuelles :
 
 Migrations versionnées 1 à 11 déjà présentes. Toute nouvelle migration doit commencer à **version 12**. Ne jamais modifier rétroactivement une migration déjà exécutée sur les postes utilisateurs.
 
-### 1.2 Écriture véhicule actuelle : défaut à traiter
+### 1.2 Écriture véhicule actuelle : défaut identifié et correctif implémenté
+
+L'audit initial a confirmé que `VehicleRepositoryImpl.createVehicle()` exécutait l'ajout dans l'outbox puis l'upsert local via deux opérations SQLite séparées. Cette séquence pouvait diverger si le deuxième write échouait ou si le processus s'arrêtait entre les deux.
+
+**Correctif maintenant implémenté sur `refactor/foundation-v1` :**
+- ajout du contrat `AtomicSyncQueue` ;
+- méthode native `enqueueWithLocalMutation()` qui ouvre `BEGIN IMMEDIATE`, applique la coalescence/écriture outbox, exécute une mutation locale synchrone sur la même connexion, puis commit ;
+- rollback commun si la mutation locale ou l'écriture outbox échoue ;
+- repository véhicule create/update/delete branché sur ce chemin ;
+- source SQLite véhicule disposant de méthodes synchrones dédiées aux mutations dans une transaction existante ;
+- l'implémentation Web échoue explicitement si cette API native est appelée, car le Web reste online-only et ne doit pas simuler une atomicité locale inexistante.
+
+Les objets `SqliteVehicleSource` et `SqliteSyncQueue` sont construits avec la même instance `LocalDatabase` dans `VehicleServices.create()`. C'est cette identité de connexion qui rend la transaction réellement commune.
+
+Des tests de régression ont été ajoutés pour commit conjoint, rollback conjoint, coalescence create → update et annulation create → delete. **Ils sont écrits mais n'ont pas encore été exécutés dans un environnement Flutter/Dart** ; leur réussite ne doit pas être présumée avant exécution locale/CI.
+
+Le correctif ne migre pas encore les autres repositories (chauffeurs, pièces, fournisseurs). Le contrat atomique devra être appliqué à chaque domaine local-first avant d'étendre massivement le modèle.
+
 
 Le chemin actuel de `VehicleRepositoryImpl.createVehicle()` exécute :
 
