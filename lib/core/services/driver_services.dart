@@ -76,7 +76,7 @@ class DriverServices {
           ? _OnlineDriverRepository(remoteSource)
           : DriverRepositoryImpl(
               local: localSource,
-              syncQueue: syncQueue,
+              atomicSyncQueue: syncQueue,
               deviceIdentity: deviceIdentity,
               companyContext: CompanyContext(companyId: companyId, teamId: teamId),
               remote: remoteSource,
