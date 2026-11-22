@@ -12,5 +12,9 @@ class SqliteVehicleSource implements LocalVehicleSource {
   @override
   Future<void> upsertVehicle(Vehicle vehicle) async {}
   @override
+  void upsertVehicleInTransaction(Vehicle vehicle) {}
+  @override
   Future<void> deleteVehicle(String id) async {}
+  @override
+  void deleteVehicleInTransaction(String id) {}
 }
