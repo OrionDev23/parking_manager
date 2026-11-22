@@ -44,7 +44,18 @@ La table Appwrite `vehicle` a retourné une ligne au moment du passage :
 
 Ce dry-run ne couvre pas les bases SQLite des postes utilisateurs. Leur export local reste nécessaire avant tout backfill global.
 
-### SQLite / synchronisation — constat bloquant identifié
+### SQLite / synchronisation — premier correctif implémenté, validation en attente
+
+Le défaut d'atomicité de `VehicleRepositoryImpl` a été corrigé sur la branche de travail :
+- mutation véhicule + opération outbox dans une transaction SQLite unique ;
+- `BEGIN IMMEDIATE` et rollback conjoint ;
+- méthodes locales synchrones dédiées à une transaction déjà ouverte ;
+- test de commit, rollback, coalescence create/update et create/delete ajouté.
+
+Les tests ne sont pas encore exécutés car aucun environnement Flutter/Dart n'est disponible dans cette session. Il faut lancer `flutter analyze` et `flutter test test/data/repositories/vehicle_atomic_mutation_test.dart` sur le poste de développement avant de considérer le correctif validé.
+
+Le correctif couvre pour l'instant les véhicules natifs Windows/Android/iOS. Le Web reste online-only. Les autres repositories local-first n'ont pas encore été migrés vers cette abstraction.
+
 
 Le code actuel de `VehicleRepositoryImpl` enregistre la mutation dans l'outbox, puis écrit la fiche locale dans un second appel. Ces opérations ne partagent pas de transaction SQLite. Le contrat v1 impose un write atomique fiche + outbox avant de continuer les évolutions du modèle.
 
