@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import '../../core/device/device_identity.dart';
 import '../../core/sync/sync_operation.dart';
-import '../../core/sync/sync_queue.dart';
+import '../../core/sync/atomic_sync_queue.dart';
 import '../../core/tenancy/company_context.dart';
 import '../../domain/entities/vehicle.dart';
 import '../../domain/repositories/repository_exception.dart';
@@ -13,13 +13,13 @@ import '../remote/vehicles/remote_vehicle_source.dart';
 class VehicleRepositoryImpl implements VehicleRepository {
   final LocalVehicleSource local;
   final RemoteVehicleSource? remote;
-  final SyncQueue syncQueue;
+  final AtomicSyncQueue atomicSyncQueue;
   final DeviceIdentity deviceIdentity;
   final CompanyContext companyContext;
 
   VehicleRepositoryImpl({
     required this.local,
-    required this.syncQueue,
+    required this.atomicSyncQueue,
     required this.deviceIdentity,
     required this.companyContext,
     this.remote,
@@ -79,16 +79,20 @@ class VehicleRepositoryImpl implements VehicleRepository {
   @override
   Future<Vehicle> createVehicle(Vehicle vehicle) async {
     _checkCompany(vehicle);
-    await _enqueue(vehicle, SyncOperationType.create);
-    await local.upsertVehicle(vehicle);
+    await atomicSyncQueue.enqueueWithLocalMutation(
+      await _operation(vehicle, SyncOperationType.create),
+      localMutation: () => local.upsertVehicleInTransaction(vehicle),
+    );
     return vehicle;
   }
 
   @override
   Future<Vehicle> updateVehicle(Vehicle vehicle) async {
     _checkCompany(vehicle);
-    await _enqueue(vehicle, SyncOperationType.update);
-    await local.upsertVehicle(vehicle);
+    await atomicSyncQueue.enqueueWithLocalMutation(
+      await _operation(vehicle, SyncOperationType.update),
+      localMutation: () => local.upsertVehicleInTransaction(vehicle),
+    );
     return vehicle;
   }
 
@@ -98,12 +102,12 @@ class VehicleRepositoryImpl implements VehicleRepository {
     if (existing == null) return;
     _checkCompany(existing);
 
-    // Queue the tombstone before deleting the local row. If queue persistence
-    // fails, retain the record rather than silently losing the pending change.
     final deviceId = await deviceIdentity.getDeviceId();
-    await syncQueue.enqueue(
+    final operationId =
+        '${deviceId}_${id}_${DateTime.now().microsecondsSinceEpoch}';
+    await atomicSyncQueue.enqueueWithLocalMutation(
       SyncOperation(
-        id: '${deviceId}_${id}_${DateTime.now().microsecondsSinceEpoch}',
+        id: operationId,
         companyId: companyContext.companyId,
         deviceId: deviceId,
         entity: 'vehicle',
@@ -112,8 +116,8 @@ class VehicleRepositoryImpl implements VehicleRepository {
         payload: {'id': id, 'companyId': existing.companyId},
         createdAt: DateTime.now().toUtc(),
       ),
+      localMutation: () => local.deleteVehicleInTransaction(id),
     );
-    await local.deleteVehicle(id);
   }
 
   void _checkCompany(Vehicle vehicle) {
@@ -124,20 +128,20 @@ class VehicleRepositoryImpl implements VehicleRepository {
     }
   }
 
-  Future<void> _enqueue(Vehicle vehicle, SyncOperationType type) async {
+  Future<SyncOperation> _operation(
+    Vehicle vehicle,
+    SyncOperationType type,
+  ) async {
     final deviceId = await deviceIdentity.getDeviceId();
-    await syncQueue.enqueue(
-      SyncOperation(
-        id: '${deviceId}_${vehicle.id}_${DateTime.now().microsecondsSinceEpoch}',
-        companyId: vehicle.companyId,
-        deviceId: deviceId,
-        entity: 'vehicle',
-        entityId: vehicle.id,
-        type: type,
-        payload:
-            jsonDecode(jsonEncode(vehicle.toMap())) as Map<String, dynamic>,
-        createdAt: DateTime.now().toUtc(),
-      ),
+    return SyncOperation(
+      id: '${deviceId}_${vehicle.id}_${DateTime.now().microsecondsSinceEpoch}',
+      companyId: vehicle.companyId,
+      deviceId: deviceId,
+      entity: 'vehicle',
+      entityId: vehicle.id,
+      type: type,
+      payload:
+          jsonDecode(jsonEncode(vehicle.toMap())) as Map<String, dynamic>,
+      createdAt: DateTime.now().toUtc(),
     );
-  }
-}
+  }}
