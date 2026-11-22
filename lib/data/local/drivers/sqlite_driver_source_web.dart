@@ -17,5 +17,9 @@ class SqliteDriverSource implements LocalDriverSource {
   @override
   Future<void> upsertDriver(Driver driver) async {}
   @override
+  void upsertDriverInTransaction(Driver driver) {}
+  @override
   Future<void> deleteDriver(String id) async {}
+  @override
+  void deleteDriverInTransaction(String id) {}
 }
