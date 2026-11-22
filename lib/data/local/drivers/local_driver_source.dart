@@ -9,5 +9,7 @@ abstract class LocalDriverSource {
   });
   Future<Driver?> getDriver(String id);
   Future<void> upsertDriver(Driver driver);
+  void upsertDriverInTransaction(Driver driver);
   Future<void> deleteDriver(String id);
+  void deleteDriverInTransaction(String id);
 }
