@@ -293,25 +293,29 @@ Future<void> _initializeBackgroundData(String companyId) async {
     }
   }
 
-  await Future.wait([
-    runMigration('vehicles', () async {
-      await vehicleServices.migrateRemoteCache();
-    }),
-    runMigration('drivers', () async {
-      await driverServices.migrateRemoteCache();
-    }),
-    runMigration('legacy_modules', () async {
-      final counts = await LegacyModuleCacheMigration(
-        localDatabase: localDatabase,
-        companyId: companyId,
-      ).migrate();
-      if (counts.isEmpty || counts.values.any((count) => count < 0)) {
-        throw StateError('One or more legacy module cache tables failed.');
-      }
-    }),
-  ]);
-
-  await syncEngine.start();
+  try {
+    await Future.wait([
+      runMigration('vehicles', () async {
+        await vehicleServices.migrateRemoteCache();
+      }),
+      runMigration('drivers', () async {
+        await driverServices.migrateRemoteCache();
+      }),
+      runMigration('legacy_modules', () async {
+        final counts = await LegacyModuleCacheMigration(
+          localDatabase: localDatabase,
+          companyId: companyId,
+        ).migrate();
+        if (counts.isEmpty || counts.values.any((count) => count < 0)) {
+          throw StateError('One or more legacy module cache tables failed.');
+        }
+      }),
+    ]);
+  } finally {
+    // Cache backfills are not allowed to block the durable outbox. Even when
+    // a legacy table cannot be read, queued vehicle/driver writes must sync.
+    await syncEngine.start();
+  }
 }
 
 Future<void> launchApp() async {
