@@ -12,7 +12,10 @@ class AppwriteBackend implements Backend {
   late final TablesDB database;
   late final Storage storage;
 
-  AppwriteBackend(this.config);
+  final Client? _providedClient;
+
+  AppwriteBackend(this.config, {Client? client})
+    : _providedClient = client;
 
   @override
   Future<void> initialize() async {
@@ -25,9 +28,13 @@ class AppwriteBackend implements Backend {
       throw StateError('Appwrite project id is required.');
     }
 
-    client = Client()
-      ..setEndpoint(endpoint)
-      ..setProject(projectId);
+    // Reuse the authenticated client when the application already has a
+    // signed-in Appwrite session. Creating a second client here silently
+    // drops the session cookie and makes tenant-scoped reads fail.
+    client = _providedClient ??
+        (Client()
+          ..setEndpoint(endpoint)
+          ..setProject(projectId));
     account = Account(client);
     database = TablesDB(client);
     storage = Storage(client);
