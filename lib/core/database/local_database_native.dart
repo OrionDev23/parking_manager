@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:sqlite3/sqlite3.dart';
 
 class LocalDatabase {
@@ -11,6 +12,13 @@ class LocalDatabase {
   factory LocalDatabase() => instance;
 
   LocalDatabase._();
+
+  @visibleForTesting
+  LocalDatabase.inMemoryForTesting() {
+    final opened = sqlite3.openInMemory();
+    _database = opened;
+    _migrate(opened);
+  }
   Database get database =>
       _database ??
       (throw StateError('LocalDatabase has not been initialized.'));
