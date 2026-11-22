@@ -71,6 +71,8 @@ void main() {
       expect(pending, hasLength(1));
       expect(pending.single.entityId, value.id);
       expect(pending.single.type, SyncOperationType.create);
+      expect(pending.single.idempotencyKey, pending.single.id);
+      expect(pending.single.payloadVersion, 1);
     });
 
     test('rolls back both writes when the local mutation fails', () async {
