@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import '../../core/device/device_identity.dart';
+import '../../core/sync/atomic_sync_queue.dart';
 import '../../core/sync/sync_operation.dart';
-import '../../core/sync/sync_queue.dart';
 import '../../core/tenancy/company_context.dart';
 import '../../domain/entities/driver.dart';
 import '../../domain/repositories/driver_repository.dart';
@@ -13,13 +13,13 @@ import '../remote/drivers/remote_driver_source.dart';
 class DriverRepositoryImpl implements DriverRepository {
   final LocalDriverSource local;
   final RemoteDriverSource? remote;
-  final SyncQueue syncQueue;
+  final AtomicSyncQueue atomicSyncQueue;
   final DeviceIdentity deviceIdentity;
   final CompanyContext companyContext;
 
   DriverRepositoryImpl({
     required this.local,
-    required this.syncQueue,
+    required this.atomicSyncQueue,
     required this.deviceIdentity,
     required this.companyContext,
     this.remote,
@@ -47,10 +47,13 @@ class DriverRepositoryImpl implements DriverRepository {
       offset: offset,
       includeArchived: includeArchived,
     );
-    for (final driver in remoteDrivers) {
+    final safeDrivers = remoteDrivers
+        .where((driver) => driver.companyId == companyContext.companyId)
+        .toList(growable: false);
+    for (final driver in safeDrivers) {
       await local.upsertDriver(driver);
     }
-    return remoteDrivers;
+    return safeDrivers;
   }
 
   @override
@@ -59,16 +62,22 @@ class DriverRepositoryImpl implements DriverRepository {
   @override
   Future<Driver> createDriver(Driver driver) async {
     _checkCompany(driver);
-    await _enqueue(driver, SyncOperationType.create);
-    await local.upsertDriver(driver);
+    final operation = await _operation(driver, SyncOperationType.create);
+    await atomicSyncQueue.enqueueWithLocalMutation(
+      operation,
+      localMutation: () => local.upsertDriverInTransaction(driver),
+    );
     return driver;
   }
 
   @override
   Future<Driver> updateDriver(Driver driver) async {
     _checkCompany(driver);
-    await _enqueue(driver, SyncOperationType.update);
-    await local.upsertDriver(driver);
+    final operation = await _operation(driver, SyncOperationType.update);
+    await atomicSyncQueue.enqueueWithLocalMutation(
+      operation,
+      localMutation: () => local.upsertDriverInTransaction(driver),
+    );
     return driver;
   }
 
@@ -78,7 +87,7 @@ class DriverRepositoryImpl implements DriverRepository {
     if (existing == null) return;
     _checkCompany(existing);
     final deviceId = await deviceIdentity.getDeviceId();
-    await syncQueue.enqueue(
+    await atomicSyncQueue.enqueueWithLocalMutation(
       SyncOperation(
         id: '${deviceId}_${id}_${DateTime.now().microsecondsSinceEpoch}',
         companyId: companyContext.companyId,
@@ -89,8 +98,8 @@ class DriverRepositoryImpl implements DriverRepository {
         payload: {'id': id, 'companyId': existing.companyId},
         createdAt: DateTime.now().toUtc(),
       ),
+      localMutation: () => local.deleteDriverInTransaction(id),
     );
-    await local.deleteDriver(id);
   }
 
   void _checkCompany(Driver driver) {
@@ -101,19 +110,20 @@ class DriverRepositoryImpl implements DriverRepository {
     }
   }
 
-  Future<void> _enqueue(Driver driver, SyncOperationType type) async {
+  Future<SyncOperation> _operation(
+    Driver driver,
+    SyncOperationType type,
+  ) async {
     final deviceId = await deviceIdentity.getDeviceId();
-    await syncQueue.enqueue(
-      SyncOperation(
-        id: '${deviceId}_${driver.id}_${DateTime.now().microsecondsSinceEpoch}',
-        companyId: driver.companyId,
-        deviceId: deviceId,
-        entity: 'driver',
-        entityId: driver.id,
-        type: type,
-        payload: jsonDecode(jsonEncode(driver.toMap())) as Map<String, dynamic>,
-        createdAt: DateTime.now().toUtc(),
-      ),
+    return SyncOperation(
+      id: '${deviceId}_${driver.id}_${DateTime.now().microsecondsSinceEpoch}',
+      companyId: driver.companyId,
+      deviceId: deviceId,
+      entity: 'driver',
+      entityId: driver.id,
+      type: type,
+      payload: jsonDecode(jsonEncode(driver.toMap())) as Map<String, dynamic>,
+      createdAt: DateTime.now().toUtc(),
     );
   }
 }
