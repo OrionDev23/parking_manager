@@ -97,7 +97,17 @@ Les significations de `decision`, `service`, `etat`, `etatactuel`, `ownership`, 
 - L'article 44 de la loi 18-07 encadre le transfert international de données. Le endpoint Appwrite configuré en région `fra` impose une revue du transfert pour les données personnelles existantes, pas uniquement pour le GPS.
 - Aucun tracking de conducteur n'est activé dans cette phase.
 
-### Gate D — staging technique
+### Gate D — environnement Appwrite de validation
+
+- Le projet actuellement connecté est `essais`, nommé **Parcoto**, statut actif, région `fra`.
+- Le projet ne déclare aucun environnement Appwrite isolé (`environments: []`) ; la base `Parking` inspectée est la base active, pas un staging démontré.
+- Créer ou désigner un projet Appwrite de staging séparé, avec sa propre base TablesDB, son propre endpoint/configuration et ses équipes de test.
+- Ne pas créer `sites`, `vehicle_assignments` ou les autres nouvelles tables dans le projet actif pour simuler un staging.
+- Tester Row Security, ACL et accès direct hors UI entre deux entreprises dans le projet de staging.
+- Tester quota, transactions, receipts, retry après ACK perdu et réconciliation.
+- Tester migrations SQLite depuis le schéma v11.
+- Exécuter Flutter analyze, tests d'intégration et build Web sur l'environnement de validation.
+
 - Créer les tables et indexes dans un environnement de validation isolé.
 - Tester Row Security, ACL et accès direct hors UI entre deux entreprises.
 - Tester quota, transactions, receipts, retry après ACK perdu et réconciliation.
