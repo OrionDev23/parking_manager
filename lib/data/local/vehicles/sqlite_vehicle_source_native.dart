@@ -74,6 +74,11 @@ class SqliteVehicleSource implements LocalVehicleSource {
 
   @override
   Future<void> upsertVehicle(Vehicle vehicle) async {
+    upsertVehicleInTransaction(vehicle);
+  }
+
+  @override
+  void upsertVehicleInTransaction(Vehicle vehicle) {
     if (vehicle.companyId != companyId) {
       throw StateError('Vehicle company does not match the local company.');
     }
@@ -110,9 +115,13 @@ class SqliteVehicleSource implements LocalVehicleSource {
 
   @override
   Future<void> deleteVehicle(String id) async {
+    deleteVehicleInTransaction(id);
+  }
+
+  @override
+  void deleteVehicleInTransaction(String id) {
     _db.execute('DELETE FROM vehicles WHERE id = ? AND company_id = ?', [
       id,
       companyId,
     ]);
   }
-}
