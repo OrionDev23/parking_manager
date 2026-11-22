@@ -533,6 +533,8 @@ Les indexes sont créés après contrôle de doublons et de la capacité de l'in
 | maintenance_work_orders | vehicle_status | key | companyId, vehicleId, status |
 | vehicle_expenses | vehicle_time | key | companyId, vehicleId, occurredAt |
 | vehicle_events | vehicle_timeline | key | companyId, vehicleId, occurredAt |
+| sync_operation_receipts | company_operation | unique | companyId, operationId |
+| sync_operation_receipts | company_entity | key | companyId, entity, entityId |
 
 Éviter de créer des index couvrant toutes les colonnes. Les index sont dimensionnés à partir des requêtes réellement implémentées, mesurées et paginées.
 
