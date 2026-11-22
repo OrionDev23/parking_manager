@@ -65,8 +65,12 @@ class TenantResourceApi {
     final execution = await Functions(client).createExecution(
       functionId: functionId,
       body: jsonEncode(payload),
-      // This API returns a structured success/error body that the outbox
-      // must inspect before acknowledging the local operation.
+      // The function reads req.bodyJson. Explicitly mark the execution body
+      // as JSON; otherwise the function can receive the raw text without a
+      // parsed action and answer with "Unknown action".
+      headers: const {'content-type': 'application/json'},
+      // The outbox must inspect the function's structured response before
+      // acknowledging the local operation.
       xasync: false,
     );
 
