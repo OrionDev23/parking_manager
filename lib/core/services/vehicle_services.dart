@@ -84,7 +84,7 @@ class VehicleServices {
           ? _OnlineVehicleRepository(remoteSource)
           : VehicleRepositoryImpl(
               local: localSource,
-              syncQueue: syncQueue,
+              atomicSyncQueue: syncQueue,
               deviceIdentity: deviceIdentity,
               companyContext: CompanyContext(companyId: companyId, teamId: teamId),
               remote: remoteSource,
