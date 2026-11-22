@@ -45,37 +45,27 @@ La table Appwrite `vehicle` a retourné une ligne au moment du passage :
 
 Ce dry-run ne couvre pas les bases SQLite des postes utilisateurs. Leur export local reste nécessaire avant tout backfill global.
 
-### SQLite / synchronisation — premier correctif implémenté, validation en attente
+### SQLite / synchronisation — socle atomique implémenté, CI finale en cours
 
-Le défaut d'atomicité de `VehicleRepositoryImpl` a été corrigé sur la branche de travail :
-- mutation véhicule + opération outbox dans une transaction SQLite unique ;
-- `BEGIN IMMEDIATE` et rollback conjoint ;
-- méthodes locales synchrones dédiées à une transaction déjà ouverte ;
-- tests de commit, rollback, coalescence create/update et create/delete ajoutés pour les véhicules et les chauffeurs ;
+Le correctif couvre les trois chemins natifs local-first identifiés :
 
-Une exécution GitHub Actions sur le commit `a29e0d9` a déjà validé `flutter test` et `flutter analyze` pour la première version du correctif véhicule. Les tests chauffeurs ont été ajoutés après ce commit : ils doivent être validés par la prochaine exécution CI. Le build Web et la vérification Node de cette exécution initiale sont également à confirmer.
+- **Véhicules** : create/update/delete utilisent la transaction commune fiche + outbox.
+- **Chauffeurs** : create/update/delete utilisent la même abstraction et la source locale refuse les écritures d'un autre companyId.
+- **Stock legacy** : save/delete synchronisent dans une transaction unique le cache `legacy_module_cache` et l'outbox. La configuration de runtime fournit à ce service la même instance `LocalDatabase`/queue que le moteur de synchronisation.
+- **Dispatch** : l'entité `storage`, déjà présente dans le registre du service Stock, est maintenant aussi reliée à son handler dans le moteur.
 
-- La migration SQLite v12 ajoute les colonnes `payload_version`, `idempotency_key`, `next_attempt_at`, `last_error_code`, `last_error_message` et `completed_at`, avec backfill de l'idempotency key depuis l'ancien `id` et indexes de file/unique.
-- `SyncOperation` transporte maintenant `idempotencyKey` et `payloadVersion` ; les anciennes opérations utilisent leur `id` comme clé stable.
-- Des tests vérifient la présence du schéma v12 dans la base SQLite de test et l'atomicité des opérations véhicules/chauffeurs.
-- Un test de mise à niveau depuis une structure v11 vérifie la conservation d'une opération pending (ID, payload, statut, tentatives) et son backfill d'idempotency key.
-- Le retry du moteur utilise maintenant `next_attempt_at`, un backoff exponentiel avec jitter et un plafond d'une heure ; les messages persistés sont génériques et ne recopient pas le contenu brut des exceptions.
-- Un test vérifie qu'une opération en échec reste hors de la file avant son échéance et redevient éligible une fois l'échéance passée.
-- La migration v12 a aussi été simulée isolément avec une ancienne opération `pending` : l'ID, le payload et le statut restent intacts, la clé d'idempotence est backfillée depuis l'ID et les indexes sont créés.
-- Cette simulation SQL ne remplace pas l'exécution du test Dart/Flutter, qui reste à faire sur le poste de développement.
+La migration SQLite v12 ajoute `payload_version`, `idempotency_key`, `next_attempt_at`, `last_error_code`, `last_error_message` et `completed_at`. Les opérations historiques gardent leur ID, payload, statut et compteur de tentatives ; l'ID est repris comme clé d'idempotence. La migration v12 est codée, additive et testée sur une structure v11 isolée, mais elle n'a pas été appliquée sur les bases des postes utilisateurs.
 
-Le correctif couvre maintenant les véhicules et les chauffeurs natifs Windows/Android/iOS. Le Web reste online-only. Les autres repositories local-first n'ont pas encore été migrés vers cette abstraction.
+Le moteur de synchronisation utilise désormais `next_attempt_at` avec backoff exponentiel, jitter déterministe et plafond d'une heure. Les rejets permanents deviennent des conflits ; les messages enregistrés pour les erreurs transitoires sont génériques et bornés.
 
+**Historique CI vérifié :**
+- Le commit véhicule/v12 `a29e0d9` a passé tests, analyse statique, build Web et syntaxe Appwrite.
+- Le commit chauffeurs `98e5ea8` a aussi passé tests, analyse statique, build Web et syntaxe Appwrite.
+- Un test Stock a échoué ensuite uniquement parce que son fichier ne contenait pas l'import de `SyncOperation`/ `SyncOperationType`. Cet import est corrigé dans `984b360e`. Le commit ajoute aussi le handler `storage` dans `45abafb7`.
+- Une exécution CI sur ces derniers changements est à contrôler avant de qualifier le lot complet de vert.
 
-Autres règles formalisées :
-- IDs stables et outbox partitionnée par companyId ;
-- idempotence par operationId ;
-- dépendances parent/enfant ;
-- revisions serveur pour détecter les écrasements concurrentiels ;
-- conflits résolus explicitement, pas de retry global aveugle ;
-- positions GPS envoyées par lots avec déduplication fixId ;
-- Web reste online-only dans le périmètre actuel, tandis que le natif utilise SQLite offline-first.
-
+Aucune table Appwrite de production n'a été créée/modifiée et aucune donnée métier n'a été réécrite dans ce sprint.
+  
 ## Décisions d'architecture verrouillées
 
 1. `vehicle` contient l'identité et les caractéristiques stables, pas toutes les relations historiques.
@@ -129,7 +119,7 @@ Le premier sprint local-first est engagé. L'ordre restant est :
 1. obtenir une exécution CI verte incluant `flutter test`, `flutter analyze` et le build Web ;
 2. traiter toute erreur détectée avant de continuer ;
 3. vérifier la migration v12 sur une copie d'une base réelle, avec sauvegarde et rapport de conservation des opérations ;
-4. appliquer le même pattern atomique aux autres repositories local-first concernés ;
+4. étendre le pattern atomique uniquement aux futurs repositories local-first qui seront ajoutés ;
 5. créer `sites` et `vehicle_assignments` dans un environnement Appwrite de staging, puis valider les ACL et les contrôles inter-tenant ;
 6. seulement après validation, préparer la migration des données réelles.
 
