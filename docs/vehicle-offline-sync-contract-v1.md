@@ -52,7 +52,7 @@ Ces deux méthodes ouvrent leurs propres opérations SQLite ; elles ne partagent
 
 Le chemin update suit le même modèle. Le delete insère d'abord un tombstone puis supprime la ligne locale, mais les deux étapes ne sont pas atomiques.
 
-**Exigence v1 :** mutation locale + opération outbox dans une même transaction SQLite. Après commit, les deux existent ; avant commit, aucune des deux n'existe.
+**Exigence v1 implémentée pour le domaine véhicule :** mutation locale + opération outbox dans une même transaction SQLite. Après commit, les deux existent ; avant commit, aucune des deux n'existe. Le contrat `AtomicSyncQueue` et `enqueueWithLocalMutation()` exécutent l'upsert/delete local synchrone et l'écriture outbox dans le même `BEGIN IMMEDIATE` / `COMMIT`, avec rollback commun. Les autres repositories local-first restent à migrer.
 
 ### 1.3 Différence Web / natif
 
@@ -358,12 +358,12 @@ La durée des positions n'est pas fixée dans ce contrat. Elle doit être déter
 
 ## 6. Stratégie de migration SQLite
 
-Le schéma local est actuellement à la version 11. Proposition de séquencement ; les numéros définitifs seront ajustés en fonction des modifications intervenues sur la branche avant codage.
+Le schéma local était à la version 11 au début de l'implémentation de phase 1 ; la migration 12 est maintenant ajoutée sur la branche de travail. Proposition de séquencement ; les numéros définitifs seront ajustés en fonction des modifications intervenues sur la branche avant codage.
 
 | Version cible | Migration |
 |---|---|
-| 12 | Ajouter payload_version, idempotency_key, next_attempt_at, last_error_code/message, completed_at ; backfill idempotencyKey depuis id |
-| 13 | Ajouter base_revision, depends_on_operation_id, sequence_no ; initialiser sequence stable depuis created_at + rowid |
+| 12 | **Implémentée** — ajouter payload_version, idempotency_key, next_attempt_at, last_error_code/message, completed_at ; backfill idempotencyKey depuis id |
+| 13 | À implémenter — ajouter base_revision, depends_on_operation_id, sequence_no ; initialiser sequence stable depuis created_at + rowid |
 | 14 | Ajouter server_revision aux tables véhicules/chauffeurs et créer tables typed sites/assignments |
 | 15 | Ajouter tables locales parking et documents/médias |
 | 16 | Ajouter meter readings et maintenance |
