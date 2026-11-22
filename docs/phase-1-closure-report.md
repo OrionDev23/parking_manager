@@ -67,8 +67,6 @@ Les tests ne sont pas encore exécutés car aucun environnement Flutter/Dart n'e
 Le correctif couvre pour l'instant les véhicules natifs Windows/Android/iOS. Le Web reste online-only. Les autres repositories local-first n'ont pas encore été migrés vers cette abstraction.
 
 
-Le code actuel de `VehicleRepositoryImpl` enregistre la mutation dans l'outbox, puis écrit la fiche locale dans un second appel. Ces opérations ne partagent pas de transaction SQLite. Le contrat v1 impose un write atomique fiche + outbox avant de continuer les évolutions du modèle.
-
 Autres règles formalisées :
 - IDs stables et outbox partitionnée par companyId ;
 - idempotence par operationId ;
@@ -122,16 +120,17 @@ Les significations de `decision`, `service`, `etat`, `etatactuel`, `ownership`, 
 - Aucune permission ou rowSecurity de production n'a été modifiée.
 - Aucun champ legacy n'a été supprimé.
 - Aucun backfill ni modification de véhicule n'a été exécuté.
-- Aucune migration SQLite n'a été codée/appliquée.
+- La migration SQLite v12 est codée, mais elle n'a pas encore été appliquée sur les bases des postes utilisateurs.
 - Aucune collecte GPS n'a été activée.
 
 ## Recommandation pour la suite
 
-Avant de refaire l'interface (phase 2), réaliser un sprint technique de mise en place :
-1. implémenter la transaction SQLite atomique mutation + outbox ;
-2. implémenter les migrations version 12+ et leurs tests ;
-3. créer les tables de base `sites` et `vehicle_assignments` dans l'environnement de staging ;
-4. ajouter la validation serveur tenant/relation/revision ;
-5. exécuter le dry-run complet et valider la migration.
+Le premier sprint local-first est engagé. L'ordre restant est :
+1. obtenir une exécution CI verte incluant `flutter test`, `flutter analyze` et le build Web ;
+2. traiter toute erreur détectée avant de continuer ;
+3. vérifier la migration v12 sur une copie d'une base réelle, avec sauvegarde et rapport de conservation des opérations ;
+4. appliquer le même pattern atomique aux autres repositories local-first concernés ;
+5. créer `sites` et `vehicle_assignments` dans un environnement Appwrite de staging, puis valider les ACL et les contrôles inter-tenant ;
+6. seulement après validation, préparer la migration des données réelles.
 
-Une fois ce socle passé, la nouvelle interface pourra être construite sur un contrat stable, sans devoir réécrire le formulaire lorsque GPS et Parking seront ajoutés.
+La refonte du formulaire reste en attente de ce socle. Elle pourra alors utiliser les contrats de données définis sans reconstituer les relations au milieu du travail UI.
