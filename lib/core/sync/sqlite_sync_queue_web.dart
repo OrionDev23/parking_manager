@@ -20,6 +20,8 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
     bool clearConflict = false,
   }) => SyncOperation(
     id: item.id,
+    idempotencyKey: item.idempotencyKey,
+    payloadVersion: item.payloadVersion,
     companyId: item.companyId,
     deviceId: item.deviceId,
     entity: item.entity,
