@@ -166,6 +166,7 @@ Future<void> _configureSessionRuntime(String companyId) async {
         'part_brand': nextStock.applySyncOperation,
         'part_option': nextStock.applySyncOperation,
         'supplier': nextStock.applySyncOperation,
+        'storage': nextStock.applySyncOperation,
       },
       pullHandlers: {
         'vehicle': nextVehicles.pullRemoteChanges,
