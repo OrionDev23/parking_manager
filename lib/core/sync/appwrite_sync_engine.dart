@@ -113,13 +113,12 @@ class AppwriteSyncEngine implements SyncEngine {
     });
   }
 
-  @override
   Future<void> _markFailedWithBackoff(
     SyncOperation operation, {
     required String errorCode,
     required String safeMessage,
   }) async {
-    final exponent = operation.attempts.clamp(0, 10);
+    final exponent = operation.attempts.clamp(0, 10).toInt();
     final baseSeconds = (5 * (1 << exponent)).clamp(5, 3600).toInt();
     final jitterWindow = baseSeconds ~/ 5;
     final stableSeed = operation.id.codeUnits.fold<int>(
@@ -139,6 +138,7 @@ class AppwriteSyncEngine implements SyncEngine {
     );
   }
 
+  @override
   Future<void> syncNow() async {
     if (!_running || _syncing) {
       debugPrint(
