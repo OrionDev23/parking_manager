@@ -45,7 +45,7 @@ La table Appwrite `vehicle` a retourné une ligne au moment du passage :
 
 Ce dry-run ne couvre pas les bases SQLite des postes utilisateurs. Leur export local reste nécessaire avant tout backfill global.
 
-### SQLite / synchronisation — socle atomique implémenté, CI finale en cours
+### SQLite / synchronisation — socle atomique implémenté, CI validée
 
 Le correctif couvre les trois chemins natifs local-first identifiés :
 
@@ -58,11 +58,10 @@ La migration SQLite v12 ajoute `payload_version`, `idempotency_key`, `next_attem
 
 Le moteur de synchronisation utilise désormais `next_attempt_at` avec backoff exponentiel, jitter déterministe et plafond d'une heure. Les rejets permanents deviennent des conflits ; les messages enregistrés pour les erreurs transitoires sont génériques et bornés.
 
-**Historique CI vérifié :**
-- Le commit véhicule/v12 `a29e0d9` a passé tests, analyse statique, build Web et syntaxe Appwrite.
-- Le commit chauffeurs `98e5ea8` a aussi passé tests, analyse statique, build Web et syntaxe Appwrite.
-- Un test Stock a échoué ensuite uniquement parce que son fichier ne contenait pas l'import de `SyncOperation`/ `SyncOperationType`. Cet import est corrigé dans `984b360e`. Le commit ajoute aussi le handler `storage` dans `45abafb7`.
-- Une exécution CI sur ces derniers changements est à contrôler avant de qualifier le lot complet de vert.
+**Validation GitHub Actions :**
+- Le premier lot véhicule/v12 a passé `flutter test`, `flutter analyze --no-pub`, `flutter build web --release` et `node --check appwrite/functions/company-tenant-api/src/index.js`.
+- Le lot qui inclut chauffeurs, Stock legacy, le handler `storage` et les documents actualisés a également passé les quatre étapes sur le commit `149a4434`.
+- Un run antérieur du test Stock avait échoué à cause d'un import manquant de `SyncOperation` et `SyncOperationType`. L'import a été ajouté dans `984b360e`, puis le lot complet a été validé.
 
 Aucune table Appwrite de production n'a été créée/modifiée et aucune donnée métier n'a été réécrite dans ce sprint.
   
