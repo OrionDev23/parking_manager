@@ -79,8 +79,9 @@ class VehicleRepositoryImpl implements VehicleRepository {
   @override
   Future<Vehicle> createVehicle(Vehicle vehicle) async {
     _checkCompany(vehicle);
+    final operation = await _operation(vehicle, SyncOperationType.create);
     await atomicSyncQueue.enqueueWithLocalMutation(
-      await _operation(vehicle, SyncOperationType.create),
+      operation,
       localMutation: () => local.upsertVehicleInTransaction(vehicle),
     );
     return vehicle;
@@ -89,8 +90,9 @@ class VehicleRepositoryImpl implements VehicleRepository {
   @override
   Future<Vehicle> updateVehicle(Vehicle vehicle) async {
     _checkCompany(vehicle);
+    final operation = await _operation(vehicle, SyncOperationType.update);
     await atomicSyncQueue.enqueueWithLocalMutation(
-      await _operation(vehicle, SyncOperationType.update),
+      operation,
       localMutation: () => local.upsertVehicleInTransaction(vehicle),
     );
     return vehicle;
