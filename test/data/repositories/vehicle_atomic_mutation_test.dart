@@ -199,6 +199,34 @@ void main() {
       expect(await queue.pending(companyId: companyId), isEmpty);
     });
 
+    test('defers failed operations until their retry deadline', () async {
+      final value = vehicle();
+      final now = DateTime.now().toUtc();
+      await queue.enqueueWithLocalMutation(
+        operation(value, SyncOperationType.create),
+        localMutation: () => local.upsertVehicleInTransaction(value),
+      );
+
+      await queue.markFailed(
+        'device-${value.id}-create',
+        errorCode: 'temporary_network_error',
+        errorMessage: 'Connection temporarily unavailable.',
+        nextAttemptAt: now.add(const Duration(minutes: 5)),
+      );
+
+      expect(await queue.pending(companyId: companyId), isEmpty);
+
+      database.database.execute(
+        "UPDATE sync_operations SET next_attempt_at=? WHERE id=?",
+        [
+          now.subtract(const Duration(seconds: 1)).toIso8601String(),
+          'device-${value.id}-create',
+        ],
+      );
+
+      expect(await queue.pending(companyId: companyId), hasLength(1));
+    });
+
     test('coalesces create then update without losing create semantics', () async {
       final created = vehicle();
       final updated = vehicle(registration: '54321-123-23');
