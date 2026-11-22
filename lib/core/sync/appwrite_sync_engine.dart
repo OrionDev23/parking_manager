@@ -114,6 +114,31 @@ class AppwriteSyncEngine implements SyncEngine {
   }
 
   @override
+  Future<void> _markFailedWithBackoff(
+    SyncOperation operation, {
+    required String errorCode,
+    required String safeMessage,
+  }) async {
+    final exponent = operation.attempts.clamp(0, 10);
+    final baseSeconds = (5 * (1 << exponent)).clamp(5, 3600).toInt();
+    final jitterWindow = baseSeconds ~/ 5;
+    final stableSeed = operation.id.codeUnits.fold<int>(
+      0,
+      (sum, unit) => (sum + unit) & 0x7fffffff,
+    );
+    final jitter = jitterWindow == 0 ? 0 : stableSeed % (jitterWindow + 1);
+    final delaySeconds = (baseSeconds + jitter).clamp(1, 3600).toInt();
+
+    await queue.markFailed(
+      operation.id,
+      errorCode: errorCode,
+      errorMessage: safeMessage,
+      nextAttemptAt: DateTime.now().toUtc().add(
+        Duration(seconds: delaySeconds),
+      ),
+    );
+  }
+
   Future<void> syncNow() async {
     if (!_running || _syncing) {
       debugPrint(
@@ -238,7 +263,11 @@ class AppwriteSyncEngine implements SyncEngine {
               reason: 'Quota / tenant API rejection (${error.statusCode}, ${error.code}): ${error.message}',
             );
           } else {
-            await queue.markFailed(operation.id);
+            await _markFailedWithBackoff(
+              operation,
+              errorCode: error.code,
+              safeMessage: 'Tenant API request failed (${error.statusCode}).',
+            );
           }
           blockedRecords.add(recordKey);
         } on AppwriteException catch (error, stackTrace) {
@@ -252,14 +281,22 @@ class AppwriteSyncEngine implements SyncEngine {
                   'Appwrite ${error.code} (${error.type ?? 'unknown'}): ${error.message ?? 'Conflit distant'}',
             );
           } else {
-            await queue.markFailed(operation.id);
+            await _markFailedWithBackoff(
+              operation,
+              errorCode: 'appwrite_${error.code}',
+              safeMessage: 'Appwrite request failed (${error.code}).',
+            );
           }
           blockedRecords.add(recordKey);
         } catch (error, stackTrace) {
           debugPrint(
             '[ParcOto Sync] ERROR entity=${operation.entity} op=${operation.type.name} id=${operation.entityId}: $error\n$stackTrace',
           );
-          await queue.markFailed(operation.id);
+          await _markFailedWithBackoff(
+            operation,
+            errorCode: 'unexpected_sync_error',
+            safeMessage: 'Unexpected synchronization error.',
+          );
           blockedRecords.add(recordKey);
         }
       }
