@@ -311,7 +311,10 @@ class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
   }) async {
     _db.execute(
       """UPDATE sync_operations
-         SET status='conflict', conflict_reason=?, conflicted_at=?
+         SET status='conflict',
+             conflict_reason=?,
+             conflicted_at=?,
+             next_attempt_at=NULL
          WHERE id=?""",
       [reason, DateTime.now().toUtc().toIso8601String(), operationId],
     );
