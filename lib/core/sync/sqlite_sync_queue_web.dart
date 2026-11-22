@@ -1,8 +1,8 @@
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
+import 'atomic_sync_queue.dart';
 import 'sync_operation.dart';
 import 'sync_queue.dart';
-import 'atomic_sync_queue.dart';
 
 /// In-memory queue for Web only. It never persists work while offline.
 class SqliteSyncQueue implements SyncQueue, AtomicSyncQueue {
