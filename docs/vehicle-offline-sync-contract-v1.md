@@ -233,6 +233,15 @@ Une opération enfant référence son parent par ID et son depends_on_operation_
 
 ### 4.1 Cycle d'une opération
 
+**État implémenté pour le retry :**
+- Les erreurs transitoires sont marquées `failed`, avec `last_error_code`, un message générique non sensible limité à 500 caractères et `next_attempt_at`.
+- Le délai est exponentiel à partir de 5 secondes, avec jitter déterministe par opération, plafonné à 3600 secondes.
+- La requête `pending()` n'inclut une opération `failed` que lorsque `next_attempt_at` est absent ou échu.
+- Une erreur permanente devient `conflict` et efface son échéance de retry ; elle reste consultable mais n'est pas rejouée automatiquement.
+- Un succès renseigne `completed_at` et efface les champs de retry/erreur.
+- Web conserve uniquement un échéancier mémoire : cela ne crée pas une outbox Web persistante et ne change pas le mode online-only.
+
+
 ```text
 Local mutation
   -> pending
