@@ -55,6 +55,30 @@ void main() {
   }
 
   group('atomic vehicle cache and outbox mutations', () {
+    test('opens with the version 12 outbox schema', () async {
+      final migrations = database.database.select(
+        'SELECT version FROM schema_migrations ORDER BY version',
+      );
+      final latestVersion = migrations.last['version'] as int;
+      final columns = database.database
+          .select('PRAGMA table_info(sync_operations)')
+          .map((row) => row['name'] as String)
+          .toSet();
+
+      expect(latestVersion, 12);
+      expect(
+        columns,
+        containsAll({
+          'payload_version',
+          'idempotency_key',
+          'next_attempt_at',
+          'last_error_code',
+          'last_error_message',
+          'completed_at',
+        }),
+      );
+    });
+
     test('commits the vehicle row and outbox operation together', () async {
       final value = vehicle();
 
