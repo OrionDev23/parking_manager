@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sqlite3/sqlite3.dart';
 
 import 'package:parc_oto/core/database/local_database.dart';
 import 'package:parc_oto/core/device/device_identity.dart';
@@ -58,6 +59,78 @@ void main() {
   }
 
   group('atomic vehicle cache and outbox mutations', () {
+    test('upgrades an existing v11 outbox without losing pending work', () {
+      final legacyDatabase = sqlite3.openInMemory();
+      try {
+        legacyDatabase.execute(
+          'CREATE TABLE schema_migrations '
+          '(version INTEGER PRIMARY KEY, applied_at TEXT NOT NULL)',
+        );
+        legacyDatabase.execute(
+          "INSERT INTO schema_migrations(version, applied_at) "
+          "VALUES (11, '2026-11-21T00:00:00.000Z')",
+        );
+        legacyDatabase.execute('''CREATE TABLE sync_operations (
+          id TEXT PRIMARY KEY,
+          company_id TEXT NOT NULL,
+          device_id TEXT NOT NULL,
+          entity TEXT NOT NULL,
+          entity_id TEXT NOT NULL,
+          operation TEXT NOT NULL,
+          payload TEXT NOT NULL,
+          created_at TEXT NOT NULL,
+          status TEXT NOT NULL,
+          attempts INTEGER NOT NULL DEFAULT 0,
+          conflict_reason TEXT,
+          conflicted_at TEXT
+        )''');
+        legacyDatabase.execute(
+          '''INSERT INTO sync_operations
+             (id, company_id, device_id, entity, entity_id, operation,
+              payload, created_at, status, attempts)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+          [
+            'legacy-operation-001',
+            companyId,
+            'legacy-device',
+            'vehicle',
+            'vehicle-legacy-001',
+            'create',
+            '{"id":"vehicle-legacy-001","companyId":"company-test-001"}',
+            '2026-11-21T00:00:00.000Z',
+            'pending',
+            2,
+          ],
+        );
+
+        LocalDatabase.migrateForTesting(legacyDatabase);
+
+        final row = legacyDatabase
+            .select(
+              "SELECT * FROM sync_operations WHERE id='legacy-operation-001'",
+            )
+            .single;
+        final version = legacyDatabase
+            .select('SELECT MAX(version) AS version FROM schema_migrations')
+            .single['version'];
+
+        expect(version, 12);
+        expect(row['id'], 'legacy-operation-001');
+        expect(row['company_id'], companyId);
+        expect(row['entity_id'], 'vehicle-legacy-001');
+        expect(row['status'], 'pending');
+        expect(row['attempts'], 2);
+        expect(
+          row['payload'],
+          '{"id":"vehicle-legacy-001","companyId":"company-test-001"}',
+        );
+        expect(row['idempotency_key'], 'legacy-operation-001');
+        expect(row['payload_version'], 1);
+      } finally {
+        legacyDatabase.dispose();
+      }
+    });
+
     test('opens with the version 12 outbox schema', () async {
       final migrations = database.database.select(
         'SELECT version FROM schema_migrations ORDER BY version',
