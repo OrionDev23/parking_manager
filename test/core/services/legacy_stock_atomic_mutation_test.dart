@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:parc_oto/core/database/local_database.dart';
 import 'package:parc_oto/core/device/device_identity.dart';
 import 'package:parc_oto/core/services/legacy_stock_sync_service.dart';
+import 'package:parc_oto/core/sync/sync_operation.dart';
 import 'package:parc_oto/core/sync/sqlite_sync_queue.dart';
 
 void main() {
