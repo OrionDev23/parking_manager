@@ -53,9 +53,6 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   int _vehicleLoadGeneration = 0;
   final ScrollController _contentScrollController = ScrollController();
   Vehicle get v => widget.vehicle;
-  String get _normalizedRegistration =>
-      VehicleDetailFormatters.normalizeRegistration(v.matricule);
-
   bool _matchesVehicleDocument(DocumentVehicle document) {
     final linkedVehicleId = document.vehicle?.trim();
     return linkedVehicleId == v.id ||
