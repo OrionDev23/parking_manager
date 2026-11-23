@@ -7,7 +7,7 @@
 ## Statut
 
 **Phase 1 — conception et contrats techniques : terminée.**  
-**Premier sprint d'implémentation locale : partiellement réalisé sur la branche de travail.**  
+**Sprint d'atomicité offline-first (véhicules, chauffeurs, Stock legacy) : implémenté et validé par CI.**  
 **Déploiement du nouveau schéma Appwrite : non commencé volontairement.**
 
 Les modèles, relations, contrats Appwrite/SQLite, règles de synchronisation et stratégie de migration sont écrits et versionnés. Aucune nouvelle table n'a été créée dans la base de production, aucune donnée métier n'a été modifiée et aucune migration locale n'a été appliquée.
@@ -32,6 +32,7 @@ Les modèles, relations, contrats Appwrite/SQLite, règles de synchronisation et
 - L'ancien index unique `numero_serie` est en échec et ne peut pas garantir l'unicité VIN.
 - La colonne `marque` a été élargie à 64 caractères lors du correctif antérieur ; la cible canonique devient `makeId`.
 - Le catalogue partagé `vehicle_makes` compte 211 marques au moment de l'audit.
+- Les six tables Stock legacy (`parts`, `categories`, `partsbrands`, `options`, `fournisseurs`, `storage`) ont été vérifiées : `companyId` est requis et Row Security est activé ; les ACL de table autorisent la création aux rôles admin/manager de deux équipes inspectées.
 - Aucune ressource dédiée `sites`, `parking_*`, `vehicle_assignments` ou `tracking_*` n'existe encore.
 
 ### Dry-run véhicules — lecture seule
@@ -60,8 +61,8 @@ Le moteur de synchronisation utilise désormais `next_attempt_at` avec backoff e
 
 **Validation GitHub Actions :**
 - Le premier lot véhicule/v12 a passé `flutter test`, `flutter analyze --no-pub`, `flutter build web --release` et `node --check appwrite/functions/company-tenant-api/src/index.js`.
-- Le lot qui inclut chauffeurs, Stock legacy, le handler `storage` et les documents actualisés a également passé les quatre étapes sur le commit `149a4434`.
-- Un run antérieur du test Stock avait échoué à cause d'un import manquant de `SyncOperation` et `SyncOperationType`. L'import a été ajouté dans `984b360e`, puis le lot complet a été validé.
+- Le run final du 22/11/2026 (`45074377970`, commit `aee741a7`) a validé le lot complet incluant véhicules, chauffeurs, Stock legacy, handler `storage` et tests tenant. Les quatre étapes sont passées : `flutter test`, `flutter analyze --no-pub`, `flutter build web --release` et `node --check` sur la Function Appwrite.
+- Le run a indiqué 20 tests du fichier véhicule passés ; les suites chauffeur et Stock sont également incluses dans `flutter test`.
 
 Aucune table Appwrite de production n'a été créée/modifiée et aucune donnée métier n'a été réécrite dans ce sprint.
   
@@ -107,12 +108,6 @@ Les significations de `decision`, `service`, `etat`, `etatactuel`, `ownership`, 
 - Tester migrations SQLite depuis le schéma v11.
 - Exécuter Flutter analyze, tests d'intégration et build Web sur l'environnement de validation.
 
-- Créer les tables et indexes dans un environnement de validation isolé.
-- Tester Row Security, ACL et accès direct hors UI entre deux entreprises.
-- Tester quota, transactions, receipts, retry après ACK perdu et réconciliation.
-- Tester migrations SQLite depuis le schéma v11.
-- Exécuter Flutter analyze et tests d'intégration sur l'environnement de développement.
-
 ## Ce qui n'a pas été fait
 
 - Aucune table ou colonne nouvelle n'a été ajoutée à Appwrite.
@@ -124,12 +119,12 @@ Les significations de `decision`, `service`, `etat`, `etatactuel`, `ownership`, 
 
 ## Recommandation pour la suite
 
-Le premier sprint local-first est engagé. L'ordre restant est :
-1. obtenir une exécution CI verte incluant `flutter test`, `flutter analyze` et le build Web ;
-2. traiter toute erreur détectée avant de continuer ;
-3. vérifier la migration v12 sur une copie d'une base réelle, avec sauvegarde et rapport de conservation des opérations ;
-4. étendre le pattern atomique uniquement aux futurs repositories local-first qui seront ajoutés ;
-5. créer `sites` et `vehicle_assignments` dans un environnement Appwrite de staging, puis valider les ACL et les contrôles inter-tenant ;
-6. seulement après validation, préparer la migration des données réelles.
+Le sprint local-first actuellement ciblé est terminé et validé par CI pour les trois chemins natifs identifiés. Les prochains travaux ne doivent pas être confondus avec ce sprint :
 
-La refonte du formulaire reste en attente de ce socle. Elle pourra alors utiliser les contrats de données définis sans reconstituer les relations au milieu du travail UI.
+1. obtenir une copie sauvegardée et anonymisée d'une vraie base SQLite poste ; exécuter la migration v12 dessus et comparer l'intégralité des opérations conservées ;
+2. créer/désigner un projet Appwrite de staging réellement séparé du projet actif ;
+3. déployer dans ce staging les tables `sites` et `vehicle_assignments`, puis tester ACL, rowSecurity, relations inter-tenant, quotas et retry après perte d'ACK ;
+4. appliquer ensuite, par étapes, les migrations de données validées ;
+5. commencer la refonte UI véhicule sur le contrat canonique.
+
+Le correctif atomique couvre actuellement véhicules, chauffeurs et le catalogue Stock legacy. Il ne rend pas automatiquement tous les anciens modules en local-first et ne crée pas encore les tables du futur modèle de domaine.
