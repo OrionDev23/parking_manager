@@ -23,7 +23,7 @@ abstract final class VehicleDetailFormatters {
         .toLowerCase()
         .replaceAll('_', ' ')
         .replaceAll('-', ' ')
-        .replaceAll(RegExp(r'\\s+'), ' ');
+        .replaceAll(RegExp(r'\s+'), ' ');
 
     switch (normalized) {
       case 'original':
