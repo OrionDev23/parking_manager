@@ -534,6 +534,8 @@
  "servicefonction": "Service/Fonction ?",
  "service": "Service",
  "fonction": "Fonction",
+ "vehicle_service_use": "Véhicule de service",
+ "vehicle_function_use": "Véhicule de fonction",
  "departement": "Département",
  "departements": "Départements",
  "listcomplete": "Liste complète",
