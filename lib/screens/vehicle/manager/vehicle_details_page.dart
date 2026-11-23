@@ -120,7 +120,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       }
       if (!mounted) return;
 
-      if (!VehicleProvider.downloadedDocuments) {
+      if (force || !VehicleProvider.downloadedDocuments) {
         await provider.refreshDocuments();
       }
       if (!mounted) return;
@@ -1862,10 +1862,13 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 : daysRemaining != null && daysRemaining <= 30
                     ? 'Expire bientôt'
                     : 'Valide';
-    final statusColor =
-        expired || (daysRemaining != null && daysRemaining <= 30)
-            ? Colors.orange
-            : accent;
+    final statusColor = expiration == null
+        ? Colors.grey[100]
+        : expired
+            ? Colors.red
+            : daysRemaining != null && daysRemaining <= 30
+                ? Colors.orange
+                : accent;
 
     return Container(
       width: double.infinity,
@@ -1892,7 +1895,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                document.nom,
+                document.nom.trim().isEmpty
+                    ? 'Document sans nom'
+                    : document.nom,
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
