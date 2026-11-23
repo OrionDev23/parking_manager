@@ -53,15 +53,16 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   int _vehicleLoadGeneration = 0;
   final ScrollController _contentScrollController = ScrollController();
   Vehicle get v => widget.vehicle;
-  String get _normalizedRegistration => v.matricule.trim().toUpperCase();
+  String get _normalizedRegistration =>
+      VehicleDetailFormatters.normalizeRegistration(v.matricule);
 
   bool _matchesVehicleDocument(DocumentVehicle document) {
     final linkedVehicleId = document.vehicle?.trim();
-    final linkedRegistration = document.vehiclemat?.trim().toUpperCase();
     return linkedVehicleId == v.id ||
-        (linkedRegistration != null &&
-            linkedRegistration.isNotEmpty &&
-            linkedRegistration == _normalizedRegistration);
+        VehicleDetailFormatters.sameRegistration(
+          document.vehiclemat,
+          v.matricule,
+        );
   }
 
   @override
@@ -730,7 +731,10 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
 
       final states = VehicleProvider.etats.values.where((state) =>
           state.vehicle == vehicleId ||
-          state.vehicleMat.trim() == registration).toList()
+          VehicleDetailFormatters.sameRegistration(
+            state.vehicleMat,
+            registration,
+          )).toList()
         ..sort((a, b) {
           final aDate = a.date ?? a.updatedAt ?? a.createdAt;
           final bDate = b.date ?? b.updatedAt ?? b.createdAt;
@@ -786,11 +790,13 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       await RepairProvider.downloadFicheReparations();
       if (!mounted || generation != _vehicleLoadGeneration) return;
 
-      final normalizedRegistration = registration.toUpperCase();
       final sheets = RepairProvider.repPerVeh.entries
           .where((entry) =>
               entry.key == v.id ||
-              entry.key.trim().toUpperCase() == normalizedRegistration)
+              VehicleDetailFormatters.sameRegistration(
+                entry.key,
+                registration,
+              ))
           .expand((entry) => entry.value)
           .toList()
         ..sort((a, b) => b.dateEntre.compareTo(a.dateEntre));
@@ -970,7 +976,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               _field('Date', _date(v.acquisitionDate)),
               _field(
                 'Prix d’achat',
-                v.purchasePrice == null ? null : '${v.purchasePrice} DA',
+                v.purchasePrice == null
+                    ? null
+                    : '${VehicleDetailFormatters.formatNumber(v.purchasePrice!)} DA',
               ),
               _field('Fournisseur', v.supplier),
               _field('Fin de garantie', _date(v.warrantyEndDate)),
@@ -1461,12 +1469,21 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
 
   Widget _maintenanceSection(Color accent) {
     final repairs = RepairProvider.reparations.values.where((repair) =>
-        repair.vehiculemat?.trim().toUpperCase() == _normalizedRegistration ||
+        VehicleDetailFormatters.sameRegistration(
+          repair.vehiculemat,
+          v.matricule,
+        ) ||
         repair.vehicule == v.id).toList()
       ..sort((a, b) => b.date.compareTo(a.date));
     final sheets = _receptionSheets;
-    final totalCost = sheets.fold<double>(
-        0, (sum, sheet) => sum + (sheet.reparationCost ?? 0));
+    final recordedCosts = sheets
+        .where((sheet) => sheet.reparationCost != null)
+        .map((sheet) => sheet.reparationCost!)
+        .toList(growable: false);
+    final totalCost = recordedCosts.fold<double>(0, (sum, value) => sum + value);
+    final costLabel = recordedCosts.isEmpty
+        ? 'Non renseigné'
+        : '${VehicleDetailFormatters.formatNumber(totalCost)} DA';
 
     if (_loadingMaintenance && repairs.isEmpty && sheets.isEmpty) {
       return const Center(child: Padding(
@@ -1492,7 +1509,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             _metric(width, FluentIcons.document, 'Fiches de réception',
                 sheets.length.toString(), accent),
             _metric(width, FluentIcons.money, 'Coût enregistré',
-                '${totalCost.toStringAsFixed(2)} DA', accent),
+                costLabel, accent),
           ]);
         }),
         const SizedBox(height: 20),
@@ -1629,7 +1646,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           final cost = sheet.reparationCost == null
               ? null
               : Text(
-                  '${sheet.reparationCost!.toStringAsFixed(2)} DA',
+                  '${VehicleDetailFormatters.formatNumber(sheet.reparationCost!)} DA',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
