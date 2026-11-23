@@ -91,8 +91,8 @@ abstract final class VehicleDetailFormatters {
 
     final code = int.tryParse(value);
     if (code == null) return value;
-    if (code == 99) return null;
-    if (code < 0 || code > 9) return 'Genre inconnu ($code)';
+    if (code == 99 || code < 0) return null;
+    if (code > 9) return 'Genre inconnu ($code)';
 
     return VehiclesUtilities.getGenreFromNumber(code);
   }
