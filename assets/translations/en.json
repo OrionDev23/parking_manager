@@ -530,6 +530,8 @@
   "servicefonction": "Service/Job ?",
   "service": "Service",
   "fonction": "Job",
+ "vehicle_service_use": "Service vehicle",
+ "vehicle_function_use": "Company car",
   "departement": "Department",
   "departements": "Departments",
   "listcomplete": "Complete list",
