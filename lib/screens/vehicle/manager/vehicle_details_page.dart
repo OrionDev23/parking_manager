@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/serializables/vehicle/vehicle.dart';
 import 'package:parc_oto/serializables/vehicle/document_vehicle.dart';
@@ -8,6 +9,9 @@ import 'package:parc_oto/providers/vehicle_provider.dart';
 import 'package:parc_oto/providers/repair_provider.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
+
+import '../../../core/services/vehicle_make_service.dart';
+import '../../../utilities/vehicle_util.dart';
 
 class VehicleDetailsPage extends StatefulWidget {
   final Vehicle vehicle;
@@ -31,6 +35,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   bool _loadingHistory = false;
   List<Etat> _vehicleStates = [];
   List<FicheReception> _receptionSheets = [];
+  int _selectedSectionIndex = 0;
+  final ScrollController _contentScrollController = ScrollController();
   Vehicle get v => widget.vehicle;
 
   @override
@@ -65,17 +71,23 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   Widget build(BuildContext context) {
     final app = context.watch<AppTheme>();
     final accent = FluentTheme.of(context).accentColor;
-    final model = [val(v.marque), val(v.type), v.modelYear?.toString() ?? '']
-        .where((e) => e != 'Non renseigné' && e.isNotEmpty)
-        .join(' ');
+    final makeName = VehicleMakeService.nameFor(v.marque);
+    final model = [
+      makeName,
+      v.type?.trim() ?? '',
+      v.modelYear?.toString() ?? '',
+    ].where((value) => value.isNotEmpty).join(' ');
     final compact = MediaQuery.sizeOf(context).width < 640;
+
     return Container(
       color: app.backGroundColor,
       child: Column(
         children: [
           _header(accent, model.isEmpty ? 'Fiche véhicule' : model),
+          _buildSectionNavigation(accent, compact: compact),
           Expanded(
             child: SingleChildScrollView(
+              controller: _contentScrollController,
               padding: EdgeInsets.fromLTRB(
                 compact ? 12 : 22,
                 18,
@@ -91,6 +103,80 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _selectSection(int index) {
+    if (index == _selectedSectionIndex) return;
+    setState(() => _selectedSectionIndex = index);
+    if (_contentScrollController.hasClients) {
+      _contentScrollController.jumpTo(0);
+    }
+  }
+
+  Widget _buildSectionNavigation(
+    Color accent, {
+    required bool compact,
+  }) {
+    const sections = <({String label, IconData icon})>[
+      (label: 'Aperçu', icon: FluentIcons.view_dashboard),
+      (label: 'Identification', icon: FluentIcons.contact),
+      (label: 'Caractéristiques', icon: FluentIcons.settings),
+      (label: 'Affectation', icon: FluentIcons.account_management),
+      (label: 'Localisation', icon: FluentIcons.map_pin),
+      (label: 'Documents', icon: FluentIcons.document_set),
+      (label: 'Maintenance', icon: FluentIcons.repair),
+      (label: 'Historique', icon: FluentIcons.history),
+    ];
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 8 : 22,
+        vertical: 8,
+      ),
+      decoration: BoxDecoration(
+        color: FluentTheme.of(context).micaBackgroundColor,
+        border: Border(
+          bottom: BorderSide(color: Colors.grey[30]),
+        ),
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            for (var index = 0; index < sections.length; index++) ...[
+              if (index > 0) const SizedBox(width: 7),
+              if (_selectedSectionIndex == index)
+                FilledButton(
+                  key: ValueKey('vehicle-section-$index'),
+                  onPressed: () => _selectSection(index),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(sections[index].icon, size: 13),
+                      const SizedBox(width: 7),
+                      Text(sections[index].label),
+                    ],
+                  ),
+                )
+              else
+                Button(
+                  key: ValueKey('vehicle-section-$index'),
+                  onPressed: () => _selectSection(index),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(sections[index].icon, size: 13),
+                      const SizedBox(width: 7),
+                      Text(sections[index].label),
+                    ],
+                  ),
+                ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -326,127 +412,140 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   }
 
   Widget _content(Color accent) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _overview(accent),
-        _section(
+    switch (_selectedSectionIndex) {
+      case 0:
+        return _overview(accent);
+      case 1:
+        return _section(
           'Identification',
-          'Identité administrative et informations principales',
+          'Immatriculation, carte grise et titulaire',
           [
             _group('Immatriculation', [
               _field('Immatriculation', v.matricule),
-              _field('Anciennes immatriculations', v.matriculePrec?.join(', ')),
               _field('Pays', v.pays),
-              _field('Date carte grise', _date(v.date)),
-              _field('Numéro carte grise', v.numero),
-              _field('Numéro de série / VIN', v.numeroSerie),
+              _field('Immatriculation étrangère', v.matriculeEtrang ? 'Oui' : 'Non'),
+              _field('Anciennes immatriculations', v.matriculePrec?.join(', ')),
+              _field('VIN / numéro de série', v.numeroSerie),
             ]),
-            _group('Identité du véhicule', [
-              _field('Marque', v.marque),
-              _field('Modèle / type', v.type),
-              _field('Finition', v.trim),
-              _field('Année modèle', v.modelYear?.toString()),
-              _field('Mise en circulation', v.anneeUtil?.toString()),
-              _field('Couleur', v.color),
-              _field('Carrosserie', v.carrosserie),
-            ]),
-            _group('Adresse administrative', [
+            _group('Carte grise', [
+              _field('Date du document', _date(v.date)),
+              _field('Numéro / référence', v.numero),
+              _field('Quittance', v.quittance == null ? null : '${v.quittance}'),
               _field('Wilaya', v.wilaya?.toString()),
               _field('Daïra', v.daira),
               _field('Commune', v.commune),
-              _field('Adresse', v.adresse),
+              _field('Adresse administrative', v.adresse),
+            ]),
+            _group('Titulaire de la carte grise', [
+              _field('Nom', v.nom),
+              _field('Prénom', v.prenom),
+              _field('Profession', v.profession),
             ]),
           ],
-        ),
-        _section(
-          'Spécifications techniques',
-          'Motorisation, transmission, dimensions et capacités',
+        );
+      case 2:
+        return _section(
+          'Caractéristiques techniques',
+          'Identité du véhicule, motorisation, transmission, dimensions et capacités',
           [
+            _group('Identité du véhicule', [
+              _field('Marque', VehicleMakeService.nameFor(v.marque)),
+              _field('Modèle / type', v.type),
+              _field('Finition', v.trim),
+              _field('Année modèle', v.modelYear?.toString()),
+              _field('Année déclarée (champ legacy)', v.anneeUtil?.toString()),
+              _field('Genre', v.genre),
+              _field('Carrosserie', v.carrosserie),
+              _field('Couleur', v.color),
+            ]),
             _group('Motorisation', [
               _field('Énergie', v.energie),
-              _field('Puissance fiscale',
-                  v.puissance == null ? null : '${v.puissance} CV fiscaux'),
-              _field('Puissance moteur (ch)',
-                  v.enginePowerHp == null ? null : '${v.enginePowerHp} ch'),
-              _field('Puissance moteur (kW)',
-                  v.enginePowerKw == null ? null : '${v.enginePowerKw} kW'),
-              _field('Cylindrée',
-                  v.engineDisplacement == null
-                      ? null
-                      : '${v.engineDisplacement} cm³'),
+              _field('Cylindrée', v.engineDisplacement == null ? null : '${v.engineDisplacement} cm³'),
+              _field('Puissance fiscale', v.puissance == null ? null : '${v.puissance} CV'),
+              _field('Puissance moteur', v.enginePowerHp == null ? null : '${v.enginePowerHp} ch'),
+              _field('Puissance moteur', v.enginePowerKw == null ? null : '${v.enginePowerKw} kW'),
               _field('Code moteur', v.engineCode),
             ]),
             _group('Transmission', [
               _field('Transmission', v.transmission),
-              _field('Boîte', v.gearbox),
+              _field('Boîte de vitesses', v.gearbox),
               _field('Roues motrices', v.driveType),
             ]),
-            _group('Dimensions & capacité', [
-              _field('Portes', v.doors?.toString()),
-              _field('Places', v.placesAssises?.toString()),
-              _field('Poids total',
-                  v.poidsTotal == null ? null : '${v.poidsTotal} kg'),
-              _field('Charge utile',
-                  v.charegeUtile == null ? null : '${v.charegeUtile} kg'),
-              _field('Longueur',
-                  v.lengthMm == null ? null : '${v.lengthMm} mm'),
+            _group('Dimensions et capacité', [
+              _field('Nombre de portes', v.doors?.toString()),
+              _field('Places assises', v.placesAssises?.toString()),
+              _field('Poids total', v.poidsTotal == null ? null : '${v.poidsTotal} kg'),
+              _field('Charge utile', v.charegeUtile == null ? null : '${v.charegeUtile} kg'),
+              _field('Longueur', v.lengthMm == null ? null : '${v.lengthMm} mm'),
               _field('Largeur', v.widthMm == null ? null : '${v.widthMm} mm'),
               _field('Hauteur', v.heightMm == null ? null : '${v.heightMm} mm'),
+              _field('Véhicule lourd (legacy)', v.lourd ? 'Oui' : 'Non'),
             ]),
           ],
-        ),
-        _section(
-          'Affectation & organisation',
-          'Rattachement administratif et conducteur associé',
+        );
+      case 3:
+        return _section(
+          'Affectation et organisation',
+          'Conducteur, rattachement organisationnel et état opérationnel',
           [
-            _group('Organisation', [
+            _group('Conducteur', [
+              _field('Matricule conducteur', v.matriculeConducteur),
+              _field('Appartenance conducteur (legacy)', v.appartenanceconducteur),
+            ]),
+            _group('Rattachement organisationnel (valeurs legacy)', [
               _field('Appartenance', v.appartenance),
               _field('Filiale', v.filliale),
               _field('Direction', v.direction),
               _field('Département', v.departement),
               _field('Périmètre', v.perimetre.toString()),
-              _field('Emplacement', v.emplacement),
             ]),
-            _group('Propriétaire', [
-              _field('Nom', v.nom),
-              _field('Prénom', v.prenom),
-              _field('Profession', v.profession),
-            ]),
-            _group('Conducteur', [
-              _field('Matricule conducteur', v.matriculeConducteur),
-              _field('Appartenance conducteur', v.appartenanceconducteur),
-            ]),
-          ],
-        ),
-        _gpsParkingSection(accent),
-        _maintenanceSection(accent),
-        _documentsSection(accent),
-        _historySection(accent),
-        _section(
-          'Finances & cycle de vie',
-          'Acquisition, garantie et suivi kilométrique',
-          [
-            _group('Acquisition', [
-              _field('Mode', v.acquisitionType),
-              _field('Date', _date(v.acquisitionDate)),
-              _field('Prix d’achat',
-                  v.purchasePrice == null ? null : '${v.purchasePrice} DA'),
-              _field('Fournisseur', v.supplier),
-              _field('Fin de garantie', _date(v.warrantyEndDate)),
-            ]),
-            _group('Kilométrage', [
-              _field('Kilométrage actuel',
-                  v.currentMileage == null ? null : '${v.currentMileage} km'),
-              _field('Prochaine révision',
-                  v.nextServiceMileage == null
-                      ? null
-                      : '${v.nextServiceMileage} km'),
+            _group('État et usage', [
+              _field(
+                'État opérationnel',
+                v.etatactuel == null
+                    ? null
+                    : VehiclesUtilities.getEtatName(v.etatactuel!).tr(),
+              ),
+              _field('Ancienne valeur « état »', v.etat),
+              _field('Type d’usage', v.service ? 'Véhicule de service' : 'Flotte'),
+              _field('Emplacement historique', v.emplacement),
             ]),
           ],
-        ),
-      ],
-    );
+        );
+      case 4:
+        return _gpsParkingSection(accent);
+      case 5:
+        return _documentsSection(accent);
+      case 6:
+        return _maintenanceSection(accent);
+      case 7:
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _historySection(accent),
+            _section(
+              'Acquisition et garantie',
+              'Informations d’acquisition actuellement enregistrées sur la fiche',
+              [
+                _group('Acquisition', [
+                  _field('Mode', v.acquisitionType),
+                  _field('Date', _date(v.acquisitionDate)),
+                  _field('Prix d’achat', v.purchasePrice == null ? null : '${v.purchasePrice} DA'),
+                  _field('Fournisseur', v.supplier),
+                  _field('Fin de garantie', _date(v.warrantyEndDate)),
+                  _field('Numéro de flotte', v.fleetNumber),
+                ]),
+                _group('Métadonnées de la fiche', [
+                  _field('Créée le', _date(v.createdAt)),
+                  _field('Modifiée le', _date(v.updatedAt)),
+                ]),
+              ],
+            ),
+          ],
+        );
+      default:
+        return const SizedBox.shrink();
+    }
   }
 
   Widget _gpsParkingSection(Color accent) {
@@ -499,13 +598,13 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                     accent,
                     [
                       _statusValue(
-                        'Emplacement enregistré',
+                        'Emplacement historique',
                         val(v.emplacement),
                         accent,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'L’affectation à un parking et à une place numérotée sera reliée au plan interactif du site.',
+                        'Cette valeur provient de l’ancien champ texte « emplacement » ; elle ne confirme pas une place de parking normalisée.',
                         style: TextStyle(
                           color: Colors.grey[100],
                           fontSize: 11,
@@ -527,141 +626,167 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   Widget _overview(Color accent) {
     final documents = VehicleProvider.documentsVehicules.values.where((doc) =>
         doc.vehicle == v.id || doc.vehiclemat == v.matricule).toList();
-    final expiring =
+    final documentsWithDeadline =
         documents.where((doc) => doc.dateExpiration != null).length;
+    final makeName = VehicleMakeService.nameFor(v.marque);
+    final currentStatus = v.etatactuel == null
+        ? 'Non renseigné'
+        : VehiclesUtilities.getEtatName(v.etatactuel!).tr();
+
+    final identityFields = <_VehicleField>[
+      _field('Immatriculation', v.matricule),
+      _field('Marque', makeName),
+      _field('Modèle', v.type),
+      _field('Année modèle', v.modelYear?.toString()),
+      _field('VIN / numéro de série', v.numeroSerie),
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _heading('Vue générale',
-            'Synthèse du véhicule, de son affectation et des informations de suivi'),
-        LayoutBuilder(builder: (context, constraints) {
-          final wide = constraints.maxWidth >= 850;
-          final left = Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _group('Informations du véhicule', [
-                _field('Immatriculation', v.matricule),
-                _field('Marque', v.marque),
-                _field('Modèle', v.type),
-                _field('Année modèle',
-                    v.modelYear?.toString() ?? v.anneeUtil?.toString()),
-                _field('VIN / numéro de série', v.numeroSerie),
-                _field('Énergie', v.energie),
-                _field('Couleur', v.color),
-                _field('Catégorie', v.carrosserie),
-              ]),
-              _group('Affectation', [
-                _field('Filiale', v.filliale),
-                _field('Direction', v.direction),
-                _field('Département', v.departement),
-                _field('Conducteur', [
-                  v.prenom,
-                  v.nom
-                ].where((e) => e?.trim().isNotEmpty == true).join(' ')),
-                _field('Matricule conducteur', v.matriculeConducteur),
-                _field('Emplacement', v.emplacement),
-              ]),
-              _group('Informations administratives', [
-                _field('Date carte grise', _date(v.date)),
-                _field('Pays', v.pays),
-                _field('Wilaya', v.wilaya?.toString()),
-                _field('Commune', v.commune),
-                _field('Adresse', v.adresse),
-              ]),
-            ],
-          );
-          final right = Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _panel(
-                'État du véhicule',
-                FluentIcons.info,
-                accent,
-                [
-                  Row(
-                    children: [
-                      Expanded(
-                          child: _statusValue('Statut', val(v.etat), accent)),
-                      Expanded(
-                          child: _statusValue(
-                              'Type', v.service ? 'Service' : 'Flotte', accent)),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  _statusValue('Numéro de flotte', val(v.fleetNumber), accent),
-                ],
-              ),
-              _panel(
-                'Kilométrage & entretien',
-                FluentIcons.car,
-                accent,
-                [
-                  _statusValue('Kilométrage actuel',
-                      n(v.currentMileage, ' km'), accent),
-                  const SizedBox(height: 13),
-                  _statusValue('Prochaine révision',
-                      n(v.nextServiceMileage, ' km'), accent),
-                  const SizedBox(height: 9),
-                  Text(
-                    'Les échéances de maintenance seront calculées à partir des relevés et interventions réellement enregistrés.',
-                    style: TextStyle(
-                        color: Colors.grey[100], fontSize: 11, height: 1.4),
-                  ),
-                ],
-              ),
-              _panel(
-                'Documents',
-                FluentIcons.document,
-                accent,
-                [
-                  Row(
-                    children: [
-                      Expanded(
-                          child: _statusValue(
-                              'Enregistrés', documents.length.toString(), accent)),
-                      Expanded(
-                          child: _statusValue(
-                              'Avec échéance', expiring.toString(), accent)),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Les échéances et pièces enregistrées sont détaillées plus bas dans cette fiche.',
-                    style: TextStyle(
-                      color: Colors.grey[100],
-                      fontSize: 11,
-                      height: 1.4,
+        _heading(
+          'Vue générale',
+          'Les informations essentielles du véhicule et les éléments nécessitant une attention',
+        ),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final wide = constraints.maxWidth >= 900;
+            final left = Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _group('Identité du véhicule', identityFields),
+                _group('Affectation connue', [
+                  _field('Matricule conducteur', v.matriculeConducteur),
+                  _field('Filiale', v.filliale),
+                  _field('Direction', v.direction),
+                  _field('Département', v.departement),
+                  _field('Emplacement historique', v.emplacement),
+                ]),
+              ],
+            );
+            final right = Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _panel(
+                  'État et usage',
+                  FluentIcons.info,
+                  accent,
+                  [
+                    _statusValue('État opérationnel', currentStatus, accent),
+                    const SizedBox(height: 12),
+                    _statusValue(
+                      'Type d’usage',
+                      v.service ? 'Véhicule de service' : 'Flotte',
+                      accent,
                     ),
-                  ),
-                ],
-              ),
-              _panel(
-                'Localisation',
-                FluentIcons.car,
-                accent,
-                [
-                  _statusValue('Dernière position', 'Non disponible', accent),
-                  const SizedBox(height: 7),
-                  Text(
-                    'Aucune donnée GPS réelle n’est actuellement associée à ce véhicule.',
-                    style: TextStyle(
-                        color: Colors.grey[100], fontSize: 11, height: 1.4),
-                  ),
-                ],
-              ),
-            ],
-          );
-          if (!wide) return Column(children: [left, right]);
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(flex: 7, child: left),
-              const SizedBox(width: 16),
-              Expanded(flex: 4, child: right),
-            ],
-          );
-        }),
+                    if (v.etat?.trim().isNotEmpty == true) ...[
+                      const SizedBox(height: 10),
+                      _statusValue(
+                        'Valeur historique « état »',
+                        v.etat!.trim(),
+                        accent,
+                      ),
+                    ],
+                  ],
+                ),
+                _panel(
+                  'Documents',
+                  FluentIcons.document,
+                  accent,
+                  [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _statusValue(
+                            'Documents enregistrés',
+                            documents.length.toString(),
+                            accent,
+                          ),
+                        ),
+                        Expanded(
+                          child: _statusValue(
+                            'Avec échéance',
+                            documentsWithDeadline.toString(),
+                            accent,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 9),
+                    Text(
+                      'Les dates et métadonnées sont détaillées dans la rubrique Documents.',
+                      style: TextStyle(
+                        color: Colors.grey[100],
+                        fontSize: 11,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+                _panel(
+                  'Kilométrage enregistré',
+                  FluentIcons.speedometer,
+                  accent,
+                  [
+                    _statusValue(
+                      'Valeur enregistrée',
+                      n(v.currentMileage, ' km'),
+                      accent,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'La date et la source de cette valeur ne sont pas disponibles dans la fiche actuelle.',
+                      style: TextStyle(
+                        color: Colors.grey[100],
+                        fontSize: 11,
+                        height: 1.4,
+                      ),
+                    ),
+                    if (v.nextServiceMileage != null) ...[
+                      const SizedBox(height: 9),
+                      _statusValue(
+                        'Seuil de révision legacy',
+                        n(v.nextServiceMileage, ' km'),
+                        accent,
+                      ),
+                    ],
+                  ],
+                ),
+                _panel(
+                  'Localisation',
+                  FluentIcons.map_pin,
+                  accent,
+                  [
+                    _statusValue(
+                      'Dernière position',
+                      'Aucune position GPS reçue',
+                      accent,
+                    ),
+                    const SizedBox(height: 7),
+                    Text(
+                      'Aucune source GPS réelle n’est actuellement associée à ce véhicule.',
+                      style: TextStyle(
+                        color: Colors.grey[100],
+                        fontSize: 11,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+
+            if (!wide) return Column(children: [left, right]);
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(flex: 7, child: left),
+                const SizedBox(width: 16),
+                Expanded(flex: 4, child: right),
+              ],
+            );
+          },
+        ),
       ],
     );
   }
@@ -1178,4 +1303,10 @@ class _VehicleField extends StatelessWidget {
                   const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
         ],
       );
+  @override
+  void dispose() {
+    _contentScrollController.dispose();
+    super.dispose();
+  }
+
 }
