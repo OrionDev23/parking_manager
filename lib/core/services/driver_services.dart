@@ -244,11 +244,12 @@ class DriverServices {
           await remoteSource.createDriver(driver);
         } on AppwriteException catch (error) {
           if (error.code != 409) rethrow;
-          // Recover a create whose remote commit succeeded but whose
-          // response was lost. Only update after verifying tenant ownership.
+          // The remote create may have committed before its response was
+          // lost. getDriver returns null for a missing row or another tenant.
+          // Accept the same-tenant row as the completed create, but never
+          // overwrite it: a later queued update is applied separately.
           final existing = await remoteSource.getDriver(operation.entityId);
           if (existing == null) rethrow;
-          await remoteSource.updateDriver(driver);
         }
         return;
       case SyncOperationType.update:
