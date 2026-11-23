@@ -742,6 +742,9 @@
   "at": "في",
   "addgroup": "مجموعة جديدة",
   "addtask": "مهمة جديدة",
-  "numero": "الرقم"
-
+  "numero": "الرقم",
+  "repair_status_waiting": "قيد الانتظار",
+  "repair_status_in_progress": "قيد التنفيذ",
+  "repair_status_completed": "مكتمل",
+  "repair_status_unknown": "حالة غير معروفة"
 }

@@ -162,6 +162,20 @@ abstract final class VehicleDetailFormatters {
         normalizedLeft == normalizeRegistration(right);
   }
 
+  static String repairStatusKey(int? state) {
+    switch (state) {
+      case null:
+      case 0:
+        return 'repair_status_waiting';
+      case 1:
+        return 'repair_status_in_progress';
+      case 2:
+        return 'repair_status_completed';
+      default:
+        return 'repair_status_unknown';
+    }
+  }
+
   static String formatNumber(num value) {
     if (value.isFinite && value % 1 == 0) {
       return value.toInt().toString();

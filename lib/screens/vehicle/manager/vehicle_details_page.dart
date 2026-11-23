@@ -1564,12 +1564,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             ],
           );
           final status = _chip(
-            repair.etat == 2
-                ? 'Terminé'
-                : repair.etat == 1
-                    ? 'En cours'
-                    : 'En attente',
-            accent,
+            VehicleDetailFormatters.repairStatusKey(repair.etat).tr(),
+            statusColor,
           );
 
           return Padding(

@@ -57,6 +57,41 @@ void main() {
     });
   });
 
+  group('VehicleDetailFormatters.repairStatusKey', () {
+    test('treats a missing status as waiting', () {
+      expect(
+        VehicleDetailFormatters.repairStatusKey(null),
+        'repair_status_waiting',
+      );
+      expect(
+        VehicleDetailFormatters.repairStatusKey(0),
+        'repair_status_waiting',
+      );
+    });
+
+    test('maps the known repair statuses', () {
+      expect(
+        VehicleDetailFormatters.repairStatusKey(1),
+        'repair_status_in_progress',
+      );
+      expect(
+        VehicleDetailFormatters.repairStatusKey(2),
+        'repair_status_completed',
+      );
+    });
+
+    test('marks unsupported status codes as unknown', () {
+      expect(
+        VehicleDetailFormatters.repairStatusKey(-1),
+        'repair_status_unknown',
+      );
+      expect(
+        VehicleDetailFormatters.repairStatusKey(3),
+        'repair_status_unknown',
+      );
+    });
+  });
+
   group('VehicleDetailFormatters.formatNumber', () {
     test('removes unnecessary decimal zeros', () {
       expect(VehicleDetailFormatters.formatNumber(110.0), '110');

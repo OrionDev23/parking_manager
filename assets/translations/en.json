@@ -740,6 +740,9 @@
   "at": "at",
   "addgroup": "New group",
   "addtask": "New task",
-  "numero": "Number"
-
+  "numero": "Number",
+  "repair_status_waiting": "Waiting",
+  "repair_status_in_progress": "In progress",
+  "repair_status_completed": "Completed",
+  "repair_status_unknown": "Unknown status"
 }

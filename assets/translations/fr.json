@@ -752,6 +752,9 @@
  "at": "à",
  "addgroup": "Nouveau groupe",
  "addtask": "Ajouter tache",
- "numero": "Numéro"
-
+ "numero": "Numéro",
+  "repair_status_waiting": "En attente",
+  "repair_status_in_progress": "En cours",
+  "repair_status_completed": "Terminé",
+  "repair_status_unknown": "Statut inconnu"
 }
