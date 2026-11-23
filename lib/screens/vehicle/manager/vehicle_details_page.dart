@@ -549,14 +549,20 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   }
 
   List<Conducteur> _driversMatchingVehicleRegistration() {
-    final registration =
-        VehicleDetailFormatters.normalizeRegistration(v.matriculeConducteur);
-    if (registration.isEmpty) return const [];
+    if (VehicleDetailFormatters.normalizeRegistration(
+      v.matriculeConducteur,
+    ).isEmpty) {
+      return const [];
+    }
 
-    return DriverProvider.conducteurs.values.where((driver) {
-      return VehicleDetailFormatters.normalizeRegistration(driver.matricule) ==
-          registration;
-    }).toList(growable: false);
+    return DriverProvider.conducteurs.values
+        .where(
+          (driver) => VehicleDetailFormatters.sameRegistration(
+            driver.matricule,
+            v.matriculeConducteur,
+          ),
+        )
+        .toList(growable: false);
   }
 
   Widget _assignmentSection(Color accent) {
@@ -588,11 +594,16 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             else if (!DriverProvider.downloadedConducteurs)
               _emptyInline('Référentiel des conducteurs non disponible')
             else if (matchingDrivers.length == 1) ...[
-              _statusValue(
-                'Conducteur',
-                matchingDrivers.single.getName().trim(),
-                accent,
-              ),
+              if (matchingDrivers.single.getName().trim().isNotEmpty)
+                _statusValue(
+                  'Conducteur',
+                  matchingDrivers.single.getName().trim(),
+                  accent,
+                )
+              else
+                _emptyInline(
+                  'Le matricule correspond à un conducteur, mais son nom n’est pas renseigné.',
+                ),
               const SizedBox(height: 8),
               _statusValue(
                 'Situation du conducteur',
