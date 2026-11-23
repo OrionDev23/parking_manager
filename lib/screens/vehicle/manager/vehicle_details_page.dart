@@ -1411,11 +1411,26 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                         '${_date(state.date ?? state.updatedAt ?? state.createdAt)}'
                         '${state.ordreNum == null ? '' : ' • Ordre #${state.ordreNum}'}',
                         style: TextStyle(color: Colors.grey[100], fontSize: 11)),
+                      if (state.type == 2 &&
+                          state.valeur != null &&
+                          state.valeur! > 0)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            'Montant de réparation : ${VehicleDetailFormatters.formatNumber(state.valeur!)} DA',
+                            style: TextStyle(
+                              color: Colors.grey[100],
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
                       if (state.remarque?.trim().isNotEmpty == true)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
-                          child: Text(state.remarque!,
-                              style: const TextStyle(fontSize: 12)),
+                          child: Text(
+                            state.remarque!,
+                            style: const TextStyle(fontSize: 12),
+                          ),
                         ),
                     ],
                   )),
