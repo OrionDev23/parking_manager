@@ -95,6 +95,32 @@ void main() {
       expect(await queue.pending(companyId: companyId), isEmpty);
     });
 
+    test('refuses to reassign an existing local driver ID to another tenant', () async {
+      final original = driver();
+      await local.upsertDriver(original);
+
+      final otherTenantSource = SqliteDriverSource(
+        database,
+        companyId: 'company-other-driver',
+      );
+      final attemptedTransfer = Driver(
+        id: original.id,
+        companyId: 'company-other-driver',
+        firstName: 'Other',
+        lastName: 'Tenant',
+        registration: 'CH-OTHER',
+        createdAt: original.createdAt,
+        updatedAt: original.updatedAt,
+      );
+
+      expect(
+        () => otherTenantSource.upsertDriverInTransaction(attemptedTransfer),
+        throwsA(isA<StateError>()),
+      );
+      expect((await local.getDriver(original.id))?.companyId, companyId);
+      expect(await otherTenantSource.getDriver(original.id), isNull);
+    });
+
     test('coalesces driver create followed by update', () async {
       final created = driver();
       final updated = driver(firstName: 'Amine Updated');
