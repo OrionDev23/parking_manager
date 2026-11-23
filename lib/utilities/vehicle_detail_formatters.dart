@@ -149,6 +149,19 @@ abstract final class VehicleDetailFormatters {
     }
   }
 
+  static String normalizeRegistration(String? value) {
+    return (value ?? '')
+        .trim()
+        .replaceAll(RegExp(r'\\s+'), '')
+        .toUpperCase();
+  }
+
+  static bool sameRegistration(String? left, String? right) {
+    final normalizedLeft = normalizeRegistration(left);
+    return normalizedLeft.isNotEmpty &&
+        normalizedLeft == normalizeRegistration(right);
+  }
+
   static String formatNumber(num value) {
     if (value.isFinite && value % 1 == 0) {
       return value.toInt().toString();
