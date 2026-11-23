@@ -86,6 +86,16 @@ class SqliteDriverSource implements LocalDriverSource {
     if (driver.companyId != companyId) {
       throw StateError('Driver company does not match the local company.');
     }
+    final existingRows = _db.select(
+      'SELECT company_id FROM drivers WHERE id = ? LIMIT 1',
+      [driver.id],
+    );
+    if (existingRows.isNotEmpty &&
+        existingRows.first['company_id'] != companyId) {
+      throw StateError(
+        'Driver ID is already owned by another local company.',
+      );
+    }
     final payload = jsonEncode(driver.toMap());
     _db.execute(
       '''INSERT INTO drivers
