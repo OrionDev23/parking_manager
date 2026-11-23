@@ -45,7 +45,7 @@ L'audit initial a trouvé le même défaut dans trois chemins natifs :
 
 L'implémentation Web reste online-only : le chemin atomique SQLite n'est pas utilisé côté Web et l'appel de cette API native y échoue explicitement.
 
-**Tests ajoutés :** migration v11→v12, schéma v12, commit/rollback, coalescence create/update/delete, backoff retry, isolation tenant des chauffeurs et atomicité du cache Stock. Le résultat CI final doit être contrôlé après les derniers commits ; un run précédent a identifié un import manquant dans le nouveau test Stock, corrigé depuis.
+**Tests ajoutés et exécutés par CI :** migration v11→v12, schéma v12, commit/rollback, coalescence create/update/delete, backoff retry, isolation tenant des chauffeurs et atomicité du cache Stock. Le run final `45074377970` est vert sur le commit `aee741a7` : tests Flutter, analyse statique, build Web et syntaxe de la Function Appwrite.
 
 ### 1.3 Différence Web / natif
 
