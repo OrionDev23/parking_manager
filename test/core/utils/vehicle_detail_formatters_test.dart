@@ -39,6 +39,24 @@ void main() {
     });
   });
 
+  group('VehicleDetailFormatters.sameRegistration', () {
+    test('matches registration without spaces and regardless of case', () {
+      expect(
+        VehicleDetailFormatters.sameRegistration(' 123 - 456 - 23 ', '123-456-23'),
+        isTrue,
+      );
+      expect(
+        VehicleDetailFormatters.sameRegistration('abc-123', 'ABC-123'),
+        isTrue,
+      );
+    });
+
+    test('does not match empty registrations', () {
+      expect(VehicleDetailFormatters.sameRegistration(null, ''), isFalse);
+      expect(VehicleDetailFormatters.sameRegistration('123', null), isFalse);
+    });
+  });
+
   group('VehicleDetailFormatters.formatNumber', () {
     test('removes unnecessary decimal zeros', () {
       expect(VehicleDetailFormatters.formatNumber(110.0), '110');
