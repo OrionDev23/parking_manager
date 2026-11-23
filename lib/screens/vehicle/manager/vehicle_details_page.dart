@@ -121,13 +121,13 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   }) {
     const sections = <({String label, IconData icon})>[
       (label: 'Aperçu', icon: FluentIcons.view_dashboard),
-      (label: 'Identification', icon: FluentIcons.contact),
+      (label: 'Identification', icon: FluentIcons.info),
       (label: 'Caractéristiques', icon: FluentIcons.settings),
       (label: 'Affectation', icon: FluentIcons.account_management),
-      (label: 'Localisation', icon: FluentIcons.map_pin),
+      (label: 'Localisation', icon: FluentIcons.car),
       (label: 'Documents', icon: FluentIcons.document_set),
       (label: 'Maintenance', icon: FluentIcons.repair),
-      (label: 'Historique', icon: FluentIcons.history),
+      (label: 'Historique', icon: FluentIcons.document),
     ];
 
     return Container(
@@ -725,7 +725,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 ),
                 _panel(
                   'Kilométrage enregistré',
-                  FluentIcons.speedometer,
+                  FluentIcons.car,
                   accent,
                   [
                     _statusValue(
@@ -754,7 +754,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 ),
                 _panel(
                   'Localisation',
-                  FluentIcons.map_pin,
+                  FluentIcons.car,
                   accent,
                   [
                     _statusValue(
