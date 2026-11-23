@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/services/vehicle_make_service.dart';
 import '../../../utilities/vehicle_util.dart';
+import '../../../ui/design_system/parcoto_tokens.dart';
 
 class VehicleDetailsPage extends StatefulWidget {
   final Vehicle vehicle;
@@ -36,29 +37,63 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   List<Etat> _vehicleStates = [];
   List<FicheReception> _receptionSheets = [];
   int _selectedSectionIndex = 0;
+  int _vehicleLoadGeneration = 0;
   final ScrollController _contentScrollController = ScrollController();
   Vehicle get v => widget.vehicle;
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _loadMaintenance();
-      _loadHistory();
-    });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadDocuments();
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_requestedDocuments) {
-      _requestedDocuments = true;
+  void didUpdateWidget(covariant VehicleDetailsPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.vehicle.id == widget.vehicle.id) return;
+
+    _vehicleLoadGeneration++;
+    _selectedSectionIndex = 0;
+    _requestedDocuments = false;
+    _requestedMaintenance = false;
+    _loadingMaintenance = false;
+    _requestedHistory = false;
+    _loadingHistory = false;
+    _vehicleStates = [];
+    _receptionSheets = [];
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _loadDocuments();
+    });
+  }
+
+  Future<void> _loadDocuments() async {
+    if (_requestedDocuments) return;
+    _requestedDocuments = true;
+    try {
       final provider = context.read<VehicleProvider>();
       if (!VehicleProvider.downloadedDocuments &&
           !VehicleProvider.downloadingDocuments) {
-        provider.refreshDocuments();
+        await provider.refreshDocuments();
       }
+    } catch (error) {
+      _requestedDocuments = false;
+      debugPrint('[Vehicle details] documents load failed: $error');
+    }
+  }
+
+  void _ensureSectionDataLoaded(int index) {
+    switch (index) {
+      case 0:
+      case 5:
+        _loadDocuments();
+        break;
+      case 6:
+        _loadMaintenance();
+        break;
+      case 7:
+        _loadHistory();
+        break;
     }
   }
 
@@ -77,14 +112,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       v.type?.trim() ?? '',
       v.modelYear?.toString() ?? '',
     ].where((value) => value.isNotEmpty).join(' ');
-    final compact = MediaQuery.sizeOf(context).width < 640;
+    final compact = MediaQuery.sizeOf(context).width < ParcotoTokens.mobileBreakpoint;
 
     return Container(
       color: app.backGroundColor,
       child: Column(
         children: [
           _header(accent, model.isEmpty ? 'Fiche véhicule' : model),
-          _buildSectionNavigation(accent, compact: compact),
+          _buildSectionNavigation(compact: compact),
           Expanded(
             child: SingleChildScrollView(
               controller: _contentScrollController,
@@ -113,10 +148,10 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     if (_contentScrollController.hasClients) {
       _contentScrollController.jumpTo(0);
     }
+    _ensureSectionDataLoaded(index);
   }
 
-  Widget _buildSectionNavigation(
-    Color accent, {
+  Widget _buildSectionNavigation({
     required bool compact,
   }) {
     const sections = <({String label, IconData icon})>[
@@ -184,7 +219,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   Widget _header(Color accent, String model) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final compact = constraints.maxWidth < 680;
+        final compact = constraints.maxWidth < ParcotoTokens.tabletBreakpoint;
         final identity = Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -347,6 +382,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     if (_requestedHistory || _loadingHistory) return;
     _requestedHistory = true;
     _loadingHistory = true;
+    final generation = _vehicleLoadGeneration;
+    final vehicleId = v.id;
+    final registration = v.matricule;
     if (mounted) setState(() {});
     try {
       final provider = context.read<VehicleProvider>();
@@ -359,7 +397,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         }
       }
       final states = VehicleProvider.etats.values.where((state) =>
-          state.vehicle == v.id || state.vehicleMat == v.matricule).toList()
+          state.vehicle == vehicleId || state.vehicleMat == registration).toList()
         ..sort((a, b) {
           final aDate = a.date ?? a.updatedAt ?? a.createdAt;
           final bDate = b.date ?? b.updatedAt ?? b.createdAt;
@@ -368,12 +406,13 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           if (bDate == null) return -1;
           return bDate.compareTo(aDate);
         });
-      if (!mounted) return;
+      if (!mounted || generation != _vehicleLoadGeneration) return;
       setState(() {
         _vehicleStates = states;
         _loadingHistory = false;
       });
     } catch (error) {
+      if (generation != _vehicleLoadGeneration) return;
       debugPrint('[Vehicle details] history load failed: $error');
       if (mounted) setState(() => _loadingHistory = false);
     }
@@ -383,6 +422,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     if (_requestedMaintenance || _loadingMaintenance) return;
     _requestedMaintenance = true;
     _loadingMaintenance = true;
+    final generation = _vehicleLoadGeneration;
+    final vehicleId = v.id;
+    final registration = v.matricule.trim();
     if (mounted) setState(() {});
     try {
       final repairProvider = RepairProvider();
@@ -394,18 +436,18 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         await repairProvider.refreshReparations();
       }
       await RepairProvider.downloadFicheReparations();
-      final key = v.matricule.trim();
       final sheets = RepairProvider.repPerVeh.entries
-          .where((entry) => entry.key == key)
+          .where((entry) => entry.key == registration)
           .expand((entry) => entry.value)
           .toList()
         ..sort((a, b) => b.dateEntre.compareTo(a.dateEntre));
-      if (!mounted) return;
+      if (!mounted || generation != _vehicleLoadGeneration) return;
       setState(() {
         _receptionSheets = sheets;
         _loadingMaintenance = false;
       });
     } catch (error) {
+      if (generation != _vehicleLoadGeneration) return;
       debugPrint('[Vehicle details] maintenance load failed: $error');
       if (mounted) setState(() => _loadingMaintenance = false);
     }
@@ -497,7 +539,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               _field('Filiale', v.filliale),
               _field('Direction', v.direction),
               _field('Département', v.departement),
-              _field('Périmètre', v.perimetre.toString()),
+              _field('Code de périmètre legacy', v.perimetre.toString()),
             ]),
             _group('État et usage', [
               _field(
@@ -507,7 +549,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                     : VehiclesUtilities.getEtatName(v.etatactuel!).tr(),
               ),
               _field('Ancienne valeur « état »', v.etat),
-              _field('Type d’usage', v.service ? 'Véhicule de service' : 'Flotte'),
+              _field('Type d’usage', v.service ? 'Véhicule de service' : 'Usage non précisé'),
               _field('Emplacement historique', v.emplacement),
             ]),
           ],
@@ -558,7 +600,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         ),
         LayoutBuilder(
           builder: (context, constraints) {
-            final twoColumns = constraints.maxWidth >= 620;
+            final twoColumns = constraints.maxWidth >= ParcotoTokens.mobileBreakpoint;
             final cardWidth = twoColumns
                 ? (constraints.maxWidth - 14) / 2
                 : constraints.maxWidth;
@@ -650,7 +692,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         ),
         LayoutBuilder(
           builder: (context, constraints) {
-            final wide = constraints.maxWidth >= 900;
+            final wide = constraints.maxWidth >= ParcotoTokens.tabletBreakpoint;
             final left = Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -679,7 +721,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                       v.service ? 'Véhicule de service' : 'Flotte',
                       accent,
                     ),
-                    if (v.etat?.trim().isNotEmpty == true) ...[
+                    if (v.etatactuel != null) ...[
+              const SizedBox(height: 9),
+              _chip(
+                'État : ${VehiclesUtilities.getEtatName(v.etatactuel!).tr()}',
+                accent,
+              ),
+            ],
+            if (v.etat?.trim().isNotEmpty == true) ...[
                       const SizedBox(height: 10),
                       _statusValue(
                         'Valeur historique « état »',
@@ -904,9 +953,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         _heading('Maintenance & interventions',
             'Interventions et fiches de réception réellement enregistrées pour ce véhicule'),
         LayoutBuilder(builder: (context, constraints) {
-          final columns = constraints.maxWidth >= 760
+          final columns = constraints.maxWidth >= ParcotoTokens.tabletBreakpoint
               ? 3
-              : constraints.maxWidth >= 480
+              : constraints.maxWidth >= ParcotoTokens.mobileBreakpoint
                   ? 2
                   : 1;
           final width =
@@ -1114,7 +1163,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     final expired = expiryDay != null && expiryDay.isBefore(today);
     final daysRemaining = expiryDay?.difference(today).inDays;
     final status = expiration == null
-        ? 'Aucune échéance'
+        ? 'Échéance inconnue'
         : expired
             ? 'Expiré'
             : daysRemaining == 0
@@ -1212,7 +1261,11 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                   const TextStyle(fontSize: 14, fontWeight: FontWeight.w700)),
           const SizedBox(height: 14),
           LayoutBuilder(builder: (context, c) {
-            final cols = c.maxWidth > 720 ? 3 : c.maxWidth > 430 ? 2 : 1;
+            final cols = c.maxWidth >= ParcotoTokens.tabletBreakpoint
+                ? 3
+                : c.maxWidth >= ParcotoTokens.mobileBreakpoint
+                    ? 2
+                    : 1;
             final w = (c.maxWidth - (cols - 1) * 18) / cols;
             return Wrap(
               spacing: 18,
