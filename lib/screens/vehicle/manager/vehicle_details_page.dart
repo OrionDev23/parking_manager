@@ -1161,7 +1161,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                     const SizedBox(height: 12),
                     _statusValue(
                       'Type d’usage',
-                      v.service ? 'Véhicule de service' : 'Usage non précisé',
+                      v.service ? 'vehicle_service_use'.tr() : 'vehicle_function_use'.tr(),
                       accent,
                     ),
                     _sectionShortcut('Voir l’affectation', 3),
@@ -1281,7 +1281,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                     else ...[
                       _statusValue(
                         'Dernier changement enregistré',
-                        'État ${latestActivity.type}',
+                        VehiclesUtilities.getEtatName(latestActivity.type).tr(),
                         accent,
                       ),
                       const SizedBox(height: 6),
