@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:parc_oto/serializables/reparation/reparation.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('Reparation search status', () {
     test('keeps a missing status aligned with the waiting default', () {
       final repair = Reparation(
