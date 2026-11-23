@@ -152,7 +152,7 @@ abstract final class VehicleDetailFormatters {
   static String normalizeRegistration(String? value) {
     return (value ?? '')
         .trim()
-        .replaceAll(RegExp(r'\\s+'), '')
+        .replaceAll(RegExp(r'\s+'), '')
         .toUpperCase();
   }
 
