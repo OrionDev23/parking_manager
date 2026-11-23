@@ -1563,6 +1563,13 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 ),
             ],
           );
+          final statusColor = repair.etat == 2
+              ? Colors.green
+              : repair.etat == 1
+                  ? accent
+                  : repair.etat == null || repair.etat == 0
+                      ? Colors.orange
+                      : Colors.grey[100];
           final status = _chip(
             VehicleDetailFormatters.repairStatusKey(repair.etat).tr(),
             statusColor,
