@@ -7,6 +7,7 @@ import 'package:parc_oto/serializables/vehicle/document_vehicle.dart';
 import 'package:parc_oto/serializables/vehicle/state.dart';
 import 'package:parc_oto/serializables/reparation/reparation.dart';
 import 'package:parc_oto/serializables/reparation/fiche_reception.dart';
+import 'package:parc_oto/providers/client_database.dart';
 import 'package:parc_oto/providers/driver_provider.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
 import 'package:parc_oto/providers/repair_provider.dart';
@@ -14,6 +15,7 @@ import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/services/vehicle_make_service.dart';
+import '../../../screens/entreprise/entreprise.dart';
 import '../../../utilities/vehicle_detail_formatters.dart';
 import '../../../utilities/vehicle_util.dart';
 import '../../../ui/design_system/parcoto_tokens.dart';
@@ -542,6 +544,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   ) {
     final raw = rawValue?.trim() ?? '';
     if (raw.isEmpty) return null;
+
+    final activeCompanyId = DatabaseGetter.activeCompanyId;
+    final companyProfile = MyEntrepriseState.p;
+    if (activeCompanyId == null ||
+        companyProfile == null ||
+        companyProfile.id != activeCompanyId) {
+      return raw;
+    }
 
     try {
       final resolved = resolver(raw).trim();
