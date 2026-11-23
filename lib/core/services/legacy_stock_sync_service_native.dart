@@ -105,9 +105,9 @@ class LegacyStockSyncService {
   }
 
 
-  /// Pulls the legacy stock catalogue into the company-scoped SQLite
-  /// cache. These Appwrite tables are installation-scoped and do not expose
-  /// companyId, so tenant isolation is applied by the local cache and outbox.
+  /// Pulls the tenant-scoped stock catalogue into the company-scoped
+  /// SQLite cache. Every mapped Appwrite table has a required companyId
+  /// column, so the remote query and local cache both enforce the tenant.
   Future<int> pullRemoteChanges() async {
     final database = legacy.DatabaseGetter.database;
     if (database == null) {
@@ -297,23 +297,21 @@ class LegacyStockSyncService {
           // Verify the row ID before treating the operation as an idempotent
           // replay; never convert unrelated conflicts into updates.
           if (error.code != 409) rethrow;
-          try {
-            await legacy.DatabaseGetter.database!.getRow(
-              databaseId: legacy.databaseId,
-              tableId: tableId,
-              rowId: operation.entityId,
-            );
-          } on AppwriteException catch (lookupError) {
-            if (lookupError.code == 404) throw error;
-            rethrow;
-          }
-          await legacy.DatabaseGetter.database!.updateRow(
+          final existing = await legacy.DatabaseGetter.database!.getRow(
             databaseId: legacy.databaseId,
             tableId: tableId,
             rowId: operation.entityId,
-            data: operation.payload,
-            permissions: _isTenantScoped(operation.entity) ? _rowPermissions() : null,
           );
+          if (_isTenantScoped(operation.entity) &&
+              existing.data['companyId'] != companyId) {
+            throw StateError(
+              'Stock row ID is already owned by another company.',
+            );
+          }
+          // The create may already have committed before its response was
+          // lost. Treat an existing row in the same tenant as the completed
+          // create; never overwrite it here. Any later update is a separate
+          // ordered outbox operation and will be applied afterwards.
         }
         break;
       case SyncOperationType.update:
