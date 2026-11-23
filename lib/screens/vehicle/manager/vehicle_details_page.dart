@@ -12,7 +12,6 @@ import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/services/vehicle_make_service.dart';
-import '../../../utilities/algeria_lists.dart';
 import '../../../utilities/vehicle_detail_formatters.dart';
 import '../../../utilities/vehicle_util.dart';
 import '../../../ui/design_system/parcoto_tokens.dart';
@@ -192,15 +191,10 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     return code.toUpperCase();
   }
 
-  String? _wilayaName(int? code) {
-    if (code == null) return null;
-
-    final name = AlgeriaList().getWilayaByNum(code.toString())?.trim();
-    if (name != null && name.isNotEmpty) return name;
-
-    // Keep unknown codes explicit. Never present a code as if it were a name.
-    return 'Wilaya $code (nom indisponible dans le référentiel local)';
-  }
+  String? _wilayaName(int? code) => VehicleDetailFormatters.wilayaName(
+        code,
+        languageCode: context.locale.languageCode,
+      );
 
   @override
   Widget build(BuildContext context) {
