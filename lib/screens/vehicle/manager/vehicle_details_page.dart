@@ -34,6 +34,10 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   bool _loadingMaintenance = false;
   bool _requestedHistory = false;
   bool _loadingHistory = false;
+  bool _historyLoadFailed = false;
+  bool _maintenanceLoadFailed = false;
+  bool _documentsLoadFailed = false;
+  bool _makeCatalogRequested = false;
   List<Etat> _vehicleStates = [];
   List<FicheReception> _receptionSheets = [];
   int _selectedSectionIndex = 0;
@@ -45,6 +49,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _loadDocuments();
+    _loadVehicleMakeCatalog();
   }
 
   @override
@@ -59,6 +64,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     _loadingMaintenance = false;
     _requestedHistory = false;
     _loadingHistory = false;
+    _historyLoadFailed = false;
+    _maintenanceLoadFailed = false;
+    _documentsLoadFailed = false;
     _vehicleStates = [];
     _receptionSheets = [];
 
@@ -67,18 +75,60 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     });
   }
 
-  Future<void> _loadDocuments() async {
-    if (_requestedDocuments) return;
+  Future<void> _loadDocuments({bool force = false}) async {
+    if (_requestedDocuments && !force) return;
     _requestedDocuments = true;
+    _documentsLoadFailed = false;
+
     try {
       final provider = context.read<VehicleProvider>();
-      if (!VehicleProvider.downloadedDocuments &&
-          !VehicleProvider.downloadingDocuments) {
+      if (VehicleProvider.downloadingDocuments) {
+        await _waitForLoading(
+          () => VehicleProvider.downloadingDocuments,
+          'documents',
+        );
+      }
+      if (!mounted) return;
+
+      if (!VehicleProvider.downloadedDocuments) {
         await provider.refreshDocuments();
       }
+      if (!mounted) return;
+
+      final failed = !VehicleProvider.downloadedDocuments &&
+          !VehicleProvider.downloadingDocuments;
+      setState(() => _documentsLoadFailed = failed);
+      if (failed) _requestedDocuments = false;
     } catch (error) {
-      _requestedDocuments = false;
+      if (!mounted) return;
       debugPrint('[Vehicle details] documents load failed: $error');
+      setState(() => _documentsLoadFailed = true);
+      _requestedDocuments = false;
+    }
+  }
+
+  Future<void> _loadVehicleMakeCatalog() async {
+    if (_makeCatalogRequested) return;
+    _makeCatalogRequested = true;
+    try {
+      await VehicleMakeService.load();
+      if (mounted) setState(() {});
+    } catch (error) {
+      // The local legacy catalogue remains available as a display fallback.
+      debugPrint('[Vehicle details] make catalogue unavailable: $error');
+    }
+  }
+
+  Future<void> _waitForLoading(
+    bool Function() isLoading,
+    String resource,
+  ) async {
+    for (var attempt = 0; attempt < 200 && isLoading(); attempt++) {
+      await Future.delayed(const Duration(milliseconds: 50));
+      if (!mounted) return;
+    }
+    if (isLoading()) {
+      throw StateError('Timed out while waiting for $resource to load.');
     }
   }
 
@@ -389,22 +439,33 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     if (_requestedHistory || _loadingHistory) return;
     _requestedHistory = true;
     _loadingHistory = true;
+    _historyLoadFailed = false;
     final generation = _vehicleLoadGeneration;
     final vehicleId = v.id;
-    final registration = v.matricule;
-    if (mounted) setState(() {});
+    final registration = v.matricule.trim();
+    setState(() {});
+
     try {
       final provider = context.read<VehicleProvider>();
-      if (!VehicleProvider.downloadedStates &&
-          !VehicleProvider.downloadingStates) {
-        await provider.refreshStates();
-      } else {
-        while (VehicleProvider.downloadingStates) {
-          await Future.delayed(const Duration(milliseconds: 50));
-        }
+      if (VehicleProvider.downloadingStates) {
+        await _waitForLoading(
+          () => VehicleProvider.downloadingStates,
+          'vehicle history',
+        );
       }
+      if (!mounted || generation != _vehicleLoadGeneration) return;
+
+      if (!VehicleProvider.downloadedStates) {
+        await provider.refreshStates();
+      }
+      if (!mounted || generation != _vehicleLoadGeneration) return;
+      if (!VehicleProvider.downloadedStates) {
+        throw StateError('Vehicle history could not be loaded from Appwrite.');
+      }
+
       final states = VehicleProvider.etats.values.where((state) =>
-          state.vehicle == vehicleId || state.vehicleMat == registration).toList()
+          state.vehicle == vehicleId ||
+          state.vehicleMat.trim() == registration).toList()
         ..sort((a, b) {
           final aDate = a.date ?? a.updatedAt ?? a.createdAt;
           final bDate = b.date ?? b.updatedAt ?? b.createdAt;
@@ -413,15 +474,21 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           if (bDate == null) return -1;
           return bDate.compareTo(aDate);
         });
+
       if (!mounted || generation != _vehicleLoadGeneration) return;
       setState(() {
         _vehicleStates = states;
         _loadingHistory = false;
+        _historyLoadFailed = false;
       });
     } catch (error) {
-      if (generation != _vehicleLoadGeneration) return;
+      if (!mounted || generation != _vehicleLoadGeneration) return;
       debugPrint('[Vehicle details] history load failed: $error');
-      if (mounted) setState(() => _loadingHistory = false);
+      setState(() {
+        _loadingHistory = false;
+        _historyLoadFailed = true;
+      });
+      _requestedHistory = false;
     }
   }
 
@@ -429,33 +496,60 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     if (_requestedMaintenance || _loadingMaintenance) return;
     _requestedMaintenance = true;
     _loadingMaintenance = true;
+    _maintenanceLoadFailed = false;
     final generation = _vehicleLoadGeneration;
     final registration = v.matricule.trim();
-    if (mounted) setState(() {});
+    setState(() {});
+
     try {
-      final repairProvider = RepairProvider();
-      while (RepairProvider.downloadingReparations) {
-        await Future.delayed(const Duration(milliseconds: 50));
+      // Reuse the dashboard-owned provider instead of creating an unmanaged
+      // ChangeNotifier instance for this page.
+      final repairProvider = context.read<RepairProvider>();
+      if (RepairProvider.downloadingReparations) {
+        await _waitForLoading(
+          () => RepairProvider.downloadingReparations,
+          'repair orders',
+        );
       }
-      if (!RepairProvider.downloadedReparations &&
-          RepairProvider.reparations.isEmpty) {
+      if (!mounted || generation != _vehicleLoadGeneration) return;
+
+      if (!RepairProvider.downloadedReparations) {
         await repairProvider.refreshReparations();
       }
+      if (!mounted || generation != _vehicleLoadGeneration) return;
+
       await RepairProvider.downloadFicheReparations();
+      if (!mounted || generation != _vehicleLoadGeneration) return;
+
+      final normalizedRegistration = registration.toUpperCase();
       final sheets = RepairProvider.repPerVeh.entries
-          .where((entry) => entry.key == registration)
+          .where((entry) =>
+              entry.key.trim().toUpperCase() == normalizedRegistration)
           .expand((entry) => entry.value)
           .toList()
         ..sort((a, b) => b.dateEntre.compareTo(a.dateEntre));
-      if (!mounted || generation != _vehicleLoadGeneration) return;
+
+      final couldNotVerify = !RepairProvider.downloadedReparations &&
+          RepairProvider.reparations.isEmpty &&
+          !RepairProvider.receptionSheetsVerified &&
+          sheets.isEmpty;
+      if (couldNotVerify) {
+        throw StateError('Maintenance data could not be verified.');
+      }
+
       setState(() {
         _receptionSheets = sheets;
         _loadingMaintenance = false;
+        _maintenanceLoadFailed = false;
       });
     } catch (error) {
-      if (generation != _vehicleLoadGeneration) return;
+      if (!mounted || generation != _vehicleLoadGeneration) return;
       debugPrint('[Vehicle details] maintenance load failed: $error');
-      if (mounted) setState(() => _loadingMaintenance = false);
+      setState(() {
+        _loadingMaintenance = false;
+        _maintenanceLoadFailed = true;
+      });
+      _requestedMaintenance = false;
     }
   }
 
@@ -510,8 +604,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               _field('Énergie', v.energie),
               _field('Cylindrée', v.engineDisplacement == null ? null : '${v.engineDisplacement} cm³'),
               _field('Puissance fiscale', v.puissance == null ? null : '${v.puissance} CV'),
-              _field('Puissance moteur', v.enginePowerHp == null ? null : '${v.enginePowerHp} ch'),
-              _field('Puissance moteur', v.enginePowerKw == null ? null : '${v.enginePowerKw} kW'),
+              _field(
+                'Puissance moteur (ch)',
+                v.enginePowerHp == null ? null : '${v.enginePowerHp} ch',
+              ),
+              _field(
+                'Puissance moteur (kW)',
+                v.enginePowerKw == null ? null : '${v.enginePowerKw} kW',
+              ),
               _field('Code moteur', v.engineCode),
             ]),
             _group('Transmission', [
@@ -527,7 +627,10 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               _field('Longueur', v.lengthMm == null ? null : '${v.lengthMm} mm'),
               _field('Largeur', v.widthMm == null ? null : '${v.widthMm} mm'),
               _field('Hauteur', v.heightMm == null ? null : '${v.heightMm} mm'),
-              _field('Véhicule lourd (legacy)', v.lourd ? 'Oui' : 'Non'),
+              _field(
+                'Indicateur véhicule lourd (legacy)',
+                v.lourd ? 'Oui' : null,
+              ),
             ]),
           ],
         );
@@ -545,7 +648,10 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               _field('Filiale', v.filliale),
               _field('Direction', v.direction),
               _field('Département', v.departement),
-              _field('Code de périmètre legacy', v.perimetre.toString()),
+              _field(
+                'Code de périmètre legacy',
+                v.perimetre == 0 ? null : v.perimetre.toString(),
+              ),
             ]),
             _group('État et usage', [
               _field(
@@ -708,7 +814,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                   _field('Filiale', v.filliale),
                   _field('Direction', v.direction),
                   _field('Département', v.departement),
-                  _field('Emplacement historique', v.emplacement),
+                  // Emplacement legacy is shown only in Localisation.
                 ]),
               ],
             );
@@ -891,7 +997,12 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         _heading('Historique du véhicule',
             'Événements de statut enregistrés dans le registre des états Parcoto'),
         _panel('Changements d’état', FluentIcons.document, accent, [
-          if (_vehicleStates.isEmpty)
+          if (_historyLoadFailed)
+            _retryNotice(
+              'Impossible de charger l’historique. Vérifiez la connexion puis réessayez.',
+              _loadHistory,
+            ),
+          if (_vehicleStates.isEmpty && !_historyLoadFailed)
             _emptyInline('Aucun changement d’état enregistré pour ce véhicule')
           else
             ..._vehicleStates.map((state) => Padding(
@@ -969,16 +1080,21 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           ]);
         }),
         const SizedBox(height: 20),
+        if (_maintenanceLoadFailed)
+          _retryNotice(
+            'Certaines données de maintenance n’ont pas pu être vérifiées. Réessayez le chargement.',
+            _loadMaintenance,
+          ),
         _panel('Ordres de réparation', FluentIcons.repair, accent, [
-          if (repairs.isEmpty)
+          if (repairs.isEmpty && !_maintenanceLoadFailed)
             _emptyInline('Aucun ordre de réparation associé à ce véhicule')
-          else
+          else if (repairs.isNotEmpty)
             ...repairs.map((repair) => _repairRow(repair, accent)),
         ]),
         _panel('Fiches de réception', FluentIcons.document, accent, [
-          if (sheets.isEmpty)
+          if (sheets.isEmpty && !_maintenanceLoadFailed)
             _emptyInline('Aucune fiche de réception trouvée pour cette immatriculation')
-          else
+          else if (sheets.isNotEmpty)
             ...sheets.map((sheet) => _receptionRow(sheet, accent)),
         ]),
         if (_loadingMaintenance)
@@ -1040,6 +1156,43 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         style: TextStyle(color: Colors.grey[100], fontSize: 12)),
   );
 
+  Widget _retryNotice(String message, VoidCallback onRetry) => Container(
+    width: double.infinity,
+    margin: const EdgeInsets.only(bottom: 12),
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: Colors.orange.withValues(alpha: .08),
+      border: Border.all(color: Colors.orange.withValues(alpha: .28)),
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 12,
+      runSpacing: 8,
+      children: [
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 620),
+          child: Text(
+            message,
+            style: TextStyle(color: Colors.grey[100], fontSize: 12),
+          ),
+        ),
+        Button(
+          onPressed: onRetry,
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(FluentIcons.refresh, size: 12),
+              SizedBox(width: 6),
+              Text('Réessayer'),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+
   Widget _documentsSection(Color accent) {
     final provider = context.watch<VehicleProvider>();
     final documents = VehicleProvider.documentsVehicules.values.where((doc) {
@@ -1070,17 +1223,42 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           'Documents du véhicule',
           'Documents administratifs et dates d’expiration enregistrés dans Parcoto',
         ),
-        Row(
-          children: [
-            _documentSummary('Documents enregistrés', documents.length.toString(),
-                FluentIcons.document, accent),
-            const SizedBox(width: 12),
-            _documentSummary(
-                'Avec expiration',
-                documents.where((d) => d.dateExpiration != null).length.toString(),
-                FluentIcons.calendar,
-                accent),
-          ],
+        if (_documentsLoadFailed)
+          _retryNotice(
+            'Impossible de récupérer les documents du véhicule. Réessayez le chargement.',
+            () => _loadDocuments(force: true),
+          ),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final twoColumns = constraints.maxWidth >= 440;
+            final cardWidth = twoColumns
+                ? (constraints.maxWidth - 12) / 2
+                : constraints.maxWidth;
+            return Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                SizedBox(
+                  width: cardWidth,
+                  child: _documentSummary(
+                    'Documents enregistrés',
+                    documents.length.toString(),
+                    FluentIcons.document,
+                    accent,
+                  ),
+                ),
+                SizedBox(
+                  width: cardWidth,
+                  child: _documentSummary(
+                    'Avec échéance',
+                    documents.where((d) => d.dateExpiration != null).length.toString(),
+                    FluentIcons.calendar,
+                    accent,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
         const SizedBox(height: 16),
         if (documents.isEmpty)
@@ -1097,7 +1275,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           child: Button(
             onPressed: VehicleProvider.downloadingDocuments
                 ? null
-                : () => provider.refreshDocuments(),
+                : () => _loadDocuments(force: true),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -1121,34 +1299,36 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   }
 
   Widget _documentSummary(
-          String label, String value, IconData icon, Color accent) =>
-      Expanded(
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey[30]),
-            borderRadius: BorderRadius.circular(11),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, color: accent, size: 18),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(label,
-                        style:
-                            TextStyle(color: Colors.grey[100], fontSize: 11)),
-                    const SizedBox(height: 4),
-                    Text(value,
-                        style: const TextStyle(
-                            fontSize: 17, fontWeight: FontWeight.w700)),
-                  ],
-                ),
+    String label,
+    String value,
+    IconData icon,
+    Color accent,
+  ) =>
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey[30]),
+          borderRadius: BorderRadius.circular(11),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: accent, size: 18),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label,
+                      style: TextStyle(color: Colors.grey[100], fontSize: 11)),
+                  const SizedBox(height: 4),
+                  Text(value,
+                      style: const TextStyle(
+                          fontSize: 17, fontWeight: FontWeight.w700)),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       );
 
