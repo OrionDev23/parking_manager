@@ -82,6 +82,16 @@ class SqliteVehicleSource implements LocalVehicleSource {
     if (vehicle.companyId != companyId) {
       throw StateError('Vehicle company does not match the local company.');
     }
+    final existingRows = _db.select(
+      'SELECT company_id FROM vehicles WHERE id = ? LIMIT 1',
+      [vehicle.id],
+    );
+    if (existingRows.isNotEmpty &&
+        existingRows.first['company_id'] != companyId) {
+      throw StateError(
+        'Vehicle ID is already owned by another local company.',
+      );
+    }
     final payload = jsonEncode(vehicle.toMap());
     _db.execute(
       '''INSERT INTO vehicles
