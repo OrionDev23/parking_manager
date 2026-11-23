@@ -671,7 +671,12 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 ? null
                 : VehiclesUtilities.getEtatName(v.etatactuel!).tr(),
           ),
-          _field('Type d’usage', v.service ? 'service'.tr() : 'fonction'.tr()),
+          _field(
+            'Type d’usage',
+            v.service
+                ? 'vehicle_service_use'.tr()
+                : 'vehicle_function_use'.tr(),
+          ),
         ]),
       ],
     );
