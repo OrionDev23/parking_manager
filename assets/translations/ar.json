@@ -529,6 +529,8 @@
   "servicefonction": "وظيفة/خدمة",
   "service": "وظيفة",
   "fonction": "خدمة",
+ "vehicle_service_use": "مركبة مصلحة",
+ "vehicle_function_use": "سيارة وظيفية",
   "departement": "القسم",
   "departements": "الأقسام",
   "listcomplete": "القائمة الكاملة",
