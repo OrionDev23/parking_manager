@@ -255,6 +255,13 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                   height: 1.3,
                 ),
               ),
+              if (v.etatactuel != null) ...[
+                const SizedBox(height: 8),
+                _chip(
+                  VehiclesUtilities.getEtatName(v.etatactuel!).tr(),
+                  accent,
+                ),
+              ],
             ],
           ),
         );
@@ -423,7 +430,6 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     _requestedMaintenance = true;
     _loadingMaintenance = true;
     final generation = _vehicleLoadGeneration;
-    final vehicleId = v.id;
     final registration = v.matricule.trim();
     if (mounted) setState(() {});
     try {
@@ -718,17 +724,10 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                     const SizedBox(height: 12),
                     _statusValue(
                       'Type d’usage',
-                      v.service ? 'Véhicule de service' : 'Flotte',
+                      v.service ? 'Véhicule de service' : 'Usage non précisé',
                       accent,
                     ),
-                    if (v.etatactuel != null) ...[
-              const SizedBox(height: 9),
-              _chip(
-                'État : ${VehiclesUtilities.getEtatName(v.etatactuel!).tr()}',
-                accent,
-              ),
-            ],
-            if (v.etat?.trim().isNotEmpty == true) ...[
+                    if (v.etat?.trim().isNotEmpty == true) ...[
                       const SizedBox(height: 10),
                       _statusValue(
                         'Valeur historique « état »',
