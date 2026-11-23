@@ -156,7 +156,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   Widget build(BuildContext context) {
     final app = context.watch<AppTheme>();
     final accent = FluentTheme.of(context).accentColor;
-    final makeName = VehicleMakeService.nameFor(v.marque);
+    final makeName = VehicleMakeService.nameFor(VehicleMakeService.canonicalId(v.marque));
     final model = [
       makeName,
       v.type?.trim() ?? '',
@@ -591,7 +591,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           'Identité du véhicule, motorisation, transmission, dimensions et capacités',
           [
             _group('Identité du véhicule', [
-              _field('Marque', VehicleMakeService.nameFor(v.marque)),
+              _field('Marque', VehicleMakeService.nameFor(VehicleMakeService.canonicalId(v.marque))),
               _field('Modèle / type', v.type),
               _field('Finition', v.trim),
               _field('Année modèle', v.modelYear?.toString()),
@@ -782,7 +782,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         doc.vehicle == v.id || doc.vehiclemat == v.matricule).toList();
     final documentsWithDeadline =
         documents.where((doc) => doc.dateExpiration != null).length;
-    final makeName = VehicleMakeService.nameFor(v.marque);
+    final makeName = VehicleMakeService.nameFor(VehicleMakeService.canonicalId(v.marque));
     final currentStatus = v.etatactuel == null
         ? 'Non renseigné'
         : VehiclesUtilities.getEtatName(v.etatactuel!).tr();
@@ -1194,7 +1194,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   );
 
   Widget _documentsSection(Color accent) {
-    final provider = context.watch<VehicleProvider>();
+    context.watch<VehicleProvider>();
     final documents = VehicleProvider.documentsVehicules.values.where((doc) {
       return doc.vehicle == v.id || doc.vehiclemat == v.matricule;
     }).toList()
@@ -1261,14 +1261,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           },
         ),
         const SizedBox(height: 16),
-        if (documents.isEmpty)
+        if (documents.isEmpty && !_documentsLoadFailed)
           _empty(
             FluentIcons.document,
             'Aucun document enregistré pour ce véhicule',
             'Les documents associés à cette immatriculation apparaîtront ici dès leur création dans la gestion documentaire.',
             'Aucun document trouvé',
           )
-        else
+        else if (documents.isNotEmpty)
           ...documents.map((document) => _documentTile(document, accent)),
         Align(
           alignment: Alignment.centerRight,
