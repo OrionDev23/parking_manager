@@ -183,6 +183,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       case 7:
         _loadHistory();
         break;
+      case 8:
+        break;
     }
   }
 
@@ -275,6 +277,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       (label: 'Documents', icon: FluentIcons.document_set),
       (label: 'Maintenance', icon: FluentIcons.repair),
       (label: 'Historique', icon: FluentIcons.document),
+      (label: 'Acquisition', icon: FluentIcons.shopping_cart),
     ];
 
     return Container(
@@ -956,28 +959,27 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       case 6:
         return _maintenanceSection(accent);
       case 7:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _historySection(accent),
-            _section(
-              'Acquisition et garantie',
-              'Informations d’acquisition actuellement enregistrées sur la fiche',
-              [
-                _group('Acquisition', [
-                  _field('Mode', v.acquisitionType),
-                  _field('Date', _date(v.acquisitionDate)),
-                  _field('Prix d’achat', v.purchasePrice == null ? null : '${v.purchasePrice} DA'),
-                  _field('Fournisseur', v.supplier),
-                  _field('Fin de garantie', _date(v.warrantyEndDate)),
-                  _field('Numéro de flotte', v.fleetNumber),
-                ]),
-                _group('Métadonnées de la fiche', [
-                  _field('Créée le', _date(v.createdAt)),
-                  _field('Modifiée le', _date(v.updatedAt)),
-                ]),
-              ],
-            ),
+        return _historySection(accent);
+      case 8:
+        return _section(
+          'Acquisition et garantie',
+          'Informations d’acquisition actuellement enregistrées sur la fiche',
+          [
+            _group('Acquisition', [
+              _field('Mode', v.acquisitionType),
+              _field('Date', _date(v.acquisitionDate)),
+              _field(
+                'Prix d’achat',
+                v.purchasePrice == null ? null : '${v.purchasePrice} DA',
+              ),
+              _field('Fournisseur', v.supplier),
+              _field('Fin de garantie', _date(v.warrantyEndDate)),
+              _field('Numéro de flotte', v.fleetNumber),
+            ]),
+            _group('Métadonnées de la fiche', [
+              _field('Créée le', _date(v.createdAt)),
+              _field('Modifiée le', _date(v.updatedAt)),
+            ]),
           ],
         );
       default:
