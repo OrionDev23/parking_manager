@@ -44,12 +44,23 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   int _vehicleLoadGeneration = 0;
   final ScrollController _contentScrollController = ScrollController();
   Vehicle get v => widget.vehicle;
+  String get _normalizedRegistration => v.matricule.trim().toUpperCase();
+
+  bool _matchesVehicleDocument(DocumentVehicle document) {
+    final linkedVehicleId = document.vehicle?.trim();
+    final linkedRegistration = document.vehiclemat?.trim().toUpperCase();
+    return linkedVehicleId == v.id ||
+        (linkedRegistration != null &&
+            linkedRegistration.isNotEmpty &&
+            linkedRegistration == _normalizedRegistration);
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _loadDocuments();
     _loadVehicleMakeCatalog();
+    _loadHistory();
   }
 
   @override
@@ -71,7 +82,12 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     _receptionSheets = [];
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _loadDocuments();
+      if (!mounted) return;
+      if (_contentScrollController.hasClients) {
+        _contentScrollController.jumpTo(0);
+      }
+      _loadDocuments();
+      _loadHistory();
     });
   }
 
@@ -135,6 +151,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   void _ensureSectionDataLoaded(int index) {
     switch (index) {
       case 0:
+        _loadDocuments();
+        _loadHistory();
+        break;
       case 5:
         _loadDocuments();
         break;
@@ -524,6 +543,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       final normalizedRegistration = registration.toUpperCase();
       final sheets = RepairProvider.repPerVeh.entries
           .where((entry) =>
+              entry.key == v.id ||
               entry.key.trim().toUpperCase() == normalizedRegistration)
           .expand((entry) => entry.value)
           .toList()
@@ -778,10 +798,26 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
 
 
   Widget _overview(Color accent) {
-    final documents = VehicleProvider.documentsVehicules.values.where((doc) =>
-        doc.vehicle == v.id || doc.vehiclemat == v.matricule).toList();
+    final documents = VehicleProvider.documentsVehicules.values
+        .where(_matchesVehicleDocument)
+        .toList();
     final documentsWithDeadline =
         documents.where((doc) => doc.dateExpiration != null).length;
+    final documentsUnavailable = _documentsLoadFailed ||
+        (!VehicleProvider.downloadedDocuments &&
+            !VehicleProvider.downloadingDocuments);
+    final documentsCountValue = documentsUnavailable
+        ? 'Indisponible'
+        : VehicleProvider.downloadingDocuments
+            ? 'Chargement…'
+            : documents.length.toString();
+    final documentsDeadlineValue = documentsUnavailable
+        ? '—'
+        : VehicleProvider.downloadingDocuments
+            ? '—'
+            : documentsWithDeadline.toString();
+    final latestActivity =
+        _vehicleStates.isEmpty ? null : _vehicleStates.first;
     final makeName = VehicleMakeService.nameFor(VehicleMakeService.canonicalId(v.marque));
     final currentStatus = v.etatactuel == null
         ? 'Non renseigné'
@@ -809,6 +845,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _group('Identité du véhicule', identityFields),
+                _sectionShortcut('Voir l’identification', 1),
                 _group('Affectation connue', [
                   _field('Matricule conducteur', v.matriculeConducteur),
                   _field('Filiale', v.filliale),
@@ -816,6 +853,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                   _field('Département', v.departement),
                   // Emplacement legacy is shown only in Localisation.
                 ]),
+                _sectionShortcut('Voir l’affectation', 3),
               ],
             );
             final right = Column(
@@ -841,6 +879,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                         accent,
                       ),
                     ],
+                    _sectionShortcut('Voir l’affectation', 3),
                   ],
                 ),
                 _panel(
@@ -853,19 +892,24 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                         Expanded(
                           child: _statusValue(
                             'Documents enregistrés',
-                            documents.length.toString(),
+                            documentsCountValue,
                             accent,
                           ),
                         ),
                         Expanded(
                           child: _statusValue(
                             'Avec échéance',
-                            documentsWithDeadline.toString(),
+                            documentsDeadlineValue,
                             accent,
                           ),
                         ),
                       ],
                     ),
+                    if (_documentsLoadFailed)
+                      _retryNotice(
+                        'Les documents n’ont pas pu être vérifiés.',
+                        () => _loadDocuments(force: true),
+                      ),
                     const SizedBox(height: 9),
                     Text(
                       'Les dates et métadonnées sont détaillées dans la rubrique Documents.',
@@ -875,6 +919,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                         height: 1.4,
                       ),
                     ),
+                    _sectionShortcut('Voir les documents', 5),
                   ],
                 ),
                 _panel(
@@ -904,6 +949,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                         accent,
                       ),
                     ],
+                    _sectionShortcut('Voir la maintenance', 6),
                   ],
                 ),
                 _panel(
@@ -925,6 +971,61 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                         height: 1.4,
                       ),
                     ),
+                    _sectionShortcut('Voir la localisation', 4),
+                  ],
+                ),
+                _panel(
+                  'Activité récente',
+                  FluentIcons.document,
+                  accent,
+                  [
+                    if (_loadingHistory && latestActivity == null)
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: ProgressRing(),
+                        ),
+                      )
+                    else if (_historyLoadFailed)
+                      _retryNotice(
+                        'L’activité récente n’a pas pu être chargée.',
+                        _loadHistory,
+                      )
+                    else if (latestActivity == null)
+                      _emptyInline('Aucun événement enregistré pour ce véhicule')
+                    else ...[
+                      _statusValue(
+                        'Dernier changement enregistré',
+                        'État ${latestActivity.type}',
+                        accent,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        _date(
+                          latestActivity.date ??
+                              latestActivity.updatedAt ??
+                              latestActivity.createdAt,
+                        ),
+                        style: TextStyle(
+                          color: Colors.grey[100],
+                          fontSize: 11,
+                        ),
+                      ),
+                      if (latestActivity.remarque?.trim().isNotEmpty == true)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(
+                            latestActivity.remarque!,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.grey[100],
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                    ],
+                    _sectionShortcut('Voir l’historique complet', 7),
                   ],
                 ),
               ],
@@ -984,6 +1085,21 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               style:
                   const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
         ],
+      );
+
+  Widget _sectionShortcut(String label, int sectionIndex) => Align(
+        alignment: Alignment.centerRight,
+        child: Button(
+          onPressed: () => _selectSection(sectionIndex),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(label),
+              const SizedBox(width: 6),
+              const Icon(FluentIcons.chevron_right, size: 11),
+            ],
+          ),
+        ),
       );
 
   Widget _historySection(Color accent) {
@@ -1046,7 +1162,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
 
   Widget _maintenanceSection(Color accent) {
     final repairs = RepairProvider.reparations.values.where((repair) =>
-        repair.vehiculemat == v.matricule || repair.vehicule == v.id).toList()
+        repair.vehiculemat?.trim().toUpperCase() == _normalizedRegistration ||
+        repair.vehicule == v.id).toList()
       ..sort((a, b) => b.date.compareTo(a.date));
     final sheets = _receptionSheets;
     final totalCost = sheets.fold<double>(
@@ -1195,9 +1312,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
 
   Widget _documentsSection(Color accent) {
     context.watch<VehicleProvider>();
-    final documents = VehicleProvider.documentsVehicules.values.where((doc) {
-      return doc.vehicle == v.id || doc.vehiclemat == v.matricule;
-    }).toList()
+    final documents = VehicleProvider.documentsVehicules.values
+        .where(_matchesVehicleDocument)
+        .toList()
       ..sort((a, b) {
         final aDate = a.dateExpiration;
         final bDate = b.dateExpiration;
