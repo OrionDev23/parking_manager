@@ -45,4 +45,33 @@ void main() {
       expect(VehicleDetailFormatters.formatNumber(0), '0');
     });
   });
+
+  group('VehicleDetailFormatters.wilayaName', () {
+    test('resolves wilayas from the 69-wilaya administrative map', () {
+      expect(
+        VehicleDetailFormatters.wilayaName(23, languageCode: 'fr'),
+        'Annaba',
+      );
+      expect(
+        VehicleDetailFormatters.wilayaName(23, languageCode: 'ar'),
+        'عنابة',
+      );
+      expect(
+        VehicleDetailFormatters.wilayaName(59, languageCode: 'fr'),
+        'Aflou',
+      );
+      expect(
+        VehicleDetailFormatters.wilayaName(69, languageCode: 'fr'),
+        'El Abiodh Sidi Cheikh',
+      );
+    });
+
+    test('keeps null and unknown codes explicit', () {
+      expect(VehicleDetailFormatters.wilayaName(null), isNull);
+      expect(
+        VehicleDetailFormatters.wilayaName(70),
+        'Code wilaya inconnu (70)',
+      );
+    });
+  });
 }
