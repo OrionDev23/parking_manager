@@ -181,6 +181,31 @@ void main() {
       expect(pending.single.payloadVersion, 1);
     });
 
+    test('refuses to reassign an existing local vehicle ID to another tenant', () async {
+      final original = vehicle();
+      await local.upsertVehicle(original);
+
+      final otherTenantSource = SqliteVehicleSource(
+        database,
+        companyId: 'company-other-001',
+      );
+      final attemptedTransfer = Vehicle(
+        id: original.id,
+        companyId: 'company-other-001',
+        registration: '99999-999-99',
+        foreignRegistration: false,
+        createdAt: original.createdAt,
+        updatedAt: original.updatedAt,
+      );
+
+      expect(
+        () => otherTenantSource.upsertVehicleInTransaction(attemptedTransfer),
+        throwsA(isA<StateError>()),
+      );
+      expect((await local.getVehicle(original.id))?.companyId, companyId);
+      expect(await otherTenantSource.getVehicle(original.id), isNull);
+    });
+
     test('rolls back both writes when the local mutation fails', () async {
       final value = vehicle();
 
