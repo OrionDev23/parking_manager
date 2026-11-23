@@ -1399,9 +1399,13 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                   Expanded(child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('État ${state.type}',
-                          style: const TextStyle(
-                              fontSize: 13, fontWeight: FontWeight.w600)),
+                      Text(
+                        VehiclesUtilities.getEtatName(state.type).tr(),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                       const SizedBox(height: 3),
                       Text(
                         '${_date(state.date ?? state.updatedAt ?? state.createdAt)}'
@@ -1491,49 +1495,157 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     );
   }
 
-  Widget _repairRow(Reparation repair, Color accent) => Padding(
-    padding: const EdgeInsets.only(bottom: 13),
-    child: Row(children: [
-      Icon(FluentIcons.repair, color: accent, size: 17),
-      const SizedBox(width: 10),
-      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Ordre #${repair.numero}',
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 3),
-        Text('${_date(repair.date)} • ${repair.prestatairenom ?? 'Prestataire non renseigné'}',
-            style: TextStyle(color: Colors.grey[100], fontSize: 11)),
-        if (repair.remarque?.trim().isNotEmpty == true)
-          Text(repair.remarque!, maxLines: 2, overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: Colors.grey[100], fontSize: 11)),
-      ])),
-      _chip(repair.etat == 2 ? 'Terminé' : repair.etat == 1 ? 'En cours' : 'En attente', accent),
-    ]),
-  );
+  Widget _repairRow(Reparation repair, Color accent) => LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 460;
+          final details = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Ordre #${repair.numero}',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                '${_date(repair.date)} • ${repair.prestatairenom ?? 'Prestataire non renseigné'}',
+                style: TextStyle(color: Colors.grey[100], fontSize: 11),
+              ),
+              if (repair.remarque?.trim().isNotEmpty == true)
+                Text(
+                  repair.remarque!,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Colors.grey[100], fontSize: 11),
+                ),
+            ],
+          );
+          final status = _chip(
+            repair.etat == 2
+                ? 'Terminé'
+                : repair.etat == 1
+                    ? 'En cours'
+                    : 'En attente',
+            accent,
+          );
 
-  Widget _receptionRow(FicheReception sheet, Color accent) => Padding(
-    padding: const EdgeInsets.only(bottom: 13),
-    child: Row(children: [
-      Icon(FluentIcons.document, color: accent, size: 17),
-      const SizedBox(width: 10),
-      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('Fiche de réception #${sheet.numero}',
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 3),
-        Text('Entrée : ${_date(sheet.dateEntre)}'
-            '${sheet.dateSortie == null ? ' • Toujours ouverte' : ' • Sortie : ${_date(sheet.dateSortie)}'}',
-            style: TextStyle(color: Colors.grey[100], fontSize: 11)),
-        if (sheet.kilometrage != null)
-          Text('Kilométrage : ${sheet.kilometrage} km',
-              style: TextStyle(color: Colors.grey[100], fontSize: 11)),
-        if (sheet.remarque?.trim().isNotEmpty == true)
-          Text(sheet.remarque!, maxLines: 2, overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: Colors.grey[100], fontSize: 11)),
-      ])),
-      if (sheet.reparationCost != null)
-        Text('${sheet.reparationCost!.toStringAsFixed(2)} DA',
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-    ]),
-  );
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 13),
+            child: compact
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(FluentIcons.repair, color: accent, size: 17),
+                          const SizedBox(width: 10),
+                          Expanded(child: details),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: status,
+                      ),
+                    ],
+                  )
+                : Row(
+                    children: [
+                      Icon(FluentIcons.repair, color: accent, size: 17),
+                      const SizedBox(width: 10),
+                      Expanded(child: details),
+                      const SizedBox(width: 10),
+                      status,
+                    ],
+                  ),
+          );
+        },
+      );
+
+  Widget _receptionRow(FicheReception sheet, Color accent) =>
+      LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 460;
+          final details = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Fiche de réception #${sheet.numero}',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                'Entrée : ${_date(sheet.dateEntre)}'
+                '${sheet.dateSortie == null ? ' • Toujours ouverte' : ' • Sortie : ${_date(sheet.dateSortie)}'}',
+                style: TextStyle(color: Colors.grey[100], fontSize: 11),
+              ),
+              if (sheet.kilometrage != null)
+                Text(
+                  'Kilométrage : ${sheet.kilometrage} km',
+                  style: TextStyle(color: Colors.grey[100], fontSize: 11),
+                ),
+              if (sheet.remarque?.trim().isNotEmpty == true)
+                Text(
+                  sheet.remarque!,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Colors.grey[100], fontSize: 11),
+                ),
+            ],
+          );
+          final cost = sheet.reparationCost == null
+              ? null
+              : Text(
+                  '${sheet.reparationCost!.toStringAsFixed(2)} DA',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                );
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 13),
+            child: compact
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(FluentIcons.document, color: accent, size: 17),
+                          const SizedBox(width: 10),
+                          Expanded(child: details),
+                        ],
+                      ),
+                      if (cost != null) ...[
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: cost,
+                        ),
+                      ],
+                    ],
+                  )
+                : Row(
+                    children: [
+                      Icon(FluentIcons.document, color: accent, size: 17),
+                      const SizedBox(width: 10),
+                      Expanded(child: details),
+                      if (cost != null) ...[
+                        const SizedBox(width: 10),
+                        cost,
+                      ],
+                    ],
+                  ),
+          );
+        },
+      );
 
   Widget _emptyInline(String message) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 10),
@@ -1749,9 +1861,10 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         border: Border.all(color: Colors.grey[30]),
         borderRadius: BorderRadius.circular(11),
       ),
-      child: Row(
-        children: [
-          Container(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 420;
+          final leading = Container(
             width: 40,
             height: 40,
             decoration: BoxDecoration(
@@ -1759,28 +1872,60 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               borderRadius: BorderRadius.circular(9),
             ),
             child: Icon(FluentIcons.document, color: accent, size: 19),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          );
+          final details = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                document.nom,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                expiration == null
+                    ? 'Date d’expiration non renseignée'
+                    : 'Expiration : ${_date(expiration)}',
+                style: TextStyle(color: Colors.grey[100], fontSize: 11),
+              ),
+            ],
+          );
+          final statusBadge = _chip(status, statusColor);
+
+          if (compact) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(document.nom,
-                    style: const TextStyle(
-                        fontSize: 13, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 5),
-                Text(
-                  expiration == null
-                      ? 'Date d’expiration non renseignée'
-                      : 'Expiration : ${_date(expiration)}',
-                  style: TextStyle(color: Colors.grey[100], fontSize: 11),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    leading,
+                    const SizedBox(width: 12),
+                    Expanded(child: details),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: statusBadge,
                 ),
               ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          _chip(status, statusColor),
-        ],
+            );
+          }
+
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              leading,
+              const SizedBox(width: 12),
+              Expanded(child: details),
+              const SizedBox(width: 10),
+              statusBadge,
+            ],
+          );
+        },
       ),
     );
   }
