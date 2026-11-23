@@ -1,3 +1,4 @@
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:parc_oto/serializables/vehicle/vehicle.dart';
@@ -11,6 +12,8 @@ import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/services/vehicle_make_service.dart';
+import '../../../utilities/algeria_lists.dart';
+import '../../../utilities/vehicle_detail_formatters.dart';
 import '../../../utilities/vehicle_util.dart';
 import '../../../ui/design_system/parcoto_tokens.dart';
 
@@ -168,8 +171,36 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
 
   String val(String? s) =>
       s == null || s.trim().isEmpty ? 'Non renseigné' : s.trim();
-  String n(num? x, [String suffix = '']) =>
-      x == null ? 'Non renseigné' : '$x$suffix';
+  String n(num? x, [String suffix = '']) => x == null
+      ? 'Non renseigné'
+      : '${VehicleDetailFormatters.formatNumber(x)}$suffix';
+
+  String? _countryName(String? rawCode) {
+    final code = rawCode?.trim() ?? '';
+    if (code.isEmpty) return null;
+
+    try {
+      final country = CountryCode.fromCountryCode(code.toUpperCase());
+      final localizedName = country.localize(context).name?.trim();
+      if (localizedName != null && localizedName.isNotEmpty) {
+        return localizedName;
+      }
+    } catch (error) {
+      debugPrint('[Vehicle details] country code "$code" could not be resolved: $error');
+    }
+
+    return code.toUpperCase();
+  }
+
+  String? _wilayaName(int? code) {
+    if (code == null) return null;
+
+    final name = AlgeriaList().getWilayaByNum(code.toString())?.trim();
+    if (name != null && name.isNotEmpty) return name;
+
+    // Keep unknown codes explicit. Never present a code as if it were a name.
+    return 'Wilaya $code (nom indisponible dans le référentiel local)';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -582,21 +613,34 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           'Identification',
           'Immatriculation, carte grise et titulaire',
           [
-            _group('Immatriculation', [
-              _field('Immatriculation', v.matricule),
-              _field('Pays', v.pays),
-              _field('Immatriculation étrangère', v.matriculeEtrang ? 'Oui' : 'Non'),
-              _field('Anciennes immatriculations', v.matriculePrec?.join(', ')),
+            _group('Identification du véhicule', [
+              _field('Immatriculation principale', v.matricule),
+              _field('Pays d’immatriculation', _countryName(v.pays)),
+              _field(
+                'Immatriculation étrangère',
+                v.matriculeEtrang ? 'Oui' : 'Non',
+              ),
+              _field(
+                'Anciennes immatriculations',
+                v.matriculePrec?.join(', '),
+              ),
               _field('VIN / numéro de série', v.numeroSerie),
             ]),
-            _group('Carte grise', [
-              _field('Date du document', _date(v.date)),
-              _field('Numéro / référence', v.numero),
-              _field('Quittance', v.quittance == null ? null : '${v.quittance}'),
-              _field('Wilaya', v.wilaya?.toString()),
+            _group('Document d’immatriculation', [
+              _field('Date enregistrée sur la fiche', _date(v.date)),
+              _field('Numéro / référence du document', v.numero),
+              _field(
+                'Montant de quittance (unité non documentée)',
+                v.quittance == null
+                    ? null
+                    : VehicleDetailFormatters.formatNumber(v.quittance!),
+              ),
+            ]),
+            _group('Adresse administrative', [
+              _field('Wilaya', _wilayaName(v.wilaya)),
               _field('Daïra', v.daira),
               _field('Commune', v.commune),
-              _field('Adresse administrative', v.adresse),
+              _field('Adresse', v.adresse),
             ]),
             _group('Titulaire de la carte grise', [
               _field('Nom', v.nom),
@@ -610,20 +654,42 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           'Caractéristiques techniques',
           'Identité du véhicule, motorisation, transmission, dimensions et capacités',
           [
-            _group('Identité du véhicule', [
-              _field('Marque', VehicleMakeService.nameFor(VehicleMakeService.canonicalId(v.marque))),
+            _group('Identité constructeur et classification', [
+              _field(
+                'Marque',
+                VehicleMakeService.nameFor(
+                  VehicleMakeService.canonicalId(v.marque),
+                ),
+              ),
               _field('Modèle / type', v.type),
               _field('Finition', v.trim),
               _field('Année modèle', v.modelYear?.toString()),
-              _field('Année déclarée (champ legacy)', v.anneeUtil?.toString()),
-              _field('Genre', v.genre),
+              _field(
+                'Année d’utilisation (champ historique)',
+                v.anneeUtil?.toString(),
+              ),
+              _field(
+                'Genre administratif',
+                VehicleDetailFormatters.genreLabel(v.genre)?.tr(),
+              ),
               _field('Carrosserie', v.carrosserie),
-              _field('Couleur', v.color),
+              _field(
+                'Couleur',
+                VehicleDetailFormatters.paintLabel(v.color),
+              ),
             ]),
             _group('Motorisation', [
               _field('Énergie', v.energie),
-              _field('Cylindrée', v.engineDisplacement == null ? null : '${v.engineDisplacement} cm³'),
-              _field('Puissance fiscale', v.puissance == null ? null : '${v.puissance} CV'),
+              _field(
+                'Cylindrée',
+                v.engineDisplacement == null
+                    ? null
+                    : '${VehicleDetailFormatters.formatNumber(v.engineDisplacement!)} cm³',
+              ),
+              _field(
+                'Puissance fiscale',
+                v.puissance == null ? null : '${v.puissance} CV',
+              ),
               _field(
                 'Puissance moteur (ch)',
                 v.enginePowerHp == null ? null : '${v.enginePowerHp} ch',
@@ -642,11 +708,26 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             _group('Dimensions et capacité', [
               _field('Nombre de portes', v.doors?.toString()),
               _field('Places assises', v.placesAssises?.toString()),
-              _field('Poids total', v.poidsTotal == null ? null : '${v.poidsTotal} kg'),
-              _field('Charge utile', v.charegeUtile == null ? null : '${v.charegeUtile} kg'),
-              _field('Longueur', v.lengthMm == null ? null : '${v.lengthMm} mm'),
-              _field('Largeur', v.widthMm == null ? null : '${v.widthMm} mm'),
-              _field('Hauteur', v.heightMm == null ? null : '${v.heightMm} mm'),
+              _field(
+                'Poids total',
+                v.poidsTotal == null ? null : '${v.poidsTotal} kg',
+              ),
+              _field(
+                'Charge utile',
+                v.charegeUtile == null ? null : '${v.charegeUtile} kg',
+              ),
+              _field(
+                'Longueur',
+                v.lengthMm == null ? null : '${v.lengthMm} mm',
+              ),
+              _field(
+                'Largeur',
+                v.widthMm == null ? null : '${v.widthMm} mm',
+              ),
+              _field(
+                'Hauteur',
+                v.heightMm == null ? null : '${v.heightMm} mm',
+              ),
               _field(
                 'Indicateur véhicule lourd (legacy)',
                 v.lourd ? 'Oui' : null,
@@ -1649,12 +1730,23 @@ class _VehicleField extends StatelessWidget {
   Widget build(BuildContext context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label,
-              style: TextStyle(color: Colors.grey[100], fontSize: 11)),
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.grey[100],
+              fontSize: 11,
+              height: 1.3,
+            ),
+          ),
           const SizedBox(height: 5),
-          Text(value,
-              style:
-                  const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+          SelectableText(
+            value,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              height: 1.4,
+            ),
+          ),
         ],
       );
 }
