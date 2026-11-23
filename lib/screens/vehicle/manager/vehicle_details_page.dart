@@ -1,11 +1,13 @@
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:parc_oto/serializables/conducteur/conducteur.dart';
 import 'package:parc_oto/serializables/vehicle/vehicle.dart';
 import 'package:parc_oto/serializables/vehicle/document_vehicle.dart';
 import 'package:parc_oto/serializables/vehicle/state.dart';
 import 'package:parc_oto/serializables/reparation/reparation.dart';
 import 'package:parc_oto/serializables/reparation/fiche_reception.dart';
+import 'package:parc_oto/providers/driver_provider.dart';
 import 'package:parc_oto/providers/vehicle_provider.dart';
 import 'package:parc_oto/providers/repair_provider.dart';
 import 'package:parc_oto/theme.dart';
@@ -37,6 +39,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   bool _requestedHistory = false;
   bool _loadingHistory = false;
   bool _historyLoadFailed = false;
+  bool _requestedDrivers = false;
+  bool _loadingDrivers = false;
+  bool _driversLoadFailed = false;
   bool _maintenanceLoadFailed = false;
   bool _documentsLoadFailed = false;
   bool _makeCatalogRequested = false;
@@ -78,6 +83,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     _requestedHistory = false;
     _loadingHistory = false;
     _historyLoadFailed = false;
+    _requestedDrivers = false;
+    _loadingDrivers = false;
+    _driversLoadFailed = false;
     _maintenanceLoadFailed = false;
     _documentsLoadFailed = false;
     _vehicleStates = [];
@@ -155,6 +163,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       case 0:
         _loadDocuments();
         _loadHistory();
+        break;
+      case 3:
+        _loadDrivers();
         break;
       case 5:
         _loadDocuments();
@@ -479,6 +490,182 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 color: accent, fontSize: 11, fontWeight: FontWeight.w600)),
       );
 
+  Future<void> _loadDrivers({bool force = false}) async {
+    if (_loadingDrivers || (_requestedDrivers && !force)) return;
+    _requestedDrivers = true;
+    _loadingDrivers = true;
+    _driversLoadFailed = false;
+    final generation = _vehicleLoadGeneration;
+    setState(() {});
+
+    try {
+      final provider = context.read<DriverProvider>();
+      if (DriverProvider.downloadingConducteurs) {
+        await _waitForLoading(
+          () => DriverProvider.downloadingConducteurs,
+          'drivers',
+        );
+      }
+      if (!mounted || generation != _vehicleLoadGeneration) return;
+
+      if (!DriverProvider.downloadedConducteurs) {
+        await provider.refreshConducteurs();
+      }
+      if (!mounted || generation != _vehicleLoadGeneration) return;
+      if (!DriverProvider.downloadedConducteurs) {
+        throw StateError('Drivers could not be loaded for the active company.');
+      }
+
+      setState(() {
+        _loadingDrivers = false;
+        _driversLoadFailed = false;
+      });
+    } catch (error) {
+      if (!mounted || generation != _vehicleLoadGeneration) return;
+      debugPrint('[Vehicle details] driver lookup failed: $error');
+      setState(() {
+        _loadingDrivers = false;
+        _driversLoadFailed = true;
+      });
+      _requestedDrivers = false;
+    }
+  }
+
+  String? _resolveOrganisationLabel(
+    String? rawValue,
+    String Function(String?) resolver,
+  ) {
+    final raw = rawValue?.trim() ?? '';
+    if (raw.isEmpty) return null;
+
+    try {
+      final resolved = resolver(raw).trim();
+      return resolved.isNotEmpty ? resolved : raw;
+    } catch (error) {
+      // Company parameters can be unavailable during initial tenant bootstrap.
+      debugPrint('[Vehicle details] organisation label resolution failed: $error');
+      return raw;
+    }
+  }
+
+  List<Conducteur> _driversMatchingVehicleRegistration() {
+    final registration =
+        VehicleDetailFormatters.normalizeRegistration(v.matriculeConducteur);
+    if (registration.isEmpty) return const [];
+
+    return DriverProvider.conducteurs.values.where((driver) {
+      return VehicleDetailFormatters.normalizeRegistration(driver.matricule) ==
+          registration;
+    }).toList(growable: false);
+  }
+
+  Widget _assignmentSection(Color accent) {
+    final driverRegistration = v.matriculeConducteur?.trim() ?? '';
+    final matchingDrivers = _driversMatchingVehicleRegistration();
+
+    return _section(
+      'Affectation et organisation',
+      'Conducteur affecté, rattachement organisationnel et état opérationnel',
+      [
+        _panel('Conducteur affecté', FluentIcons.people, accent, [
+          if (driverRegistration.isEmpty)
+            _emptyInline('Aucun matricule de conducteur n’est associé à ce véhicule')
+          else ...[
+            _statusValue('Matricule affecté', driverRegistration, accent),
+            const SizedBox(height: 10),
+            if (_loadingDrivers && matchingDrivers.isEmpty)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: ProgressRing(),
+                ),
+              )
+            else if (_driversLoadFailed)
+              _retryNotice(
+                'Impossible de vérifier le conducteur dans l’entreprise active.',
+                () => _loadDrivers(force: true),
+              )
+            else if (!DriverProvider.downloadedConducteurs)
+              _emptyInline('Référentiel des conducteurs non disponible')
+            else if (matchingDrivers.length == 1) ...[
+              _statusValue(
+                'Conducteur',
+                matchingDrivers.single.getName().trim(),
+                accent,
+              ),
+              const SizedBox(height: 8),
+              _statusValue(
+                'Situation du conducteur',
+                DriverProvider.getEtat(matchingDrivers.single.etat).tr(),
+                accent,
+              ),
+            ]
+            else if (matchingDrivers.isEmpty)
+              _emptyInline(
+                'Aucun conducteur de l’entreprise active ne correspond à ce matricule. '
+                'L’affectation reste affichée comme donnée historique.',
+              )
+            else
+              _emptyInline(
+                'Plusieurs conducteurs correspondent à ce matricule. '
+                'Le nom n’est pas affiché pour éviter une association ambiguë.',
+              ),
+          ],
+        ]),
+        _group('Rattachement organisationnel', [
+          _field(
+            'Appartenance',
+            _resolveOrganisationLabel(
+              v.appartenance,
+              VehiclesUtilities.getAppartenance,
+            ),
+          ),
+          _field(
+            'Filiale',
+            _resolveOrganisationLabel(
+              v.filliale,
+              VehiclesUtilities.getAppartenance,
+            ),
+          ),
+          _field(
+            'Direction',
+            _resolveOrganisationLabel(
+              v.direction,
+              VehiclesUtilities.getDirection,
+            ),
+          ),
+          _field(
+            'Département',
+            _resolveOrganisationLabel(
+              v.departement,
+              VehiclesUtilities.getDepartment,
+            ),
+          ),
+          _field(
+            'Périmètre',
+            VehiclesUtilities.getPerimetre(v.perimetre).tr(),
+          ),
+          _field(
+            'Appartenance du conducteur (valeur historique)',
+            _resolveOrganisationLabel(
+              v.appartenanceconducteur,
+              VehiclesUtilities.getAppartenance,
+            ),
+          ),
+        ]),
+        _group('État et usage', [
+          _field(
+            'État opérationnel',
+            v.etatactuel == null
+                ? null
+                : VehiclesUtilities.getEtatName(v.etatactuel!).tr(),
+          ),
+          _field('Type d’usage', v.service ? 'service'.tr() : 'fonction'.tr()),
+        ]),
+      ],
+    );
+  }
+
   Future<void> _loadHistory() async {
     if (_requestedHistory || _loadingHistory) return;
     _requestedHistory = true;
@@ -730,37 +917,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           ],
         );
       case 3:
-        return _section(
-          'Affectation et organisation',
-          'Conducteur, rattachement organisationnel et état opérationnel',
-          [
-            _group('Conducteur', [
-              _field('Matricule conducteur', v.matriculeConducteur),
-              _field('Appartenance conducteur (legacy)', v.appartenanceconducteur),
-            ]),
-            _group('Rattachement organisationnel (valeurs legacy)', [
-              _field('Appartenance', v.appartenance),
-              _field('Filiale', v.filliale),
-              _field('Direction', v.direction),
-              _field('Département', v.departement),
-              _field(
-                'Code de périmètre legacy',
-                v.perimetre == 0 ? null : v.perimetre.toString(),
-              ),
-            ]),
-            _group('État et usage', [
-              _field(
-                'État opérationnel',
-                v.etatactuel == null
-                    ? null
-                    : VehiclesUtilities.getEtatName(v.etatactuel!).tr(),
-              ),
-              _field('Ancienne valeur « état »', v.etat),
-              _field('Type d’usage', v.service ? 'Véhicule de service' : 'Usage non précisé'),
-              _field('Emplacement historique', v.emplacement),
-            ]),
-          ],
-        );
+        return _assignmentSection(accent);
       case 4:
         return _gpsParkingSection(accent);
       case 5:
@@ -923,9 +1080,27 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 _sectionShortcut('Voir l’identification', 1),
                 _group('Affectation connue', [
                   _field('Matricule conducteur', v.matriculeConducteur),
-                  _field('Filiale', v.filliale),
-                  _field('Direction', v.direction),
-                  _field('Département', v.departement),
+                  _field(
+                    'Filiale',
+                    _resolveOrganisationLabel(
+                      v.filliale,
+                      VehiclesUtilities.getAppartenance,
+                    ),
+                  ),
+                  _field(
+                    'Direction',
+                    _resolveOrganisationLabel(
+                      v.direction,
+                      VehiclesUtilities.getDirection,
+                    ),
+                  ),
+                  _field(
+                    'Département',
+                    _resolveOrganisationLabel(
+                      v.departement,
+                      VehiclesUtilities.getDepartment,
+                    ),
+                  ),
                   // Emplacement legacy is shown only in Localisation.
                 ]),
                 _sectionShortcut('Voir l’affectation', 3),
@@ -946,14 +1121,6 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                       v.service ? 'Véhicule de service' : 'Usage non précisé',
                       accent,
                     ),
-                    if (v.etat?.trim().isNotEmpty == true) ...[
-                      const SizedBox(height: 10),
-                      _statusValue(
-                        'Valeur historique « état »',
-                        v.etat!.trim(),
-                        accent,
-                      ),
-                    ],
                     _sectionShortcut('Voir l’affectation', 3),
                   ],
                 ),
