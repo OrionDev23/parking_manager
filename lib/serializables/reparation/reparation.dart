@@ -66,12 +66,16 @@ class Reparation extends ParcOtoDefault {
     this.vehiculemat,
     this.tasks,
   }) {
+    final statusIndex = etat ?? 0;
+    final statusLabel = statusIndex >= 0 && statusIndex < listEtats.length
+        ? listEtats[statusIndex]
+        : 'unknown';
     search =
         "$id "
         "$ficheReceptionNumber "
         "$numero ${date.toIso8601String()}"
         " $prestatairenom $vehiculemat "
-        "$remarque $nchassi ${listEtats[etat ?? 0]}";
+        "$remarque $nchassi $statusLabel";
   }
 
   factory Reparation.fromJson(Map<String, dynamic> json) =>
