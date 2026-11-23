@@ -7,8 +7,9 @@ void main() {
       expect(VehicleDetailFormatters.genreLabel('2'), 'camion');
     });
 
-    test('treats the legacy not-indicated code as missing', () {
+    test('treats legacy not-indicated codes as missing', () {
       expect(VehicleDetailFormatters.genreLabel('99'), isNull);
+      expect(VehicleDetailFormatters.genreLabel('-1'), isNull);
     });
 
     test('keeps descriptive values and marks unknown numeric codes', () {
