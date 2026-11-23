@@ -1286,6 +1286,12 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       );
 }
 
+  @override
+  void dispose() {
+    _contentScrollController.dispose();
+    super.dispose();
+  }
+}
 class _VehicleField extends StatelessWidget {
   final String label;
   final String value;
@@ -1303,10 +1309,4 @@ class _VehicleField extends StatelessWidget {
                   const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
         ],
       );
-  @override
-  void dispose() {
-    _contentScrollController.dispose();
-    super.dispose();
-  }
-
 }
