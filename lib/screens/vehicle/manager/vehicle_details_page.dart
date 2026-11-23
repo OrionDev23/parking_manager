@@ -68,6 +68,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     _loadDocuments();
     _loadVehicleMakeCatalog();
     _loadHistory();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _loadDrivers();
+    });
   }
 
   @override
@@ -98,6 +101,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       }
       _loadDocuments();
       _loadHistory();
+      _loadDrivers();
     });
   }
 
@@ -163,6 +167,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       case 0:
         _loadDocuments();
         _loadHistory();
+        _loadDrivers();
         break;
       case 3:
         _loadDrivers();
@@ -1066,6 +1071,10 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             : documentsWithDeadline.toString();
     final latestActivity =
         _vehicleStates.isEmpty ? null : _vehicleStates.first;
+    final driversForVehicle = _driversMatchingVehicleRegistration();
+    final assignedDriverName = driversForVehicle.length == 1
+        ? driversForVehicle.single.getName().trim()
+        : null;
     final makeName = VehicleMakeService.nameFor(VehicleMakeService.canonicalId(v.marque));
     final currentStatus = v.etatactuel == null
         ? 'Non renseigné'
@@ -1096,6 +1105,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 _sectionShortcut('Voir l’identification', 1),
                 _group('Affectation connue', [
                   _field('Matricule conducteur', v.matriculeConducteur),
+                  _field('Conducteur affecté', assignedDriverName),
                   _field(
                     'Filiale',
                     _resolveOrganisationLabel(
