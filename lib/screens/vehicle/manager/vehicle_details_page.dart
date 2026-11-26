@@ -532,6 +532,27 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     return '$day/$month/${date.year}';
   }
 
+  Color _vehicleStatusColor(int? status, Color fallback) {
+    switch (status) {
+      case 0:
+      case 5:
+        return Colors.green;
+      case 1:
+      case 6:
+        return Colors.red;
+      case 2:
+      case 7:
+        return Colors.orange;
+      case 3:
+      case 8:
+        return Colors.blue;
+      case 4:
+        return Colors.grey;
+      default:
+        return fallback;
+    }
+  }
+
   Widget _chip(String text, Color accent) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
         decoration: BoxDecoration(
