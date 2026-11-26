@@ -1127,14 +1127,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                   _field('vehicle_details_driver_registration'.tr(), v.matriculeConducteur),
                   _field('vehicle_details_assigned_driver'.tr(), assignedDriverName),
                   _field(
-                    'Filiale',
+                    'filiale'.tr(),
                     _resolveOrganisationLabel(
                       v.filliale,
                       VehiclesUtilities.getAppartenance,
                     ),
                   ),
                   _field(
-                    'Direction',
+                    'vehicle_field_direction'.tr(),
                     _resolveOrganisationLabel(
                       v.direction,
                       VehiclesUtilities.getDirection,
