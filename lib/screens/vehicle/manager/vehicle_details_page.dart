@@ -353,7 +353,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   Widget _header(Color accent, String model) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final compact = constraints.maxWidth < ParcotoTokens.tabletBreakpoint;
+        final compact = constraints.maxWidth < ParcotoTokens.mobileBreakpoint;
         final identity = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
