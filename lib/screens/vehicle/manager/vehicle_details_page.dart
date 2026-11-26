@@ -223,7 +223,6 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     final model = [
       makeName,
       v.type?.trim() ?? '',
-      v.modelYear?.toString() ?? '',
     ].where((value) => value.isNotEmpty).join(' ');
     final compact = MediaQuery.sizeOf(context).width < ParcotoTokens.mobileBreakpoint;
 
@@ -368,6 +367,36 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             ),
             const SizedBox(height: 5),
             Text(
+              model.isEmpty ? 'vehicle_details_model_missing'.tr() : model,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: compact ? 21 : 23,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -.2,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              [
+                if (v.trim?.trim().isNotEmpty == true) v.trim!.trim(),
+                (v.modelYear ?? v.anneeUtil)?.toString() ?? '',
+              ].where((value) => value.isNotEmpty).join(' • ').isEmpty
+                  ? 'vehicle_details_model_missing'.tr()
+                  : [
+                      if (v.trim?.trim().isNotEmpty == true) v.trim!.trim(),
+                      (v.modelYear ?? v.anneeUtil)?.toString() ?? '',
+                    ].where((value) => value.isNotEmpty).join(' • '),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Colors.grey[100],
+                fontSize: 12,
+                height: 1.3,
+              ),
+            ),
+            const SizedBox(height: 7),
+            Text(
               v.matricule,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -375,17 +404,6 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 fontSize: compact ? 22 : 25,
                 fontWeight: FontWeight.w800,
                 letterSpacing: .2,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              model.isEmpty ? 'vehicle_details_model_missing'.tr() : model,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.grey[100],
-                fontSize: 12,
-                height: 1.3,
               ),
             ),
             if (v.etatactuel != null) ...[
@@ -402,10 +420,11 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               children: [
                 if (v.fleetNumber?.trim().isNotEmpty == true)
                   _chip('N° parc : ${v.fleetNumber}', accent),
+                _chip(v.service ? 'Véhicule de service' : 'Flotte', accent),
                 if (v.energie?.trim().isNotEmpty == true)
                   _chip(v.energie!, accent),
-                if (v.gearbox?.trim().isNotEmpty == true)
-                  _chip(v.gearbox!, accent),
+                if ((v.transmission ?? v.gearbox)?.trim().isNotEmpty == true)
+                  _chip((v.transmission ?? v.gearbox)!.trim(), accent),
               ],
             ),
           ],
@@ -480,8 +499,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
 
   Widget _vehicleAvatar(Color accent, {required bool compact}) {
     final imageUrl = v.imageUrl?.trim();
-    final width = compact ? double.infinity : 148.0;
-    final height = compact ? 174.0 : 104.0;
+    final width = compact ? double.infinity : 198.0;
+    final height = compact ? 174.0 : 142.0;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(14),
