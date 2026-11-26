@@ -386,7 +386,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             if (widget.onBack != null)
               Button(
                 onPressed: widget.onBack,
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(FluentIcons.back, size: 13),
@@ -398,7 +398,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             if (widget.onEdit != null)
               FilledButton(
                 onPressed: widget.onEdit,
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(FluentIcons.edit, size: 14),
