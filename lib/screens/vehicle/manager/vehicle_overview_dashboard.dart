@@ -1,7 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
 import '../../../serializables/vehicle/vehicle.dart';
-import '../../../utilities/vehicle_util.dart';
 import '../../../core/services/vehicle_make_service.dart';
 import '../../../ui/design_system/parcoto_tokens.dart';
 
@@ -191,7 +190,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
             : Image.network(
                 image,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
+                errorBuilder: (_, _, _) =>
                     Icon(FluentIcons.car, color: accent, size: 42),
               ),
       ),
