@@ -688,7 +688,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 : VehiclesUtilities.getEtatName(v.etatactuel!).tr(),
           ),
           _field(
-            'Type d’usage',
+            'vehicle_field_usage_type'.tr(),
             v.service
                 ? 'vehicle_service_use'.tr()
                 : 'vehicle_function_use'.tr(),
@@ -1163,7 +1163,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                     _statusValue('vehicle_details_operational_status'.tr(), currentStatus, accent),
                     const SizedBox(height: 12),
                     _statusValue(
-                      'Type d’usage',
+                      'vehicle_field_usage_type'.tr(),
                       v.service ? 'vehicle_service_use'.tr() : 'vehicle_function_use'.tr(),
                       accent,
                     ),

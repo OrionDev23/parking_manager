@@ -909,5 +909,6 @@
   "vehicle_document_expiry_missing": "Date d’expiration non renseignée",
   "vehicle_document_expiry_prefix": "Expiration",
   "vehicle_field_wilaya": "Wilaya",
-  "vehicle_field_transmission": "Transmission"
+  "vehicle_field_transmission": "Transmission",
+  "vehicle_field_usage_type": "Type d’usage"
 }

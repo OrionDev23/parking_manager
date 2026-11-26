@@ -899,5 +899,6 @@
   "vehicle_document_expiry_missing": "لم يتم تحديد تاريخ انتهاء الصلاحية",
   "vehicle_document_expiry_prefix": "انتهاء الصلاحية",
   "vehicle_field_wilaya": "الولاية",
-  "vehicle_field_transmission": "ناقل الحركة"
+  "vehicle_field_transmission": "ناقل الحركة",
+  "vehicle_field_usage_type": "نوع الاستخدام"
 }
