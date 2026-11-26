@@ -185,17 +185,18 @@ class VehicleManagementState extends State<VehicleManagement>
                           ],
                         ),
                       ),
-                    FilledButton(
-                      onPressed: _openNewVehicle,
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(FluentIcons.add, size: 14),
-                          SizedBox(width: 7),
-                          Text('Ajouter'),
-                        ],
+                    if (screenWidth < 1080)
+                      FilledButton(
+                        onPressed: _openNewVehicle,
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(FluentIcons.add, size: 14),
+                            SizedBox(width: 7),
+                            Text('Ajouter'),
+                          ],
+                        ),
                       ),
-                    ),
                   ],
                 );
                 final search = _buildGlobalSearch(theme);
@@ -325,7 +326,17 @@ class VehicleManagementState extends State<VehicleManagement>
                         ),
                       ),
                     ),
-                    Icon(FluentIcons.list, size: 16, color: theme.mutedTextColor),
+                    FilledButton(
+                      onPressed: _openNewVehicle,
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(FluentIcons.add, size: 13),
+                          SizedBox(width: 5),
+                          Text('Ajouter'),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
