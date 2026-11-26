@@ -299,48 +299,49 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       return Tooltip(
         message: section.label,
         child: GestureDetector(
-        key: ValueKey('vehicle-section-$index'),
-        behavior: HitTestBehavior.opaque,
-        onTap: () => _selectSection(index),
-        child: Container(
-          constraints: BoxConstraints(minWidth: minWidth),
-          padding: EdgeInsets.fromLTRB(
-            compact ? 8 : 13,
-            10,
-            compact ? 8 : 13,
-            8,
-          ),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: selected ? accent : Colors.transparent,
-                width: 2.5,
-              ),
+          key: ValueKey('vehicle-section-$index'),
+          behavior: HitTestBehavior.opaque,
+          onTap: () => _selectSection(index),
+          child: Container(
+            constraints: BoxConstraints(minWidth: minWidth),
+            padding: EdgeInsets.fromLTRB(
+              compact ? 8 : 13,
+              10,
+              compact ? 8 : 13,
+              8,
             ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                section.icon,
-                size: compact ? 16 : 17,
-                color: selected ? accent : Colors.grey[100],
-              ),
-              const SizedBox(height: 5),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: selected ? accent : Colors.grey[100],
-                  fontSize: compact ? 9 : 10,
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: selected ? accent : Colors.transparent,
+                  width: 2.5,
                 ),
               ),
-            ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  section.icon,
+                  size: compact ? 16 : 17,
+                  color: selected ? accent : Colors.grey[100],
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: selected ? accent : Colors.grey[100],
+                    fontSize: compact ? 9 : 10,
+                    fontWeight:
+                        selected ? FontWeight.w700 : FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
       );
     }
 
