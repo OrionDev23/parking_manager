@@ -353,6 +353,13 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final compact = constraints.maxWidth < ParcotoTokens.mobileBreakpoint;
+        final version = [
+          if (v.trim?.trim().isNotEmpty == true) v.trim!.trim(),
+          (v.modelYear ?? v.anneeUtil)?.toString() ?? '',
+        ].where((value) => value.isNotEmpty).join(' • ');
+        final transmission = v.transmission?.trim().isNotEmpty == true
+            ? v.transmission!.trim()
+            : v.gearbox?.trim() ?? '';
         final identity = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -378,15 +385,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             ),
             const SizedBox(height: 4),
             Text(
-              [
-                if (v.trim?.trim().isNotEmpty == true) v.trim!.trim(),
-                (v.modelYear ?? v.anneeUtil)?.toString() ?? '',
-              ].where((value) => value.isNotEmpty).join(' • ').isEmpty
-                  ? 'vehicle_details_model_missing'.tr()
-                  : [
-                      if (v.trim?.trim().isNotEmpty == true) v.trim!.trim(),
-                      (v.modelYear ?? v.anneeUtil)?.toString() ?? '',
-                    ].where((value) => value.isNotEmpty).join(' • '),
+              version.isEmpty ? 'vehicle_details_model_missing'.tr() : version,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -423,8 +422,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 _chip(v.service ? 'Véhicule de service' : 'Flotte', accent),
                 if (v.energie?.trim().isNotEmpty == true)
                   _chip(v.energie!, accent),
-                if ((v.transmission ?? v.gearbox)?.trim().isNotEmpty == true)
-                  _chip((v.transmission ?? v.gearbox)!.trim(), accent),
+                if (transmission.isNotEmpty) _chip(transmission, accent),
               ],
             ),
           ],
