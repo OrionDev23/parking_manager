@@ -629,13 +629,13 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             ]
             else if (matchingDrivers.isEmpty)
               _emptyInline(
-                'vehicle_assignment_no_match'.tr()
-                'vehicle_assignment_historical_note'.tr(),
+                'vehicle_assignment_no_match'.tr() +
+                    'vehicle_assignment_historical_note'.tr(),
               )
             else
               _emptyInline(
-                'vehicle_assignment_multiple_matches'.tr()
-                'vehicle_assignment_ambiguous_name_hidden'.tr(),
+                'vehicle_assignment_multiple_matches'.tr() +
+                    'vehicle_assignment_ambiguous_name_hidden'.tr(),
               ),
           ],
         ]),
@@ -855,15 +855,15 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               ),
             ]),
             _group('vehicle_administrative_address_group'.tr(), [
-              _field('Wilaya', _wilayaName(v.wilaya)),
+              _field('vehicle_field_wilaya'.tr(), _wilayaName(v.wilaya)),
               _field('daira'.tr(), v.daira),
-              _field('Commune', v.commune),
-              _field('Adresse', v.adresse),
+              _field('commune'.tr(), v.commune),
+              _field('adresse'.tr(), v.adresse),
             ]),
             _group('vehicle_registration_holder_group'.tr(), [
-              _field('Nom', v.nom),
-              _field('Prénom', v.prenom),
-              _field('Profession', v.profession),
+              _field('nom'.tr(), v.nom),
+              _field('prenom'.tr(), v.prenom),
+              _field('profession'.tr(), v.profession),
             ]),
           ],
         );
@@ -874,7 +874,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           [
             _group('vehicle_characteristics_identity_group'.tr(), [
               _field(
-                'Marque',
+                'marque'.tr(),
                 VehicleMakeService.nameFor(
                   VehicleMakeService.canonicalId(v.marque),
                 ),
@@ -893,11 +893,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               _field('vehicle_field_body_type'.tr(), v.carrosserie),
               _field(
                 'vehicle_field_paint_color'.tr(),
-                VehicleDetailFormatters.paintLabel(v.color),
+                VehicleDetailFormatters.paintLabel(
+                  v.color,
+                  languageCode: context.locale.languageCode,
+                ),
               ),
             ]),
             _group('vehicle_characteristics_engine_group'.tr(), [
-              _field('Énergie', v.energie),
+              _field('energie'.tr(), v.energie),
               _field(
                 'vehicle_field_engine_displacement'.tr(),
                 v.engineDisplacement == null
@@ -970,7 +973,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           [
             _group('vehicle_details_acquisition'.tr(), [
               _field('vehicle_acquisition_mode'.tr(), v.acquisitionType),
-              _field('Date', _date(v.acquisitionDate)),
+              _field('date'.tr(), _date(v.acquisitionDate)),
               _field(
                 'vehicle_acquisition_purchase_price'.tr(),
                 v.purchasePrice == null
@@ -1098,9 +1101,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         : VehiclesUtilities.getEtatName(v.etatactuel!).tr();
 
     final identityFields = <_VehicleField>[
-      _field('Immatriculation', v.matricule),
-      _field('Marque', makeName),
-      _field('Modèle', v.type),
+      _field('matricule'.tr(), v.matricule),
+      _field('marque'.tr(), makeName),
+      _field('type'.tr(), v.type),
       _field('vehicle_field_model_year'.tr(), v.modelYear?.toString()),
       _field('vehicle_field_vin'.tr(), v.numeroSerie),
     ];

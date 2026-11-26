@@ -895,5 +895,6 @@
   "vehicle_document_valid": "Valid",
   "vehicle_document_unnamed": "Unnamed document",
   "vehicle_document_expiry_missing": "Expiry date not provided",
-  "vehicle_document_expiry_prefix": "Expiry"
+  "vehicle_document_expiry_prefix": "Expiry",
+  "vehicle_field_wilaya": "Wilaya"
 }

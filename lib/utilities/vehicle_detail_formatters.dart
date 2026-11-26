@@ -97,9 +97,27 @@ abstract final class VehicleDetailFormatters {
     return VehiclesUtilities.getGenreFromNumber(code);
   }
 
-  static String? paintLabel(String? rawValue) {
+  static String? paintLabel(
+    String? rawValue, {
+    String? languageCode,
+  }) {
     final value = rawValue?.trim() ?? '';
     if (value.isEmpty) return null;
+
+    String localized({
+      required String french,
+      required String english,
+      required String arabic,
+    }) {
+      switch (languageCode?.toLowerCase()) {
+        case 'en':
+          return english;
+        case 'ar':
+          return arabic;
+        default:
+          return french;
+      }
+    }
 
     final normalized = value
         .toLowerCase()
@@ -113,15 +131,19 @@ abstract final class VehicleDetailFormatters {
       case 'peinture d origine':
       case 'couleur d origine':
       case 'default':
-        return 'Peinture d’origine';
+        return localized(
+          french: 'Peinture d’origine',
+          english: 'Original paint',
+          arabic: 'طلاء أصلي',
+        );
       case 'white':
       case 'blanc':
       case 'blanche':
-        return 'Blanc';
+        return localized(french: 'Blanc', english: 'White', arabic: 'أبيض');
       case 'black':
       case 'noir':
       case 'noire':
-        return 'Noir';
+        return localized(french: 'Noir', english: 'Black', arabic: 'أسود');
       case 'silver':
       case 'argent':
       case 'argenté':
@@ -129,21 +151,25 @@ abstract final class VehicleDetailFormatters {
       case 'gris clair':
       case 'gris métallisé':
       case 'gris metallise':
-        return 'Argent';
+        return localized(french: 'Argent', english: 'Silver', arabic: 'فضي');
       case 'grey':
       case 'gray':
       case 'gris':
       case 'gris foncé':
       case 'gris fonce':
       case 'anthracite':
-        return 'Gris foncé';
+        return localized(
+          french: 'Gris foncé',
+          english: 'Dark grey',
+          arabic: 'رمادي داكن',
+        );
       case 'blue':
       case 'bleu':
       case 'bleue':
-        return 'Bleu';
+        return localized(french: 'Bleu', english: 'Blue', arabic: 'أزرق');
       case 'red':
       case 'rouge':
-        return 'Rouge';
+        return localized(french: 'Rouge', english: 'Red', arabic: 'أحمر');
       default:
         return value;
     }

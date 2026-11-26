@@ -31,6 +31,25 @@ void main() {
       );
     });
 
+    test('localizes standard paint colours', () {
+      expect(
+        VehicleDetailFormatters.paintLabel('white', languageCode: 'en'),
+        'White',
+      );
+      expect(
+        VehicleDetailFormatters.paintLabel('white', languageCode: 'ar'),
+        'أبيض',
+      );
+      expect(
+        VehicleDetailFormatters.paintLabel('grey', languageCode: 'en'),
+        'Dark grey',
+      );
+      expect(
+        VehicleDetailFormatters.paintLabel('gris   foncé', languageCode: 'en'),
+        'Dark grey',
+      );
+    });
+
     test('preserves custom historical colour labels', () {
       expect(
         VehicleDetailFormatters.paintLabel('Bleu nuit'),
