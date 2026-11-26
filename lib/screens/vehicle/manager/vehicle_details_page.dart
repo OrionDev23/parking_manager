@@ -1205,21 +1205,6 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         ],
       );
 
-  Widget _sectionShortcut(String label, int sectionIndex) => Align(
-        alignment: Alignment.centerRight,
-        child: Button(
-          onPressed: () => _selectSection(sectionIndex),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(label),
-              const SizedBox(width: 6),
-              const Icon(FluentIcons.chevron_right, size: 11),
-            ],
-          ),
-        ),
-      );
-
   Widget _historySection(Color accent) {
     if (_loadingHistory && _vehicleStates.isEmpty) {
       return const Center(child: Padding(
