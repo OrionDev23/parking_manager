@@ -15,6 +15,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
   final String? latestActivityLabel;
   final String? latestActivityDate;
   final String? latestActivityNote;
+  final List<({String title, String date, String? note})> recentActivities;
   final bool loadingActivity;
   final bool activityError;
   final VoidCallback onRetryActivity;
@@ -37,6 +38,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
     required this.latestActivityLabel,
     required this.latestActivityDate,
     required this.latestActivityNote,
+    this.recentActivities = const [],
     required this.loadingActivity,
     required this.activityError,
     required this.onRetryActivity,
@@ -327,12 +329,14 @@ class VehicleOverviewDashboard extends StatelessWidget {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (loadingActivity)
-            const Center(child: Padding(
-              padding: EdgeInsets.all(12),
-              child: ProgressRing(),
-            ))
-          else if (activityError)
+          if (loadingActivity && recentActivities.isEmpty)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(12),
+                child: ProgressRing(),
+              ),
+            )
+          else if (activityError && recentActivities.isEmpty)
             _emptyState(
               'Impossible de charger l’historique.',
               action: Button(
@@ -340,21 +344,31 @@ class VehicleOverviewDashboard extends StatelessWidget {
                 child: const Text('Réessayer'),
               ),
             )
+          else if (recentActivities.isNotEmpty)
+            ...recentActivities.take(3).toList().asMap().entries.map((entry) {
+              final activity = entry.value;
+              return Padding(
+                padding: EdgeInsets.only(
+                  bottom: entry.key == recentActivities.length - 1 ? 0 : 14,
+                ),
+                child: _timelineItem(
+                  accent,
+                  activity.title,
+                  activity.date,
+                  activity.note,
+                ),
+              );
+            })
           else if (latestActivityLabel == null)
             _emptyState('Aucune activité récente enregistrée.')
-          else ...[
+          else
             _timelineItem(
               accent,
               latestActivityLabel!,
               latestActivityDate ?? 'Date non renseignée',
               latestActivityNote,
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Les autres événements sont disponibles dans l’historique complet.',
-              style: TextStyle(color: Colors.grey[100], fontSize: 11),
-            ),
-          ],
+          const SizedBox(height: 8),
           Align(
             alignment: AlignmentDirectional.centerEnd,
             child: _textAction('Voir tout', onOpenHistory),
