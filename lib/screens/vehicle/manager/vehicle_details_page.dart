@@ -922,7 +922,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               _field('vehicle_field_engine_code'.tr(), v.engineCode),
             ]),
             _group('vehicle_characteristics_transmission_group'.tr(), [
-              _field('vehicle_characteristics_transmission_group'.tr(), v.transmission),
+              _field('vehicle_field_transmission'.tr(), v.transmission),
               _field('vehicle_field_gearbox'.tr(), v.gearbox),
               _field('vehicle_field_drive_type'.tr(), v.driveType),
             ]),
@@ -980,7 +980,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                     ? null
                     : '${VehicleDetailFormatters.formatNumber(v.purchasePrice!)} DA',
               ),
-              _field('Fournisseur', v.supplier),
+              _field('fournisseur'.tr(), v.supplier),
               _field('vehicle_acquisition_warranty_end'.tr(), _date(v.warrantyEndDate)),
               _field('vehicle_acquisition_fleet_number'.tr(), v.fleetNumber),
             ]),
@@ -1141,7 +1141,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                     ),
                   ),
                   _field(
-                    'Département',
+                    'departement'.tr(),
                     _resolveOrganisationLabel(
                       v.departement,
                       VehiclesUtilities.getDepartment,

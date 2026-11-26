@@ -908,5 +908,6 @@
   "vehicle_document_unnamed": "Document sans nom",
   "vehicle_document_expiry_missing": "Date d’expiration non renseignée",
   "vehicle_document_expiry_prefix": "Expiration",
-  "vehicle_field_wilaya": "Wilaya"
+  "vehicle_field_wilaya": "Wilaya",
+  "vehicle_field_transmission": "Transmission"
 }
