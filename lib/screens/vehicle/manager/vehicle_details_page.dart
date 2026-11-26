@@ -187,9 +187,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   }
 
   String val(String? s) =>
-      s == null || s.trim().isEmpty ? 'Non renseigné' : s.trim();
+      s == null || s.trim().isEmpty ? 'vehicle_not_provided'.tr() : s.trim();
   String n(num? x, [String suffix = '']) => x == null
-      ? 'Non renseigné'
+      ? 'vehicle_not_provided'.tr()
       : '${VehicleDetailFormatters.formatNumber(x)}$suffix';
 
   String? _countryName(String? rawCode) {
@@ -230,7 +230,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       color: app.backGroundColor,
       child: Column(
         children: [
-          _header(accent, model.isEmpty ? 'Fiche véhicule' : model),
+          _header(accent, model.isEmpty ? 'vehicle_details_title'.tr() : model),
           _buildSectionNavigation(compact: compact),
           Expanded(
             child: SingleChildScrollView(
@@ -266,16 +266,16 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   Widget _buildSectionNavigation({
     required bool compact,
   }) {
-    const sections = <({String label, IconData icon})>[
-      (label: 'Aperçu', icon: FluentIcons.view_dashboard),
-      (label: 'Identification', icon: FluentIcons.info),
-      (label: 'Caractéristiques', icon: FluentIcons.settings),
-      (label: 'Affectation', icon: FluentIcons.account_management),
-      (label: 'Localisation', icon: FluentIcons.car),
-      (label: 'Documents', icon: FluentIcons.document_set),
-      (label: 'Maintenance', icon: FluentIcons.repair),
-      (label: 'Historique', icon: FluentIcons.document),
-      (label: 'Acquisition', icon: FluentIcons.shopping_cart),
+    final sections = <({String label, IconData icon})>[
+      (label: 'vehicle_details_overview'.tr(), icon: FluentIcons.view_dashboard),
+      (label: 'vehicle_details_identification'.tr(), icon: FluentIcons.info),
+      (label: 'vehicle_details_characteristics'.tr(), icon: FluentIcons.settings),
+      (label: 'vehicle_details_assignment'.tr(), icon: FluentIcons.account_management),
+      (label: 'vehicle_details_location'.tr(), icon: FluentIcons.car),
+      (label: 'documents'.tr(), icon: FluentIcons.document_set),
+      (label: 'vehicle_details_maintenance'.tr(), icon: FluentIcons.repair),
+      (label: 'vehicle_details_history'.tr(), icon: FluentIcons.document),
+      (label: 'vehicle_details_acquisition'.tr(), icon: FluentIcons.shopping_cart),
     ];
 
     return Container(
@@ -338,7 +338,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'FICHE VÉHICULE',
+                'vehicle_details_kicker'.tr(),
                 style: TextStyle(
                   color: accent,
                   fontSize: 10,
@@ -359,7 +359,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               ),
               const SizedBox(height: 4),
               Text(
-                model.isEmpty ? 'Modèle non renseigné' : model,
+                model.isEmpty ? 'vehicle_details_model_missing'.tr() : model,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -391,7 +391,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                   children: [
                     Icon(FluentIcons.back, size: 13),
                     SizedBox(width: 7),
-                    Text('Retour au parc'),
+                    Text('vehicle_details_back_to_fleet'.tr()),
                   ],
                 ),
               ),
@@ -403,7 +403,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                   children: [
                     Icon(FluentIcons.edit, size: 14),
                     SizedBox(width: 7),
-                    Text('Modifier'),
+                    Text('mod'.tr()),
                   ],
                 ),
               ),
@@ -478,7 +478,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   }
 
   String _date(Object? value) {
-    if (value == null) return 'Non renseigné';
+    if (value == null) return 'vehicle_not_provided'.tr();
     final date =
         value is DateTime ? value : DateTime.tryParse(value.toString());
     if (date == null) return value.toString();
@@ -589,7 +589,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       'Affectation et organisation',
       'Conducteur affecté, rattachement organisationnel et état opérationnel',
       [
-        _panel('Conducteur affecté', FluentIcons.people, accent, [
+        _panel('vehicle_details_assigned_driver'.tr(), FluentIcons.people, accent, [
           if (driverRegistration.isEmpty)
             _emptyInline('Aucun matricule de conducteur n’est associé à ce véhicule')
           else ...[
@@ -680,9 +680,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             ),
           ),
         ]),
-        _group('État et usage', [
+        _group('vehicle_details_status_usage'.tr(), [
           _field(
-            'État opérationnel',
+            'vehicle_details_operational_status'.tr(),
             v.etatactuel == null
                 ? null
                 : VehiclesUtilities.getEtatName(v.etatactuel!).tr(),
@@ -828,7 +828,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         return _overview(accent);
       case 1:
         return _section(
-          'Identification',
+          'vehicle_details_identification'.tr(),
           'Immatriculation, carte grise et titulaire',
           [
             _group('Identification du véhicule', [
@@ -968,7 +968,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           'Acquisition et garantie',
           'Informations d’acquisition actuellement enregistrées sur la fiche',
           [
-            _group('Acquisition', [
+            _group('vehicle_details_acquisition'.tr(), [
               _field('Mode', v.acquisitionType),
               _field('Date', _date(v.acquisitionDate)),
               _field(
@@ -1094,7 +1094,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         : null;
     final makeName = VehicleMakeService.nameFor(VehicleMakeService.canonicalId(v.marque));
     final currentStatus = v.etatactuel == null
-        ? 'Non renseigné'
+        ? 'vehicle_not_provided'.tr()
         : VehiclesUtilities.getEtatName(v.etatactuel!).tr();
 
     final identityFields = <_VehicleField>[
@@ -1109,8 +1109,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _heading(
-          'Vue générale',
-          'Les informations essentielles du véhicule et les éléments nécessitant une attention',
+          'vehicle_details_overview'.tr(),
+          'vehicle_details_overview_description'.tr(),
         ),
         LayoutBuilder(
           builder: (context, constraints) {
@@ -1118,11 +1118,11 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             final left = Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _group('Identité du véhicule', identityFields),
-                _sectionShortcut('Voir l’identification', 1),
-                _group('Affectation connue', [
-                  _field('Matricule conducteur', v.matriculeConducteur),
-                  _field('Conducteur affecté', assignedDriverName),
+                _group('vehicle_details_vehicle_identity'.tr(), identityFields),
+                _sectionShortcut('vehicle_details_show_identification'.tr(), 1),
+                _group('vehicle_details_known_assignment'.tr(), [
+                  _field('vehicle_details_driver_registration'.tr(), v.matriculeConducteur),
+                  _field('vehicle_details_assigned_driver'.tr(), assignedDriverName),
                   _field(
                     'Filiale',
                     _resolveOrganisationLabel(
@@ -1146,29 +1146,29 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                   ),
                   // Emplacement legacy is shown only in Localisation.
                 ]),
-                _sectionShortcut('Voir l’affectation', 3),
+                _sectionShortcut('vehicle_details_show_assignment'.tr(), 3),
               ],
             );
             final right = Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _panel(
-                  'État et usage',
+                  'vehicle_details_status_usage'.tr(),
                   FluentIcons.info,
                   accent,
                   [
-                    _statusValue('État opérationnel', currentStatus, accent),
+                    _statusValue('vehicle_details_operational_status'.tr(), currentStatus, accent),
                     const SizedBox(height: 12),
                     _statusValue(
                       'Type d’usage',
                       v.service ? 'vehicle_service_use'.tr() : 'vehicle_function_use'.tr(),
                       accent,
                     ),
-                    _sectionShortcut('Voir l’affectation', 3),
+                    _sectionShortcut('vehicle_details_show_assignment'.tr(), 3),
                   ],
                 ),
                 _panel(
-                  'Documents',
+                  'documents'.tr(),
                   FluentIcons.document,
                   accent,
                   [
@@ -1176,14 +1176,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                       children: [
                         Expanded(
                           child: _statusValue(
-                            'Documents enregistrés',
+                            'vehicle_details_registered_documents'.tr(),
                             documentsCountValue,
                             accent,
                           ),
                         ),
                         Expanded(
                           child: _statusValue(
-                            'Avec échéance',
+                            'vehicle_details_with_deadline'.tr(),
                             documentsDeadlineValue,
                             accent,
                           ),
@@ -1192,34 +1192,34 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                     ),
                     if (_documentsLoadFailed)
                       _retryNotice(
-                        'Les documents n’ont pas pu être vérifiés.',
+                        'vehicle_details_documents_unverified'.tr(),
                         () => _loadDocuments(force: true),
                       ),
                     const SizedBox(height: 9),
                     Text(
-                      'Les dates et métadonnées sont détaillées dans la rubrique Documents.',
+                      'vehicle_details_documents_info'.tr(),
                       style: TextStyle(
                         color: Colors.grey[100],
                         fontSize: 11,
                         height: 1.4,
                       ),
                     ),
-                    _sectionShortcut('Voir les documents', 5),
+                    _sectionShortcut('vehicle_details_show_documents'.tr(), 5),
                   ],
                 ),
                 _panel(
-                  'Kilométrage enregistré',
+                  'vehicle_details_recorded_mileage'.tr(),
                   FluentIcons.car,
                   accent,
                   [
                     _statusValue(
-                      'Valeur enregistrée',
+                      'vehicle_details_recorded_value'.tr(),
                       n(v.currentMileage, ' km'),
                       accent,
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'La date et la source de cette valeur ne sont pas disponibles dans la fiche actuelle.',
+                      'vehicle_details_mileage_source_missing'.tr(),
                       style: TextStyle(
                         color: Colors.grey[100],
                         fontSize: 11,
@@ -1229,38 +1229,38 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                     if (v.nextServiceMileage != null) ...[
                       const SizedBox(height: 9),
                       _statusValue(
-                        'Seuil de révision legacy',
+                        'vehicle_details_next_service'.tr(),
                         n(v.nextServiceMileage, ' km'),
                         accent,
                       ),
                     ],
-                    _sectionShortcut('Voir la maintenance', 6),
+                    _sectionShortcut('vehicle_details_show_maintenance'.tr(), 6),
                   ],
                 ),
                 _panel(
-                  'Localisation',
+                  'vehicle_details_location'.tr(),
                   FluentIcons.car,
                   accent,
                   [
                     _statusValue(
-                      'Dernière position',
-                      'Aucune position GPS reçue',
+                      'vehicle_details_last_position'.tr(),
+                      'vehicle_details_no_gps_position'.tr(),
                       accent,
                     ),
                     const SizedBox(height: 7),
                     Text(
-                      'Aucune source GPS réelle n’est actuellement associée à ce véhicule.',
+                      'vehicle_details_no_gps_source'.tr(),
                       style: TextStyle(
                         color: Colors.grey[100],
                         fontSize: 11,
                         height: 1.4,
                       ),
                     ),
-                    _sectionShortcut('Voir la localisation', 4),
+                    _sectionShortcut('vehicle_details_show_location'.tr(), 4),
                   ],
                 ),
                 _panel(
-                  'Activité récente',
+                  'vehicle_details_recent_activity'.tr(),
                   FluentIcons.document,
                   accent,
                   [
@@ -1273,14 +1273,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                       )
                     else if (_historyLoadFailed)
                       _retryNotice(
-                        'L’activité récente n’a pas pu être chargée.',
+                        'vehicle_details_recent_activity_failed'.tr(),
                         _loadHistory,
                       )
                     else if (latestActivity == null)
-                      _emptyInline('Aucun événement enregistré pour ce véhicule')
+                      _emptyInline('vehicle_details_no_recent_event'.tr())
                     else ...[
                       _statusValue(
-                        'Dernier changement enregistré',
+                        'vehicle_details_last_change'.tr(),
                         VehiclesUtilities.getEtatName(latestActivity.type).tr(),
                         accent,
                       ),
@@ -1310,7 +1310,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                           ),
                         ),
                     ],
-                    _sectionShortcut('Voir l’historique complet', 7),
+                    _sectionShortcut('vehicle_details_show_full_history'.tr(), 7),
                   ],
                 ),
               ],
@@ -1479,7 +1479,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         .toList(growable: false);
     final totalCost = recordedCosts.fold<double>(0, (sum, value) => sum + value);
     final costLabel = recordedCosts.isEmpty
-        ? 'Non renseigné'
+        ? 'vehicle_not_provided'.tr()
         : '${VehicleDetailFormatters.formatNumber(totalCost)} DA';
 
     if (_loadingMaintenance && repairs.isEmpty && sheets.isEmpty) {
@@ -1782,7 +1782,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 SizedBox(
                   width: cardWidth,
                   child: _documentSummary(
-                    'Documents enregistrés',
+                    'vehicle_details_registered_documents'.tr(),
                     documents.length.toString(),
                     FluentIcons.document,
                     accent,
@@ -1791,7 +1791,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 SizedBox(
                   width: cardWidth,
                   child: _documentSummary(
-                    'Avec échéance',
+                    'vehicle_details_with_deadline'.tr(),
                     documents.where((d) => d.dateExpiration != null).length.toString(),
                     FluentIcons.calendar,
                     accent,
@@ -2106,7 +2106,7 @@ class _VehicleField extends StatelessWidget {
   final String label;
   final String value;
   const _VehicleField(this.label, this.value);
-  bool get hasValue => value != 'Non renseigné';
+  bool get hasValue => value != 'vehicle_not_provided'.tr();
   @override
   Widget build(BuildContext context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
