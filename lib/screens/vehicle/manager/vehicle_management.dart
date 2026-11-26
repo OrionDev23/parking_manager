@@ -391,7 +391,7 @@ class VehicleManagementState extends State<VehicleManagement>
           child: ListView.separated(
             padding: const EdgeInsets.fromLTRB(16, 2, 16, 22),
             itemCount: vehicles.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (context, index) => _VehicleListTile(
               vehicle: vehicles[index],
               selected: false,
