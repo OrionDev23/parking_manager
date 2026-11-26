@@ -51,6 +51,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   List<Etat> _vehicleStates = [];
   List<FicheReception> _receptionSheets = [];
   int _selectedSectionIndex = 0;
+  bool _moreSectionsOpen = false;
   int _vehicleLoadGeneration = 0;
   final ScrollController _contentScrollController = ScrollController();
   Vehicle get v => widget.vehicle;
@@ -79,6 +80,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.vehicle.id == widget.vehicle.id) return;
 
+    _moreSectionsOpen = false;
     _vehicleLoadGeneration++;
     _selectedSectionIndex = 0;
     _requestedDocuments = false;
@@ -255,8 +257,11 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   }
 
   void _selectSection(int index) {
-    if (index == _selectedSectionIndex) return;
-    setState(() => _selectedSectionIndex = index);
+    if (index == _selectedSectionIndex && !_moreSectionsOpen) return;
+    setState(() {
+      _selectedSectionIndex = index;
+      _moreSectionsOpen = false;
+    });
     if (_contentScrollController.hasClients) {
       _contentScrollController.jumpTo(0);
     }
@@ -279,73 +284,144 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     ];
     final accent = FluentTheme.of(context).accentColor;
 
+    Widget sectionItem(int index, {double minWidth = 88}) {
+      final section = sections[index];
+      final selected = _selectedSectionIndex == index;
+      return GestureDetector(
+        key: ValueKey('vehicle-section-$index'),
+        behavior: HitTestBehavior.opaque,
+        onTap: () => _selectSection(index),
+        child: Container(
+          constraints: BoxConstraints(minWidth: minWidth),
+          padding: EdgeInsets.fromLTRB(
+            compact ? 8 : 13,
+            10,
+            compact ? 8 : 13,
+            8,
+          ),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: selected ? accent : Colors.transparent,
+                width: 2.5,
+              ),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                section.icon,
+                size: compact ? 16 : 17,
+                color: selected ? accent : Colors.grey[100],
+              ),
+              const SizedBox(height: 5),
+              Text(
+                section.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: selected ? accent : Colors.grey[100],
+                  fontSize: compact ? 9 : 10,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    Widget moreItem() {
+      final selected = _selectedSectionIndex >= 4;
+      return GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => setState(() => _moreSectionsOpen = !_moreSectionsOpen),
+        child: Container(
+          constraints: const BoxConstraints(minWidth: 66),
+          padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: selected || _moreSectionsOpen
+                    ? accent
+                    : Colors.transparent,
+                width: 2.5,
+              ),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _moreSectionsOpen ? FluentIcons.chevron_up : FluentIcons.more,
+                size: 16,
+                color: selected || _moreSectionsOpen
+                    ? accent
+                    : Colors.grey[100],
+              ),
+              const SizedBox(height: 5),
+              Text(
+                'Plus',
+                style: TextStyle(
+                  color: selected || _moreSectionsOpen
+                      ? accent
+                      : Colors.grey[100],
+                  fontSize: 9,
+                  fontWeight: selected || _moreSectionsOpen
+                      ? FontWeight.w700
+                      : FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: FluentTheme.of(context).micaBackgroundColor,
         border: Border(bottom: BorderSide(color: Colors.grey[30])),
       ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            for (var index = 0; index < sections.length; index++)
-              GestureDetector(
-                key: ValueKey('vehicle-section-$index'),
-                behavior: HitTestBehavior.opaque,
-                onTap: () => _selectSection(index),
-                child: Container(
-                  constraints: BoxConstraints(
-                    minWidth: compact ? 72 : 88,
-                  ),
-                  padding: EdgeInsets.fromLTRB(
-                    compact ? 10 : 13,
-                    10,
-                    compact ? 10 : 13,
-                    8,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: _selectedSectionIndex == index
-                            ? accent
-                            : Colors.transparent,
-                        width: 2.5,
+      child: compact
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    for (var index = 0; index < 4; index++)
+                      Expanded(
+                        child: sectionItem(index, minWidth: 0),
                       ),
+                    moreItem(),
+                  ],
+                ),
+                if (_moreSectionsOpen)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                    child: Wrap(
+                      alignment: WrapAlignment.spaceAround,
+                      spacing: 4,
+                      runSpacing: 2,
+                      children: [
+                        for (var index = 4; index < sections.length; index++)
+                          sectionItem(index, minWidth: 94),
+                      ],
                     ),
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        sections[index].icon,
-                        size: compact ? 16 : 17,
-                        color: _selectedSectionIndex == index
-                            ? accent
-                            : Colors.grey[100],
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        sections[index].label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: _selectedSectionIndex == index
-                              ? accent
-                              : Colors.grey[100],
-                          fontSize: compact ? 9 : 10,
-                          fontWeight: _selectedSectionIndex == index
-                              ? FontWeight.w700
-                              : FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              ],
+            )
+          : SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (var index = 0; index < sections.length; index++)
+                    sectionItem(index),
+                ],
               ),
-          ],
-        ),
-      ),
+            ),
     );
   }
 
