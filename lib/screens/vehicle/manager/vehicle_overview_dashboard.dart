@@ -229,13 +229,13 @@ class VehicleOverviewDashboard extends StatelessWidget {
           runSpacing: 8,
           children: [
             if (vehicle.fleetNumber?.isNotEmpty == true)
-              _tag(FluentIcons.number_symbol, 'Parc : ${vehicle.fleetNumber}'),
+              _tag(FluentIcons.info, 'Parc : ${vehicle.fleetNumber}'),
             if (vehicle.energie?.isNotEmpty == true)
-              _tag(FluentIcons.gas, vehicle.energie!),
+              _tag(FluentIcons.car, vehicle.energie!),
             if (vehicle.transmission?.isNotEmpty == true)
               _tag(FluentIcons.settings, vehicle.transmission!),
             if (vehicle.numeroSerie?.isNotEmpty == true)
-              _tag(FluentIcons.code, 'VIN : ${vehicle.numeroSerie}'),
+              _tag(FluentIcons.document, 'VIN : ${vehicle.numeroSerie}'),
           ],
         ),
       ],
@@ -260,13 +260,13 @@ class VehicleOverviewDashboard extends StatelessWidget {
         spacing: 10,
         runSpacing: 10,
         children: [
-          _metric(context, FluentIcons.speed_high, 'Kilométrage', mileage, accent),
+          _metric(context, FluentIcons.car, 'Kilométrage', mileage, accent),
           _metric(context, FluentIcons.repair, 'Prochaine révision', nextService, accent),
-          _metric(context, FluentIcons.contact, 'Conducteur',
+          _metric(context, FluentIcons.people, 'Conducteur',
               driver?.isNotEmpty == true ? driver! : 'Non affecté', accent),
-          _metric(context, FluentIcons.org, 'Affectation',
+          _metric(context, FluentIcons.account_management, 'Affectation',
               assignment.isNotEmpty ? assignment : 'Non renseignée', accent),
-          _metric(context, FluentIcons.map_pin, 'Emplacement',
+          _metric(context, FluentIcons.car, 'Emplacement',
               location?.trim().isNotEmpty == true ? location! : 'Non renseigné', accent),
           _metric(context, FluentIcons.calendar, 'Prochaine échéance',
               documentsWithDeadline == null
@@ -283,7 +283,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
     return _panel(
       context,
       'État du véhicule',
-      FluentIcons.shield,
+      FluentIcons.info,
       accent,
       Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -296,7 +296,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
                   : '${_number(vehicle.currentMileage!)} km'),
           _infoLine(FluentIcons.document, 'Documents enregistrés',
               documentsCount == null ? 'Non vérifiés' : documentsCount.toString()),
-          _infoLine(FluentIcons.shield, 'Garantie',
+          _infoLine(FluentIcons.info, 'Garantie',
               vehicle.warrantyEndDate?.isNotEmpty == true
                   ? vehicle.warrantyEndDate!
                   : 'Non renseignée'),
@@ -314,7 +314,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
     return _panel(
       context,
       'Activité récente',
-      FluentIcons.history,
+      FluentIcons.document,
       accent,
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,7 +388,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
     final items = <(String, IconData, VoidCallback)>[
       ('Identification', FluentIcons.info, onOpenIdentification),
       ('Affectation', FluentIcons.people, onOpenAssignment),
-      ('Localisation', FluentIcons.map_pin, onOpenLocation),
+      ('Localisation', FluentIcons.car, onOpenLocation),
       ('Maintenance', FluentIcons.repair, onOpenMaintenance),
       ('Acquisition', FluentIcons.shopping_cart, onOpenAcquisition),
     ];
