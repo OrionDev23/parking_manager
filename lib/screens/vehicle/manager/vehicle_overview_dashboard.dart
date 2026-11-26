@@ -321,6 +321,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
   }
 
   Widget _activityPanel(BuildContext context, Color accent) {
+    final visibleActivities = recentActivities.take(3).toList(growable: false);
     return _panel(
       context,
       'Activité récente',
@@ -329,14 +330,14 @@ class VehicleOverviewDashboard extends StatelessWidget {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (loadingActivity && recentActivities.isEmpty)
+          if (loadingActivity && visibleActivities.isEmpty)
             const Center(
               child: Padding(
                 padding: EdgeInsets.all(12),
                 child: ProgressRing(),
               ),
             )
-          else if (activityError && recentActivities.isEmpty)
+          else if (activityError && visibleActivities.isEmpty)
             _emptyState(
               'Impossible de charger l’historique.',
               action: Button(
@@ -344,12 +345,12 @@ class VehicleOverviewDashboard extends StatelessWidget {
                 child: const Text('Réessayer'),
               ),
             )
-          else if (recentActivities.isNotEmpty)
-            ...recentActivities.take(3).toList().asMap().entries.map((entry) {
+          else if (visibleActivities.isNotEmpty)
+            ...visibleActivities.asMap().entries.map((entry) {
               final activity = entry.value;
               return Padding(
                 padding: EdgeInsets.only(
-                  bottom: entry.key == recentActivities.length - 1 ? 0 : 14,
+                  bottom: entry.key == visibleActivities.length - 1 ? 0 : 14,
                 ),
                 child: _timelineItem(
                   accent,
