@@ -123,10 +123,14 @@ class VehicleManagementState extends State<VehicleManagement>
       );
     }
 
-    final selectedVehicle = vehicles.isEmpty
-        ? null
-        : vehicles.where((vehicle) => vehicle.id == _selectedVehicle?.id)
-            .firstOrNull ?? vehicles.first;
+    Vehicle? selectedVehicle;
+    for (final vehicle in vehicles) {
+      if (vehicle.id == _selectedVehicle?.id) {
+        selectedVehicle = vehicle;
+        break;
+      }
+    }
+    selectedVehicle ??= vehicles.isEmpty ? null : vehicles.first;
 
     return ScaffoldPage(
       padding: EdgeInsets.zero,
@@ -328,12 +332,12 @@ class VehicleManagementState extends State<VehicleManagement>
                 child: ListView.separated(
                   padding: const EdgeInsets.fromLTRB(10, 2, 10, 12),
                   itemCount: vehicles.length,
-                  separatorBuilder: (_, __) => Divider(
-                    style: DividerThemeData(
-                      thickness: 1,
-                      decoration: BoxDecoration(color: theme.borderColor.withValues(alpha: .55)),
+                  separatorBuilder: (_, __) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: Container(
+                      height: 1,
+                      color: theme.borderColor.withValues(alpha: .55),
                     ),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
                   ),
                   itemBuilder: (context, index) {
                     final vehicle = vehicles[index];
@@ -562,35 +566,14 @@ class VehicleManagementState extends State<VehicleManagement>
     return LayoutBuilder(
       builder: (context, constraints) {
         final compact = constraints.maxWidth < 720;
-        final searchWidth =
-            compact ? constraints.maxWidth : constraints.maxWidth * .42;
+        final filterWidth = compact ? (constraints.maxWidth - 8) / 2 : 140.0;
         return Wrap(
-          spacing: 10,
-          runSpacing: 10,
+          spacing: 8,
+          runSpacing: 8,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             SizedBox(
-              width: searchWidth,
-              child: ParcotoTextBox(
-                controller: searchController,
-                placeholder: 'Rechercher par immatriculation, VIN, modèle…',
-                style: theme.writingStyle,
-                placeholderStyle: TextStyle(color: theme.mutedTextColor),
-                cursorColor: theme.color,
-                onChanged: (value) => setState(() => searchQuery = value),
-                suffix: searchQuery.isEmpty
-                    ? null
-                    : IconButton(
-                        icon: const Icon(FluentIcons.cancel, size: 13),
-                        onPressed: () {
-                          searchController.clear();
-                          setState(() => searchQuery = '');
-                        },
-                      ),
-              ),
-            ),
-            SizedBox(
-              width: compact ? (constraints.maxWidth - 10) / 2 : 170,
+              width: filterWidth,
               child: ComboBox<int?>(
                 isExpanded: true,
                 value: selectedState,
@@ -611,7 +594,7 @@ class VehicleManagementState extends State<VehicleManagement>
               ),
             ),
             SizedBox(
-              width: compact ? (constraints.maxWidth - 10) / 2 : 190,
+              width: filterWidth,
               child: ComboBox<String?>(
                 isExpanded: true,
                 value: selectedBrand,
@@ -645,16 +628,8 @@ class VehicleManagementState extends State<VehicleManagement>
                   brandFilterRequest.value = null;
                   externalSearchRequest.value = null;
                 }),
-                child: const Text('Effacer les filtres'),
+                child: const Text('Effacer'),
               ),
-            Text(
-              '${_visibleVehicles().length} véhicule(s)',
-              style: TextStyle(
-                color: theme.mutedTextColor,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
           ],
         );
       },
@@ -845,6 +820,164 @@ class VehicleManagementState extends State<VehicleManagement>
 
   @override
   bool get wantKeepAlive => true;
+}
+
+class _VehicleListTile extends StatelessWidget {
+  final Vehicle vehicle;
+  final bool selected;
+  final VoidCallback onTap;
+  final AppTheme theme;
+
+  const _VehicleListTile({
+    required this.vehicle,
+    required this.selected,
+    required this.onTap,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final status = vehicle.etatactuel ?? (conducteurEmploye ? 0 : 5);
+    final statusColor = _statusColor(status);
+    final brand = VehicleMakeService.nameFor(
+      VehicleMakeService.canonicalId(vehicle.marque),
+    );
+    final model = [
+      if (brand.trim().isNotEmpty) brand,
+      vehicle.type?.trim() ?? '',
+      (vehicle.modelYear ?? vehicle.anneeUtil)?.toString() ?? '',
+    ].where((value) => value.isNotEmpty).join(' · ');
+    final imageUrl = vehicle.imageUrl?.trim() ?? '';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          padding: const EdgeInsets.all(9),
+          decoration: BoxDecoration(
+            color: selected
+                ? theme.color.withValues(alpha: .10)
+                : theme.surfaceColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: selected
+                  ? theme.color.withValues(alpha: .75)
+                  : theme.borderColor.withValues(alpha: .65),
+              width: selected ? 1.4 : 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(9),
+                child: SizedBox(
+                  width: 70,
+                  height: 58,
+                  child: imageUrl.isEmpty
+                      ? _VehicleImagePlaceholder(color: theme.color)
+                      : Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) =>
+                              _VehicleImagePlaceholder(color: theme.color),
+                        ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            vehicle.matricule,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: theme.textColor,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          FluentIcons.chevron_right,
+                          size: 12,
+                          color: selected ? theme.color : theme.mutedTextColor,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      model.isEmpty ? 'Modèle non renseigné' : model,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: theme.mutedTextColor,
+                        fontSize: 10,
+                      ),
+                    ),
+                    const SizedBox(height: 7),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: _VehicleStatusBadge(
+                            label: VehiclesUtilities.getEtatName(status).tr(),
+                            color: statusColor,
+                          ),
+                        ),
+                        if (vehicle.fleetNumber?.trim().isNotEmpty == true) ...[
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              'Parc ${vehicle.fleetNumber}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: theme.mutedTextColor,
+                                fontSize: 9,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Color _statusColor(int status) {
+    if (conducteurEmploye) {
+      switch (status) {
+        case 0: return Colors.green;
+        case 1: return Colors.orange;
+        case 2: return Colors.red;
+        case 3: return Colors.blue;
+        case 4: return Colors.grey;
+      }
+    } else {
+      switch (status) {
+        case 5: return Colors.green;
+        case 6: return Colors.red;
+        case 7: return Colors.orange;
+        case 8: return Colors.blue;
+      }
+    }
+    return Colors.grey;
+  }
 }
 
 class _VehicleCard extends StatelessWidget {
