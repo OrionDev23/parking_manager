@@ -406,11 +406,15 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
   }) {
     final drawer = onNavigate != null;
 
+    const sidebarBackground = Color(0xFF102541);
+    const sidebarForeground = Color(0xFFEAF1FA);
+    const sidebarMuted = Color(0xFFB5C4D8);
+
     return Container(
-      decoration: BoxDecoration(
-        color: theme.surfaceColor,
+      decoration: const BoxDecoration(
+        color: sidebarBackground,
         border: Border(
-          right: BorderSide(color: theme.borderColor, width: 1),
+          right: BorderSide(color: Color(0x1FFFFFFF), width: 1),
         ),
       ),
       child: Column(
@@ -426,6 +430,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                         icon: const Icon(
                           FluentIcons.chevron_right,
                           size: 13,
+                          color: sidebarForeground,
                         ),
                         onPressed: () =>
                             setState(() => _sidebarCollapsed = false),
@@ -434,17 +439,46 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                   )
                 : Row(
                     children: [
-                      Expanded(
-                        child: Image.asset(
-                          'assets/images/logo.webp',
-                          alignment: Alignment.centerLeft,
-                          height: 40,
-                          fit: BoxFit.contain,
+                      const Expanded(
+                        child: Row(
+                          children: [
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: Color(0xFF0875DE),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(12),
+                                ),
+                              ),
+                              child: SizedBox(
+                                width: 40,
+                                height: 40,
+                                child: Icon(
+                                  FluentIcons.car,
+                                  size: 22,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              'Parcoto',
+                              style: TextStyle(
+                                color: sidebarForeground,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -.4,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       if (drawer)
                         IconButton(
-                          icon: const Icon(FluentIcons.cancel, size: 16),
+                          icon: const Icon(
+                            FluentIcons.cancel,
+                            size: 16,
+                            color: sidebarForeground,
+                          ),
                           onPressed: onNavigate,
                         )
                       else
@@ -452,6 +486,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                           icon: const Icon(
                             FluentIcons.chevron_left,
                             size: 13,
+                            color: sidebarForeground,
                           ),
                           onPressed: () =>
                               setState(() => _sidebarCollapsed = true),
@@ -488,7 +523,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                     padding: const EdgeInsets.fromLTRB(10, 14, 10, 10),
                     child: Container(
                       height: 1,
-                      color: theme.borderColor,
+                      color: Colors.white.withValues(alpha: .14),
                     ),
                   ),
                   ..._buildItems(
@@ -508,7 +543,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
               child: Text(
                 'PARCOTO',
                 style: TextStyle(
-                  color: theme.mutedTextColor,
+                  color: sidebarMuted,
                   fontSize: 9,
                   letterSpacing: 1.6,
                   fontWeight: FontWeight.w700,
@@ -680,7 +715,9 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
     bool collapsed = false,
   }) {
     final active = index == selected;
-    final theme = widget.appTheme;
+    const activeBackground = Color(0xFF086BCB);
+    const foreground = Color(0xFFEAF1FA);
+    const muted = Color(0xFFB5C4D8);
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: childItem ? 1 : 2),
@@ -695,9 +732,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
               duration: ParcotoTokens.motionFast,
               curve: ParcotoTokens.motionCurve,
               decoration: BoxDecoration(
-                color: active
-                    ? theme.color.withValues(alpha: .17)
-                    : Colors.transparent,
+                color: active ? activeBackground : Colors.transparent,
                 borderRadius: BorderRadius.circular(9),
               ),
               child: SizedBox(
@@ -714,9 +749,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                     IconTheme(
                       data: IconThemeData(
                         size: childItem ? 15 : 17,
-                        color: active
-                            ? theme.color
-                            : theme.mutedTextColor,
+                        color: active ? Colors.white : muted,
                       ),
                       child: icon ?? const SizedBox.shrink(),
                     ),
@@ -727,9 +760,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: active
-                                ? theme.textColor
-                                : theme.mutedTextColor,
+                            color: active ? Colors.white : foreground,
                             fontSize: childItem ? 11 : 12,
                             fontWeight: active
                                 ? FontWeight.w700
@@ -744,14 +775,14 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                             ? FluentIcons.chevron_up
                             : FluentIcons.chevron_down,
                         size: 11,
-                        color: theme.mutedTextColor,
+                        color: muted,
                       ),
                     if (active && !expandable && !collapsed)
                       Container(
                         width: 3,
                         height: 17,
                         decoration: BoxDecoration(
-                          color: theme.color,
+                          color: Colors.white.withValues(alpha: .9),
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
