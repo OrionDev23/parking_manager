@@ -26,6 +26,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
   final VoidCallback onOpenMaintenance;
   final VoidCallback onOpenHistory;
   final VoidCallback onOpenAcquisition;
+  final bool showHero;
 
   const VehicleOverviewDashboard({
     super.key,
@@ -47,6 +48,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
     required this.onOpenMaintenance,
     required this.onOpenHistory,
     required this.onOpenAcquisition,
+    this.showHero = true,
   });
 
   @override
@@ -74,8 +76,10 @@ class VehicleOverviewDashboard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _hero(context, accent, model, compact),
-        const SizedBox(height: 16),
+        if (showHero) ...[
+          _hero(context, accent, model, compact),
+          const SizedBox(height: 16),
+        ],
         LayoutBuilder(
           builder: (context, constraints) {
             final wide = constraints.maxWidth >= ParcotoTokens.tabletBreakpoint;
