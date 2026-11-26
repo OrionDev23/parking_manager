@@ -138,6 +138,25 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
       );
     }
 
+    result.add(
+      const _MobileDestination(
+        label: 'Plus',
+        icon: FluentIcons.add,
+        isMore: true,
+      ),
+    );
+
+    final repairs = _destinationForKey('repairs');
+    if (repairs != null) {
+      result.add(
+        _MobileDestination(
+          label: 'Maintenance',
+          icon: FluentIcons.repair,
+          destination: repairs,
+        ),
+      );
+    }
+
     final planner = _destinationForKey('planner');
     if (planner != null) {
       result.add(
@@ -148,14 +167,6 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
         ),
       );
     }
-
-    result.add(
-      const _MobileDestination(
-        label: 'Plus',
-        icon: FluentIcons.more,
-        isMore: true,
-      ),
-    );
     return result;
   }
 
@@ -186,7 +197,8 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
         return index;
       }
     }
-    return destinations.length - 1;
+    final moreIndex = destinations.indexWhere((item) => item.isMore);
+    return moreIndex >= 0 ? moreIndex : destinations.length - 1;
   }
 
   @override
@@ -348,14 +360,34 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
     required _MobileDestination item,
     required bool selected,
   }) {
+    if (item.isMore) {
+      return Tooltip(
+        message: 'Plus',
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => setState(() => _drawerOpen = true),
+          child: Center(
+            child: Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: theme.color,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: const Icon(
+                FluentIcons.add,
+                size: 23,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        if (item.isMore) {
-          setState(() => _drawerOpen = true);
-          return;
-        }
-
         final index = _indexOf(item.destination!);
         if (index >= 0) widget.onSelected(index);
         setState(() => _drawerOpen = false);
@@ -386,7 +418,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                color: selected ? theme.textColor : theme.mutedTextColor,
+                color: selected ? theme.color : theme.mutedTextColor,
               ),
             ),
           ],
@@ -715,6 +747,13 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
     const activeBackground = Color(0xFF086BCB);
     const foreground = Color(0xFFEAF1FA);
     const muted = Color(0xFFB5C4D8);
+    final navIcon = icon is Icon
+        ? Icon(
+            icon.icon,
+            size: childItem ? 15 : 17,
+            color: active ? Colors.white : muted,
+          )
+        : icon ?? const SizedBox.shrink();
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: childItem ? 1 : 2),
@@ -748,7 +787,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                         size: childItem ? 15 : 17,
                         color: active ? Colors.white : muted,
                       ),
-                      child: icon ?? const SizedBox.shrink(),
+                      child: navIcon,
                     ),
                     if (!collapsed) SizedBox(width: childItem ? 9 : 11),
                     if (!collapsed)
