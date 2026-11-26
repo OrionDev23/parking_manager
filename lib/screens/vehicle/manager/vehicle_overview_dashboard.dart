@@ -53,6 +53,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = FluentTheme.of(context).accentColor;
+    final statusColor = _vehicleStatusColor(vehicle.etatactuel, accent);
     final compact = MediaQuery.sizeOf(context).width < ParcotoTokens.mobileBreakpoint;
     final make = VehicleMakeService.nameFor(
       VehicleMakeService.canonicalId(vehicle.marque),
@@ -81,7 +82,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
         ],
         LayoutBuilder(
           builder: (context, constraints) {
-            final wide = constraints.maxWidth >= ParcotoTokens.tabletBreakpoint;
+            final wide = constraints.maxWidth >= 620;
             final summary = _summary(
               context,
               accent,
@@ -91,7 +92,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
               assignment,
               vehicle.emplacement,
             );
-            final status = _statusPanel(context, accent);
+            final status = _statusPanel(context, accent, statusColor);
             if (!wide) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -115,7 +116,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
         const SizedBox(height: 14),
         LayoutBuilder(
           builder: (context, constraints) {
-            final wide = constraints.maxWidth >= ParcotoTokens.tabletBreakpoint;
+            final wide = constraints.maxWidth >= 620;
             final activity = _activityPanel(context, accent);
             final documents = _documentsPanel(context, accent);
             if (!wide) {
@@ -282,7 +283,11 @@ class VehicleOverviewDashboard extends StatelessWidget {
     );
   }
 
-  Widget _statusPanel(BuildContext context, Color accent) {
+  Widget _statusPanel(
+    BuildContext context,
+    Color accent,
+    Color statusColor,
+  ) {
     return _panel(
       context,
       'État du véhicule',
@@ -291,7 +296,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
       Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _pill(statusLabel, accent, expanded: true),
+          _pill(statusLabel, statusColor, expanded: true),
           const SizedBox(height: 12),
           _infoLine(FluentIcons.repair, 'Kilométrage actuel',
               vehicle.currentMileage == null
@@ -387,6 +392,27 @@ class VehicleOverviewDashboard extends StatelessWidget {
     );
   }
 
+  Color _vehicleStatusColor(int? status, Color fallback) {
+    switch (status) {
+      case 0:
+      case 5:
+        return Colors.green;
+      case 1:
+      case 6:
+        return Colors.red;
+      case 2:
+      case 7:
+        return Colors.orange;
+      case 3:
+      case 8:
+        return Colors.blue;
+      case 4:
+        return Colors.grey;
+      default:
+        return fallback;
+    }
+  }
+
   Widget _quickAccess(BuildContext context, Color accent) {
     final items = <(String, IconData, VoidCallback)>[
       ('Identification', FluentIcons.info, onOpenIdentification),
@@ -455,7 +481,7 @@ class VehicleOverviewDashboard extends StatelessWidget {
   ) {
     return LayoutBuilder(
       builder: (context, constraints) => SizedBox(
-        width: 220,
+        width: 190,
         child: Container(
           padding: const EdgeInsets.all(11),
           decoration: BoxDecoration(
