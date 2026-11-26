@@ -246,6 +246,7 @@ class VehicleManagementState extends State<VehicleManagement>
                               _buildFleetListPane(
                                 theme,
                                 vehicles,
+                                allVehicles,
                                 activeVehicle,
                               ),
                               const SizedBox(width: 14),
@@ -263,7 +264,7 @@ class VehicleManagementState extends State<VehicleManagement>
                               ),
                             ],
                           )
-                        : _buildMobileFleetList(theme, vehicles),
+                        : _buildMobileFleetList(theme, vehicles, allVehicles),
           ),
         ],
       ),
@@ -297,6 +298,7 @@ class VehicleManagementState extends State<VehicleManagement>
   Widget _buildFleetListPane(
     AppTheme theme,
     List<Vehicle> vehicles,
+    List<Vehicle> allVehicles,
     Vehicle? selectedVehicle,
   ) {
     return SizedBox(
@@ -334,7 +336,7 @@ class VehicleManagementState extends State<VehicleManagement>
               const SizedBox(height: 9),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: _buildFilters(theme, vehicles),
+                child: _buildFilters(theme, allVehicles),
               ),
               const SizedBox(height: 8),
               Expanded(
@@ -366,7 +368,11 @@ class VehicleManagementState extends State<VehicleManagement>
     );
   }
 
-  Widget _buildMobileFleetList(AppTheme theme, List<Vehicle> vehicles) {
+  Widget _buildMobileFleetList(
+    AppTheme theme,
+    List<Vehicle> vehicles,
+    List<Vehicle> allVehicles,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -398,7 +404,7 @@ class VehicleManagementState extends State<VehicleManagement>
         const SizedBox(height: 8),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: _buildFilters(theme, vehicles),
+          child: _buildFilters(theme, allVehicles),
         ),
         const SizedBox(height: 8),
         Expanded(
