@@ -498,7 +498,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               const SizedBox(height: 8),
               _chip(
                 VehiclesUtilities.getEtatName(v.etatactuel!).tr(),
-                accent,
+                _vehicleStatusColor(v.etatactuel, accent),
               ),
             ],
             const SizedBox(height: 8),
