@@ -1261,6 +1261,11 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               latestActivity.updatedAt ??
               latestActivity.createdAt),
       latestActivityNote: latestActivity?.remarque,
+      recentActivities: _vehicleStates.take(3).map((state) => (
+        title: VehiclesUtilities.getEtatName(state.type).tr(),
+        date: _date(state.date ?? state.updatedAt ?? state.createdAt),
+        note: state.remarque,
+      )).toList(growable: false),
       loadingActivity: _loadingHistory && latestActivity == null,
       activityError: _historyLoadFailed,
       onRetryActivity: _loadHistory,
