@@ -278,52 +278,72 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       (label: 'vehicle_details_history'.tr(), icon: FluentIcons.document),
       (label: 'vehicle_details_acquisition'.tr(), icon: FluentIcons.shopping_cart),
     ];
+    final accent = FluentTheme.of(context).accentColor;
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(
-        horizontal: compact ? 8 : 22,
-        vertical: 8,
-      ),
       decoration: BoxDecoration(
         color: FluentTheme.of(context).micaBackgroundColor,
-        border: Border(
-          bottom: BorderSide(color: Colors.grey[30]),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.grey[30])),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            for (var index = 0; index < sections.length; index++) ...[
-              if (index > 0) const SizedBox(width: 7),
-              if (_selectedSectionIndex == index)
-                FilledButton(
-                  key: ValueKey('vehicle-section-$index'),
-                  onPressed: () => _selectSection(index),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(sections[index].icon, size: 13),
-                      const SizedBox(width: 7),
-                      Text(sections[index].label),
-                    ],
+            for (var index = 0; index < sections.length; index++)
+              GestureDetector(
+                key: ValueKey('vehicle-section-$index'),
+                behavior: HitTestBehavior.opaque,
+                onTap: () => _selectSection(index),
+                child: Container(
+                  constraints: BoxConstraints(
+                    minWidth: compact ? 72 : 88,
                   ),
-                )
-              else
-                Button(
-                  key: ValueKey('vehicle-section-$index'),
-                  onPressed: () => _selectSection(index),
-                  child: Row(
+                  padding: EdgeInsets.fromLTRB(
+                    compact ? 10 : 13,
+                    10,
+                    compact ? 10 : 13,
+                    8,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: _selectedSectionIndex == index
+                            ? accent
+                            : Colors.transparent,
+                        width: 2.5,
+                      ),
+                    ),
+                  ),
+                  child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(sections[index].icon, size: 13),
-                      const SizedBox(width: 7),
-                      Text(sections[index].label),
+                      Icon(
+                        sections[index].icon,
+                        size: compact ? 16 : 17,
+                        color: _selectedSectionIndex == index
+                            ? accent
+                            : Colors.grey[100],
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        sections[index].label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: _selectedSectionIndex == index
+                              ? accent
+                              : Colors.grey[100],
+                          fontSize: compact ? 9 : 10,
+                          fontWeight: _selectedSectionIndex == index
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                        ),
+                      ),
                     ],
                   ),
                 ),
-            ],
+              ),
           ],
         ),
       ),
@@ -334,50 +354,61 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final compact = constraints.maxWidth < ParcotoTokens.tabletBreakpoint;
-        final identity = Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'vehicle_details_kicker'.tr(),
-                style: TextStyle(
-                  color: accent,
-                  fontSize: 10,
-                  letterSpacing: 1.1,
-                  fontWeight: FontWeight.w700,
-                ),
+        final identity = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'vehicle_details_kicker'.tr(),
+              style: TextStyle(
+                color: accent,
+                fontSize: 10,
+                letterSpacing: 1.1,
+                fontWeight: FontWeight.w700,
               ),
-              const SizedBox(height: 5),
-              Text(
-                v.matricule,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: compact ? 20 : 25,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: .2,
-                ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              v.matricule,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: compact ? 22 : 25,
+                fontWeight: FontWeight.w800,
+                letterSpacing: .2,
               ),
-              const SizedBox(height: 4),
-              Text(
-                model.isEmpty ? 'vehicle_details_model_missing'.tr() : model,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Colors.grey[100],
-                  fontSize: 12,
-                  height: 1.3,
-                ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              model.isEmpty ? 'vehicle_details_model_missing'.tr() : model,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Colors.grey[100],
+                fontSize: 12,
+                height: 1.3,
               ),
-              if (v.etatactuel != null) ...[
-                const SizedBox(height: 8),
-                _chip(
-                  VehiclesUtilities.getEtatName(v.etatactuel!).tr(),
-                  accent,
-                ),
-              ],
+            ),
+            if (v.etatactuel != null) ...[
+              const SizedBox(height: 8),
+              _chip(
+                VehiclesUtilities.getEtatName(v.etatactuel!).tr(),
+                accent,
+              ),
             ],
-          ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 7,
+              runSpacing: 7,
+              children: [
+                if (v.fleetNumber?.trim().isNotEmpty == true)
+                  _chip('N° parc : ${v.fleetNumber}', accent),
+                if (v.energie?.trim().isNotEmpty == true)
+                  _chip(v.energie!, accent),
+                if (v.gearbox?.trim().isNotEmpty == true)
+                  _chip(v.gearbox!, accent),
+              ],
+            ),
+          ],
         );
 
         final actions = Wrap(
@@ -390,8 +421,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(FluentIcons.back, size: 13),
-                    SizedBox(width: 7),
+                    const Icon(FluentIcons.back, size: 13),
+                    const SizedBox(width: 7),
                     Text('vehicle_details_back_to_fleet'.tr()),
                   ],
                 ),
@@ -402,8 +433,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(FluentIcons.edit, size: 14),
-                    SizedBox(width: 7),
+                    const Icon(FluentIcons.edit, size: 14),
+                    const SizedBox(width: 7),
                     Text('mod'.tr()),
                   ],
                 ),
@@ -426,13 +457,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Row(
-                      children: [
-                        _vehicleAvatar(accent, compact: true),
-                        const SizedBox(width: 12),
-                        identity,
-                      ],
-                    ),
+                    _vehicleAvatar(accent, compact: true),
+                    const SizedBox(height: 13),
+                    identity,
                     const SizedBox(height: 12),
                     actions,
                   ],
@@ -441,7 +468,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                   children: [
                     _vehicleAvatar(accent, compact: false),
                     const SizedBox(width: 18),
-                    identity,
+                    Expanded(child: identity),
                     const SizedBox(width: 14),
                     actions,
                   ],
@@ -453,8 +480,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
 
   Widget _vehicleAvatar(Color accent, {required bool compact}) {
     final imageUrl = v.imageUrl?.trim();
-    final width = compact ? 88.0 : 148.0;
-    final height = compact ? 82.0 : 104.0;
+    final width = compact ? double.infinity : 148.0;
+    final height = compact ? 174.0 : 104.0;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(14),
@@ -1091,6 +1118,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         : VehiclesUtilities.getEtatName(v.etatactuel!).tr();
 
     return VehicleOverviewDashboard(
+      showHero: false,
       vehicle: v,
       statusLabel: currentStatus,
       driverName: assignedDriverName,
