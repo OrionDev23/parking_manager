@@ -898,5 +898,7 @@
   "vehicle_document_expiry_prefix": "Expiry",
   "vehicle_field_wilaya": "Wilaya",
   "vehicle_field_transmission": "Transmission",
-  "vehicle_field_usage_type": "Type of use"
+  "vehicle_field_usage_type": "Type of use",
+  "vehicle_details_unavailable": "Unavailable",
+  "vehicle_details_loading": "Loading…"
 }

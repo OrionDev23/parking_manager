@@ -900,5 +900,7 @@
   "vehicle_document_expiry_prefix": "انتهاء الصلاحية",
   "vehicle_field_wilaya": "الولاية",
   "vehicle_field_transmission": "ناقل الحركة",
-  "vehicle_field_usage_type": "نوع الاستخدام"
+  "vehicle_field_usage_type": "نوع الاستخدام",
+  "vehicle_details_unavailable": "غير متاح",
+  "vehicle_details_loading": "جارٍ التحميل…"
 }

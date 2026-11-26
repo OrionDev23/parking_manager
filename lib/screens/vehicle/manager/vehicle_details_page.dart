@@ -1080,9 +1080,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         (!VehicleProvider.downloadedDocuments &&
             !VehicleProvider.downloadingDocuments);
     final documentsCountValue = documentsUnavailable
-        ? 'Indisponible'
+        ? 'vehicle_details_unavailable'.tr()
         : VehicleProvider.downloadingDocuments
-            ? 'Chargement…'
+            ? 'vehicle_details_loading'.tr()
             : documents.length.toString();
     final documentsDeadlineValue = documentsUnavailable
         ? '—'
