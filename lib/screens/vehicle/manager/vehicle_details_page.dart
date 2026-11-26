@@ -287,7 +287,18 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     Widget sectionItem(int index, {double minWidth = 88}) {
       final section = sections[index];
       final selected = _selectedSectionIndex == index;
-      return GestureDetector(
+      final label = compact
+          ? switch (index) {
+              0 => 'Vue gén.',
+              1 => 'Ident.',
+              2 => 'Tech.',
+              3 => 'Affect.',
+              _ => section.label,
+            }
+          : section.label;
+      return Tooltip(
+        message: section.label,
+        child: GestureDetector(
         key: ValueKey('vehicle-section-$index'),
         behavior: HitTestBehavior.opaque,
         onTap: () => _selectSection(index),
@@ -317,7 +328,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               ),
               const SizedBox(height: 5),
               Text(
-                section.label,
+                label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -329,6 +340,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             ],
           ),
         ),
+      ),
       );
     }
 
