@@ -1395,16 +1395,16 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _heading('Historique du véhicule',
-            'Événements de statut enregistrés dans le registre des états Parcoto'),
-        _panel('Changements d’état', FluentIcons.document, accent, [
+        _heading('vehicle_history_title'.tr(),
+            'vehicle_history_description'.tr()),
+        _panel('vehicle_history_events_group'.tr(), FluentIcons.document, accent, [
           if (_historyLoadFailed)
             _retryNotice(
-              'Impossible de charger l’historique. Vérifiez la connexion puis réessayez.',
+              'vehicle_history_load_failed'.tr(),
               _loadHistory,
             ),
           if (_vehicleStates.isEmpty && !_historyLoadFailed)
-            _emptyInline('Aucun changement d’état enregistré pour ce véhicule')
+            _emptyInline('vehicle_history_empty'.tr())
           else
             ..._vehicleStates.map((state) => Padding(
               padding: const EdgeInsets.only(bottom: 13),
@@ -1426,7 +1426,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                       const SizedBox(height: 3),
                       Text(
                         '${_date(state.date ?? state.updatedAt ?? state.createdAt)}'
-                        '${state.ordreNum == null ? '' : ' • Ordre #${state.ordreNum}'}',
+                        '${state.ordreNum == null ? '' : ' • ${'vehicle_history_order_number'.tr()} #${state.ordreNum}'}',
                         style: TextStyle(color: Colors.grey[100], fontSize: 11)),
                       if (state.type == 2 &&
                           state.valeur != null &&
@@ -1434,7 +1434,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
-                            'Montant de réparation : ${VehicleDetailFormatters.formatNumber(state.valeur!)} DA',
+                            '${'vehicle_history_repair_amount'.tr()}: ${VehicleDetailFormatters.formatNumber(state.valeur!)} DA',
                             style: TextStyle(
                               color: Colors.grey[100],
                               fontSize: 11,
@@ -1490,8 +1490,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _heading('Maintenance & interventions',
-            'Interventions et fiches de réception réellement enregistrées pour ce véhicule'),
+        _heading('vehicle_maintenance_title'.tr(),
+            'vehicle_maintenance_description'.tr()),
         LayoutBuilder(builder: (context, constraints) {
           final columns = constraints.maxWidth >= ParcotoTokens.tabletBreakpoint
               ? 3
@@ -1501,29 +1501,29 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           final width =
               (constraints.maxWidth - (columns - 1) * 12) / columns;
           return Wrap(spacing: 12, runSpacing: 12, children: [
-            _metric(width, FluentIcons.repair, 'Ordres de réparation',
+            _metric(width, FluentIcons.repair, 'orderreparations'.tr(),
                 repairs.length.toString(), accent),
-            _metric(width, FluentIcons.document, 'Fiches de réception',
+            _metric(width, FluentIcons.document, 'fichesreception'.tr(),
                 sheets.length.toString(), accent),
-            _metric(width, FluentIcons.money, 'Coût enregistré',
+            _metric(width, FluentIcons.money, 'vehicle_maintenance_recorded_cost'.tr(),
                 costLabel, accent),
           ]);
         }),
         const SizedBox(height: 20),
         if (_maintenanceLoadFailed)
           _retryNotice(
-            'Certaines données de maintenance n’ont pas pu être vérifiées. Réessayez le chargement.',
+            'vehicle_maintenance_load_failed'.tr(),
             _loadMaintenance,
           ),
-        _panel('Ordres de réparation', FluentIcons.repair, accent, [
+        _panel('orderreparations'.tr(), FluentIcons.repair, accent, [
           if (repairs.isEmpty && !_maintenanceLoadFailed)
-            _emptyInline('Aucun ordre de réparation associé à ce véhicule')
+            _emptyInline('vehicle_maintenance_no_repair_orders'.tr())
           else if (repairs.isNotEmpty)
             ...repairs.map((repair) => _repairRow(repair, accent)),
         ]),
-        _panel('Fiches de réception', FluentIcons.document, accent, [
+        _panel('fichesreception'.tr(), FluentIcons.document, accent, [
           if (sheets.isEmpty && !_maintenanceLoadFailed)
-            _emptyInline('Aucune fiche de réception trouvée pour cette immatriculation')
+            _emptyInline('vehicle_maintenance_no_reception_sheets'.tr())
           else if (sheets.isNotEmpty)
             ...sheets.map((sheet) => _receptionRow(sheet, accent)),
         ]),
@@ -1543,7 +1543,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Ordre #${repair.numero}',
+                '${'vehicle_maintenance_repair_order_label'.tr()} #${repair.numero}',
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -1551,7 +1551,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               ),
               const SizedBox(height: 3),
               Text(
-                '${_date(repair.date)} • ${repair.prestatairenom ?? 'Prestataire non renseigné'}',
+                '${_date(repair.date)} • ${repair.prestatairenom ?? 'vehicle_maintenance_provider_missing'.tr()}',
                 style: TextStyle(color: Colors.grey[100], fontSize: 11),
               ),
               if (repair.remarque?.trim().isNotEmpty == true)
@@ -1617,7 +1617,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Fiche de réception #${sheet.numero}',
+                '${'vehicle_maintenance_reception_sheet_label'.tr()} #${sheet.numero}',
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -1625,13 +1625,13 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               ),
               const SizedBox(height: 3),
               Text(
-                'Entrée : ${_date(sheet.dateEntre)}'
-                '${sheet.dateSortie == null ? ' • Toujours ouverte' : ' • Sortie : ${_date(sheet.dateSortie)}'}',
+                '${'vehicle_maintenance_entry_date'.tr()}: ${_date(sheet.dateEntre)}'
+                '${sheet.dateSortie == null ? ' • ${'vehicle_maintenance_still_open'.tr()}' : ' • ${'vehicle_maintenance_exit_date'.tr()}: ${_date(sheet.dateSortie)}'}',
                 style: TextStyle(color: Colors.grey[100], fontSize: 11),
               ),
               if (sheet.kilometrage != null)
                 Text(
-                  'Kilométrage : ${sheet.kilometrage} km',
+                  '${'kilometrage'.tr()}: ${sheet.kilometrage} km',
                   style: TextStyle(color: Colors.grey[100], fontSize: 11),
                 ),
               if (sheet.remarque?.trim().isNotEmpty == true)
@@ -1721,12 +1721,12 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         ),
         Button(
           onPressed: onRetry,
-          child: const Row(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(FluentIcons.refresh, size: 12),
               SizedBox(width: 6),
-              Text('Réessayer'),
+              Text('retry'.tr()),
             ],
           ),
         ),
@@ -1761,12 +1761,12 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _heading(
-          'Documents du véhicule',
-          'Documents administratifs et dates d’expiration enregistrés dans Parcoto',
+          'vehicle_documents_title'.tr(),
+          'vehicle_documents_description'.tr(),
         ),
         if (_documentsLoadFailed)
           _retryNotice(
-            'Impossible de récupérer les documents du véhicule. Réessayez le chargement.',
+            'vehicle_documents_load_failed'.tr(),
             () => _loadDocuments(force: true),
           ),
         LayoutBuilder(
@@ -1805,9 +1805,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         if (documents.isEmpty && !_documentsLoadFailed)
           _empty(
             FluentIcons.document,
-            'Aucun document enregistré pour ce véhicule',
-            'Les documents associés à cette immatriculation apparaîtront ici dès leur création dans la gestion documentaire.',
-            'Aucun document trouvé',
+            'vehicle_documents_empty_title'.tr(),
+            'vehicle_documents_empty_description'.tr(),
+            'vehicle_documents_empty_badge'.tr(),
           )
         else if (documents.isNotEmpty)
           ...documents.map((document) => _documentTile(document, accent)),
@@ -1823,16 +1823,15 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 const Icon(FluentIcons.refresh, size: 13),
                 const SizedBox(width: 7),
                 Text(VehicleProvider.downloadingDocuments
-                    ? 'Actualisation…'
-                    : 'Actualiser'),
+                    ? 'vehicle_documents_refreshing'.tr()
+                    : 'actu'.tr()),
               ],
             ),
           ),
         ),
         const SizedBox(height: 8),
         Text(
-          'Note : la version actuelle conserve les métadonnées du document. '
-          'Aucun fichier joint n’est encore référencé dans ce modèle.',
+          'vehicle_documents_attachment_note'.tr(),
           style: TextStyle(color: Colors.grey[100], fontSize: 11),
         ),
       ],
@@ -1883,14 +1882,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     final expired = expiryDay != null && expiryDay.isBefore(today);
     final daysRemaining = expiryDay?.difference(today).inDays;
     final status = expiration == null
-        ? 'Échéance inconnue'
+        ? 'vehicle_document_expiry_unknown'.tr()
         : expired
-            ? 'Expiré'
+            ? 'vehicle_document_expired'.tr()
             : daysRemaining == 0
-                ? 'Expire aujourd’hui'
+                ? 'vehicle_document_expires_today'.tr()
                 : daysRemaining != null && daysRemaining <= 30
-                    ? 'Expire bientôt'
-                    : 'Valide';
+                    ? 'vehicle_document_expires_soon'.tr()
+                    : 'vehicle_document_valid'.tr();
     final statusColor = expiration == null
         ? Colors.grey[100]
         : expired
@@ -1925,7 +1924,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             children: [
               Text(
                 document.nom.trim().isEmpty
-                    ? 'Document sans nom'
+                    ? 'vehicle_document_unnamed'.tr()
                     : document.nom,
                 style: const TextStyle(
                   fontSize: 13,
@@ -1935,8 +1934,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               const SizedBox(height: 5),
               Text(
                 expiration == null
-                    ? 'Date d’expiration non renseignée'
-                    : 'Expiration : ${_date(expiration)}',
+                    ? 'vehicle_document_expiry_missing'.tr()
+                    : '${'vehicle_document_expiry_prefix'.tr()}: ${_date(expiration)}',
                 style: TextStyle(color: Colors.grey[100], fontSize: 11),
               ),
             ],
