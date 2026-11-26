@@ -37,7 +37,7 @@ class VehicleManagementState extends State<VehicleManagement>
 
   final TextEditingController searchController = TextEditingController();
   String searchQuery = '';
-  int? selectedState;
+  String? selectedAssignment;
   String? selectedBrand;
   _FleetQuickFilter _quickFilter = _FleetQuickFilter.all;
   _VehicleWorkspaceView _workspaceView = _VehicleWorkspaceView.fleet;
@@ -658,10 +658,12 @@ class VehicleManagementState extends State<VehicleManagement>
         .toList()
       ..sort((a, b) => VehicleMakeService.nameFor(a)
           .compareTo(VehicleMakeService.nameFor(b)));
-
-    final stateIds = conducteurEmploye
-        ? List<int>.generate(5, (index) => index)
-        : List<int>.generate(4, (index) => index + 5);
+    final assignments = vehicles
+        .map(_assignmentLabel)
+        .where((value) => value.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -674,31 +676,10 @@ class VehicleManagementState extends State<VehicleManagement>
           children: [
             SizedBox(
               width: filterWidth,
-              child: ComboBox<int?>(
-                isExpanded: true,
-                value: selectedState,
-                placeholder: const Text('Tous les états'),
-                items: [
-                  const ComboBoxItem<int?>(
-                    value: null,
-                    child: Text('Tous les états'),
-                  ),
-                  ...stateIds.map(
-                    (id) => ComboBoxItem<int?>(
-                      value: id,
-                      child: Text(VehiclesUtilities.getEtatName(id).tr()),
-                    ),
-                  ),
-                ],
-                onChanged: (value) => setState(() => selectedState = value),
-              ),
-            ),
-            SizedBox(
-              width: filterWidth,
               child: ComboBox<String?>(
                 isExpanded: true,
                 value: selectedBrand,
-                placeholder: const Text('Toutes les marques'),
+                placeholder: const Text('Marque'),
                 items: [
                   const ComboBoxItem<String?>(
                     value: null,
@@ -720,11 +701,37 @@ class VehicleManagementState extends State<VehicleManagement>
                 }),
               ),
             ),
-            if (selectedState != null || selectedBrand != null)
+            SizedBox(
+              width: filterWidth,
+              child: ComboBox<String?>(
+                isExpanded: true,
+                value: selectedAssignment,
+                placeholder: const Text('Affectation'),
+                items: [
+                  const ComboBoxItem<String?>(
+                    value: null,
+                    child: Text('Toutes les affectations'),
+                  ),
+                  ...assignments.map(
+                    (assignment) => ComboBoxItem<String?>(
+                      value: assignment,
+                      child: Text(
+                        assignment,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ],
+                onChanged: (value) =>
+                    setState(() => selectedAssignment = value),
+              ),
+            ),
+            if (selectedBrand != null || selectedAssignment != null)
               Button(
                 onPressed: () => setState(() {
-                  selectedState = null;
                   selectedBrand = null;
+                  selectedAssignment = null;
                   _quickFilter = _FleetQuickFilter.all;
                   brandFilterRequest.value = null;
                   externalSearchRequest.value = null;
@@ -735,6 +742,14 @@ class VehicleManagementState extends State<VehicleManagement>
         );
       },
     );
+  }
+
+  String _assignmentLabel(Vehicle vehicle) {
+    return [
+      vehicle.filliale,
+      vehicle.direction,
+      vehicle.departement,
+    ].where((value) => value?.trim().isNotEmpty == true).join(' · ');
   }
 
   List<Vehicle> _visibleVehicles() {
@@ -751,12 +766,12 @@ class VehicleManagementState extends State<VehicleManagement>
           canonicalStatus != FleetDashboardStatus.workshop) {
         return false;
       }
-      if (selectedState != null &&
-          (vehicle.etatactuel ?? (conducteurEmploye ? 0 : 5)) != selectedState) {
-        return false;
-      }
       if (selectedBrand != null &&
           VehicleMakeService.canonicalId(vehicle.marque) != selectedBrand) {
+        return false;
+      }
+      if (selectedAssignment != null &&
+          _assignmentLabel(vehicle) != selectedAssignment) {
         return false;
       }
       if (query.isEmpty) return true;
@@ -772,6 +787,9 @@ class VehicleManagementState extends State<VehicleManagement>
         vehicle.matriculeConducteur,
         vehicle.nom,
         vehicle.prenom,
+        vehicle.filliale,
+        vehicle.direction,
+        vehicle.departement,
       ];
       return values.any(
         (value) => value?.toLowerCase().contains(query) == true,
@@ -782,7 +800,7 @@ class VehicleManagementState extends State<VehicleManagement>
 
   Widget _buildEmptyState(AppTheme theme) {
     final hasFilters = searchQuery.trim().isNotEmpty ||
-        selectedState != null ||
+        selectedAssignment != null ||
         selectedBrand != null ||
         _quickFilter != _FleetQuickFilter.all;
     return Center(
@@ -838,7 +856,7 @@ class VehicleManagementState extends State<VehicleManagement>
                     onPressed: () => setState(() {
                       searchController.clear();
                       searchQuery = '';
-                      selectedState = null;
+                      selectedAssignment = null;
                       selectedBrand = null;
                       _quickFilter = _FleetQuickFilter.all;
                       brandFilterRequest.value = null;
