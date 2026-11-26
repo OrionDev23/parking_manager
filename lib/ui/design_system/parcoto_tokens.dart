@@ -30,8 +30,8 @@ abstract final class ParcotoTokens {
 
   static const double borderThin = 1;
   static const double contentMaxWidth = 1600;
-  static const double sidebarWidth = 272;
-  static const double sidebarCollapsedWidth = 76;
+  static const double sidebarWidth = 220;
+  static const double sidebarCollapsedWidth = 68;
   static const double topbarHeight = 72;
   static const double mobileTopbarHeight = 60;
 
