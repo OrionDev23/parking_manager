@@ -102,7 +102,19 @@ class VehicleManagementState extends State<VehicleManagement>
         onSaved: _handleVehicleSaved,
       );
     }
-    if (_workspaceView == _VehicleWorkspaceView.details &&
+
+    context.watch<VehicleProvider>();
+    final theme = context.watch<AppTheme>();
+    final vehicles = _visibleVehicles();
+    final allVehicles = VehicleProvider.vehicles.values.toList();
+    final loading = VehicleProvider.downloadingVehicles &&
+        VehicleProvider.vehicles.isEmpty;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final splitLayout = screenWidth >= 1080;
+
+    // On narrow screens the list and the vehicle sheet are separate views.
+    if (!splitLayout &&
+        _workspaceView == _VehicleWorkspaceView.details &&
         _selectedVehicle != null) {
       return VehicleDetailsPage(
         vehicle: _selectedVehicle!,
@@ -110,14 +122,11 @@ class VehicleManagementState extends State<VehicleManagement>
         onBack: _backToFleet,
       );
     }
-    context.watch<VehicleProvider>();
-    final theme = context.watch<AppTheme>();
-    final vehicles = _visibleVehicles();
-    final allVehicles = VehicleProvider.vehicles.values.toList();
-    final loading = VehicleProvider.downloadingVehicles &&
-        VehicleProvider.vehicles.isEmpty;
-    final compact =
-        MediaQuery.sizeOf(context).width < ParcotoTokens.mobileBreakpoint;
+
+    final selectedVehicle = vehicles.isEmpty
+        ? null
+        : vehicles.where((vehicle) => vehicle.id == _selectedVehicle?.id)
+            .firstOrNull ?? vehicles.first;
 
     return ScaffoldPage(
       padding: EdgeInsets.zero,
@@ -126,137 +135,268 @@ class VehicleManagementState extends State<VehicleManagement>
         children: [
           Padding(
             padding: EdgeInsets.fromLTRB(
-              compact ? 16 : 26,
-              compact ? 18 : 24,
-              compact ? 16 : 26,
-              14,
+              screenWidth < 720 ? 16 : 26,
+              screenWidth < 720 ? 16 : 22,
+              screenWidth < 720 ? 16 : 26,
+              12,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final actions = Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        Tooltip(
-                          message: 'Actualiser le parc',
-                          child: Button(
-                            onPressed: VehicleProvider.downloadingVehicles
-                                ? null
-                                : _refreshVehicles,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  FluentIcons.refresh,
-                                  size: 14,
-                                  color: theme.mutedTextColor,
-                                ),
-                                if (!compact) ...[
-                                  const SizedBox(width: 7),
-                                  const Text('Actualiser'),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ),
-                        if (showImportVehicles && DatabaseGetter().isAdmin())
-                          Button(
-                            onPressed: importList,
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(FluentIcons.open_file, size: 14),
-                                SizedBox(width: 7),
-                                Text('Importer'),
-                              ],
-                            ),
-                          ),
-                        FilledButton(
-                          onPressed: _openNewVehicle,
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(FluentIcons.add, size: 14),
-                              SizedBox(width: 7),
-                              Text('Ajouter un véhicule'),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final actions = Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    Tooltip(
+                      message: 'Actualiser le parc',
+                      child: Button(
+                        onPressed: VehicleProvider.downloadingVehicles
+                            ? null
+                            : _refreshVehicles,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(FluentIcons.refresh,
+                                size: 14, color: theme.mutedTextColor),
+                            if (constraints.maxWidth >= 680) ...[
+                              const SizedBox(width: 7),
+                              const Text('Actualiser'),
                             ],
-                          ),
+                          ],
                         ),
-                      ],
-                    );
-
-                    if (constraints.maxWidth < 740) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                      ),
+                    ),
+                    if (showImportVehicles && DatabaseGetter().isAdmin())
+                      Button(
+                        onPressed: importList,
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(FluentIcons.open_file, size: 14),
+                            SizedBox(width: 7),
+                            Text('Importer'),
+                          ],
+                        ),
+                      ),
+                    FilledButton(
+                      onPressed: _openNewVehicle,
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          _pageTitle(theme),
-                          const SizedBox(height: 14),
-                          Align(
-                            alignment: AlignmentDirectional.centerStart,
-                            child: actions,
-                          ),
+                          Icon(FluentIcons.add, size: 14),
+                          SizedBox(width: 7),
+                          Text('Ajouter'),
                         ],
-                      );
-                    }
+                      ),
+                    ),
+                  ],
+                );
+                final search = _buildGlobalSearch(theme);
 
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(child: _pageTitle(theme)),
-                        actions,
-                      ],
-                    );
-                  },
-                ),
-                const SizedBox(height: 20),
-                _buildMetrics(theme, allVehicles),
-                const SizedBox(height: 18),
-                _buildFilters(theme, allVehicles),
-              ],
+                if (constraints.maxWidth < 900) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _pageTitle(theme),
+                      const SizedBox(height: 14),
+                      search,
+                      const SizedBox(height: 10),
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: actions,
+                      ),
+                    ],
+                  );
+                }
+
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(child: _pageTitle(theme)),
+                    const SizedBox(width: 18),
+                    SizedBox(width: 260, child: search),
+                    const SizedBox(width: 10),
+                    actions,
+                  ],
+                );
+              },
             ),
           ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: screenWidth < 720 ? 16 : 26),
+            child: _buildMetrics(theme, allVehicles),
+          ),
+          const SizedBox(height: 14),
           Expanded(
             child: loading
                 ? const Center(child: ProgressRing())
                 : vehicles.isEmpty
                     ? _buildEmptyState(theme)
-                    : LayoutBuilder(
-                        builder: (context, constraints) {
-                          final maxExtent = constraints.maxWidth < 520
-                              ? constraints.maxWidth
-                              : 390.0;
-                          return GridView.builder(
-                            padding: EdgeInsets.fromLTRB(
-                              compact ? 12 : 26,
-                              4,
-                              compact ? 12 : 26,
-                              28,
-                            ),
-                            gridDelegate:
-                                SliverGridDelegateWithMaxCrossAxisExtent(
-                              maxCrossAxisExtent: maxExtent,
-                              mainAxisExtent: 330,
-                              crossAxisSpacing: 16,
-                              mainAxisSpacing: 16,
-                            ),
-                            itemCount: vehicles.length,
-                            itemBuilder: (context, index) {
-                              final vehicle = vehicles[index];
-                              return _VehicleCard(
-                                vehicle: vehicle,
-                                onOpen: () => _openDetails(vehicle),
-                                onEdit: () => _openEditor(vehicle),
-                              );
-                            },
-                          );
-                        },
-                      ),
+                    : splitLayout
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _buildFleetListPane(
+                                theme,
+                                vehicles,
+                                selectedVehicle,
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 18, bottom: 18),
+                                  child: selectedVehicle == null
+                                      ? _buildEmptyState(theme)
+                                      : VehicleDetailsPage(
+                                          key: ValueKey(selectedVehicle.id),
+                                          vehicle: selectedVehicle,
+                                          onEdit: () => _openEditor(selectedVehicle),
+                                        ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : _buildMobileFleetList(theme, vehicles),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildGlobalSearch(AppTheme theme) {
+    return ParcotoTextBox(
+      controller: searchController,
+      placeholder: 'Rechercher un véhicule...',
+      style: theme.writingStyle,
+      placeholderStyle: TextStyle(color: theme.mutedTextColor),
+      cursorColor: theme.color,
+      onChanged: (value) => setState(() => searchQuery = value),
+      prefix: const Padding(
+        padding: EdgeInsetsDirectional.only(start: 10, end: 6),
+        child: Icon(FluentIcons.search, size: 14),
+      ),
+      suffix: searchQuery.isEmpty
+          ? null
+          : IconButton(
+              icon: const Icon(FluentIcons.cancel, size: 13),
+              onPressed: () {
+                searchController.clear();
+                setState(() => searchQuery = '');
+              },
+            ),
+    );
+  }
+
+  Widget _buildFleetListPane(
+    AppTheme theme,
+    List<Vehicle> vehicles,
+    Vehicle? selectedVehicle,
+  ) {
+    return SizedBox(
+      width: 326,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 18, bottom: 18),
+        child: ParcotoSurface(
+          padding: EdgeInsets.zero,
+          elevated: true,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 15, 16, 10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Véhicules (${vehicles.length})',
+                        style: TextStyle(
+                          color: theme.textColor,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    Icon(FluentIcons.list, size: 16, color: theme.mutedTextColor),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: _buildFilters(theme, vehicles),
+              ),
+              const SizedBox(height: 8),
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(10, 2, 10, 12),
+                  itemCount: vehicles.length,
+                  separatorBuilder: (_, __) => Divider(
+                    style: DividerThemeData(
+                      thickness: 1,
+                      decoration: BoxDecoration(color: theme.borderColor.withValues(alpha: .55)),
+                    ),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                  ),
+                  itemBuilder: (context, index) {
+                    final vehicle = vehicles[index];
+                    return _VehicleListTile(
+                      vehicle: vehicle,
+                      selected: vehicle.id == selectedVehicle?.id,
+                      onTap: () => _openDetails(vehicle),
+                      theme: theme,
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileFleetList(AppTheme theme, List<Vehicle> vehicles) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 2, 16, 10),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Véhicules (${vehicles.length})',
+                  style: TextStyle(
+                    color: theme.textColor,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              Text(
+                'Sélectionnez un véhicule',
+                style: TextStyle(color: theme.mutedTextColor, fontSize: 10),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: _buildFilters(theme, vehicles),
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: ListView.separated(
+            padding: const EdgeInsets.fromLTRB(16, 2, 16, 22),
+            itemCount: vehicles.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            itemBuilder: (context, index) => _VehicleListTile(
+              vehicle: vehicles[index],
+              selected: false,
+              onTap: () => _openDetails(vehicles[index]),
+              theme: theme,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
