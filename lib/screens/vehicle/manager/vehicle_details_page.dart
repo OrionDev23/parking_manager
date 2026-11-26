@@ -586,14 +586,14 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     final matchingDrivers = _driversMatchingVehicleRegistration();
 
     return _section(
-      'Affectation et organisation',
-      'Conducteur affecté, rattachement organisationnel et état opérationnel',
+      'vehicle_assignment_title'.tr(),
+      'vehicle_assignment_description'.tr(),
       [
         _panel('vehicle_details_assigned_driver'.tr(), FluentIcons.people, accent, [
           if (driverRegistration.isEmpty)
-            _emptyInline('Aucun matricule de conducteur n’est associé à ce véhicule')
+            _emptyInline('vehicle_assignment_no_driver_registration'.tr())
           else ...[
-            _statusValue('Matricule affecté', driverRegistration, accent),
+            _statusValue('vehicle_assignment_registration_label'.tr(), driverRegistration, accent),
             const SizedBox(height: 10),
             if (_loadingDrivers && matchingDrivers.isEmpty)
               const Center(
@@ -604,76 +604,76 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               )
             else if (_driversLoadFailed)
               _retryNotice(
-                'Impossible de vérifier le conducteur dans l’entreprise active.',
+                'vehicle_assignment_verify_failed'.tr(),
                 () => _loadDrivers(force: true),
               )
             else if (!DriverProvider.downloadedConducteurs)
-              _emptyInline('Référentiel des conducteurs non disponible')
+              _emptyInline('vehicle_assignment_driver_directory_unavailable'.tr())
             else if (matchingDrivers.length == 1) ...[
               if (matchingDrivers.single.getName().trim().isNotEmpty)
                 _statusValue(
-                  'Conducteur',
+                  'chauffeur'.tr(),
                   matchingDrivers.single.getName().trim(),
                   accent,
                 )
               else
                 _emptyInline(
-                  'Le matricule correspond à un conducteur, mais son nom n’est pas renseigné.',
+                  'vehicle_assignment_driver_name_missing'.tr(),
                 ),
               const SizedBox(height: 8),
               _statusValue(
-                'Situation du conducteur',
+                'vehicle_assignment_driver_status'.tr(),
                 DriverProvider.getEtat(matchingDrivers.single.etat).tr(),
                 accent,
               ),
             ]
             else if (matchingDrivers.isEmpty)
               _emptyInline(
-                'Aucun conducteur de l’entreprise active ne correspond à ce matricule. '
-                'L’affectation reste affichée comme donnée historique.',
+                'vehicle_assignment_no_match'.tr()
+                'vehicle_assignment_historical_note'.tr(),
               )
             else
               _emptyInline(
-                'Plusieurs conducteurs correspondent à ce matricule. '
-                'Le nom n’est pas affiché pour éviter une association ambiguë.',
+                'vehicle_assignment_multiple_matches'.tr()
+                'vehicle_assignment_ambiguous_name_hidden'.tr(),
               ),
           ],
         ]),
-        _group('Rattachement organisationnel', [
+        _group('vehicle_assignment_organization_group'.tr(), [
           _field(
-            'Appartenance',
+            'appartenance'.tr(),
             _resolveOrganisationLabel(
               v.appartenance,
               VehiclesUtilities.getAppartenance,
             ),
           ),
           _field(
-            'Filiale',
+            'filiale'.tr(),
             _resolveOrganisationLabel(
               v.filliale,
               VehiclesUtilities.getAppartenance,
             ),
           ),
           _field(
-            'Direction',
+            'vehicle_field_direction'.tr(),
             _resolveOrganisationLabel(
               v.direction,
               VehiclesUtilities.getDirection,
             ),
           ),
           _field(
-            'Département',
+            'departement'.tr(),
             _resolveOrganisationLabel(
               v.departement,
               VehiclesUtilities.getDepartment,
             ),
           ),
           _field(
-            'Périmètre',
+            'vehicle_field_perimeter'.tr(),
             VehiclesUtilities.getPerimetre(v.perimetre).tr(),
           ),
           _field(
-            'Appartenance du conducteur (valeur historique)',
+            'vehicle_assignment_driver_belonging_legacy'.tr(),
             _resolveOrganisationLabel(
               v.appartenanceconducteur,
               VehiclesUtilities.getAppartenance,
@@ -997,8 +997,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _heading(
-          'Géolocalisation & stationnement',
-          'Position et emplacement du véhicule dans le parc',
+          'vehicle_location_parking_title'.tr(),
+          'vehicle_location_parking_description'.tr(),
         ),
         LayoutBuilder(
           builder: (context, constraints) {
@@ -1013,18 +1013,18 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 SizedBox(
                   width: cardWidth,
                   child: _panel(
-                    'Suivi GPS',
+                    'vehicle_gps_tracking_title'.tr(),
                     FluentIcons.car,
                     accent,
                     [
                       _statusValue(
-                        'Dernière position reçue',
-                        'Aucune donnée GPS disponible',
+                        'vehicle_gps_last_position_received'.tr(),
+                        'vehicle_gps_no_data'.tr(),
                         accent,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Le suivi GPS n’est pas encore connecté à une source de position pour ce véhicule.',
+                        'vehicle_gps_unconnected_source'.tr(),
                         style: TextStyle(
                           color: Colors.grey[100],
                           fontSize: 11,
@@ -1037,18 +1037,18 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 SizedBox(
                   width: cardWidth,
                   child: _panel(
-                    'Parking & emplacement',
+                    'vehicle_parking_title'.tr(),
                     FluentIcons.car,
                     accent,
                     [
                       _statusValue(
-                        'Emplacement historique',
+                        'vehicle_parking_legacy_location'.tr(),
                         val(v.emplacement),
                         accent,
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Cette valeur provient de l’ancien champ texte « emplacement » ; elle ne confirme pas une place de parking normalisée.',
+                        'vehicle_parking_legacy_warning'.tr(),
                         style: TextStyle(
                           color: Colors.grey[100],
                           fontSize: 11,
