@@ -10,6 +10,7 @@ import '../../../batch_import/import_vehicles.dart';
 import '../../../theme.dart';
 import '../../../ui/design_system/parcoto_surface.dart';
 import '../../../serializables/vehicle/vehicle.dart';
+import '../../../core/business/fleet_dashboard_status.dart';
 import '../../../core/services/vehicle_make_service.dart';
 import '../../../utilities/vehicle_util.dart';
 import '../../../widgets/forms/parcoto_form_field.dart';
@@ -17,6 +18,8 @@ import 'vehicle_details_page.dart';
 import 'vehicle_form.dart';
 
 enum _VehicleWorkspaceView { fleet, details, editor }
+
+enum _FleetQuickFilter { all, inService, maintenance }
 
 class VehicleManagement extends StatefulWidget {
   const VehicleManagement({super.key});
@@ -36,6 +39,7 @@ class VehicleManagementState extends State<VehicleManagement>
   String searchQuery = '';
   int? selectedState;
   String? selectedBrand;
+  _FleetQuickFilter _quickFilter = _FleetQuickFilter.all;
   _VehicleWorkspaceView _workspaceView = _VehicleWorkspaceView.fleet;
   Vehicle? _selectedVehicle;
   Vehicle? _editingVehicle;
@@ -325,6 +329,11 @@ class VehicleManagementState extends State<VehicleManagement>
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: _buildQuickFilters(theme),
+              ),
+              const SizedBox(height: 9),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: _buildFilters(theme, vehicles),
               ),
               const SizedBox(height: 8),
@@ -384,6 +393,11 @@ class VehicleManagementState extends State<VehicleManagement>
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: _buildQuickFilters(theme),
+        ),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: _buildFilters(theme, vehicles),
         ),
         const SizedBox(height: 8),
@@ -427,15 +441,30 @@ class VehicleManagementState extends State<VehicleManagement>
   }
 
   Widget _buildMetrics(AppTheme theme, List<Vehicle> vehicles) {
-    final availableState = conducteurEmploye ? 0 : 5;
-    final issueStates = conducteurEmploye ? const [1, 2] : const [6, 7];
-    final available = vehicles
-        .where((vehicle) => (vehicle.etatactuel ?? (conducteurEmploye ? 0 : 5)) == availableState)
-        .length;
-    final attention = vehicles
-        .where((vehicle) => issueStates.contains(vehicle.etatactuel))
-        .length;
-    final documents = VehicleProvider.documentsVehicules.length;
+    var inService = 0;
+    var inMaintenance = 0;
+    var immobilized = 0;
+    var outsideParking = 0;
+
+    for (final vehicle in vehicles) {
+      switch (FleetDashboardStatusMapper.fromLegacyCode(vehicle.etatactuel)) {
+        case FleetDashboardStatus.available:
+        case FleetDashboardStatus.onMission:
+          inService++;
+          break;
+        case FleetDashboardStatus.workshop:
+          inMaintenance++;
+          break;
+        case FleetDashboardStatus.broken:
+          immobilized++;
+          break;
+        case FleetDashboardStatus.reformed:
+        case FleetDashboardStatus.other:
+          break;
+      }
+      // Perimeter 4 is explicitly "horsparking" in Parcoto's existing data.
+      if (vehicle.perimetre == 4) outsideParking++;
+    }
 
     final metrics = <({
       String label,
@@ -452,31 +481,42 @@ class VehicleManagementState extends State<VehicleManagement>
         color: theme.color,
       ),
       (
-        label: 'Disponibles',
-        value: available.toString(),
-        detail: 'Prêts à être affectés',
+        label: 'En service',
+        value: inService.toString(),
+        detail: 'Disponibles et en mission',
         icon: FluentIcons.check_mark,
         color: Colors.green,
       ),
       (
-        label: 'À surveiller',
-        value: attention.toString(),
-        detail: 'Panne ou immobilisation',
-        icon: FluentIcons.warning,
+        label: 'En maintenance',
+        value: inMaintenance.toString(),
+        detail: 'Au garage / réparation',
+        icon: FluentIcons.repair,
         color: Colors.orange,
       ),
       (
-        label: 'Documents',
-        value: documents.toString(),
-        detail: 'Documents enregistrés',
-        icon: FluentIcons.document_set,
+        label: 'Immobilisés',
+        value: immobilized.toString(),
+        detail: 'Véhicules en panne',
+        icon: FluentIcons.blocked,
+        color: Colors.red,
+      ),
+      (
+        label: 'Hors parc',
+        value: outsideParking.toString(),
+        detail: 'Hors du parking',
+        icon: FluentIcons.car,
         color: Colors.blue,
       ),
     ];
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final columns = constraints.maxWidth < 540 ? 2 : 4;
+        final columns = constraints.maxWidth < 540
+            ? 2
+            : constraints.maxWidth < 900
+                ? 3
+                : 5;
         const gap = 10.0;
         final cardWidth =
             (constraints.maxWidth - gap * (columns - 1)) / columns;
@@ -488,21 +528,21 @@ class VehicleManagementState extends State<VehicleManagement>
               width: cardWidth,
               child: ParcotoSurface(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 13,
+                  horizontal: 12,
+                  vertical: 12,
                 ),
                 child: Row(
                   children: [
                     Container(
-                      width: 38,
-                      height: 38,
+                      width: 36,
+                      height: 36,
                       decoration: BoxDecoration(
                         color: metric.color.withValues(alpha: .11),
-                        borderRadius: BorderRadius.circular(11),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Icon(metric.icon, color: metric.color, size: 18),
+                      child: Icon(metric.icon, color: metric.color, size: 17),
                     ),
-                    const SizedBox(width: 11),
+                    const SizedBox(width: 9),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -513,7 +553,7 @@ class VehicleManagementState extends State<VehicleManagement>
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: theme.mutedTextColor,
-                              fontSize: 11,
+                              fontSize: 10,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -534,7 +574,7 @@ class VehicleManagementState extends State<VehicleManagement>
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: theme.mutedTextColor,
-                              fontSize: 10,
+                              fontSize: 9,
                             ),
                           ),
                         ],
@@ -547,6 +587,66 @@ class VehicleManagementState extends State<VehicleManagement>
           }).toList(),
         );
       },
+    );
+  }
+
+  Widget _buildQuickFilters(AppTheme theme) {
+    final items = <({String label, _FleetQuickFilter value})>[
+      (label: 'Tous', value: _FleetQuickFilter.all),
+      (label: 'En service', value: _FleetQuickFilter.inService),
+      (label: 'Maintenance', value: _FleetQuickFilter.maintenance),
+    ];
+
+    return Row(
+      children: [
+        for (var index = 0; index < items.length; index++) ...[
+          if (index > 0) const SizedBox(width: 6),
+          Expanded(
+            child: _quickFilterButton(
+              theme,
+              items[index].label,
+              items[index].value,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _quickFilterButton(
+    AppTheme theme,
+    String label,
+    _FleetQuickFilter value,
+  ) {
+    final selected = _quickFilter == value;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => setState(() => _quickFilter = value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected
+              ? theme.color
+              : theme.fillColor,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: selected ? theme.color : theme.borderColor,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: selected ? Colors.white : theme.textColor,
+              fontSize: 10,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -625,6 +725,7 @@ class VehicleManagementState extends State<VehicleManagement>
                 onPressed: () => setState(() {
                   selectedState = null;
                   selectedBrand = null;
+                  _quickFilter = _FleetQuickFilter.all;
                   brandFilterRequest.value = null;
                   externalSearchRequest.value = null;
                 }),
@@ -639,6 +740,17 @@ class VehicleManagementState extends State<VehicleManagement>
   List<Vehicle> _visibleVehicles() {
     final query = searchQuery.trim().toLowerCase();
     return VehicleProvider.vehicles.values.where((vehicle) {
+      final canonicalStatus =
+          FleetDashboardStatusMapper.fromLegacyCode(vehicle.etatactuel);
+      if (_quickFilter == _FleetQuickFilter.inService &&
+          canonicalStatus != FleetDashboardStatus.available &&
+          canonicalStatus != FleetDashboardStatus.onMission) {
+        return false;
+      }
+      if (_quickFilter == _FleetQuickFilter.maintenance &&
+          canonicalStatus != FleetDashboardStatus.workshop) {
+        return false;
+      }
       if (selectedState != null &&
           (vehicle.etatactuel ?? (conducteurEmploye ? 0 : 5)) != selectedState) {
         return false;
@@ -671,7 +783,8 @@ class VehicleManagementState extends State<VehicleManagement>
   Widget _buildEmptyState(AppTheme theme) {
     final hasFilters = searchQuery.trim().isNotEmpty ||
         selectedState != null ||
-        selectedBrand != null;
+        selectedBrand != null ||
+        _quickFilter != _FleetQuickFilter.all;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(28),
@@ -727,6 +840,7 @@ class VehicleManagementState extends State<VehicleManagement>
                       searchQuery = '';
                       selectedState = null;
                       selectedBrand = null;
+                      _quickFilter = _FleetQuickFilter.all;
                       brandFilterRequest.value = null;
                       externalSearchRequest.value = null;
                     }),
