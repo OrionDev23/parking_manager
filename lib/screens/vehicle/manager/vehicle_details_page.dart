@@ -19,6 +19,7 @@ import '../../../screens/entreprise/entreprise.dart';
 import '../../../utilities/vehicle_detail_formatters.dart';
 import '../../../utilities/vehicle_util.dart';
 import '../../../ui/design_system/parcoto_tokens.dart';
+import 'vehicle_overview_dashboard.dart';
 
 class VehicleDetailsPage extends StatefulWidget {
   final Vehicle vehicle;
@@ -1079,258 +1080,42 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     final documentsUnavailable = _documentsLoadFailed ||
         (!VehicleProvider.downloadedDocuments &&
             !VehicleProvider.downloadingDocuments);
-    final documentsCountValue = documentsUnavailable
-        ? 'vehicle_details_unavailable'.tr()
-        : VehicleProvider.downloadingDocuments
-            ? 'vehicle_details_loading'.tr()
-            : documents.length.toString();
-    final documentsDeadlineValue = documentsUnavailable
-        ? '—'
-        : VehicleProvider.downloadingDocuments
-            ? '—'
-            : documentsWithDeadline.toString();
     final latestActivity =
         _vehicleStates.isEmpty ? null : _vehicleStates.first;
     final driversForVehicle = _driversMatchingVehicleRegistration();
     final assignedDriverName = driversForVehicle.length == 1
         ? driversForVehicle.single.getName().trim()
         : null;
-    final makeName = VehicleMakeService.nameFor(VehicleMakeService.canonicalId(v.marque));
     final currentStatus = v.etatactuel == null
         ? 'vehicle_not_provided'.tr()
         : VehiclesUtilities.getEtatName(v.etatactuel!).tr();
 
-    final identityFields = <_VehicleField>[
-      _field('matricule'.tr(), v.matricule),
-      _field('marque'.tr(), makeName),
-      _field('type'.tr(), v.type),
-      _field('vehicle_field_model_year'.tr(), v.modelYear?.toString()),
-      _field('vehicle_field_vin'.tr(), v.numeroSerie),
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _heading(
-          'vehicle_details_overview'.tr(),
-          'vehicle_details_overview_description'.tr(),
-        ),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final wide = constraints.maxWidth >= ParcotoTokens.tabletBreakpoint;
-            final left = Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _group('vehicle_details_vehicle_identity'.tr(), identityFields),
-                _sectionShortcut('vehicle_details_show_identification'.tr(), 1),
-                _group('vehicle_details_known_assignment'.tr(), [
-                  _field('vehicle_details_driver_registration'.tr(), v.matriculeConducteur),
-                  _field('vehicle_details_assigned_driver'.tr(), assignedDriverName),
-                  _field(
-                    'filiale'.tr(),
-                    _resolveOrganisationLabel(
-                      v.filliale,
-                      VehiclesUtilities.getAppartenance,
-                    ),
-                  ),
-                  _field(
-                    'vehicle_field_direction'.tr(),
-                    _resolveOrganisationLabel(
-                      v.direction,
-                      VehiclesUtilities.getDirection,
-                    ),
-                  ),
-                  _field(
-                    'departement'.tr(),
-                    _resolveOrganisationLabel(
-                      v.departement,
-                      VehiclesUtilities.getDepartment,
-                    ),
-                  ),
-                  // Emplacement legacy is shown only in Localisation.
-                ]),
-                _sectionShortcut('vehicle_details_show_assignment'.tr(), 3),
-              ],
-            );
-            final right = Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _panel(
-                  'vehicle_details_status_usage'.tr(),
-                  FluentIcons.info,
-                  accent,
-                  [
-                    _statusValue('vehicle_details_operational_status'.tr(), currentStatus, accent),
-                    const SizedBox(height: 12),
-                    _statusValue(
-                      'vehicle_field_usage_type'.tr(),
-                      v.service ? 'vehicle_service_use'.tr() : 'vehicle_function_use'.tr(),
-                      accent,
-                    ),
-                    _sectionShortcut('vehicle_details_show_assignment'.tr(), 3),
-                  ],
-                ),
-                _panel(
-                  'documents'.tr(),
-                  FluentIcons.document,
-                  accent,
-                  [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _statusValue(
-                            'vehicle_details_registered_documents'.tr(),
-                            documentsCountValue,
-                            accent,
-                          ),
-                        ),
-                        Expanded(
-                          child: _statusValue(
-                            'vehicle_details_with_deadline'.tr(),
-                            documentsDeadlineValue,
-                            accent,
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (_documentsLoadFailed)
-                      _retryNotice(
-                        'vehicle_details_documents_unverified'.tr(),
-                        () => _loadDocuments(force: true),
-                      ),
-                    const SizedBox(height: 9),
-                    Text(
-                      'vehicle_details_documents_info'.tr(),
-                      style: TextStyle(
-                        color: Colors.grey[100],
-                        fontSize: 11,
-                        height: 1.4,
-                      ),
-                    ),
-                    _sectionShortcut('vehicle_details_show_documents'.tr(), 5),
-                  ],
-                ),
-                _panel(
-                  'vehicle_details_recorded_mileage'.tr(),
-                  FluentIcons.car,
-                  accent,
-                  [
-                    _statusValue(
-                      'vehicle_details_recorded_value'.tr(),
-                      n(v.currentMileage, ' km'),
-                      accent,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'vehicle_details_mileage_source_missing'.tr(),
-                      style: TextStyle(
-                        color: Colors.grey[100],
-                        fontSize: 11,
-                        height: 1.4,
-                      ),
-                    ),
-                    if (v.nextServiceMileage != null) ...[
-                      const SizedBox(height: 9),
-                      _statusValue(
-                        'vehicle_details_next_service'.tr(),
-                        n(v.nextServiceMileage, ' km'),
-                        accent,
-                      ),
-                    ],
-                    _sectionShortcut('vehicle_details_show_maintenance'.tr(), 6),
-                  ],
-                ),
-                _panel(
-                  'vehicle_details_location'.tr(),
-                  FluentIcons.car,
-                  accent,
-                  [
-                    _statusValue(
-                      'vehicle_details_last_position'.tr(),
-                      'vehicle_details_no_gps_position'.tr(),
-                      accent,
-                    ),
-                    const SizedBox(height: 7),
-                    Text(
-                      'vehicle_details_no_gps_source'.tr(),
-                      style: TextStyle(
-                        color: Colors.grey[100],
-                        fontSize: 11,
-                        height: 1.4,
-                      ),
-                    ),
-                    _sectionShortcut('vehicle_details_show_location'.tr(), 4),
-                  ],
-                ),
-                _panel(
-                  'vehicle_details_recent_activity'.tr(),
-                  FluentIcons.document,
-                  accent,
-                  [
-                    if (_loadingHistory && latestActivity == null)
-                      const Center(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          child: ProgressRing(),
-                        ),
-                      )
-                    else if (_historyLoadFailed)
-                      _retryNotice(
-                        'vehicle_details_recent_activity_failed'.tr(),
-                        _loadHistory,
-                      )
-                    else if (latestActivity == null)
-                      _emptyInline('vehicle_details_no_recent_event'.tr())
-                    else ...[
-                      _statusValue(
-                        'vehicle_details_last_change'.tr(),
-                        VehiclesUtilities.getEtatName(latestActivity.type).tr(),
-                        accent,
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        _date(
-                          latestActivity.date ??
-                              latestActivity.updatedAt ??
-                              latestActivity.createdAt,
-                        ),
-                        style: TextStyle(
-                          color: Colors.grey[100],
-                          fontSize: 11,
-                        ),
-                      ),
-                      if (latestActivity.remarque?.trim().isNotEmpty == true)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: Text(
-                            latestActivity.remarque!,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Colors.grey[100],
-                              fontSize: 11,
-                            ),
-                          ),
-                        ),
-                    ],
-                    _sectionShortcut('vehicle_details_show_full_history'.tr(), 7),
-                  ],
-                ),
-              ],
-            );
-
-            if (!wide) return Column(children: [left, right]);
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(flex: 7, child: left),
-                const SizedBox(width: 16),
-                Expanded(flex: 4, child: right),
-              ],
-            );
-          },
-        ),
-      ],
+    return VehicleOverviewDashboard(
+      vehicle: v,
+      statusLabel: currentStatus,
+      driverName: assignedDriverName,
+      documentsCount: documentsUnavailable ? null : documents.length,
+      documentsWithDeadline:
+          documentsUnavailable ? null : documentsWithDeadline,
+      latestActivityLabel: latestActivity == null
+          ? null
+          : VehiclesUtilities.getEtatName(latestActivity.type).tr(),
+      latestActivityDate: latestActivity == null
+          ? null
+          : _date(latestActivity.date ??
+              latestActivity.updatedAt ??
+              latestActivity.createdAt),
+      latestActivityNote: latestActivity?.remarque,
+      loadingActivity: _loadingHistory && latestActivity == null,
+      activityError: _historyLoadFailed,
+      onRetryActivity: _loadHistory,
+      onOpenIdentification: () => _selectSection(1),
+      onOpenAssignment: () => _selectSection(3),
+      onOpenLocation: () => _selectSection(4),
+      onOpenDocuments: () => _selectSection(5),
+      onOpenMaintenance: () => _selectSection(6),
+      onOpenHistory: () => _selectSection(7),
+      onOpenAcquisition: () => _selectSection(8),
     );
   }
 
