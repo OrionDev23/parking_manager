@@ -829,38 +829,38 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       case 1:
         return _section(
           'vehicle_details_identification'.tr(),
-          'Immatriculation, carte grise et titulaire',
+          'vehicle_identification_description'.tr(),
           [
-            _group('Identification du véhicule', [
-              _field('Immatriculation principale', v.matricule),
-              _field('Pays d’immatriculation', _countryName(v.pays)),
+            _group('vehicle_identification_group'.tr(), [
+              _field('vehicle_field_primary_registration'.tr(), v.matricule),
+              _field('vehicle_field_registration_country'.tr(), _countryName(v.pays)),
               _field(
-                'Immatriculation étrangère',
-                v.matriculeEtrang ? 'Oui' : 'Non',
+                'vehicle_field_foreign_registration'.tr(),
+                v.matriculeEtrang ? 'oui'.tr() : 'non'.tr(),
               ),
               _field(
-                'Anciennes immatriculations',
+                'vehicle_field_previous_registrations'.tr(),
                 v.matriculePrec?.join(', '),
               ),
-              _field('VIN / numéro de série', v.numeroSerie),
+              _field('vehicle_field_vin'.tr(), v.numeroSerie),
             ]),
-            _group('Document d’immatriculation', [
-              _field('Date enregistrée sur la fiche', _date(v.date)),
-              _field('Numéro / référence du document', v.numero),
+            _group('vehicle_registration_document_group'.tr(), [
+              _field('vehicle_field_recorded_date'.tr(), _date(v.date)),
+              _field('vehicle_field_document_reference'.tr(), v.numero),
               _field(
-                'Montant de quittance (unité non documentée)',
+                'vehicle_field_receipt_amount'.tr(),
                 v.quittance == null
                     ? null
                     : VehicleDetailFormatters.formatNumber(v.quittance!),
               ),
             ]),
-            _group('Adresse administrative', [
+            _group('vehicle_administrative_address_group'.tr(), [
               _field('Wilaya', _wilayaName(v.wilaya)),
-              _field('Daïra', v.daira),
+              _field('daira'.tr(), v.daira),
               _field('Commune', v.commune),
               _field('Adresse', v.adresse),
             ]),
-            _group('Titulaire de la carte grise', [
+            _group('vehicle_registration_holder_group'.tr(), [
               _field('Nom', v.nom),
               _field('Prénom', v.prenom),
               _field('Profession', v.profession),
@@ -869,86 +869,86 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         );
       case 2:
         return _section(
-          'Caractéristiques techniques',
-          'Identité du véhicule, motorisation, transmission, dimensions et capacités',
+          'vehicle_characteristics_title'.tr(),
+          'vehicle_characteristics_description'.tr(),
           [
-            _group('Identité constructeur et classification', [
+            _group('vehicle_characteristics_identity_group'.tr(), [
               _field(
                 'Marque',
                 VehicleMakeService.nameFor(
                   VehicleMakeService.canonicalId(v.marque),
                 ),
               ),
-              _field('Modèle / type', v.type),
-              _field('Finition', v.trim),
-              _field('Année modèle', v.modelYear?.toString()),
+              _field('vehicle_field_model_type'.tr(), v.type),
+              _field('vehicle_field_trim'.tr(), v.trim),
+              _field('vehicle_field_model_year'.tr(), v.modelYear?.toString()),
               _field(
-                'Année d’utilisation (champ historique)',
+                'vehicle_field_legacy_usage_year'.tr(),
                 v.anneeUtil?.toString(),
               ),
               _field(
-                'Genre administratif',
+                'vehicle_field_administrative_genre'.tr(),
                 VehicleDetailFormatters.genreLabel(v.genre)?.tr(),
               ),
-              _field('Carrosserie', v.carrosserie),
+              _field('vehicle_field_body_type'.tr(), v.carrosserie),
               _field(
-                'Couleur',
+                'vehicle_field_paint_color'.tr(),
                 VehicleDetailFormatters.paintLabel(v.color),
               ),
             ]),
-            _group('Motorisation', [
+            _group('vehicle_characteristics_engine_group'.tr(), [
               _field('Énergie', v.energie),
               _field(
-                'Cylindrée',
+                'vehicle_field_engine_displacement'.tr(),
                 v.engineDisplacement == null
                     ? null
                     : '${VehicleDetailFormatters.formatNumber(v.engineDisplacement!)} cm³',
               ),
               _field(
-                'Puissance fiscale',
+                'vehicle_field_fiscal_power'.tr(),
                 v.puissance == null ? null : '${v.puissance} CV',
               ),
               _field(
-                'Puissance moteur (ch)',
+                'vehicle_field_engine_power_hp'.tr(),
                 v.enginePowerHp == null ? null : '${v.enginePowerHp} ch',
               ),
               _field(
-                'Puissance moteur (kW)',
+                'vehicle_field_engine_power_kw'.tr(),
                 v.enginePowerKw == null ? null : '${v.enginePowerKw} kW',
               ),
-              _field('Code moteur', v.engineCode),
+              _field('vehicle_field_engine_code'.tr(), v.engineCode),
             ]),
-            _group('Transmission', [
-              _field('Transmission', v.transmission),
-              _field('Boîte de vitesses', v.gearbox),
-              _field('Roues motrices', v.driveType),
+            _group('vehicle_characteristics_transmission_group'.tr(), [
+              _field('vehicle_characteristics_transmission_group'.tr(), v.transmission),
+              _field('vehicle_field_gearbox'.tr(), v.gearbox),
+              _field('vehicle_field_drive_type'.tr(), v.driveType),
             ]),
-            _group('Dimensions et capacité', [
-              _field('Nombre de portes', v.doors?.toString()),
-              _field('Places assises', v.placesAssises?.toString()),
+            _group('vehicle_characteristics_dimensions_group'.tr(), [
+              _field('vehicle_field_door_count'.tr(), v.doors?.toString()),
+              _field('vehicle_field_seating_capacity'.tr(), v.placesAssises?.toString()),
               _field(
-                'Poids total',
+                'vehicle_field_total_weight'.tr(),
                 v.poidsTotal == null ? null : '${v.poidsTotal} kg',
               ),
               _field(
-                'Charge utile',
+                'vehicle_field_payload'.tr(),
                 v.charegeUtile == null ? null : '${v.charegeUtile} kg',
               ),
               _field(
-                'Longueur',
+                'vehicle_field_length'.tr(),
                 v.lengthMm == null ? null : '${v.lengthMm} mm',
               ),
               _field(
-                'Largeur',
+                'vehicle_field_width'.tr(),
                 v.widthMm == null ? null : '${v.widthMm} mm',
               ),
               _field(
-                'Hauteur',
+                'vehicle_field_height'.tr(),
                 v.heightMm == null ? null : '${v.heightMm} mm',
               ),
               _field(
-                'Indicateur véhicule lourd (legacy)',
-                v.lourd ? 'Oui' : null,
+                'vehicle_field_heavy_vehicle_legacy'.tr(),
+                v.lourd ? 'oui'.tr() : null,
               ),
             ]),
           ],
@@ -965,25 +965,25 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         return _historySection(accent);
       case 8:
         return _section(
-          'Acquisition et garantie',
-          'Informations d’acquisition actuellement enregistrées sur la fiche',
+          'vehicle_acquisition_title'.tr(),
+          'vehicle_acquisition_description'.tr(),
           [
             _group('vehicle_details_acquisition'.tr(), [
-              _field('Mode', v.acquisitionType),
+              _field('vehicle_acquisition_mode'.tr(), v.acquisitionType),
               _field('Date', _date(v.acquisitionDate)),
               _field(
-                'Prix d’achat',
+                'vehicle_acquisition_purchase_price'.tr(),
                 v.purchasePrice == null
                     ? null
                     : '${VehicleDetailFormatters.formatNumber(v.purchasePrice!)} DA',
               ),
               _field('Fournisseur', v.supplier),
-              _field('Fin de garantie', _date(v.warrantyEndDate)),
-              _field('Numéro de flotte', v.fleetNumber),
+              _field('vehicle_acquisition_warranty_end'.tr(), _date(v.warrantyEndDate)),
+              _field('vehicle_acquisition_fleet_number'.tr(), v.fleetNumber),
             ]),
-            _group('Métadonnées de la fiche', [
-              _field('Créée le', _date(v.createdAt)),
-              _field('Modifiée le', _date(v.updatedAt)),
+            _group('vehicle_record_metadata_group'.tr(), [
+              _field('vehicle_record_created_at'.tr(), _date(v.createdAt)),
+              _field('vehicle_record_updated_at'.tr(), _date(v.updatedAt)),
             ]),
           ],
         );
@@ -1101,8 +1101,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       _field('Immatriculation', v.matricule),
       _field('Marque', makeName),
       _field('Modèle', v.type),
-      _field('Année modèle', v.modelYear?.toString()),
-      _field('VIN / numéro de série', v.numeroSerie),
+      _field('vehicle_field_model_year'.tr(), v.modelYear?.toString()),
+      _field('vehicle_field_vin'.tr(), v.numeroSerie),
     ];
 
     return Column(
