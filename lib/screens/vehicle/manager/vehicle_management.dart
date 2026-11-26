@@ -300,7 +300,7 @@ class VehicleManagementState extends State<VehicleManagement>
     Vehicle? selectedVehicle,
   ) {
     return SizedBox(
-      width: 326,
+      width: 284,
       child: Padding(
         padding: const EdgeInsets.only(left: 18, bottom: 18),
         child: ParcotoSurface(
