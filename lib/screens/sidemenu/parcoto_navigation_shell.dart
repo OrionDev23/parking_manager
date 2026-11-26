@@ -254,7 +254,6 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                               ? ParcotoTokens.sidebarCollapsedWidth
                               : ParcotoTokens.sidebarWidth,
                           child: _sidebar(
-                            theme,
                             selected,
                             destinations,
                             collapsed: _sidebarCollapsed,
@@ -288,7 +287,6 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                           .clamp(280.0, 340.0)
                           .toDouble(),
                       child: _sidebar(
-                        theme,
                         selected,
                         destinations,
                         onNavigate: () =>
@@ -398,7 +396,6 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
   }
 
   Widget _sidebar(
-    AppTheme theme,
     int selected,
     List<NavigationPaneItem> destinations, {
     VoidCallback? onNavigate,
@@ -573,7 +570,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                   padding: const EdgeInsets.fromLTRB(10, 15, 8, 7),
                   child: DefaultTextStyle(
                     style: TextStyle(
-                      color: widget.appTheme.mutedTextColor,
+                      color: const Color(0xFF9FB3CC),
                       fontSize: 9,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.05,
@@ -591,7 +588,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
             ),
             child: Container(
               height: 1,
-              color: widget.appTheme.borderColor,
+              color: Colors.white.withValues(alpha: .14),
             ),
           ),
         );
@@ -656,7 +653,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                     padding: const EdgeInsets.fromLTRB(11, 9, 8, 5),
                     child: DefaultTextStyle(
                       style: TextStyle(
-                        color: widget.appTheme.mutedTextColor,
+                        color: const Color(0xFF9FB3CC),
                         fontSize: 9,
                         fontWeight: FontWeight.w700,
                         letterSpacing: .5,
@@ -676,7 +673,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
                       horizontal: 10,
                       vertical: 6,
                     ),
-                    color: widget.appTheme.borderColor,
+                    color: Colors.white.withValues(alpha: .14),
                   ),
                 ),
               );
