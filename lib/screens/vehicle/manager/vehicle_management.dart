@@ -131,6 +131,7 @@ class VehicleManagementState extends State<VehicleManagement>
       }
     }
     selectedVehicle ??= vehicles.isEmpty ? null : vehicles.first;
+    final activeVehicle = selectedVehicle;
 
     return ScaffoldPage(
       padding: EdgeInsets.zero,
@@ -242,18 +243,18 @@ class VehicleManagementState extends State<VehicleManagement>
                               _buildFleetListPane(
                                 theme,
                                 vehicles,
-                                selectedVehicle,
+                                activeVehicle,
                               ),
                               const SizedBox(width: 14),
                               Expanded(
                                 child: Padding(
                                   padding: const EdgeInsets.only(right: 18, bottom: 18),
-                                  child: selectedVehicle == null
+                                  child: activeVehicle == null
                                       ? _buildEmptyState(theme)
                                       : VehicleDetailsPage(
-                                          key: ValueKey(selectedVehicle.id),
-                                          vehicle: selectedVehicle,
-                                          onEdit: () => _openEditor(selectedVehicle),
+                                          key: ValueKey(activeVehicle.id),
+                                          vehicle: activeVehicle,
+                                          onEdit: () => _openEditor(activeVehicle),
                                         ),
                                 ),
                               ),
