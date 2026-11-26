@@ -127,17 +127,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
       );
     }
 
-    final repairs = _destinationForKey('repairs');
-    if (repairs != null) {
-      result.add(
-        _MobileDestination(
-          label: 'Maintenance',
-          icon: FluentIcons.repair,
-          destination: repairs,
-        ),
-      );
-    }
-
+    // The central action opens the complete navigation drawer.
     result.add(
       const _MobileDestination(
         label: 'Plus',
@@ -167,6 +157,7 @@ class _ParcotoNavigationShellState extends State<ParcotoNavigationShell> {
         ),
       );
     }
+
     return result;
   }
 
