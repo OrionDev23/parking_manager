@@ -304,7 +304,7 @@ class DocumentFormState extends State<DocumentForm> {
         fileId: fileId,
       );
       final fileName = widget.vd?.fileName ?? 'document-' + fileId;
-      await FilePicker.platform.saveFile(
+      await FilePicker.saveFile(
         dialogTitle: 'vehicle_doc_download_title'.tr(),
         fileName: fileName,
         bytes: bytes,
