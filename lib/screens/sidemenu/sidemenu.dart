@@ -15,6 +15,7 @@ import 'package:window_manager/window_manager.dart';
 import '../../main.dart';
 import '../../theme.dart';
 import '../dashboard/notifications/notif_list.dart';
+import '../vehicle/vehicle_dashboard.dart';
 
 class PanesList extends StatefulWidget {
   final PaneItemsAndFooters paneList;
@@ -187,9 +188,15 @@ class PanesListState extends State<PanesList>
         return ValueListenableBuilder(
           valueListenable: index,
           builder: (BuildContext context, int selectedIndex, Widget? child) {
-            final activePaneKey =
-                PaneItemsAndFooters.paneKeyForIndex(selectedIndex);
-            return ParcotoNavigationShell(
+            return AnimatedBuilder(
+              animation: Listenable.merge([
+                VehicleDashboard.selectedSection,
+                VehicleDashboard.selectedReference,
+              ]),
+              builder: (context, _) {
+                final activePaneKey =
+                    PaneItemsAndFooters.paneKeyForIndex(selectedIndex);
+                return ParcotoNavigationShell(
               items: PaneItemsAndFooters.originalItems,
               footerItems: PaneItemsAndFooters.footerItems,
               selectedIndex: index,
@@ -384,6 +391,8 @@ class PanesListState extends State<PanesList>
                   ],
                 ),
               ),
+                );
+              },
             );
           },
         );
