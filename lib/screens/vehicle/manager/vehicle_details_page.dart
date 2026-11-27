@@ -392,50 +392,61 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
       );
     }
 
-    return Container(
-      constraints: const BoxConstraints(minHeight: 64),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: FluentTheme.of(context).micaBackgroundColor,
-        border: Border(bottom: BorderSide(color: Colors.grey[30])),
-      ),
-      child: compact
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final distributeDesktopTabs =
+            !compact && constraints.maxWidth >= sections.length * 72;
+        return Container(
+          constraints: const BoxConstraints(minHeight: 62),
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: FluentTheme.of(context).micaBackgroundColor,
+            border: Border(bottom: BorderSide(color: Colors.grey[30])),
+          ),
+          child: compact
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    for (var index = 0; index < 4; index++)
-                      Expanded(
-                        child: sectionItem(index, minWidth: 0),
-                      ),
-                    moreItem(),
-                  ],
-                ),
-                if (_moreSectionsOpen)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-                    child: Wrap(
-                      alignment: WrapAlignment.spaceAround,
-                      spacing: 4,
-                      runSpacing: 2,
+                    Row(
                       children: [
-                        for (var index = 4; index < sections.length; index++)
-                          sectionItem(index, minWidth: 104),
+                        for (var index = 0; index < 4; index++)
+                          Expanded(child: sectionItem(index, minWidth: 0)),
+                        moreItem(),
                       ],
                     ),
-                  ),
-              ],
-            )
-          : SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  for (var index = 0; index < sections.length; index++)
-                    sectionItem(index),
-                ],
-              ),
-            ),
+                    if (_moreSectionsOpen)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                        child: Wrap(
+                          alignment: WrapAlignment.spaceAround,
+                          spacing: 4,
+                          runSpacing: 2,
+                          children: [
+                            for (var index = 4; index < sections.length; index++)
+                              sectionItem(index, minWidth: 84),
+                          ],
+                        ),
+                      ),
+                  ],
+                )
+              : distributeDesktopTabs
+                  ? Row(
+                      children: [
+                        for (var index = 0; index < sections.length; index++)
+                          Expanded(child: sectionItem(index, minWidth: 0)),
+                      ],
+                    )
+                  : SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          for (var index = 0; index < sections.length; index++)
+                            sectionItem(index, minWidth: 78),
+                        ],
+                      ),
+                    ),
+        );
+      },
     );
   }
 
@@ -443,26 +454,25 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final compact = constraints.maxWidth < ParcotoTokens.mobileBreakpoint;
-        final version = [
+        final versionParts = [
           if (v.trim?.trim().isNotEmpty == true) v.trim!.trim(),
           (v.modelYear ?? v.anneeUtil)?.toString() ?? '',
-        ].where((value) => value.isNotEmpty).join(' • ');
+        ].where((value) => value.isNotEmpty).toList(growable: false);
+        final version = versionParts.join(' • ');
         final transmission = v.transmission?.trim().isNotEmpty == true
             ? v.transmission!.trim()
             : v.gearbox?.trim() ?? '';
+        final metadata = <String>[
+          if (v.fleetNumber?.trim().isNotEmpty == true)
+            'N° parc : ${v.fleetNumber!.trim()}',
+          if (v.numeroSerie?.trim().isNotEmpty == true)
+            'VIN : ${v.numeroSerie!.trim()}',
+        ];
+
         final identity = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              'vehicle_details_kicker'.tr(),
-              style: TextStyle(
-                color: accent,
-                fontSize: 10,
-                letterSpacing: 1.1,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 5),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -472,9 +482,9 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                     maxLines: compact ? 2 : 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: compact ? 21 : 23,
+                      fontSize: compact ? 21 : 22,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: -.2,
+                      letterSpacing: -.25,
                     ),
                   ),
                 ),
@@ -487,17 +497,15 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 ],
               ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              version.isEmpty ? 'vehicle_details_model_missing'.tr() : version,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.grey[100],
-                fontSize: 12,
-                height: 1.3,
+            if (version.isNotEmpty) ...[
+              const SizedBox(height: 3),
+              Text(
+                version,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.grey[100], fontSize: 12),
               ),
-            ),
+            ],
             const SizedBox(height: 7),
             Text(
               v.matricule,
@@ -509,16 +517,27 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 letterSpacing: .2,
               ),
             ),
+            if (metadata.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                metadata.join('   •   '),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.grey[100],
+                  fontSize: 10.5,
+                  height: 1.25,
+                ),
+              ),
+            ],
             const SizedBox(height: 8),
             Wrap(
               spacing: 7,
-              runSpacing: 7,
+              runSpacing: 6,
               children: [
-                if (v.fleetNumber?.trim().isNotEmpty == true)
-                  _chip('N° parc : ${v.fleetNumber}', accent),
-                _chip(v.service ? 'Véhicule de service' : 'Flotte', accent),
+                _chip(v.service ? 'Véhicule de fonction' : 'Flotte', accent),
                 if (v.energie?.trim().isNotEmpty == true)
-                  _chip(v.energie!, accent),
+                  _chip(v.energie!.trim(), accent),
                 if (transmission.isNotEmpty) _chip(transmission, accent),
               ],
             ),
@@ -558,10 +577,10 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
 
         return Container(
           padding: EdgeInsets.fromLTRB(
-            compact ? 12 : 18,
-            compact ? 10 : 10,
-            compact ? 12 : 18,
-            compact ? 12 : 14,
+            compact ? 12 : 16,
+            compact ? 10 : 12,
+            compact ? 12 : 16,
+            compact ? 12 : 12,
           ),
           decoration: BoxDecoration(
             color: FluentTheme.of(context).micaBackgroundColor,
@@ -572,19 +591,22 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _vehicleAvatar(accent, compact: true),
-                    const SizedBox(height: 13),
-                    identity,
                     const SizedBox(height: 12),
+                    identity,
+                    const SizedBox(height: 10),
                     actions,
                   ],
                 )
               : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _vehicleAvatar(accent, compact: false),
-                    const SizedBox(width: 18),
+                    const SizedBox(width: 16),
                     Expanded(child: identity),
-                    const SizedBox(width: 14),
-                    actions,
+                    if (widget.onEdit != null || widget.onBack != null) ...[
+                      const SizedBox(width: 14),
+                      actions,
+                    ],
                   ],
                 ),
         );
@@ -595,8 +617,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   Widget _vehicleAvatar(Color accent, {required bool compact}) {
     final imageUrl = v.imageUrl?.trim();
     // Match the reference layout: a clear vehicle thumbnail beside the identity.
-    final width = compact ? double.infinity : 190.0;
-    final height = compact ? 160.0 : 140.0;
+    final width = compact ? double.infinity : 198.0;
+    final height = compact ? 160.0 : 150.0;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(14),
