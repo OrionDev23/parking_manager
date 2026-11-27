@@ -35,7 +35,6 @@ class MesFillialesState extends State<MesFilliales> {
 
   String _searchQuery = '';
 
-  bool notEmpty = false;
   double height = 400.px;
 
   @override
@@ -365,13 +364,13 @@ class MesFillialesState extends State<MesFilliales> {
       });
     } else if (widget.type == 0) {
       MyEntrepriseState.p?.filiales?.forEach((value) {
-        if (value.toUpperCase().contains(searchController.text.toUpperCase())) {
+        if (value.toUpperCase().contains(_searchQuery.toUpperCase())) {
           result.add(value);
         }
       });
     } else {
       MyEntrepriseState.p?.departments?.forEach((value) {
-        if (value.toUpperCase().contains(searchController.text.toUpperCase())) {
+        if (value.toUpperCase().contains(_searchQuery.toUpperCase())) {
           result.add(value);
         }
       });
