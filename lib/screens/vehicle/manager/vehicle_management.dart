@@ -1039,7 +1039,7 @@ class VehicleManagementState extends State<VehicleManagement>
             )
           else
             for (var index = 0; index < vehicles.length; index++) ...[
-              if (index > 0) Divider(height: 12, color: theme.borderColor),
+              if (index > 0) Container(height: 1, color: theme.borderColor),
               _fleetVehicleCard(theme, vehicles[index], onSelectVehicle),
             ],
         ],
@@ -1177,7 +1177,7 @@ class VehicleManagementState extends State<VehicleManagement>
       ),
       child: Text(
         '$label à renseigner',
-        style: const TextStyle(color: Colors.orange, fontSize: 9, fontWeight: FontWeight.w600),
+        style: TextStyle(color: Colors.orange, fontSize: 9, fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -1196,7 +1196,7 @@ class VehicleManagementState extends State<VehicleManagement>
         children: [
           Row(
             children: [
-              Icon(FluentIcons.data_usage, color: theme.color, size: 16),
+              Icon(FluentIcons.info, color: theme.color, size: 16),
               const SizedBox(width: 8),
               Text(
                 'Données du parc',
@@ -1205,10 +1205,10 @@ class VehicleManagementState extends State<VehicleManagement>
             ],
           ),
           const SizedBox(height: 12),
-          _fleetDataRow(theme, 'Kilométrage renseigné', withMileage, total, FluentIcons.speedometer),
-          Divider(height: 12, color: theme.borderColor),
+          _fleetDataRow(theme, 'Kilométrage renseigné', withMileage, total, FluentIcons.car),
+          Container(height: 1, color: theme.borderColor),
           _fleetDataRow(theme, 'Affectation renseignée', withAssignment, total, FluentIcons.account_management),
-          Divider(height: 12, color: theme.borderColor),
+          Container(height: 1, color: theme.borderColor),
           _fleetDataRow(theme, 'Photo disponible', withImage, total, FluentIcons.photo),
           const SizedBox(height: 12),
           Container(
@@ -1391,25 +1391,6 @@ class VehicleManagementState extends State<VehicleManagement>
           ),
         ),
       ],
-    );
-  }
-
-  Widget _fleetFeatureChip(AppTheme theme, IconData icon, String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
-      decoration: BoxDecoration(
-        color: theme.fillColor,
-        border: Border.all(color: theme.borderColor),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 13, color: theme.color),
-          const SizedBox(width: 6),
-          Text(label, style: TextStyle(color: theme.textColor, fontSize: 10, fontWeight: FontWeight.w600)),
-        ],
-      ),
     );
   }
 
