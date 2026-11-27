@@ -741,5 +741,5 @@ String userScopedPreferenceKey(String baseKey) {
   final userId = DatabaseGetter.me.value?.id ??
       DatabaseGetter.user?.$id ??
       'no-user';
-  return '${baseKey}_${companyId}_${userId}';
+  return '${baseKey}_${companyId}_$userId';
 }
