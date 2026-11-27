@@ -1592,7 +1592,7 @@ class _VehicleFormState extends State<VehicleForm>
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    'Données professionnelles et exploitation',
+                    'Caractéristiques techniques et gestion du parc',
                     style: appTheme.writingStyle.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -1614,6 +1614,12 @@ class _VehicleFormState extends State<VehicleForm>
               spacing: 12,
               runSpacing: 14,
               children: [
+                _identitySubsectionTitle(
+                  appTheme,
+                  availableWidth,
+                  'Caractéristiques constructeur',
+                  'Finition, année modèle, peinture, moteur, transmission et dimensions',
+                ),
                 field('Version / finition', trimController),
                 field('Année modèle', modelYearController,
                     hint: 'Ex. 2022', numeric: true),
@@ -1670,6 +1676,12 @@ class _VehicleFormState extends State<VehicleForm>
                 field('Longueur (mm)', lengthController, numeric: true),
                 field('Largeur (mm)', widthController, numeric: true),
                 field('Hauteur (mm)', heightController, numeric: true),
+                _identitySubsectionTitle(
+                  appTheme,
+                  availableWidth,
+                  'Acquisition et suivi du parc',
+                  'Données de gestion propres à l’entreprise',
+                ),
                 field('Type d’acquisition', acquisitionTypeController,
                     hint: 'Achat, leasing, location…'),
                 dateField('Date d’acquisition', acquisitionDateController),
