@@ -240,7 +240,9 @@ class DisponibliteTableState extends State<DisponibliteTable> {
                                                 padding: const EdgeInsets.all(
                                                   10.0,
                                                 ),
-                                                child: ParcotoFieldSurface(
+                                                child: ParcotoSurface(
+                                                  tone: ParcotoSurfaceTone.subtle,
+                                                  padding: EdgeInsets.zero,
                                                   child: DropDownButton(
                                                   title: Text(
                                                     type == null
