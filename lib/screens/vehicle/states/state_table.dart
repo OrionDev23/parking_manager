@@ -32,6 +32,9 @@ class StateTable extends StatefulWidget {
 }
 
 class StateTableState extends State<StateTable> {
+  static final ValueNotifier<String?> appBarSearchRequest =
+      ValueNotifier<String?>(null);
+
   late VStatesDatasource vehicleStateDatasource;
 
   bool assending = false;
@@ -40,13 +43,25 @@ class StateTableState extends State<StateTable> {
 
   @override
   void initState() {
+    super.initState();
     vehicleStateDatasource = VStatesDatasource(
       current: context,
       collectionID: etatId,
       selectC: widget.selectD,
     );
     initColumns();
-    super.initState();
+    appBarSearchRequest.addListener(_applyAppBarSearchRequest);
+    _applyAppBarSearchRequest();
+  }
+
+  void _applyAppBarSearchRequest() {
+    final query = appBarSearchRequest.value;
+    if (query == null) return;
+    searchController.text = query;
+    notEmpty = query.isNotEmpty;
+    vehicleStateDatasource.search(query);
+    appBarSearchRequest.value = null;
+    if (mounted) setState(() {});
   }
 
   int sortColumn = 5;
@@ -147,8 +162,6 @@ class StateTableState extends State<StateTable> {
 
   int rowPerPage = 12;
 
-  TextEditingController searchController = TextEditingController();
-
   bool notEmpty = false;
   bool filtered = false;
 
@@ -168,9 +181,6 @@ class StateTableState extends State<StateTable> {
     return DataTableParc(
       header: LayoutBuilder(
         builder: (context, constraints) {
-          final searchWidth = (constraints.maxWidth - 105)
-              .clamp(140.0, 350.0)
-              .toDouble();
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
             child: Wrap(
@@ -238,53 +248,7 @@ class StateTableState extends State<StateTable> {
                 ],
               ),
             ),
-            SizedBox(
-              width: searchWidth,
-              height: 45.px,
-              child: ParcotoTextBox(
-                onChanged: (s) {
-                  if (s.isEmpty) {
-                    notEmpty = false;
-                    vehicleStateDatasource.search('');
-                  } else {
-                    notEmpty = true;
-                  }
-                  setState(() {});
-                },
-                controller: searchController,
-                placeholder: 'search'.tr(),
-                style: appTheme.writingStyle,
-                cursorColor: appTheme.color.darker,
-                placeholderStyle: placeStyle,
-                onSubmitted: (s) {
-                  if (s.isNotEmpty) {
-                    vehicleStateDatasource.search(s);
-                    if (!notEmpty) {
-                      setState(() {
-                        notEmpty = true;
-                      });
-                    }
-                  } else {
-                    if (notEmpty) {
-                      setState(() {
-                        notEmpty = false;
-                      });
-                    }
-                  }
-                },
-                suffix: notEmpty
-                    ? IconButton(
-                        icon: const Icon(FluentIcons.cancel),
-                        onPressed: () {
-                          searchController.text = "";
-                          notEmpty = false;
-                          setState(() {});
-                          vehicleStateDatasource.search('');
-                        },
-                      )
-                    : null,
-              ),
-            ),
+            
               ],
             ),
           );
@@ -534,6 +498,7 @@ class StateTableState extends State<StateTable> {
 
   @override
   void dispose() {
+    appBarSearchRequest.removeListener(_applyAppBarSearchRequest);
     vehicleStateDatasource.dispose();
     super.dispose();
   }
