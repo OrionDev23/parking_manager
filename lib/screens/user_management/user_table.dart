@@ -16,7 +16,7 @@ class UsersTable extends StatefulWidget {
   const UsersTable({super.key, this.selectD = false, this.archive = false});
 
   @override
-  State<UsersTable> createState() => _UsersTableState();
+  State<UsersTable> createState() => UsersTableState();
 }
 
 class UsersTableState extends State<UsersTable> {
