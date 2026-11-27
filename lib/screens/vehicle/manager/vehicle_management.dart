@@ -255,7 +255,7 @@ class VehicleManagementState extends State<VehicleManagement>
                                 child: Padding(
                                   padding: const EdgeInsets.only(right: 18, bottom: 18),
                                   child: activeVehicle == null
-                                      ? _buildFleetOverview(theme, vehicles)
+                                      ? _buildFleetOverview(theme, vehicles, _openDetails)
                                       : VehicleDetailsPage(
                                           key: ValueKey(activeVehicle.id),
                                           vehicle: activeVehicle,
@@ -818,11 +818,15 @@ class VehicleManagementState extends State<VehicleManagement>
   Widget _buildFleetOverview(
     AppTheme theme,
     List<Vehicle> vehicles,
+    ValueChanged<Vehicle> onSelectVehicle,
   ) {
     var available = 0;
     var maintenance = 0;
     var immobilized = 0;
     var other = 0;
+    var withMileage = 0;
+    var withAssignment = 0;
+    var withImage = 0;
 
     for (final vehicle in vehicles) {
       switch (FleetDashboardStatusMapper.fromLegacyCode(vehicle.etatactuel)) {
@@ -841,6 +845,12 @@ class VehicleManagementState extends State<VehicleManagement>
           other++;
           break;
       }
+      if (vehicle.currentMileage != null) withMileage++;
+      if ([vehicle.filliale, vehicle.direction, vehicle.departement]
+          .any((value) => value?.trim().isNotEmpty == true)) {
+        withAssignment++;
+      }
+      if (vehicle.imageUrl?.trim().isNotEmpty == true) withImage++;
     }
 
     final total = vehicles.length;
@@ -859,147 +869,388 @@ class VehicleManagementState extends State<VehicleManagement>
     return Padding(
       padding: const EdgeInsets.only(right: 18, bottom: 18),
       child: ParcotoSurface(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         elevated: true,
         child: LayoutBuilder(
           builder: (context, constraints) {
             final compact = constraints.maxWidth < 760;
+            final visibleVehicles = vehicles.take(6).toList(growable: false);
             return SingleChildScrollView(
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: theme.color.withValues(alpha: .12),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(FluentIcons.view_dashboard, color: theme.color, size: 21),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Vue d’ensemble du parc',
-                            style: TextStyle(color: theme.textColor, fontSize: 19, fontWeight: FontWeight.w800),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            'Suivez la situation de votre flotte en un coup d’œil.',
-                            style: TextStyle(color: theme.mutedTextColor, fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: theme.fillColor,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: theme.borderColor),
-                      ),
-                      child: Text(
-                        '$total véhicule${total > 1 ? 's' : ''}',
-                        style: TextStyle(color: theme.textColor, fontSize: 11, fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 28),
-                Text(
-                  'ÉTAT OPÉRATIONNEL',
-                  style: TextStyle(color: theme.mutedTextColor, fontSize: 10, letterSpacing: 1.1, fontWeight: FontWeight.w800),
-                ),
-                const SizedBox(height: 12),
-                if (compact)
-                  Column(
-                    children: [
-                      for (final item in statusItems)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: _fleetStatusRow(theme, item, total),
-                        ),
-                    ],
-                  )
-                else
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      for (var index = 0; index < statusItems.length; index++)
-                        Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.only(right: index == statusItems.length - 1 ? 0 : 12),
-                            child: _fleetStatusCard(theme, statusItems[index], total),
-                          ),
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: theme.color.withValues(alpha: .12),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                    ],
-                  ),
-                const SizedBox(height: 24),
-                Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 520),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 76,
-                          height: 76,
-                          decoration: BoxDecoration(color: theme.color.withValues(alpha: .10), shape: BoxShape.circle),
-                          child: Icon(FluentIcons.car, size: 34, color: theme.color),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Sélectionnez un véhicule',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: theme.textColor, fontSize: 20, fontWeight: FontWeight.w800),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Choisissez un véhicule dans la liste à gauche pour afficher sa fiche complète, ses caractéristiques, son affectation et son historique.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: theme.mutedTextColor, fontSize: 12, height: 1.6),
-                        ),
-                        const SizedBox(height: 18),
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 8,
-                          runSpacing: 8,
+                        child: Icon(FluentIcons.view_dashboard, color: theme.color, size: 21),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _fleetFeatureChip(theme, FluentIcons.info, 'Identification'),
-                            _fleetFeatureChip(theme, FluentIcons.settings, 'Caractéristiques'),
-                            _fleetFeatureChip(theme, FluentIcons.account_management, 'Affectation'),
-                            _fleetFeatureChip(theme, FluentIcons.document, 'Historique'),
+                            Text(
+                              'Vue d’ensemble du parc',
+                              style: TextStyle(color: theme.textColor, fontSize: 19, fontWeight: FontWeight.w800),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              'Indicateurs opérationnels et état des véhicules.',
+                              style: TextStyle(color: theme.mutedTextColor, fontSize: 12),
+                            ),
                           ],
                         ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: theme.fillColor,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: theme.borderColor),
+                        ),
+                        child: Text(
+                          '$total véhicule${total > 1 ? 's' : ''}',
+                          style: TextStyle(color: theme.textColor, fontSize: 11, fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'ÉTAT OPÉRATIONNEL',
+                    style: TextStyle(color: theme.mutedTextColor, fontSize: 10, letterSpacing: 1.1, fontWeight: FontWeight.w800),
+                  ),
+                  const SizedBox(height: 10),
+                  if (compact)
+                    Column(
+                      children: [
+                        for (final item in statusItems)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: _fleetStatusRow(theme, item, total),
+                          ),
+                      ],
+                    )
+                  else
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        for (var index = 0; index < statusItems.length; index++)
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.only(right: index == statusItems.length - 1 ? 0 : 10),
+                              child: _fleetStatusCard(theme, statusItems[index], total),
+                            ),
+                          ),
                       ],
                     ),
+                  const SizedBox(height: 20),
+                  LayoutBuilder(
+                    builder: (context, lowerConstraints) {
+                      final narrow = lowerConstraints.maxWidth < 820;
+                      final vehiclePanel = _fleetVehicleListPanel(
+                        theme,
+                        visibleVehicles,
+                        total,
+                        onSelectVehicle,
+                      );
+                      final dataPanel = _fleetDataPanel(
+                        theme,
+                        total,
+                        withMileage,
+                        withAssignment,
+                        withImage,
+                      );
+                      if (narrow) {
+                        return Column(
+                          children: [
+                            vehiclePanel,
+                            const SizedBox(height: 12),
+                            dataPanel,
+                          ],
+                        );
+                      }
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(flex: 7, child: vehiclePanel),
+                          const SizedBox(width: 12),
+                          Expanded(flex: 4, child: dataPanel),
+                        ],
+                      );
+                    },
                   ),
-                ),
-                const SizedBox(height: 24),
-                Container(height: 1, color: theme.borderColor),
-                Row(
-                  children: [
-                    Icon(FluentIcons.info, size: 15, color: theme.mutedTextColor),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'La fiche détaillée s’affichera ici dès que vous sélectionnerez un véhicule.',
-                        style: TextStyle(color: theme.mutedTextColor, fontSize: 11),
-                      ),
-                    ),
-                  ],
-                ),
                 ],
               ),
             );
           },
         ),
       ),
+    );
+  }
+
+  Widget _fleetVehicleListPanel(
+    AppTheme theme,
+    List<Vehicle> vehicles,
+    int total,
+    ValueChanged<Vehicle> onSelectVehicle,
+  ) {
+    return ParcotoSurface(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(FluentIcons.car, color: theme.color, size: 16),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Véhicules du parc',
+                  style: TextStyle(color: theme.textColor, fontSize: 14, fontWeight: FontWeight.w700),
+                ),
+              ),
+              Text(
+                '$total au total',
+                style: TextStyle(color: theme.mutedTextColor, fontSize: 10),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (vehicles.isEmpty)
+            Text(
+              'Aucun véhicule ne correspond aux filtres actuels.',
+              style: TextStyle(color: theme.mutedTextColor, fontSize: 11),
+            )
+          else
+            for (var index = 0; index < vehicles.length; index++) ...[
+              if (index > 0) Divider(height: 12, color: theme.borderColor),
+              _fleetVehicleCard(theme, vehicles[index], onSelectVehicle),
+            ],
+          if (total > vehicles.length) ...[
+            const SizedBox(height: 10),
+            Text(
+              'Affichage des ${vehicles.length} premiers véhicules. Utilisez la recherche ou les filtres pour retrouver les autres.',
+              style: TextStyle(color: theme.mutedTextColor, fontSize: 10),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _fleetVehicleCard(
+    AppTheme theme,
+    Vehicle vehicle,
+    ValueChanged<Vehicle> onSelectVehicle,
+  ) {
+    final make = VehicleMakeService.nameFor(
+      VehicleMakeService.canonicalId(vehicle.marque),
+    );
+    final model = [
+      make,
+      vehicle.type?.trim() ?? '',
+      vehicle.modelYear?.toString() ?? '',
+    ].where((part) => part.isNotEmpty).join(' ');
+    final status = FleetDashboardStatusMapper.fromLegacyCode(vehicle.etatactuel);
+    late final String statusLabel;
+    late final Color statusColor;
+    switch (status) {
+      case FleetDashboardStatus.available:
+      case FleetDashboardStatus.onMission:
+        statusLabel = 'En service';
+        statusColor = Colors.green;
+        break;
+      case FleetDashboardStatus.workshop:
+        statusLabel = 'En maintenance';
+        statusColor = Colors.orange;
+        break;
+      case FleetDashboardStatus.broken:
+        statusLabel = 'Immobilisé';
+        statusColor = Colors.red;
+        break;
+      case FleetDashboardStatus.reformed:
+      case FleetDashboardStatus.other:
+        statusLabel = 'Autre état';
+        statusColor = theme.mutedTextColor;
+        break;
+    }
+    final imageUrl = vehicle.imageUrl?.trim() ?? '';
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => onSelectVehicle(vehicle),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(9),
+              child: Container(
+                width: 76,
+                height: 58,
+                color: theme.color.withValues(alpha: .08),
+                child: imageUrl.isEmpty
+                    ? Icon(FluentIcons.car, color: theme.color, size: 25)
+                    : Image.network(
+                        imageUrl,
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, _, _) =>
+                            Icon(FluentIcons.car, color: theme.color, size: 25),
+                      ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    model.isEmpty ? 'Véhicule sans modèle renseigné' : model,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: theme.textColor, fontSize: 12, fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    vehicle.matricule,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: theme.mutedTextColor, fontSize: 11),
+                  ),
+                  const SizedBox(height: 5),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: .10),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          statusLabel,
+                          style: TextStyle(color: statusColor, fontSize: 9, fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                      if (vehicle.currentMileage != null)
+                        Text(
+                          '${vehicle.currentMileage} km',
+                          style: TextStyle(color: theme.mutedTextColor, fontSize: 9),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(FluentIcons.chevron_right, color: theme.mutedTextColor, size: 14),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _fleetDataPanel(
+    AppTheme theme,
+    int total,
+    int withMileage,
+    int withAssignment,
+    int withImage,
+  ) {
+    return ParcotoSurface(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(FluentIcons.data_usage, color: theme.color, size: 16),
+              const SizedBox(width: 8),
+              Text(
+                'Données du parc',
+                style: TextStyle(color: theme.textColor, fontSize: 14, fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _fleetDataRow(theme, 'Kilométrage renseigné', withMileage, total, FluentIcons.speedometer),
+          Divider(height: 12, color: theme.borderColor),
+          _fleetDataRow(theme, 'Affectation renseignée', withAssignment, total, FluentIcons.account_management),
+          Divider(height: 12, color: theme.borderColor),
+          _fleetDataRow(theme, 'Photo disponible', withImage, total, FluentIcons.photo),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: theme.color.withValues(alpha: .07),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(FluentIcons.info, size: 14, color: theme.color),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Sélectionnez une ligne du parc pour ouvrir la fiche complète du véhicule.',
+                    style: TextStyle(color: theme.mutedTextColor, fontSize: 10, height: 1.4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _fleetDataRow(
+    AppTheme theme,
+    String label,
+    int value,
+    int total,
+    IconData icon,
+  ) {
+    final ratio = total == 0 ? 0.0 : value / total;
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: theme.mutedTextColor),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: theme.mutedTextColor, fontSize: 10),
+          ),
+        ),
+        Text(
+          '$value/$total',
+          style: TextStyle(color: theme.textColor, fontSize: 11, fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 48,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(5),
+            child: LinearProgressIndicator(
+              value: ratio,
+              minHeight: 4,
+              backgroundColor: theme.fillColor,
+              valueColor: AlwaysStoppedAnimation<Color>(theme.color),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
