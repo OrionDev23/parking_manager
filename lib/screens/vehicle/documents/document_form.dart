@@ -176,6 +176,7 @@ class DocumentFormState extends State<DocumentForm> {
         'update("team:$teamId/admin")',
         'update("team:$teamId/manager")',
         'delete("team:$teamId/admin")',
+        'delete("team:$teamId/manager")',
       ];
 
   Future<void> _pickAttachment() async {
