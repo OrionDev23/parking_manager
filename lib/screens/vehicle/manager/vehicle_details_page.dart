@@ -284,7 +284,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     ];
     final accent = FluentTheme.of(context).accentColor;
 
-    Widget sectionItem(int index, {double minWidth = 88}) {
+    Widget sectionItem(int index, {double minWidth = 108}) {
       final section = sections[index];
       final selected = _selectedSectionIndex == index;
       final label = compact
@@ -305,10 +305,10 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           child: Container(
             constraints: BoxConstraints(minWidth: minWidth),
             padding: EdgeInsets.fromLTRB(
-              compact ? 8 : 13,
-              10,
-              compact ? 8 : 13,
-              8,
+              compact ? 10 : 15,
+              compact ? 12 : 14,
+              compact ? 10 : 15,
+              compact ? 10 : 12,
             ),
             decoration: BoxDecoration(
               border: Border(
@@ -323,17 +323,17 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               children: [
                 Icon(
                   section.icon,
-                  size: compact ? 16 : 17,
+                  size: compact ? 19 : 22,
                   color: selected ? accent : Colors.grey[100],
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 7),
                 Text(
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: selected ? accent : Colors.grey[100],
-                    fontSize: compact ? 9 : 10,
+                    fontSize: compact ? 10.5 : 11.5,
                     fontWeight:
                         selected ? FontWeight.w700 : FontWeight.w500,
                   ),
@@ -351,7 +351,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         behavior: HitTestBehavior.opaque,
         onTap: () => setState(() => _moreSectionsOpen = !_moreSectionsOpen),
         child: Container(
-          constraints: const BoxConstraints(minWidth: 66),
+          constraints: const BoxConstraints(minWidth: 76),
           padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
           decoration: BoxDecoration(
             border: Border(
@@ -368,7 +368,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             children: [
               Icon(
                 _moreSectionsOpen ? FluentIcons.chevron_up : FluentIcons.more,
-                size: 16,
+                size: 19,
                 color: selected || _moreSectionsOpen
                     ? accent
                     : Colors.grey[100],
@@ -380,7 +380,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                   color: selected || _moreSectionsOpen
                       ? accent
                       : Colors.grey[100],
-                  fontSize: 9,
+                  fontSize: 10.5,
                   fontWeight: selected || _moreSectionsOpen
                       ? FontWeight.w700
                       : FontWeight.w500,
@@ -393,6 +393,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     }
 
     return Container(
+      constraints: const BoxConstraints(minHeight: 88),
       width: double.infinity,
       decoration: BoxDecoration(
         color: FluentTheme.of(context).micaBackgroundColor,
@@ -420,7 +421,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                       runSpacing: 2,
                       children: [
                         for (var index = 4; index < sections.length; index++)
-                          sectionItem(index, minWidth: 94),
+                          sectionItem(index, minWidth: 104),
                       ],
                     ),
                   ),
