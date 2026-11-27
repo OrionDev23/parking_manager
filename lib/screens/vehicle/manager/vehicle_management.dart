@@ -235,7 +235,7 @@ class VehicleManagementState extends State<VehicleManagement>
             child: _buildMetrics(theme, allVehicles),
           ),
           const SizedBox(height: 8),
-          Expanded,
+          Expanded(
             child: loading
                 ? const Center(child: ProgressRing())
                 : vehicles.isEmpty
