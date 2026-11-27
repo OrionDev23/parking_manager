@@ -80,6 +80,16 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
       };
 
   @override
+  void didUpdateWidget(covariant _ModuleSearchLauncher oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.scope != widget.scope) {
+      _crossSearchTimer?.cancel();
+      _controller.clear();
+      _lastCrossSuggestionQuery = null;
+    }
+  }
+
+  @override
   void dispose() {
     _crossSearchTimer?.cancel();
     _controller.dispose();
@@ -232,16 +242,18 @@ class _ModuleSearchLauncherState extends State<_ModuleSearchLauncher> {
             padding: EdgeInsets.only(left: 10),
             child: Icon(FluentIcons.search, size: 15),
           ),
-          suffix: _controller.text.isEmpty
-              ? null
-              : IconButton(
-                  icon: const Icon(FluentIcons.cancel, size: 13),
-                  onPressed: () {
-                    _controller.clear();
-                    _dispatchLocalSearch('');
-                    setState(() {});
-                  },
-                ),
+          suffix: ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _controller,
+            builder: (context, value, _) => value.text.isEmpty
+                ? const SizedBox.shrink()
+                : IconButton(
+                    icon: const Icon(FluentIcons.cancel, size: 13),
+                    onPressed: () {
+                      _controller.clear();
+                      _dispatchLocalSearch('');
+                    },
+                  ),
+          ),
         ),
       ),
     );
@@ -318,10 +330,18 @@ Future<List<VehiclePart>> _searchParts(
 
   final provider = PartsProvider();
   try {
-    if (PartsProvider.errorParts && !PartsProvider.downloadingParts) {
+    if (PartsProvider.downloadingParts) {
+      for (var attempt = 0;
+          attempt < 100 && PartsProvider.downloadingParts;
+          attempt++) {
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+    } else if (PartsProvider.errorParts) {
       await provider.downloadAllParts();
     }
-    if (PartsProvider.errorParts) return const [];
+    if (PartsProvider.errorParts || PartsProvider.downloadingParts) {
+      return const [];
+    }
 
     return PartsProvider.parts.values.where((part) {
       final searchable = [
