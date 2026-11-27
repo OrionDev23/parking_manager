@@ -240,7 +240,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
               controller: _contentScrollController,
               padding: EdgeInsets.fromLTRB(
                 compact ? 12 : 16,
-                compact ? 10 : 10,
+                compact ? 8 : 8,
                 compact ? 12 : 16,
                 20,
               ),
@@ -487,9 +487,11 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Expanded(
+                Flexible(
+                  fit: FlexFit.loose,
                   child: Text(
                     model.isEmpty ? 'vehicle_details_model_missing'.tr() : model,
                     maxLines: compact ? 2 : 1,
