@@ -162,7 +162,7 @@ class _NotificationTileState extends State<NotificationTile> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Masquer cette alerte pour ce compte ? La synchronisation se fera dès que possible.'
+          'Masquer cette alerte pour ce compte ? La synchronisation se fera dès que possible.',
           style: TextStyle(
             color: theme.textColor,
             fontSize: 11,
