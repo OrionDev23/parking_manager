@@ -938,5 +938,6 @@
   "vehicle_make_category_agricultural": "Agricultural equipment",
   "vehicle_make_category_construction": "Construction equipment",
   "vehicle_make_category_industrial": "Industrial equipment",
-  "vehicle_make_category_other": "Other"
+  "vehicle_make_category_other": "Other",
+  "vehicle_doc_no_attachment": "No attachment"
 }
