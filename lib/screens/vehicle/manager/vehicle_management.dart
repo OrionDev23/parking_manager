@@ -1242,11 +1242,27 @@ class VehicleManagementState extends State<VehicleManagement>
           width: 48,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(5),
-            child: LinearProgressIndicator(
-              value: ratio,
-              minHeight: 4,
-              backgroundColor: theme.fillColor,
-              valueColor: AlwaysStoppedAnimation<Color>(theme.color),
+            child: SizedBox(
+              height: 4,
+              child: LayoutBuilder(
+                builder: (context, constraints) => Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    DecoratedBox(
+                      decoration: BoxDecoration(color: theme.fillColor),
+                    ),
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: SizedBox(
+                        width: constraints.maxWidth * ratio,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(color: theme.color),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
