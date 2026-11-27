@@ -189,6 +189,8 @@ class PanesListState extends State<PanesList>
         return ValueListenableBuilder(
           valueListenable: index,
           builder: (BuildContext context, int selectedIndex, Widget? child) {
+            final activePaneKey =
+                PaneItemsAndFooters.paneKeyForIndex(selectedIndex);
             return ParcotoNavigationShell(
               items: PaneItemsAndFooters.originalItems,
               footerItems: PaneItemsAndFooters.footerItems,
@@ -198,7 +200,7 @@ class PanesListState extends State<PanesList>
                 index.value = i;
               },
               appTheme: widget.appTheme,
-              search: const GlobalSearchLauncher(),
+              search: ContextualSearchLauncher(paneKey: activePaneKey),
               topBar: Container(
                 height: (compact
                         ? ParcotoTokens.mobileTopbarHeight
@@ -240,7 +242,7 @@ class PanesListState extends State<PanesList>
                                     ),
                                   ),
                                   const SizedBox(width: ParcotoTokens.space2),
-                                  const GlobalSearchLauncher(compact: true),
+                                  ContextualSearchLauncher(paneKey: activePaneKey, compact: true),
                                 ] else ...[
                                   Image.asset(
                                     'assets/images/logo.webp',
@@ -257,7 +259,7 @@ class PanesListState extends State<PanesList>
                                 ),
                                 const SizedBox(width: ParcotoTokens.space4),
                                 const Expanded(
-                                  child: GlobalSearchLauncher(),
+                                  child: ContextualSearchLauncher(paneKey: activePaneKey),
                                 ),
                               ] else ...[
                                 Image.asset(
