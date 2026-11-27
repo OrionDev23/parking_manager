@@ -139,6 +139,74 @@ class VehicleManagementState extends State<VehicleManagement>
       );
     }
 
+    // Mobile workspace: keep the entire fleet view in one scrollable surface.
+    // A single scroll viewport is easier to operate than a nested list-only scroller.
+    if (!splitLayout) {
+      return ScaffoldPage(
+        padding: EdgeInsets.zero,
+        content: SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+                child: Align(
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      if (showImportVehicles && DatabaseGetter().isAdmin())
+                        Button(
+                          onPressed: importList,
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(FluentIcons.open_file, size: 14),
+                              SizedBox(width: 7),
+                              Text('Importer'),
+                            ],
+                          ),
+                        ),
+                      FilledButton(
+                        onPressed: _openNewVehicle,
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(FluentIcons.add, size: 14),
+                            SizedBox(width: 7),
+                            Text('Ajouter'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _buildMetrics(theme, allVehicles),
+              ),
+              const SizedBox(height: 14),
+              if (loading)
+                const SizedBox(
+                  height: 220,
+                  child: Center(child: ProgressRing()),
+                )
+              else if (vehicles.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _buildEmptyState(theme),
+                )
+              else
+                _buildMobileFleetList(theme, vehicles, allVehicles),
+            ],
+          ),
+        ),
+      );
+    }
+
     Vehicle? selectedVehicle;
     for (final vehicle in vehicles) {
       if (vehicle.id == _selectedVehicle?.id) {
@@ -154,6 +222,7 @@ class VehicleManagementState extends State<VehicleManagement>
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const SizedBox(height: 14),
           if ((showImportVehicles && DatabaseGetter().isAdmin()) ||
               screenWidth < 1080)
             Padding(
@@ -201,7 +270,7 @@ class VehicleManagementState extends State<VehicleManagement>
             padding: EdgeInsets.symmetric(horizontal: screenWidth < 720 ? 16 : 26),
             child: _buildMetrics(theme, allVehicles),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 14),
           Expanded(
             child: loading
                 ? const Center(child: ProgressRing())
@@ -362,17 +431,23 @@ class VehicleManagementState extends State<VehicleManagement>
           child: _buildFilters(theme, allVehicles),
         ),
         const SizedBox(height: 8),
-        Expanded(
-          child: ListView.separated(
-            padding: const EdgeInsets.fromLTRB(16, 2, 16, 22),
-            itemCount: vehicles.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 8),
-            itemBuilder: (context, index) => _VehicleListTile(
-              vehicle: vehicles[index],
-              selected: false,
-              onTap: () => _openDetails(vehicles[index]),
-              theme: theme,
-            ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 2, 16, 22),
+          child: Column(
+            children: [
+              for (var index = 0; index < vehicles.length; index++)
+                Padding(
+                  padding: EdgeInsets.only(
+                    bottom: index == vehicles.length - 1 ? 0 : 8,
+                  ),
+                  child: _VehicleListTile(
+                    vehicle: vehicles[index],
+                    selected: false,
+                    onTap: () => _openDetails(vehicles[index]),
+                    theme: theme,
+                  ),
+                ),
+            ],
           ),
         ),
       ],
