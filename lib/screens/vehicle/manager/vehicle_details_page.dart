@@ -14,6 +14,7 @@ import 'package:parc_oto/providers/repair_provider.dart';
 import 'package:parc_oto/theme.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/business/fleet_dashboard_status.dart';
 import '../../../core/services/vehicle_make_service.dart';
 import '../../../screens/entreprise/entreprise.dart';
 import '../../../utilities/vehicle_detail_formatters.dart';
@@ -491,7 +492,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                 if (v.etatactuel != null) ...[
                   const SizedBox(width: 10),
                   _chip(
-                    VehiclesUtilities.getEtatName(v.etatactuel!).tr(),
+                    _vehicleOperationalLabel(),
                     _vehicleStatusColor(v.etatactuel, accent),
                   ),
                 ],
@@ -650,6 +651,25 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     final day = date.day.toString().padLeft(2, '0');
     final month = date.month.toString().padLeft(2, '0');
     return '$day/$month/${date.year}';
+  }
+
+  String _vehicleOperationalLabel() {
+    switch (FleetDashboardStatusMapper.fromLegacyCode(v.etatactuel)) {
+      case FleetDashboardStatus.available:
+        return 'En service';
+      case FleetDashboardStatus.onMission:
+        return 'En mission';
+      case FleetDashboardStatus.workshop:
+        return 'En maintenance';
+      case FleetDashboardStatus.broken:
+        return 'Immobilisé';
+      case FleetDashboardStatus.reformed:
+        return 'Réformé';
+      case FleetDashboardStatus.other:
+        return v.etatactuel == null
+            ? 'État non renseigné'
+            : VehiclesUtilities.getEtatName(v.etatactuel!).tr();
+    }
   }
 
   Color _vehicleStatusColor(int? status, Color fallback) {
@@ -1326,9 +1346,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     final assignedDriverName = driversForVehicle.length == 1
         ? driversForVehicle.single.getName().trim()
         : null;
-    final currentStatus = v.etatactuel == null
-        ? 'vehicle_not_provided'.tr()
-        : VehiclesUtilities.getEtatName(v.etatactuel!).tr();
+    final currentStatus = _vehicleOperationalLabel();
 
     return VehicleOverviewDashboard(
       showHero: false,
