@@ -918,5 +918,14 @@
   "vehicle_doc_download_failed": "Download failed",
   "vehicle_doc_issue_date_prefix": "Issued",
   "vehicle_doc_attachment_available": "Attachment available",
-  "vehicle_doc_saved": "Document saved."
+  "vehicle_doc_saved": "Document saved.",
+  "vehicle_form_administrative_identity_title": "Algerian administrative information",
+  "vehicle_form_identity_photo_title": "Vehicle identity and photo",
+  "vehicle_form_identity_photo_description": "Algerian registration and manufacturer specifications",
+  "vehicle_form_registration_section": "Algerian registration",
+  "vehicle_form_manufacturer_section": "Manufacturer specifications",
+  "vehicle_form_technical_management_section": "Technical specifications and fleet management",
+  "vehicle_form_technical_specs_subtitle": "Trim, model year, paint, engine, transmission and dimensions",
+  "vehicle_form_acquisition_section": "Acquisition and fleet follow-up",
+  "vehicle_form_company_management_subtitle": "Company-specific management data"
 }
