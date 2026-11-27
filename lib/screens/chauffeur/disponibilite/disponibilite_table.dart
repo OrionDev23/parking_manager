@@ -10,6 +10,7 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import '../../../theme.dart';
 import '../../../ui/design_system/parcoto_surface.dart';
+import '../../../ui/design_system/parcoto_tokens.dart';
 import '../../../widgets/zone_box.dart';
 import '../../data_table_parcoto.dart';
 
