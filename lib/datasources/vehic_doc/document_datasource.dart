@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:appwrite/appwrite.dart';
 import 'package:fluent_ui/fluent_ui.dart' as f;
 import 'package:material_ui/material_ui.dart';
 import 'package:parc_oto/datasources/parcoto_datasource.dart';
@@ -124,6 +125,17 @@ class DocumentsDataSource extends ParcOtoDatasource<DocumentVehicle> {
             : const Text(''),
       ),
     ];
+  }
+
+  @override
+  Future<void> deleteRelatedResources(DocumentVehicle record) async {
+    final fileId = record.fileId?.trim() ?? '';
+    final client = DatabaseGetter.client;
+    if (fileId.isEmpty || client == null) return;
+    await Storage(client).deleteFile(
+      bucketId: 'images',
+      fileId: fileId,
+    );
   }
 
   @override
